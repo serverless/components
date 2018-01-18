@@ -1,0 +1,14 @@
+name: githubWebhookReceiver@0.0.1
+
+inputs:
+    awsKey: abc
+    awsSecret: abc
+    tableName: abc
+    path: /webhook
+    method: post
+    handler: code.js
+
+components:
+    - apigateway@0.0.1
+    - dynamodb@0.0.1
+    - lambda@0.0.1

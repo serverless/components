@@ -1,0 +1,18 @@
+{
+  "name": "cli",
+  "version": "1.0.0",
+  "description": "Serverless Components CLI",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Eslam A. Hefnawy",
+  "bin": {
+    "s": "./bin/serverless"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "ramda": "^0.25.0",
+    "yamljs": "^0.3.0"
+  }
+}

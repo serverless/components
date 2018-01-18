@@ -1,0 +1,6 @@
+name: lambda@0.0.1
+
+inputs:
+    awsKey: abc
+    awsSecret: abc
+    handler: code.js

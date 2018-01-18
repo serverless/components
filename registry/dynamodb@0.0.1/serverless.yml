@@ -1,0 +1,6 @@
+name: dynamodb@0.0.1
+
+inputs:
+    awsKey: abc
+    awsSecret: abc
+    tableName: some-table-name
