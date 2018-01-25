@@ -1,5 +1,5 @@
 {
-  "name": "dynamodb",
+  "name": "apigateway",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,9 +8,7 @@
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "aws-sdk": "^2.184.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "standard": "^10.0.3"
   }

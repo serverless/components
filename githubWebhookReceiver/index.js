@@ -1,14 +1,4 @@
-module.exports.deploy = (inputs) => {
-   
-    // async logic goes here...
-        
-        
-    console.log('')
-    console.log(`Github Webhook Receiver Deployed`)
-    console.log('')
+module.exports = async (config, state) => {
 
-    const outputs = {
-        githubwebhook: 'abc'
-    }
-    return Promise.resolve(outputs)
+    return { customProp: 'hello' }
 }

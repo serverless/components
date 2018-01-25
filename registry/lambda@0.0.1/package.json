@@ -1,5 +1,5 @@
 {
-  "name": "dynamodb",
+  "name": "lambda",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,9 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.184.0"
-  },
-  "devDependencies": {
-    "standard": "^10.0.3"
+    "archiver": "^2.1.1"
   }
 }

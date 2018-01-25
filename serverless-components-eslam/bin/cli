@@ -1,0 +1,10 @@
+#!/usr/bin/env node
+
+const ServerlessComponentsEslam = require('../index')
+
+const { provision } = ServerlessComponentsEslam
+
+;(async () => {
+  const outputs = await provision()
+  // console.log(outputs)
+})()
