@@ -1,5 +1,5 @@
 {
-  "name": "serverless-components-eslam",
+  "name": "framework",
   "version": "1.0.0",
   "description": "Serverless Components Eslam",
   "main": "index.js",
@@ -8,7 +8,7 @@
   },
   "author": "Eslam A. Hefnawy",
   "bin": {
-    "provision": "./bin/cli"
+    "components": "./bin/cli"
   },
   "license": "MIT",
   "dependencies": {

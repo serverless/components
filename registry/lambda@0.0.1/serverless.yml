@@ -1,9 +1,7 @@
 name: lambda@0.0.1
 
-#config:
-#    name: serverless-components-eslam-lambda
-#    description: Serverless Components Eslam Lambda Description
-#    memory: 128
-#    timeout: 10
-#    handler: code.handler
-#    lambdaRoleName: serverless-components-eslam-lambda-role
+inputs:
+  name: lambda
+  memory: 128
+  timeout: 10
+  handler: code.handler

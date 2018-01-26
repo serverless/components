@@ -17,7 +17,9 @@ const create = async ({token, owner, repo, url, event}) => {
 
   const res = await octokit.repos.createHook(params)
 
-  return { webhookId: res.id }
+  return {
+    id: res.data.id
+  }
 }
 
 const update = async ({token, owner, repo, url, event}, id) => {
@@ -36,9 +38,11 @@ const update = async ({token, owner, repo, url, event}, id) => {
     active: true
   }
 
-  await octokit.repos.editHook(params)
+  const res = await octokit.repos.editHook(params)
 
-  return { webhookId: id }
+  return {
+    id: res.data.id
+  }
 }
 
 const remove = async ({token, owner, repo}, id) => {
@@ -49,23 +53,23 @@ const remove = async ({token, owner, repo}, id) => {
 
   await octokit.repos.deleteHook({owner, repo, id})
 
-  return { webhookId: null }
+  return {
+    id: null
+  }
 }
 
 module.exports = async (config, state) => {
   let outputs
-  if (!config.token && !state.token) {
-    console.log('Skipping Github: no token provided')
-  } else if (!state.webhookId) {
+  if (!state.id) {
     console.log('Creating Github Webhook')
     outputs = await create(config)
-  } else if (state.webhookId && config.token && config.owner && config.repo && config.url && config.event) {
+  } else if (state.id && config.token && config.owner && config.repo && config.url && config.event) {
     console.log('Updating Github Webhook')
-    outputs = await update(config, state.webhookId)
+    outputs = await update(config, state.id)
   } else {
-    console.log('Removing Github Webhook:')
-    outputs = await remove(config, state.webhookid)
+    console.log('Removing Github Webhook')
+    outputs = await remove(config, state.id)
   }
-  console.log('Done')
+  console.log('')
   return outputs
 }

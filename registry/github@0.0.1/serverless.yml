@@ -1,5 +1,8 @@
-name: dynamodb@0.0.1
+name: github@0.0.1
 
 inputs:
-    awsKey: abc
-    awsSecret: abc
+  token: ${GITHUB_TOKEN}
+  owner: serverless
+  repo: components-eslam
+  url: https://serverless.com
+  event: push

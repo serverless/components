@@ -1,0 +1,27 @@
+#!/usr/bin/env node
+
+const R = require('ramda')
+const Serverless = require('../index')
+
+const { forEachObjIndexed } = R
+const { Components } = Serverless
+
+;(async () => {
+  const command = process.argv[3]
+
+  let outputs
+
+  if (command === 'deploy') {
+    outputs = await Components()
+  } else if (command === 'remove') {
+    outputs = await Components(false)
+  } else {
+    throw new Error(`Command "${command}" not supported`)
+  }
+  console.log('')
+  console.log('  Outputs')
+  console.log(forEachObjIndexed((outputValue, outputKey) => {
+    console.log(`    ${outputKey}  ${outputValue}`)
+  }, outputs))
+  console.log('')
+})()

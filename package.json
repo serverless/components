@@ -1,0 +1,14 @@
+{
+  "name": "components-eslam",
+  "version": "1.0.0",
+  "description": "Serverless Components Eslam",
+  "scripts": {
+    "setup": "./setup.sh"
+  },
+  "author": "Eslam A. Hefnawy",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "standard": "^10.0.3"
+  }
+}

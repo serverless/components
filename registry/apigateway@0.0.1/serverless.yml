@@ -1,7 +1,7 @@
 name: apigateway@0.0.1
 
 inputs:
-    awsKey: abc
-    awsSecret: abc
-    path: /webhook
-    method: post
+  name: apigateway
+  method: POST
+  path: /hello
+  lambda: ""

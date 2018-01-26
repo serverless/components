@@ -1,0 +1,38 @@
+name: github-webhook-receiver@0.0.1
+
+inputs:
+  lambdaArn: ${lambda:arn}
+  lambdaRoleArn: ${lambda:roleArn}
+  apiId: ${apigateway:id
+  apiRoleArn: ${apigateway:roleArn}
+  url: ${apigateway:url}
+  tableName: ${dynamodb:name}
+  webhookId: ${github:id}
+
+components:
+  dynamodb:
+    type: dynamodb@0.0.1
+    inputs:
+      name: github-webhook-receiver
+  lambda:
+    type: lambda@0.0.1
+    inputs:
+      name: github-webhook-receiver-3
+      memory: 128
+      timeout: 10
+      handler: code.handler
+  apigateway:
+    type: apigateway@0.0.1
+    inputs:
+      name: github-webhook-receiver
+      method: POST
+      path: /github/webhook
+      lambda: ${lambda:arn}
+  github:
+    type: github@0.0.1
+    inputs:
+      token: ${GITHUB_TOKEN}
+      owner: serverless
+      repo: components-eslam
+      url: ${apigateway:url}
+      event: pull_request

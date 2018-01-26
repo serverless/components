@@ -1,8 +1,9 @@
-const AWS = require('aws-sdk')
+const ServerlessComponentsEslam = require('serverless-components-eslam')
+const { AWS } = ServerlessComponentsEslam
 
-const createTable = (tableName) => {
-  // todo get api keys from inputs
-  const dynamodb = new AWS.DynamoDB({ region: 'us-east-1' }) // todo move to inputs
+const dynamodb = new AWS.DynamoDB({ region: 'us-east-1' })
+
+const create = (name) => {
   const params = {
     AttributeDefinitions: [
       {
@@ -20,39 +21,36 @@ const createTable = (tableName) => {
       ReadCapacityUnits: 1,
       WriteCapacityUnits: 1
     },
-    TableName: tableName
+    TableName: name
   }
 
   return dynamodb.createTable(params).promise()
 }
 
-const deleteTable = (tableName) => {
-  // todo get api keys from inputs
-  const dynamodb = new AWS.DynamoDB({ region: 'us-east-1' }) // todo move to inputs
+const remove = (name) => {
   const params = {
-    TableName: tableName
+    TableName: name
   }
 
   return dynamodb.deleteTable(params).promise()
 }
 
 module.exports = async (inputs, state) => {
-  if (state.tableName === inputs.tableName) {
-    console.log('DynamoDB is up to date!')
-  } else if (!state.tableName && inputs.tableName) {
-    await createTable(inputs.tableName)
-    console.log(`Table ${inputs.tableName} created`)
-  } else if (!inputs.tableName && state.tableName) {
-    await deleteTable(state.tableName)
-    console.log(`Table ${state.tableName} deleted`)
-  } else if (state.tableName !== inputs.tableName) {
-    await deleteTable(state.tableName)
-    console.log(`Table ${state.tableName} deleted`)
-    await createTable(inputs.tableName)
-    console.log(`Table ${inputs.tableName} created`)
+  if (!state.name && inputs.name) {
+    console.log(`Creating Table: ${inputs.name}`)
+    await create(inputs.name)
+  } else if (!inputs.name && state.name) {
+    console.log(`Removing Table: ${state.name}`)
+    await remove(state.name)
+  } else if (state.name !== inputs.name) {
+    console.log(`Removing Table: ${state.name}`)
+    await remove(state.name)
+    console.log(`Creating Table: ${inputs.name}`)
+    await create(inputs.name)
   }
+  console.log('')
   const outputs = {
-    table: inputs.tableName
+    name: inputs.name
   }
   return outputs
 }

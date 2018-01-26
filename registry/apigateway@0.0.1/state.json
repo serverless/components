@@ -1,9 +1,0 @@
-{
-  "apiId": "aosyo7yvqd",
-  "apiRoleArn": "arn:aws:iam::552750238299:role/apig-serverless-components-eslam-api-2",
-  "endpoint": "https://aosyo7yvqd.execute-api.us-east-1.amazonaws.com/dev/github/webhook/test",
-  "lambdaArn": "arn:aws:lambda:us-east-1:552750238299:function:serverless-components-eslam-lambda-2",
-  "name": "serverless-components-eslam-api-2",
-  "method": "GET",
-  "path": "/github/webhook/test"
-}

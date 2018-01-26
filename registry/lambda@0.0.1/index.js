@@ -26,10 +26,14 @@ const create = async ({ name, handler, memory, timeout, description }) => {
     Timeout: timeout
   }
 
-  return lambda.createFunction(params).promise()
+  const res = await lambda.createFunction(params).promise()
+  return {
+    arn: res.FunctionArn,
+    roleArn: res.Role
+  }
 }
 
-const update = async ({ name, handler, memory, timeout, description }, lambdaRoleArn) => {
+const update = async ({ name, handler, memory, timeout, description }) => {
   const pkg = await pack()
   const functionCodeParams = {
     FunctionName: name,
@@ -42,13 +46,17 @@ const update = async ({ name, handler, memory, timeout, description }, lambdaRol
     Description: description,
     Handler: handler,
     MemorySize: memory,
-    Role: lambdaRoleArn,
     Runtime: 'nodejs6.10',
     Timeout: timeout
   }
 
-  await lambda.updateFunctionConfiguration(functionConfigParams).promise()
-  return lambda.updateFunctionCode(functionCodeParams).promise()
+  await lambda.updateFunctionCode(functionCodeParams).promise()
+  const res = await lambda.updateFunctionConfiguration(functionConfigParams).promise()
+
+  return {
+    arn: res.FunctionArn,
+    roleArn: res.Role
+  }
 }
 
 const remove = async (name) => {
@@ -57,37 +65,30 @@ const remove = async (name) => {
     FunctionName: name
   }
 
-  return lambda.deleteFunction(params).promise()
+  await lambda.deleteFunction(params).promise()
+  return {
+    arn: null,
+    roleArn: null
+  }
 }
 
-module.exports = async (config, state) => {
-  let outputs = {
-    lambdaArn: null,
-    lambdaRoleArn: null
-  }
-  if (!config.name && !state.name) {
-    console.log('Skipping Lambda: no function name provided')
-  } else if (config.name && !state.name) {
-    console.log(`Creating Lambda: ${config.name}`)
-    const res = await create(config)
-    outputs.lambdaArn = res.FunctionArn
-    outputs.lambdaRoleArn = res.Role
-  } else if (state.name && !config.name) {
+module.exports = async (inputs, state) => {
+  let outputs
+  if (inputs.name && !state.name) {
+    console.log(`Creating Lambda: ${inputs.name}`)
+    outputs = await create(inputs)
+  } else if (state.name && !inputs.name) {
+    console.log(`Removing Lambda: ${state.name}`)
+    outputs = await remove(state.name)
+  } else if (inputs.name !== state.name) {
     console.log(`Removing Lambda: ${state.name}`)
     await remove(state.name)
-  } else if (config.name !== state.name) {
-    console.log(`Removing Lambda: ${state.name}`)
-    await remove(state.name)
-    console.log(`Creating Lambda: ${config.name}`)
-    const res = await create(config)
-    outputs.lambdaArn = res.FunctionArn
-    outputs.lambdaRoleArn = res.Role
+    console.log(`Creating Lambda: ${inputs.name}`)
+    outputs = await create(inputs)
   } else {
-    console.log(`Updating Lambda: ${config.name}`)
-    await update(config, state.lambdaRoleArn)
-    outputs.lambdaRoleArn = state.lambdaRoleArn
-    outputs.lambdaArn = state.lambdaArn
+    console.log(`Updating Lambda: ${inputs.name}`)
+    outputs = await update(inputs)
   }
-  console.log('Done')
+  console.log('')
   return outputs
 }

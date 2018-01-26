@@ -9,9 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@octokit/rest": "^0.0.0-semantically-released"
-  },
-  "devDependencies": {
-    "standard": "^10.0.3"
+    "@octokit/rest": "^14.0.5"
   }
 }
