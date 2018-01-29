@@ -7,7 +7,9 @@
   },
   "author": "Eslam A. Hefnawy",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "axios": "^0.17.1"
+  },
   "devDependencies": {
     "standard": "^10.0.3"
   }

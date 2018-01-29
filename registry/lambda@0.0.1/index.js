@@ -10,7 +10,7 @@ const lambda = new AWS.Lambda({ region: 'us-east-1' })
 const create = async ({ name, handler, memory, timeout, description }) => {
   const lambdaRoleArn = await createRole(name)
   const pkg = await pack()
-  await BbPromise.delay(10000)
+  await BbPromise.delay(15000)
 
   const params = {
     FunctionName: name,

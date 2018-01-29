@@ -17,7 +17,7 @@ components:
   lambda:
     type: lambda@0.0.1
     inputs:
-      name: github-webhook-receiver-2
+      name: github-webhook-receiver
       memory: 128
       timeout: 10
       handler: code.handler
@@ -26,7 +26,7 @@ components:
     inputs:
       name: github-webhook-receiver
       method: POST
-      path: /github/webhook
+      path: /github/webhook/test
       lambda: ${lambda:arn}
   github:
     type: github@0.0.1

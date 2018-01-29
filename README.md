@@ -69,22 +69,33 @@ components deploy
 
 ## 4. Test
 
-Add a custom command named `components test` by creating a `test.js` file in the current working directory. Looking like this:
+I've already added a custom command named `components test` by creating a `test.js` file in the current working directory. it looks like this.
 
 ```js
 
-module.exports = async (inputs, state) => {
-  /*
-   * Custom lifecyle logic here
-   */
-  console.log(`Testing endpoint: ${state.url}`)
+const axios = require('axios')
 
-  return {}
+module.exports = async (inputs, state) => {
+  console.log(`Testing Endpoint: ${state.url}`)
+
+  try {
+    const res = await axios({
+      method: 'post',
+      url: state.url,
+      data: {}
+    })
+    console.log('')
+    console.log('Result:')
+    console.log(res.data)
+  } catch (e) {
+    throw new Error(e)
+  }
 }
+
 
 ```
 
-Then run `components test`
+Then run `components test`. You can add another one under a different name.
 
 ## 5. Remove
 

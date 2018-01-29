@@ -10,7 +10,10 @@ const create = async ({token, owner, repo, url, event}) => {
     name: 'web',
     owner,
     repo,
-    config: {url},
+    config: {
+      url,
+      content_type: 'json'
+    },
     events: [event],
     active: true
   }
@@ -33,7 +36,10 @@ const update = async ({token, owner, repo, url, event}, id) => {
     id,
     owner,
     repo,
-    config: {url},
+    config: {
+      url,
+      content_type: 'json'
+    },
     events: [event],
     active: true
   }

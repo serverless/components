@@ -22,7 +22,7 @@ const remove = async (name, id) => {
 
 const create = async ({ name, lambda, path, method }) => {
   const apiRoleArn = await createRole(name)
-  await BbPromise.delay(10000)
+  await BbPromise.delay(15000)
 
   const swagger = getSwaggerDefinition(name, lambda, path, method, apiRoleArn)
   const json = JSON.stringify(swagger)
@@ -61,8 +61,12 @@ const update = async ({ name, lambda, path, method }, id, apiRoleArn) => {
 }
 
 module.exports = async (inputs, state) => {
+  const noChanges = (inputs.name === state.name && inputs.method === state.method &&
+    inputs.path === state.path && inputs.lambda === state.lambda)
   let outputs
-  if (inputs.name && !state.name) {
+  if (noChanges) {
+    outputs = state
+  } else if (inputs.name && !state.name) {
     console.log(`Creating APIG: ${inputs.name}`)
     outputs = await create(inputs)
   } else if (state.name && !inputs.name) {
