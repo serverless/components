@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "Serverless Components Eslam",
   "scripts": {
-    "setup": "./setup.sh"
+    "setup": "./setup.sh",
+    "clean": "./clean.sh"
   },
   "author": "Eslam A. Hefnawy",
   "license": "MIT",

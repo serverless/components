@@ -1,3 +1,4 @@
+npm install
 cd framework
 npm install
 cd ../github-webhook-receiver@0.0.1
