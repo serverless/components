@@ -58,14 +58,18 @@ const remove = async ({token, owner, repo}, id) => {
   }
 }
 
-module.exports = async (config, state) => {
+module.exports = async (inputs, state) => {
+  const noChanges = (inputs.token === state.token && inputs.owner === state.owner &&
+    inputs.repo === state.repo && inputs.url === state.url && inputs.event === state.event)
   let outputs
-  if (!state.id) {
+  if (noChanges) {
+    outputs = { id: state.id }
+  } else if (!state.id) {
     console.log('Creating Github Webhook')
-    outputs = await create(config)
-  } else if (state.id && config.token && config.owner && config.repo && config.url && config.event) {
+    outputs = await create(inputs)
+  } else if (state.id && inputs.token && inputs.owner && inputs.repo && inputs.url && inputs.event) {
     console.log('Updating Github Webhook')
-    outputs = await update(config, state.id)
+    outputs = await update(inputs, state.id)
   } else {
     console.log('Removing Github Webhook')
     outputs = await remove(state, state.id)

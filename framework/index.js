@@ -92,8 +92,23 @@ const Components = async (deploy = true, componentRoot = process.cwd(), inputs =
   return outputs
 }
 
+const runCommand = async (command) => {
+  const commandLogicPath = path.join(process.cwd(), `${command}.js`)
+
+  if (!await fileExists(commandLogicPath)) {
+    throw new Error(`Command ${command} does not exist`)
+  }
+
+  const commandLogic = require(commandLogicPath)
+
+  const state = await getState(process.cwd())
+
+  return commandLogic({}, state) // todo, resolve inputs
+}
+
 module.exports = {
   Components,
+  runCommand,
   AWS,
   BbPromise,
   ...utils
