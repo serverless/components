@@ -1,1 +1,3 @@
-module.exports = async (inputs, state) => inputs
+module.exports = async (inputs, state) => {
+  return {}
+}

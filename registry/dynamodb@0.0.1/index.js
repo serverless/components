@@ -1,5 +1,5 @@
-const ServerlessComponentsEslam = require('serverless-components-eslam')
-const { AWS } = ServerlessComponentsEslam
+const Serverless = require('framework')
+const { AWS } = Serverless
 
 const dynamodb = new AWS.DynamoDB({ region: 'us-east-1' })
 
@@ -48,7 +48,6 @@ module.exports = async (inputs, state) => {
     console.log(`Creating Table: ${inputs.name}`)
     await create(inputs.name)
   }
-  console.log('')
   const outputs = {
     name: inputs.name
   }

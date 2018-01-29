@@ -8,5 +8,7 @@
   },
   "author": "",
   "license": "MIT",
-  "dependencies": {}
+  "dependencies": {
+    "framework": "file:../../framework"
+  }
 }

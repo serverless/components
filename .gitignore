@@ -34,3 +34,5 @@ default.etcd
 
 .serverlessrc
 .serverless
+
+state.json

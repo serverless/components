@@ -1,9 +1,9 @@
-const ServerlessComponentsEslam = require('serverless-components-eslam')
+const Serverless = require('framework')
 const pack = require('./utils/pack')
 const createRole = require('./utils/createRole')
 const removeRole = require('./utils/removeRole')
 
-const { AWS, BbPromise } = ServerlessComponentsEslam
+const { AWS, BbPromise } = Serverless
 
 const lambda = new AWS.Lambda({ region: 'us-east-1' })
 
@@ -89,6 +89,5 @@ module.exports = async (inputs, state) => {
     console.log(`Updating Lambda: ${inputs.name}`)
     outputs = await update(inputs)
   }
-  console.log('')
   return outputs
 }

@@ -1,9 +1,9 @@
-const ServerlessComponentsEslam = require('serverless-components-eslam')
+const Serverless = require('framework')
 const getSwaggerDefinition = require('./utils/getSwaggerDefinition')
 const createRole = require('./utils/createRole')
 const removeRole = require('./utils/removeRole')
 
-const { AWS, BbPromise } = ServerlessComponentsEslam
+const { AWS, BbPromise } = Serverless
 
 const APIGateway = new AWS.APIGateway({region: 'us-east-1'})
 
@@ -77,6 +77,5 @@ module.exports = async (inputs, state) => {
     console.log(`Updating APIG: ${inputs.name}`)
     outputs = await update(inputs, state.id, state.roleArn)
   }
-  console.log('')
   return outputs
 }

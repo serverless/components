@@ -1,0 +1,17 @@
+#!/usr/bin/env node
+
+const Serverless = require('../index')
+
+const {Components} = Serverless
+
+;(async () => {
+  const command = process.argv[2]
+
+  if (command === 'deploy') {
+    await Components()
+  } else if (command === 'remove') {
+    await Components(false)
+  } else {
+    throw new Error(`Command "${command}" not supported`)
+  }
+})().catch(e => console.log(e))

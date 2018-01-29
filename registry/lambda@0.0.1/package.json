@@ -9,6 +9,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "archiver": "^2.1.1"
+    "archiver": "^2.1.1",
+    "framework": "file:../../framework"
   }
 }

@@ -1,3 +1,3 @@
 module.exports.handler = (e, ctx, cb) => {
-  cb(null, { statusCode: 200, body: 'success' })
+  cb(null, { statusCode: 200, body: 'hello world' })
 }

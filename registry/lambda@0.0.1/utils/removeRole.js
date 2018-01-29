@@ -1,5 +1,5 @@
-const ServerlessComponentsEslam = require('serverless-components-eslam')
-const { AWS } = ServerlessComponentsEslam
+const Serverless = require('framework')
+const { AWS } = Serverless
 
 const IAM = new AWS.IAM({region: 'us-east-1'})
 

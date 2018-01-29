@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@octokit/rest": "^14.0.5"
+    "@octokit/rest": "^14.0.5",
+    "framework": "file:../../framework"
   }
 }

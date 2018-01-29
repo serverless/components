@@ -3,7 +3,7 @@ const octokit = require('@octokit/rest')()
 const create = async ({token, owner, repo, url, event}) => {
   octokit.authenticate({
     type: 'token',
-    token: token
+    token: token || process.env.GITHUB_TOKEN
   })
 
   const params = {
@@ -48,7 +48,7 @@ const update = async ({token, owner, repo, url, event}, id) => {
 const remove = async ({token, owner, repo}, id) => {
   octokit.authenticate({
     type: 'token',
-    token: token
+    token: token || process.env.GITHUB_TOKEN
   })
 
   await octokit.repos.deleteHook({owner, repo, id})
@@ -68,8 +68,7 @@ module.exports = async (config, state) => {
     outputs = await update(config, state.id)
   } else {
     console.log('Removing Github Webhook')
-    outputs = await remove(config, state.id)
+    outputs = await remove(state, state.id)
   }
-  console.log('')
   return outputs
 }

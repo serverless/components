@@ -1,9 +1,9 @@
 const path = require('path')
 const archiver = require('archiver')
 const os = require('os')
-const ServerlessComponentsEslam = require('serverless-components-eslam') // get it from somewhere!
+const Serverless = require('framework')
 
-const { fse } = ServerlessComponentsEslam
+const { fse } = Serverless
 
 module.exports = async () => {
   const outputFileName = `${String(Date.now())}.zip`
