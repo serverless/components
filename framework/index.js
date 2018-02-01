@@ -63,9 +63,30 @@ const resolveOutputReferences = (inputs, outputs) => {
   return map(resolveValue, inputs)
 }
 
+const determineOperation = (inputs, state) => {
+
+  let operation = 'update'
+
+  const obj = {
+    operation: 'update',
+    args: mergeDeepRight(inputs, state)
+  }
+
+  mapObjIndexed((definition, input) => {
+    if (is(true, definition.teardown) && (!definition.value && state[input])) {
+      obj.operation = 'create'
+    }
+  }, inputs)
+
+
+}
+
 const Components = async (deploy = true, componentRoot = process.cwd(), inputs = {}) => {
   const slsYml = await readFile(path.join(componentRoot, 'serverless.yml'))
-  inputs = mergeDeepRight(slsYml.inputs || {}, inputs)
+  const inputDefinitions = slsYml.inputs
+  const defaultInputValues = mapObjIndexed((input, definition) => input.default, inputDefinitions)
+
+  inputs = mergeDeepRight(defaultInputValues || {}, inputs)
   const nestedComponents = resolveNestedComponentsRoots(slsYml.components || {})
   let state = await getState(componentRoot)
 
