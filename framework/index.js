@@ -195,9 +195,49 @@ const getGraph = async () => {
   return graph
 }
 
+const getDependenciesOutputs = (componentId, graph) => {
+  const component = graph.data[componentId]
+  return reduce((accum, dependencyId) => {
+    accum[dependencyId] = graph.data[dependencyId].outputs
+    return accum
+  }, {}, component.dependencies)
+}
+
+const resolveOutputReferences = (inputs, outputs) => {
+  const regex = RegExp('\\${([ ~:a-zA-Z0-9._\'",\\-\\/\\(\\)]+?)}', 'g') // eslint-disable-line
+
+  const resolveValue = (value) => {
+    if (is(Object, value) || is(Array, value)) {
+      return map(resolveValue, value)
+    }
+
+    if (is(String, value) && test(regex, value)) {
+      const referencedOutput = replace(/[${}]/g, '', match(regex, value)[0]) // todo support multiple matches in single value?
+      if (referencedOutput.split(':').length === 1) {
+        return process.env[referencedOutput]
+      }
+      let referencedComponentId = referencedOutput.split(':')
+      const referencedOutputKey = referencedComponentId.pop()
+      referencedComponentId = referencedComponentId.join(':')
+
+      if (not(contains(referencedComponentId, keys(outputs)))) {
+        throw new Error(`Component "${referencedComponentId}" does not exist or has not yet been provisioned`)
+      }
+      if (not(contains(referencedOutputKey, keys(outputs[referencedComponentId])))) {
+        throw new Error(`Component "${referencedComponentId}" does not output "${referencedOutputKey}"`)
+      }
+      return outputs[referencedComponentId][referencedOutputKey]
+    }
+    return value
+  }
+  return map(resolveValue, inputs)
+}
+
 const executeComponent = async (componentId, graph) => {
   const component = graph.data[componentId]
-  component.outputs = await component.fn(component.inputs)
+  const dependenciesOutputs = getDependenciesOutputs(componentId, graph)
+  const inputs = resolveOutputReferences(component.inputs, dependenciesOutputs)
+  component.outputs = await component.fn(inputs)
   graph.nodes.removeNode(componentId)
 }
 

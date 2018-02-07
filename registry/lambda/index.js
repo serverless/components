@@ -86,6 +86,7 @@ const remove = async (name) => {
 // }
 module.exports = async (inputs) => {
   console.log('lambda')
+  console.log(inputs)
   await BbPromise.delay(1000)
-  return {}
+  return { arn: 'lambda-function' }
 }

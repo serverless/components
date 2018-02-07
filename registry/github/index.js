@@ -86,6 +86,7 @@ const remove = async ({token, owner, repo}, id) => {
 // }
 module.exports = async (inputs) => {
   console.log('github')
+  console.log(inputs)
   await BbPromise.delay(1000)
   return {}
 }

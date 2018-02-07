@@ -78,6 +78,7 @@ const update = async ({ name, lambda, path, method }, id, role) => {
 // }
 module.exports = async (inputs) => {
   console.log('apigateway')
+  console.log(inputs)
   await BbPromise.delay(1000)
-  return {}
+  return { url: 'serverless.com' }
 }

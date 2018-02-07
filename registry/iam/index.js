@@ -63,7 +63,6 @@ const remove = async (name) => {
 // }
 module.exports = async (inputs) => {
   console.log('iam')
-  console.log(inputs)
   await BbPromise.delay(2000)
-  return {}
+  return { arn: 'iam-role' }
 }
