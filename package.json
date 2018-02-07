@@ -9,7 +9,8 @@
   "author": "Eslam A. Hefnawy",
   "license": "MIT",
   "dependencies": {
-    "axios": "^0.17.1"
+    "axios": "^0.17.1",
+    "graphlib": "^2.1.5"
   },
   "devDependencies": {
     "standard": "^10.0.3"

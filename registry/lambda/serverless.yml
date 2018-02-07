@@ -1,0 +1,14 @@
+name: lambda
+
+inputs:
+  name: lambda
+  memory: 128
+  timeout: 10
+  handler: code.handler
+  role: ${role:arn}
+
+components:
+  role:
+    type: iam
+    inputs:
+      name: lambda-role

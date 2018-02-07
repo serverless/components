@@ -1,30 +1,25 @@
 const Serverless = require('framework')
 const getSwaggerDefinition = require('./utils/getSwaggerDefinition')
-const createRole = require('./utils/createRole')
-const removeRole = require('./utils/removeRole')
 
 const { AWS, BbPromise } = Serverless
 
 const APIGateway = new AWS.APIGateway({region: 'us-east-1'})
 
 const remove = async (name, id) => {
-  await removeRole(name)
   await APIGateway.deleteRestApi({
     restApiId: id
   }).promise()
   const outputs = {
     id: null,
-    roleArn: null,
     url: null
   }
   return outputs
 }
 
-const create = async ({ name, lambda, path, method }) => {
-  const apiRoleArn = await createRole(name)
+const create = async ({ name, lambda, path, method, role }) => {
   await BbPromise.delay(15000)
 
-  const swagger = getSwaggerDefinition(name, lambda, path, method, apiRoleArn)
+  const swagger = getSwaggerDefinition(name, lambda, path, method, role)
   const json = JSON.stringify(swagger)
 
   const res = await APIGateway.importRestApi({
@@ -35,14 +30,13 @@ const create = async ({ name, lambda, path, method }) => {
 
   const outputs = {
     id: res.id,
-    roleArn: apiRoleArn,
     url: `https://${res.id}.execute-api.us-east-1.amazonaws.com/dev/${path.replace(/^\/+/, '')}`
   }
   return outputs
 }
 
-const update = async ({ name, lambda, path, method }, id, apiRoleArn) => {
-  const swagger = getSwaggerDefinition(name, lambda, path, method, apiRoleArn)
+const update = async ({ name, lambda, path, method }, id, role) => {
+  const swagger = getSwaggerDefinition(name, lambda, path, method, role)
   const json = JSON.stringify(swagger)
 
   await APIGateway.putRestApi({
@@ -54,7 +48,6 @@ const update = async ({ name, lambda, path, method }, id, apiRoleArn) => {
 
   const outputs = {
     id,
-    roleArn: apiRoleArn,
     url: `https://${id}.execute-api.us-east-1.amazonaws.com/dev/${path.replace(/^\/+/, '')}`
   }
   return outputs
@@ -62,7 +55,7 @@ const update = async ({ name, lambda, path, method }, id, apiRoleArn) => {
 
 module.exports = async (inputs, state) => {
   const noChanges = (inputs.name === state.name && inputs.method === state.method &&
-    inputs.path === state.path && inputs.lambda === state.lambda)
+    inputs.path === state.path && inputs.lambda === state.lambda && inputs.role === state.role)
   let outputs
   if (noChanges) {
     outputs = state

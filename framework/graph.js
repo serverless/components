@@ -5,25 +5,16 @@ const R = require('ramda')
 const BbPromise = require('bluebird')
 const utils = require('./utils')
 
-const { readFile } = utils
-const { reduce, mergeDeepRight, isEmpty, map, keys, forEach, forEachObjIndexed, not, is, test, replace, contains, match } = R
-/*
- * dynamodb
- *
- * github-webhook
- *   |- apigateway
- *     |- apig-iam
- *     |- lambda
- *       |- lambda-iam
- *
- */
+const { readFile, fileExists, writeFile } = utils
+const { reduce, mergeDeepRight, forEachObjIndexed, mapObjIndexed, is, isEmpty, keys, map, contains, not, test, match, replace, forEach } = R
+
 const components = {
-  'github-webhook-receiver:dynamodb': {
-    type: 'dynamodb@0.0.1',
+  'github-webhook-receiver': {
+    type: 'github-webhook-receiver@0.0.1',
     inputs: {},
     outputs: {},
     fn: async (inputs) => {
-      console.log('dynamodb')
+      console.log('github-webhook-receiver')
       await BbPromise.delay(1000)
     },
     dependencies: []
@@ -83,52 +74,15 @@ const components = {
       await BbPromise.delay(1000)
     },
     dependencies: ['github-webhook-receiver:lambda', 'github-webhook-receiver:apig:iam']
-  },
-  'github-webhook-receiver:github': {
-    type: 'github@0.0.1',
-    inputs: {
-    },
-    outputs: {},
-    fn: async (inputs) => {
-      console.log('github-webhook')
-      await BbPromise.delay(1000)
-    },
-    dependencies: ['github-webhook-receiver:apig']
   }
-}
-
-const normalizeInputs = (inputs, componentId) => {
-  const regex = RegExp('\\${([ ~:a-zA-Z0-9._\'",\\-\\/\\(\\)]+?)}', 'g') // eslint-disable-line
-  const normalizeInput = (input) => {
-    if (is(Object, input) || is(Array, input)) {
-      return map(normalizeInput, input)
-    }
-
-    if (is(String, input) && test(regex, input)) {
-      const referencedOutput = replace(/[${}]/g, '', match(regex, input)[0]) // todo support multiple matches in single value?
-      if (referencedOutput.split(':').length === 1) {
-        return input
-      }
-      const referencedComponentAlias = referencedOutput.split(':')[0]
-      const referencedOutputKey = referencedOutput.split(':')[1] // todo support deep nested outputs?
-
-      return `\${${componentId}:${referencedComponentAlias}:${referencedOutputKey}}`
-    }
-    return input
-  }
-
-  return map(normalizeInput, inputs)
 }
 
 const getComponents = async (componentRoot = process.cwd(), inputs = {}, componentId, components = {}) => {
   const slsYml = await readFile(path.join(componentRoot, 'serverless.yml'))
+  inputs = mergeDeepRight(slsYml.inputs || {}, inputs)
   if (!componentId) {
     componentId = slsYml.name
   }
-  inputs = mergeDeepRight(slsYml.inputs || {}, inputs)
-  const relativeComponentId = componentId.split(':')
-  relativeComponentId.splice(-1,1)
-  inputs = normalizeInputs(inputs, componentId)
 
   const nestedComponents = await reduce(async (accum, componentAlias) => {
     accum = await Promise.resolve(accum)
@@ -153,20 +107,22 @@ const getComponents = async (componentRoot = process.cwd(), inputs = {}, compone
 const getGraph = async () => {
   const graph = {
     nodes: new Graph(),
-    data: components
+    data: await getComponents()
   }
 
-  forEach((componentId) => {
-    graph.nodes.setNode(componentId)
-  }, keys(components))
+  // console.log(graph.data)
 
-  forEachObjIndexed((component, componentId) => {
-    if (not(isEmpty(component.dependencies))) {
-      forEach((dependencyId) => {
-        graph.nodes.setEdge(componentId, dependencyId)
-      }, component.dependencies)
-    }
-  }, graph.data)
+  // forEach((componentId) => {
+  //   graph.nodes.setNode(componentId)
+  // }, keys(components))
+  //
+  // forEachObjIndexed((componentData, componentId) => {
+  //   if (not(isEmpty(componentData.dependencies))) {
+  //     forEach((dependencyId) => {
+  //       graph.nodes.setEdge(componentId, dependencyId)
+  //     }, componentData.dependencies)
+  //   }
+  // }, components)
   return graph
 }
 
@@ -190,7 +146,8 @@ const execute = async (graph) => {
 
 const Components = async () => {
   const graph = await getGraph(components)
-  return execute(graph)
+  console.log(graph.data)
+  // return execute(graph)
 }
 
 module.exports = {

@@ -14,6 +14,7 @@
   "dependencies": {
     "aws-sdk": "^2.185.0",
     "bluebird": "^3.5.1",
+    "dependency-graph": "^0.7.0",
     "fs-extra": "^5.0.0",
     "js-yaml": "^3.10.0",
     "ramda": "^0.25.0"

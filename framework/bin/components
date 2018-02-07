@@ -2,7 +2,7 @@
 
 const Serverless = require('../index')
 
-const {Components, runCommand} = Serverless
+const {Components} = Serverless
 
 ;(async () => {
   const command = process.argv[2]
@@ -12,6 +12,6 @@ const {Components, runCommand} = Serverless
   } else if (command === 'remove') {
     await Components(false)
   } else {
-    await runCommand(command)
+    // await runCommand(command)
   }
 })().catch(e => console.log(e))

@@ -1,0 +1,14 @@
+name: apigateway
+
+inputs:
+  name: apigateway
+  method: POST
+  path: /hello
+  lambda: ""
+  role: ${role:arn}
+
+components:
+  role:
+    type: iam
+    inputs:
+      name: apig-role

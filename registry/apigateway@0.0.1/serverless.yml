@@ -1,7 +1,0 @@
-name: apigateway@0.0.1
-
-inputs:
-  name: apigateway
-  method: POST
-  path: /hello
-  lambda: ""
