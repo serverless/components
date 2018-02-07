@@ -6,7 +6,7 @@ const BbPromise = require('bluebird')
 const utils = require('./utils')
 
 const { readFile } = utils
-const { reduce, mergeDeepRight, isEmpty, map, keys, forEach, forEachObjIndexed, not, is, test, replace, contains, match } = R
+const { reduce, mergeDeepRight, isEmpty, map, reject, isNil, keys, forEach, forEachObjIndexed, not, is, test, replace, contains, match } = R
 /*
  * dynamodb
  *
@@ -125,10 +125,15 @@ const getComponents = async (componentRoot = process.cwd(), inputs = {}, compone
   if (!componentId) {
     componentId = slsYml.name
   }
-  inputs = mergeDeepRight(slsYml.inputs || {}, inputs)
+  let inlineInputs = slsYml.inputs || {}
+  inlineInputs = normalizeInputs(inlineInputs, componentId)
+
+  let parentInputs = inputs
   const relativeComponentId = componentId.split(':')
-  relativeComponentId.splice(-1,1)
-  inputs = normalizeInputs(inputs, componentId)
+  relativeComponentId.splice(-1, 1)
+  parentInputs = normalizeInputs(parentInputs, relativeComponentId)
+
+  inputs = mergeDeepRight(inlineInputs, parentInputs)
 
   const nestedComponents = await reduce(async (accum, componentAlias) => {
     accum = await Promise.resolve(accum)
@@ -139,8 +144,6 @@ const getComponents = async (componentRoot = process.cwd(), inputs = {}, compone
     return accum
   }, Promise.resolve(components), keys(slsYml.components) || [])
 
-  // console.log(nestedComponents)
-
   components[componentId] = {
     inputs,
     outputs: {},
@@ -150,17 +153,39 @@ const getComponents = async (componentRoot = process.cwd(), inputs = {}, compone
   return components
 }
 
+const getDependencies = (inputs) => {
+  const regex = RegExp('\\${([ ~:a-zA-Z0-9._\'",\\-\\/\\(\\)]+?)}', 'g') // eslint-disable-line
+
+  const dependencies = map((inputKey) => {
+    // console.log(inputs[inputKey])
+    if (is(String, inputs[inputKey]) && test(regex, inputs[inputKey])) {
+      const referencedOutput = replace(/[${}]/g, '', match(regex, inputs[inputKey])[0]) // todo support multiple matches in single value?
+      if (referencedOutput.split(':').length === 1) {
+        return null // env var
+      }
+      let referencedComponentId = referencedOutput.split(':')
+      referencedComponentId.splice(-1, 1)
+      referencedComponentId = referencedComponentId.join(':')
+      return referencedComponentId
+    }
+    return null
+  }, keys(inputs))
+
+  return reject(isNil, dependencies)
+}
+
 const getGraph = async () => {
   const graph = {
     nodes: new Graph(),
-    data: components
+    data: await getComponents()
   }
 
   forEach((componentId) => {
     graph.nodes.setNode(componentId)
-  }, keys(components))
+  }, keys(graph.data))
 
   forEachObjIndexed((component, componentId) => {
+    component.dependencies = getDependencies(component.inputs)
     if (not(isEmpty(component.dependencies))) {
       forEach((dependencyId) => {
         graph.nodes.setEdge(componentId, dependencyId)
@@ -172,7 +197,7 @@ const getGraph = async () => {
 
 const executeComponent = async (componentId, graph) => {
   const component = graph.data[componentId]
-  components[componentId].outputs = await component.fn(component.inputs)
+  component.outputs = await component.fn(component.inputs)
   graph.nodes.removeNode(componentId)
 }
 

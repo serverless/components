@@ -1,5 +1,5 @@
 const Serverless = require('framework')
-const { AWS } = Serverless
+const { AWS, BbPromise } = Serverless
 
 const IAM = new AWS.IAM({ region: 'us-east-1' })
 
@@ -45,19 +45,25 @@ const remove = async (name) => {
   }
 }
 
-module.exports = async (inputs, state) => {
-  let outputs
-  if (!state.name && inputs.name) {
-    console.log(`Creating Role: ${inputs.name}`)
-    outputs = await create(inputs.name)
-  } else if (!inputs.name && state.name) {
-    console.log(`Removing Role: ${state.name}`)
-    outputs = await remove(state.name)
-  } else if (state.name !== inputs.name) {
-    console.log(`Removing Role: ${state.name}`)
-    await remove(state.name)
-    console.log(`Creating Role: ${inputs.name}`)
-    outputs = await create(inputs.name)
-  }
-  return outputs
+// module.exports = async (inputs, state) => {
+//   let outputs
+//   if (!state.name && inputs.name) {
+//     console.log(`Creating Role: ${inputs.name}`)
+//     outputs = await create(inputs.name)
+//   } else if (!inputs.name && state.name) {
+//     console.log(`Removing Role: ${state.name}`)
+//     outputs = await remove(state.name)
+//   } else if (state.name !== inputs.name) {
+//     console.log(`Removing Role: ${state.name}`)
+//     await remove(state.name)
+//     console.log(`Creating Role: ${inputs.name}`)
+//     outputs = await create(inputs.name)
+//   }
+//   return outputs
+// }
+module.exports = async (inputs) => {
+  console.log('iam')
+  console.log(inputs)
+  await BbPromise.delay(2000)
+  return {}
 }

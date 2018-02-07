@@ -1,5 +1,5 @@
 const Serverless = require('framework')
-const { AWS } = Serverless
+const { AWS, BbPromise } = Serverless
 
 const dynamodb = new AWS.DynamoDB({ region: 'us-east-1' })
 
@@ -35,21 +35,27 @@ const remove = (name) => {
   return dynamodb.deleteTable(params).promise()
 }
 
-module.exports = async (inputs, state) => {
-  if (!state.name && inputs.name) {
-    console.log(`Creating Table: ${inputs.name}`)
-    await create(inputs.name)
-  } else if (!inputs.name && state.name) {
-    console.log(`Removing Table: ${state.name}`)
-    await remove(state.name)
-  } else if (state.name !== inputs.name) {
-    console.log(`Removing Table: ${state.name}`)
-    await remove(state.name)
-    console.log(`Creating Table: ${inputs.name}`)
-    await create(inputs.name)
-  }
-  const outputs = {
-    name: inputs.name
-  }
-  return outputs
+// module.exports = async (inputs, state) => {
+//   if (!state.name && inputs.name) {
+//     console.log(`Creating Table: ${inputs.name}`)
+//     await create(inputs.name)
+//   } else if (!inputs.name && state.name) {
+//     console.log(`Removing Table: ${state.name}`)
+//     await remove(state.name)
+//   } else if (state.name !== inputs.name) {
+//     console.log(`Removing Table: ${state.name}`)
+//     await remove(state.name)
+//     console.log(`Creating Table: ${inputs.name}`)
+//     await create(inputs.name)
+//   }
+//   const outputs = {
+//     name: inputs.name
+//   }
+//   return outputs
+// }
+
+module.exports = async (inputs) => {
+  console.log('dynanmodb')
+  await BbPromise.delay(1000)
+  return {}
 }

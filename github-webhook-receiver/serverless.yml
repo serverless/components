@@ -1,14 +1,5 @@
 name: github-webhook-receiver
 
-inputs:
-  lambdaArn: ${lambda:arn}
-  lambdaRoleArn: ${lambda:roleArn}
-  apiId: ${apigateway:id
-  apiRoleArn: ${apigateway:roleArn}
-  url: ${apigateway:url}
-  tableName: ${dynamodb:name}
-  webhookId: ${github:id}
-
 components:
   dynamodb:
     type: dynamodb
