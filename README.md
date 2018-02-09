@@ -17,7 +17,8 @@
     3. [Outputs](#outputs)
     4. [State](#state)
     5. [Variables](#variables)
-    6. [Custom Commands](#custom-commands)
+    6. [Graph](#graph)
+    7. [Custom Commands](#custom-commands)
 2. [Next Steps](#next-steps)
 
 # Quick Start
@@ -26,29 +27,26 @@
 ## 1. Setup
 
 ```
-# 1. Clone
+# 1. Clone the repo
 git clone https://github.com/serverless/components-eslam
 cd components-eslam
 
-# 2. Install all dependencies
-npm run setup
+# 2. Install the CLI
+npm i -g
 
-# 3. Install The CLI
-npm i -g framework # might need sudo
-
-# 4. Setup the environment
+# 3. Setup the environment
 export GITHUB_TOKEN="abc"
 export AWS_ACCESS_KEY_ID="fgh"
 export AWS_SECRET_ACCESS_KEY="xyz"
 
-# 5. navigate to github-webhook-receiver to start playing!
-cd github-webhook-receiver@0.0.1
+# 4. Navigate to the github-webhook-receiver example to start playing!
+cd example
 ```
 
 ## 2. Deploy
 
 ```
-components deploy
+proto deploy
 ```
 This will provision all components, and their sub-components, and their sub components...etc.
 
@@ -64,7 +62,7 @@ Change some of the inputs in `serverless.yml`, then deploy again. For example:
 This will trigger an update only on the components affected by the updates you made. Please keep in mind that validation & error handling are still not that great. So please be gentle
 
 ```
-components deploy
+proto deploy
 ```
 
 ## 4. Test
@@ -95,14 +93,14 @@ module.exports = async (inputs, state) => {
 
 ```
 
-Then run `components test`. You can add another one under a different name.
+Then run `proto test`. You can add another one under a different name.
 
 ## 5. Remove
 
 Destroy everything!!
 
 ```
-components remove
+proto remove
 ```
 
 # Concepts
@@ -119,43 +117,34 @@ These two files look something like this:
 
 
 ```yml
-name: github-webhook-receiver@0.0.1
-
-inputs: 
-  lambdaArn: ${lambda:arn}
-  lambdaRoleArn: ${lambda:roleArn}
-  apiId: ${apigateway:id
-  apiRoleArn: ${apigateway:roleArn}
-  url: ${apigateway:url}
-  tableName: ${dynamodb:name}
-  webhookId: ${github:id}
+type: github-webhook-receiver
 
 components:
-  dynamodb: # component alias, to be referenced with Variables
-    type: dynamodb@0.0.1
+  myTable: # component alias, to be referenced with Variables
+    type: dynamodb
     inputs:
       name: github-webhook-receiver
-  lambda:
-    type: lambda@0.0.1
+  myFunction:
+    type: lambda
     inputs:
-      name: github-webhook-receiver-2
+      name: github-webhook-receiver
       memory: 128
       timeout: 10
       handler: code.handler
-  apigateway:
-    type: apigateway@0.0.1
+  myEndpoint:
+    type: apigateway
     inputs:
       name: github-webhook-receiver
       method: POST
       path: /github/webhook
-      lambda: ${lambda:arn} # Variable from another component output
-  github:
-    type: github@0.0.1
+      lambda: ${myFunction:arn} # Variable from another component output
+  myGithubWebhook:
+    type: github
     inputs:
       token: ${GITHUB_TOKEN} # Variable from env var
       owner: serverless
       repo: components-eslam
-      url: ${apigateway:url}
+      url: ${myEndpoint:url}
       event: pull_request
 ```
 
@@ -173,20 +162,11 @@ module.exports = async (inputs, state) => {
 }
 
 ```
-
-### Order of Operation
-
-The parent component is always the last to be provisioned, so that any referenced output from the child components would be resolved first.
-
-For child components, the provisioning order is top to bottom in `serverless.yml`, so any child component can depend on any component output on top of it in `serverless.yml`, but not below.
-
-That's why the github child component in the example above is at the bottom of the list, becasue it depends on APIG, which itself depends on lambda.
-
 ## Inputs
 Inputs are the configuration that are supplied to your component logic by the user. You supply those inputs in `serverless.yml`:
 
 ```yml
-name: github-webhook-receiver@0.0.1
+type: github-webhook-receiver
 
 inputs:
   firstInput: hello
@@ -198,7 +178,7 @@ Or, if the component is being used as a child of another parent component, like 
 So, if the lambda `serverless.yml` looks like this:
 
 ```yml
-name: lambda@0.0.1
+type: lambda
 
 inputs:
   memory: 128
@@ -208,11 +188,11 @@ inputs:
 and github-webhook-receiver `serverless.yml` looks like this:
 
 ```yml
-name: github-webhook-receiver@0.0.1
+type: github-webhook-receiver
 
 components:
-  lambda:
-    type: lambda@0.0.1
+  myFunction:
+    type: lambda
     inputs:
       memory: 512
       timeout: 300
@@ -224,7 +204,7 @@ Your provisioning logic, or your `index.js` file, can optionally return an outpu
 
 
 ## State
-State is simply the inputs and outputs of the last provision. It represents a historical snapshot of what happened last time you ran `deploy` or `remove`.
+State is simply the inputs and outputs of the last operation. It represents a historical snapshot of what happened last time you ran `deploy` or `remove`.
 
 The provisioning logic can use this state object and compare it with the current inputs, to make decisions whether to deploy, update, or remove.
 
@@ -259,7 +239,14 @@ module.exports = async (inputs, state) => {
 The framework supports variables from two sources:
 
 - **Environment Variables:** for example, ${GITHUB_TOKEN}
-- **Output:** for example: ${apigateway.url}, where apigateway is the component alias as defined in `serverless.yml`, and url is a property in the outputs object that is returned from the apigateway provisioning function.
+- **Output:** for example: `${myEndpoint.url}`, where `myEndpoint` is the component alias as defined in `serverless.yml`, and `url` is a property in the outputs object that is returned from the `myEndpoint` provisioning function.
+
+## Graph
+When you start composing components together, and each of those components use other nested components, and all those components depend on each other with variable references, you end up with a graph of components.
+
+Internally, the framework constructs this dependency graph by analysing the entire component structure and their variable references. With this dependency graph the framework is able to provision the required components in parallel whenever they don't depend on each other, while holding on other components that depend on components that haven't been provisioned yet.
+
+The component author doesn't have to worry about this graph at all. He just uses variables to reference the outputs he wants and it'll just work.
 
 ## Custom Commands
 Other than the built in `deploy` and `remove` commands, you can add custom commands to add extra management for your component lifecycle. You do so by adding a JS file in the current working directory named after the command you're creating. Just like the `index.js` file, it accepts inputs, and state as arguments
@@ -285,4 +272,3 @@ With this MVP, all 3 goals are now acheived, however it still has some limitatio
 - Errors & Validation. Components are now fragile. I need to add some validation to make sure everything deploys smoothly.
 - Embrace Failure. Even after validation, I can't expect what could happen at the provider level. So I'd like to assume that failures would happen and come up with a responding strategy to make the implementation more robust.
 - Abstract operation routing. Each component decides what needs to be done based on inputs/state. After writing many components, I started to see some paterns that maybe I could abstract and handle at the framework level, enabling the user to only provide the provisioning logic for the three main operations (deploy, update and remove), and letting the framework magically decide what needs to be done.
-- Because I'm mocking the registry locally, and because state is saved inside each component, you can only use each component once. To solve that, I'd like to publish all components to npm, and manage state elsewhere.

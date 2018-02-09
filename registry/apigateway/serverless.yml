@@ -1,0 +1,15 @@
+type: apigateway
+
+inputs:
+  name: apigateway
+  method: POST
+  path: /hello
+  lambda: ""
+  role: ${myRole:arn}
+
+components:
+  myRole:
+    type: iam
+    inputs:
+      name: apig-role
+      service: apigateway.amazonaws.com

@@ -1,0 +1,4 @@
+type: iam
+
+inputs:
+  name: role-name

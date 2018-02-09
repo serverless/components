@@ -1,4 +1,4 @@
-name: github@0.0.1
+type: github
 
 inputs:
   token: ${GITHUB_TOKEN}

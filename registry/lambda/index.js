@@ -1,16 +1,11 @@
-const Serverless = require('framework')
-const pack = require('./utils/pack')
-const createRole = require('./utils/createRole')
-const removeRole = require('./utils/removeRole')
+const AWS = require('aws-sdk')
+const Serverless = require('../../lib')
 
-const { AWS, BbPromise } = Serverless
-
+const { pack } = Serverless
 const lambda = new AWS.Lambda({ region: 'us-east-1' })
 
-const create = async ({ name, handler, memory, timeout, description }) => {
-  const lambdaRoleArn = await createRole(name)
+const create = async ({ name, handler, memory, timeout, description, role }) => {
   const pkg = await pack()
-  await BbPromise.delay(15000)
 
   const params = {
     FunctionName: name,
@@ -21,15 +16,14 @@ const create = async ({ name, handler, memory, timeout, description }) => {
     Handler: handler,
     MemorySize: memory,
     Publish: true,
-    Role: lambdaRoleArn,
+    Role: role,
     Runtime: 'nodejs6.10',
     Timeout: timeout
   }
 
   const res = await lambda.createFunction(params).promise()
   return {
-    arn: res.FunctionArn,
-    roleArn: res.Role
+    arn: res.FunctionArn
   }
 }
 
@@ -54,21 +48,18 @@ const update = async ({ name, handler, memory, timeout, description }) => {
   const res = await lambda.updateFunctionConfiguration(functionConfigParams).promise()
 
   return {
-    arn: res.FunctionArn,
-    roleArn: res.Role
+    arn: res.FunctionArn
   }
 }
 
 const remove = async (name) => {
-  await removeRole(name)
   const params = {
     FunctionName: name
   }
 
   await lambda.deleteFunction(params).promise()
   return {
-    arn: null,
-    roleArn: null
+    arn: null
   }
 }
 

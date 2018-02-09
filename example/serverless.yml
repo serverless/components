@@ -1,0 +1,32 @@
+type: github-webhook-receiver
+
+inputs:
+  url: ${myEndpoint:url}
+
+components:
+  myTable:
+    type: dynamodb
+    inputs:
+      name: github-webhook-receiver
+  myFunction:
+    type: lambda
+    inputs:
+      name: github-webhook-receiver
+      memory: 512
+      timeout: 10
+      handler: code.handler
+  myEndpoint:
+    type: apigateway
+    inputs:
+      name: github-webhook-receiver
+      method: POST
+      path: /github/webhook
+      lambda: ${myFunction:arn}
+  myGithubWebhook:
+    type: github
+    inputs:
+      token: ${GITHUB_TOKEN}
+      owner: serverless
+      repo: components-eslam
+      url: ${myEndpoint:url}
+      event: pull_request

@@ -1,5 +1,4 @@
-const Serverless = require('framework')
-const { AWS } = Serverless
+const AWS = require('aws-sdk')
 
 const dynamodb = new AWS.DynamoDB({ region: 'us-east-1' })
 

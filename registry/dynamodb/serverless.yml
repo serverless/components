@@ -1,4 +1,4 @@
-name: dynamodb@0.0.1
+type: dynamodb
 
 inputs:
   name: dynamodb
