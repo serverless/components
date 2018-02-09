@@ -1,6 +1,4 @@
 const octokit = require('@octokit/rest')()
-const Serverless = require('framework')
-const { AWS, BbPromise } = Serverless
 
 const create = async ({token, owner, repo, url, event}) => {
   octokit.authenticate({
@@ -66,27 +64,21 @@ const remove = async ({token, owner, repo}, id) => {
   }
 }
 
-// module.exports = async (inputs, state) => {
-//   const noChanges = (inputs.token === state.token && inputs.owner === state.owner &&
-//     inputs.repo === state.repo && inputs.url === state.url && inputs.event === state.event)
-//   let outputs
-//   if (noChanges) {
-//     outputs = { id: state.id }
-//   } else if (!state.id) {
-//     console.log('Creating Github Webhook')
-//     outputs = await create(inputs)
-//   } else if (state.id && inputs.token && inputs.owner && inputs.repo && inputs.url && inputs.event) {
-//     console.log('Updating Github Webhook')
-//     outputs = await update(inputs, state.id)
-//   } else {
-//     console.log('Removing Github Webhook')
-//     outputs = await remove(state, state.id)
-//   }
-//   return outputs
-// }
-module.exports = async (inputs) => {
-  console.log('github')
-  console.log(inputs)
-  await BbPromise.delay(1000)
-  return {}
+module.exports = async (inputs, state) => {
+  const noChanges = (inputs.token === state.token && inputs.owner === state.owner &&
+    inputs.repo === state.repo && inputs.url === state.url && inputs.event === state.event)
+  let outputs
+  if (noChanges) {
+    outputs = { id: state.id }
+  } else if (!state.id) {
+    console.log('Creating Github Webhook')
+    outputs = await create(inputs)
+  } else if (state.id && inputs.token && inputs.owner && inputs.repo && inputs.url && inputs.event) {
+    console.log('Updating Github Webhook')
+    outputs = await update(inputs, state.id)
+  } else {
+    console.log('Removing Github Webhook')
+    outputs = await remove(state, state.id)
+  }
+  return outputs
 }

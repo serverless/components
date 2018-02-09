@@ -1,6 +1,6 @@
 const axios = require('axios')
 
-module.exports = async (inputs, state) => {
+module.exports = async (state) => {
   console.log(`Testing Endpoint: ${state.url}`)
 
   try {

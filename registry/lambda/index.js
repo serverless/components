@@ -1,13 +1,11 @@
-const Serverless = require('framework')
-const pack = require('./utils/pack')
+const AWS = require('aws-sdk')
+const Serverless = require('../../lib')
 
-const { AWS, BbPromise } = Serverless
-
+const { pack } = Serverless
 const lambda = new AWS.Lambda({ region: 'us-east-1' })
 
 const create = async ({ name, handler, memory, timeout, description, role }) => {
   const pkg = await pack()
-  await BbPromise.delay(15000)
 
   const params = {
     FunctionName: name,
@@ -64,29 +62,23 @@ const remove = async (name) => {
     arn: null
   }
 }
-//
-// module.exports = async (inputs, state) => {
-//   let outputs
-//   if (inputs.name && !state.name) {
-//     console.log(`Creating Lambda: ${inputs.name}`)
-//     outputs = await create(inputs)
-//   } else if (state.name && !inputs.name) {
-//     console.log(`Removing Lambda: ${state.name}`)
-//     outputs = await remove(state.name)
-//   } else if (inputs.name !== state.name) {
-//     console.log(`Removing Lambda: ${state.name}`)
-//     await remove(state.name)
-//     console.log(`Creating Lambda: ${inputs.name}`)
-//     outputs = await create(inputs)
-//   } else {
-//     console.log(`Updating Lambda: ${inputs.name}`)
-//     outputs = await update(inputs)
-//   }
-//   return outputs
-// }
-module.exports = async (inputs) => {
-  console.log('lambda')
-  console.log(inputs)
-  await BbPromise.delay(1000)
-  return { arn: 'lambda-function' }
+
+module.exports = async (inputs, state) => {
+  let outputs
+  if (inputs.name && !state.name) {
+    console.log(`Creating Lambda: ${inputs.name}`)
+    outputs = await create(inputs)
+  } else if (state.name && !inputs.name) {
+    console.log(`Removing Lambda: ${state.name}`)
+    outputs = await remove(state.name)
+  } else if (inputs.name !== state.name) {
+    console.log(`Removing Lambda: ${state.name}`)
+    await remove(state.name)
+    console.log(`Creating Lambda: ${inputs.name}`)
+    outputs = await create(inputs)
+  } else {
+    console.log(`Updating Lambda: ${inputs.name}`)
+    outputs = await update(inputs)
+  }
+  return outputs
 }

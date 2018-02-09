@@ -1,14 +1,16 @@
-name: lambda
+type: lambda
 
 inputs:
   name: lambda
   memory: 128
   timeout: 10
+  description: default description goes here
   handler: code.handler
-  role: ${role:arn}
+  role: ${myRole:arn}
 
 components:
-  role:
+  myRole:
     type: iam
     inputs:
       name: lambda-role
+      service: lambda.amazonaws.com

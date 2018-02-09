@@ -1,0 +1,10 @@
+#!/usr/bin/env node
+
+const Serverless = require('../lib/index')
+
+const {provision} = Serverless
+
+;(async () => {
+  const command = process.argv[2]
+  await provision(command)
+})().catch(e => console.log(e))
