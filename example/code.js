@@ -27,6 +27,6 @@ module.exports.handler = (e, ctx, cb) => {
       cb(null, { statusCode: 500, body: 'FUDGE! something went wrong while saving github event!' })
     })
   } else {
-    cb(null, { statusCode: 200, body: 'Someone invoked me again!' })
+    cb(null, { statusCode: 200, body: 'Someone invoked me!' })
   }
 }

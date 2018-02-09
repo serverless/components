@@ -48,7 +48,7 @@ cd example
 ```
 proto deploy
 ```
-This will provision all components, and their sub-components, and their sub components...etc.
+This will provision all components in parallel whenever possible using a dependency graph.
 
 ## 3. Update
 
@@ -106,9 +106,9 @@ proto remove
 # Concepts
 
 ## Component
-A component is the smallest unit of abstraction for your infrastructure. It could be a single small piece like an IAM role, or a larger piece that includes other small pieces, like github-webhook-receiver, which includes lambda (which itself includes iam), apigateway (which also includes iam), dynamodb, and github-webhook. So components could be composed with each other in a component dependency tree to build larger components.
+A component is the smallest unit of abstraction for your infrastructure. It could be a single small piece like an IAM role, or a larger piece that includes other small pieces, like github-webhook-receiver, which includes lambda (which itself includes iam), apigateway (which also includes iam), dynamodb, and github-webhook. So components could be composed with each other in a component dependency graph to build larger components.
 
-You define a component using two files: `serverless.yml` for config, and `index.js` for the provisioning logic. The `index.js` file exports a **single function** that takes two arguments: inputs & state. However, this `index.js` file is optional, since your component could just be a composition of other smaller components without provisioning logic on its own.
+You define a component using two files: `serverless.yml` for config, and `index.js` for the provisioning logic. The `index.js` file exports a **single function** that takes two arguments: inputs & state. However, this `index.js` file is optional, since your component could just be a composition of other smaller components without provisioning logic on its own. `github-webhook-receiver` is a good example of this.
 
 These two files look something like this:
 
@@ -156,9 +156,8 @@ module.exports = async (inputs, state) => {
   /*
    * your provisioning logic goes here
    */
-  
-  const outputs = {}
-  return outputs
+
+  return {} // outputs
 }
 
 ```
