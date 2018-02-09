@@ -59,7 +59,7 @@ Change some of the inputs in `serverless.yml`, then deploy again. For example:
 - change the lambda memory or timeout
 - change the apigateway method or path
 
-This will trigger an update only on the components affected by the updates you made. Please keep in mind that validation & error handling are still not that great. So please be gentle
+This will trigger an update only on the components affected by the updates you made. Please keep in mind that validation & error handling are still not that great, So please be gentle ;)
 
 ```
 proto deploy
@@ -119,6 +119,9 @@ These two files look something like this:
 ```yml
 type: github-webhook-receiver
 
+inputs:
+  url: ${myEndpoint:url} # Variable from another component output
+
 components:
   myTable: # component alias, to be referenced with Variables
     type: dynamodb
@@ -137,7 +140,7 @@ components:
       name: github-webhook-receiver
       method: POST
       path: /github/webhook
-      lambda: ${myFunction:arn} # Variable from another component output
+      lambda: ${myFunction:arn}
   myGithubWebhook:
     type: github
     inputs:
