@@ -1,0 +1,35 @@
+type: s3-prototype
+
+components:
+  filesBucket:
+    type: s3
+    inputs:
+      name: files
+  filesTable:
+    type: dynamodb
+    inputs:
+      name: files
+  dowloaderLambda:
+    type: lambda
+    inputs:
+      name: s3-downloader
+      handler: downloader.handler
+  uploaderLambda:
+    type: lambda
+    inputs:
+      name: s3-uploader
+      handler: uploader.handler
+  uploaderSubscription:
+    type: eventgateway-subscription
+    inputs:
+      event: http
+      method: POST
+      path: /upload
+      name: s3-uploader
+      arn: ${uploaderLambda:arn}
+  downloaderSubscription:
+    type: eventgateway-subscription
+    inputs:
+      event: fileUploaded
+      name: s3-downloader
+      arn: ${downloaderLambda:arn}
