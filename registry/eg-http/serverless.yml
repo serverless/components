@@ -1,6 +1,0 @@
-type: eg-http
-
-inputs:
-  lambda: ""
-  method: POST
-  path: /upload
