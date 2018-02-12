@@ -40,7 +40,7 @@ export AWS_ACCESS_KEY_ID="fgh"
 export AWS_SECRET_ACCESS_KEY="xyz"
 
 # 4. Navigate to the github-webhook-receiver example to start playing!
-cd example
+cd examples/github-webhook-receiver
 ```
 
 ## 2. Deploy
