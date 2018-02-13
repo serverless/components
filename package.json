@@ -13,13 +13,14 @@
     "proto": "./bin/serverless"
   },
   "dependencies": {
-    "axios": "^0.17.1",
-    "graphlib": "^2.1.5",
     "@octokit/rest": "^14.0.5",
+    "@serverless/fdk": "^0.7.1",
     "archiver": "^2.1.1",
     "aws-sdk": "^2.185.0",
+    "axios": "^0.17.1",
     "bluebird": "^3.5.1",
     "fs-extra": "^5.0.0",
+    "graphlib": "^2.1.5",
     "js-yaml": "^3.10.0",
     "ramda": "^0.25.0"
   },
