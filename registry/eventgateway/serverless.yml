@@ -1,4 +1,4 @@
-type: eg-subscription
+type: eventgateway
 
 inputs:
   event: http

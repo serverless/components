@@ -59,11 +59,18 @@ const unsubscribe = async ({ subscriptionId }) => {
   return eventGateway.unsubscribe(params)
 }
 
+const getUrl = (path) => {
+  const namespace = path.split('/')[0]
+  const tailedPath = path.split('/')[1]
+  return `https://${namespace}.eventgateway-dev.io/${tailedPath}`
+}
+
 const create = async ({ id, arn, event, path, method }) => {
   await registerFunction({ id, arn })
   const res = await subscribe({ id, event, path, method })
   return {
-    subscriptionId: res.subscriptionId
+    subscriptionId: res.subscriptionId,
+    url: (event === 'http') ? getUrl(path) : null
   }
 }
 
@@ -71,7 +78,8 @@ const update = async ({ id, event, path, method, subscriptionId }) => {
   await await unsubscribe({ subscriptionId })
   const res = await subscribe({ id, event, path, method })
   return {
-    subscriptionId: res.subscriptionId
+    subscriptionId: res.subscriptionId,
+    url: (event === 'http') ? getUrl(path) : null
   }
 }
 
@@ -79,7 +87,8 @@ const remove = async ({ id, subscriptionId }) => {
   await deleteFunction({ id })
   await unsubscribe({ subscriptionId })
   return {
-    subscriptionId: null
+    subscriptionId: null,
+    url: null
   }
 }
 

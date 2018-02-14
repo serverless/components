@@ -12,24 +12,24 @@ components:
   dowloaderLambda:
     type: lambda
     inputs:
-      name: s3-downloader
+      name: eslam-s3-downloader
       handler: downloader.handler
   uploaderLambda:
     type: lambda
     inputs:
-      name: s3-uploader
+      name: eslam-s3-uploader
       handler: uploader.handler
   uploaderSubscription:
-    type: eventgateway-subscription
+    type: eventgateway
     inputs:
       event: http
       method: POST
-      path: /upload
-      id: s3-uploader
+      path: eslam/upload
+      id: eslam-s3-uploader
       arn: ${uploaderLambda:arn}
   downloaderSubscription:
-    type: eventgateway-subscription
+    type: eventgateway
     inputs:
       event: fileUploaded
-      id: s3-downloader # creates and deletes
-      arn: ${downloaderLambda:arn} # creates and deletes
+      id: eslam-s3-downloader
+      arn: ${downloaderLambda:arn}
