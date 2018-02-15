@@ -4,32 +4,38 @@ components:
   filesBucket:
     type: s3
     inputs:
-      name: files
+      name: serverless-components-eslam-files
   filesTable:
     type: dynamodb
     inputs:
       name: files
-  dowloaderLambda:
+  downloaderLambda:
     type: lambda
     inputs:
-      name: eslam-s3-downloader
+      name: eahefnawy-downloader
       handler: downloader.handler
+      env:
+        EVENT_GATEWAY_TOKEN: ${EVENT_GATEWAY_TOKEN}
+        FILES_TABLE: files
   uploaderLambda:
     type: lambda
     inputs:
-      name: eslam-s3-uploader
+      name: eahefnawy-uploader
       handler: uploader.handler
+      env:
+        EVENT_GATEWAY_TOKEN: ${EVENT_GATEWAY_TOKEN}
+        BUCKET: serverless-components-eslam-files
   uploaderSubscription:
     type: eventgateway
     inputs:
       event: http
       method: POST
-      path: eslam/upload
-      id: eslam-s3-uploader
+      path: eahefnawy-uploader
+      id: eahefnawy-uploader
       arn: ${uploaderLambda:arn}
   downloaderSubscription:
     type: eventgateway
     inputs:
       event: fileUploaded
-      id: eslam-s3-downloader
+      id: eahefnawy-downloader
       arn: ${downloaderLambda:arn}

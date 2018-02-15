@@ -2,7 +2,3 @@ type: eventgateway
 
 inputs:
   event: http
-  method: POST
-  path: /upload
-  name: s3-uploader
-  arn: ""

@@ -4,7 +4,7 @@ const Serverless = require('../../lib')
 const { pack } = Serverless
 const lambda = new AWS.Lambda({ region: 'us-east-1' })
 
-const create = async ({ name, handler, memory, timeout, description, role }) => {
+const create = async ({ name, handler, memory, timeout, env, description, role }) => {
   const pkg = await pack()
 
   const params = {
@@ -18,7 +18,10 @@ const create = async ({ name, handler, memory, timeout, description, role }) => 
     Publish: true,
     Role: role,
     Runtime: 'nodejs6.10',
-    Timeout: timeout
+    Timeout: timeout,
+    Environment: {
+      Variables: env
+    }
   }
 
   const res = await lambda.createFunction(params).promise()
@@ -27,7 +30,7 @@ const create = async ({ name, handler, memory, timeout, description, role }) => 
   }
 }
 
-const update = async ({ name, handler, memory, timeout, description }) => {
+const update = async ({ name, handler, memory, timeout, env, description }) => {
   const pkg = await pack()
   const functionCodeParams = {
     FunctionName: name,
@@ -41,7 +44,10 @@ const update = async ({ name, handler, memory, timeout, description }) => {
     Handler: handler,
     MemorySize: memory,
     Runtime: 'nodejs6.10',
-    Timeout: timeout
+    Timeout: timeout,
+    Environment: {
+      Variables: env
+    }
   }
 
   await lambda.updateFunctionCode(functionCodeParams).promise()

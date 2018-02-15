@@ -40,7 +40,7 @@ const remove = async (name) => {
 }
 
 module.exports = async (inputs, state) => {
-  let outputs
+  let outputs = {}
   if (!state.name && inputs.name) {
     console.log(`Creating Bucket: ${inputs.name}`)
     outputs = await create(inputs.name)

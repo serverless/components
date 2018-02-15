@@ -43,10 +43,11 @@ const deleteFunction = async ({ id }) => {
 const subscribe = async ({ id, event, path, method }) => {
   const params = {
     functionId: id,
-    event
+    event,
+    path: '/eslam/anything'
   }
   if (path && method) {
-    params.path = path
+    params.path = `/eslam/${path}`
     params.method = method
   }
   return eventGateway.subscribe(params)
@@ -59,18 +60,12 @@ const unsubscribe = async ({ subscriptionId }) => {
   return eventGateway.unsubscribe(params)
 }
 
-const getUrl = (path) => {
-  const namespace = path.split('/')[0]
-  const tailedPath = path.split('/')[1]
-  return `https://${namespace}.eventgateway-dev.io/${tailedPath}`
-}
-
 const create = async ({ id, arn, event, path, method }) => {
   await registerFunction({ id, arn })
   const res = await subscribe({ id, event, path, method })
   return {
     subscriptionId: res.subscriptionId,
-    url: (event === 'http') ? getUrl(path) : null
+    url: (event === 'http') ? `https://eslam.eventgateway-dev.io/${path}` : null
   }
 }
 
@@ -79,7 +74,7 @@ const update = async ({ id, event, path, method, subscriptionId }) => {
   const res = await subscribe({ id, event, path, method })
   return {
     subscriptionId: res.subscriptionId,
-    url: (event === 'http') ? getUrl(path) : null
+    url: (event === 'http') ? `https://eslam.eventgateway-dev.io/${path}` : null
   }
 }
 
@@ -99,11 +94,15 @@ module.exports = async (inputs, state) => {
   const isRecreate = (state.id !== inputs.id || state.arn !== inputs.arn)
 
   if (isCreate) {
+    console.log(`Creating Event Gateway Subscription: ${inputs.id}`)
     outputs = await create(inputs)
   } else if (isRemove) {
+    console.log(`Removing Event Gateway Subscription: ${state.id}`)
     outputs = await remove(state)
   } else if (isRecreate) {
+    console.log(`Removing Event Gateway Subscription: ${state.id}`)
     await remove(state)
+    console.log(`Creating Event Gateway Subscription: ${inputs.id}`)
     outputs = await create(inputs)
   } else {
     outputs = await update({ ...state, ...inputs })
