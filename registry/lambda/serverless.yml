@@ -6,11 +6,10 @@ inputs:
   timeout: 10
   description: default description goes here
   handler: code.handler
-  role: arn:aws:iam::552750238299:role/s
 
-#components:
-#  myRole:
-#    type: iam
-#    inputs:
-#      name: lambda-role
-#      service: lambda.amazonaws.com
+components:
+  myRole:
+    type: iam
+    inputs:
+      name: ${parent:name}
+      service: lambda.amazonaws.com
