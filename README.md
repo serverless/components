@@ -1,30 +1,42 @@
 # Goals
 
-- [x] **Component Lifecycle Management**
-- [x] **Component Composability & Reusability**
-- [x] **Custom Lifecycle Extension**
+- [x] **Component Abstraction**
+- [x] **Declarative Composition**
+- [x] **Component Logic Reuse**
+- [x] **Variable Support:**
+  - [x] **Referencing Component Outputs**
+  - [x] **Referencing Component Inputs**
+  - [x] **Referencing Environment Variables**
+- [x] **Dependency Graph Parallel Orchestration**
+- [x] **Integration With Event Gateway**
+- [x] **Event & Event Source Abstraction**
 
 # Table of Contents
-1. [Quick Start](#quick-start)
-    1. [Setup](#1-setup)
-    2. [Deploy](#2-deploy)
-    3. [Update](#3-update)
-    4. [Test](#4-test)
-    5. [Remove](#5-remove)
-2. [Concepts](#concepts)
+1. [Setup](#setup)
+2. [Registry](#registry)
+    1. [github-webhook-receiver](#github-webhook-receiver)
+    2. [s3-prototype](#s3-prototype)
+    3. [rest-api](#rest-api)
+    4. [s3-downloader](#s3-downloader)
+    5. [s3-uploader](#s3-uploader)
+    6. [s3](#s3)
+    7. [dynamodb](#dynamodb)
+    8. [lambda](#lambda)
+    9. [apigateway](#apigateway)
+    10. [eventgateway](#eventgateway)
+    11. [iam](#iam)
+
+3. [Concepts](#concepts)
     1. [Component](#component)
     2. [Inputs](#inputs)
     3. [Outputs](#outputs)
     4. [State](#state)
     5. [Variables](#variables)
     6. [Graph](#graph)
-    7. [Custom Commands](#custom-commands)
-2. [Next Steps](#next-steps)
 
-# Quick Start
+# Setup
+
 **Requires: Node 8+**
-
-## 1. Setup
 
 ```
 # 1. Clone the repo
@@ -34,74 +46,31 @@ cd components-eslam
 # 2. Install the CLI
 npm i -g
 
-# 3. Setup the environment
+# 3. Setup the environment to use the examples
 export GITHUB_TOKEN="abc"
 export AWS_ACCESS_KEY_ID="fgh"
 export AWS_SECRET_ACCESS_KEY="xyz"
-
-# 4. Navigate to the github-webhook-receiver example to start playing!
-cd examples/github-webhook-receiver
+export EVENT_GATEWAY_TOKEN="poi"
 ```
 
-## 2. Deploy
+# Registry
+The registry contains all the example components that we've created. You can navigate to any of them and run any of the their supported lifecycle hooks (most commonly, deploy & remove).
 
-```
-proto deploy
-```
-This will provision all components in parallel whenever possible using a dependency graph.
+Some components are just a composition of other components (ie. s3-downloader) in a `serverless.yml`, while others contain their own lifecycle logic.
 
-## 3. Update
+After execution, a `state.json` file is generated in the current working directory that represent the current state of your application.
 
-Change some of the inputs in `serverless.yml`, then deploy again. For example:
-
-- change the github webhook event
-- change the lambda or table name name
-- change the lambda memory or timeout
-- change the apigateway method or path
-
-This will trigger an update only on the components affected by the updates you made. Please keep in mind that validation & error handling are still not that great, So please be gentle ;)
-
-```
-proto deploy
-```
-
-## 4. Test
-
-I've already added a custom command named `components test` by creating a `test.js` file in the current working directory. it looks like this.
-
-```js
-
-const axios = require('axios')
-
-module.exports = async (inputs, state) => {
-  console.log(`Testing Endpoint: ${state.url}`)
-
-  try {
-    const res = await axios({
-      method: 'post',
-      url: state.url,
-      data: {}
-    })
-    console.log('')
-    console.log('Result:')
-    console.log(res.data)
-  } catch (e) {
-    throw new Error(e)
-  }
-}
-
-
-```
-
-Then run `proto test`. You can add another one under a different name.
-
-## 5. Remove
-
-Destroy everything!!
-
-```
-proto remove
-```
+## github-webhook-receiver
+## s3-prototype
+## rest-api
+## s3-downloader
+## s3-uploader
+## s3
+## dynamodb
+## lambda
+## apigateway
+## eventgateway
+## iam
 
 # Concepts
 

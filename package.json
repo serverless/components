@@ -22,6 +22,7 @@
     "fs-extra": "^5.0.0",
     "graphlib": "^2.1.5",
     "js-yaml": "^3.10.0",
+    "minimist": "^1.2.0",
     "ramda": "^0.25.0"
   },
   "devDependencies": {

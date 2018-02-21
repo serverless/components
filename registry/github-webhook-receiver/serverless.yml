@@ -15,13 +15,21 @@ components:
       memory: 128
       timeout: 10
       handler: code.handler
+#  myEndpoint:
+#    type: apigateway
+#    inputs:
+#      name: github-webhook-receiver
+#      method: POST
+#      path: /github/webhook
+#      lambda: ${myFunction:arn}
   myEndpoint:
-    type: apigateway
+    type: eventgateway
     inputs:
-      name: github-webhook-receiver
+      event: http
       method: POST
-      path: /github/webhook
-      lambda: ${myFunction:arn}
+      path: github-webhook-receiver-eahefnawy
+      id: github-webhook-receiver-eahefnawy
+      arn: ${myFunction:arn}
   myGithubWebhook:
     type: github
     inputs:

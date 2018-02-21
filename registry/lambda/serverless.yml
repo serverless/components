@@ -6,6 +6,7 @@ inputs:
   timeout: 10
   description: default description goes here
   handler: code.handler
+  role: ${myRole:arn}
 
 components:
   myRole:

@@ -11,5 +11,5 @@ components:
   myRole:
     type: iam
     inputs:
-      name: apig-role
+      name: ${parent:name}
       service: apigateway.amazonaws.com

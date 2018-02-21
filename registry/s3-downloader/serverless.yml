@@ -1,0 +1,20 @@
+type: s3-downloader
+
+inputs:
+  name: abc
+
+components:
+  downloaderLambda:
+    type: lambda
+    inputs:
+      name: ${parent:name}
+      handler: downloader.handler
+      env:
+        EVENT_GATEWAY_TOKEN: ${EVENT_GATEWAY_TOKEN}
+        FILES_TABLE: serverless-components-eslam-files
+  downloaderSubscription:
+    type: eventgateway
+    inputs:
+      event: fileUploaded
+      id: ${parent:name}
+      arn: ${downloaderLambda:arn}

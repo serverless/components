@@ -88,25 +88,28 @@ const remove = async ({ id, subscriptionId }) => {
 }
 
 module.exports = async (inputs, state) => {
-  let outputs
-  const isCreate = (!state.id || !state.arn)
-  const isRemove = (!inputs.id && !inputs.arn) && (state.id && state.arn)
-  const isRecreate = (state.id !== inputs.id || state.arn !== inputs.arn)
-
-  if (isCreate) {
-    console.log(`Creating Event Gateway Subscription: ${inputs.id}`)
-    outputs = await create(inputs)
-  } else if (isRemove) {
-    console.log(`Removing Event Gateway Subscription: ${state.id}`)
-    outputs = await remove(state)
-  } else if (isRecreate) {
-    console.log(`Removing Event Gateway Subscription: ${state.id}`)
-    await remove(state)
-    console.log(`Creating Event Gateway Subscription: ${inputs.id}`)
-    outputs = await create(inputs)
-  } else {
-    outputs = await update({ ...state, ...inputs })
+  return {
+    sampleEventGatewayOutput: 'eventgateway'
   }
-
-  return outputs
+  // let outputs
+  // const isCreate = (!state.id || !state.arn)
+  // const isRemove = (!inputs.id && !inputs.arn) && (state.id && state.arn)
+  // const isRecreate = (state.id !== inputs.id || state.arn !== inputs.arn)
+  //
+  // if (isCreate) {
+  //   console.log(`Creating Event Gateway Subscription: ${inputs.id}`)
+  //   outputs = await create(inputs)
+  // } else if (isRemove) {
+  //   console.log(`Removing Event Gateway Subscription: ${state.id}`)
+  //   outputs = await remove(state)
+  // } else if (isRecreate) {
+  //   console.log(`Removing Event Gateway Subscription: ${state.id}`)
+  //   await remove(state)
+  //   console.log(`Creating Event Gateway Subscription: ${inputs.id}`)
+  //   outputs = await create(inputs)
+  // } else {
+  //   outputs = await update({ ...state, ...inputs })
+  // }
+  //
+  // return outputs
 }
