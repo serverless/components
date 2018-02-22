@@ -1,6 +1,4 @@
-# Serverless Components
-
-## Overview
+![serverless components logo](https://s3.amazonaws.com/assets.github.serverless/serverless-components-readme3.png)
 
 This project is a prototype of a new concept Serverless has been exploring called "components". Our aim is to introduce highly configurable and composable pieces that allow for multi-cloud & third party resource use cases.
 
