@@ -1,9 +1,9 @@
 type: lambda
 
 inputs:
-  name: lambda
-  memory: 128
-  timeout: 10
+  name: default-lambda-name-goes-here
+  memory: 512
+  timeout: 100
   description: default description goes here
   handler: code.handler
   role: ${myRole:arn}

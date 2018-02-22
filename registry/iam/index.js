@@ -48,7 +48,7 @@ const deleteRole = async (name) => {
 }
 
 const deploy = async (inputs, state, context) => {
-  let outputs
+  let outputs = state
   if (!state.name && inputs.name) {
     context.log(`Creating Role: ${inputs.name}`)
     outputs = await createRole(inputs)
