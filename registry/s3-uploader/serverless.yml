@@ -1,0 +1,22 @@
+type: s3-uploader
+
+inputs:
+  name: abc
+
+components:
+  uploaderLambda:
+    type: lambda
+    inputs:
+      name: ${parent:name}
+      handler: uploader.handler
+      env:
+        EVENT_GATEWAY_TOKEN: ${EVENT_GATEWAY_TOKEN}
+        BUCKET: serverless-components-eslam-files
+  uploaderSubscription:
+    type: eventgateway
+    inputs:
+      event: http
+      method: POST
+      path: ${parent:name}
+      id: ${parent:name}
+      arn: ${uploaderLambda:arn}

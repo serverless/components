@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-
+const minimist = require('minimist')
 const Serverless = require('../lib/index')
-
-const {provision} = Serverless
 
 ;(async () => {
   const command = process.argv[2]
-  await provision(command)
+  const options = minimist(process.argv.slice(2))
+  delete options['_']
+  await Serverless(command, options)
 })().catch(e => console.log(e))

@@ -1,0 +1,24 @@
+type: rest-api
+
+inputs:
+  gateway: apigateway
+#  gateways:
+#    eventgateway:
+#      active: true
+#      token: xxx
+#    apigateway:
+#      active: false
+#      apiKey: xxx
+#      apiSecret: xxx
+  routes:
+    users:
+      post:
+        cors: true
+        fn: createUser
+      get:
+        fn: getUser
+      put:
+        fn: updateUser
+      delete:
+        fn: deleteUser
+

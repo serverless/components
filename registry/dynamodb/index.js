@@ -2,7 +2,7 @@ const AWS = require('aws-sdk')
 
 const dynamodb = new AWS.DynamoDB({ region: 'us-east-1' })
 
-const create = (name) => {
+const createTable = (name) => {
   const params = {
     AttributeDefinitions: [
       {
@@ -26,7 +26,7 @@ const create = (name) => {
   return dynamodb.createTable(params).promise()
 }
 
-const remove = (name) => {
+const deleteTable = (name) => {
   const params = {
     TableName: name
   }
@@ -34,21 +34,35 @@ const remove = (name) => {
   return dynamodb.deleteTable(params).promise()
 }
 
-module.exports = async (inputs, state) => {
+const deploy = async (inputs, state, context) => {
   if (!state.name && inputs.name) {
-    console.log(`Creating Table: ${inputs.name}`)
-    await create(inputs.name)
+    context.log(`Creating Table: ${inputs.name}`)
+    await createTable(inputs.name)
   } else if (!inputs.name && state.name) {
-    console.log(`Removing Table: ${state.name}`)
-    await remove(state.name)
+    context.log(`Removing Table: ${state.name}`)
+    await deleteTable(state.name)
   } else if (state.name !== inputs.name) {
-    console.log(`Removing Table: ${state.name}`)
-    await remove(state.name)
-    console.log(`Creating Table: ${inputs.name}`)
-    await create(inputs.name)
+    context.log(`Removing Table: ${state.name}`)
+    await deleteTable(state.name)
+    context.log(`Creating Table: ${inputs.name}`)
+    await createTable(inputs.name)
   }
   const outputs = {
     name: inputs.name
   }
   return outputs
+}
+
+const remove = async (inputs, state, context) => {
+  context.log(`Removing Table: ${state.name}`)
+  await deleteTable(state.name)
+  const outputs = {
+    name: null
+  }
+  return outputs
+}
+
+module.exports = {
+  deploy,
+  remove
 }

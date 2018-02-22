@@ -1,4 +1,4 @@
 type: dynamodb
 
 inputs:
-  name: dynamodb
+  name: default-table-name-goes-here
