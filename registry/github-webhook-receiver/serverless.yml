@@ -11,25 +11,25 @@ components:
   myFunction:
     type: lambda
     inputs:
-      name: github-webhook-receiver
-      memory: 128
+      name: github-webhook-receiver-function
+      memory: 512
       timeout: 10
       handler: code.handler
-#  myEndpoint:
-#    type: apigateway
-#    inputs:
-#      name: github-webhook-receiver
-#      method: POST
-#      path: /github/webhook
-#      lambda: ${myFunction:arn}
   myEndpoint:
-    type: eventgateway
+    type: apigateway
     inputs:
-      event: http
+      name: github-webhook-receiver-api
       method: POST
-      path: github-webhook-receiver-eahefnawy
-      id: github-webhook-receiver-eahefnawy
-      arn: ${myFunction:arn}
+      path: /github/webhook
+      lambda: ${myFunction:arn}
+#  myEndpoint:
+#    type: eventgateway
+#    inputs:
+#      event: http
+#      method: POST
+#      path: github-webhook-receiver-eahefnawy
+#      id: github-webhook-receiver-eahefnawy
+#      arn: ${myFunction:arn}
   myGithubWebhook:
     type: github
     inputs:

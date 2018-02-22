@@ -1,6 +1,6 @@
 const octokit = require('@octokit/rest')()
 
-const create = async ({token, owner, repo, url, event}) => {
+const createWebhook = async ({token, owner, repo, url, event}) => {
   octokit.authenticate({
     type: 'token',
     token: token || process.env.GITHUB_TOKEN
@@ -25,7 +25,7 @@ const create = async ({token, owner, repo, url, event}) => {
   }
 }
 
-const update = async ({token, owner, repo, url, event}, id) => {
+const updateWebhook = async ({token, owner, repo, url, event}, id) => {
   octokit.authenticate({
     type: 'token',
     token: token
@@ -51,7 +51,7 @@ const update = async ({token, owner, repo, url, event}, id) => {
   }
 }
 
-const remove = async ({token, owner, repo}, id) => {
+const deleteWebhook = async ({token, owner, repo}, id) => {
   octokit.authenticate({
     type: 'token',
     token: token || process.env.GITHUB_TOKEN
@@ -64,21 +64,32 @@ const remove = async ({token, owner, repo}, id) => {
   }
 }
 
-module.exports = async (inputs, state) => {
+const remove = async (inputs, state, context) => {
+  context.log('Removing Github Webhook')
+  const outputs = await deleteWebhook(state, state.id)
+  return outputs
+}
+
+const deploy = async (inputs, state, context) => {
   const noChanges = (inputs.token === state.token && inputs.owner === state.owner &&
     inputs.repo === state.repo && inputs.url === state.url && inputs.event === state.event)
   let outputs
   if (noChanges) {
     outputs = { id: state.id }
   } else if (!state.id) {
-    console.log('Creating Github Webhook')
-    outputs = await create(inputs)
+    context.log('Creating Github Webhook')
+    outputs = await createWebhook(inputs)
   } else if (state.id && inputs.token && inputs.owner && inputs.repo && inputs.url && inputs.event) {
-    console.log('Updating Github Webhook')
-    outputs = await update(inputs, state.id)
+    context.log('Updating Github Webhook')
+    outputs = await updateWebhook(inputs, state.id)
   } else {
-    console.log('Removing Github Webhook')
-    outputs = await remove(state, state.id)
+    context.log('Removing Github Webhook')
+    outputs = await deleteWebhook(state, state.id)
   }
   return outputs
+}
+
+module.exports = {
+  deploy,
+  remove
 }

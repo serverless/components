@@ -1,22 +1,18 @@
 const AWS = require('aws-sdk')
-const Serverless = require('../../lib')
-
-const { getSwaggerDefinition } = Serverless
-
 const APIGateway = new AWS.APIGateway({region: 'us-east-1'})
-//
-// const remove = async (name, id) => {
-//   await APIGateway.deleteRestApi({
-//     restApiId: id
-//   }).promise()
-//   const outputs = {
-//     id: null,
-//     url: null
-//   }
-//   return outputs
-// }
 
-const create = async ({ name, lambda, path, method, role }) => {
+const deleteApi = async (name, id) => {
+  await APIGateway.deleteRestApi({
+    restApiId: id
+  }).promise()
+  const outputs = {
+    id: null,
+    url: null
+  }
+  return outputs
+}
+
+const createApi = async ({ name, lambda, path, method, role }, getSwaggerDefinition) => {
   const swagger = getSwaggerDefinition(name, lambda, path, method, role)
   const json = JSON.stringify(swagger)
 
@@ -33,7 +29,7 @@ const create = async ({ name, lambda, path, method, role }) => {
   return outputs
 }
 
-const update = async ({ name, lambda, path, method, role }, id) => {
+const updateApi = async ({ name, lambda, path, method, role }, id, getSwaggerDefinition) => {
   const swagger = getSwaggerDefinition(name, lambda, path, method, role)
   const json = JSON.stringify(swagger)
 
@@ -51,40 +47,35 @@ const update = async ({ name, lambda, path, method, role }, id) => {
   return outputs
 }
 
-const deploy = async (inputs, state, context, options) => {
-  console.log('hello')
-  return {
-    sampleApigatewayOutput: 'apigateway'
+const deploy = async (inputs, state, context) => {
+  const noChanges = (inputs.name === state.name && inputs.method === state.method &&
+    inputs.path === state.path && inputs.lambda === state.lambda && inputs.role === state.role)
+  let outputs
+  if (noChanges) {
+    outputs = state
+  } else if (inputs.name && !state.name) {
+    context.log(`Creating APIG: ${inputs.name}`)
+    outputs = await createApi(inputs, context.getSwaggerDefinition)
+  } else if (state.name && !inputs.name) {
+    context.log(`Removing APIG: ${state.name}`)
+    outputs = await deleteApi(state.name, state.id)
+  } else if (inputs.name !== state.name) {
+    context.log(`Removing APIG: ${state.name}`)
+    await deleteApi(state.name, state.id)
+    context.log(`Creating APIG: ${inputs.name}`)
+    outputs = await createApi(inputs, context.getSwaggerDefinition)
+  } else {
+    context.log(`Updating APIG: ${inputs.name}`)
+    outputs = await updateApi(inputs, state.id, context.getSwaggerDefinition)
   }
+  return outputs
 }
 
 const remove = async (inputs, state, context) => {
-
+  context.log(`Removing APIG: ${state.name}`)
+  const outputs = await deleteApi(state.name, state.id)
+  return outputs
 }
-
-// module.exports = async (inputs, state) => {
-//   const noChanges = (inputs.name === state.name && inputs.method === state.method &&
-//     inputs.path === state.path && inputs.lambda === state.lambda && inputs.role === state.role)
-//   let outputs
-//   if (noChanges) {
-//     outputs = state
-//   } else if (inputs.name && !state.name) {
-//     console.log(`Creating APIG: ${inputs.name}`)
-//     outputs = await create(inputs)
-//   } else if (state.name && !inputs.name) {
-//     console.log(`Removing APIG: ${state.name}`)
-//     outputs = await remove(state.name, state.id)
-//   } else if (inputs.name !== state.name) {
-//     console.log(`Removing APIG: ${state.name}`)
-//     await remove(state.name, state.id)
-//     console.log(`Creating APIG: ${inputs.name}`)
-//     outputs = await create(inputs)
-//   } else {
-//     console.log(`Updating APIG: ${inputs.name}`)
-//     outputs = await update(inputs, state.id)
-//   }
-//   return outputs
-// }
 
 module.exports = {
   deploy,
