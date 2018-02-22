@@ -1,4 +1,4 @@
 type: s3
 
 inputs:
-  name: default-bucket-name
+  name: default-bucket-name-goes-here
