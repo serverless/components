@@ -319,14 +319,20 @@ Creates / Removes an Event Gateway function registration and corresponding subsc
 
 ##### Inputs
 
-| Name   | Description                                       | Type   |
-| ------ | ------------------------------------------------- | ------ |
-| `type` | The event type for the Event Gateway subscription | String |
+| Name                 | Description                                                                    | Type   |
+| -------------------- | ------------------------------------------------------------------------------ | ------ |
+| `event`              | `http` or a freeform event like `user.created`                                 | String |
+| `path`               | The event path                                                                 | String |
+| `method`             | **Optional** The HTTP method (if the `http` event is used)                     | String |
+| `space`              | The Event Gateway space which should be used                                   | String |
+| `eventGatewayApiKey` | The Event Gateway API Key which is used to manage configuration on your behalf | String |
+| `lambdaArn`          | The functions runtime                                                          | String |
 
 ##### Commands
 
 * `proto deploy`
 * `proto remove`
+* `proto info`
 
 ##### Example
 
@@ -334,7 +340,12 @@ Creates / Removes an Event Gateway function registration and corresponding subsc
 type: eventgateway
 
 inputs:
-  event: http
+  event: http # or any freeform event like "user.created"
+  path: some-path
+  method: POST # optional
+  space: some-space
+  eventGatewayApiKey: s0m33v3ntg4t3w4y4p1k3y
+  lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
 ```
 
 #### `github`
@@ -413,8 +424,9 @@ components:
       event: http
       method: POST
       path: github-webhook-receiver-path
-      id: github-webhook-receiver-path
-      arn: ${myFunction:arn}
+      space: github-webhook-receiver
+      eventGatewayApiKey: s0m33v3ntg4t3w4y4p1k3y
+      lambdaArn: ${myFunction:arn}
   myGithubWebhook:
     type: github
     inputs:
@@ -581,8 +593,9 @@ components:
     type: eventgateway
     inputs:
       event: fileUploaded
-      id: ${parent:name}
-      arn: ${downloaderLambda:arn}
+      space: s3-downloader
+      eventGatewayApiKey: s0m33v3ntg4t3w4y4p1k3y
+      lambdaArn: ${downloaderLambda:arn}
 ```
 
 #### `s3-prototype`
@@ -662,6 +675,7 @@ components:
       event: http
       method: POST
       path: ${parent:name}
-      id: ${parent:name}
-      arn: ${uploaderLambda:arn}
+      space: s3-uploader
+      eventGatewayApiKey: s0m33v3ntg4t3w4y4p1k3y
+      lambdaArn: ${uploaderLambda:arn}
 ```
