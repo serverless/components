@@ -1,34 +1,84 @@
 const AWS = require('aws-sdk')
 
-const dynamodb = new AWS.DynamoDB({ region: 'us-east-1' })
+const createTable = (inputs) => {
 
-const createTable = (name) => {
-  const params = {
-    AttributeDefinitions: [
-      {
-        AttributeName: 'repo',
-        AttributeType: 'S'
-      }
-    ],
-    KeySchema: [
-      {
-        AttributeName: 'repo',
-        KeyType: 'HASH'
-      }
-    ],
+  const dynamodb = new AWS.DynamoDB({ region: inputs.TableRegion })
+
+  let params = {
+    TableName: inputs.TableName,
+    AttributeDefinitions: inputs.AttributeDefinitions,
+    KeySchema: inputs.KeySchema,
     ProvisionedThroughput: {
-      ReadCapacityUnits: 1,
-      WriteCapacityUnits: 1
-    },
-    TableName: name
+      ReadCapacityUnits: inputs.ProvisionedThroughput.ReadCapacityUnits,
+      WriteCapacityUnits: inputs.ProvisionedThroughput.WriteCapacityUnits
+    }
   }
 
-  return dynamodb.createTable(params).promise()
+  // validate params values against allowed values
+
+  if (inputs.GlobalSecondaryIndexes) {
+    // validate inputs.GlobalSecondaryIndexes
+    // if valid add to params
+    params.GlobalSecondaryIndexes = inputs.GlobalSecondaryIndexes
+  }
+
+  if (inputs.LocalSecondaryIndexes) {
+    // validate inputs.GlobalSecondaryIndexes
+    // if valid add to params
+    params.LocalSecondaryIndexes = inputs.LocalSecondaryIndexes
+  }
+
+  if (inputs.StreamSpecification) {
+    // validate inputs.StreamSpecification
+    // if valid add to params
+    params.StreamSpecification = inputs.StreamSpecification
+  }
+
+  const createPromise = dynamodb.createTable(params).promise()
+
+  if (!inputs.TimeToLiveSpecification) {
+    // no TTL create table and return promise
+    return createPromise
+  }
+
+  // validate inputs.TimeToLiveSpecification
+
+  // Has TTL specification add it to table
+  const TTLparams = {
+    TableName: inputs.TableName,
+    TimeToLiveSpecification: inputs.TimeToLiveSpecification
+  }
+  return createPromise.then(() => {
+    return dynamodb.updateTimeToLive(TTLparams).promise()
+  })
 }
 
-const deleteTable = (name) => {
+// Need update table for changes in inputs
+const updateTable = (inputs, state) => {
+
+  // Validate input against allowed SDK params
+
+  // If changed or removed, Logic for updating ProvisionedThroughput
+
+  // If changed or removed, Logic for updating StreamSpecification
+
+  // If changed or removed, Logic for updating OR deleting GlobalSecondaryIndexes
+
+  // If changed or removed, Logic for updating OR deleting TimeToLiveSpecification
+}
+
+
+const deleteTable = (state) => {
+
+  const dynamodb = new AWS.DynamoDB({ region: state.TableRegion })
+
   const params = {
-    TableName: name
+    TableName: state.TableName
+  }
+
+  if (state.DeletionPolicy === "Retain") {
+    // return error?
+    return null
   }
 
   return dynamodb.deleteTable(params).promise()
@@ -37,16 +87,17 @@ const deleteTable = (name) => {
 const deploy = async (inputs, options, state, context) => {
   if (!state.name && inputs.name) {
     context.log(`Creating Table: ${inputs.name}`)
-    await createTable(inputs.name)
+    await createTable(inputs)
   } else if (!inputs.name && state.name) {
     context.log(`Removing Table: ${state.name}`)
-    await deleteTable(state.name)
+    await deleteTable(state)
   } else if (state.name !== inputs.name) {
     context.log(`Removing Table: ${state.name}`)
-    await deleteTable(state.name)
+    await deleteTable(state)
     context.log(`Creating Table: ${inputs.name}`)
-    await createTable(inputs.name)
+    await createTable(inputs)
   }
+  // Add all inputs to outputs?
   const outputs = {
     name: inputs.name
   }
@@ -55,7 +106,7 @@ const deploy = async (inputs, options, state, context) => {
 
 const remove = async (inputs, options, state, context) => {
   context.log(`Removing Table: ${state.name}`)
-  await deleteTable(state.name)
+  await deleteTable(state)
   const outputs = {
     name: null
   }
