@@ -1,0 +1,11 @@
+type: example
+
+inputs:
+  name: example
+
+components:
+  myRole:
+    type: iam
+    inputs:
+      name: ${parent:name}
+      service: lambda.amazonaws.com

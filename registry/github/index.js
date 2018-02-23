@@ -65,7 +65,7 @@ const deleteWebhook = async ({token, owner, repo}, id) => {
 }
 
 const remove = async (inputs, state, context) => {
-  context.log('Removing Github Webhook')
+  context.cli.log('Removing Github Webhook')
   const outputs = await deleteWebhook(state, state.id)
   return outputs
 }
@@ -77,13 +77,13 @@ const deploy = async (inputs, state, context) => {
   if (noChanges) {
     outputs = { id: state.id }
   } else if (!state.id) {
-    context.log('Creating Github Webhook')
+    context.cli.log('Creating Github Webhook')
     outputs = await createWebhook(inputs)
   } else if (state.id && inputs.token && inputs.owner && inputs.repo && inputs.url && inputs.event) {
-    context.log('Updating Github Webhook')
+    context.cli.log('Updating Github Webhook')
     outputs = await updateWebhook(inputs, state.id)
   } else {
-    context.log('Removing Github Webhook')
+    context.cli.log('Removing Github Webhook')
     outputs = await deleteWebhook(state, state.id)
   }
   return outputs

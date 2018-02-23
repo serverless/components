@@ -31,15 +31,15 @@ const deleteBucket = async (name) => {
 
 const deploy = async (inputs, state, context) => {
   if (!state.name && inputs.name) {
-    context.log(`Creating Bucket: ${inputs.name}`)
+    context.cli.log(`Creating Bucket: ${inputs.name}`)
     await createBucket(inputs.name)
   } else if (!inputs.name && state.name) {
-    context.log(`Removing Bucket: ${state.name}`)
+    context.cli.log(`Removing Bucket: ${state.name}`)
     await deleteBucket(state.name)
   } else if (state.name !== inputs.name) {
-    context.log(`Removing Bucket: ${state.name}`)
+    context.cli.log(`Removing Bucket: ${state.name}`)
     await deleteBucket(state.name)
-    context.log(`Creating Bucket: ${inputs.name}`)
+    context.cli.log(`Creating Bucket: ${inputs.name}`)
     await createBucket(inputs.name)
   }
   const outputs = {
@@ -49,7 +49,7 @@ const deploy = async (inputs, state, context) => {
 }
 
 const remove = async (inputs, state, context) => {
-  context.log(`Removing Bucket: ${state.name}`)
+  context.cli.log(`Removing Bucket: ${state.name}`)
   await deleteBucket(state.name)
   const outputs = {
     name: null
