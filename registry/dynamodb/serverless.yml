@@ -1,4 +1,20 @@
 type: dynamodb
 
 inputs:
-  name: default-table-name-goes-here
+  TableRegion: ${parent:TableRegion}
+  TableName: ${parent:TableName}
+  DeletionPolicy: ${parent:DeletionPolicy}
+  AttributeDefinitions: ${parent:AttributeDefinitions}
+  KeySchema: ${parent:KeySchema}
+  ProvisionedThroughput:
+    ReadCapacityUnits: ${parent:ReadCapacityUnits}
+    WriteCapacityUnits: ${parent:WriteCapacityUnits}
+  GlobalSecondaryIndexes: ${parent:GlobalSecondaryIndexes}
+  LocalSecondaryIndexes: ${parent:LocalSecondaryIndexes}
+  TimeToLiveSpecification:
+    AttributeName: ${parent:TimeToLiveSpecificationAttributeName}
+    Enabled: ${parent:TimeToLiveSpecificationEnabled}
+  StreamSpecification: ${parent:StreamSpecification}
+  Tags: ${parent:tags}
+  SSESpecification:
+    Enabled: ${parent:SSESpecificationEnabled}
