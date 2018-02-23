@@ -69,25 +69,25 @@ const deleteLambda = async (name) => {
 const deploy = async (inputs, state, context) => {
   let outputs
   if (inputs.name && !state.name) {
-    context.log(`Creating Lambda: ${inputs.name}`)
+    context.cli.log(`Creating Lambda: ${inputs.name}`)
     outputs = await createLambda(inputs, context.pack)
   } else if (state.name && !inputs.name) {
-    context.log(`Removing Lambda: ${state.name}`)
+    context.cli.log(`Removing Lambda: ${state.name}`)
     outputs = await deleteLambda(state.name)
   } else if (inputs.name !== state.name) {
-    context.log(`Removing Lambda: ${state.name}`)
+    context.cli.log(`Removing Lambda: ${state.name}`)
     await deleteLambda(state.name)
-    context.log(`Creating Lambda: ${inputs.name}`)
+    context.cli.log(`Creating Lambda: ${inputs.name}`)
     outputs = await createLambda(inputs, context.pack)
   } else {
-    context.log(`Updating Lambda: ${inputs.name}`)
+    context.cli.log(`Updating Lambda: ${inputs.name}`)
     outputs = await updateLambda(inputs, context.pack)
   }
   return outputs
 }
 
 const remove = async (inputs, state, context) => {
-  context.log(`Removing Lambda: ${state.name}`)
+  context.cli.log(`Removing Lambda: ${state.name}`)
   const outputs = await deleteLambda(state.name)
   return outputs
 }

@@ -54,25 +54,25 @@ const deploy = async (inputs, state, context) => {
   if (noChanges) {
     outputs = state
   } else if (inputs.name && !state.name) {
-    context.log(`Creating APIG: ${inputs.name}`)
+    context.cli.log(`Creating APIG: ${inputs.name}`)
     outputs = await createApi(inputs, context.getSwaggerDefinition)
   } else if (state.name && !inputs.name) {
-    context.log(`Removing APIG: ${state.name}`)
+    context.cli.log(`Removing APIG: ${state.name}`)
     outputs = await deleteApi(state.name, state.id)
   } else if (inputs.name !== state.name) {
-    context.log(`Removing APIG: ${state.name}`)
+    context.cli.log(`Removing APIG: ${state.name}`)
     await deleteApi(state.name, state.id)
-    context.log(`Creating APIG: ${inputs.name}`)
+    context.cli.log(`Creating APIG: ${inputs.name}`)
     outputs = await createApi(inputs, context.getSwaggerDefinition)
   } else {
-    context.log(`Updating APIG: ${inputs.name}`)
+    context.cli.log(`Updating APIG: ${inputs.name}`)
     outputs = await updateApi(inputs, state.id, context.getSwaggerDefinition)
   }
   return outputs
 }
 
 const remove = async (inputs, state, context) => {
-  context.log(`Removing APIG: ${state.name}`)
+  context.cli.log(`Removing APIG: ${state.name}`)
   const outputs = await deleteApi(state.name, state.id)
   return outputs
 }

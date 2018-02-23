@@ -1,7 +1,7 @@
 const axios = require('axios')
 
 const invoke = async (inputs, state, context, options) => {
-  context.log(`Testing Endpoint: ${state.url}`)
+  context.cli.log(`Testing Endpoint: ${state.url}`)
 
   try {
     const res = await axios({
@@ -9,9 +9,9 @@ const invoke = async (inputs, state, context, options) => {
       url: state.url,
       data: {}
     })
-    context.log('')
-    context.log('Result:')
-    context.log(res.data)
+    context.cli.log('')
+    context.cli.log('Result:')
+    context.cli.log(res.data)
   } catch (e) {
     throw new Error(e)
   }

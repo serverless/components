@@ -36,15 +36,15 @@ const deleteTable = (name) => {
 
 const deploy = async (inputs, state, context) => {
   if (!state.name && inputs.name) {
-    context.log(`Creating Table: ${inputs.name}`)
+    context.cli.log(`Creating Table: ${inputs.name}`)
     await createTable(inputs.name)
   } else if (!inputs.name && state.name) {
-    context.log(`Removing Table: ${state.name}`)
+    context.cli.log(`Removing Table: ${state.name}`)
     await deleteTable(state.name)
   } else if (state.name !== inputs.name) {
-    context.log(`Removing Table: ${state.name}`)
+    context.cli.log(`Removing Table: ${state.name}`)
     await deleteTable(state.name)
-    context.log(`Creating Table: ${inputs.name}`)
+    context.cli.log(`Creating Table: ${inputs.name}`)
     await createTable(inputs.name)
   }
   const outputs = {
@@ -54,7 +54,7 @@ const deploy = async (inputs, state, context) => {
 }
 
 const remove = async (inputs, state, context) => {
-  context.log(`Removing Table: ${state.name}`)
+  context.cli.log(`Removing Table: ${state.name}`)
   await deleteTable(state.name)
   const outputs = {
     name: null
