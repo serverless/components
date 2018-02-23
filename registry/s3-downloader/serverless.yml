@@ -16,5 +16,6 @@ components:
     type: eventgateway
     inputs:
       event: fileUploaded
-      id: ${parent:name}
-      arn: ${downloaderLambda:arn}
+      space: eslam
+      eventGatewayApiKey: s0m33v3ntg4t3w4y4p1k3y
+      lambdaArn: ${downloaderLambda:arn}

@@ -1,9 +1,13 @@
-const fdk = require('@serverless/fdk')
+const EventGateway = require('@serverless/event-gateway-sdk')
 
-const eventGateway = fdk.eventGateway({
-  url: 'http://localhost', // NOTE irellevant for a config only call
-  configurationUrl: 'https://config.eventgateway-dev.io'
-})
+const getEventGatewayInstance = ({ space, eventGatewayApiKey }) => {
+  return new EventGateway({
+    url: 'https://eventgateway-dev.io',
+    configurationUrl: 'https://config.eventgateway-dev.io',
+    apikey: eventGatewayApiKey,
+    space
+  })
+}
 
 const getCredentials = () => {
   const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN } = process.env
@@ -20,96 +24,139 @@ const getCredentials = () => {
   return credentials
 }
 
-const registerFunction = async ({ id, arn }) => {
-  const params = {
-    functionId: id,
+const getFunctionId = ({ lambdaArn }) => {
+  const matchRes = lambdaArn.match(new RegExp('(.+):(.+):(.+):(.+):(.+):(.+):(.+)'))
+  return matchRes ? matchRes[7] : ''
+}
+
+const getRegion = ({ lambdaArn }) => {
+  const matchRes = lambdaArn.match(new RegExp('(.+):(.+):(.+):(.+):(.+):(.+):(.+)'))
+  return matchRes ? matchRes[4] : ''
+}
+
+const registerFunction = async ({ egInstance, functionId, lambdaArn, region }) => {
+  const credentials = getCredentials()
+  return egInstance.registerFunction({
+    functionId,
     provider: {
       type: 'awslambda',
-      arn,
-      region: 'us-east-1',
-      ...getCredentials()
+      arn: lambdaArn,
+      region,
+      ...credentials
     }
-  }
-  return eventGateway.registerFunction(params)
+  })
 }
 
-const deleteFunction = async ({ id }) => {
-  const params = {
-    functionId: id
-  }
-  return eventGateway.deleteFunction(params)
-}
+const deleteFunction = async ({ egInstance, functionId }) =>
+  egInstance.deleteFunction({ functionId })
 
-const subscribe = async ({ id, event, path, method }) => {
-  const params = {
-    functionId: id,
+const subscribe = async ({ egInstance, functionId, event, path, method, space }) => {
+  let params = {
+    functionId,
     event,
-    path: '/eslam/anything'
+    path: `/${space}/${path}`
   }
   if (path && method) {
-    params.path = `/eslam/${path}`
-    params.method = method
+    params = {
+      ...params,
+      method
+    }
   }
-  return eventGateway.subscribe(params)
+  return egInstance.subscribe(params)
 }
 
-const unsubscribe = async ({ subscriptionId }) => {
-  const params = {
-    subscriptionId
-  }
-  return eventGateway.unsubscribe(params)
-}
+const unsubscribe = async ({ egInstance, subscriptionId }) =>
+  egInstance.unsubscribe({ subscriptionId })
 
-const create = async ({ id, arn, event, path, method }) => {
-  await registerFunction({ id, arn })
-  const res = await subscribe({ id, event, path, method })
+const create = async ({ egInstance, functionId, lambdaArn, event, path, method, space, region }) => {
+  await registerFunction({ egInstance, functionId, lambdaArn, region })
+  const res = await subscribe({ egInstance, functionId, event, path, method, space })
   return {
     subscriptionId: res.subscriptionId,
-    url: (event === 'http') ? `https://eslam.eventgateway-dev.io/${path}` : null
+    url: (event === 'http') ? `https://${space}.eventgateway-dev.io/${path}` : null
   }
 }
 
-const update = async ({ id, event, path, method, subscriptionId }) => {
-  await await unsubscribe({ subscriptionId })
-  const res = await subscribe({ id, event, path, method })
+const update = async ({ egInstance, functionId, event, path, method, space, subscriptionId }) => {
+  await unsubscribe({ egInstance, subscriptionId })
+  const res = await subscribe({ egInstance, functionId, event, path, method, space })
   return {
     subscriptionId: res.subscriptionId,
-    url: (event === 'http') ? `https://eslam.eventgateway-dev.io/${path}` : null
+    url: (event === 'http') ? `https://${space}.eventgateway-dev.io/${path}` : null
   }
 }
 
-const remove = async ({ id, subscriptionId }) => {
-  await deleteFunction({ id })
-  await unsubscribe({ subscriptionId })
-  return {
-    subscriptionId: null,
-    url: null
+const deploy = async (inputs, state, context, options) => {
+  const region = getRegion(inputs)
+  const functionId = getFunctionId(inputs)
+  const egInstance = getEventGatewayInstance(inputs)
+
+  inputs = {
+    ...inputs,
+    functionId,
+    region,
+    egInstance
+  }
+
+  const shouldCreate = (!state.lambdaArn || !state.subscriptionId)
+  const shouldUpdate = (state.event !== inputs.event
+    || state.path !== inputs.path
+    || state.method !== inputs.method)
+
+  let outputs = state
+  if (shouldCreate) {
+    context.log(`Creating Event Gateway Subscription: "${functionId}"`)
+    outputs = await create(inputs)
+  } else if (shouldUpdate) {
+    context.log(`Updating Event Gateway Subscription: "${functionId}"`)
+    outputs = await update({
+      ...state,
+      ...inputs
+    })
+  }
+  return outputs
+}
+
+const remove = async (inputs, state, context, options) => {
+  const region = getRegion(inputs)
+  const functionId = getFunctionId(inputs)
+  const egInstance = getEventGatewayInstance(inputs)
+
+  inputs = {
+    ...inputs,
+    functionId,
+    region,
+    egInstance
+  }
+
+  const shouldRemove = state.subscriptionId
+
+  let outputs = state
+  if (shouldRemove) {
+    context.log(`Removing Event Gateway Subscription: "${functionId}"`)
+    await unsubscribe({ egInstance, subscriptionId: state.subscriptionId })
+    await deleteFunction({ egInstance, functionId })
+    outputs = {
+      subscriptionId: null,
+      url: null
+    }
+  }
+  return outputs
+}
+
+const info = (inputs, state, context, options) => {
+  context.log('Event Gateway setup:')
+  if (Object.keys(state).length) {
+    const setup = { ...state }
+    delete setup.eventGatewayApiKey // TODO: remove mutation
+    context.log(JSON.stringify(setup, null, 2))
+  } else {
+    context.log('Not deployed yet...')
   }
 }
 
-module.exports = async (inputs, state) => {
-  return {
-    sampleEventGatewayOutput: 'eventgateway'
-  }
-  // let outputs
-  // const isCreate = (!state.id || !state.arn)
-  // const isRemove = (!inputs.id && !inputs.arn) && (state.id && state.arn)
-  // const isRecreate = (state.id !== inputs.id || state.arn !== inputs.arn)
-  //
-  // if (isCreate) {
-  //   console.log(`Creating Event Gateway Subscription: ${inputs.id}`)
-  //   outputs = await create(inputs)
-  // } else if (isRemove) {
-  //   console.log(`Removing Event Gateway Subscription: ${state.id}`)
-  //   outputs = await remove(state)
-  // } else if (isRecreate) {
-  //   console.log(`Removing Event Gateway Subscription: ${state.id}`)
-  //   await remove(state)
-  //   console.log(`Creating Event Gateway Subscription: ${inputs.id}`)
-  //   outputs = await create(inputs)
-  // } else {
-  //   outputs = await update({ ...state, ...inputs })
-  // }
-  //
-  // return outputs
+module.exports = {
+  deploy,
+  remove,
+  info
 }

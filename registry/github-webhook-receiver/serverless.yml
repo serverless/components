@@ -28,8 +28,9 @@ components:
 #      event: http
 #      method: POST
 #      path: github-webhook-receiver-eahefnawy
-#      id: github-webhook-receiver-eahefnawy
-#      arn: ${myFunction:arn}
+#      space: eslam
+#      eventGatewayApiKey: s0m33v3ntg4t3w4y4p1k3y
+#      lambdaArn: ${myFunction:arn}
   myGithubWebhook:
     type: github
     inputs:

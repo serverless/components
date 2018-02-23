@@ -18,5 +18,6 @@ components:
       event: http
       method: POST
       path: ${parent:name}
-      id: ${parent:name}
-      arn: ${uploaderLambda:arn}
+      space: eslam
+      eventGatewayApiKey: s0m33v3ntg4t3w4y4p1k3y
+      lambdaArn: ${uploaderLambda:arn}

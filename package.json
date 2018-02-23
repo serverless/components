@@ -14,7 +14,6 @@
   },
   "dependencies": {
     "@octokit/rest": "^14.0.5",
-    "@serverless/fdk": "^0.7.1",
     "archiver": "^2.1.1",
     "aws-sdk": "^2.185.0",
     "axios": "^0.17.1",
