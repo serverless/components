@@ -1,11 +1,22 @@
 {
-  "name": "components-eslam",
-  "version": "1.0.0",
-  "description": "Serverless Components Eslam",
-  "repository": "https://github.com/serverless/components-eslam",
-  "author": "Eslam A. Hefnawy",
-  "license": "MIT",
+  "name": "@serverless/serverless-components",
+  "version": "0.1.0",
+  "description": "PoC for the next version of the Serverless Framework",
+  "author": "Serverless, Inc.",
+  "license": "Apache-2.0",
   "main": "lib/index.js",
+  "preferGlobal": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/serverless/serverless-components"
+  },
+  "bugs": {
+    "url": "https://github.com/serverless/serverless-components/issues"
+  },
+  "homepage": "https://github.com/serverless/serverless-components#readme",
+  "publishConfig": {
+    "access": "public"
+  },
   "bin": {
     "proto": "./bin/serverless"
   },
