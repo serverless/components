@@ -1,11 +1,17 @@
 type: apigateway
 
 inputs:
-  name: default-rest-api-name-goes-here
-  method: POST
-  path: /hello
-  lambda: ""
-  role: ${myRole:arn}
+  name: some-rest-api
+  roleArn: ${myRole:arn}
+  routes:
+    /hello:
+      post:
+        function: hello
+      get:
+        function: hello
+    /hello/world:
+      delete:
+        function: world
 
 components:
   myRole:

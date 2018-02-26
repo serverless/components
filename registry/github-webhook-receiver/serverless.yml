@@ -19,9 +19,11 @@ components:
     type: apigateway
     inputs:
       name: github-webhook-receiver-api
-      method: POST
-      path: /github/webhook
-      lambda: ${myFunction:arn}
+      roleArn: arn:aws:iam::XXXXX:role/some-api-gateway-role
+      routes:
+        /github/webhook:
+          post:
+            function: ${myFunction:name}
 #  myEndpoint:
 #    type: eventgateway
 #    inputs:
