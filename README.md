@@ -78,9 +78,11 @@ components:
     type: apigateway
     inputs:
       name: github-webhook-receiver
-      method: POST
-      path: /github/webhook
-      lambda: ${myFunction:arn}
+      roleArn: arn:aws:iam::XXXXX:role/some-api-gateway-role
+      routes:
+        /github/webhook:
+          post:
+            function: ${myFunction:name}
   myGithubWebhook:
     type: github
     inputs:
@@ -263,13 +265,11 @@ Creates / Removes an API endpoint which is exposed via AWS API Gateway and conne
 
 ##### Inputs
 
-| Name     | Description                                                                  | Type   |
-| -------- | ---------------------------------------------------------------------------- | ------ |
-| `name`   | The API name                                                                 | String |
-| `method` | The HTTP method                                                              | String |
-| `path`   | The HTTP path                                                                | String |
-| `lambda` | The AWS Lambda functions `arn` which should be connected via the API Gateway | String |
-| `role`   | The AWS IAM Role `arn` which should be used for this API Gateway             | String |
+| Name      | Description                                                                   | Type   |
+| --------- | ----------------------------------------------------------------------------- | ------ |
+| `name`    | The API name                                                                  | String |
+| `roleArn` | The AWS IAM Role `arn` which should be used for this API Gateway              | String |
+| `routes`  | The routes definitions for this API (**NOTE:** methods need to be lowercased) | Object |
 
 ##### Commands
 
@@ -283,10 +283,16 @@ type: apigateway
 
 inputs:
   name: apigateway
-  method: POST
-  path: /hello
-  lambda: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
-  role: arn:aws:iam::XXXXX:role/some-api-gateway-role
+  roleArn: arn:aws:iam::XXXXX:role/some-api-gateway-role
+  routes:
+    /hello:
+      post:
+        function: hello
+      get:
+        function: hello
+    /hello/world:
+      delete:
+        function: world
 ```
 
 #### `dynamodb`
