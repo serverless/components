@@ -40,6 +40,15 @@ Components are capable of provisioning infrastructure while including both appli
    * `export EVENT_GATEWAY_TOKEN=my_event_gateway_token`
    * `export AWS_ACCESS_KEY_ID=my_access_key_id`
    * `export AWS_SECRET_ACCESS_KEY=my_secret_access_key`
+2. Make sure to install sub dependancies in every `/registry/*` with `package.json`
+
+## Running Locally
+
+Run commands with 
+
+```
+node ../../bin/serverless [Command]
+```
 
 ## Concepts
 
