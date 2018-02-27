@@ -37,14 +37,14 @@ Components are capable of provisioning infrastructure while including both appli
 1. `npm install --global @serverless/serverless-components`
 1. Setup the environment variables
    * `export GITHUB_TOKEN=my_github_token`
-   * `export EVENT_GATEWAY_TOKEN=my_event_gateway_token`
+   * `export EVENT_GATEWAY_API_KEY=my_event_gateway_api_key`
    * `export AWS_ACCESS_KEY_ID=my_access_key_id`
    * `export AWS_SECRET_ACCESS_KEY=my_secret_access_key`
-2. Make sure to install sub dependancies in every `/registry/*` with `package.json`
+1. Make sure to install sub dependancies in every `/registry/*` with `package.json`
 
 ## Running Locally
 
-Run commands with 
+Run commands with
 
 ```
 node ../../bin/serverless [Command]
@@ -603,7 +603,7 @@ components:
       name: ${parent:name}
       handler: downloader.handler
       env:
-        EVENT_GATEWAY_TOKEN: ${EVENT_GATEWAY_TOKEN}
+        EVENT_GATEWAY_APIKEY: ${EVENT_GATEWAY_API_KEY}
         FILES_TABLE: some-dynamodb-table
   downloaderSubscription:
     type: eventgateway
@@ -683,7 +683,7 @@ components:
       name: ${parent:name}
       handler: uploader.handler
       env:
-        EVENT_GATEWAY_TOKEN: ${EVENT_GATEWAY_TOKEN}
+        EVENT_GATEWAY_APIKEY: ${EVENT_GATEWAY_API_KEY}
         BUCKET: some-s3-bucket
   uploaderSubscription:
     type: eventgateway
