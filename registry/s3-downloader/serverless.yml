@@ -10,7 +10,7 @@ components:
       name: ${parent:name}
       handler: downloader.handler
       env:
-        EVENT_GATEWAY_TOKEN: ${EVENT_GATEWAY_TOKEN}
+        EVENT_GATEWAY_APIKEY: ${EVENT_GATEWAY_API_KEY}
         FILES_TABLE: serverless-components-eslam-files
   downloaderSubscription:
     type: eventgateway

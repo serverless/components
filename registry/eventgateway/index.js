@@ -1,6 +1,10 @@
 const EventGateway = require('@serverless/event-gateway-sdk')
 
 const getEventGatewayInstance = ({ space, eventGatewayApiKey }) => {
+  if (process.env.EVENT_GATEWAY_API_KEY) {
+    eventGatewayApiKey = process.env.EVENT_GATEWAY_API_KEY // eslint-disable-line no-param-reassign
+  }
+
   return new EventGateway({
     url: 'https://eventgateway-dev.io',
     configurationUrl: 'https://config.eventgateway-dev.io',
@@ -34,7 +38,9 @@ const getRegion = ({ lambdaArn }) => {
   return matchRes ? matchRes[4] : ''
 }
 
-const registerFunction = async ({ egInstance, functionId, lambdaArn, region }) => {
+const registerFunction = async ({
+  egInstance, functionId, lambdaArn, region
+}) => {
   const credentials = getCredentials()
   return egInstance.registerFunction({
     functionId,
@@ -50,7 +56,9 @@ const registerFunction = async ({ egInstance, functionId, lambdaArn, region }) =
 const deleteFunction = async ({ egInstance, functionId }) =>
   egInstance.deleteFunction({ functionId })
 
-const subscribe = async ({ egInstance, functionId, event, path, method, space }) => {
+const subscribe = async ({
+  egInstance, functionId, event, path, method, space
+}) => {
   let params = {
     functionId,
     event,
@@ -68,25 +76,55 @@ const subscribe = async ({ egInstance, functionId, event, path, method, space })
 const unsubscribe = async ({ egInstance, subscriptionId }) =>
   egInstance.unsubscribe({ subscriptionId })
 
-const create = async ({ egInstance, functionId, lambdaArn, event, path, method, space, region }) => {
-  await registerFunction({ egInstance, functionId, lambdaArn, region })
-  const res = await subscribe({ egInstance, functionId, event, path, method, space })
+const create = async ({
+  egInstance,
+  functionId,
+  lambdaArn,
+  event,
+  path,
+  method,
+  space,
+  region
+}) => {
+  await registerFunction({
+    egInstance,
+    functionId,
+    lambdaArn,
+    region
+  })
+  const res = await subscribe({
+    egInstance,
+    functionId,
+    event,
+    path,
+    method,
+    space
+  })
   return {
     subscriptionId: res.subscriptionId,
-    url: (event === 'http') ? `https://${space}.eventgateway-dev.io/${path}` : null
+    url: event === 'http' ? `https://${space}.eventgateway-dev.io/${path}` : null
   }
 }
 
-const update = async ({ egInstance, functionId, event, path, method, space, subscriptionId }) => {
+const update = async ({
+  egInstance, functionId, event, path, method, space, subscriptionId
+}) => {
   await unsubscribe({ egInstance, subscriptionId })
-  const res = await subscribe({ egInstance, functionId, event, path, method, space })
+  const res = await subscribe({
+    egInstance,
+    functionId,
+    event,
+    path,
+    method,
+    space
+  })
   return {
     subscriptionId: res.subscriptionId,
-    url: (event === 'http') ? `https://${space}.eventgateway-dev.io/${path}` : null
+    url: event === 'http' ? `https://${space}.eventgateway-dev.io/${path}` : null
   }
 }
 
-const deploy = async (inputs, state, context, options) => {
+const deploy = async (inputs, state, context) => {
   const region = getRegion(inputs)
   const functionId = getFunctionId(inputs)
   const egInstance = getEventGatewayInstance(inputs)
@@ -98,10 +136,9 @@ const deploy = async (inputs, state, context, options) => {
     egInstance
   }
 
-  const shouldCreate = (!state.lambdaArn || !state.subscriptionId)
-  const shouldUpdate = (state.event !== inputs.event
-    || state.path !== inputs.path
-    || state.method !== inputs.method)
+  const shouldCreate = !state.lambdaArn || !state.subscriptionId
+  const shouldUpdate =
+    state.event !== inputs.event || state.path !== inputs.path || state.method !== inputs.method
 
   let outputs = state
   if (shouldCreate) {
@@ -117,7 +154,7 @@ const deploy = async (inputs, state, context, options) => {
   return outputs
 }
 
-const remove = async (inputs, state, context, options) => {
+const remove = async (inputs, state, context) => {
   const region = getRegion(inputs)
   const functionId = getFunctionId(inputs)
   const egInstance = getEventGatewayInstance(inputs)
@@ -144,7 +181,7 @@ const remove = async (inputs, state, context, options) => {
   return outputs
 }
 
-const info = (inputs, state, context, options) => {
+const info = (inputs, state, context) => {
   context.log('Event Gateway setup:')
   if (Object.keys(state).length) {
     const setup = { ...state }
