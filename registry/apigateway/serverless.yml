@@ -7,6 +7,7 @@ inputs:
     /hello:
       post:
         function: hello
+        cors: true
       get:
         function: hello
     /hello/world:
