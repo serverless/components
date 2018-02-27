@@ -274,11 +274,11 @@ Creates / Removes an API endpoint which is exposed via AWS API Gateway and conne
 
 ##### Inputs
 
-| Name      | Description                                                                   | Type   |
-| --------- | ----------------------------------------------------------------------------- | ------ |
-| `name`    | The API name                                                                  | String |
-| `roleArn` | The AWS IAM Role `arn` which should be used for this API Gateway              | String |
-| `routes`  | The routes definitions for this API (**NOTE:** methods need to be lowercased) | Object |
+| Name      | Description                                                      | Type   |
+| --------- | ---------------------------------------------------------------- | ------ |
+| `name`    | The API name                                                     | String |
+| `roleArn` | The AWS IAM Role `arn` which should be used for this API Gateway | String |
+| `routes`  | The routes definitions for this API                              | Object |
 
 ##### Commands
 
@@ -297,6 +297,7 @@ inputs:
     /hello:
       post:
         function: hello
+        cors: true
       get:
         function: hello
     /hello/world:
