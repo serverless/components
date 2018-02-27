@@ -34,7 +34,7 @@ const deleteTable = (name) => {
   return dynamodb.deleteTable(params).promise()
 }
 
-const deploy = async (inputs, state, context) => {
+const deploy = async (inputs, options, state, context) => {
   if (!state.name && inputs.name) {
     context.log(`Creating Table: ${inputs.name}`)
     await createTable(inputs.name)
@@ -53,7 +53,7 @@ const deploy = async (inputs, state, context) => {
   return outputs
 }
 
-const remove = async (inputs, state, context) => {
+const remove = async (inputs, options, state, context) => {
   context.log(`Removing Table: ${state.name}`)
   await deleteTable(state.name)
   const outputs = {

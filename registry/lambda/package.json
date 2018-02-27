@@ -1,0 +1,15 @@
+{
+  "name": "@serverless/lambda-component",
+  "version": "0.1.0",
+  "description": "Lambda component.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "serverless.com",
+  "license": "MIT",
+  "dependencies": {
+    "aws-sdk": "^2.201.0",
+    "archiver": "^2.1.1"
+  }
+}

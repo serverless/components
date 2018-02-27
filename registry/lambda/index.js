@@ -1,7 +1,8 @@
 const AWS = require('aws-sdk')
+const pack = require('./pack')
 const lambda = new AWS.Lambda({ region: 'us-east-1' })
 
-const createLambda = async ({ name, handler, memory, timeout, env, description, role }, pack) => {
+const createLambda = async ({ name, handler, memory, timeout, env, description, role }) => {
   const pkg = await pack()
 
   const params = {
@@ -27,7 +28,7 @@ const createLambda = async ({ name, handler, memory, timeout, env, description, 
   }
 }
 
-const updateLambda = async ({ name, handler, memory, timeout, env, description }, pack) => {
+const updateLambda = async ({ name, handler, memory, timeout, env, description }) => {
   const pkg = await pack()
   const functionCodeParams = {
     FunctionName: name,
@@ -66,11 +67,11 @@ const deleteLambda = async (name) => {
   }
 }
 
-const deploy = async (inputs, state, context) => {
+const deploy = async (inputs, options, state, context) => {
   let outputs
   if (inputs.name && !state.name) {
     context.log(`Creating Lambda: ${inputs.name}`)
-    outputs = await createLambda(inputs, context.pack)
+    outputs = await createLambda(inputs)
   } else if (state.name && !inputs.name) {
     context.log(`Removing Lambda: ${state.name}`)
     outputs = await deleteLambda(state.name)
@@ -78,15 +79,15 @@ const deploy = async (inputs, state, context) => {
     context.log(`Removing Lambda: ${state.name}`)
     await deleteLambda(state.name)
     context.log(`Creating Lambda: ${inputs.name}`)
-    outputs = await createLambda(inputs, context.pack)
+    outputs = await createLambda(inputs)
   } else {
     context.log(`Updating Lambda: ${inputs.name}`)
-    outputs = await updateLambda(inputs, context.pack)
+    outputs = await updateLambda(inputs)
   }
   return outputs
 }
 
-const remove = async (inputs, state, context) => {
+const remove = async (inputs, options, state, context) => {
   context.log(`Removing Lambda: ${state.name}`)
   const outputs = await deleteLambda(state.name)
   return outputs

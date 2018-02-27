@@ -3,7 +3,7 @@ const BbPromise = require('bluebird')
 
 const IAM = new AWS.IAM({ region: 'us-east-1' })
 
-const createRole = async ({name, service}) => {
+const createRole = async ({ name, service }) => {
   const assumeRolePolicyDocument = {
     Version: '2012-10-17',
     Statement: {
@@ -47,7 +47,7 @@ const deleteRole = async (name) => {
   }
 }
 
-const deploy = async (inputs, state, context) => {
+const deploy = async (inputs, options, state, context) => {
   let outputs = state
   if (!state.name && inputs.name) {
     context.log(`Creating Role: ${inputs.name}`)
@@ -64,7 +64,7 @@ const deploy = async (inputs, state, context) => {
   return outputs
 }
 
-const remove = async (inputs, state, context) => {
+const remove = async (inputs, options, state, context) => {
   context.log(`Removing Role: ${state.name}`)
   const outputs = await deleteRole(state.name)
   return outputs

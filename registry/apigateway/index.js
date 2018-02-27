@@ -62,7 +62,7 @@ const updateApi = async (params) => {
   return outputs
 }
 
-const deploy = async (inputs, state, context) => {
+const deploy = async (inputs, options, state, context) => {
   const noChanges =
     inputs.name === state.name &&
     inputs.roleArn === state.roleArn &&
@@ -84,7 +84,7 @@ const deploy = async (inputs, state, context) => {
   return outputs
 }
 
-const remove = async (inputs, state, context) => {
+const remove = async (inputs, options, state, context) => {
   context.log(`Removing API Gateway: "${state.name}"`)
   const outputs = await deleteApi({ name: state.name, id: state.id })
   return outputs

@@ -124,7 +124,7 @@ const update = async ({
   }
 }
 
-const deploy = async (inputs, state, context) => {
+const deploy = async (inputs, options, state, context) => {
   const region = getRegion(inputs)
   const functionId = getFunctionId(inputs)
   const egInstance = getEventGatewayInstance(inputs)
@@ -154,7 +154,7 @@ const deploy = async (inputs, state, context) => {
   return outputs
 }
 
-const remove = async (inputs, state, context) => {
+const remove = async (inputs, options, state, context) => {
   const region = getRegion(inputs)
   const functionId = getFunctionId(inputs)
   const egInstance = getEventGatewayInstance(inputs)
@@ -181,7 +181,7 @@ const remove = async (inputs, state, context) => {
   return outputs
 }
 
-const info = (inputs, state, context) => {
+const info = (inputs, options, state, context) => {
   context.log('Event Gateway setup:')
   if (Object.keys(state).length) {
     const setup = { ...state }
