@@ -25,7 +25,6 @@
   },
   "dependencies": {
     "@octokit/rest": "^14.0.5",
-    "archiver": "^2.1.1",
     "aws-sdk": "^2.185.0",
     "axios": "^0.17.1",
     "bluebird": "^3.5.1",

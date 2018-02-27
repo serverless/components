@@ -9,18 +9,18 @@ const convertToApiGatewayInputs = (inputs) => {
   return inputs
 }
 
-const deploy = async (inputs, state, context, options) => {
+const deploy = async (inputs, options, state, context) => {
   const outputs = {}
   if (inputs.gateway === 'eventgateway') {
     const eventGatewayInputs = convertToEventGatewayInputs(inputs)
-    const eventGatewayState = state.eventgateway || {}
-    const eventGatewayComponent = await context.loadComponent('eventgateway')
-    outputs.eventgateway = await eventGatewayComponent.deploy(eventGatewayInputs, eventGatewayState, context, options)
+    const eventGatewayComponent = await context.load('eventgateway', 'eg')
+    const eventGatewayState = await eventGatewayComponent.deploy(eventGatewayInputs)
+    // utilize EG state
   } else if (inputs.gateway === 'apigateway') {
     const apiGatewayInputs = convertToApiGatewayInputs(inputs)
-    const apiGatewayState = state.apigateway || {}
-    const apiGatewayComponent = await context.loadComponent('apigateway')
-    outputs.apigateway = await apiGatewayComponent.deploy(apiGatewayInputs, apiGatewayState, context, options)
+    const apiGatewayComponent = await context.load('apigateway', 'apig')
+    const apigatewayState = await apiGatewayComponent.deploy(apiGatewayInputs)
+    // utilize APIG state
   }
   return outputs
 }

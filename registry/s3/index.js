@@ -29,7 +29,7 @@ const deleteBucket = async (name) => {
   return S3.deleteBucket({ Bucket: name }).promise()
 }
 
-const deploy = async (inputs, state, context) => {
+const deploy = async (inputs, options, state, context) => {
   if (!state.name && inputs.name) {
     context.log(`Creating Bucket: ${inputs.name}`)
     await createBucket(inputs.name)
@@ -48,7 +48,7 @@ const deploy = async (inputs, state, context) => {
   return outputs
 }
 
-const remove = async (inputs, state, context) => {
+const remove = async (inputs, options, state, context) => {
   context.log(`Removing Bucket: ${state.name}`)
   await deleteBucket(state.name)
   const outputs = {

@@ -1,6 +1,6 @@
 const axios = require('axios')
 
-const invoke = async (inputs, state, context, options) => {
+const invoke = async (inputs, options, state, context) => {
   context.log(`Testing Endpoint: ${state.url}`)
 
   try {
