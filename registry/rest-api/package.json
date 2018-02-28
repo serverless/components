@@ -1,0 +1,14 @@
+{
+  "name": "@serverless/rest-api-component",
+  "version": "0.1.0",
+  "description": "REST API component.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "serverless.com",
+  "license": "MIT",
+  "dependencies": {
+    "ramda": "^0.25.0"
+  }
+}

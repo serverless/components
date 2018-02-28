@@ -1,24 +1,18 @@
 type: rest-api
 
 inputs:
-  gateway: eventgateway
-#  gateways:
-#    eventgateway:
-#      active: true
-#      token: xxx
-#    apigateway:
-#      active: false
-#      apiKey: xxx
-#      apiSecret: xxx
+  gateway: apigateway
+  eventGatewayApiKey: s0m33v3ntg4t3w4y4p1k3y # optional
+  space: some-space # optional
+  name: some-rest-api
   routes:
     users:
       post:
+        lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
         cors: true
-        fn: createUser
       get:
-        fn: getUser
+        lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
       put:
-        fn: updateUser
+        lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
       delete:
-        fn: deleteUser
-
+        lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
