@@ -22,11 +22,12 @@ const setPolicyAndCors = async ({bucketName}) => {
   }).promise()
 
   // configure CORS
-  const putPostDeleteRule = {
+  const putPostDeleteHeadRule = {
     AllowedMethods: [
       'PUT',
       'POST',
-      'DELETE'
+      'DELETE',
+      'HEAD'
     ],
     AllowedOrigins: [
       'https://*.amazonaws.com'
@@ -35,7 +36,7 @@ const setPolicyAndCors = async ({bucketName}) => {
       '*'
     ],
     MaxAgeSeconds: 0
-  };
+  }
 
   const getRule = {
     AllowedMethods: [
@@ -54,7 +55,7 @@ const setPolicyAndCors = async ({bucketName}) => {
     Bucket: bucketName,
     CORSConfiguration: {
       CORSRules: [
-        putPostDeleteRule,
+        putPostDeleteHeadRule,
         getRule
       ]
     },

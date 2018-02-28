@@ -1,5 +1,5 @@
 const deploy = async (inputs, state, context) => {
-  const s3url = `http://${inputs.hosting_domain}.s3-website-${inputs.hosting_region}.amazonas.com`
+  const s3url = `http://${inputs.hosting_domain}.s3-website-${inputs.hosting_region}.amazonaws.com`
 
   if (!state.name && inputs.name) {
     context.log(`Creating site: ${inputs.name}`)

@@ -5,9 +5,11 @@
 # [x] configure S3 bucket permissions to be public
 #   [x] Set S3 policy
 #   [x] Set CORS
-# [] upload content to S3 bucket (rgfamily.com)
+# [x] upload content to S3 bucket (rgfamily.com)
 # [x] Configure root bucket for static website hosting
 # [x] Configure www bucket for website redirect to root bucket
+# [] Build CloudFront Site Component
+# [] Configure and set Route53
 # [x] output resulting website url
 # [] output instructions to configure DNS, CNAME records and A records
 
@@ -41,14 +43,6 @@ components:
     type: rg-s3policy
     inputs:
       bucketName: ${rootDomainBucket:name}
-  # rootDomainBucketRole:
-  #   type: rg-iamrole
-  #   inputs:
-  #     name: rgfamilycomRole #${parent:hosting:domain}Role
-  #     service: s3.amazonaws.com
-  #     policyArn: ${rootDomainBucketPolicy:policyArn}
-    # outputs:
-    #   roleArn
   siteContentUploader:
     type: rg-s3dirloader
     inputs:
@@ -58,10 +52,6 @@ components:
     type: s3
     inputs:
       name: ${parent:redirect_domain}
-  # codeUploader:
-  #   type: s3-uploader
-  #   inputs:
-  #     name: xxxxxx
   rootDomainBucketConfig:
     type: rg-s3-website-config
     inputs:
