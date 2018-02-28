@@ -57,7 +57,7 @@ const deleteFunction = async ({ egInstance, functionId }) =>
   egInstance.deleteFunction({ functionId })
 
 const subscribe = async ({
-  egInstance, functionId, event, path, method, space
+  egInstance, functionId, event, path, method, cors, space
 }) => {
   let params = {
     functionId,
@@ -70,11 +70,19 @@ const subscribe = async ({
       method
     }
   }
+  if (cors) {
+    params = {
+      ...params,
+      cors: {}
+    }
+  }
   return egInstance.subscribe(params)
 }
 
 const unsubscribe = async ({ egInstance, subscriptionId }) =>
   egInstance.unsubscribe({ subscriptionId })
+
+const listSubscriptions = async ({ egInstance }) => egInstance.listSubscriptions()
 
 const create = async ({
   egInstance,
@@ -83,6 +91,7 @@ const create = async ({
   event,
   path,
   method,
+  cors,
   space,
   region
 }) => {
@@ -98,6 +107,7 @@ const create = async ({
     event,
     path,
     method,
+    cors,
     space
   })
   return {
@@ -107,7 +117,14 @@ const create = async ({
 }
 
 const update = async ({
-  egInstance, functionId, event, path, method, space, subscriptionId
+  egInstance,
+  functionId,
+  event,
+  path,
+  method,
+  cors,
+  space,
+  subscriptionId
 }) => {
   await unsubscribe({ egInstance, subscriptionId })
   const res = await subscribe({
@@ -116,6 +133,7 @@ const update = async ({
     event,
     path,
     method,
+    cors,
     space
   })
   return {
@@ -138,7 +156,10 @@ const deploy = async (inputs, options, state, context) => {
 
   const shouldCreate = !state.lambdaArn || !state.subscriptionId
   const shouldUpdate =
-    state.event !== inputs.event || state.path !== inputs.path || state.method !== inputs.method
+    state.event !== inputs.event ||
+    state.path !== inputs.path ||
+    state.method !== inputs.method ||
+    state.cors !== inputs.cors
 
   let outputs = state
   if (shouldCreate) {
@@ -181,12 +202,34 @@ const remove = async (inputs, options, state, context) => {
   return outputs
 }
 
-const info = (inputs, options, state, context) => {
+const info = async (inputs, options, state, context) => {
+  const egInstance = getEventGatewayInstance(inputs)
+
   context.log('Event Gateway setup:')
   if (Object.keys(state).length) {
-    const setup = { ...state }
-    delete setup.eventGatewayApiKey // TODO: remove mutation
-    context.log(JSON.stringify(setup, null, 2))
+    let res = await listSubscriptions({ egInstance })
+    if (res.length) {
+      // filter out the result we're looking for
+      res = res
+        .filter((entry) => {
+          const pathWithoutSpace = entry.path.replace(`/${inputs.space}/`, '')
+          const functionName = inputs.lambdaArn.split(':').pop()
+          return (
+            inputs.event === entry.event &&
+            inputs.path === pathWithoutSpace &&
+            functionName === entry.functionId
+          )
+        })
+        .shift()
+      // enhance the result with some information from the state
+      const setup = {
+        ...res,
+        url: state.url
+      }
+      context.log(JSON.stringify(setup, null, 2))
+    } else {
+      context.log('Something went wrong...')
+    }
   } else {
     context.log('Not deployed yet...')
   }

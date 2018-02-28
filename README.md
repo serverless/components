@@ -335,14 +335,15 @@ Creates / Removes an Event Gateway function registration and corresponding subsc
 
 ##### Inputs
 
-| Name                 | Description                                                                    | Type   |
-| -------------------- | ------------------------------------------------------------------------------ | ------ |
-| `event`              | `http` or a freeform event like `user.created`                                 | String |
-| `path`               | The event path                                                                 | String |
-| `method`             | **Optional** The HTTP method (if the `http` event is used)                     | String |
-| `space`              | The Event Gateway space which should be used                                   | String |
-| `eventGatewayApiKey` | The Event Gateway API Key which is used to manage configuration on your behalf | String |
-| `lambdaArn`          | The functions runtime                                                          | String |
+| Name                 | Description                                                                    | Type    |
+| -------------------- | ------------------------------------------------------------------------------ | ------- |
+| `event`              | `http` or a freeform event like `user.created`                                 | String  |
+| `path`               | The event path                                                                 | String  |
+| `method`             | **Optional** The HTTP method (if the `http` event is used)                     | String  |
+| `cors`               | **Optional** If CORS support should be setup                                   | Boolean |
+| `space`              | The Event Gateway space which should be used                                   | String  |
+| `eventGatewayApiKey` | The Event Gateway API Key which is used to manage configuration on your behalf | String  |
+| `lambdaArn`          | The functions runtime                                                          | String  |
 
 ##### Commands
 
@@ -359,6 +360,7 @@ inputs:
   event: http # or any freeform event like "user.created"
   path: some-path
   method: POST # optional
+  cors: true # optional
   space: some-space
   eventGatewayApiKey: s0m33v3ntg4t3w4y4p1k3y
   lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
