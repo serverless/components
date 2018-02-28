@@ -1,0 +1,8 @@
+type: rg-s3-website-config
+
+inputs:
+  rootBucketName: default.com
+  indexDocument: index.html
+  errorDocument: error.html
+  redirectBucketName: www.default.com
+  redirectToHostName: default.com

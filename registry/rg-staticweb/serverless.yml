@@ -1,82 +1,67 @@
 
 # access website at http://rgfamily.com
 
-# create S3 bucket (rgfamily.com, www.rgfamily.com)
-# upload content to S3 bucket (rgfamily.com)
-# configure S3 bucket permissions to be public
-# {
-#   "Version":"2012-10-17",
-#   "Statement":[{
-# 	  "Sid":"PublicReadGetObject",
-#     "Effect":"Allow",
-# 	  "Principal": "*",
-#     "Action":["s3:GetObject"],
-#       "Resource":["arn:aws:s3:::rgfamily.com/*"
-#     ]
-#     }
-#   ]
-# }
-# redirect 'www.rgfamily.com' bucket to 'rgfamily.com' bucket
-# https://docs.aws.amazon.com/AmazonS3/latest/dev/website-hosting-custom-domain-walkthrough.html
-# output resulting website url
-# output instructions to configure DNS, CNAME records and A records
+# [x] create S3 bucket (rgfamily.com, www.rgfamily.com)
+# [x] configure S3 bucket permissions to be public
+#   [x] Set S3 policy
+#   [x] Set CORS
+# [] upload content to S3 bucket (rgfamily.com)
+# [x] Configure root bucket for static website hosting
+# [x] Configure www bucket for website redirect to root bucket
+# [x] output resulting website url
+# [] output instructions to configure DNS, CNAME records and A records
 
 type: rg-aws-staticweb
 
 inputs:
   name: rgfamilysite
-  content:
-    path: ./site
-    index: index.html
-    error: error.html
-  cdn:
-    type: cloudfront
-  hosting:
-    region: us-east-1
-    domain: rgfamily.com
+  # content:
+  #   path: ./site
+  #   index: index.html
+  #   error: error.html
+  # cdn:
+  #   type: cloudfront
+  # hosting:
+  #   region: us-east-1
+  #   domain: rgfamily.com
+  content_path: ./site
+  content_index: index.html
+  content_error: error.html
+  cdn_type: cloudfront
+  hosting_region: us-east-1
+  hosting_domain: rgfamily.com
+  redirect_domain: www.rgfamily.com
 
 components:
   rootDomainBucket:
     type: s3
     inputs:
-      name: rgfamily.com #${parent:hosting:domain}
+      name: ${parent:hosting_domain}
   rootDomainBucketPolicy:
-    type: rg-iampolicy
+    type: rg-s3policy
     inputs:
-      name: rgfamilycomPolicy #${parent:hosting:domain}Policy
-      # bucketName: ${rootDomainBucket:inputs:name}
-      bucketName: rgfamily.com #${parent:hosting:domain}
-    # outputs:
-    #   policyArn
-  rootDomainBucketRole:
-    type: rg-iamrole
-    inputs:
-      name: rgfamilycomRole #${parent:hosting:domain}Role
-      service: s3.amazonaws.com
-      policyArn: ${rootDomainBucketPolicy:policyArn}
+      bucketName: ${rootDomainBucket:name}
+  # rootDomainBucketRole:
+  #   type: rg-iamrole
+  #   inputs:
+  #     name: rgfamilycomRole #${parent:hosting:domain}Role
+  #     service: s3.amazonaws.com
+  #     policyArn: ${rootDomainBucketPolicy:policyArn}
     # outputs:
     #   roleArn
   wwwDomainBucket:
     type: s3
     inputs:
-      name: www.rgfamily.com #www.${parent:hosting:domain}
-  wwwDomainBucketPolicy:
-    type: rg-iampolicy
-    inputs:
-      name: wwwrgfamilycomPolicy #www${parent:hosting:domain}Policy
-      # bucketName: ${wwwDomainBucket:inputs:name}
-      bucketName: www.rgfamily.com #www.${parent:hosting:domain}
-    # outputs:
-    #   policyArn
-  wwwDomainBucketRole:
-    type: rg-iamrole
-    inputs:
-      name: wwwrgfamilycomRole #${parent:hosting:domain}Role
-      service: s3.amazonaws.com
-      policyArn: ${wwwDomainBucketPolicy:policyArn}
-    # outputs:
-    #   roleArn
+      name: ${parent:redirect_domain}
   # codeUploader:
   #   type: s3-uploader
   #   inputs:
-  #     name: eslam-hefnawy-uploader
+  #     name: xxxxxx
+  rootDomainBucketConfig:
+    type: rg-s3-website-config
+    inputs:
+      rootBucketName: ${rootDomainBucket:name}
+      indexDocument: ${parent:content_index}
+      errorDocument: ${parent:content_error}
+      redirectBucketName: ${wwwDomainBucket:name}
+      redirectToHostName: ${parent:hosting_domain}

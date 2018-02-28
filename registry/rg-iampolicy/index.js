@@ -8,7 +8,9 @@ const createPolicy = async ({name, bucketName}) => {
     Version: '2012-10-17',
     Statement: [{
       Effect: 'Allow',
-      // Principal: '*',
+      Principal: {
+        AWS: '*'
+      },
       Action: ['s3:GetObject'],
       Resource: [`arn:aws:s3:::${bucketName}/*`]
     }]
