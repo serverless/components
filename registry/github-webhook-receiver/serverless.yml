@@ -23,7 +23,7 @@ components:
       routes:
         /github/webhook:
           post:
-            function: ${myFunction:name}
+            lambdaArn: ${myFunction:arn}
 #  myEndpoint:
 #    type: eventgateway
 #    inputs:

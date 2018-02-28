@@ -124,7 +124,6 @@ function getCorsOptionsConfig() {
 
 // "public" function
 function getSwaggerDefinition(name, roleArn, routes) {
-  const arnParts = roleArn.match(new RegExp('(.+):(.+):(.+):(.*):(.+)'))
   let paths = {}
 
   // TODO: udpate code to be functional
@@ -135,9 +134,9 @@ function getSwaggerDefinition(name, roleArn, routes) {
 
     forEachObjIndexed((methodObject, method) => {
       const normalizedMethod = getNormalizedMethod(method)
-      const func = methodObject.function
-      const lambdaArn = `arn:aws:lambda:us-east-1:${arnParts[4]}:function:${func}`
-      const uri = `arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/${lambdaArn}/invocations`
+      const uri = `arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/${
+        methodObject.lambdaArn
+      }/invocations`
 
       let isCorsEnabled
       if (methodObject.cors) {

@@ -91,7 +91,7 @@ components:
       routes:
         /github/webhook:
           post:
-            function: ${myFunction:name}
+            lambdaArn: ${myFunction:arn}
   myGithubWebhook:
     type: github
     inputs:
@@ -296,13 +296,13 @@ inputs:
   routes:
     /hello:
       post:
-        function: hello
+        lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
         cors: true
       get:
-        function: hello
+        lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
     /hello/world:
       delete:
-        function: world
+        lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
 ```
 
 #### `dynamodb`
