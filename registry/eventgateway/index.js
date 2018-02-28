@@ -1,6 +1,9 @@
 const EventGateway = require('@serverless/event-gateway-sdk')
 
-const getEventGatewayInstance = ({ space, eventGatewayApiKey }) => {
+// "private" functions
+function getEventGatewayInstance(params) {
+  const { space } = params
+  let { eventGatewayApiKey } = params
   if (process.env.EVENT_GATEWAY_API_KEY) {
     eventGatewayApiKey = process.env.EVENT_GATEWAY_API_KEY // eslint-disable-line no-param-reassign
   }
@@ -13,7 +16,7 @@ const getEventGatewayInstance = ({ space, eventGatewayApiKey }) => {
   })
 }
 
-const getCredentials = () => {
+function getCredentials() {
   const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN } = process.env
   let credentials = {
     awsAccessKeyId: AWS_ACCESS_KEY_ID,
@@ -28,19 +31,22 @@ const getCredentials = () => {
   return credentials
 }
 
-const getFunctionId = ({ lambdaArn }) => {
+function getFunctionId(params) {
+  const { lambdaArn } = params
   const matchRes = lambdaArn.match(new RegExp('(.+):(.+):(.+):(.+):(.+):(.+):(.+)'))
   return matchRes ? matchRes[7] : ''
 }
 
-const getRegion = ({ lambdaArn }) => {
+function getRegion(params) {
+  const { lambdaArn } = params
   const matchRes = lambdaArn.match(new RegExp('(.+):(.+):(.+):(.+):(.+):(.+):(.+)'))
   return matchRes ? matchRes[4] : ''
 }
 
-const registerFunction = async ({
-  egInstance, functionId, lambdaArn, region
-}) => {
+async function registerFunction(params) {
+  const {
+    egInstance, functionId, lambdaArn, region
+  } = params
   const credentials = getCredentials()
   return egInstance.registerFunction({
     functionId,
@@ -53,24 +59,32 @@ const registerFunction = async ({
   })
 }
 
-const deleteFunction = async ({ egInstance, functionId }) =>
-  egInstance.deleteFunction({ functionId })
+async function deleteFunction(params) {
+  const { egInstance, functionId } = params
+  return egInstance.deleteFunction({ functionId })
+}
 
-const subscribe = async ({
-  egInstance, functionId, event, path, method, cors, space
-}) => {
-  let params = {
+async function subscribe(params) {
+  const {
+    egInstance, functionId, event, path, method, cors, space
+  } = params
+
+  // TODO: remove mutation
+  // eslint-disable-next-line no-param-reassign
+  params = {
     functionId,
     event,
     path: `/${space}/${path}`
   }
   if (path && method) {
+    // eslint-disable-next-line no-param-reassign
     params = {
       ...params,
       method
     }
   }
   if (cors) {
+    // eslint-disable-next-line no-param-reassign
     params = {
       ...params,
       cors: {}
@@ -79,22 +93,20 @@ const subscribe = async ({
   return egInstance.subscribe(params)
 }
 
-const unsubscribe = async ({ egInstance, subscriptionId }) =>
-  egInstance.unsubscribe({ subscriptionId })
+async function unsubscribe(params) {
+  const { egInstance, subscriptionId } = params
+  return egInstance.unsubscribe({ subscriptionId })
+}
 
-const listSubscriptions = async ({ egInstance }) => egInstance.listSubscriptions()
+async function listSubscriptions(params) {
+  const { egInstance } = params
+  return egInstance.listSubscriptions()
+}
 
-const create = async ({
-  egInstance,
-  functionId,
-  lambdaArn,
-  event,
-  path,
-  method,
-  cors,
-  space,
-  region
-}) => {
+async function create(params) {
+  const {
+    egInstance, functionId, lambdaArn, event, path, method, cors, space, region
+  } = params
   await registerFunction({
     egInstance,
     functionId,
@@ -116,16 +128,10 @@ const create = async ({
   }
 }
 
-const update = async ({
-  egInstance,
-  functionId,
-  event,
-  path,
-  method,
-  cors,
-  space,
-  subscriptionId
-}) => {
+async function update(params) {
+  const {
+    egInstance, functionId, event, path, method, cors, space, subscriptionId
+  } = params
   await unsubscribe({ egInstance, subscriptionId })
   const res = await subscribe({
     egInstance,
@@ -142,11 +148,13 @@ const update = async ({
   }
 }
 
-const deploy = async (inputs, options, state, context) => {
+// "public" functions
+async function deploy(inputs, options, state, context) {
   const region = getRegion(inputs)
   const functionId = getFunctionId(inputs)
   const egInstance = getEventGatewayInstance(inputs)
 
+  // eslint-disable-next-line no-param-reassign
   inputs = {
     ...inputs,
     functionId,
@@ -175,11 +183,12 @@ const deploy = async (inputs, options, state, context) => {
   return outputs
 }
 
-const remove = async (inputs, options, state, context) => {
+async function remove(inputs, options, state, context) {
   const region = getRegion(inputs)
   const functionId = getFunctionId(inputs)
   const egInstance = getEventGatewayInstance(inputs)
 
+  // eslint-disable-next-line no-param-reassign
   inputs = {
     ...inputs,
     functionId,
@@ -202,7 +211,7 @@ const remove = async (inputs, options, state, context) => {
   return outputs
 }
 
-const info = async (inputs, options, state, context) => {
+async function info(inputs, options, state, context) {
   const egInstance = getEventGatewayInstance(inputs)
 
   context.log('Event Gateway setup:')
