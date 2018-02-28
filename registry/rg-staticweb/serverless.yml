@@ -49,6 +49,11 @@ components:
   #     policyArn: ${rootDomainBucketPolicy:policyArn}
     # outputs:
     #   roleArn
+  siteContentUploader:
+    type: rg-s3dirloader
+    inputs:
+      contentPath: ${parent:content_path}
+      bucketName: ${rootDomainBucket:name}
   wwwDomainBucket:
     type: s3
     inputs:
