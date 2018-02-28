@@ -1,0 +1,5 @@
+type: rg-iampolicy
+
+inputs:
+  name: default-role-name-goes-here-2
+  bucketName: some-unique-bucket-name
