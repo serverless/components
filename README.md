@@ -515,14 +515,17 @@ inputs:
 
 #### `rest-api`
 
-Creates / Removes a RESTful API.
+Creates / Removes a RESTful API. Uses the specified gateway component behind the scenes.
 
 ##### Inputs
 
-| Name      | Description                                                                | Type   |
-| --------- | -------------------------------------------------------------------------- | ------ |
-| `gateway` | The component name of the gateway which should be used (e.g. `apigateway`) | String |
-| `routes`  | The routes this RESTful API should expose                                  | Object |
+| Name                 | Description                                                                | Type   |
+| -------------------- | -------------------------------------------------------------------------- | ------ |
+| `gateway`            | The component name of the gateway which should be used (e.g. `apigateway`) | String |
+| `eventGatewayApiKey` | **Optional** The Event Gateway API Key                                     | String |
+| `space`              | **Optional** The space used by the Event Gateway                           | String |
+| `name`               | The APIs name                                                              | String |
+| `routes`             | The routes this RESTful API should expose                                  | Object |
 
 ##### Commands
 
@@ -535,18 +538,22 @@ Creates / Removes a RESTful API.
 type: rest-api
 
 inputs:
-  gateway: apigateway
+  gateway: eventgateway
+  eventGatewayApiKey: s0m33v3ntg4t3w4y4p1k3y # optional
+  space: some-space # optional
+  name: some-rest-api
   routes:
     users:
       post:
+        lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
         cors: true
-        fn: createUser
       get:
-        fn: getUser
+        lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
+        cors: true
       put:
-        fn: updateUser
+        lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
       delete:
-        fn: deleteUser
+        lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
 ```
 
 #### `s3`

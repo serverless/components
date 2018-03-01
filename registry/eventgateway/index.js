@@ -171,10 +171,18 @@ async function deploy(inputs, options, state, context) {
 
   let outputs = state
   if (shouldCreate) {
-    context.log(`Creating Event Gateway Subscription: "${functionId}"`)
+    if (inputs.event === 'http') {
+      context.log(`Creating Event Gateway Subscription: ${inputs.method} ${inputs.path} --> "${functionId}"`)
+    } else {
+      context.log(`Creating Event Gateway Subscription: ${inputs.path} --> "${functionId}"`)
+    }
     outputs = await create(inputs)
   } else if (shouldUpdate) {
-    context.log(`Updating Event Gateway Subscription: "${functionId}"`)
+    if (inputs.event === 'http') {
+      context.log(`Updating Event Gateway Subscription: ${inputs.method} ${inputs.path} --> "${functionId}"`)
+    } else {
+      context.log(`Updating Event Gateway Subscription: ${inputs.path} --> "${functionId}"`)
+    }
     outputs = await update({
       ...state,
       ...inputs
@@ -200,9 +208,14 @@ async function remove(inputs, options, state, context) {
 
   let outputs = state
   if (shouldRemove) {
-    context.log(`Removing Event Gateway Subscription: "${functionId}"`)
+    context.log(`Removing Event Gateway Subscription: ${state.subscriptionId} --> "${functionId}"`)
     await unsubscribe({ egInstance, subscriptionId: state.subscriptionId })
-    await deleteFunction({ egInstance, functionId })
+    try {
+      await deleteFunction({ egInstance, functionId })
+    } catch (error) {
+      // NOTE: fail silently if the function could not be found
+      // (which might mean that the function was already removed when removing another subscription)
+    }
     outputs = {
       subscriptionId: null,
       url: null
