@@ -1,0 +1,5 @@
+type: tests-integration-iam-mock
+
+inputs:
+  name: test-role
+  service: some.serverless.service

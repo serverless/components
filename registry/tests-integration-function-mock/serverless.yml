@@ -1,0 +1,14 @@
+type: tests-integration-function-mock
+
+inputs:
+  name: ${FUNCTION_NAME}
+  memorySize: 512
+  timeout: 100
+  role: ${myRole:id}
+
+components:
+  myRole:
+    type: tests-integration-iam-mock
+    inputs:
+      name: ${parent:name}
+      service: my.function.service
