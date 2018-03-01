@@ -8,13 +8,15 @@
 # [x] upload content to S3 bucket (rgfamily.com)
 # [x] Configure root bucket for static website hosting
 # [x] Configure www bucket for website redirect to root bucket
-# [] Build CloudFront Site Component
-# [] Configure and set Route53
+# [x] Build CloudFront Component
+#   [x] Create/Enable a new Distribution
+#   [] Enable/Disable an existing Distribution
+#   [x] Delete an existing Distribution
+# [] Build Route53 Component
 # [x] output resulting website url
 # [] output instructions to configure DNS, CNAME records and A records
 
 type: rg-aws-staticweb
-
 inputs:
   name: rgfamilysite
   # content:
@@ -60,3 +62,17 @@ components:
       errorDocument: ${parent:content_error}
       redirectBucketName: ${wwwDomainBucket:name}
       redirectToHostName: ${parent:hosting_domain}
+  siteCloudFrontConfig:
+    type: rg-cloudfront
+    inputs:
+      distributionName: ${parent:name}
+      defaultRootObject: ${parent:content_index}
+      originId: ${rootDomainBucket:name}
+      originDomain: rgfamily.com.s3.amazonaws.com
+      aliasDomain: www.showcaseideas.com
+      distributionEnabled: false
+      loggingEnabled: false
+      loggingBucket: ${parent:name}
+      loggingIncludeCookies: false
+      loggingPrefix: ${parent:name}
+      priceClass: PriceClass_All # PriceClass_100 | PriceClass_200 | PriceClass_All

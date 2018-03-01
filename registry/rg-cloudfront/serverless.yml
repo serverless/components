@@ -1,0 +1,13 @@
+type: rg-cloudfront
+
+inputs:
+  distributionName: cf-bucketname  # sent to CallerReference
+  defaultRootObject: index.html
+  originDomain: bucketname.s3.amazonaws.com  # later accept a list
+  aliasDomain: www.example.com # later accept a list
+  distributionEnabled: true
+  loggingEnabled: false
+  loggingBucket: logbucket
+  loggingIncludeCookies: false
+  loggingPrefix: cf-bucketname-
+  priceClass: PriceClass_All # PriceClass_100 | PriceClass_200 | PriceClass_All
