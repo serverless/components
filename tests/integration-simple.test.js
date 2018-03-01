@@ -54,7 +54,10 @@ describe('Integration Test - Simple', () => {
       it('should deploy the "iam" and "function" components', async () => {
         await cpp.execAsync(`${serverlessExec} deploy`, {
           cwd: functionMockDir,
-          env: { FUNCTION_NAME: 'my-function' }
+          env: {
+            ...process.env,
+            FUNCTION_NAME: 'my-function'
+          }
         })
         const stateFileContent = await fsp.readJsonAsync(functionMockStateFile)
         const expected = {
@@ -79,7 +82,10 @@ describe('Integration Test - Simple', () => {
       it('should re-deploy the "iam" and "function" components', async () => {
         await cpp.execAsync(`${serverlessExec} deploy`, {
           cwd: functionMockDir,
-          env: { FUNCTION_NAME: 'my-function' }
+          env: {
+            ...process.env,
+            FUNCTION_NAME: 'my-function'
+          }
         })
         const stateFileContent = await fsp.readJsonAsync(functionMockStateFile)
         const expected = {
