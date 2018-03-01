@@ -15,6 +15,11 @@ Components are capable of provisioning infrastructure while including both appli
   * [Variables](#variables)
   * [Graph](#graph)
   * [Custom commands](#custom-commands)
+* [Creating components](#creating-components)
+  * [Basic setup](#basic-setup)
+  * [`serverless.yml`](#serverless.yml)
+  * [`index.js`](#index.js)
+  * [Testing](#testing)
 * [Docs](#docs)
   * [apigateway](#apigateway)
   * [dynamodb](#dynamodb)
@@ -107,11 +112,11 @@ components:
 ```js
 const deploy = (inputs, state, context, options) => {
   // provisioning logic goes here
-};
+}
 
 module.exports = {
   deploy // this is the command name which is exposed via the CLI
-};
+}
 ```
 
 ### Registry
@@ -225,17 +230,142 @@ Other than the built in `deploy` and `remove` commands, you can add custom comma
 ```js
 const deploy = (inputes, state, context, options) => {
   // some provisioning logic
-};
+}
 
 const test = (inputs, state, context, options) => {
-  console.log("Testing the components functionality...");
-};
+  console.log('Testing the components functionality...')
+}
 
 module.exports = {
   deploy,
   test // make the function accisble from the CLI
-};
+}
 ```
+
+## Creating components
+
+A quick guide to help you build your kick-start component development.
+
+**Note:** Make sure to re-visit the [core concepts](#concepts) above before you jump right into the component implementation.
+
+### Basic setup
+
+In this guide we'll build a simple `greeter` component which will greet us with a custom message when we run the `deploy`, `greet` or `remove` commands.
+
+The first step we need to take is to create a dedicated directory for our component. This directory will include all the necessary files for our component like its `serverless.yml` file, the `index.js` file (which includes the components logic) and files such as `package.json` to define its dependencies.
+
+Go ahead and create a `greeter` directory in the "Serverless Registry" directory located at [`registry`](./registry).
+
+### `serverless.yml`
+
+Let's start by describing our components interface. We define the interface with the help of a `serverless.yml` file. Create this file in the components directory and paste in the following content:
+
+```yml
+type: greeter
+
+inputs:
+  firstName: John
+  lastName: ${LAST_NAME}
+```
+
+Let's take a closer look at the code we've just pasted. At first we define the `type` (think of it as an identifier or name) of the component. In our case the component is called `greeter`.
+
+Next up we need to define the `inputs` our component receives. `inputs` are values which are accessible from within the components logic. In our case we expect a `firstName` and a `lastName`. The `firstName` is hardcoded to `John`, whereas the `lastName` is retrieved from an environment variables (the `${}` syntax shows us that we're using [variables](#variables) here).
+
+That's it for the component definition. Let's move on to the implementation of its logic.
+
+### `index.js`
+
+The components logic is implemented with the help of an `index.js` file which is located in the root of the components directory. Go ahead and create an empty `index.js` file in the components root directory.
+
+Next up we'll implement the logic for the `deploy`, `greet` and `remove` commands. We do this by adding the respective functions in the file and exporting them so that the Frameworks CLI can pick them up (_Remember:_ only the exported functions are accessible via CLI commands).
+
+Just paste the following code in the `index.js` file:
+
+```js
+// "private" functions
+function greetWithFullName(inputs, context) {
+  context.log(`Hello ${inputs.firstName} ${inputs.lastName}!`)
+}
+
+// "public" functions
+function deploy(inputs, options, state, context) {
+  greetWithFullName(inputs, context)
+
+  if (state && state.deployedAt) {
+    context.log(`Last deployment: ${state.deployedAt}...`)
+  }
+
+  const deployedAt = new Date().toISOString()
+  return {
+    ...inputs,
+    ...state,
+    deployedAt
+  }
+}
+
+function greet(inputs, options, state, context) {
+  context.log(`Hola ${inputs.firstName} ${inputs.lastName}!`)
+  return {
+    ...inputs,
+    ...state
+  }
+}
+
+function remove(inputs, options, state, context) {
+  greetWithFullName(inputs, context)
+  context.log('Removing...')
+  return {}
+}
+
+module.exports = {
+  deploy,
+  greet,
+  remove
+}
+```
+
+Let's take a closer look at the implementation.
+
+Right at the top we've define a "helper" function (this function is not exported at the bottom and can therefore only used internally) we use to reduce code duplication. this `greetWithFullName` function gets the `inputs` and the `context` and logs a message which greets the user with his full name. Note that we're using the `log` function which is available at the `context` object instead of the native `console.log` function. The `context` object has other, very helpful functions and data attached to it.
+
+Next up we've defined the `deploy` function. This function is executed every time the user runs a `deploy` command since we've exported it at the bottom of the file. At first we re-use our `greetWithFullName` function to greet our user. Next up we check the state to see if we've already deployed previously. If that's the case we log out the timestamp of the last deployment. After that we get the current time and return an object which includes the `state`, the `inputs` and the new `deployedAt` timestamp. The Framework will pick up this returned information and use it to store it in the state file.
+
+The `greet` function is a custom `command` function we use to extend the CLIs capabilities. Since we've exported it at the bottom of the file it'll be execute every time someone runs the `greet` command. The functionality is pretty straightforward. We just log out a different greeting using the `context.log` method and the `inputs` and return the `inputs` merged together with the `state`.
+
+The last function we've defined in our components implementation is the `remove` function. Remove is also accessible from the CLI because we export it at the bottom of the file. The functions code is also pretty easy to understand. At first we greet our user with the `greetWithFullName` helper function. Next up we log a message that the removal was triggered. After that we simply return an empty object to reset the state file. That's it.
+
+### Testing
+
+Let's test our component!
+
+If we take another look at the `serverless.yml` file we can see that our `lastName` config value depends on a variable called `LAST_NAME` which is fetched from the local environment. This means that we need to export this variable so that the Framework can pick it up and pass it down into our `inputs`:
+
+```sh
+export LAST_NAME=Doe
+```
+
+Once this is done we can `cd` into our `greeter` directory by running:
+
+```sh
+cd registry/greeter
+```
+
+Run the following commands to test the components logic:
+
+```
+../../bin/serverless deploy
+
+../../bin/serverless deploy
+
+../../bin/serverless greet
+
+../../bin/serverless remove
+```
+
+Congratulations! You've successfully created your first Serverless component!
+
+Want to learn more? Make sure to take a look at all the different component implementations in the ["Serverless Registry"](./registry)!
 
 ## Docs
 
