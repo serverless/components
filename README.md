@@ -45,14 +45,14 @@ Components are capable of provisioning infrastructure while including both appli
    * `export EVENT_GATEWAY_API_KEY=my_event_gateway_api_key`
    * `export AWS_ACCESS_KEY_ID=my_access_key_id`
    * `export AWS_SECRET_ACCESS_KEY=my_secret_access_key`
-1. Make sure to install sub dependancies in every `/registry/*` with `package.json`
+1. Install the dependencies in all `/registry/*` directories with a `package.json` file
 
 ## Running Locally
 
 Run commands with
 
 ```
-node ../../bin/serverless [Command]
+../../bin/serverless [Command]
 ```
 
 ## Concepts
@@ -110,7 +110,7 @@ components:
 **index.js**
 
 ```js
-const deploy = (inputs, state, context, options) => {
+const deploy = (inputs, options, state, context) => {
   // provisioning logic goes here
 }
 
@@ -183,7 +183,7 @@ The operation that needs to be done depends on the inputs and how the provider w
 Here's an example on how the lambda component decides what needs to be done based on the inputs and state:
 
 ```js
-const deploy = (inputs, state, context, options) => {
+const deploy = (inputs, options, state, context) => {
 let outputs;
   if (inputs.name && !state.name) {
     console.log(`Creating Lambda: ${inputs.name}`);
@@ -228,11 +228,11 @@ The component author doesn't have to worry about this graph at all. One just use
 Other than the built in `deploy` and `remove` commands, you can add custom commands to add extra management for your component lifecycle. You do so by adding the corresponding function to the `index.js` file. Just like the other functions in `index.js`, it accepts `inputs`, `state`, `context` and `options`.
 
 ```js
-const deploy = (inputes, state, context, options) => {
+const deploy = (inputs, options, state, context) => {
   // some provisioning logic
 }
 
-const test = (inputs, state, context, options) => {
+const test = (inputs, options, state, context) => {
   console.log('Testing the components functionality...')
 }
 
