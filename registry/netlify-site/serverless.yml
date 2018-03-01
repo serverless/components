@@ -1,0 +1,9 @@
+type: netlify-site
+
+# Inputs are WIP 
+inputs:
+  name: mysite.netlify.com
+  custom_domain: lol.com
+  force_ssl: true
+  netlifyApiToken: xyz
+  repo: https://github.com/serverless/platform
