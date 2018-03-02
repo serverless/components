@@ -3,6 +3,7 @@ const fetch = require('node-fetch')
 const parseGithubUrl = require('parse-github-url')
 
 async function createNetlifyDeployKey(config, apiToken) {
+  console.log('Creating netlify deploy key')
   const url = `https://api.netlify.com/api/v1/deploy_keys/`
   const response = await fetch(url, {
     method: 'POST',
@@ -16,6 +17,7 @@ async function createNetlifyDeployKey(config, apiToken) {
 }
 
 async function deleteNetlifyDeployKey(id) {
+  console.log('Deleting netlify deploy key')
   const url = `https://api.netlify.com/api/v1/deploy_keys/${id}`
   const response = await fetch(url, {
     method: 'DELETE',
@@ -42,6 +44,7 @@ async function deleteNetlifyDeployKey(id) {
 }
 
 async function createNetlifySite(config, apiToken) {
+  console.log('Creating netlify site', config)
   const url = `https://api.netlify.com/api/v1/sites/`
   const response = await fetch(url, {
     method: 'POST',
@@ -51,10 +54,12 @@ async function createNetlifySite(config, apiToken) {
       'Authorization': `Bearer ${apiToken}`
     },
   })
+  console.log(response)
   return await response.json()
 }
 
 async function deleteNetlifySite(id, apiToken) {
+  console.log('Deleting netlify site')
   const url = `https://api.netlify.com/api/v1/sites/${id}`
   const response = await fetch(url, {
     method: 'DELETE',
@@ -81,6 +86,7 @@ async function deleteNetlifySite(id, apiToken) {
 }
 
 async function createNetlifyWebhook(config, netlifyApiToken) {
+  console.log('Creating netlify webhook')
   const url = `https://api.netlify.com/api/v1/hooks`
   const response = await fetch(url, {
     method: 'POST',
@@ -94,6 +100,7 @@ async function createNetlifyWebhook(config, netlifyApiToken) {
 }
 
 async function addGithubDeployKey(config) {
+  console.log('Adding netlify deploy key to github repo')
   const url = `https://api.github.com/repos/${config.repo}/keys`
   const response = await fetch(url, {
     method: 'POST',
@@ -110,7 +117,8 @@ async function addGithubDeployKey(config) {
   return await response.json()
 }
 
-async function addGithubWebhooks(githubApiToken) {
+async function addGithubWebhooks(config, githubApiToken) {
+  console.log('Creating github webhook')
   const url = `https://api.github.com/repos/${config.repo}/hooks`
   const response = await fetch(url, {
     method: 'POST',
@@ -134,6 +142,7 @@ async function addGithubWebhooks(githubApiToken) {
 
 /* Deploy logic */
 const deploy = async (inputs, options, state, context) => {
+  console.log(inputs, options, state, context)
   console.log(`Deploying site:`)
 
   const netlifyApiToken = inputs.netlifyApiToken
@@ -167,7 +176,7 @@ const deploy = async (inputs, options, state, context) => {
   }
 
   if (siteInputs.forceSsl) {
-    siteConfig.force_ssl = siteInputs.forceSsl
+    // siteConfig.force_ssl = siteInputs.forceSsl
   }
 
   const branch = siteInputs.repo.branch || 'master'
@@ -195,10 +204,13 @@ const deploy = async (inputs, options, state, context) => {
     siteConfig.repo.dir = siteInputs.repo.buildDirectory
   }
 
-  const netlifySite = await createNetlifySite(siteConfig)
+  const netlifySite = await createNetlifySite(siteConfig, netlifyApiToken)
 
   // 4. Then add github webhook to repo. https://api.github.com/repos/DavidTron5000/responsible/hooks
-  const githubWebhook = await addGithubWebhooks(githubApiToken)
+  const githubWebhookConfig = {
+    repo: githubData.repo
+  }
+  const githubWebhook = await addGithubWebhooks(githubWebhookConfig, githubApiToken)
 
   // 5. Then make netlify https://api.netlify.com/api/v1/hooks call
   const netlifyDeployCreatedWebhook = await createNetlifyWebhook({
