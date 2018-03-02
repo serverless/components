@@ -207,6 +207,7 @@ const deploy = async (inputs) => {
 
   const siteInputs = inputs.siteSettings
 
+  /* TODO: handle input validations */
   if (!siteInputs.repo || !siteInputs.repo.url) {
     throw new Error('Need repo url')
   }
@@ -218,6 +219,10 @@ const deploy = async (inputs) => {
   if (!githubApiToken) {
     throw new Error('No githubApiToken found')
   }
+
+  /* TODO: Check inputs if update or create */
+
+  /* TODO: If update run update() function instead and bail */
 
   const githubData = parseGithubUrl(siteInputs.repo.url)
 
