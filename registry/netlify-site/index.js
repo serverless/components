@@ -43,7 +43,7 @@ async function deleteNetlifyDeployKey(id, apiToken) {
 }
 
 async function createNetlifySite(config, apiToken) {
-  console.log('Creating netlify site', config)
+  console.log('Creating netlify site')
   const url = 'https://api.netlify.com/api/v1/sites/'
   const response = await fetch(url, {
     method: 'POST',
