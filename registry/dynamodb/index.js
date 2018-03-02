@@ -66,7 +66,7 @@ const createTable = (inputs) => {
 }
 
 // Need update table for changes in inputs
-const updateTable = (inputs, options, state, context) => {
+const updateTable = (inputs, options, state, context) => { // eslint-disable-line
 
   // Validate input against allowed SDK params
 
@@ -88,8 +88,8 @@ const deleteTable = (state) => {
   }
 
   if (state.DeletionPolicy === 'Retain') {
-    // return error?
-    return Promise.resolve(null)
+    // return error or state? ¯\_(ツ)_/¯
+    return Promise.resolve(state)
   }
 
   return dynamodb.deleteTable(params).promise().then((data) => data)
@@ -101,15 +101,22 @@ const deploy = async (inputs, options, state, context) => {
   if (!Object.keys(state).length) {
     console.log(`Creating Table: ${inputs.Properties.TableName}`)
     tableData = await createTable(inputs)
+    console.log(`Created Table: ${inputs.Properties.TableName}`)
+  }
+
+  /*
+  TODO update logic diffing needs https://serverlessteam.atlassian.net/browse/SC-55
   } else if (!inputs.name && state.name) {
-    context.log(`Removing Table: ${state.Properties.TableName}`)
-    // await deleteTable(state)
+     context.log(`Removing Table: ${state.Properties.TableName}`)
+     // await deleteTable(state)
   } else if (state.name !== inputs.name) {
     context.log(`Removing Table: ${state.Properties.TableName}`)
     // await deleteTable(state)
     context.log(`Creating Table: ${inputs.Properties.TableName}`)
     // await createTable(inputs)
   }
+  */
+
   // Add all inputs to outputs?
   const outputs = {
     name: inputs.name,
@@ -119,12 +126,10 @@ const deploy = async (inputs, options, state, context) => {
 }
 
 const remove = async (inputs, options, state, context) => {
-  context.log(`Removing Table: ${state.Properties.TableName}`)
-  const deleteData = await deleteTable(state)
-
-  const outputs = {
-    deleteData: deleteData // eslint-disable-line
-  }
+  console.log(`Removing Table: ${inputs.Properties.TableName}`)
+  const newState = await deleteTable(state)
+  console.log(`Removed Table: ${inputs.Properties.TableName}`)
+  const outputs = newState
   return outputs
 }
 
