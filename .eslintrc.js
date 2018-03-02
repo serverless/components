@@ -18,6 +18,7 @@ module.exports = {
     'arrow-parens': ['error', 'always'],
     'comma-dangle': ['error', 'never'],
     'func-names': 'off',
+    'no-param-reassign': 'off',
     semi: ['error', 'never']
   }
 }

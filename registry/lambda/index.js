@@ -67,24 +67,25 @@ const deleteLambda = async (name) => {
   }
 }
 
-const deploy = async (inputs, options, state, context) => {
-  let outputs
-  if (inputs.name && !state.name) {
-    context.log(`Creating Lambda: ${inputs.name}`)
-    outputs = await createLambda(inputs)
-  } else if (state.name && !inputs.name) {
-    context.log(`Removing Lambda: ${state.name}`)
-    outputs = await deleteLambda(state.name)
-  } else if (inputs.name !== state.name) {
-    context.log(`Removing Lambda: ${state.name}`)
-    await deleteLambda(state.name)
-    context.log(`Creating Lambda: ${inputs.name}`)
-    outputs = await createLambda(inputs)
-  } else {
-    context.log(`Updating Lambda: ${inputs.name}`)
-    outputs = await updateLambda(inputs)
-  }
-  return outputs
+const deploy = async (inputs, context) => {
+  console.log('2')
+  // let outputs
+  // if (inputs.name && !state.name) {
+  //   context.log(`Creating Lambda: ${inputs.name}`)
+  //   outputs = await createLambda(inputs)
+  // } else if (state.name && !inputs.name) {
+  //   context.log(`Removing Lambda: ${state.name}`)
+  //   outputs = await deleteLambda(state.name)
+  // } else if (inputs.name !== state.name) {
+  //   context.log(`Removing Lambda: ${state.name}`)
+  //   await deleteLambda(state.name)
+  //   context.log(`Creating Lambda: ${inputs.name}`)
+  //   outputs = await createLambda(inputs)
+  // } else {
+  //   context.log(`Updating Lambda: ${inputs.name}`)
+  //   outputs = await updateLambda(inputs)
+  // }
+  // return outputs
 }
 
 const remove = async (inputs, options, state, context) => {
