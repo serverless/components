@@ -81,36 +81,34 @@ const updateTable = (inputs, options, state, context) => {
 
 
 const deleteTable = (state) => {
-  const dynamodb = new AWS.DynamoDB({ region: state.TableRegion })
+  const dynamodb = new AWS.DynamoDB({ region: state.region })
 
   const params = {
-    TableName: state.TableName
+    TableName: state.Properties.TableName
   }
 
   if (state.DeletionPolicy === 'Retain') {
     // return error?
-    return null
+    return Promise.resolve(null)
   }
 
-  return dynamodb.deleteTable(params).promise()
+  return dynamodb.deleteTable(params).promise().then((data) => data)
 }
 
 const deploy = async (inputs, options, state, context) => {
-  console.log('inputs', inputs)
-  console.log('state', state)
   let tableData
   // No state, create table
   if (!Object.keys(state).length) {
-    console.log(`Creating Table: ${inputs.name}`)
+    console.log(`Creating Table: ${inputs.Properties.TableName}`)
     tableData = await createTable(inputs)
   } else if (!inputs.name && state.name) {
-    context.log(`Removing Table: ${state.name}`)
-    //await deleteTable(state)
+    context.log(`Removing Table: ${state.Properties.TableName}`)
+    // await deleteTable(state)
   } else if (state.name !== inputs.name) {
-    context.log(`Removing Table: ${state.name}`)
-    //await deleteTable(state)
-    context.log(`Creating Table: ${inputs.name}`)
-    //await createTable(inputs)
+    context.log(`Removing Table: ${state.Properties.TableName}`)
+    // await deleteTable(state)
+    context.log(`Creating Table: ${inputs.Properties.TableName}`)
+    // await createTable(inputs)
   }
   // Add all inputs to outputs?
   const outputs = {
@@ -121,10 +119,11 @@ const deploy = async (inputs, options, state, context) => {
 }
 
 const remove = async (inputs, options, state, context) => {
-  context.log(`Removing Table: ${state.name}`)
-  await deleteTable(state)
+  context.log(`Removing Table: ${state.Properties.TableName}`)
+  const deleteData = await deleteTable(state)
+
   const outputs = {
-    name: null
+    deleteData: deleteData // eslint-disable-line
   }
   return outputs
 }
