@@ -8,8 +8,9 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
-    "node-fetch": "^2.0.0"
+    "node-fetch": "^2.0.0",
+    "parse-github-url": "^1.0.2"
   }
 }

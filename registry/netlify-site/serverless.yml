@@ -1,9 +1,17 @@
 type: netlify-site
 
-# Inputs are WIP 
+# Inputs are WIP
 inputs:
-  name: mysite.netlify.com
-  custom_domain: lol.com
-  force_ssl: true
-  netlifyApiToken: xyz
-  repo: https://github.com/serverless/platform
+  netlifyApiToken: xyz-123-999
+  githubApiToken: xyz-123-4532
+  siteSettings:
+    name: mysite.netlify.com
+    customDomain: lol.com
+    forceSsl: true # not in use
+    repo:
+      url: https://github.com/serverless/platform
+      buildCommand: npm run build
+      buildDirectory: demo
+      branch: master
+      allowedBranchs:
+        - master

@@ -1,5 +1,6 @@
 /* eslint-disable */
 const fetch = require('node-fetch')
+const parseGithubUrl = require('parse-github-url')
 
 async function createNetlifyDeployKey(config, apiToken) {
   const url = `https://api.netlify.com/api/v1/deploy_keys/`
@@ -79,125 +80,160 @@ async function deleteNetlifySite(id, apiToken) {
   return response
 }
 
-/* Deploy logic */
-const deploy = async (inputs, state, context) => {
-  context.log(`Deploying site:`)
+async function createNetlifyWebhook(config, netlifyApiToken) {
+  const url = `https://api.netlify.com/api/v1/hooks`
+  const response = await fetch(url, {
+    method: 'POST',
+    body: JSON.stringify(config),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${netlifyApiToken}`
+    },
+  })
+  return await response.json()
+}
 
-  const netlifyApiToken = '605f3a53132a3cd12a03a4a424111cac806f551c3f51f6f21e2063617a8aebce'
+async function addGithubDeployKey(config) {
+  const url = `https://api.github.com/repos/${config.repo}/keys`
+  const response = await fetch(url, {
+    method: 'POST',
+    body: JSON.stringify({
+      title: 'Netlify Deploy Key',
+      key: config.key,
+      read_only: true
+    }),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${config.githubApiToken}`
+    },
+  })
+  return await response.json()
+}
+
+async function addGithubWebhooks(githubApiToken) {
+  const url = `https://api.github.com/repos/${config.repo}/hooks`
+  const response = await fetch(url, {
+    method: 'POST',
+    body: JSON.stringify({
+      "name": "web",
+      "active": true,
+      "events": ['delete', 'push', 'pull_request'],
+      'config': {
+        'url': 'https://api.netlify.com/hooks/github',
+        'content_type':'json'
+      }
+    }),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${githubApiToken}`
+    },
+  })
+  return await response.json()
+}
+
+
+/* Deploy logic */
+const deploy = async (inputs, options, state, context) => {
+  console.log(`Deploying site:`)
+
+  const netlifyApiToken = inputs.netlifyApiToken
+  const githubApiToken = inputs.githubApiToken
+  const siteInputs = inputs.siteSettings
+
+  if (!siteInputs.repo || !siteInputs.repo.url) {
+    throw new Error('Need repo url')
+  }
+
+  const githubData = parseGithubUrl(siteInputs.repo.url)
 
   // 1. Create netlify deploy key `createNetlifyDeployKey`
-
+  const netlifyDeployKey = await createNetlifyDeployKey({}, netlifyApiToken)
 
   // 2. Then add key to github repo https://api.github.com/repos/DavidTron5000/responsible/keys
-  /*
-  {
-    "mimeType": "application/json",
-    "text": {
-      "name": "web",
-      "active": true,
-      "events": ['delete', 'push', 'pull_request'],
-      'config': {
-        'url': 'https://api.netlify.com/hooks/github',
-        'content_type':'json'
-      }
-    }
-  }
-  */
+  const githubDeployKey = await addGithubDeployKey({
+    repo: githubData.repo,
+    key: netlifyDeployKey.public_key,
+    githubApiToken: githubApiToken
+  })
+  // make output -> ghDeployKey.response.redirectURL
 
   // 3. Then createNetlifySite with https://api.netlify.com/api/v1/sites
+  let siteConfig = {
+    name: siteInputs.name,
+  }
+
+  if (siteInputs.customDomain) {
+    siteConfig.custom_domain = siteInputs.customDomain
+  }
+
+  if (siteInputs.forceSsl) {
+    siteConfig.force_ssl = siteInputs.forceSsl
+  }
+
+  const branch = siteInputs.repo.branch || 'master'
+  const allowedBranches = siteInputs.repo.allowedBranchs || [branch]
+
+  // Set repo configuration
+  siteConfig.repo = {
+    deploy_key_id: netlifyDeployKey.id,
+    provider: 'github',
+    public_repo: false,
+    repo_branch: branch,
+    repo_path: githubData.repo,
+    repo_type: 'git',
+    repo_url: siteInputs.repo.url,
+    allowed_branches: allowedBranches
+  }
+
+  // Set build command
+  if (siteInputs.repo.buildCommand) {
+    siteConfig.repo.cmd = siteInputs.repo.buildCommand
+  }
+
+  // Set build output directory
+  if (siteInputs.repo.buildDirectory) {
+    siteConfig.repo.dir = siteInputs.repo.buildDirectory
+  }
+
+  const netlifySite = await createNetlifySite(siteConfig)
 
   // 4. Then add github webhook to repo. https://api.github.com/repos/DavidTron5000/responsible/hooks
-  /*
-  {
-    "mimeType": "application/json",
-    "text": {
-      "name": "web",
-      "active": true,
-      "events": ['delete', 'push', 'pull_request'],
-      'config': {
-        'url': 'https://api.netlify.com/hooks/github',
-        'content_type':'json'
-      }
-    }
-  }
-  */
+  const githubWebhook = await addGithubWebhooks(githubApiToken)
 
   // 5. Then make netlify https://api.netlify.com/api/v1/hooks call
-
-  /*
-  {
-    "mimeType": "application/json",
-    "text": {
-      "site_id": "3e944871-7094-4b73-9248-c87d124ce19f",
-      "type": "github_commit_status",
-      "event": "deploy_created",
-      "data": {
-        "access_token": "xyz-122-github-auth-token"
-      }
+  const netlifyDeployCreatedWebhook = await createNetlifyWebhook({
+    "site_id": netlifySite.site_id,
+    "type": "github_commit_status",
+    "event": "deploy_created",
+    "data": {
+      "access_token": githubApiToken
     }
-  }
-  */
+  }, netlifyApiToken)
 
   // 6. Then make another netlify https://api.netlify.com/api/v1/hooks call
-
-  /*
-  {
-    "mimeType": "application/json",
-    "text":  {
-      site_id: "3e944871-7094-4b73-9248-c87d124ce19f\",
-      type: "github_commit_status",
-      event: "deploy_failed",
-      data: {
-        access_token: "xyz-122-github-auth-token"
-      }
+  const netlifyDeployFailedWebhook = await createNetlifyWebhook({
+    "site_id": netlifySite.site_id,
+    "type": "github_commit_status",
+    "event": "deploy_failed",
+    "data": {
+      "access_token": githubApiToken
     }
-  }
-  */
+  }, netlifyApiToken)
 
   // 7. Then make another netlify https://api.netlify.com/api/v1/hooks call
-
-  /*
-  "postData": {
-    "mimeType": "application/json",
-    "text": {
-      site_id: "3e944871-7094-4b73-9248-c87d124ce19f",
-      type: "github_commit_status",
-      event: "deploy_building\",
-      data: {
-        access_token: "xyz-122-github-auth-token"
-      }
+  const netlifyDeployBuildingWebhook = await createNetlifyWebhook({
+    "site_id": netlifySite.site_id,
+    "type": "github_commit_status",
+    "event": "deploy_failed",
+    "data": {
+      "access_token": githubApiToken
     }
+  }, netlifyApiToken)
+
+  // TODO make real outputs
+  const outputs = {
+    hi: 'lol'
   }
-  */
-  createNetlifyDeployKey({}, netlifyApiToken)
-    .then((data) => {
-      console.log('data', data)
-      const deploy_key_id = data.id
-      const public_key = data.public_key
-      const created_at = data.created_at
-
-      createNetlifySite({
-        name: 'my-new-site-lol-xyz',
-        custom_domain: 'testing-lol-lol-lol.com',
-        'repo': {
-          'allowed_branches': [
-            'other-branch'
-          ],
-          //'cmd': 'string',
-          'deploy_key_id': deploy_key_id,
-          'dir': 'demo',
-          'provider': 'github',
-          'public_repo': false,
-          'repo_branch': 'other-branch',
-          'repo_path': 'DavidTron5000/responsible',
-          'repo_type': 'git',
-          'repo_url': 'https://github.com/DavidTron5000/responsible'
-        }
-      }).then(() => {
-
-      })
-
-  })
 
   return outputs
 }
