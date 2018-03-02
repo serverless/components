@@ -1,20 +1,25 @@
 type: dynamodb
 
 inputs:
-  TableRegion: ${parent:TableRegion}
-  TableName: ${parent:TableName}
-  DeletionPolicy: ${parent:DeletionPolicy}
-  AttributeDefinitions: ${parent:AttributeDefinitions}
-  KeySchema: ${parent:KeySchema}
-  ProvisionedThroughput:
-    ReadCapacityUnits: ${parent:ReadCapacityUnits}
-    WriteCapacityUnits: ${parent:WriteCapacityUnits}
-  GlobalSecondaryIndexes: ${parent:GlobalSecondaryIndexes}
-  LocalSecondaryIndexes: ${parent:LocalSecondaryIndexes}
-  TimeToLiveSpecification:
-    AttributeName: ${parent:TimeToLiveSpecificationAttributeName}
-    Enabled: ${parent:TimeToLiveSpecificationEnabled}
-  StreamSpecification: ${parent:StreamSpecification}
-  Tags: ${parent:tags}
-  SSESpecification:
-    Enabled: ${parent:SSESpecificationEnabled}
+  region: us-east-1
+  DeletionPolicy: Delete
+  Properties:
+    TableName: 'my-table-name-wow'
+    AttributeDefinitions:
+      - AttributeName: number
+        AttributeType: N
+    KeySchema:
+      - AttributeName: number
+        KeyType: HASH
+    ProvisionedThroughput:
+      ReadCapacityUnits: 1
+      WriteCapacityUnits: 1
+    GlobalSecondaryIndexes: null
+    LocalSecondaryIndexes: null
+    TimeToLiveSpecification:
+      AttributeName: ttl
+      Enabled: true
+    StreamSpecification: null
+    Tags: null
+    SSESpecification:
+      SSEEnabled: false

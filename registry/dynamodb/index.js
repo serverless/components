@@ -1,60 +1,72 @@
+/* eslint-disable no-console */
 const AWS = require('aws-sdk')
 
 const createTable = (inputs) => {
+  const dynamodb = new AWS.DynamoDB({ region: inputs.region })
+  const properties = inputs.Properties
+  const tableName = properties.TableName
 
-  const dynamodb = new AWS.DynamoDB({ region: inputs.TableRegion })
-
-  let params = {
-    TableName: inputs.TableName,
-    AttributeDefinitions: inputs.AttributeDefinitions,
-    KeySchema: inputs.KeySchema,
+  let params = { // eslint-disable-line
+    TableName: tableName,
+    AttributeDefinitions: properties.AttributeDefinitions,
+    KeySchema: properties.KeySchema,
     ProvisionedThroughput: {
-      ReadCapacityUnits: inputs.ProvisionedThroughput.ReadCapacityUnits,
-      WriteCapacityUnits: inputs.ProvisionedThroughput.WriteCapacityUnits
+      ReadCapacityUnits: properties.ProvisionedThroughput.ReadCapacityUnits,
+      WriteCapacityUnits: properties.ProvisionedThroughput.WriteCapacityUnits
     }
   }
 
   // validate params values against allowed values
 
-  if (inputs.GlobalSecondaryIndexes) {
+  if (properties.GlobalSecondaryIndexes) {
     // validate inputs.GlobalSecondaryIndexes
     // if valid add to params
-    params.GlobalSecondaryIndexes = inputs.GlobalSecondaryIndexes
+    params.GlobalSecondaryIndexes = properties.GlobalSecondaryIndexes
   }
 
-  if (inputs.LocalSecondaryIndexes) {
+  if (properties.LocalSecondaryIndexes) {
     // validate inputs.GlobalSecondaryIndexes
     // if valid add to params
-    params.LocalSecondaryIndexes = inputs.LocalSecondaryIndexes
+    params.LocalSecondaryIndexes = properties.LocalSecondaryIndexes
   }
 
-  if (inputs.StreamSpecification) {
+  if (properties.StreamSpecification) {
     // validate inputs.StreamSpecification
     // if valid add to params
-    params.StreamSpecification = inputs.StreamSpecification
+    params.StreamSpecification = properties.StreamSpecification
   }
 
   const createPromise = dynamodb.createTable(params).promise()
 
-  if (!inputs.TimeToLiveSpecification) {
+  if (!properties.TimeToLiveSpecification) {
     // no TTL create table and return promise
-    return createPromise
+    return createPromise.then((tableData) => { // eslint-disable-line
+      return tableData
+    })
   }
 
   // validate inputs.TimeToLiveSpecification
 
   // Has TTL specification add it to table
   const TTLparams = {
-    TableName: inputs.TableName,
-    TimeToLiveSpecification: inputs.TimeToLiveSpecification
+    TableName: tableName,
+    TimeToLiveSpecification: properties.TimeToLiveSpecification
   }
-  return createPromise.then(() => {
-    return dynamodb.updateTimeToLive(TTLparams).promise()
+
+  return createPromise.then((tableData) => { // eslint-disable-line
+    const waitForPromise = dynamodb.waitFor('tableExists', {
+      TableName: tableName
+    }).promise()
+    return waitForPromise.then(() => { // eslint-disable-line
+      return dynamodb.updateTimeToLive(TTLparams).promise().then(() => { // eslint-disable-line
+        return tableData
+      })
+    })
   })
 }
 
 // Need update table for changes in inputs
-const updateTable = (inputs, state) => {
+const updateTable = (inputs, options, state, context) => {
 
   // Validate input against allowed SDK params
 
@@ -69,14 +81,13 @@ const updateTable = (inputs, state) => {
 
 
 const deleteTable = (state) => {
-
   const dynamodb = new AWS.DynamoDB({ region: state.TableRegion })
 
   const params = {
     TableName: state.TableName
   }
 
-  if (state.DeletionPolicy === "Retain") {
+  if (state.DeletionPolicy === 'Retain') {
     // return error?
     return null
   }
@@ -85,21 +96,26 @@ const deleteTable = (state) => {
 }
 
 const deploy = async (inputs, options, state, context) => {
-  if (!state.name && inputs.name) {
-    context.log(`Creating Table: ${inputs.name}`)
-    await createTable(inputs)
+  console.log('inputs', inputs)
+  console.log('state', state)
+  let tableData
+  // No state, create table
+  if (!Object.keys(state).length) {
+    console.log(`Creating Table: ${inputs.name}`)
+    tableData = await createTable(inputs)
   } else if (!inputs.name && state.name) {
     context.log(`Removing Table: ${state.name}`)
-    await deleteTable(state)
+    //await deleteTable(state)
   } else if (state.name !== inputs.name) {
     context.log(`Removing Table: ${state.name}`)
-    await deleteTable(state)
+    //await deleteTable(state)
     context.log(`Creating Table: ${inputs.name}`)
-    await createTable(inputs)
+    //await createTable(inputs)
   }
   // Add all inputs to outputs?
   const outputs = {
-    name: inputs.name
+    name: inputs.name,
+    tableData: tableData // eslint-disable-line
   }
   return outputs
 }
