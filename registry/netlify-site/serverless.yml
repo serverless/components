@@ -2,16 +2,16 @@ type: netlify-site
 
 # Inputs are WIP
 inputs:
-  netlifyApiToken: xyz-123-999
-  githubApiToken: xyz-123-4532
+  netlifyApiToken: 65c098ca0e3bcd79f8ac466a3529250ab9e4da6e264b4a2897c903b9d0d17e67
+  githubApiToken: c7b108f271665419cfb84c8fb4d9853ae957f445
   siteSettings:
-    name: mysite.netlify.com
-    customDomain: lol.com
+    name: my-awesome-site-lol-lol.netlify.com
+    customDomain: testing-lol-lol-lol.com
     forceSsl: true # not in use
     repo:
-      url: https://github.com/serverless/platform
-      buildCommand: npm run build
+      url: https://github.com/DavidTron5000/responsible
+      # buildCommand:
       buildDirectory: demo
-      branch: master
+      branch: other-branch
       allowedBranchs:
-        - master
+        - other-branch
