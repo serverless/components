@@ -62,17 +62,14 @@ describe('Integration Test - Simple', () => {
         const stateFileContent = await fsp.readJsonAsync(functionMockStateFile)
         const expected = {
           'tests-integration-function-mock:myRole': {
-            name: 'my-function',
-            service: 'my.function.service',
             id: 'id:iam:role:my-function',
+            name: 'my-function',
             deploymentCounter: 1
           },
           'tests-integration-function-mock': {
-            name: 'my-function',
-            memorySize: 512,
-            timeout: 100,
-            role: 'id:iam:role:my-function',
             id: 'id:function:my-function',
+            name: 'my-function',
+            role: 'id:iam:role:my-function',
             deploymentCounter: 1
           }
         }
@@ -90,17 +87,14 @@ describe('Integration Test - Simple', () => {
         const stateFileContent = await fsp.readJsonAsync(functionMockStateFile)
         const expected = {
           'tests-integration-function-mock:myRole': {
-            name: 'my-function',
-            service: 'my.function.service',
             id: 'id:iam:role:my-function',
+            name: 'my-function',
             deploymentCounter: 2
           },
           'tests-integration-function-mock': {
-            name: 'my-function',
-            memorySize: 512,
-            timeout: 100,
-            role: 'id:iam:role:my-function',
             id: 'id:function:my-function',
+            name: 'my-function',
+            role: 'id:iam:role:my-function',
             deploymentCounter: 2
           }
         }
@@ -114,17 +108,14 @@ describe('Integration Test - Simple', () => {
         const stateFileContent = await fsp.readJsonAsync(functionMockStateFile)
         const expected = {
           'tests-integration-function-mock:myRole': {
-            name: 'my-function',
-            service: 'my.function.service',
             id: 'id:iam:role:my-function',
+            name: 'my-function',
             deploymentCounter: 2
           },
           'tests-integration-function-mock': {
-            name: 'my-function',
-            memorySize: 512,
-            timeout: 100,
-            role: 'id:iam:role:my-function',
             id: 'id:function:my-function',
+            name: 'my-function',
+            role: 'id:iam:role:my-function',
             deploymentCounter: 2,
             data: 'Hello World'
           }

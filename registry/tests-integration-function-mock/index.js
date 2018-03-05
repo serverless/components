@@ -1,35 +1,36 @@
-function deploy(inputs, options, state, context) {
-  const { name } = inputs
+function deploy(inputs, context) {
+  const { name, role } = inputs
   context.log(`Deploying function "${name}"`)
 
   const id = `id:function:${name}`
   let deploymentCounter = 1
-  if (state && state.deploymentCounter) {
+  if (context.state && context.state.deploymentCounter) {
     // eslint-disable-next-line prefer-destructuring
-    deploymentCounter = state.deploymentCounter
+    deploymentCounter = context.state.deploymentCounter
     deploymentCounter += 1
   }
 
-  return {
+  context.saveState({
+    ...context.state,
     id,
+    name,
+    role,
     deploymentCounter
-  }
+  })
 }
 
-function invoke(inputs, options, state, context) {
+function invoke(inputs, context) {
   context.log(`Invoking function "${inputs.name}"`)
-  const { data } = options
+  const { data } = context.options
 
-  return {
+  context.saveState({
+    ...context.state,
     data
-  }
+  })
 }
 
-function remove(inputs, options, state, context) {
+function remove(inputs, context) {
   context.log(`Removing function "${inputs.name}"`)
-  return {
-    ...state
-  }
 }
 
 module.exports = {
