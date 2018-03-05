@@ -13,7 +13,7 @@ module.exports = async (components) => {
   forEachObjIndexed((component, componentId) => {
     if (not(isEmpty(component.dependencies))) {
       forEach((dependencyId) => {
-        graph.nodes.setEdge(componentId, dependencyId)
+        graph.setEdge(componentId, dependencyId)
       }, component.dependencies)
     }
   }, components)
