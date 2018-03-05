@@ -5,12 +5,16 @@ const {
 } = utils
 
 const run = async (command, options) => {
-  const stateFile = await readStateFile()
-  const components = await getComponents(stateFile)
-  const graph = await buildGraph(components)
-  await executeGraph(graph, components, command, options)
-  await updateStateFile(components)
-  return components
+  let components
+  try {
+    const stateFile = await readStateFile()
+    components = await getComponents(stateFile)
+    const graph = await buildGraph(components)
+    await executeGraph(graph, components, command, options)
+  } finally {
+    await updateStateFile(components)
+    return components // eslint-disable-line no-unsafe-finally
+  }
 }
 
 module.exports = {
