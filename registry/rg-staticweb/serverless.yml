@@ -62,17 +62,25 @@ components:
       errorDocument: ${parent:content_error}
       redirectBucketName: ${wwwDomainBucket:name}
       redirectToHostName: ${parent:hosting_domain}
-  siteCloudFrontConfig:
-    type: rg-cloudfront
+  # siteCloudFrontConfig:
+  #   type: rg-cloudfront
+  #   inputs:
+  #     distributionName: ${parent:name}
+  #     defaultRootObject: ${parent:content_index}
+  #     originId: ${rootDomainBucket:name}
+  #     originDomain: rgfamily.com.s3.amazonaws.com
+  #     aliasDomain: www.showcaseideas.com
+  #     distributionEnabled: false
+  #     loggingEnabled: false
+  #     loggingBucket: ${parent:name}
+  #     loggingIncludeCookies: false
+  #     loggingPrefix: ${parent:name}
+  #     priceClass: PriceClass_All # PriceClass_100 | PriceClass_200 | PriceClass_All
+  siteRoute53Config:
+    type: rg-route53
     inputs:
-      distributionName: ${parent:name}
-      defaultRootObject: ${parent:content_index}
-      originId: ${rootDomainBucket:name}
-      originDomain: rgfamily.com.s3.amazonaws.com
-      aliasDomain: www.showcaseideas.com
-      distributionEnabled: false
-      loggingEnabled: false
-      loggingBucket: ${parent:name}
-      loggingIncludeCookies: false
-      loggingPrefix: ${parent:name}
-      priceClass: PriceClass_All # PriceClass_100 | PriceClass_200 | PriceClass_All
+      name: ${parent:name}
+      domainName: www.familymine.com
+      privateZone: false
+      vpcId: my-existing-vpc-id
+      vpcRegion: ${parent:hosting_region}
