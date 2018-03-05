@@ -1,11 +1,11 @@
-const resolveEnvVars = require('./resolveEnvVars')
+const resolvePreExecutionVars = require('./resolvePreExecutionVars')
 const resolveInputsVars = require('./resolveInputsVars')
 const resolveStateVars = require('./resolveStateVars')
-const transformStateVars = require('./transformStateVars')
+const transformPostExecutionVars = require('./transformPostExecutionVars')
 
 module.exports = {
-  resolveEnvVars,
+  resolvePreExecutionVars,
   resolveInputsVars,
   resolveStateVars,
-  transformStateVars
+  transformPostExecutionVars
 }

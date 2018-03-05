@@ -48,9 +48,16 @@ const deleteRole = async (name) => {
 }
 
 const deploy = async (inputs, context) => {
-  // context.saveState({ foo: 'bars' })
-  console.log('1')
-  return 'hello'
+
+  // console.log(inputs)
+
+  context.saveState({ foo: 'bar' })
+
+  return { }
+
+
+
+
   // let outputs = state
   // if (!state.name && inputs.name) {
   //   context.log(`Creating Role: ${inputs.name}`)

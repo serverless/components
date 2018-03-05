@@ -4,10 +4,9 @@ const R = require('ramda')
 const getRegistryRoot = require('../getRegistryRoot')
 const fs = require('../fs')
 
-const resolveEnvVars = require('../variables/resolveEnvVars')
-const resolveInputsVars = require('../variables/resolveInputsVars')
-const transformStateVars = require('../variables/transformStateVars')
-const getComponentDependencies = require('../variables/getComponentDependencies')
+const resolvePreExecutionVars = require('../variables/resolvePreExecutionVars')
+const transformPostExecutionVars = require('../variables/transformPostExecutionVars')
+const getComponentDependencies = require('./getComponentDependencies')
 
 
 const { readFile, fileExists } = fs
@@ -19,13 +18,13 @@ const getComponents = async (
 ) => {
   let slsYml = await readFile(path.join(componentRoot, 'serverless.yml'))
   slsYml.inputs = mergeDeepRight(slsYml.inputs || {}, inputs)
-  slsYml = await resolveEnvVars(slsYml)
-  slsYml = await resolveInputsVars(slsYml)
+  slsYml = await resolvePreExecutionVars(slsYml)
 
   componentId = componentId || slsYml.type
 
-  slsYml = await transformStateVars(slsYml, componentId)
-  const dependencies = getComponentDependencies(slsYml)
+  slsYml = await transformPostExecutionVars(slsYml, componentId)
+  const dependencies = getComponentDependencies(slsYml.inputs)
+  // console.log(dependencies)
 
   const nestedComponents = await reduce(async (accum, componentAlias) => {
     accum = await Promise.resolve(accum)

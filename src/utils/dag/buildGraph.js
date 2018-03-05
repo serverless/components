@@ -3,8 +3,6 @@ const {
   forEach, keys, forEachObjIndexed, not, isEmpty
 } = require('ramda')
 
-const getComponentDependencies = require('../components/getComponentDependencies')
-
 module.exports = async (components) => {
   const graph = new Graph()
 
@@ -13,11 +11,10 @@ module.exports = async (components) => {
   }, keys(components))
 
   forEachObjIndexed((component, componentId) => {
-    const componentDependencies = getComponentDependencies(component.inputs)
-    if (not(isEmpty(componentDependencies))) {
+    if (not(isEmpty(component.dependencies))) {
       forEach((dependencyId) => {
         graph.nodes.setEdge(componentId, dependencyId)
-      }, componentDependencies)
+      }, component.dependencies)
     }
   }, components)
   return graph

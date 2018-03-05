@@ -68,7 +68,7 @@ const deleteLambda = async (name) => {
 }
 
 const deploy = async (inputs, context) => {
-  console.log('2')
+  // console.log(inputs)
   // let outputs
   // if (inputs.name && !state.name) {
   //   context.log(`Creating Lambda: ${inputs.name}`)
