@@ -149,7 +149,7 @@ async function update(params) {
 }
 
 // "public" functions
-async function deploy(inputs, options, state, context) {
+async function deploy(inputs, context) {
   const region = getRegion(inputs)
   const functionId = getFunctionId(inputs)
   const egInstance = getEventGatewayInstance(inputs)
@@ -162,14 +162,14 @@ async function deploy(inputs, options, state, context) {
     egInstance
   }
 
-  const shouldCreate = !state.lambdaArn || !state.subscriptionId
+  const shouldCreate = !context.state.lambdaArn || !context.state.subscriptionId
   const shouldUpdate =
-    state.event !== inputs.event ||
-    state.path !== inputs.path ||
-    state.method !== inputs.method ||
-    state.cors !== inputs.cors
+    context.state.event !== inputs.event ||
+    context.state.path !== inputs.path ||
+    context.state.method !== inputs.method ||
+    context.state.cors !== inputs.cors
 
-  let outputs = state
+  let outputs = {}
   if (shouldCreate) {
     if (inputs.event === 'http') {
       context.log(`Creating Event Gateway Subscription: ${inputs.method} ${inputs.path} --> "${functionId}"`)
@@ -184,14 +184,22 @@ async function deploy(inputs, options, state, context) {
       context.log(`Updating Event Gateway Subscription: ${inputs.path} --> "${functionId}"`)
     }
     outputs = await update({
-      ...state,
+      ...context.state,
       ...inputs
     })
   }
-  return outputs
+
+  const updatedState = {
+    ...context.state,
+    ...inputs,
+    ...outputs
+  }
+  context.saveState(updatedState)
+
+  return updatedState
 }
 
-async function remove(inputs, options, state, context) {
+async function remove(inputs, context) {
   const region = getRegion(inputs)
   const functionId = getFunctionId(inputs)
   const egInstance = getEventGatewayInstance(inputs)
@@ -204,31 +212,25 @@ async function remove(inputs, options, state, context) {
     egInstance
   }
 
-  const shouldRemove = state.subscriptionId
+  const shouldRemove = context.state.subscriptionId
 
-  let outputs = state
   if (shouldRemove) {
-    context.log(`Removing Event Gateway Subscription: ${state.subscriptionId} --> "${functionId}"`)
-    await unsubscribe({ egInstance, subscriptionId: state.subscriptionId })
+    context.log(`Removing Event Gateway Subscription: ${context.state.subscriptionId} --> "${functionId}"`)
+    await unsubscribe({ egInstance, subscriptionId: context.state.subscriptionId })
     try {
       await deleteFunction({ egInstance, functionId })
     } catch (error) {
       // NOTE: fail silently if the function could not be found
       // (which might mean that the function was already removed when removing another subscription)
     }
-    outputs = {
-      subscriptionId: null,
-      url: null
-    }
   }
-  return outputs
 }
 
-async function info(inputs, options, state, context) {
+async function info(inputs, context) {
   const egInstance = getEventGatewayInstance(inputs)
 
   context.log('Event Gateway setup:')
-  if (Object.keys(state).length) {
+  if (Object.keys(context.state).length) {
     let res = await listSubscriptions({ egInstance })
     if (res.length) {
       // filter out the result we're looking for
@@ -246,7 +248,7 @@ async function info(inputs, options, state, context) {
       // enhance the result with some information from the state
       const setup = {
         ...res,
-        url: state.url
+        url: context.state.url
       }
       context.log(JSON.stringify(setup, null, 2))
     } else {
