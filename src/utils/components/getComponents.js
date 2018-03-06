@@ -1,40 +1,17 @@
 const path = require('path')
-const R = require('ramda')
+const { reduce, keys } = require('ramda')
 
 const getRegistryRoot = require('../getRegistryRoot')
-const fs = require('../fs')
+const { fileExists } = require('../fs')
 
-const resolvePreExecutionVars = require('../variables/resolvePreExecutionVars')
-const transformPostExecutionVars = require('../variables/transformPostExecutionVars')
+const getComponent = require('./getComponent')
 const getDependencies = require('../variables/getDependencies')
-
-
-const { readFile, fileExists } = fs
-const {
-  reduce, keys, forEachObjIndexed
-} = R
-
-const generateNestedComponentsIds = (slsYml) => {
-  forEachObjIndexed((componentObj, componentAlias) => {
-    componentObj.id = `${slsYml.id}:${componentAlias}`
-  }, slsYml.components)
-  return slsYml
-}
 
 const getComponents = async (
   stateFile, componentRoot = process.cwd(), inputs = {}, componentId, components = {}
 ) => {
-  let slsYml = await readFile(path.join(componentRoot, 'serverless.yml'))
+  const slsYml = await getComponent(componentRoot, componentId, inputs)
 
-  slsYml.id = componentId || slsYml.type
-
-  slsYml = generateNestedComponentsIds(slsYml)
-
-  slsYml = await transformPostExecutionVars(slsYml)
-
-  slsYml.inputs = { ...slsYml.inputs, ...inputs } // shallow merge
-
-  slsYml = await resolvePreExecutionVars(slsYml)
   const dependencies = getDependencies(slsYml.inputs)
 
   const nestedComponents = await reduce(async (accum, componentAlias) => {

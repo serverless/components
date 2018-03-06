@@ -2,9 +2,9 @@
 const minimist = require('minimist')
 const { run } = require('../src/index')
 
-;(async () => {
+;(async () => { // eslint-disable-line
   const command = process.argv[2]
   const options = minimist(process.argv.slice(2))
-  delete options['_']
+  delete options._
   await run(command, options)
-})().catch(e => console.log(e))
+})().catch((e) => console.log(e))

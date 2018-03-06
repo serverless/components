@@ -21,7 +21,8 @@
     "components": "./bin/components"
   },
   "scripts": {
-    "components": "./bin/components",
+    "proto": "./bin/serverless",
+    "lint": "eslint . --cache",
     "test": "jest ."
   },
   "dependencies": {

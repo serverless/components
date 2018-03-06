@@ -1,5 +1,8 @@
 type: github-webhook-receiver
 
+inputs:
+  url: ${myEndpoint.state.url}
+
 components:
   myTable:
     type: dynamodb
