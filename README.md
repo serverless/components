@@ -9,12 +9,12 @@ Components are capable of provisioning infrastructure while including both appli
 * [Getting started](#getting-started)
 * [Concepts](#concepts)
   * [Components](#components)
-  * [Registry](#registry)
   * [Inputs & Outputs](#inputs-outputs)
   * [State](#state)
   * [Variables](#variables)
   * [Graph](#graph)
   * [Custom commands](#custom-commands)
+  * [Registry](#registry)
 * [Creating components](#creating-components)
   * [Basic setup](#basic-setup)
   * [`serverless.yml`](#serverless.yml)
@@ -43,7 +43,6 @@ Components are capable of provisioning infrastructure while including both appli
 1. Setup the environment variables
    * `export AWS_ACCESS_KEY_ID=my_access_key_id`
    * `export AWS_SECRET_ACCESS_KEY=my_secret_access_key`
-1. Install the dependencies in all `/registry/*` directories with a `package.json` file
 
 ## Running Locally
 
@@ -60,19 +59,40 @@ components [Command]
 A component is the smallest unit of abstraction for your infrastructure. It could be a single small piece like an IAM role, or a larger piece that includes other small pieces, like [`github-webhook-receiver`](#github-webhook-receiver), which includes `lambda` (which itself includes `iam`), `apigateway` (which also includes `iam`), `dynamodb`, and `github-webhook`. So components could be composed with each other in a component dependency graph to build larger components.
 
 You define a component using two files: `serverless.yml` for config, and `index.js` for the provisioning logic.
-The `index.js` file exports multiple functions that take four arguments: `inputs`, `state`, `context` and `options`. Each exported function name reflects the CLI command which will invoke it (the `deploy` function will be executed when one runs `proto deploy`).
-
-However, this `index.js` file is optional, since your component could just be a composition of other smaller components without provisioning logic on its own. [`github-webhook-receiver`](#github-webhook-receiver) is a good example of this.
+The `index.js` file exports a deploy function that takes two arguments: `inputs` and `context`. Each exported function name reflects the CLI command which will invoke it (the `deploy` function will be executed when one runs `components deploy`).
 
 These two files look something like this:
 
 **serverless.yml**
 
 ```yml
-type: github-webhook-receiver
+type: my-component
 
-inputs:
-  url: ${myEndpoint:url} # Variable from another component output
+inputs: # inputs that my-component expects to receive
+  foo: string
+  bar: number
+```
+
+**index.js**
+
+```js
+const deploy = (inputs, context) => {
+  // provisioning logic goes here
+}
+
+module.exports = {
+  deploy // this is the command name which is exposed via the CLI
+}
+```
+
+However, this `index.js` file is optional, since your component could just be a composition of other smaller components without provisioning logic on its own. [`github-webhook-receiver`](#github-webhook-receiver) is a good example of this.
+
+This component has only a `serverless.yml` and no provisioning logic in the `index.js` file.
+
+**serverless.yml**
+
+```yml
+type: github-webhook-receiver
 
 components:
   myTable: # component alias, to be referenced with Variables
@@ -105,26 +125,6 @@ components:
       event: pull_request
 ```
 
-**index.js**
-
-```js
-const deploy = (inputs, options, state, context) => {
-  // provisioning logic goes here
-}
-
-module.exports = {
-  deploy // this is the command name which is exposed via the CLI
-}
-```
-
-### Registry
-
-The ["Serverless Registry"](./registry) is a core part in this implementation since it makes it possible to discover, publish and share existing components.
-
-The registry is not only constrained to serve components. Since components are functions it's possible to wrap existing business logic into functions and publish them to the registry as well.
-
-Looking into the future it could be possible to serve functions which are written in different languages through the registry.
-
 ### Inputs & Outputs
 
 #### Inputs
@@ -132,11 +132,16 @@ Looking into the future it could be possible to serve functions which are writte
 Inputs are the configuration that are supplied to your component logic by the user. You supply those inputs in `serverless.yml`:
 
 ```yml
-type: github-webhook-receiver
+type: some-component
 
 inputs:
-  firstInput: hello
-  secondInput: world
+  firstInput: 
+    displayName: "The first input"
+    type: string
+    required: true
+    default: 'foo value'
+    
+  secondInput: number  # short hand 
 ```
 
 Or, if the component is being used as a child of another parent component, like the `lambda` component, the parent could supply those inputs, and they would overwrite the default inputs that are defined at the child level.
@@ -147,14 +152,22 @@ So, if the lambda `serverless.yml` looks like this:
 type: lambda
 
 inputs:
-  memory: 128
-  timeout: 10
+  memory: 
+    displayName: "The amount of memory to provide to the lambda function"
+    type: number
+    required: true
+    default: 128
+  timeout:
+    displayName: "The timeout of the function in seconds"
+    type: number
+    required: true
+    default: 10
 ```
 
-and `github-webhook-receiver` `serverless.yml` looks like this:
+a `serverless.yml` which uses lambda could look like this:
 
 ```yml
-type: github-webhook-receiver
+type: my-component
 
 components:
   myFunction:
@@ -166,32 +179,69 @@ components:
 
 Then your deployed `lambda` function would have a memory size of 512, and timeout of 300.
 
+
 #### Outputs
 
-Your provisioning logic, or your `index.js` file, can optionally return an outputs object. This output can be referenced in `serverless.yml` as inputs to another component.
+Your provisioning logic, or the `deploy` method of your `index.js` file, can optionally return an outputs object. This output can be referenced in `serverless.yml` as inputs to another component.
+
+For example, the lambda component's deploy method returns outputs that look like this...
+**index.js**
+
+```js
+const deploy = (inputs, context) => {
+  // lambda provisioning logic
+  
+  // return outputs
+  return {   
+    arn: res.FunctionArn
+  }
+}
+
+module.exports = {
+  deploy
+}
+```
+
+These outputs can then be referenced by other components such as in this example we reference the function arn and pass it in to the apigateway component to setup a handler for the route.
+```yml
+type: my-component
+
+components:
+  myFunction:
+    type: lambda
+    inputs:
+      handler: code.handler
+  myEndpoint:
+    type: apigateway
+    inputs:
+      routes:
+        /github/webhook:
+          post:
+            lambdaArn: ${myFunction.outputs.arn}
+```
 
 ### State
 
-State is simply the inputs and outputs of the last operation. It represents a historical snapshot of what happened last time you ran a command such as `deploy`, `remove`, etc.
+State can be accessed at via the `context` object and represents a historical snapshot of what happened last time you ran a command such as `deploy`, `remove`, etc.
 
 The provisioning logic can use this state object and compare it with the current inputs, to make decisions whether to deploy, update, or remove.
 
-The operation that needs to be done depends on the inputs and how the provider works. Change in some inputs for some provider could trigger a create/remove, while other inputs might trigger an update. It's up to the component to decide.
+The operation that needs to be done depends on the inputs and how the provider works. Change in some inputs for some provider could trigger a create / remove, while other inputs might trigger an update. It's up to the component to decide.
 
 Here's an example on how the lambda component decides what needs to be done based on the inputs and state:
 
 ```js
-const deploy = (inputs, options, state, context) => {
+const deploy = (inputs, context) => {
 let outputs;
-  if (inputs.name && !state.name) {
+  if (inputs.name && !context.state.name) {
     console.log(`Creating Lambda: ${inputs.name}`);
     outputs = await create(inputs);
-  } else if (state.name && !inputs.name) {
-    console.log(`Removing Lambda: ${state.name}`);
-    outputs = await remove(state.name);
-  } else if (inputs.name !== state.name) {
-    console.log(`Removing Lambda: ${state.name}`);
-    await remove(state.name);
+  } else if (context.state.name && !inputs.name) {
+    console.log(`Removing Lambda: ${context.state.name}`);
+    outputs = await remove(context.state.name);
+  } else if (inputs.name !== context.state.name) {
+    console.log(`Removing Lambda: ${context.state.name}`);
+    await remove(context.state.name);
     console.log(`Creating Lambda: ${inputs.name}`);
     outputs = await create(inputs);
   } else {
@@ -239,6 +289,15 @@ module.exports = {
   test // make the function accisble from the CLI
 }
 ```
+
+### Registry (not yet implemented)
+
+The ["Serverless Registry"](./registry) will be a core part in the implementation since it makes it possible to discover, publish and share existing components. For now, `serverless-components` ships with a number of built in components that are usable by type name.
+
+The registry is not only constrained to serve components. Since components are functions it's possible to wrap existing business logic into functions and publish them to the registry as well.
+
+Looking into the future it could be possible to serve functions which are written in different languages through the registry.
+
 
 ## Creating components
 
