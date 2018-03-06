@@ -6,3 +6,13 @@ install:
 - npm install
 script:
 - npm test
+deploy:
+  provider: npm
+  email: services@serverless.com
+  skip_cleanup: true
+  on:
+    branch: master
+    tags: true
+    repo: serverless/serverless-components
+  api_key:
+    secure: YTztLKRyrjnyDJdhc6SV1jB4wMjta/wNWZ423d4GySlU3ncLlXRJUOMWKg9DUHyGlF4tlwlB+UFDqty6qrf9x56Yx7703Xgsvdvtf67VVF3gkki0OcG2VL1cCp9vsc2BBg2ChTvR0pwNnDahDdT68rzIZPyeDV1DxJw/f0yrFmMaXJ3TLnJmEYD0j7vGfb+gWOhRDKrPBtkRHLYFnDVxOaG93AvFxZNYD5sMk+MviEX2IDnKL6XyAk6zsKJsot2GDP5q0ziI+ipEd9345J9cc3Pc3agqgB7EsjVruq98A6IwZAW0OSCD6ZUUdYmqD8Qx9J/VC2g3jq0vmT7fg0PIWjkbLX1aD9OMadlw82U38gS8B7taeB9KXqhaf8VswYRy5FOSCww7PpOTLCVTEAafZcSgsgOPQMD6Uc99a8fGfhJvXs2DPm3nbz2zz1xxNsYfB7/esvBmJ5k02dfhFPlozvJjuCCzC9xg8oPsJT4VQZmA2jm1XvIROWQkD1gt6sWYLaBWn/Gz3HxW8uDJcZf9sApNV/8pJFLYLfTqx0A1Ixc0P3sm5zlCh7AYDRyYECj/EmvUNJpCyoF3/nxYfOoqh6s1/dE3CEgm7bDmwxImQHKshL0/F6/7U5eNERnE8JGU1RfCoPcnZBJqWKX39HvGR5E6r1ffJFwHCwh2CPqYqnE=
