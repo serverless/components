@@ -1,5 +1,5 @@
 {
-  "name": "@serverless/serverless-components",
+  "name": "serverless-components",
   "version": "0.1.0",
   "description": "PoC for the next version of the Serverless Framework",
   "author": "Serverless, Inc.",
@@ -18,10 +18,10 @@
     "access": "public"
   },
   "bin": {
-    "proto": "./bin/serverless"
+    "components": "./bin/components"
   },
   "scripts": {
-    "proto": "./bin/serverless",
+    "components": "./bin/components",
     "test": "jest ."
   },
   "dependencies": {
