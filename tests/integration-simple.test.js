@@ -25,6 +25,7 @@ describe('Integration Test - Simple', () => {
   const functionMockDir = path.join(testDir, '..', 'registry', 'tests-integration-function-mock')
   const iamMockStateFile = path.join(iamMockDir, 'state.json')
   const functionMockStateFile = path.join(functionMockDir, 'state.json')
+  const FUNCTION_NAME = 'my-function'
 
   beforeAll(async () => {
     await removeStateFiles([ iamMockStateFile, functionMockStateFile ])
@@ -56,7 +57,7 @@ describe('Integration Test - Simple', () => {
           cwd: functionMockDir,
           env: {
             ...process.env,
-            FUNCTION_NAME: 'my-function'
+            FUNCTION_NAME
           }
         })
         const stateFileContent = await fsp.readJsonAsync(functionMockStateFile)
@@ -81,7 +82,7 @@ describe('Integration Test - Simple', () => {
           cwd: functionMockDir,
           env: {
             ...process.env,
-            FUNCTION_NAME: 'my-function'
+            FUNCTION_NAME
           }
         })
         const stateFileContent = await fsp.readJsonAsync(functionMockStateFile)
@@ -111,6 +112,36 @@ describe('Integration Test - Simple', () => {
             id: 'id:iam:role:my-function',
             name: 'my-function',
             deploymentCounter: 2
+          },
+          'tests-integration-function-mock': {
+            id: 'id:function:my-function',
+            name: 'my-function',
+            role: 'id:iam:role:my-function',
+            deploymentCounter: 2,
+            data: 'Hello World'
+          }
+        }
+        expect(stateFileContent).toEqual(expected)
+      })
+
+      it('should save the current state if an error occurs during command execution', async () => {
+        // NOTE: we've added some logic in the function component so that it fails when the
+        // third deployment is done
+        // NOTE: the order of this test here is important since we're keeping and checking the
+        // state file throughout the whole test suite
+        await cpp.execAsync(`${serverlessExec} deploy`, {
+          cwd: functionMockDir,
+          env: {
+            ...process.env,
+            FUNCTION_NAME
+          }
+        })
+        const stateFileContent = await fsp.readJsonAsync(functionMockStateFile)
+        const expected = {
+          'tests-integration-function-mock:myRole': {
+            id: 'id:iam:role:my-function',
+            name: 'my-function',
+            deploymentCounter: 3
           },
           'tests-integration-function-mock': {
             id: 'id:function:my-function',

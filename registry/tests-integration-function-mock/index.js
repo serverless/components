@@ -10,6 +10,11 @@ function deploy(inputs, context) {
     deploymentCounter += 1
   }
 
+  // fail on the third deployment
+  if (deploymentCounter === 3) {
+    throw new Error(`Failed to deploy function "${name}"`)
+  }
+
   const newState = {
     ...context.state,
     id,
