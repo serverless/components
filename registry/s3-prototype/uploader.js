@@ -1,16 +1,16 @@
-const AWS = require('aws-sdk')
+const AWS = require('aws-sdk') // eslint-disable-line
 const fdk = require('@serverless/fdk')
 const multipart = require('parse-multipart')
 
 const eventGateway = fdk.eventGateway({
-  url: `https://eslam.eventgateway-dev.io/anything`
+  url: 'https://eslam.eventgateway-dev.io/anything'
 })
 const s3 = new AWS.S3({ apiVersion: '2006-03-01' })
 
 module.exports.handler = (event, context, callback) => {
-  console.log('Event: ', event);
+  console.log('Event: ', event)
   const boundary = multipart.getBoundary(event.data.headers['Content-Type'][0])
-  const body = new Buffer(event.data.body, 'base64')
+  const body = new Buffer(event.data.body, 'base64') // eslint-disable-line
   console.log(body)
   const parts = multipart.Parse(body, boundary)
 
@@ -38,12 +38,12 @@ module.exports.handler = (event, context, callback) => {
         body: JSON.stringify({
           message: 'Success!'
         })
-      };
+      }
 
       callback(null, response)
     })
-    .catch(err => {
-      console.log(err);
+    .catch((err) => {
+      console.log(err)
       callback('Something went wrong')
     })
 }

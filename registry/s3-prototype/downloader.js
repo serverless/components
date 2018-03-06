@@ -1,4 +1,4 @@
-const AWS = require('aws-sdk')
+const AWS = require('aws-sdk') // eslint-disable-line
 const uuidv4 = require('uuid/v4')
 
 const dbClient = new AWS.DynamoDB.DocumentClient()
@@ -16,7 +16,7 @@ const putFileEntry = (fileUrl, fileName) =>
       Item: item
     }
 
-    dbClient.put(params, err => {
+    dbClient.put((params), (err) => {
       if (err) reject(err)
       else resolve(item)
     })
@@ -35,7 +35,7 @@ module.exports.handler = (event, context, callback) => {
 
       callback(null, response)
     })
-    .catch(err => {
+    .catch((err) => {
       console.log(err)
       callback('Something went wrong')
     })

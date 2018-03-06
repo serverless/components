@@ -1,7 +1,7 @@
 const AWS = require('aws-sdk')
 
 const dynamodb = new AWS.DynamoDB()
-module.exports.handler = (e, ctx, cb) => {
+module.exports.handler = (e, ctx, cb) => { // eslint-disable-line
   if (e.headers['X-GitHub-Event'] === 'ping') {
     cb(null, { statusCode: 200, body: 'Hello Github!' })
   }
@@ -9,10 +9,10 @@ module.exports.handler = (e, ctx, cb) => {
   if (body.action) {
     const params = {
       Item: {
-        'repo': {
+        repo: {
           S: 'eslam-components'
         },
-        'action': {
+        action: {
           S: body.action
         }
       },
@@ -20,13 +20,13 @@ module.exports.handler = (e, ctx, cb) => {
       TableName: 'github-webhook-receiver'
     }
 
-    return dynamodb.putItem(params).promise().then(res => {
+    return dynamodb.putItem(params).promise().then(() => {
       cb(null, { statusCode: 200, body: 'YAY! github event saved to database!' })
-    }).catch(e => {
-      console.log(e)
+    }).catch((err) => {
+      console.log(err)
       cb(null, { statusCode: 500, body: 'FUDGE! something went wrong while saving github event!' })
     })
-  } else {
+  } else { // eslint-disable-line
     cb(null, { statusCode: 200, body: 'Someone invoked me!' })
   }
 }

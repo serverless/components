@@ -1,5 +1,3 @@
 const fse = require('./fse')
 
-module.exports = (filePath) => {
-  return fse.removeAsync(filePath)
-}
+module.exports = (filePath) => fse.removeAsync(filePath)
