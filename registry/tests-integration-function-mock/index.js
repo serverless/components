@@ -10,23 +10,29 @@ function deploy(inputs, context) {
     deploymentCounter += 1
   }
 
-  context.saveState({
+  const newState = {
     ...context.state,
     id,
     name,
     role,
     deploymentCounter
-  })
+  }
+  context.saveState(newState)
+
+  return newState
 }
 
 function invoke(inputs, context) {
   context.log(`Invoking function "${inputs.name}"`)
   const { data } = context.options
 
-  context.saveState({
+  const newState = {
     ...context.state,
     data
-  })
+  }
+  context.saveState(newState)
+
+  return newState
 }
 
 function remove(inputs, context) {

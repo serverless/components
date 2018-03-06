@@ -10,12 +10,15 @@ function deploy(inputs, context) {
     deploymentCounter += 1
   }
 
-  context.saveState({
+  const newState = {
     ...context.state,
     id,
     name,
     deploymentCounter
-  })
+  }
+  context.saveState(newState)
+
+  return newState
 }
 
 function remove(inputs, context) {
