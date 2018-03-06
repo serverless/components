@@ -4,8 +4,8 @@ const getRegistryRoot = require('../getRegistryRoot')
 
 const generateContext = (componentId, components, options) => {
   const context = {
-    componentId,
-    state: components[componentId].state,
+    id: componentId,
+    state: components[componentId].state || {},
     options,
     log: (message) => {
       if (!process.env.CI) {
@@ -16,7 +16,7 @@ const generateContext = (componentId, components, options) => {
       const component = require(path.join(getRegistryRoot(), type)) // eslint-disable-line
 
       const childComponentId = `${componentId}:${alias}`
-      components[childComponentId] = components[childComponentId] || {}
+      components[childComponentId] = components[childComponentId] || { id: childComponentId }
       const childComponentContext = generateContext(childComponentId, components, options)
 
       const fnNames = keys(component)
@@ -30,8 +30,8 @@ const generateContext = (componentId, components, options) => {
       return modifiedComponent
     },
     saveState: function (state = {}) { // eslint-disable-line
-      components[componentId].state = state
-      this.state = components[componentId].state
+      components[this.id].state = state
+      this.state = components[this.id].state
     }
   }
   return context
