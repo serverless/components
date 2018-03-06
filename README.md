@@ -439,10 +439,35 @@ Creates / Removes an AWS DynamoDB table.
 
 ##### Inputs
 
-| Name   | Description                 | Type   |
-| ------ | --------------------------- | ------ |
-| `name` | The AWS DynamoDB table name | String |
+See [docs](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-dynamodb-table.html)
 
+```yml
+type: dynamodb
+
+inputs:
+  region: string
+  DeletionPolicy: string
+  Properties:
+    AttributeDefinitions:
+      - AttributeDefinition
+    GlobalSecondaryIndexes:
+      - GlobalSecondaryIndexes
+    KeySchema:
+      - KeySchema
+    LocalSecondaryIndexes:
+      - LocalSecondaryIndexes
+    ProvisionedThroughput:
+      ProvisionedThroughput
+    SSESpecification:
+      SSESpecification
+    StreamSpecification:
+      StreamSpecification
+    TableName: String
+    Tags:
+      - Resource Tag
+    TimeToLiveSpecification:
+      TimeToLiveSpecification
+```
 ##### Commands
 
 * `proto deploy`
@@ -450,12 +475,7 @@ Creates / Removes an AWS DynamoDB table.
 
 ##### Example
 
-```yml
-type: dynamodb
-
-inputs:
-  name: dynamodb
-```
+[See Default inputs](./registry/dynamodb)
 
 #### `eventgateway`
 
