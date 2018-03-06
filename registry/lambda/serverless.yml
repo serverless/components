@@ -7,6 +7,7 @@ inputs:
   description: default description goes here
   handler: code.handler
   role: ${myRole:arn}
+  env: null
 
 components:
   myRole:

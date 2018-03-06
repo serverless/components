@@ -1,0 +1,12 @@
+type: my-project
+
+components:
+  myFunction:
+    type: lambda
+    inputs:
+      name: some-function
+      memory: 512
+      timeout: 10
+      handler: code.handler
+      env:
+        FOO: ${env:FOO}
