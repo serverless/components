@@ -38,7 +38,7 @@ const getComponents = async (
     id: slsYml.id,
     inputs: slsYml.inputs,
     outputs: {},
-    state: stateFile[componentId] || {},
+    state: stateFile[slsYml.id] || {},
     dependencies,
     fns
   }
