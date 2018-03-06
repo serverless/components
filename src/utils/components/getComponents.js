@@ -17,7 +17,7 @@ const getComponents = async (
   const nestedComponents = await reduce(async (accum, componentAlias) => {
     accum = await Promise.resolve(accum)
     const nestedComponentRoot = path.join(getRegistryRoot(), slsYml.components[componentAlias].type)
-    const nestedComponentInputs = slsYml.components[componentAlias].inputs
+    const nestedComponentInputs = slsYml.components[componentAlias].inputs || {}
     const nestedComponentId = slsYml.components[componentAlias].id
     accum = await getComponents(
       stateFile,
