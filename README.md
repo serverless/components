@@ -59,31 +59,8 @@ components [Command]
 A component is the smallest unit of abstraction for your infrastructure. It could be a single small piece like an IAM role, or a larger piece that includes other small pieces, like [`github-webhook-receiver`](#github-webhook-receiver), which includes `lambda` (which itself includes `iam`), `apigateway` (which also includes `iam`), `dynamodb`, and `github-webhook`. So components could be composed with each other in a component dependency graph to build larger components.
 
 You define a component using two files: `serverless.yml` for config, and `index.js` for the provisioning logic.
-The `index.js` file exports a deploy function that takes two arguments: `inputs` and `context`. Each exported function name reflects the CLI command which will invoke it (the `deploy` function will be executed when one runs `components deploy`).
 
-These two files look something like this:
-
-**serverless.yml**
-
-```yml
-type: my-component
-
-inputs: # inputs that my-component expects to receive
-  foo: string
-  bar: number
-```
-
-**index.js**
-
-```js
-const deploy = (inputs, context) => {
-  // provisioning logic goes here
-}
-
-module.exports = {
-  deploy // this is the command name which is exposed via the CLI
-}
-```
+The `index.js` file exports multiple functions that take two arguments: `inputs` and `context`. Each exported function name reflects the CLI command which will invoke it (the `deploy` function will be executed when one runs `proto deploy`).
 
 However, this `index.js` file is optional, since your component could just be a composition of other smaller components without provisioning logic on its own. [`github-webhook-receiver`](#github-webhook-receiver) is a good example of this.
 
@@ -93,6 +70,10 @@ This component has only a `serverless.yml` and no provisioning logic in the `ind
 
 ```yml
 type: github-webhook-receiver
+
+
+inputs:
+  url: ${myEndpoint.outputs.url} # Variable from another component output
 
 components:
   myTable: # component alias, to be referenced with Variables
@@ -114,16 +95,37 @@ components:
       routes:
         /github/webhook:
           post:
-            lambdaArn: ${myFunction:arn}
+            lambdaArn: ${myFunction.outputs.arn}
   myGithubWebhook:
     type: github
     inputs:
       token: ${GITHUB_TOKEN} # Variable from env var
       owner: serverless
       repo: components-eslam
-      url: ${myEndpoint:url}
+      url: ${myEndpoint.outputs.url}
       event: pull_request
 ```
+
+**index.js**
+
+```js
+const deploy = (inputs, context) => {
+  // provisioning logic goes here
+}
+
+module.exports = {
+  deploy // this is the command name which is exposed via the CLI
+}
+```
+
+### Registry
+
+The ["Serverless Registry"](./registry) is a core part in this implementation since it makes it possible to discover, publish and share existing components.
+
+The registry is not only constrained to serve components. Since components are functions it's possible to wrap existing business logic into functions and publish them to the registry as well.
+
+Looking into the future it could be possible to serve functions which are written in different languages through the registry.
+
 
 ### Inputs & Outputs
 
@@ -261,7 +263,7 @@ module.exports = {
 The framework supports variables from two sources:
 
 * **Environment Variables:** for example, `${GITHUB_TOKEN}`
-* **Output:** for example: `${myEndpoint.url}`, where `myEndpoint` is the component alias as defined in `serverless.yml`, and `url` is a property in the outputs object that is returned from the `myEndpoint` provisioning function.
+* **Output:** for example: `${myEndpoint.outputs.url}`, where `myEndpoint` is the component alias as defined in `serverless.yml`, and `url` is a property in the outputs object that is returned from the `myEndpoint` provisioning function.
 
 ### Graph
 
@@ -276,17 +278,17 @@ The component author doesn't have to worry about this graph at all. One just use
 Other than the built in `deploy` and `remove` commands, you can add custom commands to add extra management for your component lifecycle. You do so by adding the corresponding function to the `index.js` file. Just like the other functions in `index.js`, it accepts `inputs`, `state`, `context` and `options`.
 
 ```js
-const deploy = (inputs, options, state, context) => {
+const deploy = (inputs, context) => {
   // some provisioning logic
 }
 
-const test = (inputs, options, state, context) => {
+const test = (inputs, context) => {
   console.log('Testing the components functionality...')
 }
 
 module.exports = {
   deploy,
-  test // make the function accisble from the CLI
+  test // make the function accessible from the CLI
 }
 ```
 
@@ -346,33 +348,32 @@ function greetWithFullName(inputs, context) {
 }
 
 // "public" functions
-function deploy(inputs, options, state, context) {
+function deploy(inputs, context) {
   greetWithFullName(inputs, context)
 
-  if (state && state.deployedAt) {
-    context.log(`Last deployment: ${state.deployedAt}...`)
+  if (context.state.deployedAt) {
+    context.log(`Last deployment: ${context.state.deployedAt}...`)
   }
 
   const deployedAt = new Date().toISOString()
-  return {
+
+  const updatedState = {
+    ...context.state,
     ...inputs,
-    ...state,
     deployedAt
   }
+  context.saveState(updatedState)
+
+  return updatedState
 }
 
-function greet(inputs, options, state, context) {
+function greet(inputs, context) {
   context.log(`Hola ${inputs.firstName} ${inputs.lastName}!`)
-  return {
-    ...inputs,
-    ...state
-  }
 }
 
-function remove(inputs, options, state, context) {
+function remove(inputs, context) {
   greetWithFullName(inputs, context)
   context.log('Removing...')
-  return {}
 }
 
 module.exports = {
@@ -386,11 +387,11 @@ Let's take a closer look at the implementation.
 
 Right at the top we've define a "helper" function (this function is not exported at the bottom and can therefore only used internally) we use to reduce code duplication. this `greetWithFullName` function gets the `inputs` and the `context` and logs a message which greets the user with his full name. Note that we're using the `log` function which is available at the `context` object instead of the native `console.log` function. The `context` object has other, very helpful functions and data attached to it.
 
-Next up we've defined the `deploy` function. This function is executed every time the user runs a `deploy` command since we've exported it at the bottom of the file. At first we re-use our `greetWithFullName` function to greet our user. Next up we check the state to see if we've already deployed previously. If that's the case we log out the timestamp of the last deployment. After that we get the current time and return an object which includes the `state`, the `inputs` and the new `deployedAt` timestamp. The Framework will pick up this returned information and use it to store it in the state file.
+Next up we've defined the `deploy` function. This function is executed every time the user runs a `deploy` command since we've exported it at the bottom of the file. At first we re-use our `greetWithFullName` function to greet our user. Next up we check the state to see if we've already deployed previously. If that's the case we log out the timestamp of the last deployment. After that we get the current time and store it in an object which includes the `state`, the `inputs` and the new `deployedAt` timestamp. This object reflects our current state which we store. After that we return the object as outputs.
 
-The `greet` function is a custom `command` function we use to extend the CLIs capabilities. Since we've exported it at the bottom of the file it'll be execute every time someone runs the `greet` command. The functionality is pretty straightforward. We just log out a different greeting using the `context.log` method and the `inputs` and return the `inputs` merged together with the `state`.
+The `greet` function is a custom `command` function we use to extend the CLIs capabilities. Since we've exported it at the bottom of the file it'll be execute every time someone runs the `greet` command. The functionality is pretty straightforward. We just log out a different greeting using the `context.log` method and the `inputs`.
 
-The last function we've defined in our components implementation is the `remove` function. Remove is also accessible from the CLI because we export it at the bottom of the file. The functions code is also pretty easy to understand. At first we greet our user with the `greetWithFullName` helper function. Next up we log a message that the removal was triggered. After that we simply return an empty object to reset the state file. That's it.
+The last function we've defined in our components implementation is the `remove` function. Remove is also accessible from the CLI because we export it at the bottom of the file. The functions code is also pretty easy to understand. At first we greet our user with the `greetWithFullName` helper function. Next up we log a message that the removal was triggered. That's it.
 
 ### Testing
 
