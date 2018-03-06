@@ -34,6 +34,6 @@ components:
     inputs:
       token: ${GITHUB_TOKEN}
       owner: serverless
-      repo: serverless-component
+      repo: serverless-components
       url: ${myEndpoint.outputs.url}
       event: pull_request

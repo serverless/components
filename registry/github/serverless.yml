@@ -3,6 +3,6 @@ type: github
 inputs:
   token: ${GITHUB_TOKEN}
   owner: serverless
-  repo: serverless-component
+  repo: serverless-components
   url: https://serverless.com
   event: push
