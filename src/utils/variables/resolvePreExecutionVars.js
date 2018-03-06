@@ -2,12 +2,9 @@ const {
   is, not, replace, match, contains, keys, map, test, reduce
 } = require('ramda')
 
-// todo
-//  multiple variable references
-//  variables as substring
-module.exports = (slsYml) => {
-  const regex = RegExp('\\${([ ~:a-zA-Z0-9._\'",\\-\\/\\(\\)]+?)}', 'g') // eslint-disable-line
+const regex = require('./getVariableSyntax')()
 
+module.exports = (slsYml) => {
   const resolveValue = (value) => {
     if (is(Object, value) || is(Array, value)) {
       return map(resolveValue, value)

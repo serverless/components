@@ -1,8 +1,5 @@
 type: github-webhook-receiver
 
-inputs:
-  url: ${myEndpoint:url}
-
 components:
   myTable:
     type: dynamodb
@@ -19,11 +16,10 @@ components:
     type: apigateway
     inputs:
       name: github-webhook-receiver-api
-      roleArn: arn:aws:iam::XXXXX:role/some-api-gateway-role
       routes:
         /github/webhook:
           post:
-            lambdaArn: ${myFunction:arn}
+            lambdaArn: ${myFunction.outputs.arn}
 #  myEndpoint:
 #    type: eventgateway
 #    inputs:
@@ -38,6 +34,6 @@ components:
     inputs:
       token: ${GITHUB_TOKEN}
       owner: serverless
-      repo: components-eslam
-      url: ${myEndpoint:url}
+      repo: serverless-component
+      url: ${myEndpoint.outputs.url}
       event: pull_request

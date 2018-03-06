@@ -4,4 +4,3 @@ module.exports = async (component, command, context) => {
   }
   if (command === 'remove') component.state = {}
 }
-

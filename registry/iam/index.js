@@ -48,35 +48,27 @@ const deleteRole = async (name) => {
 }
 
 const deploy = async (inputs, context) => {
-
-  // console.log(inputs)
-
-  context.saveState({ foo: 'bar' })
-
-  return { }
-
-
-
-
-  // let outputs = state
-  // if (!state.name && inputs.name) {
-  //   context.log(`Creating Role: ${inputs.name}`)
-  //   outputs = await createRole(inputs)
-  // } else if (!inputs.name && state.name) {
-  //   context.log(`Removing Role: ${state.name}`)
-  //   outputs = await deleteRole(state.name)
-  // } else if (state.name !== inputs.name) {
-  //   context.log(`Removing Role: ${state.name}`)
-  //   await deleteRole(state.name)
-  //   context.log(`Creating Role: ${inputs.name}`)
-  //   outputs = await createRole(inputs)
-  // }
-  // return outputs
+  let outputs = context.state
+  if (!context.state.name && inputs.name) {
+    context.log(`Creating Role: ${inputs.name}`)
+    outputs = await createRole(inputs)
+  } else if (!inputs.name && context.state.name) {
+    context.log(`Removing Role: ${context.state.name}`)
+    outputs = await deleteRole(context.state.name)
+  } else if (context.state.name !== inputs.name) {
+    context.log(`Removing Role: ${context.state.name}`)
+    await deleteRole(context.state.name)
+    context.log(`Creating Role: ${inputs.name}`)
+    outputs = await createRole(inputs)
+  }
+  context.saveState({ ...inputs, ...outputs })
+  return outputs
 }
 
-const remove = async (inputs, options, state, context) => {
-  context.log(`Removing Role: ${state.name}`)
-  const outputs = await deleteRole(state.name)
+const remove = async (inputs, context) => {
+  context.log(`Removing Role: ${context.state.name}`)
+  const outputs = await deleteRole(context.state.name)
+  context.saveState({ ...inputs, ...outputs })
   return outputs
 }
 

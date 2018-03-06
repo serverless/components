@@ -1,11 +1,13 @@
 const resolvePreExecutionVars = require('./resolvePreExecutionVars')
-const resolveInputsVars = require('./resolveInputsVars')
-const resolveStateVars = require('./resolveStateVars')
+const resolvePostExecutionVars = require('./resolvePostExecutionVars')
 const transformPostExecutionVars = require('./transformPostExecutionVars')
+const getDependencies = require('./getDependencies')
+const getVariableSyntax = require('./getVariableSyntax')
 
 module.exports = {
   resolvePreExecutionVars,
-  resolveInputsVars,
-  resolveStateVars,
-  transformPostExecutionVars
+  resolvePostExecutionVars,
+  transformPostExecutionVars,
+  getDependencies,
+  getVariableSyntax
 }

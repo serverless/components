@@ -2,7 +2,7 @@ const BbPromise = require('bluebird')
 const { isEmpty, map } = require('ramda')
 const executeComponent = require('../components/executeComponent')
 const generateContext = require('../components/generateContext')
-const resolveStateVars = require('../variables/resolveStateVars')
+const resolvePostExecutionVars = require('../variables/resolvePostExecutionVars')
 
 const execute = async (graph, components, command, options) => {
   const leaves = graph.sinks()
@@ -13,7 +13,7 @@ const execute = async (graph, components, command, options) => {
   await BbPromise.all(map(
     async (componentId) => {
       const component = components[componentId]
-      component.inputs = resolveStateVars(component.inputs, components)
+      component.inputs = resolvePostExecutionVars(component.inputs, components)
       const context = generateContext(componentId, components, options)
       await executeComponent(component, command, context)
       graph.removeNode(componentId)

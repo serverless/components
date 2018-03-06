@@ -1,9 +1,8 @@
 const path = require('path')
-const { keys, reduce, mergeDeepRight } = require('ramda')
+const { keys, reduce } = require('ramda')
 const getRegistryRoot = require('../getRegistryRoot')
 
 const generateContext = (componentId, components, options) => {
-  // console.log(components[componentId].state)
   const context = {
     componentId,
     state: components[componentId].state,
@@ -30,8 +29,8 @@ const generateContext = (componentId, components, options) => {
 
       return modifiedComponent
     },
-    saveState: function (state = {}) {
-      components[componentId].state = mergeDeepRight(components[componentId].state, state)
+    saveState: function (state = {}) { // eslint-disable-line
+      components[componentId].state = state
       this.state = components[componentId].state
     }
   }

@@ -1,6 +1,8 @@
 const octokit = require('@octokit/rest')()
 
-const createWebhook = async ({token, owner, repo, url, event}) => {
+const createWebhook = async ({
+  token, owner, repo, url, event
+}) => {
   octokit.authenticate({
     type: 'token',
     token: token || process.env.GITHUB_TOKEN
@@ -14,7 +16,7 @@ const createWebhook = async ({token, owner, repo, url, event}) => {
       url,
       content_type: 'json'
     },
-    events: [event],
+    events: [ event ],
     active: true
   }
 
@@ -25,10 +27,12 @@ const createWebhook = async ({token, owner, repo, url, event}) => {
   }
 }
 
-const updateWebhook = async ({token, owner, repo, url, event}, id) => {
+const updateWebhook = async ({
+  token, owner, repo, url, event
+}, id) => {
   octokit.authenticate({
     type: 'token',
-    token: token
+    token
   })
 
   const params = {
@@ -40,7 +44,7 @@ const updateWebhook = async ({token, owner, repo, url, event}, id) => {
       url,
       content_type: 'json'
     },
-    events: [event],
+    events: [ event ],
     active: true
   }
 
@@ -51,41 +55,45 @@ const updateWebhook = async ({token, owner, repo, url, event}, id) => {
   }
 }
 
-const deleteWebhook = async ({token, owner, repo}, id) => {
+const deleteWebhook = async ({ token, owner, repo }, id) => {
   octokit.authenticate({
     type: 'token',
     token: token || process.env.GITHUB_TOKEN
   })
 
-  await octokit.repos.deleteHook({owner, repo, id})
+  await octokit.repos.deleteHook({ owner, repo, id })
 
   return {
     id: null
   }
 }
 
-const remove = async (inputs, options, state, context) => {
+const remove = async (inputs, context) => {
   context.log('Removing Github Webhook')
-  const outputs = await deleteWebhook(state, state.id)
+  const outputs = await deleteWebhook(context.state, context.state.id)
+  context.saveState({ ...inputs, ...outputs })
   return outputs
 }
 
-const deploy = async (inputs, options, state, context) => {
-  const noChanges = (inputs.token === state.token && inputs.owner === state.owner &&
-    inputs.repo === state.repo && inputs.url === state.url && inputs.event === state.event)
+const deploy = async (inputs, context) => {
+  const noChanges = (inputs.token === context.state.token && inputs.owner === context.state.owner &&
+    inputs.repo === context.state.repo && inputs.url === context.state.url &&
+    inputs.event === context.state.event)
   let outputs
   if (noChanges) {
-    outputs = { id: state.id }
-  } else if (!state.id) {
+    outputs = { id: context.state.id }
+  } else if (!context.state.id) {
     context.log('Creating Github Webhook')
     outputs = await createWebhook(inputs)
-  } else if (state.id && inputs.token && inputs.owner && inputs.repo && inputs.url && inputs.event) {
+  } else if (context.state.id && inputs.token && inputs.owner
+    && inputs.repo && inputs.url && inputs.event) {
     context.log('Updating Github Webhook')
-    outputs = await updateWebhook(inputs, state.id)
+    outputs = await updateWebhook(inputs, context.state.id)
   } else {
     context.log('Removing Github Webhook')
-    outputs = await deleteWebhook(state, state.id)
+    outputs = await deleteWebhook(context.state, context.state.id)
   }
+  context.saveState({ ...inputs, ...outputs })
   return outputs
 }
 

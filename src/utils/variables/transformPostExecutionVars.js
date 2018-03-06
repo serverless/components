@@ -2,29 +2,29 @@ const {
   is, replace, match, map, test
 } = require('ramda')
 
-// todo
-//  multiple variable references
-//  variables as substring
-module.exports = (slsYml, componentId) => {
-  const regex = RegExp('\\${([ ~:a-zA-Z0-9._\'",\\-\\/\\(\\)]+?)}', 'g') // eslint-disable-line
+const regex = require('./getVariableSyntax')()
 
-  const resolveValue = (value) => {
+module.exports = (slsYml) => {
+  const transformValue = (value) => {
     if (is(Object, value) || is(Array, value)) {
-      return map(resolveValue, value)
+      return map(transformValue, value)
     }
     if (is(String, value) && test(regex, value)) {
       const referencedVariable = replace(/[${}]/g, '', match(regex, value)[0]).split('.')
       if (referencedVariable[1] === 'outputs' || referencedVariable[1] === 'state') {
         const referencedComponentAlias = referencedVariable[0]
-        referencedVariable.splice(0, 1)
 
+        let componentId
         if (referencedComponentAlias === slsYml.type) {
-          return `\${${componentId}.${referencedVariable.join('.')}}`
+          componentId = slsYml.id
+        } else {
+          componentId = slsYml.components[referencedComponentAlias].id
         }
-        return `\${${componentId}:${referencedComponentAlias}.${referencedVariable.join('.')}}`
+        referencedVariable.splice(0, 1)
+        return `\${${componentId}.${referencedVariable.join('.')}}`
       }
     }
     return value
   }
-  return map(resolveValue, slsYml)
+  return map(transformValue, slsYml)
 }

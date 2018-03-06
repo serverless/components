@@ -6,31 +6,42 @@ const fs = require('../fs')
 
 const resolvePreExecutionVars = require('../variables/resolvePreExecutionVars')
 const transformPostExecutionVars = require('../variables/transformPostExecutionVars')
-const getComponentDependencies = require('./getComponentDependencies')
+const getDependencies = require('../variables/getDependencies')
 
 
 const { readFile, fileExists } = fs
-const { mergeDeepRight, reduce, keys } = R
+const {
+  reduce, keys, forEachObjIndexed
+} = R
 
+const generateNestedComponentsIds = (slsYml) => {
+  forEachObjIndexed((componentObj, componentAlias) => {
+    componentObj.id = `${slsYml.id}:${componentAlias}`
+  }, slsYml.components)
+  return slsYml
+}
 
 const getComponents = async (
   stateFile, componentRoot = process.cwd(), inputs = {}, componentId, components = {}
 ) => {
   let slsYml = await readFile(path.join(componentRoot, 'serverless.yml'))
-  slsYml.inputs = mergeDeepRight(slsYml.inputs || {}, inputs)
+
+  slsYml.id = componentId || slsYml.type
+
+  slsYml = generateNestedComponentsIds(slsYml)
+
+  slsYml = await transformPostExecutionVars(slsYml)
+
+  slsYml.inputs = { ...slsYml.inputs, ...inputs } // shallow merge
+
   slsYml = await resolvePreExecutionVars(slsYml)
-
-  componentId = componentId || slsYml.type
-
-  slsYml = await transformPostExecutionVars(slsYml, componentId)
-  const dependencies = getComponentDependencies(slsYml.inputs)
-  // console.log(dependencies)
+  const dependencies = getDependencies(slsYml.inputs)
 
   const nestedComponents = await reduce(async (accum, componentAlias) => {
     accum = await Promise.resolve(accum)
     const nestedComponentRoot = path.join(getRegistryRoot(), slsYml.components[componentAlias].type)
     const nestedComponentInputs = slsYml.components[componentAlias].inputs
-    const nestedComponentId = `${componentId}:${componentAlias}`
+    const nestedComponentId = slsYml.components[componentAlias].id
     accum = await getComponents(
       stateFile,
       nestedComponentRoot,
@@ -46,12 +57,12 @@ const getComponents = async (
     fns = require(path.join(componentRoot, 'index.js')) // eslint-disable-line
   }
 
-  components[componentId] = {
-    id: componentId,
+  components[slsYml.id] = {
+    id: slsYml.id,
     inputs: slsYml.inputs,
     outputs: {},
     state: stateFile[componentId] || {},
-    dependencies: [],
+    dependencies,
     fns
   }
   return { ...components, ...nestedComponents }
