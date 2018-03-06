@@ -39,10 +39,8 @@ Components are capable of provisioning infrastructure while including both appli
 **Note:** Make sure you have Node.js 8+ and npm installed on your machine
 
 1. Setup
-1. `npm install --global @serverless/serverless-components`
+1. `npm install --global serverless-components`
 1. Setup the environment variables
-   * `export GITHUB_TOKEN=my_github_token`
-   * `export EVENT_GATEWAY_API_KEY=my_event_gateway_api_key`
    * `export AWS_ACCESS_KEY_ID=my_access_key_id`
    * `export AWS_SECRET_ACCESS_KEY=my_secret_access_key`
 1. Install the dependencies in all `/registry/*` directories with a `package.json` file
@@ -52,7 +50,7 @@ Components are capable of provisioning infrastructure while including both appli
 Run commands with
 
 ```
-../../bin/serverless [Command]
+components [Command]
 ```
 
 ## Concepts

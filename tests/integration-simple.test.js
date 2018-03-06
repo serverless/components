@@ -20,7 +20,7 @@ async function removeStateFiles(stateFiles) {
 
 describe('Integration Test - Simple', () => {
   const testDir = path.dirname(require.main.filename)
-  const serverlessExec = path.join(testDir, '..', 'bin', 'serverless')
+  const componentsExec = path.join(testDir, '..', 'bin', 'components')
   const iamMockDir = path.join(testDir, '..', 'registry', 'tests-integration-iam-mock')
   const functionMockDir = path.join(testDir, '..', 'registry', 'tests-integration-function-mock')
   const iamMockStateFile = path.join(iamMockDir, 'state.json')
@@ -52,7 +52,7 @@ describe('Integration Test - Simple', () => {
     'when running through a typical component usage lifecycle',
     () => {
       it('should deploy the "iam" and "function" components', async () => {
-        await cpp.execAsync(`${serverlessExec} deploy`, {
+        await cpp.execAsync(`${componentsExec} deploy`, {
           cwd: functionMockDir,
           env: {
             ...process.env,
@@ -80,7 +80,7 @@ describe('Integration Test - Simple', () => {
       })
 
       it('should re-deploy the "iam" and "function" components', async () => {
-        await cpp.execAsync(`${serverlessExec} deploy`, {
+        await cpp.execAsync(`${componentsExec} deploy`, {
           cwd: functionMockDir,
           env: {
             ...process.env,
@@ -108,7 +108,7 @@ describe('Integration Test - Simple', () => {
       })
 
       it('should invoke the "function" component with CLI options', async () => {
-        await cpp.execAsync(`${serverlessExec} invoke --data "Hello World"`, {
+        await cpp.execAsync(`${componentsExec} invoke --data "Hello World"`, {
           cwd: functionMockDir
         })
         const stateFileContent = await fsp.readJsonAsync(functionMockStateFile)
@@ -133,7 +133,7 @@ describe('Integration Test - Simple', () => {
       })
 
       it('should remove the "iam" and "function" components', async () => {
-        await cpp.execAsync(`${serverlessExec} remove`, { cwd: functionMockDir })
+        await cpp.execAsync(`${componentsExec} remove`, { cwd: functionMockDir })
         const stateFileContent = await fsp.readJsonAsync(functionMockStateFile)
         const expected = {
           'tests-integration-function-mock:myRole': {},
