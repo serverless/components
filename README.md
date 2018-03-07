@@ -126,7 +126,6 @@ The registry is not only constrained to serve components. Since components are f
 
 Looking into the future it could be possible to serve functions which are written in different languages through the registry.
 
-
 ### Inputs & Outputs
 
 #### Inputs
@@ -137,13 +136,13 @@ Inputs are the configuration that are supplied to your component logic by the us
 type: some-component
 
 inputs:
-  firstInput: 
+  firstInput:
     displayName: "The first input"
     type: string
     required: true
     default: 'foo value'
-    
-  secondInput: number  # short hand 
+
+  secondInput: number  # short hand
 ```
 
 Or, if the component is being used as a child of another parent component, like the `lambda` component, the parent could supply those inputs, and they would overwrite the default inputs that are defined at the child level.
@@ -154,7 +153,7 @@ So, if the lambda `serverless.yml` looks like this:
 type: lambda
 
 inputs:
-  memory: 
+  memory:
     displayName: "The amount of memory to provide to the lambda function"
     type: number
     required: true
@@ -181,7 +180,6 @@ components:
 
 Then your deployed `lambda` function would have a memory size of 512, and timeout of 300.
 
-
 #### Outputs
 
 Your provisioning logic, or the `deploy` method of your `index.js` file, can optionally return an outputs object. This output can be referenced in `serverless.yml` as inputs to another component.
@@ -192,9 +190,9 @@ For example, the lambda component's deploy method returns outputs that look like
 ```js
 const deploy = (inputs, context) => {
   // lambda provisioning logic
-  
+
   // return outputs
-  return {   
+  return {
     arn: res.FunctionArn
   }
 }
@@ -205,6 +203,7 @@ module.exports = {
 ```
 
 These outputs can then be referenced by other components such as in this example we reference the function arn and pass it in to the apigateway component to setup a handler for the route.
+
 ```yml
 type: my-component
 
@@ -299,7 +298,6 @@ The ["Serverless Registry"](./registry) will be a core part in the implementatio
 The registry is not only constrained to serve components. Since components are functions it's possible to wrap existing business logic into functions and publish them to the registry as well.
 
 Looking into the future it could be possible to serve functions which are written in different languages through the registry.
-
 
 ## Creating components
 
