@@ -4,22 +4,13 @@ inputs:
   region: us-east-1
   deletionPolicy: Delete
   properties:
-    tableName: 'my-table-name-wow'
+    tableName: my-table
     attributeDefinitions:
-      - attributeName: number
+      - attributeName: id
         attributeType: N
     keySchema:
-      - attributeName: number
+      - attributeName: id
         keyType: HASH
     provisionedThroughput:
       readCapacityUnits: 1
       writeCapacityUnits: 1
-    globalSecondaryIndexes: null
-    localSecondaryIndexes: null
-    timeToLiveSpecification:
-      attributeName: ttl
-      enabled: true
-    streamSpecification: null
-    tags: null
-    sSESpecification:
-      sSEEnabled: false

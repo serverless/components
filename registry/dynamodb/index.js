@@ -10,31 +10,14 @@ const createTable = (inputs) => {
   const { properties } = inputs
   const { tableName } = properties.tableName
 
-  const params = {
-    TableName: tableName,
-    AttributeDefinitions: properties.attributeDefinitions,
-    KeySchema: properties.keySchema,
-    ProvisionedThroughput: {
-      ReadCapacityUnits: properties.provisionedThroughput.readCapacityUnits,
-      WriteCapacityUnits: properties.provisionedThroughput.writeCapacityUnits
-    }
-  }
+  let params = { ...inputs.properties }
+  params = convertKeysToCase(params, 'upperCaseFirstCharacter') // eslint-disable-line no-param-reassign
 
   // TODO: implement validation logic here
-  if (properties.globalSecondaryIndexes) {
-    // if valid add to params
-    params.GlobalSecondaryIndexes = properties.globalSecondaryIndexes
-  }
-
-  if (properties.localSecondaryIndexes) {
-    // if valid add to params
-    params.LocalSecondaryIndexes = properties.localSecondaryIndexes
-  }
-
-  if (properties.streamSpecification) {
-    // if valid add to params
-    params.StreamSpecification = properties.streamSpecification
-  }
+  // if (properties.globalSecondaryIndexes) {
+  //   // if valid add to params
+  //   params.GlobalSecondaryIndexes = properties.globalSecondaryIndexes
+  // }
 
   const createPromise = ddb.createTable(params).promise()
 
@@ -94,7 +77,6 @@ const deploy = async (inputs, context) => {
   if (!Object.keys(context.state).length) {
     context.log(`Creating Table: ${inputs.properties.tableName}`)
     res = await createTable(inputs)
-    context.log(`Created Table: ${inputs.properties.tableName}`)
   }
   // TODO: update logic diffing needs https://serverlessteam.atlassian.net/browse/SC-55
 
@@ -102,6 +84,7 @@ const deploy = async (inputs, context) => {
 
   const updatedState = {
     ...context.state,
+    ...inputs,
     ...res
   }
   context.saveState(updatedState)
