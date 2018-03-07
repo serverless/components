@@ -19,9 +19,11 @@ const CloudFront = new AWS.CloudFront({apiVersion: '2017-03-25'})
 //    Cookie Logging => Off
 //    Distribution State => Enabled
 
-const createDistribution = async ({distributionName, defaultRootObject, originId, originDomain, aliasDomain, distributionEnabled, loggingEnabled, loggingBucket, loggingIncludeCookies, loggingPrefix, priceClass}) => {
+const createDistribution = async ({name, defaultRootObject, originId, originDomain, aliasDomain, distributionEnabled, loggingEnabled, loggingBucket, loggingIncludeCookies, loggingPrefix, priceClass}) => {
+  const callerReference = name + '-' + timestamp()
+
   const distributionConfig = {
-    CallerReference: distributionName,
+    CallerReference: callerReference,
     Comment: `CloudFront distribution for ${originId}`,
     DefaultCacheBehavior: {
       ForwardedValues: {
@@ -94,7 +96,7 @@ const createDistribution = async ({distributionName, defaultRootObject, originId
   const distRes = await CloudFront.createDistribution({
     DistributionConfig: distributionConfig
   }).promise()
-  console.log(`CloudFront distribution '${distributionName}' creation intiated.`)
+  console.log(`CloudFront distribution '${name}' creation intiated.`)
 
   return {
     distribution: {
@@ -174,14 +176,19 @@ const deleteDistribution = async (distributionId, distributionETag) => {
   const res = await toggleEnabledForDistribution(distributionId, false)
 
   // delete distribution
-  await CloudFront.deleteDistribution({
-    Id: distributionId,
-    IfMatch: res.distribution.eTag
-  }).promise()
-  console.log(`CloudFront distribution '${distributionId}' deletion initiated.`)
+  try {
+    await CloudFront.deleteDistribution({
+      Id: distributionId,
+      IfMatch: res.distribution.eTag
+    }).promise()
+    console.log(`CloudFront distribution '${distributionId}' deletion initiated.`)
 
-  return {
-    distribution: null
+    return {
+      distribution: null
+    }
+  } catch (err) {
+    console.log(`Error in deleting CloudFront distribution '${distributionId}'.`, err.message)
+    return
   }
 }
 
@@ -203,21 +210,24 @@ const getDistributionConfig = async (distributionId) => {
   return distConfigRes
 }
 
+const timestamp = () => {
+  return Math.floor(Date.now() / 1000)
+}
 
 const deploy = async (inputs, state, context) => {
   let outputs = state
-  if (!state.distribution && inputs.distributionName) {
-    context.log(`Creating distribution: ${inputs.distributionName}`)
+  if (!state.distribution && inputs.name) {
+    context.log(`Creating distribution: ${inputs.name}`)
     outputs = await createDistribution(inputs)
-  } else if (!inputs.distributionName && state.distribution.id) {
-    context.log(`Removing distribution: ${state.distributionName} with id: ${state.distribution.id}`)
+  } else if (!inputs.name && state.distribution.id) {
+    context.log(`Removing distribution: ${state.name} with id: ${state.distribution.id}`)
     outputs = await deleteDistribution(state.distribution.id, state.distribution.eTag)
-  } else if (state.distributionName !== inputs.distributionName && state.distribution) {
-    context.log(`Removing distribution: ${state.distributionName} with id: ${state.distribution.id}`)
+  } else if (state.name !== inputs.name && state.distribution) {
+    context.log(`Removing distribution: ${state.name} with id: ${state.distribution.id}`)
     outputs = await deleteDistribution(state.distribution.id, state.distribution.eTag)
-    context.log(`Creating distribution: ${inputs.distributionName}`)
+    context.log(`Creating distribution: ${inputs.name}`)
     outputs = await createDistribution(inputs)
-  } else if (state.distributionName && state.distribution && inputs.distributionEnabled != state.distribution.distConfig.enabled) {
+  } else if (state.name && state.distribution && inputs.distributionEnabled != state.distribution.distConfig.enabled) {
     context.log(`Toggling distribution: Enabled - ${inputs.distributionEnabled}`)
     outputs = await toggleEnabledForDistribution(state.distribution.id, inputs.distributionEnabled)
   }
@@ -225,7 +235,7 @@ const deploy = async (inputs, state, context) => {
 }
 
 const remove = async (inputs, state, context) => {
-  context.log(`Removing distribution: ${state.distributionName} with id: ${state.distribution.id}`)
+  context.log(`Removing distribution: ${state.name} with id: ${state.distribution.id}`)
   const outputs = await deleteDistribution(state.distribution.id, state.distribution.eTag)
   return outputs
 }
