@@ -42,6 +42,7 @@ function invoke(inputs, context) {
 
 function remove(inputs, context) {
   context.log(`Removing function "${inputs.name}"`)
+  context.saveState()
 }
 
 module.exports = {
