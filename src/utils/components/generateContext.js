@@ -2,10 +2,10 @@ const path = require('path')
 const { keys, reduce } = require('ramda')
 const getRegistryRoot = require('../getRegistryRoot')
 
-const generateContext = (componentId, components, options) => {
+const generateContext = (componentId, stateFile, options) => {
   const context = {
     id: componentId,
-    state: components[componentId].state || {},
+    state: stateFile[componentId] || {},
     options,
     log: (message) => {
       if (!process.env.CI) {
@@ -16,8 +16,7 @@ const generateContext = (componentId, components, options) => {
       const component = require(path.join(getRegistryRoot(), type)) // eslint-disable-line
 
       const childComponentId = `${componentId}:${alias}`
-      components[childComponentId] = components[childComponentId] || { id: childComponentId }
-      const childComponentContext = generateContext(childComponentId, components, options)
+      const childComponentContext = generateContext(childComponentId, stateFile, options)
 
       const fnNames = keys(component)
 
@@ -30,8 +29,8 @@ const generateContext = (componentId, components, options) => {
       return modifiedComponent
     },
     saveState: function (state = {}) { // eslint-disable-line
-      components[this.id].state = state
-      this.state = components[this.id].state
+      stateFile[this.id] = state
+      this.state = state
     }
   }
   return context

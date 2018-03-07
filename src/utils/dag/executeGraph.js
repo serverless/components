@@ -4,7 +4,7 @@ const executeComponent = require('../components/executeComponent')
 const generateContext = require('../components/generateContext')
 const resolvePostExecutionVars = require('../variables/resolvePostExecutionVars')
 
-const execute = async (graph, components, command, options) => {
+const execute = async (graph, components, stateFile, command, options) => {
   const leaves = graph.sinks()
 
   if (isEmpty(leaves)) {
@@ -14,13 +14,13 @@ const execute = async (graph, components, command, options) => {
     async (componentId) => {
       const component = components[componentId]
       component.inputs = resolvePostExecutionVars(component.inputs, components)
-      const context = generateContext(componentId, components, options)
+      const context = generateContext(componentId, stateFile, options)
       await executeComponent(component, command, context)
       graph.removeNode(componentId)
     }
     , leaves
   ))
-  return execute(graph, components, command, options)
+  return execute(graph, components, stateFile, command, options)
 }
 
 module.exports = execute
