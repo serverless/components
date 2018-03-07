@@ -499,35 +499,44 @@ Creates / Removes an AWS DynamoDB table.
 
 ##### Inputs
 
-See [docs](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-dynamodb-table.html)
+| Name             | Description                                                                                              | Type   |
+| ---------------- | -------------------------------------------------------------------------------------------------------- | ------ |
+| `region`         | The region in which this table should be created                                                         | String |
+| `deletionPolicy` | The deletion policy this table should follow                                                             | String |
+| `properties`     | Property definitions to describe the tables config in detail (See info below for in-depth documentation) | Object |
+
+**Note:** You can find the full range of configurable parameters in the [AWS docs](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-dynamodb-table.html)
 
 ```yml
 type: dynamodb
 
 inputs:
-  region: string
-  DeletionPolicy: string
-  Properties:
-    AttributeDefinitions:
-      - AttributeDefinition
-    GlobalSecondaryIndexes:
-      - GlobalSecondaryIndexes
-    KeySchema:
-      - KeySchema
-    LocalSecondaryIndexes:
-      - LocalSecondaryIndexes
-    ProvisionedThroughput:
-      ProvisionedThroughput
-    SSESpecification:
-      SSESpecification
-    StreamSpecification:
-      StreamSpecification
-    TableName: String
-    Tags:
-      - Resource Tag
-    TimeToLiveSpecification:
-      TimeToLiveSpecification
+  region: us-east-1
+  deletionPolicy: Delete
+  properties:
+    tableName: my-table
+    attributeDefinitions:
+      - attributeName: id
+        attributeType: S
+    keySchema:
+      - attributeName: id
+        keyType: HASH
+    globalSecondaryIndexes: null
+    localSecondaryIndexes: null
+    provisionedThroughput:
+      readCapacityUnits: 1
+      writeCapacityUnits: 1
+    streamSpecification: null
+    tags:
+      - tag-1
+      - tag-2
+    timeToLiveSpecification:
+      attributeName: ttl
+      enabled: true
+    sSESpecification:
+      sSEEnabled: false
 ```
+
 ##### Commands
 
 * `proto deploy`
