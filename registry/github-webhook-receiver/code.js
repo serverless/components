@@ -22,8 +22,7 @@ module.exports.handler = (e, ctx, cb) => { // eslint-disable-line
 
     return dynamodb.putItem(params).promise().then(() => {
       cb(null, { statusCode: 200, body: 'YAY! github event saved to database!' })
-    }).catch((err) => {
-      console.log(err)
+    }).catch(() => {
       cb(null, { statusCode: 500, body: 'FUDGE! something went wrong while saving github event!' })
     })
   } else { // eslint-disable-line

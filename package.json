@@ -22,6 +22,7 @@
   },
   "scripts": {
     "components": "./bin/components",
+    "setup": "node scripts/setup.js",
     "lint": "eslint . --cache",
     "test": "jest ."
   },

@@ -4,5 +4,7 @@ node_js:
 - 8
 install:
 - npm install
+- npm run setup
 script:
+- npm run lint
 - npm test

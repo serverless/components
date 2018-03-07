@@ -23,7 +23,6 @@ const putFileEntry = (fileUrl, fileName) =>
   })
 
 module.exports.handler = (event, context, callback) => {
-  console.log('Event: ', event)
   putFileEntry(event.data.fileUrl, event.data.fileName)
     .then(() => {
       const response = {
@@ -35,8 +34,7 @@ module.exports.handler = (event, context, callback) => {
 
       callback(null, response)
     })
-    .catch((err) => {
-      console.log(err)
+    .catch(() => {
       callback('Something went wrong')
     })
 }
