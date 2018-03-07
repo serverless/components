@@ -2,24 +2,15 @@ type: dynamodb
 
 inputs:
   region: us-east-1
-  DeletionPolicy: Delete
-  Properties:
-    TableName: 'my-table-name-wow'
-    AttributeDefinitions:
-      - AttributeName: number
-        AttributeType: N
-    KeySchema:
-      - AttributeName: number
-        KeyType: HASH
-    ProvisionedThroughput:
-      ReadCapacityUnits: 1
-      WriteCapacityUnits: 1
-    GlobalSecondaryIndexes: null
-    LocalSecondaryIndexes: null
-    TimeToLiveSpecification:
-      AttributeName: ttl
-      Enabled: true
-    StreamSpecification: null
-    Tags: null
-    SSESpecification:
-      SSEEnabled: false
+  deletionPolicy: Delete
+  properties:
+    tableName: my-table
+    attributeDefinitions:
+      - attributeName: id
+        attributeType: N
+    keySchema:
+      - attributeName: id
+        keyType: HASH
+    provisionedThroughput:
+      readCapacityUnits: 1
+      writeCapacityUnits: 1

@@ -1,48 +1,29 @@
-/* eslint-disable no-console */
 const AWS = require('aws-sdk')
+const { convertKeysToCase } = require('./utils')
+
+function getDynamoDbInstance(region) {
+  return new AWS.DynamoDB({ region })
+}
 
 const createTable = (inputs) => {
-  const dynamodb = new AWS.DynamoDB({ region: inputs.region })
-  const properties = inputs.Properties
-  const tableName = properties.TableName
+  const ddb = getDynamoDbInstance(inputs.region)
+  const { properties } = inputs
+  const { tableName } = properties.tableName
 
-  let params = { // eslint-disable-line
-    TableName: tableName,
-    AttributeDefinitions: properties.AttributeDefinitions,
-    KeySchema: properties.KeySchema,
-    ProvisionedThroughput: {
-      ReadCapacityUnits: properties.ProvisionedThroughput.ReadCapacityUnits,
-      WriteCapacityUnits: properties.ProvisionedThroughput.WriteCapacityUnits
-    }
-  }
+  let params = { ...inputs.properties }
+  params = convertKeysToCase(params, 'upperCaseFirstCharacter') // eslint-disable-line no-param-reassign
 
-  // validate params values against allowed values
+  // TODO: implement validation logic here
+  // if (properties.globalSecondaryIndexes) {
+  //   // if valid add to params
+  //   params.GlobalSecondaryIndexes = properties.globalSecondaryIndexes
+  // }
 
-  if (properties.GlobalSecondaryIndexes) {
-    // validate inputs.GlobalSecondaryIndexes
-    // if valid add to params
-    params.GlobalSecondaryIndexes = properties.GlobalSecondaryIndexes
-  }
+  const createPromise = ddb.createTable(params).promise()
 
-  if (properties.LocalSecondaryIndexes) {
-    // validate inputs.GlobalSecondaryIndexes
-    // if valid add to params
-    params.LocalSecondaryIndexes = properties.LocalSecondaryIndexes
-  }
-
-  if (properties.StreamSpecification) {
-    // validate inputs.StreamSpecification
-    // if valid add to params
-    params.StreamSpecification = properties.StreamSpecification
-  }
-
-  const createPromise = dynamodb.createTable(params).promise()
-
-  if (!properties.TimeToLiveSpecification) {
+  if (!properties.timeToLiveSpecification) {
     // no TTL create table and return promise
-    return createPromise.then((tableData) => { // eslint-disable-line
-      return tableData
-    })
+    return createPromise.then((tableData) => tableData)
   }
 
   // validate inputs.TimeToLiveSpecification
@@ -50,76 +31,71 @@ const createTable = (inputs) => {
   // Has TTL specification add it to table
   const TTLparams = {
     TableName: tableName,
-    TimeToLiveSpecification: properties.TimeToLiveSpecification
+    TimeToLiveSpecification: properties.timeToLiveSpecification
   }
 
-  return createPromise.then((tableData) => { // eslint-disable-line
-    const waitForPromise = dynamodb.waitFor('tableExists', {
-      TableName: tableName
-    }).promise()
-    return waitForPromise.then(() => { // eslint-disable-line
-      return dynamodb.updateTimeToLive(TTLparams).promise().then(() => { // eslint-disable-line
-        return tableData
+  return createPromise.then((tableData) => {
+    const waitForPromise = ddb
+      .waitFor('tableExists', {
+        TableName: tableName
       })
-    })
+      .promise()
+    return waitForPromise.then(() =>
+      ddb
+        .updateTimeToLive(TTLparams)
+        .promise()
+        .then(() => tableData))
   })
 }
 
-// Need update table for changes in inputs
-const updateTable = (inputs, options, state, context) => { // eslint-disable-line
-
-  // Validate input against allowed SDK params
-
-  // If changed or removed, Logic for updating ProvisionedThroughput
-
-  // If changed or removed, Logic for updating StreamSpecification
-
-  // If changed or removed, Logic for updating OR deleting GlobalSecondaryIndexes
-
-  // If changed or removed, Logic for updating OR deleting TimeToLiveSpecification
-}
-
+// TODO: implement
+const updateTable = (inputs, context) => {} // eslint-disable-line
 
 const deleteTable = (state) => {
-  const dynamodb = new AWS.DynamoDB({ region: state.region })
+  const ddb = getDynamoDbInstance(state.region)
 
   const params = {
-    TableName: state.Properties.TableName
+    TableName: state.properties.tableName
   }
 
-  if (state.DeletionPolicy === 'Retain') {
+  if (state.deletionPolicy === 'Retain') {
     // return error or state? ¯\_(ツ)_/¯
     return Promise.resolve(state)
   }
 
-  return dynamodb.deleteTable(params).promise().then((data) => data)
+  return ddb
+    .deleteTable(params)
+    .promise()
+    .then((data) => data)
 }
 
 const deploy = async (inputs, context) => {
-  let tableData
-  // No state, create table
+  inputs = convertKeysToCase(inputs, 'lowerCaseFirstCharacter') // eslint-disable-line no-param-reassign
+
+  let res
+  // no state --> create table
   if (!Object.keys(context.state).length) {
-    console.log(`Creating Table: ${inputs.Properties.TableName}`)
-    tableData = await createTable(inputs)
-    console.log(`Created Table: ${inputs.Properties.TableName}`)
+    context.log(`Creating Table: ${inputs.properties.tableName}`)
+    res = await createTable(inputs)
   }
-  // Add all inputs to outputs?
-  const outputs = {
-    name: inputs.name,
-    tableData: tableData // eslint-disable-line
+  // TODO: update logic diffing needs https://serverlessteam.atlassian.net/browse/SC-55
+
+  res = convertKeysToCase(res, 'lowerCaseFirstCharacter')
+
+  const updatedState = {
+    ...context.state,
+    ...inputs,
+    ...res
   }
-  context.saveState({ ...inputs, ...outputs })
-  return outputs
+  context.saveState(updatedState)
+
+  return updatedState
 }
 
 const remove = async (inputs, context) => {
-  context.log(`Removing Table: ${context.state.name}`)
+  inputs = convertKeysToCase(inputs, 'lowerCaseFirstCharacter') // eslint-disable-line no-param-reassign
+  context.log(`Removing Table: ${inputs.properties.tableName}`)
   await deleteTable(context.state)
-  const outputs = {
-    name: null
-  }
-  context.saveState({ ...inputs, ...outputs })
-  return outputs
 }
 
 module.exports = {
