@@ -12,7 +12,7 @@ const generateContext = (componentId, stateFile, options) => {
         process.stdin.write(`${message}\n`)
       }
     },
-    load: async (type, alias) => {
+    load: (type, alias) => {
       const component = require(path.join(getRegistryRoot(), type)) // eslint-disable-line
 
       const childComponentId = `${componentId}:${alias}`

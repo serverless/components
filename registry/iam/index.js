@@ -68,7 +68,7 @@ const deploy = async (inputs, context) => {
 const remove = async (inputs, context) => {
   context.log(`Removing Role: ${context.state.name}`)
   const outputs = await deleteRole(context.state.name)
-  context.saveState({ ...inputs, ...outputs })
+  context.saveState()
   return outputs
 }
 

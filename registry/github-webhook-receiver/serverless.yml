@@ -4,10 +4,10 @@ inputs:
   url: ${myEndpoint.state.url}
 
 components:
-  myTable:
-    type: dynamodb
-    inputs:
-      name: github-webhook-receiver
+#  myTable:
+#    type: dynamodb
+#    inputs:
+#      name: github-webhook-receiver
   myFunction:
     type: lambda
     inputs:

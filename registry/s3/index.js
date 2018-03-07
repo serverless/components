@@ -53,7 +53,7 @@ const remove = async (inputs, context) => {
   const outputs = {
     name: null
   }
-  context.saveState({ ...inputs, ...outputs })
+  context.saveState()
   return outputs
 }
 

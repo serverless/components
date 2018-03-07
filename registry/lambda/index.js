@@ -96,7 +96,7 @@ const deploy = async (inputs, context) => {
 const remove = async (inputs, context) => {
   context.log(`Removing Lambda: ${context.state.name}`)
   const outputs = await deleteLambda(context.state.name)
-  context.saveState({ ...inputs, ...outputs })
+  context.saveState()
   return outputs
 }
 

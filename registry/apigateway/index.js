@@ -91,7 +91,7 @@ const deploy = async (inputs, context) => {
 const remove = async (inputs, context) => {
   context.log(`Removing API Gateway: "${context.state.name}"`)
   const outputs = await deleteApi({ name: context.state.name, id: context.state.id })
-  context.saveState({ ...inputs, ...outputs })
+  context.saveState()
   return outputs
 }
 
