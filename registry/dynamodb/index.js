@@ -95,41 +95,30 @@ const deleteTable = (state) => {
   return dynamodb.deleteTable(params).promise().then((data) => data)
 }
 
-const deploy = async (inputs, options, state, context) => {
+const deploy = async (inputs, context) => {
   let tableData
   // No state, create table
-  if (!Object.keys(state).length) {
+  if (!Object.keys(context.state).length) {
     console.log(`Creating Table: ${inputs.Properties.TableName}`)
     tableData = await createTable(inputs)
     console.log(`Created Table: ${inputs.Properties.TableName}`)
   }
-
-  /*
-  TODO update logic diffing needs https://serverlessteam.atlassian.net/browse/SC-55
-  } else if (!inputs.name && state.name) {
-     context.log(`Removing Table: ${state.Properties.TableName}`)
-     // await deleteTable(state)
-  } else if (state.name !== inputs.name) {
-    context.log(`Removing Table: ${state.Properties.TableName}`)
-    // await deleteTable(state)
-    context.log(`Creating Table: ${inputs.Properties.TableName}`)
-    // await createTable(inputs)
-  }
-  */
-
   // Add all inputs to outputs?
   const outputs = {
     name: inputs.name,
     tableData: tableData // eslint-disable-line
   }
+  context.saveState({ ...inputs, ...outputs })
   return outputs
 }
 
-const remove = async (inputs, options, state, context) => {
-  console.log(`Removing Table: ${inputs.Properties.TableName}`)
-  const newState = await deleteTable(state)
-  console.log(`Removed Table: ${inputs.Properties.TableName}`)
-  const outputs = newState
+const remove = async (inputs, context) => {
+  context.log(`Removing Table: ${context.state.name}`)
+  await deleteTable(context.state)
+  const outputs = {
+    name: null
+  }
+  context.saveState({ ...inputs, ...outputs })
   return outputs
 }
 

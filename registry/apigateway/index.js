@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk')
-const { equals } = require('ramda')
+const { equals, keys } = require('ramda')
 const { getSwaggerDefinition, generateUrls } = require('./utils')
 
 const APIGateway = new AWS.APIGateway({ region: 'us-east-1' }) // TODO: make configurable
@@ -12,7 +12,8 @@ const deleteApi = async (params) => {
   }).promise()
   const outputs = {
     id: null,
-    url: null
+    url: null,
+    urls: null
   }
   return outputs
 }
@@ -33,6 +34,7 @@ const createApi = async (params) => {
 
   const outputs = {
     id: res.id,
+    url: `https://${res.id}.execute-api.us-east-1.amazonaws.com/dev/${keys(routes)[0].replace(/^\/+/, '')}`,
     urls
   }
   return outputs
@@ -57,36 +59,39 @@ const updateApi = async (params) => {
 
   const outputs = {
     id,
+    url: `https://${id}.execute-api.us-east-1.amazonaws.com/dev/${keys(routes)[0].replace(/^\/+/, '')}`,
     urls
   }
   return outputs
 }
 
-const deploy = async (inputs, options, state, context) => {
+const deploy = async (inputs, context) => {
   const noChanges =
-    inputs.name === state.name &&
-    inputs.roleArn === state.roleArn &&
-    equals(inputs.routes, state.routes)
+    inputs.name === context.state.name &&
+    inputs.roleArn === context.state.roleArn &&
+    equals(inputs.routes, context.state.routes)
 
   let outputs
   if (noChanges) {
-    outputs = state
-  } else if (inputs.name && !state.name) {
+    outputs = context.state
+  } else if (inputs.name && !context.state.name) {
     context.log(`Creating API Gateway: "${inputs.name}"`)
     outputs = await createApi(inputs)
   } else {
     context.log(`Updating API Gateway: "${inputs.name}"`)
     outputs = await updateApi({
       ...inputs,
-      id: state.id
+      id: context.state.id
     })
   }
+  context.saveState({ ...inputs, ...outputs })
   return outputs
 }
 
-const remove = async (inputs, options, state, context) => {
-  context.log(`Removing API Gateway: "${state.name}"`)
-  const outputs = await deleteApi({ name: state.name, id: state.id })
+const remove = async (inputs, context) => {
+  context.log(`Removing API Gateway: "${context.state.name}"`)
+  const outputs = await deleteApi({ name: context.state.name, id: context.state.id })
+  context.saveState()
   return outputs
 }
 

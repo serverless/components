@@ -1,10 +1,16 @@
 #!/usr/bin/env node
 const minimist = require('minimist')
-const Serverless = require('../lib/index')
+const { run } = require('../src/index')
 
-;(async () => {
-  const command = process.argv[2]
-  const options = minimist(process.argv.slice(2))
-  delete options['_']
-  await Serverless(command, options)
-})().catch(e => console.log(e))
+// re-throw unhandled Promise rejections
+process.on('unhandledRejection', (error) => {
+  // TODO: re-throw error to exit with a non-zero exit code
+  // throw new Error(error.message)
+  // eslint-disable-next-line no-console
+  console.log(error)
+})
+
+const command = process.argv[2]
+const options = minimist(process.argv.slice(2))
+delete options._
+run(command, options)

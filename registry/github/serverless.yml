@@ -3,6 +3,6 @@ type: github
 inputs:
   token: ${GITHUB_TOKEN}
   owner: serverless
-  repo: components-eslam
+  repo: serverless-components
   url: https://serverless.com
   event: push

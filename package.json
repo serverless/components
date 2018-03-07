@@ -4,7 +4,7 @@
   "description": "PoC for the next version of the Serverless Framework",
   "author": "Serverless, Inc.",
   "license": "Apache-2.0",
-  "main": "lib/index.js",
+  "main": "src/index.js",
   "preferGlobal": true,
   "repository": {
     "type": "git",
@@ -22,6 +22,7 @@
   },
   "scripts": {
     "components": "./bin/components",
+    "lint": "eslint . --cache",
     "test": "jest ."
   },
   "dependencies": {

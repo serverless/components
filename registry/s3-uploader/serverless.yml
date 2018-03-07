@@ -7,7 +7,7 @@ components:
   uploaderLambda:
     type: lambda
     inputs:
-      name: ${parent:name}
+      name: ${s3-uploader.inputs.name}
       handler: uploader.handler
       env:
         EVENT_GATEWAY_APIKEY: ${EVENT_GATEWAY_API_KEY}
@@ -17,7 +17,7 @@ components:
     inputs:
       event: http
       method: POST
-      path: ${parent:name}
+      path: ${s3-uploader.inputs.name}
       space: eslam
       eventGatewayApiKey: s0m33v3ntg4t3w4y4p1k3y
-      lambdaArn: ${uploaderLambda:arn}
+      lambdaArn: ${uploaderLambda.outputs.arn}
