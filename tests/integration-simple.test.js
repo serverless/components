@@ -129,7 +129,7 @@ describe('Integration Test - Simple', () => {
         // third deployment is done
         // NOTE: the order of this test here is important since we're keeping and checking the
         // state file throughout the whole test suite
-        await cpp.execAsync(`${serverlessExec} deploy`, {
+        await cpp.execAsync(`${componentsExec} deploy`, {
           cwd: functionMockDir,
           env: {
             ...process.env,
