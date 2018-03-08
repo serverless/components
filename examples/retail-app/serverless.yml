@@ -1,0 +1,45 @@
+type: retail-app
+
+components:
+  createProduct:
+    type: lambda
+    inputs:
+      name: createProduct
+      memory: 512
+      timeout: 10
+      handler: code/products.create
+  getProduct:
+    type: lambda
+    inputs:
+      name: getProduct
+      memory: 512
+      timeout: 10
+      handler: code/products.get
+  listProducts:
+    type: lambda
+    inputs:
+      name: listProducts
+      memory: 512
+      timeout: 10
+      handler: code/products.list
+  productsApi:
+    type: rest-api
+    inputs:
+      gateway: apigateway
+      name: products-api
+      routes:
+        /products: # routes begin with a slash
+          post: # HTTP method names are used to attach handlers
+            function: ${createProduct.outputs}
+
+          # sub-routes can be declared hierarchically
+          /{id}: # path parameters use curly braces
+            get:
+              function: ${getProduct.outputs}
+              cors: true # CORS can be allowed with this flag
+
+        # multi-segment routes can be declared all at once
+        /catalog/{...categories}: # catch-all path parameters use ellipses
+            get:
+              function: ${listProducts.outputs}
+              cors: true
