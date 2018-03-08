@@ -758,17 +758,21 @@ inputs:
   space: some-space # optional
   name: some-rest-api
   routes:
-    users:
-      post:
-        lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
-        cors: true
-      get:
-        lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
-        cors: true
-      put:
-        lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
-      delete:
-        lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
+    /products: # routes begin with a slash
+      post: # HTTP method names are used to attach handlers
+        lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:products-create
+
+      # sub-routes can be declared hierarchically
+      /{id}: # path parameters use curly braces
+        get:
+          lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:products-get
+          cors: true # CORS can be allowed with this flag
+
+    # multi-segment routes can be declared all at once
+    /catalog/{...categories}: # catch-all path parameters use ellipses
+        get:
+          lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:products-list
+          cors: true
 ```
 
 #### `s3`

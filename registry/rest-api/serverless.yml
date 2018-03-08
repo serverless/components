@@ -6,13 +6,14 @@ inputs:
   space: some-space # optional
   name: some-rest-api
   routes:
-    users:
-      post:
-        lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
-        cors: true
-      get:
-        lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
-      put:
-        lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
-      delete:
-        lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
+    /products: # path entries must start with a slash
+      post: # method entries do not start with a slash
+        lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:create-product-lambda
+      /{id}: # path parameters are in curly braces
+        get:
+          lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:get-product-lambda
+          cors: true
+        put:
+          lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:update-product-lambda
+        delete:
+          lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:delete-product-lambda
