@@ -2,10 +2,16 @@ const BbPromise = require('bluebird')
 const utils = require('./utils')
 
 const {
-  getComponents, buildGraph, executeGraph, readStateFile, writeStateFile
+  errorReporter,
+  getComponents,
+  buildGraph,
+  executeGraph,
+  readStateFile,
+  writeStateFile
 } = utils
 
 const run = async (command, options) => {
+  const reporter = await errorReporter()
   let components = {}
   let stateFile = {}
   try {
@@ -14,6 +20,7 @@ const run = async (command, options) => {
     const graph = await buildGraph(components)
     await executeGraph(graph, components, stateFile, command, options)
   } catch (error) {
+    reporter.captureException(error)
     return BbPromise.reject(error)
   } finally {
     await writeStateFile(stateFile)

@@ -24,7 +24,8 @@
     "components": "./bin/components",
     "lint": "eslint . --cache",
     "test": "jest .",
-    "postinstall": "node scripts/setup.js"
+    "postinstall": "node scripts/setup.js",
+    "prepublishOnly": "node ./scripts/prepublish.js"
   },
   "dependencies": {
     "@octokit/rest": "^14.0.5",
@@ -35,7 +36,8 @@
     "graphlib": "^2.1.5",
     "js-yaml": "^3.10.0",
     "minimist": "^1.2.0",
-    "ramda": "^0.25.0"
+    "ramda": "^0.25.0",
+    "raven": "^2.4.2"
   },
   "devDependencies": {
     "babel-jest": "^22.4.1",
