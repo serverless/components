@@ -22,9 +22,9 @@
   },
   "scripts": {
     "components": "./bin/components",
-    "setup": "node scripts/setup.js",
     "lint": "eslint . --cache",
-    "test": "jest ."
+    "test": "jest .",
+    "postinstall": "node scripts/setup.js"
   },
   "dependencies": {
     "@octokit/rest": "^14.0.5",
