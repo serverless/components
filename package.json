@@ -24,7 +24,7 @@
     "components": "./bin/components",
     "lint": "eslint . --cache",
     "test": "jest .",
-    "postinstall": "node scripts/setup.js",
+    "postinstall": "node ./scripts/postinstall.js",
     "prepublishOnly": "node ./scripts/prepublish.js"
   },
   "dependencies": {
