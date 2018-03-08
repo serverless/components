@@ -6,14 +6,21 @@ inputs:
   space: some-space # optional
   name: some-rest-api
   routes:
-    /products: # path entries must start with a slash
-      post: # method entries do not start with a slash
-        lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:create-product-lambda
-      /{id}: # path parameters are in curly braces
+    /products: # routes begin with a slash
+      post: # HTTP method names are used to attach handlers
+        function:
+          arn: arn:aws:lambda:us-east-1:XXXXX:function:create-product
+
+      # sub-routes can be declared hierarchically
+      /{id}: # path parameters use curly braces
         get:
-          lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:get-product-lambda
+          function:
+            arn: arn:aws:lambda:us-east-1:XXXXX:function:get-product
+          cors: true # CORS can be allowed with this flag
+
+    # multi-segment routes can be declared all at once
+    /catalog/{...categories}: # catch-all path parameters use ellipses
+        get:
+          function:
+            arn: arn:aws:lambda:us-east-1:XXXXX:function:list-products
           cors: true
-        put:
-          lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:update-product-lambda
-        delete:
-          lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:delete-product-lambda
