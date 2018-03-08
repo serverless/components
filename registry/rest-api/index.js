@@ -35,7 +35,8 @@ function getAwsApiGatewayInputs(inputs) {
     forEachObjIndexed((methodObject, method) => {
       const normalizedMethod = method.toUpperCase()
 
-      routeObject[normalizedMethod] = methodObject
+      routeObject[normalizedMethod] = { lambdaArn: methodObject.function.arn, ...methodObject }
+      delete routeObject[normalizedMethod].function
     }, methods)
   }, inputs.routes)
 
@@ -70,7 +71,7 @@ function getEventGatewayInputs(inputs) {
         cors: methodObject.cors || false,
         space: inputs.space,
         eventGatewayApiKey: inputs.eventGatewayApiKey || null,
-        lambdaArn: methodObject.lambdaArn
+        lambdaArn: methodObject.function.arn
       })
     }, methods)
   }, inputs.routes)

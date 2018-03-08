@@ -760,18 +760,18 @@ inputs:
   routes:
     /products: # routes begin with a slash
       post: # HTTP method names are used to attach handlers
-        lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:products-create
+        function: { 'arn': 'arn:aws:lambda:us-east-1:XXXXX:function:products-create' } # value can be a direct component reference or an object containing the Lambda ARN
 
       # sub-routes can be declared hierarchically
       /{id}: # path parameters use curly braces
         get:
-          lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:products-get
+          function: { 'arn': 'arn:aws:lambda:us-east-1:XXXXX:function:products-get' }
           cors: true # CORS can be allowed with this flag
 
     # multi-segment routes can be declared all at once
     /catalog/{...categories}: # catch-all path parameters use ellipses
         get:
-          lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:products-list
+          function: { 'arn': 'arn:aws:lambda:us-east-1:XXXXX:function:products-list' }
           cors: true
 ```
 
