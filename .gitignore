@@ -36,3 +36,4 @@ default.etcd
 .serverless
 
 state.json
+tracking-config.json
