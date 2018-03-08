@@ -24,48 +24,48 @@ components:
   rootDomainBucket:
     type: s3
     inputs:
-      name: ${parent:hosting_domain}
-  rootDomainBucketPolicy:
-    type: rg-s3policy
-    inputs:
-      bucketName: ${rootDomainBucket:name}
-  siteContentUploader:
-    type: rg-s3dirloader
-    inputs:
-      contentPath: ${parent:content_path}
-      bucketName: ${rootDomainBucket:name}
+      name: ${rg-aws-staticweb.inputs.hosting_domain}
+  # rootDomainBucketPolicy:
+  #   type: rg-s3policy
+  #   inputs:
+  #     bucketName: ${rootDomainBucket:name}
+  # siteContentUploader:
+  #   type: rg-s3dirloader
+  #   inputs:
+  #     contentPath: ${rg-aws-staticweb.inputs.content_path}
+  #     bucketName: ${rootDomainBucket:name}
   wwwDomainBucket:
     type: s3
     inputs:
-      name: ${parent:redirect_domain}
-  rootDomainBucketConfig:
-    type: rg-s3-website-config
-    inputs:
-      rootBucketName: ${rootDomainBucket:name}
-      indexDocument: ${parent:content_index}
-      errorDocument: ${parent:content_error}
-      redirectBucketName: ${wwwDomainBucket:name}
-      redirectToHostName: ${parent:hosting_domain}
-  siteCloudFrontConfig:
-    type: rg-cloudfront
-    inputs:
-      name: ${parent:name}
-      defaultRootObject: ${parent:content_index}
-      originId: ${rootDomainBucket:name}
-      originDomain: rgfamily.com.s3.amazonaws.com
-      aliasDomain: ${parent:redirect_domain}
-      # distributionEnabled: false
-      # loggingEnabled: false
-      # loggingBucket: ${parent:name}
-      # loggingIncludeCookies: false
-      # loggingPrefix: ${parent:name}
-      # priceClass: PriceClass_All
-  siteRoute53Config:
-    type: rg-route53
-    inputs:
-      name: ${parent:name}
-      domainName: ${parent:redirect_domain}
-      dnsName: d111111abcdef8.cloudfront.net #${siteCloudFrontConfig:distribution:domainName}
-      # privateZone: false
-      # vpcId: my-existing-vpc-id
-      # vpcRegion: ${parent:hosting_region}
+      name: ${rg-aws-staticweb.inputs.redirect_domain}
+  # rootDomainBucketConfig:
+  #   type: rg-s3-website-config
+  #   inputs:
+  #     rootBucketName: ${rootDomainBucket:name}
+  #     indexDocument: ${rg-aws-staticweb.inputs.content_index}
+  #     errorDocument: ${rg-aws-staticweb.inputs.content_error}
+  #     redirectBucketName: ${wwwDomainBucket:name}
+  #     redirectToHostName: ${rg-aws-staticweb.inputs.hosting_domain}
+  # siteCloudFrontConfig:
+  #   type: rg-cloudfront
+  #   inputs:
+  #     name: ${rg-aws-staticweb.inputs.name}
+  #     defaultRootObject: ${rg-aws-staticweb.inputs.content_index}
+  #     originId: ${rootDomainBucket:name}
+  #     originDomain: rgfamily.com.s3.amazonaws.com
+  #     aliasDomain: ${rg-aws-staticweb.inputs.redirect_domain}
+  #     # distributionEnabled: false
+  #     # loggingEnabled: false
+  #     # loggingBucket: ${rg-aws-staticweb.inputs.name}
+  #     # loggingIncludeCookies: false
+  #     # loggingPrefix: ${rg-aws-staticweb.inputs.name}
+  #     # priceClass: PriceClass_All
+  # siteRoute53Config:
+  #   type: rg-route53
+  #   inputs:
+  #     name: ${rg-aws-staticweb.inputs.name}
+  #     domainName: ${rg-aws-staticweb.inputs.redirect_domain}
+  #     dnsName: d111111abcdef8.cloudfront.net #${siteCloudFrontConfig:distribution:domainName}
+  #     # privateZone: false
+  #     # vpcId: my-existing-vpc-id
+  #     # vpcRegion: ${rg-aws-staticweb.inputs.hosting_region}
