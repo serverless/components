@@ -79,27 +79,28 @@ const unsetPolicyAndCors = async (bucketName) => {
   return {}
 }
 
-const deploy = async (inputs, state, context) => {
-  let outputs = state
-  if (!state.bucketName && inputs.bucketName) {
+const deploy = async (inputs, context) => {
+  if (!context.state.bucketName && inputs.bucketName) {
     context.log(`Setting policy for bucket: ${inputs.bucketName}`)
     await setPolicyAndCors(inputs)
-  } else if (!inputs.bucketName && state.bucketName) {
-    context.log(`Removing policy for bucket: ${state.bucketName}`)
-    await unsetPolicyAndCors(state.bucketName)
-  } else if (state.bucketName !== inputs.bucketName) {
-    context.log(`Removing policy for bucket: ${state.bucketName}`)
-    await unsetPolicyAndCors(state.bucketName)
+  } else if (!inputs.bucketName && context.state.bucketName) {
+    context.log(`Removing policy for bucket: ${context.state.bucketName}`)
+    await unsetPolicyAndCors(context.state.bucketName)
+  } else if (context.state.bucketName !== inputs.bucketName) {
+    context.log(`Removing policy for bucket: ${context.state.bucketName}`)
+    await unsetPolicyAndCors(context.state.bucketName)
     context.log(`Setting policy for bucket: ${inputs.bucketName}`)
     await setPolicyAndCors(inputs)
   }
-  return outputs
+  context.saveState({ ...inputs})
+  return inputs
 }
 
-const remove = async (inputs, state, context) => {
-  // context.log(`Removing policy for bucket: ${state.bucketName}`)
-  // const outputs = await unsetPolicyAndCors(state.bucketName)
-  // return outputs
+const remove = async (inputs, context) => {
+  // context.log(`Removing policy for bucket: ${context.state.bucketName}`)
+  // const outputs = await unsetPolicyAndCors(context.state.bucketName)
+  context.saveState({})
+  return {}
 }
 
 module.exports = {
