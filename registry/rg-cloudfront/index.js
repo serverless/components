@@ -1,5 +1,4 @@
 const AWS = require('aws-sdk')
-const BbPromise = require('bluebird')
 
 const CloudFront = new AWS.CloudFront({apiVersion: '2017-03-25'})
 
@@ -182,13 +181,10 @@ const deleteDistribution = async (distributionId, distributionETag) => {
       IfMatch: res.distribution.eTag
     }).promise()
     console.log(`CloudFront distribution '${distributionId}' deletion initiated.`)
-
-    return {
-      distribution: null
-    }
+    return {}
   } catch (err) {
     console.log(`Error in deleting CloudFront distribution '${distributionId}'.`, err.message)
-    return
+    return {error: err}
   }
 }
 
@@ -214,30 +210,36 @@ const timestamp = () => {
   return Math.floor(Date.now() / 1000)
 }
 
-const deploy = async (inputs, state, context) => {
-  let outputs = state
-  if (!state.distribution && inputs.name) {
-    context.log(`Creating distribution: ${inputs.name}`)
+const deploy = async (inputs, context) => {
+  let outputs = context.state
+  if (!context.state.distribution && inputs.name) {
+    context.log(`Creating CloudFront distribution: ${inputs.name}`)
     outputs = await createDistribution(inputs)
-  } else if (!inputs.name && state.distribution.id) {
-    context.log(`Removing distribution: ${state.name} with id: ${state.distribution.id}`)
-    outputs = await deleteDistribution(state.distribution.id, state.distribution.eTag)
-  } else if (state.name !== inputs.name && state.distribution) {
-    context.log(`Removing distribution: ${state.name} with id: ${state.distribution.id}`)
-    outputs = await deleteDistribution(state.distribution.id, state.distribution.eTag)
-    context.log(`Creating distribution: ${inputs.name}`)
-    outputs = await createDistribution(inputs)
-  } else if (state.name && state.distribution && inputs.distributionEnabled != state.distribution.distConfig.enabled) {
-    context.log(`Toggling distribution: Enabled - ${inputs.distributionEnabled}`)
-    outputs = await toggleEnabledForDistribution(state.distribution.id, inputs.distributionEnabled)
+  } else if (!inputs.name && context.state.distribution.id) {
+    context.log(`Removing CloudFront distribution: ${context.state.name} with id: ${context.state.distribution.id}`)
+    await deleteDistribution(context.state.distribution.id, context.state.distribution.eTag)
+  } else if (context.state.name !== inputs.name && context.state.distribution) {
+    context.log(`Removing CloudFront distribution: ${context.state.name} with id: ${context.state.distribution.id}`)
+    const res = await deleteDistribution(context.state.distribution.id, context.state.distribution.eTag)
+    if (!res.error) {
+      context.log(`Creating CloudFront distribution: ${inputs.name}`)
+      outputs = await createDistribution(inputs)
+    }
+  } else if (context.state.name && context.state.distribution && inputs.distributionEnabled != context.state.distribution.distConfig.enabled) {
+    context.log(`Toggling CloudFront distribution: Enabled - ${inputs.distributionEnabled}`)
+    outputs = await toggleEnabledForDistribution(context.state.distribution.id, inputs.distributionEnabled)
   }
+  context.saveState({ ...inputs, ...outputs })
   return outputs
 }
 
-const remove = async (inputs, state, context) => {
-  context.log(`Removing distribution: ${state.name} with id: ${state.distribution.id}`)
-  const outputs = await deleteDistribution(state.distribution.id, state.distribution.eTag)
-  return outputs
+const remove = async (inputs, context) => {
+  context.log(`Removing CloudFront distribution: ${context.state.name} with id: ${context.state.distribution.id}`)
+  const res = await deleteDistribution(context.state.distribution.id, context.state.distribution.eTag)
+  if (!res.error) {
+    context.saveState({})
+  }
+  return {}
 }
 
 module.exports = {
