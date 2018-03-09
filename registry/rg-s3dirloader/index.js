@@ -1,12 +1,11 @@
 const AWS = require('aws-sdk')
-const utils = require('../../lib/utils')
+const utils = require('../../src/utils')
 const mime = require('mime-types')
 const fs = require('fs')
 
 const S3 = new AWS.S3({ region: 'us-east-1' })
 
 const uploadFiles = async ({contentPath, bucketName}) => {
-
   const filePaths = await utils.walkDirSync(contentPath)
   const uploadedFiles = filePaths.map(async (file) => {
     const cleanedFilePath = file.replace(contentPath.replace('./', '')+'/', '')
@@ -29,21 +28,33 @@ const uploadFiles = async ({contentPath, bucketName}) => {
 
 }
 
-const deploy = async (inputs, state, context) => {
-  let outputs = state
-  if (!state.contentPath && inputs.contentPath) {
+const deploy = async (inputs, context) => {
+  let outputs = context.state
+
+  if (!context.state.contentPath && inputs.contentPath) {
     context.log(`Uploading files to Bucket: ${inputs.bucketName}.`)
     outputs = await uploadFiles(inputs)
-  } else if (!inputs.contentPath && state.contentPath) {
-    context.log(`Re-uploading files to Bucket: ${inputs.bucketName}.`)
-    outputs = await uploadFiles(inputs)
-  } else if (state.contentPath !== inputs.contentPath) {
-    context.log(`Re-uploading files to Bucket: ${inputs.bucketName}.`)
+  } else if (!inputs.contentPath && context.state.contentPath) {
+    context.log(`Removing files from Bucket: ${inputs.bucketName}.`)
+    // outputs = await removeFiles(context.state.contentPath)
+  } else if (context.state.contentPath !== inputs.contentPath) {
+    context.log(`Removing old files from Bucket: ${context.state.contentPath}.`)
+    // outputs = await removeFiles(context.state.contentPath)
+    context.log(`Uploading new files to Bucket: ${inputs.bucketName}.`)
     outputs = await uploadFiles(inputs)
   }
+  context.saveState({ ...inputs, ...outputs })
   return outputs
 }
 
+const remove = async (inputs, context) => {
+  context.log(`Removing files from Bucket: ${context.state.contentPath}`)
+  // outputs = await removeFiles(context.state.contentPath)
+  context.saveState({})
+  return {}
+}
+
 module.exports = {
-  deploy
+  deploy,
+  remove
 }
