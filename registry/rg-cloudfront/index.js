@@ -234,6 +234,8 @@ const deploy = async (inputs, context) => {
 }
 
 const remove = async (inputs, context) => {
+  if (!context.state.name) return {}
+
   context.log(`Removing CloudFront distribution: ${context.state.name} with id: ${context.state.distribution.id}`)
   const res = await deleteDistribution(context.state.distribution.id, context.state.distribution.eTag)
   if (!res.error) {
