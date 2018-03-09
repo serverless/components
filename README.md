@@ -62,6 +62,30 @@ You define a component using two files: `serverless.yml` for config, and `index.
 
 The `index.js` file exports multiple functions that take two arguments: `inputs` and `context`. Each exported function name reflects the CLI command which will invoke it (the `deploy` function will be executed when one runs `proto deploy`).
 
+These two files look something like this:
+
+**serverless.yml**
+
+```yml
+type: my-component
+
+inputTypes: # inputs that my-component expects to receive
+  foo: string
+  bar: number
+```
+
+**index.js**
+
+```js
+const deploy = (inputs, context) => {
+  // provisioning logic goes here
+}
+
+module.exports = {
+  deploy // this is the command name which is exposed via the CLI
+}
+```
+
 However, this `index.js` file is optional, since your component could just be a composition of other smaller components without provisioning logic on its own. [`github-webhook-receiver`](#github-webhook-receiver) is a good example of this.
 
 This component has only a `serverless.yml` and no provisioning logic in the `index.js` file.
@@ -70,10 +94,6 @@ This component has only a `serverless.yml` and no provisioning logic in the `ind
 
 ```yml
 type: github-webhook-receiver
-
-
-inputs:
-  url: ${myEndpoint.outputs.url} # Variable from another component output
 
 components:
   myTable: # component alias, to be referenced with Variables
@@ -118,13 +138,6 @@ module.exports = {
 }
 ```
 
-### Registry
-
-The ["Serverless Registry"](./registry) is a core part in this implementation since it makes it possible to discover, publish and share existing components.
-
-The registry is not only constrained to serve components. Since components are functions it's possible to wrap existing business logic into functions and publish them to the registry as well.
-
-Looking into the future it could be possible to serve functions which are written in different languages through the registry.
 
 ### Inputs & Outputs
 
@@ -135,7 +148,7 @@ Inputs are the configuration that are supplied to your component logic by the us
 ```yml
 type: some-component
 
-inputs:
+inputTypes:
   firstInput:
     displayName: "The first input"
     type: string
@@ -152,7 +165,7 @@ So, if the lambda `serverless.yml` looks like this:
 ```yml
 type: lambda
 
-inputs:
+inputTypes:
   memory:
     displayName: "The amount of memory to provide to the lambda function"
     type: number
@@ -298,6 +311,7 @@ The ["Serverless Registry"](./registry) will be a core part in the implementatio
 The registry is not only constrained to serve components. Since components are functions it's possible to wrap existing business logic into functions and publish them to the registry as well.
 
 Looking into the future it could be possible to serve functions which are written in different languages through the registry.
+
 
 ## Creating components
 
