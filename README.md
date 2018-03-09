@@ -2,14 +2,14 @@
 
 This project is a prototype of a new concept Serverless has been exploring called "components". Our aim is to introduce highly configurable and composable pieces that allow for multi-cloud & third party resource use cases.
 
-Components are capable of provisioning infrastructure while including both application logic AND lifecycle management. They have a focus on serverless/cloud resources and they also greatly enable reuse, sharing and simplicity.
+Components are capable of provisioning infrastructure while including both application logic AND lifecycle management. They have a focus on serverless / cloud resources and they also greatly enable reuse, sharing and simplicity.
 
 ## Table of contents
 
 * [Getting started](#getting-started)
 * [Concepts](#concepts)
   * [Components](#components)
-  * [Inputs & Outputs](#inputs-outputs)
+  * [Input types, Inputs & Outputs](#input-types-inputs-outputs)
   * [State](#state)
   * [Variables](#variables)
   * [Graph](#graph)
@@ -60,7 +60,7 @@ A component is the smallest unit of abstraction for your infrastructure. It coul
 
 You define a component using two files: `serverless.yml` for config, and `index.js` for the provisioning logic.
 
-The `index.js` file exports multiple functions that take two arguments: `inputs` and `context`. Each exported function name reflects the CLI command which will invoke it (the `deploy` function will be executed when one runs `proto deploy`).
+The `index.js` file exports multiple functions that take two arguments: `inputs` and `context`. Each exported function name reflects the CLI command which will invoke it (the `deploy` function will be executed when one runs `components deploy`).
 
 These two files look something like this:
 
@@ -139,49 +139,48 @@ module.exports = {
 ```
 
 
-### Inputs & Outputs
+### Input types, Inputs & Outputs
 
-#### Inputs
+#### Input types
 
-Inputs are the configuration that are supplied to your component logic by the user. You supply those inputs in `serverless.yml`:
+Input types are the description of the inputs your components receives. You supply those input types in the components `serverless.yml` file:
 
 ```yml
 type: some-component
 
 inputTypes:
   firstInput:
-    displayName: "The first input"
+    displayName: The first input
     type: string
     required: true
-    default: 'foo value'
-
+    default: foo value
   secondInput: number  # short hand
 ```
 
-Or, if the component is being used as a child of another parent component, like the `lambda` component, the parent could supply those inputs, and they would overwrite the default inputs that are defined at the child level.
-
-So, if the lambda `serverless.yml` looks like this:
+Or, if the component is being used as a child of another parent component, like the `lambda` component, the parent could supply those `inputTypes`, and they would overwrite the default `inputTypes` that are defined at the child level:
 
 ```yml
 type: lambda
 
 inputTypes:
   memory:
-    displayName: "The amount of memory to provide to the lambda function"
+    displayName: The amount of memory to provide to the lambda function
     type: number
     required: true
     default: 128
   timeout:
-    displayName: "The timeout of the function in seconds"
+    displayName: The timeout of the function in seconds
     type: number
     required: true
     default: 10
 ```
 
-a `serverless.yml` which uses lambda could look like this:
+#### Inputs
+
+Inputs are the configuration that are supplied to your components logic by the user. You define those inputs in the `serverless.yml` file where the component is used:
 
 ```yml
-type: my-component
+type: my-application
 
 components:
   myFunction:
@@ -191,7 +190,7 @@ components:
       timeout: 300
 ```
 
-Then your deployed `lambda` function would have a memory size of 512, and timeout of 300.
+Given this `serverless.yml` you'd deploy a `lambda` function which would have a memory size of 512 and timeout of 300.
 
 #### Outputs
 
@@ -218,7 +217,7 @@ module.exports = {
 These outputs can then be referenced by other components such as in this example we reference the function arn and pass it in to the apigateway component to setup a handler for the route.
 
 ```yml
-type: my-component
+type: my-application
 
 components:
   myFunction:
@@ -335,14 +334,18 @@ Let's start by describing our components interface. We define the interface with
 ```yml
 type: greeter
 
-inputs:
-  firstName: John
-  lastName: ${LAST_NAME}
+inputTypes:
+  firstName:
+    type: string
+    required: true
+  lastName:
+    type: string
+    required: true
 ```
 
 Let's take a closer look at the code we've just pasted. At first we define the `type` (think of it as an identifier or name) of the component. In our case the component is called `greeter`.
 
-Next up we need to define the `inputs` our component receives. `inputs` are values which are accessible from within the components logic. In our case we expect a `firstName` and a `lastName`. The `firstName` is hardcoded to `John`, whereas the `lastName` is retrieved from an environment variables (the `${}` syntax shows us that we're using [variables](#variables) here).
+Next up we need to declare the `inputTypes` our component has. `inputTypes` define the shape our inputs take and are accessible from within the components logic. In our case we expect a `firstName` and a `lastName`.
 
 That's it for the component definition. Let's move on to the implementation of its logic.
 
@@ -410,28 +413,41 @@ The last function we've defined in our components implementation is the `remove`
 
 Let's test our component!
 
-If we take another look at the `serverless.yml` file we can see that our `lastName` config value depends on a variable called `LAST_NAME` which is fetched from the local environment. This means that we need to export this variable so that the Framework can pick it up and pass it down into our `inputs`:
+First of all let's create a new example application which uses our `greeter` component. `cd` into the `examples` directory by running:
+
+```sh
+cd examples
+```
+
+Create a new directory named `test` which has one `serverless.yml` file with the following content:
+
+```yml
+type: my-application
+
+components:
+  myGreeter:
+    type: greeter
+    inputs:
+      firstName: John
+      lastName: ${LAST_NAME}
+```
+
+If we take a closer look at the `serverless.yml` file we can see that our `lastName` config value depends on a variable called `LAST_NAME` which is fetched from the local environment. This means that we need to export this variable so that the Framework can pick it up and pass it down into our `inputs`:
 
 ```sh
 export LAST_NAME=Doe
 ```
 
-Once this is done we can `cd` into our `greeter` directory by running:
-
-```sh
-cd registry/greeter
-```
-
-Run the following commands to test the components logic:
+That's it. Let's take it for a spin. Run the following commands to test the components logic:
 
 ```
-../../bin/serverless deploy
+../../bin/components deploy
 
-../../bin/serverless deploy
+../../bin/components deploy
 
-../../bin/serverless greet
+../../bin/components greet
 
-../../bin/serverless remove
+../../bin/components remove
 ```
 
 Congratulations! You've successfully created your first Serverless component!
@@ -447,7 +463,7 @@ Want to learn more? Make sure to take a look at all the different component impl
 To deploy your app, run
 
 ```
-proto deploy
+components deploy
 ```
 
 #### Updating
@@ -456,7 +472,7 @@ proto deploy
 * Then run
 
 ```
-proto deploy
+components deploy
 ```
 
 #### Removal
@@ -464,7 +480,7 @@ proto deploy
 To remove your app, run
 
 ```
-proto remove
+components remove
 ```
 
 ### Component Usage
@@ -483,27 +499,30 @@ Creates / Removes an API endpoint which is exposed via AWS API Gateway and conne
 
 ##### Commands
 
-* `proto deploy`
-* `proto remove`
+* `components deploy`
+* `components remove`
 
 ##### Example
 
 ```yml
-type: apigateway
+type: my-application
 
-inputs:
-  name: apigateway
-  roleArn: arn:aws:iam::XXXXX:role/some-api-gateway-role
-  routes:
-    /hello:
-      post:
-        lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
-        cors: true
-      get:
-        lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
-    /hello/world:
-      delete:
-        lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
+components:
+  myApiGateway:
+    type: apigateway
+    inputs:
+      name: apigateway
+      roleArn: arn:aws:iam::XXXXX:role/some-api-gateway-role
+      routes:
+        /hello:
+          post:
+            lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
+            cors: true
+          get:
+            lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
+        /hello/world:
+          delete:
+            lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
 ```
 
 #### `dynamodb`
@@ -521,39 +540,42 @@ Creates / Removes an AWS DynamoDB table.
 **Note:** You can find the full range of configurable parameters in the [AWS docs](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-dynamodb-table.html)
 
 ```yml
-type: dynamodb
+type: my-application
 
-inputs:
-  region: us-east-1
-  deletionPolicy: Delete
-  properties:
-    tableName: my-table
-    attributeDefinitions:
-      - attributeName: id
-        attributeType: S
-    keySchema:
-      - attributeName: id
-        keyType: HASH
-    globalSecondaryIndexes: null
-    localSecondaryIndexes: null
-    provisionedThroughput:
-      readCapacityUnits: 1
-      writeCapacityUnits: 1
-    streamSpecification: null
-    tags:
-      - tag-1
-      - tag-2
-    timeToLiveSpecification:
-      attributeName: ttl
-      enabled: true
-    sSESpecification:
-      sSEEnabled: false
+components:
+  myDynamoDBTable:
+    type: dynamodb
+    inputs:
+      region: us-east-1
+      deletionPolicy: Delete
+      properties:
+        tableName: my-table
+        attributeDefinitions:
+          - attributeName: id
+            attributeType: S
+        keySchema:
+          - attributeName: id
+            keyType: HASH
+        globalSecondaryIndexes: null
+        localSecondaryIndexes: null
+        provisionedThroughput:
+          readCapacityUnits: 1
+          writeCapacityUnits: 1
+        streamSpecification: null
+        tags:
+          - tag-1
+          - tag-2
+        timeToLiveSpecification:
+          attributeName: ttl
+          enabled: true
+        sSESpecification:
+          sSEEnabled: false
 ```
 
 ##### Commands
 
-* `proto deploy`
-* `proto remove`
+* `components deploy`
+* `components remove`
 
 ##### Example
 
@@ -577,23 +599,26 @@ Creates / Removes an Event Gateway function registration and corresponding subsc
 
 ##### Commands
 
-* `proto deploy`
-* `proto remove`
-* `proto info`
+* `components deploy`
+* `components remove`
+* `components info`
 
 ##### Example
 
 ```yml
-type: eventgateway
+type: my-application
 
-inputs:
-  event: http # or any freeform event like "user.created"
-  path: some-path
-  method: POST # optional
-  cors: true # optional
-  space: some-space
-  eventGatewayApiKey: s0m33v3ntg4t3w4y4p1k3y
-  lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
+components:
+  myEventGateway:
+    type: eventgateway
+    inputs:
+      event: http # or any freeform event like "user.created"
+      path: some-path
+      method: POST # optional
+      cors: true # optional
+      space: some-space
+      eventGatewayApiKey: s0m33v3ntg4t3w4y4p1k3y
+      lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
 ```
 
 #### `github`
@@ -612,20 +637,23 @@ Creates / Removes a GitHub Webhook.
 
 ##### Commands
 
-* `proto deploy`
-* `proto remove`
+* `components deploy`
+* `components remove`
 
 ##### Example
 
 ```yml
-type: github
+type: my-application
 
-inputs:
-  token: ${GITHUB_TOKEN}
-  owner: jdoe
-  repo: some-repository
-  url: https://some-endpoint.com
-  event: push
+components:
+  myGitHub:
+    type: github
+    inputs:
+      token: ${GITHUB_TOKEN}
+      owner: jdoe
+      repo: some-repository
+      url: https://some-endpoint.com
+      event: push
 ```
 
 #### `github-webhook-receiver`
@@ -640,49 +668,22 @@ Creates / Tests / Removes a GitHub Webhook receiver.
 
 ##### Commands
 
-* `proto deploy`
-* `proto test`
-* `proto remove`
+* `components deploy`
+* `components test`
+* `components remove`
 
 ##### Example
 
 **Note:** This example re-uses other components.
 
 ```yml
-type: github-webhook-receiver
-
-inputs:
-  url: ${myEndpoint:url}
+type: my-application
 
 components:
-  myTable:
-    type: dynamodb
+  myGitHubWebhookReceiver:
+    type: github-webhook-receiver
     inputs:
-      name: github-webhook-receiver
-  myFunction:
-    type: lambda
-    inputs:
-      name: github-webhook-receiver
-      memory: 128
-      timeout: 10
-      handler: code.handler
-  myEndpoint:
-    type: eventgateway
-    inputs:
-      event: http
-      method: POST
-      path: github-webhook-receiver-path
-      space: github-webhook-receiver
-      eventGatewayApiKey: s0m33v3ntg4t3w4y4p1k3y
-      lambdaArn: ${myFunction:arn}
-  myGithubWebhook:
-    type: github
-    inputs:
-      token: ${GITHUB_TOKEN}
-      owner: jdoe
-      repo: some-repository
-      url: ${myEndpoint:url}
-      event: pull_request
+      url: https://my.endpoint
 ```
 
 #### `iam`
@@ -697,16 +698,19 @@ Creates / Removes an AWS IAM role.
 
 ##### Commands
 
-* `proto deploy`
-* `proto remove`
+* `components deploy`
+* `components remove`
 
 ##### Example
 
 ```yml
-type: iam
+type: my-application
 
-inputs:
-  name: role-name
+components:
+  myIam:
+    type: iam
+    inputs:
+      name: role-name
 ```
 
 #### `lambda`
@@ -726,21 +730,24 @@ Creates / Removes an AWS Lambda function.
 
 ##### Commands
 
-* `proto deploy`
-* `proto remove`
+* `components deploy`
+* `components remove`
 
 ##### Example
 
 ```yml
-type: lambda
+type: my-application
 
-inputs:
-  name: some-lambda-function
-  memory: 128
-  timeout: 10
-  description: dome description
-  handler: code.handler
-  role: arn:aws:iam::XXXXX:role/some-lambda-role
+components:
+  myLambda:
+    type: lambda
+    inputs:
+      name: some-lambda-function
+      memory: 128
+      timeout: 10
+      description: dome description
+      handler: code.handler
+      role: arn:aws:iam::XXXXX:role/some-lambda-role
 ```
 
 #### `rest-api`
@@ -759,35 +766,38 @@ Creates / Removes a RESTful API. Uses the specified gateway component behind the
 
 ##### Commands
 
-* `proto deploy`
-* `proto remove`
+* `components deploy`
+* `components remove`
 
 ##### Example
 
 ```yml
-type: rest-api
+type: my-application
 
-inputs:
-  gateway: eventgateway
-  eventGatewayApiKey: s0m33v3ntg4t3w4y4p1k3y # optional
-  space: some-space # optional
-  name: some-rest-api
-  routes:
-    /products: # routes begin with a slash
-      post: # HTTP method names are used to attach handlers
-        function: { 'arn': 'arn:aws:lambda:us-east-1:XXXXX:function:products-create' } # value can be a direct component reference or an object containing the Lambda ARN
+components:
+  myRestApi:
+    type: rest-api
+    inputs:
+      gateway: eventgateway
+      eventGatewayApiKey: s0m33v3ntg4t3w4y4p1k3y # optional
+      space: some-space # optional
+      name: some-rest-api
+      routes:
+        /products: # routes begin with a slash
+          post: # HTTP method names are used to attach handlers
+            function: { 'arn': 'arn:aws:lambda:us-east-1:XXXXX:function:products-create' } # value can be a direct component reference or an object containing the Lambda ARN
 
-      # sub-routes can be declared hierarchically
-      /{id}: # path parameters use curly braces
-        get:
-          function: { 'arn': 'arn:aws:lambda:us-east-1:XXXXX:function:products-get' }
-          cors: true # CORS can be allowed with this flag
+          # sub-routes can be declared hierarchically
+          /{id}: # path parameters use curly braces
+            get:
+              function: { 'arn': 'arn:aws:lambda:us-east-1:XXXXX:function:products-get' }
+              cors: true # CORS can be allowed with this flag
 
-    # multi-segment routes can be declared all at once
-    /catalog/{...categories}: # catch-all path parameters use ellipses
-        get:
-          function: { 'arn': 'arn:aws:lambda:us-east-1:XXXXX:function:products-list' }
-          cors: true
+        # multi-segment routes can be declared all at once
+        /catalog/{...categories}: # catch-all path parameters use ellipses
+            get:
+              function: { 'arn': 'arn:aws:lambda:us-east-1:XXXXX:function:products-list' }
+              cors: true
 ```
 
 #### `s3`
@@ -802,16 +812,19 @@ Creates / Removes an AWS S3 bucket.
 
 ##### Commands
 
-* `proto deploy`
-* `proto remove`
+* `components deploy`
+* `components remove`
 
 ##### Example
 
 ```yml
-type: s3
+type: my-application
 
-inputs:
-  name: default-bucket-name
+components:
+  myS3:
+    type: s3
+    inputs:
+      name: default-bucket-name
 ```
 
 #### `s3-downloader`
@@ -826,35 +839,21 @@ Creates / Removes a component which makes it possible to listen to a "file uploa
 
 ##### Commands
 
-* `proto deploy`
-* `proto remove`
+* `components deploy`
+* `components remove`
 
 ##### Example
 
 **Note:** This example re-uses other components.
 
 ```yml
-type: s3-downloader
-
-inputs:
-  name: some-name
+type: my-application
 
 components:
-  downloaderLambda:
-    type: lambda
+  myS3Downloader:
+    type: s3-downloader
     inputs:
-      name: ${parent:name}
-      handler: downloader.handler
-      env:
-        EVENT_GATEWAY_APIKEY: ${EVENT_GATEWAY_API_KEY}
-        FILES_TABLE: some-dynamodb-table
-  downloaderSubscription:
-    type: eventgateway
-    inputs:
-      event: fileUploaded
-      space: s3-downloader
-      eventGatewayApiKey: s0m33v3ntg4t3w4y4p1k3y
-      lambdaArn: ${downloaderLambda:arn}
+      name: some-name
 ```
 
 #### `s3-prototype`
@@ -867,33 +866,19 @@ Creates / Removes a component which wraps the, [`s3`](#s3), [`dynamodb`](#dynamo
 
 ##### Commands
 
-* `proto deploy`
-* `proto remove`
+* `components deploy`
+* `components remove`
 
 ##### Example
 
 **Note:** This example re-uses other components.
 
 ```yml
-type: s3-prototype
+type: my-application
 
 components:
-  filesBucket:
-    type: s3
-    inputs:
-      name: some-s3-bucket
-  filesTable:
-    type: dynamodb
-    inputs:
-      name: some-dynamodb-table
-  downloader:
-    type: s3-downloader
-    inputs:
-      name: some-s3-downloader
-  uploader:
-    type: s3-uploader
-    inputs:
-      name: some-s3-uploader
+  myS3Prototype:
+    type: s3-prototype
 ```
 
 #### `s3-uploader`
@@ -908,33 +893,17 @@ Creates / Removes a component which makes it possible to upload files via the Ev
 
 ##### Commands
 
-* `proto deploy`
-* `proto remove`
+* `components deploy`
+* `components remove`
 
 ##### Example
 
 ```yml
-type: s3-uploader
-
-inputs:
-  name: some-name
+type: my-application
 
 components:
-  uploaderLambda:
-    type: lambda
+  myS3Uploader:
+    type: s3-uploader
     inputs:
-      name: ${parent:name}
-      handler: uploader.handler
-      env:
-        EVENT_GATEWAY_APIKEY: ${EVENT_GATEWAY_API_KEY}
-        BUCKET: some-s3-bucket
-  uploaderSubscription:
-    type: eventgateway
-    inputs:
-      event: http
-      method: POST
-      path: ${parent:name}
-      space: s3-uploader
-      eventGatewayApiKey: s0m33v3ntg4t3w4y4p1k3y
-      lambdaArn: ${uploaderLambda:arn}
+      name: some-name
 ```
