@@ -5,14 +5,8 @@ const S3 = new AWS.S3({ region: 'us-east-1' })
 const createBucket = async (name) => S3.createBucket({ Bucket: name }).promise()
 
 const deleteBucket = async (name) => {
-  let res
-  try {
-    res = await S3.listObjectsV2({ Bucket: name }).promise()
-  } catch (error) {
-    if (error.statusCode == 404) {
-      return
-    }
-  }
+
+  const res = await S3.listObjectsV2({ Bucket: name }).promise()
 
   const objectsInBucket = []
   if (res) {
@@ -61,7 +55,7 @@ const remove = async (inputs, context) => {
   const outputs = {
     name: null
   }
-  context.saveState()
+  context.saveState({})
   return outputs
 }
 
