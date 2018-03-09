@@ -39,6 +39,7 @@
     "minimist": "^1.2.0",
     "ramda": "^0.25.0",
     "raven": "^2.4.2",
+    "raml-validate": "^1.1.2",
     "s3-client": "^4.4.1"
   },
   "devDependencies": {
