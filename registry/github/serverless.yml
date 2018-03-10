@@ -1,8 +1,18 @@
 type: github
 
-inputs:
-  token: ${GITHUB_TOKEN}
-  owner: serverless
-  repo: serverless-components
-  url: https://serverless.com
-  event: push
+inputTypes:
+  token:
+    type: string
+    required: true
+  owner:
+    type: string
+    required: true
+  repo:
+    type: string
+    required: true
+  url:
+    type: string
+    required: true
+  event:
+    type: string
+    required: true

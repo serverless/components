@@ -1,4 +1,6 @@
 type: s3
 
-inputs:
-  name: default-bucket-name-goes-here-2
+inputTypes:
+  name:
+    type: string
+    required: true
