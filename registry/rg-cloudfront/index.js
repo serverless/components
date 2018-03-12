@@ -95,7 +95,7 @@ const createDistribution = async ({name, defaultRootObject, originId, originDoma
   const distRes = await CloudFront.createDistribution({
     DistributionConfig: distributionConfig
   }).promise()
-  console.log(`CloudFront distribution '${name}' creation intiated.`)
+  console.log(`CloudFront distribution '${name}' creation initiated.`)
 
   return {
     distribution: {
