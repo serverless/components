@@ -1,6 +1,7 @@
 const { merge } = require('ramda')
 const fetch = require('node-fetch')
 const isValidEventName = require('./isValidEventName')
+const getConfig = require('../config/getConfig')
 
 const TRACK_URL = 'https://serverless.com/api/framework/track'
 
@@ -8,15 +9,13 @@ module.exports = async (eventName, payload) => {
   const data = payload || {}
   let userId = data.id
   let userEmail = data.email
-
-  const TRACKING_IS_DISABLED = get('trackingDisabled')
+  const config = getConfig()
 
   // exit early if tracking disabled
-  if (TRACKING_IS_DISABLED && !data.force) {
+  if (config.trackingDisabled && !data.force) {
     return
   }
 
-  const config = getConfig()
   const { frameworkId } = config
   // getConfig for values if not provided from .track call
   if (!userId || !userEmail) {
