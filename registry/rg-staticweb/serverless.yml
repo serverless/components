@@ -3,28 +3,18 @@
 type: rg-aws-staticweb
 inputs:
   name: rgfamilysite
-  # content:
-  #   path: ./site
-  #   index: index.html
-  #   error: error.html
-  # cdn:
-  #   type: cloudfront
-  # hosting:
-  #   region: us-east-1
-  #   domain: rgfamily.com
-  content_path: ./site
-  content_index: index.html
-  content_error: error.html
-  cdn_type: cloudfront
-  hosting_region: us-east-1
-  hosting_domain: rgfamily.com
-  redirect_domain: www.rgfamily.com
+  contentPath: ./site
+  contentIndex: index.html
+  contentError: error.html
+  hostingRegion: us-east-1
+  hostingDomain: rgfamily.com
+  aliasDomain: www.rgfamily.com
 
 components:
   rootDomainBucket:
     type: s3
     inputs:
-      name: ${rg-aws-staticweb.inputs.hosting_domain}
+      name: ${rg-aws-staticweb.inputs.hostingDomain}
   rootDomainBucketPolicy:
     type: rg-s3policy
     inputs:
@@ -32,40 +22,32 @@ components:
   siteContentUploader:
     type: rg-s3dirloader
     inputs:
-      contentPath: ${rg-aws-staticweb.inputs.content_path}
+      contentPath: ${rg-aws-staticweb.inputs.contentPath}
       bucketName: ${rootDomainBucket.outputs.name}
   wwwDomainBucket:
     type: s3
     inputs:
-      name: ${rg-aws-staticweb.inputs.redirect_domain}
+      name: ${rg-aws-staticweb.inputs.aliasDomain}
   rootDomainBucketConfig:
     type: rg-s3-website-config
     inputs:
       rootBucketName: ${rootDomainBucket.outputs.name}
-      indexDocument: ${rg-aws-staticweb.inputs.content_index}
-      errorDocument: ${rg-aws-staticweb.inputs.content_error}
+      indexDocument: ${rg-aws-staticweb.inputs.contentIndex}
+      errorDocument: ${rg-aws-staticweb.inputs.contentError}
       redirectBucketName: ${wwwDomainBucket.outputs.name}
-      redirectToHostName: ${rg-aws-staticweb.inputs.hosting_domain}
+      redirectToHostName: ${rg-aws-staticweb.inputs.hostingDomain}
   siteCloudFrontConfig:
     type: rg-cloudfront
     inputs:
       name: ${rg-aws-staticweb.inputs.name}
-      defaultRootObject: ${rg-aws-staticweb.inputs.content_index}
+      defaultRootObject: ${rg-aws-staticweb.inputs.contentIndex}
       originId: ${rootDomainBucket.outputs.name}
       originDomain: rgfamily.com.s3.amazonaws.com
-      aliasDomain: ${rg-aws-staticweb.inputs.redirect_domain}
+      aliasDomain: ${rg-aws-staticweb.inputs.aliasDomain}
       distributionEnabled: true
-      # loggingEnabled: false
-      # loggingBucket: ${rg-aws-staticweb.inputs.name}
-      # loggingIncludeCookies: false
-      # loggingPrefix: ${rg-aws-staticweb.inputs.name}
-      # priceClass: PriceClass_All
   siteRoute53Config:
     type: rg-route53
     inputs:
       name: ${rg-aws-staticweb.inputs.name}
-      domainName: ${rg-aws-staticweb.inputs.redirect_domain}
+      domainName: ${rg-aws-staticweb.inputs.aliasDomain}
       dnsName: ${siteCloudFrontConfig.outputs.distribution.domainName} # d111111abcdef8.cloudfront.net
-      # privateZone: false
-      # vpcId: my-existing-vpc-id
-      # vpcRegion: ${rg-aws-staticweb.inputs.hosting_region}
