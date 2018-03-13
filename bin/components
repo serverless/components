@@ -4,10 +4,7 @@ const { run } = require('../src/index')
 
 // re-throw unhandled Promise rejections
 process.on('unhandledRejection', (error) => {
-  // TODO: re-throw error to exit with a non-zero exit code
-  // throw new Error(error.message)
-  // eslint-disable-next-line no-console
-  console.log(error)
+  throw new Error(error.message)
 })
 
 const command = process.argv[2]

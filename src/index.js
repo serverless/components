@@ -20,12 +20,12 @@ const run = async (command, options) => {
     const graph = await buildGraph(components)
     await executeGraph(graph, components, stateFile, command, options)
   } catch (error) {
-    reporter.captureException(error)
+    if (reporter) { reporter.captureException(error) }
     return BbPromise.reject(error)
   } finally {
     await writeStateFile(stateFile)
-    return components // eslint-disable-line no-unsafe-finally
   }
+  return components
 }
 
 module.exports = {
