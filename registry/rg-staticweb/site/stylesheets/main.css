@@ -1,0 +1,18 @@
+body {
+  font-family: "Times New Roman", serif;
+  text-align: center;
+}
+
+p {
+  font-size: 1em;
+}
+
+h1 {
+  font-family: Helvetica, san-serif;
+  font-size: 2em;
+}
+
+img.center {
+  display: block;
+  margin: 0 auto;
+}

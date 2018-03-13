@@ -1,0 +1,4 @@
+type: rg-s3policy
+
+inputs:
+  bucketName: some-unique-bucket-name

@@ -1,0 +1,5 @@
+type: rg-s3dirloader
+
+inputs:
+  contentPath: ./site
+  bucketName: rg-content-bucket

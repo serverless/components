@@ -1,0 +1,53 @@
+# static website component
+
+type: rg-staticweb
+inputs:
+  name: rgfamilysite
+  contentPath: ./site
+  contentIndex: index.html
+  contentError: error.html
+  hostingRegion: us-east-1
+  hostingDomain: rgfamily.com
+  aliasDomain: www.rgfamily.com
+
+components:
+  rootDomainBucket:
+    type: s3
+    inputs:
+      name: ${rg-staticweb.inputs.hostingDomain}
+  rootDomainBucketPolicy:
+    type: rg-s3policy
+    inputs:
+      bucketName: ${rootDomainBucket.outputs.name}
+  siteContentUploader:
+    type: rg-s3sync
+    inputs:
+      contentPath: ${rg-staticweb.inputs.contentPath}
+      bucketName: ${rootDomainBucket.outputs.name}
+  wwwDomainBucket:
+    type: s3
+    inputs:
+      name: ${rg-staticweb.inputs.aliasDomain}
+  rootDomainBucketConfig:
+    type: rg-s3-website-config
+    inputs:
+      rootBucketName: ${rootDomainBucket.outputs.name}
+      indexDocument: ${rg-staticweb.inputs.contentIndex}
+      errorDocument: ${rg-staticweb.inputs.contentError}
+      redirectBucketName: ${wwwDomainBucket.outputs.name}
+      redirectToHostName: ${rg-staticweb.inputs.hostingDomain}
+  siteCloudFrontConfig:
+    type: rg-cloudfront
+    inputs:
+      name: ${rg-staticweb.inputs.name}
+      defaultRootObject: ${rg-staticweb.inputs.contentIndex}
+      originId: ${rootDomainBucket.outputs.name}
+      originDomain: rgfamily.com.s3.amazonaws.com
+      aliasDomain: ${rg-staticweb.inputs.aliasDomain}
+      distributionEnabled: true
+  siteRoute53Config:
+    type: rg-route53
+    inputs:
+      name: ${rg-staticweb.inputs.name}
+      domainName: ${rg-staticweb.inputs.aliasDomain}
+      dnsName: ${siteCloudFrontConfig.outputs.distribution.domainName} # d111111abcdef8.cloudfront.net
