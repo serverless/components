@@ -21,7 +21,7 @@ const run = async (command, options) => {
     await executeGraph(graph, components, stateFile, command, options)
   } catch (error) {
     if (reporter) { reporter.captureException(error) }
-    return BbPromise.reject(error)
+    throw error
   } finally {
     await writeStateFile(stateFile)
   }
