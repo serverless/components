@@ -42,7 +42,7 @@ components:
       name: ${rg-staticweb.inputs.name}
       defaultRootObject: ${rg-staticweb.inputs.contentIndex}
       originId: ${rootDomainBucket.outputs.name}
-      originDomain: rgfamily.com.s3.amazonaws.com
+      # originDomain: rgfamily.com.s3.amazonaws.com
       aliasDomain: ${rg-staticweb.inputs.aliasDomain}
       distributionEnabled: true
   siteRoute53Config:

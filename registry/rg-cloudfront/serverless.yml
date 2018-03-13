@@ -3,7 +3,7 @@ type: rg-cloudfront
 inputs:
   name: cf-bucketname  # sent to CallerReference
   defaultRootObject: index.html
-  originDomain: bucketname.s3.amazonaws.com  # later accept a list
+  # originDomain: bucketname.s3.amazonaws.com  # later accept a list
   aliasDomain: www.example.com # later accept a list
   distributionEnabled: false
   loggingEnabled: false
