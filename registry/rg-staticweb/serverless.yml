@@ -20,7 +20,7 @@ components:
     inputs:
       bucketName: ${rootDomainBucket.outputs.name}
   siteContentUploader:
-    type: rg-s3dirloader
+    type: rg-s3sync
     inputs:
       contentPath: ${rg-aws-staticweb.inputs.contentPath}
       bucketName: ${rootDomainBucket.outputs.name}

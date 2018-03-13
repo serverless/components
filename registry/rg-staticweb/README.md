@@ -40,16 +40,22 @@ Creating Bucket: 'rgfamily.com'
 Creating site: 'rgfamilysite'
 Created site with url: 'http://rgfamily.com.s3-website-us-east-1.amazonaws.com'
 Creating Bucket: 'www.rgfamily.com'
-Creating Route53 to CloudFront mapping: 'www.rgfamily.com => d111111abcdef8.cloudfront.net'
-Route53 Hosted Zone 'rgfamilysite-1520807104' creation initiated.
-Route53 Record Set 'www.rgfamily.com => d111111abcdef8.cloudfront.net' creation initiated.
 Setting policy for bucket: 'rgfamily.com'
-Uploading files to Bucket: 'rgfamily.com'
+Syncing files from './site' to bucket: 'rgfamily.com'
 Setting Bucket: 'rgfamily.com' with website configuration.
 Creating CloudFront distribution: 'rgfamilysite'
 Setting Bucket: 'www.rgfamily.com' for redirection.
+Uploading file: 'site/stylesheets/main.css' ...
+Uploading file: 'site/error.html' ...
+Uploading file: 'site/index.html' ...
+Uploading file: 'site/images/serverless_products.png' ...
 Set policy and CORS for bucket 'rgfamily.com'.
+Uploading file: 'site/images/serverless-bloody.gif' ...
+Objects Found: 0 , Files Found: 5 , Files Deleted: 0
 CloudFront distribution 'rgfamilysite' creation initiated.
+Creating Route53 to CloudFront mapping: 'www.rgfamily.com => d2t3f8tv29lrbg.cloudfront.net'
+Route53 Hosted Zone 'rgfamilysite-1520928601' creation initiated.
+Route53 Record Set 'www.rgfamily.com => d2t3f8tv29lrbg.cloudfront.net' creation initiated.
 ```
 
 ### Remove
