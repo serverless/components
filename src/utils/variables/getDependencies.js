@@ -1,5 +1,5 @@
 const {
-  is, replace, match, forEachObjIndexed, test
+  is, replace, match, forEachObjIndexed
 } = require('ramda')
 
 const regex = require('./getVariableSyntax')()
@@ -11,11 +11,13 @@ module.exports = (inputs) => {
     if (is(Object, value) || is(Array, value)) {
       return forEachObjIndexed(iterate, value)
     }
-    if (is(String, value) && test(regex, value)) {
-      const referencedVariable = replace(/[${}]/g, '', match(regex, value)[0]).split('.')
-      if (referencedVariable[0] !== 'input' && referencedVariable[0] !== 'env') {
-        dependencies.push(referencedVariable[0])
-      }
+    if (is(String, value)) {
+      match(regex, value).forEach((reference) => {
+        const referencedVariable = replace(/[${}]/g, '', reference).split('.')
+        if (referencedVariable[0] !== 'input' && referencedVariable[0] !== 'env') {
+          dependencies.push(referencedVariable[0])
+        }
+      })
     }
     return value
   }
