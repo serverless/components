@@ -2,15 +2,10 @@
 const minimist = require('minimist')
 const { run } = require('../src/index')
 
-// re-throw unhandled Promise rejections
-process.on('unhandledRejection', (error) => {
-  // TODO: re-throw error to exit with a non-zero exit code
-  // throw new Error(error.message)
-  // eslint-disable-next-line no-console
-  console.log(error)
-})
-
 const command = process.argv[2]
 const options = minimist(process.argv.slice(2))
 delete options._
-run(command, options)
+run(command, options).catch((error) => {
+  console.error(error)
+  process.exit(1)
+})

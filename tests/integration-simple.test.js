@@ -129,13 +129,15 @@ describe('Integration Test - Simple', () => {
         // third deployment is done
         // NOTE: the order of this test here is important since we're keeping and checking the
         // state file throughout the whole test suite
-        await cpp.execAsync(`${componentsExec} deploy`, {
+        const cmd = cpp.execAsync(`${componentsExec} deploy`, {
           cwd: functionMockDir,
           env: {
             ...process.env,
             FUNCTION_NAME
           }
         })
+        await expect(cmd).rejects.toThrow('Failed to deploy function "my-function"')
+
         const stateFileContent = await fsp.readJsonAsync(functionMockStateFile)
         const expected = {
           'tests-integration-function-mock:myRole': {

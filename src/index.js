@@ -1,4 +1,3 @@
-const BbPromise = require('bluebird')
 const utils = require('./utils')
 
 const {
@@ -20,12 +19,12 @@ const run = async (command, options) => {
     const graph = await buildGraph(components)
     await executeGraph(graph, components, stateFile, command, options)
   } catch (error) {
-    reporter.captureException(error)
-    return BbPromise.reject(error)
+    if (reporter) { reporter.captureException(error) }
+    throw error
   } finally {
     await writeStateFile(stateFile)
-    return components // eslint-disable-line no-unsafe-finally
   }
+  return components
 }
 
 module.exports = {

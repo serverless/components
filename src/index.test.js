@@ -31,8 +31,7 @@ describe('#run()', () => {
   it('should report any errors to Sentry while still writing the state to disk', async () => {
     utils.executeGraph.mockImplementation(() => Promise.reject(new Error('something went wrong')))
 
-    const res = await index.run('deploy', {})
-    expect(res).toEqual({ some: 'component' })
+    await expect(index.run('deploy', {})).rejects.toThrow('something went wrong')
 
     expect(utils.getComponents).toHaveBeenCalled()
     expect(utils.buildGraph).toHaveBeenCalled()
