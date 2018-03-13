@@ -6,11 +6,11 @@ inputs:
   timeout: 100
   description: default description goes here
   handler: code.handler
-  role: ${myRole.outputs.arn}
+  role: ${myRole.arn}
 
 components:
   myRole:
     type: iam
     inputs:
-      name: ${lambda.inputs.name}
+      name: ${input.name}
       service: lambda.amazonaws.com

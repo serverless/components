@@ -13,14 +13,9 @@ module.exports = (inputs, components) => {
     if (is(String, value) && test(regex, value)) {
       const referencedVariable = replace(/[${}]/g, '', match(regex, value)[0]).split('.')
       const referencedComponentId = referencedVariable[0]
-      const referencedSource = referencedVariable[1]
-      if (referencedSource === 'outputs' || referencedSource === 'state') {
-        const referencedVariableKey = referencedVariable[2]
-        const componentVariables = components[referencedComponentId][referencedSource]
-        if (!referencedVariableKey) {
-          return componentVariables
-        }
-        referencedVariable.splice(0, 2)
+      if (referencedComponentId !== 'input') {
+        const componentVariables = components[referencedComponentId].outputs
+        referencedVariable.splice(0, 1)
         return reduce((accum, key) => accum[key], componentVariables, referencedVariable)
       }
     }

@@ -2,7 +2,7 @@ type: apigateway
 
 inputs:
   name: some-rest-api
-  roleArn: ${myRole.outputs.arn}
+  roleArn: ${myRole.arn}
   routes:
     /hello:
       post:
@@ -18,5 +18,5 @@ components:
   myRole:
     type: iam
     inputs:
-      name: ${apigateway.inputs.name}
+      name: ${input.name}
       service: apigateway.amazonaws.com

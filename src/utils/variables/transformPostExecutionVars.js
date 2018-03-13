@@ -11,17 +11,11 @@ module.exports = (slsYml) => {
     }
     if (is(String, value) && test(regex, value)) {
       const referencedVariable = replace(/[${}]/g, '', match(regex, value)[0]).split('.')
-      if (referencedVariable[1] === 'outputs' || referencedVariable[1] === 'state') {
-        const referencedComponentAlias = referencedVariable[0]
-
-        let componentId
-        if (referencedComponentAlias === slsYml.type) {
-          componentId = slsYml.id
-        } else {
-          componentId = slsYml.components[referencedComponentAlias].id
-        }
-        referencedVariable.splice(0, 1)
-        return `\${${componentId}.${referencedVariable.join('.')}}`
+      const referencedComponentAlias = referencedVariable[0]
+      if (referencedComponentAlias !== 'input') {
+        const componentId = slsYml.components[referencedComponentAlias].id
+        referencedVariable[0] = componentId
+        return `\${${referencedVariable.join('.')}}`
       }
     }
     return value

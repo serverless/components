@@ -7,7 +7,7 @@ components:
   downloaderLambda:
     type: lambda
     inputs:
-      name: ${s3-downloader.inputs.name}
+      name: ${input.name}
       handler: downloader.handler
       env:
         EVENT_GATEWAY_APIKEY: ${EVENT_GATEWAY_API_KEY}
@@ -18,4 +18,4 @@ components:
       event: fileUploaded
       space: eslam
       eventGatewayApiKey: s0m33v3ntg4t3w4y4p1k3y
-      lambdaArn: ${downloaderLambda.outputs.arn}
+      lambdaArn: ${downloaderLambda.arn}
