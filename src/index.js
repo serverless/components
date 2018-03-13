@@ -1,4 +1,3 @@
-const BbPromise = require('bluebird')
 const utils = require('./utils')
 
 const {
