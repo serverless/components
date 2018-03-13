@@ -13,7 +13,7 @@ module.exports = (inputs) => {
     }
     if (is(String, value) && test(regex, value)) {
       const referencedVariable = replace(/[${}]/g, '', match(regex, value)[0]).split('.')
-      if (referencedVariable[1] === 'outputs' || referencedVariable[1] === 'state') {
+      if (referencedVariable[0] !== 'input' && referencedVariable[0] !== 'env') {
         dependencies.push(referencedVariable[0])
       }
     }

@@ -115,14 +115,14 @@ components:
       routes:
         /github/webhook:
           post:
-            lambdaArn: ${myFunction.outputs.arn}
+            lambdaArn: ${myFunction.arn}
   myGithubWebhook:
     type: github
     inputs:
       token: ${GITHUB_TOKEN} # Variable from env var
       owner: serverless
       repo: components-eslam
-      url: ${myEndpoint.outputs.url}
+      url: ${myEndpoint.url}
       event: pull_request
 ```
 
@@ -231,7 +231,7 @@ components:
       routes:
         /github/webhook:
           post:
-            lambdaArn: ${myFunction.outputs.arn}
+            lambdaArn: ${myFunction.arn}
 ```
 
 ### State
@@ -274,8 +274,9 @@ module.exports = {
 
 The framework supports variables from two sources:
 
-* **Environment Variables:** for example, `${GITHUB_TOKEN}`
-* **Output:** for example: `${myEndpoint.outputs.url}`, where `myEndpoint` is the component alias as defined in `serverless.yml`, and `url` is a property in the outputs object that is returned from the `myEndpoint` provisioning function.
+* **Environment Variables:** for example, `${env.GITHUB_TOKEN}`
+* **Output:** for example: `${myEndpoint.url}`, where `myEndpoint` is the component alias as defined in `serverless.yml`, and `url` is a property in the outputs object that is returned from the `myEndpoint` provisioning function.
+* **Input:** input values are passed when instantiating a component, and are referenced as variables, e.g. `${input.callbackUrl}`
 
 ### Graph
 

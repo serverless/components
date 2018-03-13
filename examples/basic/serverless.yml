@@ -9,4 +9,4 @@ components:
       timeout: 10
       handler: code.handler
       env:
-        FOO: ${env:FOO}
+        FOO: ${env.FOO}

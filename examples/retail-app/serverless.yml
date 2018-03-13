@@ -30,16 +30,16 @@ components:
       routes:
         /products: # routes begin with a slash
           post: # HTTP method names are used to attach handlers
-            function: ${createProduct.outputs}
+            function: ${createProduct}
 
           # sub-routes can be declared hierarchically
           /{id}: # path parameters use curly braces
             get:
-              function: ${getProduct.outputs}
+              function: ${getProduct}
               cors: true # CORS can be allowed with this flag
 
         # multi-segment routes can be declared all at once
         /catalog/{...categories}: # catch-all path parameters use ellipses
             get:
-              function: ${listProducts.outputs}
+              function: ${listProducts}
               cors: true
