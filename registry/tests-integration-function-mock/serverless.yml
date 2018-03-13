@@ -10,5 +10,5 @@ components:
   myRole:
     type: tests-integration-iam-mock
     inputs:
-      name: ${input.name}}
+      name: ${input.name}
       service: my.function.service
