@@ -12,6 +12,14 @@ module.exports = (slsYml) => {
 
     if (is(String, value) && test(regex, value)) {
       const referencedVariable = replace(/[${}]/g, '', match(regex, value)[0]).split('.')
+
+      if (referencedVariable[0] === 'env') {
+        if (referencedVariable.length !== 2) {
+          throw new Error(`Invalid environment reference: ${value}`)
+        }
+        return process.env[referencedVariable[1]]
+      }
+
       if (referencedVariable[0] === 'input') {
         const referencedInput = referencedVariable[1]
         const inputs = slsYml.inputs // eslint-disable-line

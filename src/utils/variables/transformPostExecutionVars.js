@@ -12,7 +12,7 @@ module.exports = (slsYml) => {
     if (is(String, value) && test(regex, value)) {
       const referencedVariable = replace(/[${}]/g, '', match(regex, value)[0]).split('.')
       const referencedComponentAlias = referencedVariable[0]
-      if (referencedComponentAlias !== 'input') {
+      if (referencedComponentAlias !== 'input' && referencedComponentAlias !== 'env') {
         const componentId = slsYml.components[referencedComponentAlias].id
         referencedVariable[0] = componentId
         return `\${${referencedVariable.join('.')}}`

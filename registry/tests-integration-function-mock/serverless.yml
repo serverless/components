@@ -1,7 +1,7 @@
 type: tests-integration-function-mock
 
 inputs:
-  name: ${FUNCTION_NAME}
+  name: ${env.FUNCTION_NAME}
   memorySize: 512
   timeout: 100
   role: ${myRole.id}
