@@ -42,11 +42,12 @@ const timestamp = () => { // eslint-disable-line arrow-body-style
 //    Distribution State => Enabled
 
 const createDistribution = async ({
-  name, defaultRootObject, originId, originDomain,
-  aliasDomain, distributionEnabled, loggingEnabled, loggingBucket,
+  name, defaultRootObject, originId, aliasDomain,
+  distributionEnabled, loggingEnabled, loggingBucket,
   loggingIncludeCookies, loggingPrefix, priceClass
 }) => {
   const callerReference = `${name}-${timestamp()}`
+  const originDomain = `${originId}.s3.amazonaws.com`
 
   const distributionConfig = {
     CallerReference: callerReference,
