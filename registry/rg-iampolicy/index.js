@@ -1,9 +1,11 @@
+/* eslint-disable no-console */
+
 const AWS = require('aws-sdk')
 const BbPromise = require('bluebird')
 
 const IAM = new AWS.IAM({ region: 'us-east-1' })
 
-const createPolicy = async ({name, bucketName}) => {
+const createPolicy = async ({ name, bucketName }) => {
   const s3BucketPolicyDocument = {
     Version: '2012-10-17',
     Statement: [{
@@ -11,8 +13,8 @@ const createPolicy = async ({name, bucketName}) => {
       Principal: {
         AWS: '*'
       },
-      Action: ['s3:GetObject'],
-      Resource: [`arn:aws:s3:::${bucketName}/*`]
+      Action: [ 's3:GetObject' ],
+      Resource: [ `arn:aws:s3:::${bucketName}/*` ]
     }]
   }
 
@@ -31,7 +33,6 @@ const createPolicy = async ({name, bucketName}) => {
 }
 
 const deletePolicy = async (name, policyArn) => {
-
   await IAM.deletePolicy({
     PolicyArn: policyArn
   }).promise()
@@ -42,27 +43,31 @@ const deletePolicy = async (name, policyArn) => {
   }
 }
 
-const deploy = async (inputs, state, context) => {
-  let outputs = state
-  if (!state.name && inputs.name) {
+const deploy = async (inputs, context) => {
+  let outputs = context.state
+  if (!context.state.name && inputs.name) {
     context.log(`Creating Policy: ${inputs.name}`)
     outputs = await createPolicy(inputs)
-  } else if (!inputs.name && state.name) {
-    context.log(`Removing Policy: ${state.name}`)
-    outputs = await deletePolicy(state.name, state.policyArn)
-  } else if (state.name !== inputs.name) {
-    context.log(`Removing Policy: ${state.name}`)
-    await deletePolicy(state.name, state.policyArn)
+  } else if (!inputs.name && context.state.name) {
+    context.log(`Removing Policy: ${context.state.name}`)
+    outputs = await deletePolicy(context.state.name, context.state.policyArn)
+  } else if (context.state.name !== inputs.name) {
+    context.log(`Removing Policy: ${context.state.name}`)
+    await deletePolicy(context.state.name, context.state.policyArn)
     context.log(`Creating Policy: ${inputs.name}`)
     outputs = await createPolicy(inputs)
   }
+  context.saveState({ ...inputs, ...outputs })
   return outputs
 }
 
-const remove = async (inputs, state, context) => {
-  context.log(`Removing Policy: ${state.name}`)
-  const outputs = await deletePolicy(state.name, state.policyArn)
-  return outputs
+const remove = async (inputs, context) => {
+  if (!context.state.name) return {}
+
+  context.log(`Removing Policy: ${context.state.name}`)
+  await deletePolicy(context.state.name, context.state.policyArn)
+  context.saveState({})
+  return {}
 }
 
 module.exports = {
