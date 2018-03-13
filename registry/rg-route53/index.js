@@ -1,6 +1,8 @@
+/* eslint-disable no-console */
+
 const AWS = require('aws-sdk')
 
-const Route53 = new AWS.Route53({apiVersion: '2013-04-01'})
+const Route53 = new AWS.Route53({ apiVersion: '2013-04-01' })
 
 // If your domain is registered with a registrar
 // other than Amazon Route 53, you must update
@@ -9,29 +11,13 @@ const Route53 = new AWS.Route53({apiVersion: '2013-04-01'})
 // Change the name servers for your domain to the set
 // of NameServers that CreateHostedZone returns in DelegationSet.
 
-const addRoute53ToCloudFrontDomainMapping = async ({name, domainName, dnsName, privateZone, vpcId, vpcRegion}) => {
-  const res1 = await createHostedZone(name, domainName, privateZone, vpcId, vpcRegion)
-  const res2 = await upsertAliasRecordSetForCloudFront(domainName, dnsName, res1.hostedZone.id)
-
-  // merge outputs
-  const outputs = Object.assign({}, res1, res2)
-
-  return outputs
-}
-
-const removeRoute53ToCloudFrontDomainMapping = async (domainName, dnsName, hostedZoneId) => {
-  const res1 = await deleteAliasRecordSetForCloudFront(domainName, dnsName, hostedZoneId)
-  const res2 = await deleteHostedZone(hostedZoneId)
-
-  // merge outputs
-  const outputs = Object.assign({}, res1, res2)
-
-  return outputs
-}
-
 // Helper methods
+const timestamp = () => { // eslint-disable-line arrow-body-style
+  return Math.floor(Date.now() / 1000)
+}
+
 const createHostedZone = async (name, domainName, privateZone, vpcId, vpcRegion) => {
-  const callerReference = name + '-' + timestamp()
+  const callerReference = `${name}-${timestamp()}`
 
   const privateHostedZone = {
     HostedZoneConfig: {
@@ -52,7 +38,7 @@ const createHostedZone = async (name, domainName, privateZone, vpcId, vpcRegion)
     hostedZone = Object.assign({}, publicHostedZone, privateHostedZone)
   }
   const hZoneRes = await Route53.createHostedZone(hostedZone).promise()
-  console.log(`Route53 Hosted Zone '${callerReference}' creation initiated.`)
+  console.log(`Route53 Hosted Zone '${callerReference}' creation initiated`)
 
   return {
     hostedZone: {
@@ -78,11 +64,10 @@ const createHostedZone = async (name, domainName, privateZone, vpcId, vpcRegion)
 }
 
 const deleteHostedZone = async (hostedZoneId) => {
-
   await Route53.deleteHostedZone({
     Id: hostedZoneId
   }).promise()
-  console.log(`Route53 Hosted Zone '${hostedZoneId}' deletion initiated.`)
+  console.log(`Route53 Hosted Zone '${hostedZoneId}' deletion initiated`)
 
   return {
     hostedZone: null
@@ -93,7 +78,7 @@ const upsertAliasRecordSetForCloudFront = async (domainName, dnsName, hostedZone
   const changeBatch = {
     Changes: [
       {
-        Action: "UPSERT",
+        Action: 'UPSERT',
         ResourceRecordSet: {
           AliasTarget: {
             DNSName: dnsName,
@@ -101,18 +86,18 @@ const upsertAliasRecordSetForCloudFront = async (domainName, dnsName, hostedZone
             HostedZoneId: 'Z2FDTNDATAQYW2' // For CloudFront distribution
           },
           Name: domainName,
-          Type: "A"
+          Type: 'A'
         }
       }
     ],
-    Comment: `CloudFront distribution for ${domainName}`
+    Comment: `CloudFront distribution for '${domainName}'`
   }
 
   const resRecordSetRes = await Route53.changeResourceRecordSets({
     ChangeBatch: changeBatch,
     HostedZoneId: hostedZoneId
   }).promise()
-  console.log(`Route53 Record Set ${domainName} => ${dnsName} creation initiated.`)
+  console.log(`Route53 Record Set '${domainName} => ${dnsName}' creation initiated`)
 
   return {
     changeRecordSet: {
@@ -124,14 +109,13 @@ const upsertAliasRecordSetForCloudFront = async (domainName, dnsName, hostedZone
       }
     }
   }
-
 }
 
 const deleteAliasRecordSetForCloudFront = async (domainName, dnsName, hostedZoneId) => {
   const changeBatch = {
     Changes: [
       {
-        Action: "DELETE",
+        Action: 'DELETE',
         ResourceRecordSet: {
           AliasTarget: {
             DNSName: dnsName,
@@ -139,42 +123,64 @@ const deleteAliasRecordSetForCloudFront = async (domainName, dnsName, hostedZone
             HostedZoneId: 'Z2FDTNDATAQYW2' // For CloudFront distribution
           },
           Name: domainName,
-          Type: "A"
+          Type: 'A'
         }
       }
     ],
-    Comment: `CloudFront distribution for ${domainName}`
+    Comment: `CloudFront distribution for '${domainName}'`
   }
 
-  const resRecordSetRes = await Route53.changeResourceRecordSets({
+  await Route53.changeResourceRecordSets({
     ChangeBatch: changeBatch,
     HostedZoneId: hostedZoneId
   }).promise()
-  console.log(`Route53 Record Set ${domainName} => ${dnsName} deletion initiated.`)
+  console.log(`Route53 Record Set '${domainName} => ${dnsName}' deletion initiated`)
 
   return {
     changeRecordSet: null
   }
-
 }
 
-// Helper methods
-const timestamp = () => {
-  return Math.floor(Date.now() / 1000)
+const addRoute53ToCloudFrontDomainMapping = async ({
+  name, domainName, dnsName, privateZone, vpcId, vpcRegion
+}) => {
+  const res1 = await createHostedZone(name, domainName, privateZone, vpcId, vpcRegion)
+  const res2 = await upsertAliasRecordSetForCloudFront(domainName, dnsName, res1.hostedZone.id)
+
+  // merge outputs
+  const outputs = Object.assign({}, res1, res2)
+
+  return outputs
+}
+
+const removeRoute53ToCloudFrontDomainMapping = async (domainName, dnsName, hostedZoneId) => {
+  const res1 = await deleteAliasRecordSetForCloudFront(domainName, dnsName, hostedZoneId)
+  const res2 = await deleteHostedZone(hostedZoneId)
+
+  // merge outputs
+  const outputs = Object.assign({}, res1, res2)
+
+  return outputs
 }
 
 const deploy = async (inputs, context) => {
   let outputs = context.state
   if ((!context.state.hostedZone || !context.state.hostedZone.name) && inputs.domainName) {
-    context.log(`Creating Route53 to CloudFront mapping: ${inputs.domainName} => ${inputs.dnsName}`)
+    context.log(`Creating Route53 to CloudFront mapping: '${inputs.domainName} => ${inputs.dnsName}'`)
     outputs = await addRoute53ToCloudFrontDomainMapping(inputs)
   } else if (!inputs.domainName && context.state.hostedZone.id) {
-    context.log(`Removing Route53 to CloudFront mapping: ${inputs.domainName} => ${inputs.dnsName}`)
-    await removeRoute53ToCloudFrontDomainMapping(inputs.domainName, inputs.dnsName, context.state.hostedZone.id)
+    context.log(`Removing Route53 to CloudFront mapping: '${inputs.domainName} => ${inputs.dnsName}'`)
+    await removeRoute53ToCloudFrontDomainMapping(
+      inputs.domainName, inputs.dnsName,
+      context.state.hostedZone.id
+    )
   } else if (context.state.hostedZone && context.state.hostedZone.name !== inputs.domainName) {
-    context.log(`Removing Route53 to CloudFront mapping: ${inputs.domainName} => ${inputs.dnsName}`)
-    await removeRoute53ToCloudFrontDomainMapping(inputs.domainName, inputs.dnsName, context.state.hostedZone.id)
-    context.log(`Re-Creating Route53 to CloudFront mapping: ${inputs.domainName} => ${inputs.dnsName}`)
+    context.log(`Removing Route53 to CloudFront mapping: '${inputs.domainName} => ${inputs.dnsName}'`)
+    await removeRoute53ToCloudFrontDomainMapping(
+      inputs.domainName, inputs.dnsName,
+      context.state.hostedZone.id
+    )
+    context.log(`Re-Creating Route53 to CloudFront mapping: '${inputs.domainName} => ${inputs.dnsName}'`)
     outputs = await addRoute53ToCloudFrontDomainMapping(inputs)
   }
   context.saveState({ ...inputs, ...outputs })
@@ -184,8 +190,12 @@ const deploy = async (inputs, context) => {
 const remove = async (inputs, context) => {
   if (!context.state.name) return {}
 
-  context.log(`Removing Route53 to CloudFront mapping: ${context.state.hostedZone.name} with id: ${context.state.hostedZone.id}`)
-  await removeRoute53ToCloudFrontDomainMapping(inputs.domainName, inputs.dnsName, context.state.hostedZone.id)
+  context.log(`Removing Route53 to CloudFront mapping: '${context.state.hostedZone.name}' with id: '${context.state.hostedZone.id}'`)
+  await removeRoute53ToCloudFrontDomainMapping(
+    inputs.domainName,
+    inputs.dnsName,
+    context.state.hostedZone.id
+  )
   context.saveState({})
   return {}
 }

@@ -1,6 +1,6 @@
 # static website component
 
-type: rg-aws-staticweb
+type: rg-staticweb
 inputs:
   name: rgfamilysite
   contentPath: ./site
@@ -14,7 +14,7 @@ components:
   rootDomainBucket:
     type: s3
     inputs:
-      name: ${rg-aws-staticweb.inputs.hostingDomain}
+      name: ${rg-staticweb.inputs.hostingDomain}
   rootDomainBucketPolicy:
     type: rg-s3policy
     inputs:
@@ -22,32 +22,32 @@ components:
   siteContentUploader:
     type: rg-s3sync
     inputs:
-      contentPath: ${rg-aws-staticweb.inputs.contentPath}
+      contentPath: ${rg-staticweb.inputs.contentPath}
       bucketName: ${rootDomainBucket.outputs.name}
   wwwDomainBucket:
     type: s3
     inputs:
-      name: ${rg-aws-staticweb.inputs.aliasDomain}
+      name: ${rg-staticweb.inputs.aliasDomain}
   rootDomainBucketConfig:
     type: rg-s3-website-config
     inputs:
       rootBucketName: ${rootDomainBucket.outputs.name}
-      indexDocument: ${rg-aws-staticweb.inputs.contentIndex}
-      errorDocument: ${rg-aws-staticweb.inputs.contentError}
+      indexDocument: ${rg-staticweb.inputs.contentIndex}
+      errorDocument: ${rg-staticweb.inputs.contentError}
       redirectBucketName: ${wwwDomainBucket.outputs.name}
-      redirectToHostName: ${rg-aws-staticweb.inputs.hostingDomain}
+      redirectToHostName: ${rg-staticweb.inputs.hostingDomain}
   siteCloudFrontConfig:
     type: rg-cloudfront
     inputs:
-      name: ${rg-aws-staticweb.inputs.name}
-      defaultRootObject: ${rg-aws-staticweb.inputs.contentIndex}
+      name: ${rg-staticweb.inputs.name}
+      defaultRootObject: ${rg-staticweb.inputs.contentIndex}
       originId: ${rootDomainBucket.outputs.name}
       originDomain: rgfamily.com.s3.amazonaws.com
-      aliasDomain: ${rg-aws-staticweb.inputs.aliasDomain}
+      aliasDomain: ${rg-staticweb.inputs.aliasDomain}
       distributionEnabled: true
   siteRoute53Config:
     type: rg-route53
     inputs:
-      name: ${rg-aws-staticweb.inputs.name}
-      domainName: ${rg-aws-staticweb.inputs.aliasDomain}
+      name: ${rg-staticweb.inputs.name}
+      domainName: ${rg-staticweb.inputs.aliasDomain}
       dnsName: ${siteCloudFrontConfig.outputs.distribution.domainName} # d111111abcdef8.cloudfront.net

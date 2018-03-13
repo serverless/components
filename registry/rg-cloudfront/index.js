@@ -1,6 +1,29 @@
+/* eslint-disable no-console */
+
 const AWS = require('aws-sdk')
 
-const CloudFront = new AWS.CloudFront({apiVersion: '2017-03-25'})
+const CloudFront = new AWS.CloudFront({ apiVersion: '2017-03-25' })
+
+// Helper Methods
+const getDistribution = async (distributionId) => {
+  const distRes = await CloudFront.getDistribution({
+    Id: distributionId
+  }).promise()
+
+  return distRes
+}
+
+const getDistributionConfig = async (distributionId) => { // eslint-disable-line no-unused-vars
+  const distConfigRes = await CloudFront.getDistributionConfig({
+    Id: distributionId
+  }).promise()
+
+  return distConfigRes
+}
+
+const timestamp = () => { // eslint-disable-line arrow-body-style
+  return Math.floor(Date.now() / 1000)
+}
 
 // [] Create Create Distribution
 //    Origin Domain Name => siteurl (without scheme) (Origins)
@@ -18,8 +41,12 @@ const CloudFront = new AWS.CloudFront({apiVersion: '2017-03-25'})
 //    Cookie Logging => Off
 //    Distribution State => Enabled
 
-const createDistribution = async ({name, defaultRootObject, originId, originDomain, aliasDomain, distributionEnabled, loggingEnabled, loggingBucket, loggingIncludeCookies, loggingPrefix, priceClass}) => {
-  const callerReference = name + '-' + timestamp()
+const createDistribution = async ({
+  name, defaultRootObject, originId, originDomain,
+  aliasDomain, distributionEnabled, loggingEnabled, loggingBucket,
+  loggingIncludeCookies, loggingPrefix, priceClass
+}) => {
+  const callerReference = `${name}-${timestamp()}`
 
   const distributionConfig = {
     CallerReference: callerReference,
@@ -73,13 +100,13 @@ const createDistribution = async ({name, defaultRootObject, originId, originDoma
           S3OriginConfig: {
             OriginAccessIdentity: ''
           }
-        },
+        }
       ]
     },
     Aliases: {
       Quantity: 1,
       Items: [
-        aliasDomain,
+        aliasDomain
       ]
     },
     DefaultRootObject: defaultRootObject,
@@ -95,7 +122,7 @@ const createDistribution = async ({name, defaultRootObject, originId, originDoma
   const distRes = await CloudFront.createDistribution({
     DistributionConfig: distributionConfig
   }).promise()
-  console.log(`CloudFront distribution '${name}' creation initiated.`)
+  console.log(`CloudFront distribution '${name}' creation initiated`)
 
   return {
     distribution: {
@@ -115,7 +142,6 @@ const createDistribution = async ({name, defaultRootObject, originId, originDoma
 }
 
 const updateDistribution = async (distributionId, eTag, newDistributionConfig) => {
-
   // update logic
   // The new configuration replaces the existing configuration;
   // the values that you specify in an UpdateDistribution request
@@ -125,7 +151,7 @@ const updateDistribution = async (distributionId, eTag, newDistributionConfig) =
     IfMatch: eTag,
     DistributionConfig: newDistributionConfig
   }).promise()
-  console.log(`CloudFront distribution '${distributionId}' update initiated.`)
+  console.log(`CloudFront distribution '${distributionId}' update initiated`)
 
   return {
     distribution: {
@@ -145,12 +171,15 @@ const updateDistribution = async (distributionId, eTag, newDistributionConfig) =
 }
 
 const toggleEnabledForDistribution = async (distributionId, enabled) => {
-  // const distConfigRes = await getDistributionConfig(distributionId)
   const distRes = await getDistribution(distributionId)
 
-  if (distRes.DistributionConfig.Enabled != enabled) {
+  if (distRes.DistributionConfig.Enabled !== enabled) {
     distRes.DistributionConfig.Enabled = enabled
-    const distUpdateRes = await updateDistribution(distributionId, distRes.ETag, distRes.DistributionConfig)
+    const distUpdateRes = await updateDistribution(
+      distributionId,
+      distRes.ETag,
+      distRes.DistributionConfig
+    )
     return distUpdateRes
   }
   return {
@@ -170,7 +199,7 @@ const toggleEnabledForDistribution = async (distributionId, enabled) => {
   }
 }
 
-const deleteDistribution = async (distributionId, distributionETag) => {
+const deleteDistribution = async (distributionId) => {
   // disable distribution first
   const res = await toggleEnabledForDistribution(distributionId, false)
 
@@ -180,54 +209,37 @@ const deleteDistribution = async (distributionId, distributionETag) => {
       Id: distributionId,
       IfMatch: res.distribution.eTag
     }).promise()
-    console.log(`CloudFront distribution '${distributionId}' deletion initiated.`)
+    console.log(`CloudFront distribution '${distributionId}' deletion initiated`)
     return {}
   } catch (err) {
-    console.log(`Error in deleting CloudFront distribution '${distributionId}'.`, err.message)
-    return {error: err}
+    console.log(`Error in deleting CloudFront distribution '${distributionId}'`, err.message)
+    return { error: err }
   }
 }
 
-// Helper Methods
-const getDistribution = async (distributionId) => {
-
-  const distRes = await CloudFront.getDistribution({
-    Id: distributionId
-  }).promise()
-
-  return distRes
-}
-
-const getDistributionConfig = async (distributionId) => {
-  const distConfigRes = await CloudFront.getDistributionConfig({
-    Id: distributionId
-  }).promise()
-
-  return distConfigRes
-}
-
-const timestamp = () => {
-  return Math.floor(Date.now() / 1000)
-}
 
 const deploy = async (inputs, context) => {
   let outputs = context.state
   if (!context.state.distribution && inputs.name) {
-    context.log(`Creating CloudFront distribution: ${inputs.name}`)
+    context.log(`Creating CloudFront distribution: '${inputs.name}'`)
     outputs = await createDistribution(inputs)
   } else if (!inputs.name && context.state.distribution.id) {
-    context.log(`Removing CloudFront distribution: ${context.state.name} with id: ${context.state.distribution.id}`)
-    await deleteDistribution(context.state.distribution.id, context.state.distribution.eTag)
+    context.log(`Removing CloudFront distribution: '${context.state.name}' with id: '${context.state.distribution.id}'`)
+    await deleteDistribution(context.state.distribution.id)
   } else if (context.state.name !== inputs.name && context.state.distribution) {
-    context.log(`Removing CloudFront distribution: ${context.state.name} with id: ${context.state.distribution.id}`)
-    const res = await deleteDistribution(context.state.distribution.id, context.state.distribution.eTag)
+    context.log(`Removing CloudFront distribution: '${context.state.name}' with id: '${context.state.distribution.id}'`)
+    const res = await deleteDistribution(context.state.distribution.id)
     if (!res.error) {
-      context.log(`Creating CloudFront distribution: ${inputs.name}`)
+      context.log(`Creating CloudFront distribution: '${inputs.name}'`)
       outputs = await createDistribution(inputs)
     }
-  } else if (context.state.name && context.state.distribution && inputs.distributionEnabled != context.state.distribution.distConfig.enabled) {
-    context.log(`Toggling CloudFront distribution: Enabled - ${inputs.distributionEnabled}`)
-    outputs = await toggleEnabledForDistribution(context.state.distribution.id, inputs.distributionEnabled)
+  } else if (context.state.name && context.state.distribution &&
+             inputs.distributionEnabled !== context.state.distribution.distConfig.enabled) {
+    context.log(`Toggling CloudFront distribution to '${inputs.distributionEnabled}'`)
+    outputs = await toggleEnabledForDistribution(
+      context.state.distribution.id,
+      inputs.distributionEnabled
+    )
   }
   context.saveState({ ...inputs, ...outputs })
   return outputs
@@ -236,8 +248,11 @@ const deploy = async (inputs, context) => {
 const remove = async (inputs, context) => {
   if (!context.state.name) return {}
 
-  context.log(`Removing CloudFront distribution: ${context.state.name} with id: ${context.state.distribution.id}`)
-  const res = await deleteDistribution(context.state.distribution.id, context.state.distribution.eTag)
+  context.log(`Removing CloudFront distribution: '${context.state.name}' with id: '${context.state.distribution.id}'`)
+  const res = await deleteDistribution(
+    context.state.distribution.id,
+    context.state.distribution.eTag
+  )
   if (!res.error) {
     context.saveState({})
   }
