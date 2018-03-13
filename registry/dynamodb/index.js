@@ -2,7 +2,7 @@ const AWS = require('aws-sdk')
 const { convertKeysToCase } = require('./utils')
 
 function getDynamoDbInstance(region) {
-  return new AWS.DynamoDB({ region })
+  return new AWS.DynamoDB({ apiVersion: '2012-08-10', region })
 }
 
 const createTable = (inputs) => {
@@ -69,6 +69,16 @@ const deleteTable = (state) => {
     .then((data) => data)
 }
 
+const describeTable = async (inputs) => {
+  const ddb = getDynamoDbInstance(inputs.region)
+
+  const res = await ddb.describeTable({
+    TableName: inputs.properties.tableName
+  }).promise()
+
+  return res
+}
+
 const deploy = async (inputs, context) => {
   inputs = convertKeysToCase(inputs, 'lowerCaseFirstCharacter') // eslint-disable-line no-param-reassign
 
@@ -93,12 +103,37 @@ const deploy = async (inputs, context) => {
 }
 
 const remove = async (inputs, context) => {
+  if (!context.state.tableDescription ||
+      !context.state.tableDescription.tableName) return {}
+
   inputs = convertKeysToCase(inputs, 'lowerCaseFirstCharacter') // eslint-disable-line no-param-reassign
-  context.log(`Removing Table: ${inputs.properties.tableName}`)
+  context.log(`Removing Table: '${inputs.properties.tableName}'`)
   await deleteTable(context.state)
+  context.saveState({})
+  return {}
+}
+
+const status = async (inputs, context) => {
+  if (!context.state.tableDescription ||
+      !context.state.tableDescription.tableName) return {}
+
+  inputs = convertKeysToCase(inputs, 'lowerCaseFirstCharacter') // eslint-disable-line no-param-reassign
+  let res = await describeTable(inputs)
+  res = convertKeysToCase(res, 'lowerCaseFirstCharacter')
+  context.log(`Status for Table: '${inputs.properties.tableName}' - '${res.table.tableStatus}'`)
+
+  const updatedState = {
+    ...inputs,
+    ...context.state
+  }
+  updatedState.tableDescription.tableStatus = res.table.tableStatus
+  context.saveState(updatedState)
+
+  return updatedState
 }
 
 module.exports = {
   deploy,
-  remove
+  remove,
+  status
 }
