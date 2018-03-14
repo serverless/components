@@ -7,7 +7,7 @@ const getConfig = require('../config/getConfig')
 // do we want it for tracking?
 // const getLocation = require('./getLocation')
 
-const { segmentWriteKey } = require(path.join('..', '..', '..', 'tracking-config.json')) // eslint-disable-line
+const { segmentWriteKey } = require(path.join('..', '..', 'tracking-config.json')) // eslint-disable-line
 
 const analytics = new Analytics(segmentWriteKey)
 
