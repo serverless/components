@@ -18,7 +18,9 @@ function convertKeysToCase(obj, caseFunc) {
       output[i[caseFunc]()] = convertKeysToCase(obj[i], caseFunc)
     } else if (Object.prototype.toString.apply(obj[i]) === '[object Array]') {
       output[i[caseFunc]()] = []
-      output[i[caseFunc]()].push(convertKeysToCase(obj[i][0], caseFunc))
+      for (let j = 0; j < obj[i].length; j++) { // eslint-disable-line no-plusplus
+        output[i[caseFunc]()].push(convertKeysToCase(obj[i][j], caseFunc))
+      }
     } else {
       output[i[caseFunc]()] = obj[i]
     }
@@ -26,6 +28,27 @@ function convertKeysToCase(obj, caseFunc) {
   return output
 }
 
+function isJsonEqual(obj1, obj2) {
+  return JSON.stringify(obj1) === JSON.stringify(obj2)
+}
+
+function isArrayEqual(arr1, arr2) {
+  return arr1.length === arr2.length && arr1.every((v, i) => isJsonEqual(v, arr2[i]))
+}
+
+function keepCommonItems(leftObj, rightObj) {
+  let newObj = {} // eslint-disable-line prefer-const
+  Object.keys(rightObj).forEach((k) => {
+    if (Object.keys(leftObj).includes(k)) {
+      newObj[`${k}`] = rightObj[k]
+    }
+  })
+  return newObj
+}
+
 module.exports = {
-  convertKeysToCase
+  convertKeysToCase,
+  isJsonEqual,
+  isArrayEqual,
+  keepCommonItems
 }
