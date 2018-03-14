@@ -1,22 +1,12 @@
 type: apigateway
 
-inputs:
-  name: some-rest-api
-  roleArn: ${myRole.arn}
+inputTypes:
+  name:
+    type: string
+    required: true
+  roleArn:
+    type: string
+    required: true
   routes:
-    /hello:
-      post:
-        lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
-        cors: true
-      get:
-        lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
-    /hello/world:
-      delete:
-        lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
-
-components:
-  myRole:
-    type: iam
-    inputs:
-      name: ${input.name}
-      service: apigateway.amazonaws.com
+    type: object
+    required: true

@@ -1,16 +1,21 @@
 type: lambda
 
-inputs:
-  name: default-lambda-name-goes-here
-  memory: 512
-  timeout: 100
-  description: default description goes here
-  handler: code.handler
-  role: ${myRole.arn}
-
-components:
-  myRole:
-    type: iam
-    inputs:
-      name: ${input.name}
-      service: lambda.amazonaws.com
+inputTypes:
+  name:
+    type: string
+    required: true
+  memory:
+    type: number
+    required: true
+  timeout:
+    type: number
+    required: true
+  description:
+    type: string
+    required: false
+  handler:
+    type: string
+    required: true
+  role:
+    type: string
+    required: true

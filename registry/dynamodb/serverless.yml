@@ -1,16 +1,14 @@
 type: dynamodb
 
-inputs:
-  region: us-east-1
-  deletionPolicy: Delete
+inputTypes:
+  region:
+    type: string
+    required: true
+    default: us-east-1
+  deletionPolicy:
+    type: string
+    required: true
+    default: Retain
   properties:
-    tableName: my-table
-    attributeDefinitions:
-      - attributeName: id
-        attributeType: N
-    keySchema:
-      - attributeName: id
-        keyType: HASH
-    provisionedThroughput:
-      readCapacityUnits: 1
-      writeCapacityUnits: 1
+    type: object
+    required: true

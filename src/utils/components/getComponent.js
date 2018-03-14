@@ -4,6 +4,7 @@ const { readFile } = require('../fs')
 
 const transformPostExecutionVars = require('../variables/transformPostExecutionVars')
 const resolvePreExecutionVars = require('../variables/resolvePreExecutionVars')
+const validateInputs = require('./validateInputs')
 
 module.exports = async (componentRoot, componentId, inputs) => {
   let slsYml = await readFile(path.join(componentRoot, 'serverless.yml'))
@@ -19,6 +20,9 @@ module.exports = async (componentRoot, componentId, inputs) => {
   slsYml.inputs = { ...slsYml.inputs, ...inputs }
 
   slsYml = await resolvePreExecutionVars(slsYml)
+
+  // check if inputs match the exepcted input types
+  validateInputs(slsYml.id, slsYml.inputTypes, slsYml.inputs)
 
   return slsYml
 }

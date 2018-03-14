@@ -1,5 +1,9 @@
 type: iam
 
-inputs:
-  name: default-role-name-goes-here
-  service: lambda.amazonaws.com # or apigateway.amazonaws.com or any other service
+inputTypes:
+  name:
+    type: string
+    required: true
+  service:
+    type: string
+    required: true
