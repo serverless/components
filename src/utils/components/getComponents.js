@@ -6,15 +6,11 @@ const { fileExists } = require('../fs')
 
 const getComponent = require('./getComponent')
 const getDependencies = require('../variables/getDependencies')
-const validateInputs = require('./validateInputs')
 
 const getComponents = async (
   stateFile, componentRoot = process.cwd(), inputs = {}, componentId, components = {}
 ) => {
   const slsYml = await getComponent(componentRoot, componentId, inputs)
-
-  // check if inputs match the exepcted input types
-  validateInputs(slsYml.id, slsYml.inputTypes, slsYml.inputs)
 
   const dependencies = getDependencies(slsYml.inputs)
 
