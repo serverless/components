@@ -3,6 +3,7 @@ const {
 } = require('ramda')
 
 const regex = require('./getVariableSyntax')()
+const reservedNames = require('./reservedNames')
 
 module.exports = (inputs) => {
   const dependencies = []
@@ -14,7 +15,7 @@ module.exports = (inputs) => {
     if (is(String, value)) {
       match(regex, value).forEach((reference) => {
         const referencedVariable = replace(/[${}]/g, '', reference).split('.')
-        if (referencedVariable[0] !== 'input' && referencedVariable[0] !== 'env') {
+        if (!reservedNames.includes(referencedVariable[0])) {
           dependencies.push(referencedVariable[0])
         }
       })

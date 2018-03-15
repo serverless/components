@@ -4,7 +4,7 @@ const {
 
 const regex = require('./getVariableSyntax')()
 
-module.exports = (slsYml) => {
+module.exports = (selfProperties, slsYml) => {
   const resolveValue = (value) => {
     if (is(Object, value) || is(Array, value)) {
       return map(resolveValue, value)
@@ -19,6 +19,15 @@ module.exports = (slsYml) => {
             throw new Error(`Invalid environment reference: ${value}`)
           }
           return process.env[referencedVariable[1]]
+        }
+
+        if (referencedVariable[0] === 'self') {
+          switch (referencedVariable.join('.')) {
+            case 'self.path':
+              return selfProperties.path
+            default:
+              throw new Error(`No such property of self: ${reference}`)
+          }
         }
 
         if (referencedVariable[0] === 'input') {

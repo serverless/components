@@ -3,6 +3,7 @@ const {
 } = require('ramda')
 
 const regex = require('./getVariableSyntax')()
+const reservedNames = require('./reservedNames')
 
 module.exports = (slsYml) => {
   const transformValue = (value) => {
@@ -13,7 +14,7 @@ module.exports = (slsYml) => {
       return value.replace(regex, (reference) => {
         const referencedVariable = replace(/[${}]/g, '', reference).split('.')
         const referencedComponentAlias = referencedVariable[0]
-        if (referencedComponentAlias !== 'input' && referencedComponentAlias !== 'env') {
+        if (!reservedNames.includes(referencedComponentAlias)) {
           const componentId = slsYml.components[referencedComponentAlias].id
           referencedVariable[0] = componentId
           return `\${${referencedVariable.join('.')}}`

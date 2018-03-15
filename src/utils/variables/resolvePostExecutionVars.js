@@ -3,12 +3,13 @@ const {
 } = require('ramda')
 
 const regex = require('./getVariableSyntax')()
+const reservedNames = require('./reservedNames')
 
 module.exports = (inputs, components) => {
   const resolveReferenceToValue = (reference) => {
     const referencedVariable = replace(/[${}]/g, '', reference).split('.')
     const referencedComponentId = referencedVariable[0]
-    if (referencedComponentId !== 'input' && referencedComponentId !== 'env') {
+    if (!reservedNames.includes(referencedComponentId)) {
       const componentVariables = components[referencedComponentId].outputs
       referencedVariable.splice(0, 1)
       const resolvedValue = reduce(
