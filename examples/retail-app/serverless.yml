@@ -1,24 +1,36 @@
 type: retail-app
 
 components:
+  webFrontend:
+    type: rg-staticweb
+    inputs:
+      name: retail-frontend
+      contentPath: ${self.path}/frontend
+      templateValues:
+      contentIndex: index.htm
+      contentError: error.htm
+      hostingRegion: us-east-1
+      hostingDomain: jeremystatictesting.example.com
+      aliasDomain: www.jeremystatictesting.example.com
+
   createProduct:
     type: lambda
     inputs:
-      name: createProduct
+      name: retail-createProduct
       memory: 512
       timeout: 10
       handler: code/products.create
   getProduct:
     type: lambda
     inputs:
-      name: getProduct
+      name: retail-getProduct
       memory: 512
       timeout: 10
       handler: code/products.get
   listProducts:
     type: lambda
     inputs:
-      name: listProducts
+      name: retail-listProducts
       memory: 512
       timeout: 10
       handler: code/products.list
@@ -26,7 +38,7 @@ components:
     type: rest-api
     inputs:
       gateway: apigateway
-      name: products-api
+      name: retail-productsApi
       routes:
         /products: # routes begin with a slash
           post: # HTTP method names are used to attach handlers
