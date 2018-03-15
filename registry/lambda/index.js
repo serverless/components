@@ -3,9 +3,22 @@ const pack = require('./pack')
 
 const lambda = new AWS.Lambda({ region: 'us-east-1' })
 
-const createLambda = async ({
-  name, handler, memory, timeout, env, description, role
-}) => {
+const createLambda = async (
+  {
+    name, handler, memory, timeout, env, description, role
+  },
+  context
+) => {
+  if (!role) {
+    const iamInputs = {
+      name,
+      service: 'lambda.amazonaws.com'
+    }
+
+    const iamComponent = await context.load('iam', 'iam')
+    role = await iamComponent.deploy(iamInputs)
+  }
+
   const pkg = await pack()
 
   const params = {
@@ -17,7 +30,7 @@ const createLambda = async ({
     Handler: handler,
     MemorySize: memory,
     Publish: true,
-    Role: role,
+    Role: role.arn,
     Runtime: 'nodejs6.10',
     Timeout: timeout,
     Environment: {
@@ -76,7 +89,7 @@ const deploy = async (inputs, context) => {
   let outputs
   if (inputs.name && !context.state.name) {
     context.log(`Creating Lambda: ${inputs.name}`)
-    outputs = await createLambda(inputs)
+    outputs = await createLambda(inputs, context)
   } else if (context.state.name && !inputs.name) {
     context.log(`Removing Lambda: ${context.state.name}`)
     outputs = await deleteLambda(context.state.name)

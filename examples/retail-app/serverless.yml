@@ -7,11 +7,12 @@ components:
       name: retail-frontend
       contentPath: ${self.path}/frontend
       templateValues:
+        apiUrl: ${productsApi.url}
       contentIndex: index.htm
       contentError: error.htm
       hostingRegion: us-east-1
-      hostingDomain: jeremystatictesting.example.com
-      aliasDomain: www.jeremystatictesting.example.com
+      hostingDomain: serverless-retail-site-test.example.com
+      aliasDomain: www.serverless-retail-site-test.example.com
 
   createProduct:
     type: lambda

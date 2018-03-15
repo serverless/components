@@ -727,7 +727,8 @@ components:
       timeout: 10
       description: dome description
       handler: code.handler
-      role: arn:aws:iam::XXXXX:role/some-lambda-role
+      role:
+        arn: arn:aws:iam::XXXXX:role/some-lambda-role
 ```
 
 #### `rest-api`

@@ -14,18 +14,18 @@ const deploy = (inputs) => {
   // copy non-template files
   recursive(sourcePath, (error, sources) => {
     sources.forEach((source) => {
+      const destination = path.join(
+        tmpPath,
+        path.relative(sourcePath, source.replace(/\.mustache$/i, ''))
+      )
+
       if (source.match(/\.mustache/i)) {
         const template = fs.readFileSync(source, { encoding: 'utf8' })
         const rendered = mustache.render(template, values)
-        const destination = path.join(
-          tmpPath,
-          path.relative(sourcePath, source.replace(/\.mustache$/i, ''))
-        )
         fs.writeFileSync(destination, rendered, {
           encoding: 'utf8'
         })
       } else {
-        const destination = path.join(tmpPath, path.relative(sourcePath, source))
         fs.copyFileSync(source, destination)
       }
     })

@@ -26,8 +26,7 @@ function getAwsApiGatewayInputs(inputs) {
   }
 
   forEachObjIndexed((methods, path) => {
-    const reparameterizedPath = path
-      .replace(catchallParameterPattern, '{$1+}')
+    const reparameterizedPath = path.replace(catchallParameterPattern, '{$1+}')
     const normalizedPath = reparameterizedPath.replace(/^\/+/, '')
     const routeObject = {}
     apiGatewayInputs.routes[normalizedPath] = routeObject
@@ -117,7 +116,9 @@ function flattenRoutes(routes) {
       if (key.startsWith('/')) {
         doFlatten(value, joinPath(basePath, key))
       } else {
-        if (![ 'any', 'delete', 'get', 'head', 'options', 'patch', 'post', 'put' ].includes(key.toLowerCase())) {
+        if (
+          ![ 'any', 'delete', 'get', 'head', 'options', 'patch', 'post', 'put' ].includes(key.toLowerCase())
+        ) {
           throw new Error(`Configuration key "${key}" was interpreted as an HTTP method because it does not start with a slash, but it is not a valid method.`)
         }
         if (flattened[basePath]) {
@@ -144,6 +145,7 @@ async function deploy(inputs, context) {
   const outputs = {}
   if (inputs.gateway === 'eventgateway') {
     outputs.eventgateway = await deployEventGateway(flatInputs, context)
+    outputs.url = outputs.eventgateway.url
   } else if (inputs.gateway === 'apigateway') {
     outputs.iam = await deployIamRole(inputs, context)
     outputs.apigateway = await deployApiGateway(
@@ -153,7 +155,9 @@ async function deploy(inputs, context) {
       },
       context
     )
+    outputs.url = outputs.apigateway.url
   }
+  console.log('REST API', JSON.stringify(outputs))
   return outputs
 }
 
