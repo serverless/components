@@ -20,7 +20,7 @@ module.exports = async (componentRoot, componentId, inputs) => {
   slsYml.inputs = { ...slsYml.inputs, ...inputs }
 
   slsYml = await resolvePreExecutionVars({
-    dir: path.resolve(componentRoot).replace(/\/*$/, '')
+    path: path.resolve(componentRoot).replace(/\/*$/, '')
   }, slsYml)
 
   // check if inputs match the exepcted input types

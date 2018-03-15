@@ -23,8 +23,8 @@ module.exports = (selfProperties, slsYml) => {
 
         if (referencedVariable[0] === 'self') {
           switch (referencedVariable.join('.')) {
-            case 'self.dir':
-              return selfProperties.dir
+            case 'self.path':
+              return selfProperties.path
             default:
               throw new Error(`No such property of self: ${reference}`)
           }
