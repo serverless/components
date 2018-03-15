@@ -1,1 +1,23 @@
-API: {{apiUrl}}
+<html>
+<head>
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+</head>
+<body>
+  <span>Products</span>
+  <div id="products">
+    Loading...
+  </div>
+  <script type="text/javascript">
+      var productList = $('#products')
+      productList.empty()
+      $.get("{{{apiUrl}}}catalog/all", function(products) {
+        $(document).ready(function () {
+        for(var i in products) {
+          var product = products[i]
+          productList.append("<div>" + JSON.stringify(product) + "</div>")
+        }
+      });
+    });
+  </script>
+</body>
+</html>

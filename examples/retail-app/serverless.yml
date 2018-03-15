@@ -44,6 +44,7 @@ components:
         /products: # routes begin with a slash
           post: # HTTP method names are used to attach handlers
             function: ${createProduct}
+            cors: true
 
           # sub-routes can be declared hierarchically
           /{id}: # path parameters use curly braces
