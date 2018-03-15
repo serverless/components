@@ -7,9 +7,11 @@ const getConfig = require('../config/getConfig')
 // do we want it for tracking?
 // const getLocation = require('./getLocation')
 
-const { segmentWriteKey } = require(path.join('..', '..', 'tracking-config.json')) // eslint-disable-line
-
-const analytics = new Analytics(segmentWriteKey)
+/*
+ * Segment write key is not sensitive and can be exposed in version control:
+ * REF: https://community.segment.com/t/m26sng/writekey-accessible-by-anyone
+ */
+const analytics = new Analytics('IhWcpDxil0KbBkoBXrQ7Brwz82OHwNh3')
 
 module.exports = async (eventName, data = {}) => {
   if (!eventName) {
