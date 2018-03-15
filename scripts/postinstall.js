@@ -4,6 +4,13 @@ const { join } = require('path')
 const cp = require('child_process')
 const os = require('os')
 
+const { track } = require('../src/utils')
+
+track('serverless-components Installed', {
+  nodeVersion: process.version,
+  platform: os.platform()
+})
+
 // get registry path
 const registry = path.resolve(__dirname, path.join('..', 'registry'))
 

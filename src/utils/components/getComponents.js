@@ -36,6 +36,7 @@ const getComponents = async (
 
   components[slsYml.id] = {
     id: slsYml.id,
+    type: slsYml.type,
     inputs: slsYml.inputs,
     outputs: {},
     state: stateFile[slsYml.id] || {},

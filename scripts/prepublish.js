@@ -8,8 +8,14 @@ if (!process.env.SENTRY_DSN) {
   throw new Error('SENTRY_DSN env var not set')
 }
 
+// don't release without Segment write key!
+if (!process.env.SEGMENT_WRITE_KEY) {
+  throw new Error('SEGMENT_WRITE_KEY env var not set')
+}
+
 const trackingConfig = {
   sentryDSN: process.env.SENTRY_DSN,
-  environment: 'production'
+  environment: 'production',
+  segmentWriteKey: process.env.SEGMENT_WRITE_KEY
 };
 (() => writeFile(trackingConfigFilePath, trackingConfig))()

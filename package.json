@@ -29,18 +29,26 @@
   },
   "dependencies": {
     "@octokit/rest": "^14.0.5",
+    "analytics-node": "^3.2.0",
     "aws-sdk": "^2.185.0",
     "axios": "^0.17.1",
     "bluebird": "^3.5.1",
+    "chalk": "^2.3.2",
     "fs-extra": "^5.0.0",
     "graphlib": "^2.1.5",
     "js-yaml": "^3.10.0",
     "mime-types": "^2.1.18",
     "minimist": "^1.2.0",
+    "node-fetch": "^2.1.1",
+    "node-where": "^1.1.0",
+    "public-ip": "^2.4.0",
     "ramda": "^0.25.0",
     "raven": "^2.4.2",
     "raml-validate": "^1.1.2",
-    "s3-client": "^4.4.1"
+    "s3-client": "^4.4.1",
+    "rc": "^1.2.6",
+    "uuid": "^3.2.1",
+    "write-file-atomic": "^2.3.0"
   },
   "devDependencies": {
     "babel-jest": "^22.4.1",
