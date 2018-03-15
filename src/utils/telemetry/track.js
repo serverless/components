@@ -1,4 +1,5 @@
 const uuid = require('uuid')
+const path = require('path')
 const Analytics = require('analytics-node')
 const getConfig = require('../config/getConfig')
 
@@ -6,22 +7,23 @@ const getConfig = require('../config/getConfig')
 // do we want it for tracking?
 // const getLocation = require('./getLocation')
 
-/*
- * Segment write key is not sensitive and can be exposed in version control:
- * REF: https://community.segment.com/t/m26sng/writekey-accessible-by-anyone
- */
-const analytics = new Analytics('IhWcpDxil0KbBkoBXrQ7Brwz82OHwNh3')
-
 module.exports = async (eventName, data = {}) => {
-  if (!eventName) {
-    throw new Error('Please provide an event name for tracking')
-  }
   const { trackingDisabled, frameworkId, userId } = await getConfig()
 
   // exit early if tracking disabled
-  if (trackingDisabled) {
+  if (trackingDisabled || process.env.CI || process.env.TRAVIS) {
     return
   }
+
+  const { segmentWriteKey } = require(path.join('..', '..', '..', 'tracking-config.json')) // eslint-disable-line
+
+  const analytics = new Analytics(segmentWriteKey)
+
+
+  if (!eventName) {
+    throw new Error('Please provide an event name for tracking')
+  }
+
 
   const payload = {
     event: eventName,
