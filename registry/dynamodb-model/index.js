@@ -135,7 +135,29 @@ const deleteTable = (table) => {
   }
 }
 
+const saveItemDataToTable = (table, itemData) => {
+  const model = defineTable(
+    table.name,
+    table.hashKey,
+    table.rangeKey,
+    table.schema,
+    table.options
+  )
+  let modelDataAttrs = {}
+  if (model) {
+    model.create(itemData, (err, modelIns) => {
+      if (err) {
+        console.log(`Error inserting data to table: '${table.name}'\n${err.message}`)
+      } else {
+        modelDataAttrs = JSON.stringify(modelIns.attrs)
+        console.log(`Item inserted to table: '${table.name}'\n${modelDataAttrs}`)
+      }
+    })
+  }
+  return modelDataAttrs
+}
 
+// Public methods
 const deploy = async (inputs, context) => {
   let outputs = context.state
 
@@ -174,7 +196,25 @@ const remove = async (inputs, context) => {
   return {}
 }
 
+const insert = async (inputs, context) => {
+  let outputs = context.state
+
+  if (!context.state.tables ||
+       context.state.tables.length === 0) return {}
+
+  if (context.options && context.options.tablename && context.options.itemdata) {
+    const tableName = context.options.tablename
+    const itemData = context.options.itemdata
+    const table = findTableByName(context.state.tables, tableName)
+    outputs = saveItemDataToTable(table, JSON.parse(itemData))
+  } else {
+    context.log('Incorrect or insufficient parameters. \nUsage: insert --tablename <tablename> --itemdata <data in json format>')
+  }
+  return outputs
+}
+
 module.exports = {
   deploy,
-  remove
+  remove,
+  insert
 }

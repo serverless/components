@@ -86,3 +86,52 @@ $ components remove --tablename <table name>
 
 Removing table: '<table name>'
 ```
+
+### Insert
+
+The `insert` command will insert an item into the specified table.
+
+#### If everything is good
+
+```
+$ components insert --tablename BlogPost --itemdata \
+'{
+  "authorName": "Rupak Ganguly",
+  "authorEmail": "rupak@serverless.com",
+  "title": "How to create a DynamoDB component",
+  "content": "some junk data",
+  "tags": ["how-to", "DynamoDB", "components", "serverless"],
+  "published": true
+}'
+
+Item inserted to table: 'BlogPost'
+{"authorName":"Rupak Ganguly","authorEmail":"rupak@serverless.com","title":"How to create a DynamoDB component","content":{"type":"Buffer","data":[115,111,109,101,32,109,111,114,101,32,106,117,110,107,32,100,97,116,97]},"tags":["how-to","DynamoDB","components","serverless"],"published":true,"id":"1959366d-d595-47a9-b9e1-baf929cea552"}
+```
+
+#### If parameters are wrong
+
+```
+$ components insert
+
+Incorrect or insufficient parameters.
+Usage: insert --tablename <tablename> --itemdata <data in json format>
+
+```
+
+```
+$ components insert --tablename BlogPost
+
+Incorrect or insufficient parameters.
+Usage: insert --tablename <tablename> --itemdata <data in json format>
+
+```
+
+#### If an error is thrown
+
+```
+$ components insert --tablename BlogPost --itemdata \
+\ '{}'
+
+Error inserting data to table: 'BlogPost'
+One or more parameter values were invalid: Missing the key authorEmail in the item
+```
