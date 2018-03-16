@@ -177,6 +177,28 @@ const deleteItem = (table, keyData) => {
   return {}
 }
 
+const getItem = (table, keyData) => {
+  const model = defineTable(
+    table.name,
+    table.hashKey,
+    table.rangeKey,
+    table.schema,
+    table.options
+  )
+  let modelDataAttrs = {}
+  if (model) {
+    model.get(keyData, (err, modelIns) => {
+      if (err) {
+        console.log(`Error retrieving item from table: '${table.name}'\n${err.message}`)
+      } else {
+        modelDataAttrs = JSON.stringify(modelIns.attrs)
+        console.log(`Item retrieved from table: '${table.name}'\n${modelDataAttrs}`)
+      }
+    })
+  }
+  return modelDataAttrs
+}
+
 // Public methods
 const deploy = async (inputs, context) => {
   let outputs = context.state
@@ -250,9 +272,26 @@ const destroy = async (inputs, context) => {
   return outputs
 }
 
+const get = async (inputs, context) => {
+  let outputs = context.state
+
+  if (!context.state.tables ||
+       context.state.tables.length === 0) return {}
+
+  if (context.options && context.options.tablename && context.options.keydata) {
+    const tableName = context.options.tablename
+    const keyData = context.options.keydata
+    const table = findTableByName(context.state.tables, tableName)
+    outputs = getItem(table, JSON.parse(keyData))
+  } else {
+    context.log('Incorrect or insufficient parameters. \nUsage: get --tablename <tablename> --keydata <hashkey and rangekey key/value pairs in json format>')
+  }
+  return outputs
+}
 module.exports = {
   deploy,
   remove,
   insert,
-  destroy
+  destroy,
+  get
 }

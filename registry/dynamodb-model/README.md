@@ -135,6 +135,35 @@ Error inserting data to table: 'BlogPost'
 One or more parameter values were invalid: Missing the key authorEmail in the item
 ```
 
+### Get
+
+The `get` command will retrieve an item from the specified table.
+
+#### If everything is good
+
+```
+$ components get --tablename BlogPost --keydata \
+'{
+  "authorEmail": "rupak@serverless.com",
+  "title": "How to create a DynamoDB component"
+}'
+
+Item retrieved from table: 'BlogPost'
+{"content":{"type":"Buffer","data":[115,111,109,101,32,106,117,110,107,32,100,97,116,97]},"authorEmail":"rupak@serverless.com","authorName":"Rupak Ganguly","published":true,"id":"8461c448-cb60-4045-8a71-4c9c1a8a1e13","tags":["DynamoDB","components","how-to","serverless"],"title":"How to create a DynamoDB component"}
+```
+
+#### If an error is thrown
+
+```
+components get --tablename BlogPost --keydata \
+'{
+  "authorEmail": "rupak@serverless.com"
+}'
+
+Error retrieving item from table: 'BlogPost'
+The provided key element does not match the schema
+```
+
 ### Destroy
 
 The `destroy` command will delete an item from the specified table.
