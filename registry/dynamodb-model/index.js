@@ -135,7 +135,7 @@ const deleteTable = (table) => {
   }
 }
 
-const saveItemDataToTable = (table, itemData) => {
+const insertItem = (table, itemData) => {
   const model = defineTable(
     table.name,
     table.hashKey,
@@ -147,7 +147,7 @@ const saveItemDataToTable = (table, itemData) => {
   if (model) {
     model.create(itemData, (err, modelIns) => {
       if (err) {
-        console.log(`Error inserting data to table: '${table.name}'\n${err.message}`)
+        console.log(`Error inserting item to table: '${table.name}'\n${err.message}`)
       } else {
         modelDataAttrs = JSON.stringify(modelIns.attrs)
         console.log(`Item inserted to table: '${table.name}'\n${modelDataAttrs}`)
@@ -155,6 +155,26 @@ const saveItemDataToTable = (table, itemData) => {
     })
   }
   return modelDataAttrs
+}
+
+const deleteItem = (table, keyData) => {
+  const model = defineTable(
+    table.name,
+    table.hashKey,
+    table.rangeKey,
+    table.schema,
+    table.options
+  )
+  if (model) {
+    model.destroy(keyData, (err) => {
+      if (err) {
+        console.log(`Error deleting item from table: '${table.name}'\n${err.message}`)
+      } else {
+        console.log(`Item deleted from table: '${table.name}'`)
+      }
+    })
+  }
+  return {}
 }
 
 // Public methods
@@ -206,9 +226,26 @@ const insert = async (inputs, context) => {
     const tableName = context.options.tablename
     const itemData = context.options.itemdata
     const table = findTableByName(context.state.tables, tableName)
-    outputs = saveItemDataToTable(table, JSON.parse(itemData))
+    outputs = insertItem(table, JSON.parse(itemData))
   } else {
     context.log('Incorrect or insufficient parameters. \nUsage: insert --tablename <tablename> --itemdata <data in json format>')
+  }
+  return outputs
+}
+
+const destroy = async (inputs, context) => {
+  let outputs = context.state
+
+  if (!context.state.tables ||
+       context.state.tables.length === 0) return {}
+
+  if (context.options && context.options.tablename && context.options.keydata) {
+    const tableName = context.options.tablename
+    const keyData = context.options.keydata
+    const table = findTableByName(context.state.tables, tableName)
+    outputs = deleteItem(table, JSON.parse(keyData))
+  } else {
+    context.log('Incorrect or insufficient parameters. \nUsage: destroy --tablename <tablename> --keydata <hashkey and rangekey key/value pairs in json format>')
   }
   return outputs
 }
@@ -216,5 +253,6 @@ const insert = async (inputs, context) => {
 module.exports = {
   deploy,
   remove,
-  insert
+  insert,
+  destroy
 }

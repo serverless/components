@@ -108,7 +108,7 @@ Item inserted to table: 'BlogPost'
 {"authorName":"Rupak Ganguly","authorEmail":"rupak@serverless.com","title":"How to create a DynamoDB component","content":{"type":"Buffer","data":[115,111,109,101,32,109,111,114,101,32,106,117,110,107,32,100,97,116,97]},"tags":["how-to","DynamoDB","components","serverless"],"published":true,"id":"1959366d-d595-47a9-b9e1-baf929cea552"}
 ```
 
-#### If parameters are wrong
+#### If parameters are missing or wrong
 
 ```
 $ components insert
@@ -129,9 +129,36 @@ Usage: insert --tablename <tablename> --itemdata <data in json format>
 #### If an error is thrown
 
 ```
-$ components insert --tablename BlogPost --itemdata \
-\ '{}'
+$ components insert --tablename BlogPost --itemdata '{}'
 
 Error inserting data to table: 'BlogPost'
 One or more parameter values were invalid: Missing the key authorEmail in the item
+```
+
+### Destroy
+
+The `destroy` command will delete an item from the specified table.
+
+#### If everything is good
+
+```
+$ components destroy --tablename BlogPost --keydata \
+'{
+  "authorEmail": "rupak@serverless.com",
+  "title": "How to create a DynamoDB component"
+}'
+
+Item deleted from table: 'BlogPost'
+```
+
+#### If an error is thrown
+
+```
+components destroy --tablename BlogPost --keydata \
+'{
+  "authorEmail": "rupak@serverless.com"
+}'
+
+Error deleting item from table: 'BlogPost'
+The provided key element does not match the schema
 ```
