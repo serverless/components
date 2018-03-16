@@ -1,27 +1,29 @@
 const path = require('path')
 const { keys, reduce } = require('ramda')
 const getRegistryRoot = require('../getRegistryRoot')
+const getState = require('../state/getState')
 
-const generateContext = (componentId, stateFile, options) => {
+const generateContext = (component, stateFile, options) => {
+  const { id, type } = component
   const context = {
-    id: componentId,
-    state: stateFile[componentId] || {},
+    id,
+    state: getState(stateFile, id),
     options,
     log: (message) => {
       if (!process.env.CI) {
         process.stdin.write(`${message}\n`)
       }
     },
-    load: (type, alias) => {
-      const component = require(path.join(getRegistryRoot(), type)) // eslint-disable-line
+    load: (type, alias) => { // eslint-disable-line no-shadow
+      const childComponent = require(path.join(getRegistryRoot(), type)) // eslint-disable-line
 
-      const childComponentId = `${componentId}:${alias}`
-      const childComponentContext = generateContext(childComponentId, stateFile, options)
+      childComponent.id = `${id}:${alias}`
+      const childComponentContext = generateContext(childComponent, stateFile, options)
 
-      const fnNames = keys(component)
+      const fnNames = keys(childComponent)
 
       const modifiedComponent = reduce((accum, fnName) => {
-        const childComponentFn = component[fnName]
+        const childComponentFn = childComponent[fnName]
         accum[fnName] = async (inputs) => childComponentFn(inputs, childComponentContext)
         return accum
       }, {}, fnNames)
@@ -29,7 +31,14 @@ const generateContext = (componentId, stateFile, options) => {
       return modifiedComponent
     },
     saveState: function (state = {}) { // eslint-disable-line
-      stateFile[this.id] = state
+      // NOTE: set default values if information about component in stateFile is not yet present
+      if (!stateFile[this.id]) {
+        stateFile[this.id] = {
+          type,
+          state: {}
+        }
+      }
+      stateFile[this.id].state = state
       this.state = state
     }
   }

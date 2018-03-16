@@ -1,13 +1,12 @@
 const path = require('path')
 const { reduce, keys } = require('ramda')
-
 const getRegistryRoot = require('../getRegistryRoot')
 const { fileExists } = require('../fs')
-
 const getComponent = require('./getComponent')
 const getDependencies = require('../variables/getDependencies')
+const getState = require('../state/getState')
 
-const getComponents = async (
+const getComponentsToUse = async (
   stateFile, componentRoot = process.cwd(), inputs = {}, componentId, components = {}
 ) => {
   const slsYml = await getComponent(componentRoot, componentId, inputs)
@@ -19,7 +18,7 @@ const getComponents = async (
     const nestedComponentRoot = path.join(getRegistryRoot(), slsYml.components[componentAlias].type)
     const nestedComponentInputs = slsYml.components[componentAlias].inputs || {}
     const nestedComponentId = slsYml.components[componentAlias].id
-    accum = await getComponents(
+    accum = await getComponentsToUse(
       stateFile,
       nestedComponentRoot,
       nestedComponentInputs,
@@ -39,11 +38,11 @@ const getComponents = async (
     type: slsYml.type,
     inputs: slsYml.inputs,
     outputs: {},
-    state: stateFile[slsYml.id] || {},
+    state: getState(stateFile, slsYml.id),
     dependencies,
     fns
   }
   return { ...components, ...nestedComponents }
 }
 
-module.exports = getComponents
+module.exports = getComponentsToUse

@@ -2,7 +2,8 @@ const utils = require('./utils')
 
 const {
   errorReporter,
-  getComponents,
+  getComponentsToUse,
+  getComponentsToRemove,
   buildGraph,
   executeGraph,
   readStateFile,
@@ -16,12 +17,16 @@ const run = async (command, options) => {
   let stateFile = {}
   try {
     stateFile = await readStateFile()
-    components = await getComponents(stateFile)
+    const componentsToUse = await getComponentsToUse(stateFile)
+    const componentsToRemove = await getComponentsToRemove(stateFile, componentsToUse)
+    components = { ...componentsToUse, ...componentsToRemove }
     if (command === 'deploy') trackDeployment(components)
-    const graph = await buildGraph(components)
-    await executeGraph(graph, components, stateFile, command, options)
+    const graph = await buildGraph(componentsToUse, componentsToRemove, command)
+    await executeGraph(graph, components, stateFile, options)
   } catch (error) {
-    if (reporter) { reporter.captureException(error) }
+    if (reporter) {
+      reporter.captureException(error)
+    }
     throw error
   } finally {
     await writeStateFile(stateFile)
