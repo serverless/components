@@ -2,20 +2,24 @@ const uuid = require('uuid')
 const path = require('path')
 const Analytics = require('analytics-node')
 const getConfig = require('../config/getConfig')
+const fileExists = require('../fs/fileExists')
+const readFile = require('../fs/readFile')
 
 // commented out because fetching location adds 1-2 seconds delay
 // do we want it for tracking?
 // const getLocation = require('./getLocation')
 
 module.exports = async (eventName, data = {}) => {
+  const trackingFilePath = path.join('..', '..', '..', 'tracking-config.json')
   const { trackingDisabled, frameworkId, userId } = await getConfig()
 
   // exit early if tracking disabled
-  if (trackingDisabled || process.env.CI || process.env.TRAVIS) {
+  if (trackingDisabled || !await fileExists(trackingFilePath)
+    || process.env.CI || process.env.TRAVIS) {
     return
   }
 
-  const { segmentWriteKey } = require(path.join('..', '..', '..', 'tracking-config.json')) // eslint-disable-line
+  const { segmentWriteKey } = await readFile(trackingFilePath) // eslint-disable-line
 
   const analytics = new Analytics(segmentWriteKey)
 
