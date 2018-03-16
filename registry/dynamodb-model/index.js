@@ -135,7 +135,9 @@ const deleteTable = (table) => {
   }
 }
 
-const insertItem = (table, itemData) => {
+const insertItem = (state, tableName, data) => {
+  const table = findTableByName(state.tables, tableName)
+  const itemData = JSON.parse(data)
   const model = defineTable(
     table.name,
     table.hashKey,
@@ -157,7 +159,9 @@ const insertItem = (table, itemData) => {
   return modelDataAttrs
 }
 
-const deleteItem = (table, keyData) => {
+const deleteItem = (state, tableName, data) => {
+  const table = findTableByName(state.tables, tableName)
+  const keyData = JSON.parse(data)
   const model = defineTable(
     table.name,
     table.hashKey,
@@ -177,7 +181,9 @@ const deleteItem = (table, keyData) => {
   return {}
 }
 
-const getItem = (table, keyData) => {
+const getItem = (state, tableName, data) => {
+  const table = findTableByName(state.tables, tableName)
+  const keyData = JSON.parse(data)
   const model = defineTable(
     table.name,
     table.hashKey,
@@ -245,10 +251,7 @@ const insert = async (inputs, context) => {
        context.state.tables.length === 0) return {}
 
   if (context.options && context.options.tablename && context.options.itemdata) {
-    const tableName = context.options.tablename
-    const itemData = context.options.itemdata
-    const table = findTableByName(context.state.tables, tableName)
-    outputs = insertItem(table, JSON.parse(itemData))
+    outputs = insertItem(context.state, context.options.tablename, context.options.itemdata)
   } else {
     context.log('Incorrect or insufficient parameters. \nUsage: insert --tablename <tablename> --itemdata <data in json format>')
   }
@@ -262,10 +265,7 @@ const destroy = async (inputs, context) => {
        context.state.tables.length === 0) return {}
 
   if (context.options && context.options.tablename && context.options.keydata) {
-    const tableName = context.options.tablename
-    const keyData = context.options.keydata
-    const table = findTableByName(context.state.tables, tableName)
-    outputs = deleteItem(table, JSON.parse(keyData))
+    outputs = deleteItem(context.state, context.options.tablename, context.options.keydata)
   } else {
     context.log('Incorrect or insufficient parameters. \nUsage: destroy --tablename <tablename> --keydata <hashkey and rangekey key/value pairs in json format>')
   }
@@ -279,15 +279,13 @@ const get = async (inputs, context) => {
        context.state.tables.length === 0) return {}
 
   if (context.options && context.options.tablename && context.options.keydata) {
-    const tableName = context.options.tablename
-    const keyData = context.options.keydata
-    const table = findTableByName(context.state.tables, tableName)
-    outputs = getItem(table, JSON.parse(keyData))
+    outputs = getItem(context.state, context.options.tablename, context.options.keydata)
   } else {
     context.log('Incorrect or insufficient parameters. \nUsage: get --tablename <tablename> --keydata <hashkey and rangekey key/value pairs in json format>')
   }
   return outputs
 }
+
 module.exports = {
   deploy,
   remove,
