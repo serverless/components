@@ -82,69 +82,74 @@ const convertInputSchemaToNativeSchema = (inputSchema) => {
   return nativeSchema
 }
 
-const defineTable = (name, vHashKey, vRangeKey, vSchema, options) => {
+const defineTable = (table) => {
+  if (!table) return null
+
+  const vIndexes = table.indexes
+  const vSchema = table.schema
+  const vOptions = table.options
   const nativeSchema = (vSchema) ? convertInputSchemaToNativeSchema(vSchema) : null
   let params = {
-    hashKey: vHashKey,
-    rangeKey: vRangeKey,
+    hashKey: table.hashKey,
+    rangeKey: table.rangeKey,
     schema: nativeSchema
   }
-  params = { ...params, ...options }
+  if (vIndexes) {
+    params = { ...params, indexes: vIndexes }
+  }
+  if (vOptions) {
+    params = { ...params, ...vOptions }
+  }
 
   // define the table schema
-  return dynamo.define(name, params)
+  return dynamo.define(table.name, params)
 }
 
-const defineTables = (inputs) => {
+const createTables = (inputs) => {
+  let ret
+  let model
   inputs.tables.forEach((table) => {
-    defineTable(
-      table.name,
-      table.hashKey,
-      table.rangeKey,
-      table.schema,
-      table.options
-    )
-  })
-}
-
-const defineAndCreateTables = (inputs) => {
-  // define all tables
-  defineTables(inputs)
-
-  dynamo.createTables({
-    // 'BlogPost': {readCapacity: 5, writeCapacity: 10},
-  }, (err) => {
-    if (err) {
-      console.log('Error creating tables: ', err.message)
-    } else {
-      console.log('All tables have been created')
+    try {
+      model = defineTable(table)
+      // console.log(`Defined schema for table: '${table.name}'`)
+      ret = {}
+    } catch (err) {
+      console.log(`Error defining schema for table: '${table.name}'`)
+      ret = null
+    }
+    if (model) {
+      model.createTable((err) => {
+        if (err) {
+          console.log(`Error creating table: '${table.name}'\n${err.message}`)
+          throw err
+        } else {
+          console.log(`Created table: '${table.name}'`)
+        }
+      })
     }
   })
+  return ret
 }
 
-const deleteTable = (table) => {
-  const model = defineTable(
-    table.name,
-    table.hashKey,
-    table.rangeKey,
-    table.schema,
-    table.options
-  )
+const deleteTable = (state, tableName) => {
+  const table = findTableByName(state.tables, tableName)
+  const model = defineTable(table)
   if (model) {
-    model.deleteTable()
+    model.deleteTable((err) => {
+      if (err) {
+        console.log(`Error deleting table: '${tableName}'\n${err.message}`)
+        throw err
+      } else {
+        console.log(`Deleted table: '${tableName}'`)
+      }
+    })
   }
 }
 
 const insertItem = (state, tableName, data) => {
   const table = findTableByName(state.tables, tableName)
   const itemData = JSON.parse(data)
-  const model = defineTable(
-    table.name,
-    table.hashKey,
-    table.rangeKey,
-    table.schema,
-    table.options
-  )
+  const model = defineTable(table)
   let modelDataAttrs = {}
   if (model) {
     model.create(itemData, (err, modelIns) => {
@@ -162,13 +167,7 @@ const insertItem = (state, tableName, data) => {
 const deleteItem = (state, tableName, data) => {
   const table = findTableByName(state.tables, tableName)
   const keyData = JSON.parse(data)
-  const model = defineTable(
-    table.name,
-    table.hashKey,
-    table.rangeKey,
-    table.schema,
-    table.options
-  )
+  const model = defineTable(table)
   if (model) {
     model.destroy(keyData, (err) => {
       if (err) {
@@ -184,13 +183,7 @@ const deleteItem = (state, tableName, data) => {
 const getItem = (state, tableName, data) => {
   const table = findTableByName(state.tables, tableName)
   const keyData = JSON.parse(data)
-  const model = defineTable(
-    table.name,
-    table.hashKey,
-    table.rangeKey,
-    table.schema,
-    table.options
-  )
+  const model = defineTable(table)
   let modelDataAttrs = {}
   if (model) {
     model.get(keyData, (err, modelIns) => {
@@ -209,14 +202,17 @@ const getItem = (state, tableName, data) => {
 const deploy = async (inputs, context) => {
   let outputs = context.state
 
-  context.log('Creating table(s)...')
-  try {
-    outputs = defineAndCreateTables(inputs)
-  } catch (err) {
-    context.log('Error in creating table(s): ', err)
+  if (!context.state ||
+      !context.state.tables ||
+      context.state.tables.length === 0) {
+    context.log('Creating table(s)...')
+    try {
+      outputs = createTables(inputs)
+      context.saveState({ ...inputs, ...outputs })
+    } catch (err) {
+      context.log('Error in creating table(s)')
+    }
   }
-  context.saveState({ ...inputs, ...outputs })
-
   return outputs
 }
 
@@ -226,16 +222,12 @@ const remove = async (inputs, context) => {
 
   if (context.options && context.options.tablename) {
     const tableName = context.options.tablename
-    const table = findTableByName(context.state.tables, tableName)
-
-    if (table) {
-      context.log(`Removing table: '${tableName}'`)
-      try {
-        deleteTable(table)
-        context.saveState({})
-      } catch (err) {
-        context.log(`Error in removing table: '${context.state.tables[0].name}'\n${err.message}`)
-      }
+    context.log(`Removing table: '${tableName}'`)
+    try {
+      deleteTable(context.state, tableName)
+      context.saveState({})
+    } catch (err) {
+      context.log(`Error in removing table: '${tableName}'`)
     }
   } else {
     context.log('Incorrect or insufficient parameters. \nUsage: remove --tablename <tablename>')

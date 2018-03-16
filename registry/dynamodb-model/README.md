@@ -9,12 +9,24 @@ The component requires a few input parameters to manage the DynamoDB table(s):
 * `region`: *required* - `string`: AWS region where the table(s) will be created.
 * `tables`: *required* - An array of table models.
   * `name`: *required* - `string`: The name of the table.
-  * `hashKey`: *required* - `string`: The field name that will be the partition key of type 'HASH'.
-  * `rangeKey`: *optional* - `string`: The field name that will be the sort key of type 'RANGE'.
+  * `hashKey`: *required* - `string`: An existing field name from the schema that will be the partition key of type 'HASH'.
+  * `rangeKey`: *optional* - `string`: An existing field name from the schema that will be the sort key of type 'RANGE'.
+  * `indexes`: *optional* - The indexes for the table model.
+    * [A list of indexes and it's properties. See below.]
   * `schema`: *required* - The schema for the table model.
     * [A list of field names and it's properties. See below.]
   * `options`: *optional* - A list of additional options.
     * [A list of options. See below.]
+
+### Indexes
+
+The optional `indexes` attribute of the table model is defined as below:
+
+* `indexes`: *optional*
+  * `name`: *required* - `string`: The name of the index.
+  * `type`: *required* - `string`: The type of the index. Values: [`global` | `local`]
+  * `hashKey`: *required* - `string`: An existing field name from the schema.
+  * `rangeKey`: *optional* - `string`: An existing field name from the schema.
 
 ### Schema
 
@@ -45,6 +57,11 @@ inputs:
     - name: BlogPost
       hashKey: authorEmail
       rangeKey: title
+      indexes:
+        - name: BlogTitleIndex
+          type: global
+          hashKey: title
+          rangeKey: createdAt
       schema:
         id: uuid
         authorName: string
@@ -61,7 +78,6 @@ inputs:
             default: false
       options:
         timestamps: true
-        createdAt: false
 ```
 
 ## Operations

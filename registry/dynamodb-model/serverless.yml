@@ -6,6 +6,11 @@ inputs:
     - name: BlogPost
       hashKey: authorEmail
       rangeKey: title
+      indexes:
+        - name: BlogTitleIndex
+          type: global
+          hashKey: title
+          rangeKey: createdAt
       schema:
         id: uuid
         authorName: string
@@ -22,4 +27,3 @@ inputs:
             default: false
       options:
         timestamps: true
-        createdAt: false
