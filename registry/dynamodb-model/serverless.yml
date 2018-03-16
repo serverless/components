@@ -1,0 +1,25 @@
+type: dynamodb-model
+
+inputs:
+  region: us-east-1
+  tables:
+    - name: BlogPost
+      hashKey: authorEmail
+      rangeKey: title
+      schema:
+        id: uuid
+        authorName: string
+        authorEmail:
+          type: email
+          options:
+            required: true
+        title: string
+        content: binary
+        tags: stringset
+        published:
+          type: boolean
+          options:
+            default: false
+      options:
+        timestamps: true
+        createdAt: false
