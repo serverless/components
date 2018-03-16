@@ -1,9 +1,11 @@
+const { union, keys, map } = require('ramda')
 const buildGraph = require('./buildGraph')
 
 describe('#buildGraph()', () => {
-  const components = {
+  const componentsToUse = {
     apiGateway: {
       id: 'myApiGateway',
+      type: 'gateway',
       inputs: {
         method: 'POST',
         path: 'my-path'
@@ -18,6 +20,7 @@ describe('#buildGraph()', () => {
     },
     func: {
       id: 'myFunc',
+      type: 'function',
       inputs: {
         memorySize: 512,
         timeout: 60
@@ -33,6 +36,7 @@ describe('#buildGraph()', () => {
     },
     role: {
       id: 'myRole',
+      type: 'role',
       inputs: {
         service: 'my.serverless.service'
       },
@@ -46,6 +50,7 @@ describe('#buildGraph()', () => {
     },
     'apiGateway:role': {
       id: 'apiGatewayRole',
+      type: 'role',
       inputs: {
         service: 'my.api-gateway.service'
       },
@@ -59,6 +64,7 @@ describe('#buildGraph()', () => {
     },
     'apiGateway:func': {
       id: 'apiGatewayFunc',
+      type: 'function',
       inputs: {
         memorySize: 512,
         timeout: 60
@@ -74,6 +80,7 @@ describe('#buildGraph()', () => {
     },
     'func:role': {
       id: 'funcRole',
+      type: 'role',
       inputs: {
         service: 'my.function.service'
       },
@@ -87,11 +94,53 @@ describe('#buildGraph()', () => {
     }
   }
 
-  it('should return a correct graphlib Graph', async () => {
-    const graph = await buildGraph(components)
+  const componentsToRemove = {
+    orphanedRole: {
+      id: 'myOrphanedRole',
+      type: 'role',
+      inputs: {
+        service: 'my.old.serverless.service'
+      },
+      outputs: {},
+      state: {},
+      dependencies: [],
+      fns: {
+        deploy: () => {},
+        remove: () => {}
+      }
+    }
+  }
 
-    expect(graph.nodes()).toEqual(Object.keys(components))
-    expect(graph.edges()).toContainEqual(
+  it('should return a correct graphlib Graph', async () => {
+    const command = 'deploy'
+    const graph = await buildGraph(componentsToUse, componentsToRemove, command)
+
+    const edges = graph.edges()
+    const nodes = graph.nodes()
+    const nodeValueResults = map((node) => {
+      const val = graph.node(node)
+      const { type, command } = val // eslint-disable-line no-shadow
+      return {
+        id: node,
+        type,
+        command
+      }
+    }, nodes)
+    const expectedNodeValueResult = [
+      { id: 'orphanedRole', type: 'orphan', command: 'remove' },
+      { id: 'apiGateway', type: 'main', command },
+      { id: 'func', type: 'main', command },
+      { id: 'role', type: 'main', command },
+      { id: 'apiGateway:role', type: 'main', command },
+      { id: 'apiGateway:func', type: 'main', command },
+      { id: 'func:role', type: 'main', command }
+    ]
+    expect(nodeValueResults).toEqual(expectedNodeValueResult)
+
+    const componentKeys = union(keys(componentsToRemove), keys(componentsToUse))
+
+    expect(nodes).toEqual(componentKeys)
+    expect(edges).toContainEqual(
       { v: 'func', w: 'role' },
       {
         v: 'apiGateway',

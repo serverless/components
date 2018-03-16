@@ -22,7 +22,7 @@ function deploy(inputs, context) {
 }
 
 function remove(inputs, context) {
-  context.log(`Removing role "${inputs.name}"`)
+  context.log(`Removing role "${context.state.name}"`)
   context.saveState()
 }
 

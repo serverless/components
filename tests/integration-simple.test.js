@@ -63,15 +63,21 @@ describe('Integration Test - Simple', () => {
         const stateFileContent = await fsp.readJsonAsync(functionMockStateFile)
         const expected = {
           'tests-integration-function-mock:myRole': {
-            id: 'id:iam:role:my-function',
-            name: 'my-function',
-            deploymentCounter: 1
+            type: 'tests-integration-iam-mock',
+            state: {
+              id: 'id:iam:role:my-function',
+              name: 'my-function',
+              deploymentCounter: 1
+            }
           },
           'tests-integration-function-mock': {
-            id: 'id:function:my-function',
-            name: 'my-function',
-            role: 'id:iam:role:my-function',
-            deploymentCounter: 1
+            type: 'tests-integration-function-mock',
+            state: {
+              id: 'id:function:my-function',
+              name: 'my-function',
+              role: 'id:iam:role:my-function',
+              deploymentCounter: 1
+            }
           }
         }
         expect(stateFileContent).toEqual(expected)
@@ -88,15 +94,21 @@ describe('Integration Test - Simple', () => {
         const stateFileContent = await fsp.readJsonAsync(functionMockStateFile)
         const expected = {
           'tests-integration-function-mock:myRole': {
-            id: 'id:iam:role:my-function',
-            name: 'my-function',
-            deploymentCounter: 2
+            type: 'tests-integration-iam-mock',
+            state: {
+              id: 'id:iam:role:my-function',
+              name: 'my-function',
+              deploymentCounter: 2
+            }
           },
           'tests-integration-function-mock': {
-            id: 'id:function:my-function',
-            name: 'my-function',
-            role: 'id:iam:role:my-function',
-            deploymentCounter: 2
+            type: 'tests-integration-function-mock',
+            state: {
+              id: 'id:function:my-function',
+              name: 'my-function',
+              role: 'id:iam:role:my-function',
+              deploymentCounter: 2
+            }
           }
         }
         expect(stateFileContent).toEqual(expected)
@@ -109,16 +121,22 @@ describe('Integration Test - Simple', () => {
         const stateFileContent = await fsp.readJsonAsync(functionMockStateFile)
         const expected = {
           'tests-integration-function-mock:myRole': {
-            id: 'id:iam:role:my-function',
-            name: 'my-function',
-            deploymentCounter: 2
+            type: 'tests-integration-iam-mock',
+            state: {
+              id: 'id:iam:role:my-function',
+              name: 'my-function',
+              deploymentCounter: 2
+            }
           },
           'tests-integration-function-mock': {
-            id: 'id:function:my-function',
-            name: 'my-function',
-            role: 'id:iam:role:my-function',
-            deploymentCounter: 2,
-            data: 'Hello World'
+            type: 'tests-integration-function-mock',
+            state: {
+              id: 'id:function:my-function',
+              name: 'my-function',
+              role: 'id:iam:role:my-function',
+              deploymentCounter: 2,
+              data: 'Hello World'
+            }
           }
         }
         expect(stateFileContent).toEqual(expected)
@@ -141,16 +159,22 @@ describe('Integration Test - Simple', () => {
         const stateFileContent = await fsp.readJsonAsync(functionMockStateFile)
         const expected = {
           'tests-integration-function-mock:myRole': {
-            id: 'id:iam:role:my-function',
-            name: 'my-function',
-            deploymentCounter: 3
+            type: 'tests-integration-iam-mock',
+            state: {
+              id: 'id:iam:role:my-function',
+              name: 'my-function',
+              deploymentCounter: 3
+            }
           },
           'tests-integration-function-mock': {
-            id: 'id:function:my-function',
-            name: 'my-function',
-            role: 'id:iam:role:my-function',
-            deploymentCounter: 2,
-            data: 'Hello World'
+            type: 'tests-integration-function-mock',
+            state: {
+              id: 'id:function:my-function',
+              name: 'my-function',
+              role: 'id:iam:role:my-function',
+              deploymentCounter: 2,
+              data: 'Hello World'
+            }
           }
         }
         expect(stateFileContent).toEqual(expected)
@@ -160,8 +184,14 @@ describe('Integration Test - Simple', () => {
         await cpp.execAsync(`${componentsExec} remove`, { cwd: functionMockDir })
         const stateFileContent = await fsp.readJsonAsync(functionMockStateFile)
         const expected = {
-          'tests-integration-function-mock:myRole': {},
-          'tests-integration-function-mock': {}
+          'tests-integration-function-mock:myRole': {
+            type: 'tests-integration-iam-mock',
+            state: {}
+          },
+          'tests-integration-function-mock': {
+            type: 'tests-integration-function-mock',
+            state: {}
+          }
         }
         expect(stateFileContent).toEqual(expected)
       })
