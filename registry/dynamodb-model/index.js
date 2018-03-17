@@ -6,11 +6,16 @@ const util = require('util')
 
 dynamo.AWS.config.update({ region: 'us-east-1' })
 
-const findTableByName = (tables, tableName) => {
-  const t = tables.map((table) => { // eslint-disable-line array-callback-return, consistent-return
-    if (table.name === tableName) return table // eslint-disable-line max-len
-  })
-  return t[0]
+const findTableByName = (tables, tableName) => { // eslint-disable-line arrow-body-style
+  return tables.filter((table) => (table.name === tableName))[0]
+}
+
+const findOutputTableByName = (tables, tableName) => { // eslint-disable-line arrow-body-style
+  return tables.filter((table) => (table[tableName]))[0]
+}
+
+const removeOutputTableByName = (tables, tableName) => { // eslint-disable-line arrow-body-style
+  return { ddbtables: [ tables.filter((table) => (!table[tableName]))[0] ] }
 }
 
 const convertUserTypeToJoiType = (userType) => {
@@ -124,16 +129,16 @@ const createTables = async (inputs) => {
       })
   })
 
-  return Promise.all(allTables).then((results) => {
+  return Promise.all(allTables).then((ddbtables) => {
     const outputs = {
-      ddbtables: results
+      ddbtables
     }
     return outputs
   })
 }
 
 const deleteTable = (state, tableName) => {
-  const table = findTableByName(state.tables, tableName)
+  const table = findOutputTableByName(state.ddbtables, tableName)
   const model = defineTable(table)
   if (model) {
     model.deleteTable((err) => {
@@ -145,6 +150,7 @@ const deleteTable = (state, tableName) => {
       }
     })
   }
+  return table
 }
 
 const insertItem = (state, tableName, data) => {
@@ -223,13 +229,20 @@ const remove = async (inputs, context) => {
 
   if (context.options && context.options.tablename) {
     const tableName = context.options.tablename
+    // if table does not exist in state -> ddbtables, bail
+    if (!findOutputTableByName(context.state.ddbtables, tableName)) {
+      context.log(`Table '${tableName}' does not exist`)
+      return {}
+    }
+    // remove table
     context.log(`Removing table: '${tableName}'`)
     try {
       deleteTable(context.state, tableName)
-      // TODO: Delete state only for the specified table
-      context.saveState({})
+      // Delete output state only for the specified table
+      const ddbTables = removeOutputTableByName(context.state.ddbtables, tableName)
+      context.saveState({ ...inputs, ...ddbTables })
     } catch (err) {
-      context.log(`Error in removing table: '${tableName}'`)
+      context.log(`Error in removing table: '${tableName}'\n${err}`)
     }
   } else {
     context.log('Incorrect or insufficient parameters. \nUsage: remove --tablename <tablename>')
