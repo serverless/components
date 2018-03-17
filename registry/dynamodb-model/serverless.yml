@@ -6,6 +6,9 @@ inputs:
     - name: BlogPost
       hashKey: authorEmail
       rangeKey: title
+      provisionedThroughput:
+        readCapacity: 2
+        writeCapacity: 2
       indexes:
         - name: BlogTitleIndex
           type: global

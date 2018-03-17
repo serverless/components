@@ -114,10 +114,16 @@ const defineTable = (table) => {
 const createTables = async (inputs) => {
   const allTables = inputs.tables.map(async (table) => {
     const tableName = table.name
-
+    // add provisionedThroughput parameters
+    let options = {}
+    if (table.provisionedThroughput) {
+      options = table.provisionedThroughput
+    }
+    // define schema
     const model = defineTable(table)
+    // create table
     const createTableAsync = util.promisify(model.createTable)
-    return createTableAsync({})
+    return createTableAsync(options)
       .then((data) => {
         console.log(`Created table: '${tableName}'`)
         const obj = {}
@@ -125,7 +131,8 @@ const createTables = async (inputs) => {
         return obj
       })
       .catch((err) => {
-        console.log(`Error creating table: '${tableName}'\n${err.message}`)
+        // console.log(`Error creating table: '${tableName}'\n${err.message}`)
+        throw err
       })
   })
 
@@ -138,7 +145,8 @@ const createTables = async (inputs) => {
 }
 
 const deleteTable = (state, tableName) => {
-  const table = findOutputTableByName(state.ddbtables, tableName)
+  const ddbtable = findOutputTableByName(state.ddbtables, tableName)
+  const table = findTableByName(state.tables, tableName)
   const model = defineTable(table)
   if (model) {
     model.deleteTable((err) => {
@@ -150,7 +158,7 @@ const deleteTable = (state, tableName) => {
       }
     })
   }
-  return table
+  return ddbtable
 }
 
 const insertItem = (state, tableName, data) => {
@@ -217,7 +225,7 @@ const deploy = async (inputs, context) => {
       outputs = await createTables(inputs)
       context.saveState({ ...inputs, ...outputs })
     } catch (err) {
-      console.log('Error in creating table(s)', err)
+      console.log('Error in creating table(s)', err.message)
     }
   }
   return outputs
