@@ -7,14 +7,17 @@ const util = require('util')
 dynamo.AWS.config.update({ region: 'us-east-1' })
 
 const findTableByName = (tables, tableName) => { // eslint-disable-line arrow-body-style
+  if (!tables || tables.length === 0) return {}
   return tables.filter((table) => (table.name === tableName))[0]
 }
 
 const findOutputTableByName = (tables, tableName) => { // eslint-disable-line arrow-body-style
+  if (!tables || tables.length === 0) return {}
   return tables.filter((table) => (table[tableName]))[0]
 }
 
 const removeOutputTableByName = (tables, tableName) => { // eslint-disable-line arrow-body-style
+  if (!tables || tables.length === 0) return { ddbtables: [] }
   return { ddbtables: [ tables.filter((table) => (!table[tableName]))[0] ] }
 }
 
@@ -145,14 +148,14 @@ const createTables = async (inputs) => {
 }
 
 const deleteTable = (state, tableName) => {
-  const ddbtable = findOutputTableByName(state.ddbtables, tableName)
   const table = findTableByName(state.tables, tableName)
+  const ddbtable = findOutputTableByName(state.ddbtables, tableName)
   const model = defineTable(table)
   if (model) {
     model.deleteTable((err) => {
       if (err) {
         console.log(`Error deleting table: '${tableName}'\n${err.message}`)
-        throw err
+        throw err.message
       } else {
         console.log(`Deleted table: '${tableName}'`)
       }
@@ -218,8 +221,8 @@ const deploy = async (inputs, context) => {
   let outputs = context.state
 
   if (!context.state ||
-      !context.state.tables ||
-      context.state.tables.length === 0) {
+      !context.state.ddbtables ||
+      context.state.ddbtables.length !== context.state.tables.length) {
     context.log('Creating table(s)...')
     try {
       outputs = await createTables(inputs)
