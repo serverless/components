@@ -27,3 +27,19 @@ inputs:
             default: false
       options:
         timestamps: true
+    - name: User
+      hashKey: email
+      indexes:
+        - name: UserCityIndex
+          type: global
+          hashKey: city
+      schema:
+        fname: string
+        lname: string
+        email:
+          type: email
+          options:
+            required: true
+        city: string
+      options:
+        timestamps: true

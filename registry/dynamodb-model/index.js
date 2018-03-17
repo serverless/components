@@ -2,6 +2,7 @@
 
 const dynamo = require('dynamodb')
 const Joi = require('joi')
+const util = require('util')
 
 dynamo.AWS.config.update({ region: 'us-east-1' })
 
@@ -105,30 +106,30 @@ const defineTable = (table) => {
   return dynamo.define(table.name, params)
 }
 
-const createTables = (inputs) => {
-  let ret
-  let model
-  inputs.tables.forEach((table) => {
-    try {
-      model = defineTable(table)
-      // console.log(`Defined schema for table: '${table.name}'`)
-      ret = {}
-    } catch (err) {
-      console.log(`Error defining schema for table: '${table.name}'`)
-      ret = null
-    }
-    if (model) {
-      model.createTable((err) => {
-        if (err) {
-          console.log(`Error creating table: '${table.name}'\n${err.message}`)
-          throw err
-        } else {
-          console.log(`Created table: '${table.name}'`)
-        }
+const createTables = async (inputs) => {
+  const allTables = inputs.tables.map(async (table) => {
+    const tableName = table.name
+
+    const model = defineTable(table)
+    const createTableAsync = util.promisify(model.createTable)
+    return createTableAsync({})
+      .then((data) => {
+        console.log(`Created table: '${tableName}'`)
+        const obj = {}
+        obj[tableName] = data
+        return obj
       })
-    }
+      .catch((err) => {
+        console.log(`Error creating table: '${tableName}'\n${err.message}`)
+      })
   })
-  return ret
+
+  return Promise.all(allTables).then((results) => {
+    const outputs = {
+      ddbtables: results
+    }
+    return outputs
+  })
 }
 
 const deleteTable = (state, tableName) => {
@@ -207,10 +208,10 @@ const deploy = async (inputs, context) => {
       context.state.tables.length === 0) {
     context.log('Creating table(s)...')
     try {
-      outputs = createTables(inputs)
+      outputs = await createTables(inputs)
       context.saveState({ ...inputs, ...outputs })
     } catch (err) {
-      context.log('Error in creating table(s)')
+      console.log('Error in creating table(s)', err)
     }
   }
   return outputs
@@ -225,6 +226,7 @@ const remove = async (inputs, context) => {
     context.log(`Removing table: '${tableName}'`)
     try {
       deleteTable(context.state, tableName)
+      // TODO: Delete state only for the specified table
       context.saveState({})
     } catch (err) {
       context.log(`Error in removing table: '${tableName}'`)
