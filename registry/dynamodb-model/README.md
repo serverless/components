@@ -11,6 +11,9 @@ The component requires a few input parameters to manage the DynamoDB table(s):
   * `name`: *required* - `string`: The name of the table.
   * `hashKey`: *required* - `string`: An existing field name from the schema that will be the partition key of type 'HASH'.
   * `rangeKey`: *optional* - `string`: An existing field name from the schema that will be the sort key of type 'RANGE'.
+  * `provisionedThroughput`: *optional*
+    * `readCapacity`: *optional* - `number`: The read capacity value.
+    * `writeCapacity`: *optional* - `number`: The write capacity value.
   * `indexes`: *optional* - The indexes for the table model.
     * [A list of indexes and it's properties. See below.]
   * `schema`: *required* - The schema for the table model.
@@ -48,9 +51,13 @@ The optional `options` attribute of the table model is defined as below:
 * `createdAt`: *optional* - `boolean`: Overrides the timestamp attribute to specify if `createdAt` field is wanted or not. Values: [`true` | `false`]
 * `updatedAt`: *optional* - `boolean`: Overrides the timestamp clause to specify if `updatedAt` field is wanted or not. Values: [`true` | `false`]
 
-### Example Inputs
+### Examples
+
+#### Single Table
 
 ```json
+type: dynamodb-model
+
 inputs:
   region: us-east-1
   tables:
@@ -80,9 +87,68 @@ inputs:
         timestamps: true
 ```
 
+#### Multiple Tables
+
+```json
+type: dynamodb-model
+
+inputs:
+  region: us-east-1
+  tables:
+    - name: BlogPost
+      hashKey: authorEmail
+      rangeKey: title
+      provisionedThroughput:
+        readCapacity: 2
+        writeCapacity: 2
+      indexes:
+        - name: BlogTitleIndex
+          type: global
+          hashKey: title
+          rangeKey: createdAt
+      schema:
+        id: uuid
+        authorName: string
+        authorEmail:
+          type: email
+          options:
+            required: true
+        title: string
+        content: binary
+        tags: stringset
+        published:
+          type: boolean
+          options:
+            default: false
+      options:
+        timestamps: true
+    - name: User
+      hashKey: email
+      indexes:
+        - name: UserCityIndex
+          type: global
+          hashKey: city
+      schema:
+        fname: string
+        lname: string
+        email:
+          type: email
+          options:
+            required: true
+        city: string
+      options:
+        timestamps: true
+```
+
 ## Operations
 
-The component exposes operations via two commands - `deploy` and `remove`.
+The component exposes operations via these commands:
+
+* `deploy`
+* `remove`
+* `insert`
+* `destroy`
+* `get`
 
 ### Deploy
 
@@ -121,7 +187,19 @@ $ components insert --tablename BlogPost --itemdata \
 }'
 
 Item inserted to table: 'BlogPost'
-{"authorName":"Rupak Ganguly","authorEmail":"rupak@serverless.com","title":"How to create a DynamoDB component","content":{"type":"Buffer","data":[115,111,109,101,32,109,111,114,101,32,106,117,110,107,32,100,97,116,97]},"tags":["how-to","DynamoDB","components","serverless"],"published":true,"id":"1959366d-d595-47a9-b9e1-baf929cea552"}
+{
+  "authorName":"Rupak Ganguly",
+  "authorEmail":"rupak@serverless.com",
+  "title":"How to create a DynamoDB component",
+  "content":{
+    "type":"Buffer",
+    "data":[115,111,109,101,32,109,111,114,101,32,106,117,110,107,32,100,97,116,97]
+  },
+  "tags":["how-to","DynamoDB","components","serverless"],
+  "published":true,
+  "id":"1959366d-d595-47a9-b9e1-baf929cea552"
+}
+
 ```
 
 #### If parameters are missing or wrong
@@ -165,7 +243,17 @@ $ components get --tablename BlogPost --keydata \
 }'
 
 Item retrieved from table: 'BlogPost'
-{"content":{"type":"Buffer","data":[115,111,109,101,32,106,117,110,107,32,100,97,116,97]},"authorEmail":"rupak@serverless.com","authorName":"Rupak Ganguly","published":true,"id":"8461c448-cb60-4045-8a71-4c9c1a8a1e13","tags":["DynamoDB","components","how-to","serverless"],"title":"How to create a DynamoDB component"}
+{
+  "content":{
+    "type":"Buffer","data":[115,111,109,101,32,106,117,110,107,32,100,97,116,97]
+  },
+  "authorEmail":"rupak@serverless.com",
+  "authorName":"Rupak Ganguly",
+  "published":true,
+  "id":"8461c448-cb60-4045-8a71-4c9c1a8a1e13",
+  "tags":["DynamoDB","components","how-to","serverless"],
+  "title":"How to create a DynamoDB component"
+}
 ```
 
 #### If an error is thrown
