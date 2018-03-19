@@ -24,7 +24,7 @@ module.exports = async (componentRoot, componentId, inputs) => {
   }, slsYml)
 
   // check if inputs match the exepcted input types
-  validateInputs(slsYml.id, slsYml.inputTypes, slsYml.inputs)
+  slsYml.inputs = validateInputs(slsYml.id, slsYml.inputTypes, slsYml.inputs)
 
   return slsYml
 }
