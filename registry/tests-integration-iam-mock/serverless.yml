@@ -1,5 +1,9 @@
 type: tests-integration-iam-mock
 
-inputs:
-  name: test-role
-  service: some.serverless.service
+inputTypes:
+  name:
+    type: string
+    required: true
+  service:
+    type: string
+    required: true
