@@ -1,4 +1,7 @@
 const validate = require('raml-validate')()
+const {
+  assoc, prop, isEmpty, has, forEachObjIndexed, isNil
+} = require('ramda')
 
 function validateInputs(componentId, inputTypes, inputs) {
   let errorMessages = []
@@ -17,6 +20,16 @@ function validateInputs(componentId, inputTypes, inputs) {
     const message = errorMessages.join(' ')
     throw new Error(message)
   }
+
+  // update the inputs with e.g. default values
+  let updatedInputs = { ...inputs }
+  forEachObjIndexed((value, key) => {
+    if (has('default', value) && (isEmpty(prop(key, inputs)) || isNil(prop(key, inputs)))) {
+      updatedInputs = assoc(key, prop('default', value), inputs)
+    }
+  }, inputTypes)
+
+  return updatedInputs
 }
 
 module.exports = validateInputs
