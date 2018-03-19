@@ -41,7 +41,7 @@ function invoke(inputs, context) {
 }
 
 function remove(inputs, context) {
-  context.log(`Removing function "${inputs.name}"`)
+  context.log(`Removing function "${context.state.name}"`)
   context.saveState()
 }
 

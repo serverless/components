@@ -7,7 +7,8 @@ afterAll(() => {
   jest.restoreAllMocks()
 })
 
-utils.getComponents.mockImplementation(() => Promise.resolve({ some: 'component' }))
+utils.getComponentsToUse.mockImplementation(() => Promise.resolve({ componentToUse: { id: 'component1', type: 'function' } }))
+utils.getComponentsToRemove.mockImplementation(() => Promise.resolve({ componentToRemove: { id: 'component2', type: 'iam' } }))
 utils.buildGraph.mockImplementation(() => Promise.resolve())
 utils.readStateFile.mockImplementation(() => Promise.resolve())
 utils.writeStateFile.mockImplementation(() => Promise.resolve())
@@ -18,9 +19,19 @@ describe('#run()', () => {
     utils.executeGraph.mockImplementation(() => Promise.resolve())
 
     const res = await index.run('deploy', {})
-    expect(res).toEqual({ some: 'component' })
+    expect(res).toEqual({
+      componentToUse: {
+        id: 'component1',
+        type: 'function'
+      },
+      componentToRemove: {
+        id: 'component2',
+        type: 'iam'
+      }
+    })
 
-    expect(utils.getComponents).toHaveBeenCalled()
+    expect(utils.getComponentsToUse).toHaveBeenCalled()
+    expect(utils.getComponentsToRemove).toHaveBeenCalled()
     expect(utils.buildGraph).toHaveBeenCalled()
     expect(utils.readStateFile).toHaveBeenCalled()
     expect(utils.executeGraph).toHaveBeenCalled()
@@ -33,7 +44,8 @@ describe('#run()', () => {
 
     await expect(index.run('deploy', {})).rejects.toThrow('something went wrong')
 
-    expect(utils.getComponents).toHaveBeenCalled()
+    expect(utils.getComponentsToUse).toHaveBeenCalled()
+    expect(utils.getComponentsToRemove).toHaveBeenCalled()
     expect(utils.buildGraph).toHaveBeenCalled()
     expect(utils.readStateFile).toHaveBeenCalled()
     expect(utils.executeGraph).toHaveBeenCalled()

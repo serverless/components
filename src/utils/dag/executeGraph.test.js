@@ -6,7 +6,7 @@ describe('#executeGraph()', () => {
   let graph
 
   beforeEach(async () => {
-    graph = await buildGraph(components)
+    graph = await buildGraph(components, {}, '')
   })
 
   it('should return the graph if it has no sinks', async () => {
@@ -28,7 +28,7 @@ describe('#executeGraph()', () => {
       }
     }
 
-    const res = await executeGraph(graph, components, 'deploy', {})
+    const res = await executeGraph(graph, components, {}, {})
     expect(res).toEqual(graph)
   })
 
@@ -77,7 +77,7 @@ describe('#executeGraph()', () => {
       }
     }
 
-    const res = await executeGraph(graph, components, 'deploy', {})
+    const res = await executeGraph(graph, components, {}, {})
     expect(res.nodes()).toEqual([])
   })
 })
