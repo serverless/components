@@ -20,7 +20,7 @@ const run = async (command, options) => {
     const componentsToUse = await getComponentsToUse(stateFile)
     const componentsToRemove = await getComponentsToRemove(stateFile, componentsToUse)
     components = { ...componentsToUse, ...componentsToRemove }
-    if (command === 'deploy') trackDeployment(components)
+    if (command === 'deploy') trackDeployment(componentsToUse)
     const graph = await buildGraph(componentsToUse, componentsToRemove, command)
     await executeGraph(graph, components, stateFile, options)
   } catch (error) {
