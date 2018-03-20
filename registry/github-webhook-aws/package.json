@@ -1,0 +1,14 @@
+{
+  "name": "@serverless/github-webhook-aws",
+  "version": "0.1.0",
+  "description": "REST API component.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "serverless.com",
+  "license": "MIT",
+  "dependencies": {
+    "parse-github-url": "^1.0.2"
+  }
+}
