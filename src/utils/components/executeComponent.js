@@ -11,6 +11,11 @@ module.exports = async (componentId, components, stateFile, archive,
   } else if (typeof component.fns[command] === 'function') {
     component.outputs = (await component.fns[command](component.inputs, context)) || {}
   }
-  if (command === 'remove') stateFile[componentId] = {}
+  if (command === 'remove') {
+    stateFile[componentId] = {
+      type: component.type,
+      state: {}
+    }
+  }
   component.executed = true
 }
