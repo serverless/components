@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk')
-const { equals, keys } = require('ramda')
+const { equals } = require('ramda')
 const { getSwaggerDefinition, generateUrls } = require('./utils')
 
 const APIGateway = new AWS.APIGateway({ region: 'us-east-1' }) // TODO: make configurable
