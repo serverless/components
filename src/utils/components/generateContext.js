@@ -7,7 +7,8 @@ const generateContext = (component, stateFile, archive, options, command) => {
   const { id, type } = component
   const context = {
     id,
-    archive: archive[id] || {},
+    type,
+    archive: getState(archive, id),
     state: getState(stateFile, id),
     command,
     options,
