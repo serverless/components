@@ -7,7 +7,11 @@ const getDependencies = require('../variables/getDependencies')
 const getState = require('../state/getState')
 
 const getComponentsToUse = async (
-  stateFile, componentRoot = process.cwd(), inputs = {}, componentId, components = {}
+  stateFile,
+  componentRoot = process.cwd(),
+  inputs = {},
+  componentId,
+  components = {}
 ) => {
   const slsYml = await getComponent(componentRoot, componentId, inputs)
 

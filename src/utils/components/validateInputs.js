@@ -1,6 +1,12 @@
 const validate = require('raml-validate')()
+const chalk = require('chalk')
 const {
-  assoc, prop, isEmpty, has, forEachObjIndexed, isNil
+  assoc,
+  prop,
+  isEmpty,
+  has,
+  forEachObjIndexed,
+  isNil
 } = require('ramda')
 
 function validateInputs(componentId, inputTypes, inputs) {
@@ -10,14 +16,20 @@ function validateInputs(componentId, inputTypes, inputs) {
     const validation = schema({ ...inputs })
     if (!validation.valid) {
       const component = componentId.split(':').pop()
-      errorMessages = validation.errors.map((error) =>
-        `Type error in component "${component}" --> Input "${error.key}" has value ${
-          error.value
-        } but expected the following: ${error.rule} ${error.attr}.`)
+      errorMessages = validation.errors.map((error, i) => {
+        const componentName = chalk.white(`"${component}"`)
+        const header = (i !== 0) ? '' : chalk.redBright.bold(`\nType error in component ${componentName}`)
+        const value = chalk.cyanBright(`"${error.value}"`)
+        const key = `${chalk.yellowBright(error.key)}`
+        const suppliedType = typeof error.value
+        const newLine = (i === 0) ? '\n' : ''
+        return `${header}${newLine} - Input ${key} has \`${suppliedType}\` value of ${value} but expected the following: ${chalk.yellowBright(error.rule)} ${chalk.yellowBright(error.attr)}.\n`
+      })
     }
   }
+
   if (errorMessages.length) {
-    const message = errorMessages.join(' ')
+    const message = errorMessages.join('')
     throw new Error(message)
   }
 
