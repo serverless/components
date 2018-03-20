@@ -38,7 +38,7 @@ Serverless Components can deploy anything, but they're biased toward SaaS & clou
   * [Testing](#testing)
 * [Docs](#docs)
   * [apigateway](#apigateway)
-  * [dynamodb](#dynamodb)
+  * [dynamodb](registry/dynamodb-model/README.md)
   * [eventgateway](#eventgateway)
   * [github](#github)
   * [github-webhook-receiver](#github-webhook-receiver)

@@ -1,0 +1,9 @@
+type: dynamodb-model
+
+inputTypes:
+  region:
+    type: string
+    required: true
+  tables:
+    type: object[]
+    required: true
