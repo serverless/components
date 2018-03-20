@@ -1,4 +1,6 @@
 type: rg-s3policy
 
-inputs:
-  bucketName: some-unique-bucket-name
+inputTypes:
+  bucketName:
+    type: string
+    required: true

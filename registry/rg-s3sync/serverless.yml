@@ -1,5 +1,9 @@
 type: rg-s3sync
 
-inputs:
-  contentPath: ./site
-  bucketName: rg-content-bucket
+inputTypes:
+  contentPath:
+    type: string
+    required: true
+  bucketName:
+    type: string
+    required: true

@@ -1,9 +1,16 @@
 type: rg-route53
 
-inputs:
-  name: mydefaulthostedzone  # sent to CallerReference
-  domainName: www.defaultdomain.com
-  dnsName: d111111abcdef8.cloudfront.net
-  privateZone: false
-  vpcId: my-existing-vpc-id
-  vpcRegion: mydefaultvpcregion
+inputTypes:
+  name:
+    type: string
+    required: true
+  domainName:
+    type: string
+  dnsName:
+    type: string
+  privateZone:
+    type: boolean
+  vpcId:
+    type: string
+  vpcRegion:
+    type: string

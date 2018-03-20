@@ -1,8 +1,10 @@
 # TODO: move this to the "examples" directory
 type: github-webhook-receiver
 
-inputs:
-  url: http://example.com/webhook
+inputTypes:
+  url:
+    type: string
+    default: http://example.com/webhook
 
 components:
 #  myTable:

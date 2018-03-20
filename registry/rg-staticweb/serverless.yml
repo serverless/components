@@ -1,14 +1,29 @@
+# TODO: move this to the "examples" directory
 # static website component
 
 type: rg-staticweb
-inputs:
-  name: rgfamilysite
-  contentPath: ./site
-  contentIndex: index.html
-  contentError: error.html
-  hostingRegion: us-east-1
-  hostingDomain: rgfamily.com
-  aliasDomain: www.rgfamily.com
+inputTypes:
+  name:
+    type: string
+    default: rgfamilysite
+  contentPath:
+    type: string
+    default: ./site
+  contentIndex:
+    type: string
+    default: index.html
+  contentError:
+    type: string
+    default: error.html
+  hostingRegion:
+    type: string
+    default: us-east-1
+  hostingDomain:
+    type: string
+    default: rgfamily.com
+  aliasDomain:
+    type: string
+    default: www.rgfamily.com
 
 components:
   rootDomainBucket:
