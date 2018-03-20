@@ -9,8 +9,8 @@
   </div>
   <script type="text/javascript">
       var productList = $('#products')
-      productList.empty()
       $.get("{{{apiUrl}}}catalog/all", function(products) {
+        productList.empty()
         $(document).ready(function () {
         for(var i in products) {
           var product = products[i]
