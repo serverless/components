@@ -1,6 +1,12 @@
 type: rg-iamrole
 
-inputs:
-  name: default-role-name-goes-here-2
-  service: lambda.amazonaws.com
-  policyArn: some-policy-arn
+inputTypes:
+  name:
+    type: string
+    required: true
+  service:
+    type: string
+    required: true
+  policyArn:
+    type: string
+    required: true

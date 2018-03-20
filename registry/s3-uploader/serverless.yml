@@ -1,8 +1,10 @@
 # TODO: move this to the "examples" directory
 type: s3-uploader
 
-inputs:
-  name: abc
+inputTypes:
+  name:
+    type: string
+    default: my-s3-uploader
 
 components:
   uploaderLambda:
