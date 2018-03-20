@@ -4,7 +4,7 @@ const path = require('path')
 const mustache = require('mustache')
 const recursive = require('recursive-readdir')
 
-const deploy = (inputs) => {
+const deploy = async (inputs) => {
   const values = inputs.values || {}
   const sourcePath = inputs.sourcePath || process.cwd()
 
@@ -12,7 +12,7 @@ const deploy = (inputs) => {
   const tmpPath = tmpDir.name
 
   // copy non-template files
-  recursive(sourcePath, (error, sources) => {
+  await recursive(sourcePath).then((sources) => {
     sources.forEach((source) => {
       const destination = path.join(
         tmpPath,
