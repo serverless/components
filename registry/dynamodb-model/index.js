@@ -18,7 +18,11 @@ const findOutputTableByName = (tables, tableName) => { // eslint-disable-line ar
 
 const removeOutputTableByName = (tables, tableName) => { // eslint-disable-line arrow-body-style
   if (!tables || tables.length === 0) return { ddbtables: [] }
-  return { ddbtables: [ tables.filter((table) => (!table[tableName]))[0] ] }
+  const val = tables.filter((table) => (!table[tableName]))[0]
+  if (val) {
+    return { ddbtables: [ val ] }
+  }
+  return { ddbtables: [] }
 }
 
 const convertUserTypeToJoiType = (userType) => {
@@ -114,7 +118,8 @@ const defineTable = (table) => {
   return dynamo.define(table.name, params)
 }
 
-const createTables = async (inputs) => {
+const createTables = async (inputs, context) => {
+  const ddbtables = context.state.ddbtables // eslint-disable-line prefer-destructuring
   const allTables = inputs.tables.map(async (table) => {
     const tableName = table.name
     // add provisionedThroughput parameters
@@ -131,17 +136,21 @@ const createTables = async (inputs) => {
         console.log(`Created table: '${tableName}'`)
         const obj = {}
         obj[tableName] = data
+        ddbtables.push(obj)
+        const outputs = {
+          ddbtables
+        }
+        context.saveState({ ...inputs, ...outputs })
         return obj
       })
       .catch((err) => {
-        // console.log(`Error creating table: '${tableName}'\n${err.message}`)
         throw err
       })
   })
 
-  return Promise.all(allTables).then((ddbtables) => {
+  return Promise.all(allTables).then((results) => {
     const outputs = {
-      ddbtables
+      results
     }
     return outputs
   })
@@ -225,8 +234,7 @@ const deploy = async (inputs, context) => {
       context.state.ddbtables.length !== context.state.tables.length) {
     context.log('Creating table(s)...')
     try {
-      outputs = await createTables(inputs)
-      context.saveState({ ...inputs, ...outputs })
+      outputs = await createTables(inputs, context)
     } catch (err) {
       console.log('Error in creating table(s)', err.message)
     }
@@ -253,7 +261,7 @@ const remove = async (inputs, context) => {
       const ddbTables = removeOutputTableByName(context.state.ddbtables, tableName)
       context.saveState({ ...inputs, ...ddbTables })
     } catch (err) {
-      context.log(`Error in removing table: '${tableName}'\n${err}`)
+      context.log(`Error in removing table: '${tableName}'\n${err.message}`)
     }
   } else {
     context.log('Incorrect or insufficient parameters. \nUsage: remove --tablename <tablename>')
