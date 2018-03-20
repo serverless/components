@@ -9,6 +9,9 @@ inputTypes:
   contentPath:
     type: string
     default: ./site
+  templateValues:
+    type: object
+    default: {}
   contentIndex:
     type: string
     default: index.html
@@ -26,6 +29,11 @@ inputTypes:
     default: www.rgfamily.com
 
 components:
+  renderedFiles:
+    type: mustache
+    inputs:
+      sourcePath: ${input.contentPath}
+      values: ${input.templateValues}
   rootDomainBucket:
     type: s3
     inputs:
@@ -37,7 +45,7 @@ components:
   siteContentUploader:
     type: rg-s3sync
     inputs:
-      contentPath: ${input.contentPath}
+      contentPath: ${renderedFiles.renderedFilePath}
       bucketName: ${rootDomainBucket.name}
   wwwDomainBucket:
     type: s3

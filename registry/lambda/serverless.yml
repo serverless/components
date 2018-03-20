@@ -17,5 +17,5 @@ inputTypes:
     type: string
     required: true
   role:
-    type: string
-    required: true
+    type: object
+    required: false

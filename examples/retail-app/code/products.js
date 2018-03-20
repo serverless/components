@@ -8,7 +8,8 @@ function create(evt, ctx, cb) {
   cb(null, {
     statusCode: 201,
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
     },
     body: 'created'
   })
@@ -27,7 +28,8 @@ function get(evt, ctx, cb) {
   cb(null, {
     statusCode: 200,
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
     },
     body: JSON.stringify(products[id])
   })
@@ -37,7 +39,8 @@ function list(evt, ctx, cb) {
   cb(null, {
     statusCode: 200,
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
     },
     body: JSON.stringify(products)
   })

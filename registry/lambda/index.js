@@ -4,8 +4,8 @@ const pack = require('./pack')
 const lambda = new AWS.Lambda({ region: 'us-east-1' })
 
 const createLambda = async ({
-  name, handler, memory, timeout, env, description, role
-}) => {
+  name, handler, memory, timeout, env, description
+}, role) => {
   const pkg = await pack()
 
   const params = {
@@ -17,7 +17,7 @@ const createLambda = async ({
     Handler: handler,
     MemorySize: memory,
     Publish: true,
-    Role: role,
+    Role: role.arn,
     Runtime: 'nodejs6.10',
     Timeout: timeout,
     Environment: {
@@ -27,13 +27,14 @@ const createLambda = async ({
 
   const res = await lambda.createFunction(params).promise()
   return {
-    arn: res.FunctionArn
+    arn: res.FunctionArn,
+    roleArn: role.arn
   }
 }
 
 const updateLambda = async ({
   name, handler, memory, timeout, env, description
-}) => {
+}, role) => {
   const pkg = await pack()
   const functionCodeParams = {
     FunctionName: name,
@@ -46,6 +47,7 @@ const updateLambda = async ({
     Description: description,
     Handler: handler,
     MemorySize: memory,
+    Role: role.arn,
     Runtime: 'nodejs6.10',
     Timeout: timeout,
     Environment: {
@@ -57,7 +59,8 @@ const updateLambda = async ({
   const res = await lambda.updateFunctionConfiguration(functionConfigParams).promise()
 
   return {
-    arn: res.FunctionArn
+    arn: res.FunctionArn,
+    roleArn: role.arn
   }
 }
 
@@ -73,10 +76,26 @@ const deleteLambda = async (name) => {
 }
 
 const deploy = async (inputs, context) => {
-  let outputs
+  let outputs = {}
+
+  const configuredRole = inputs.role
+  let { defaultRole } = context.state
+
+  const defaultRoleComponent = context.load('iam', 'defaultRole')
+
+  if (!configuredRole && !defaultRole) {
+    const iamInputs = {
+      name: `${inputs.name}-execution-role`,
+      service: 'lambda.amazonaws.com'
+    }
+    defaultRole = await defaultRoleComponent.deploy(iamInputs)
+  }
+
+  const role = configuredRole || defaultRole
+
   if (inputs.name && !context.state.name) {
     context.log(`Creating Lambda: ${inputs.name}`)
-    outputs = await createLambda(inputs)
+    outputs = await createLambda(inputs, role)
   } else if (context.state.name && !inputs.name) {
     context.log(`Removing Lambda: ${context.state.name}`)
     outputs = await deleteLambda(context.state.name)
@@ -84,16 +103,27 @@ const deploy = async (inputs, context) => {
     context.log(`Removing Lambda: ${context.state.name}`)
     await deleteLambda(context.state.name)
     context.log(`Creating Lambda: ${inputs.name}`)
-    outputs = await createLambda(inputs)
+    outputs = await createLambda(inputs, role)
   } else {
     context.log(`Updating Lambda: ${inputs.name}`)
-    outputs = await updateLambda(inputs)
+    outputs = await updateLambda(inputs, role)
   }
-  context.saveState({ ...inputs, ...outputs })
+
+  if (configuredRole && defaultRole) {
+    await defaultRoleComponent.remove()
+    defaultRole = null
+  }
+
+  context.saveState({ ...inputs, ...outputs, defaultRole })
   return outputs
 }
 
 const remove = async (inputs, context) => {
+  if (context.state.defaultRole) {
+    const defaultRoleComponent = context.load('iam', 'defaultRole')
+    await defaultRoleComponent.remove()
+  }
+
   context.log(`Removing Lambda: ${context.state.name}`)
   const outputs = await deleteLambda(context.state.name)
   context.saveState()
