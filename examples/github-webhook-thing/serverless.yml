@@ -1,0 +1,16 @@
+type: github-webhook-example
+
+components:
+  myGithubFunction:
+    type: lambda
+    inputs:
+      name: myGithubFunction
+      memory: 512
+      timeout: 10
+      handler: code/handler.githubFunction
+  productsApi:
+    type: github-webhook-aws
+    inputs:
+      handler: ${myGithubFunction}
+      events:
+        - pull_request
