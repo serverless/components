@@ -232,6 +232,11 @@ const deploy = async (inputs, context) => {
   if (!context.state ||
       !context.state.ddbtables ||
       context.state.ddbtables.length !== context.state.tables.length) {
+    // TODO: Fix creating multiple tables on deploy. Restrict to one table for now
+    if (inputs.tables.length > 1) {
+      context.log('Cannot deploy multiple tables at this time. Please update your inputs and try again...')
+      return {}
+    }
     context.log('Creating table(s)...')
     try {
       outputs = await createTables(inputs, context)
