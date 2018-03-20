@@ -22,7 +22,7 @@ Components are capable of provisioning infrastructure while including both appli
   * [Testing](#testing)
 * [Docs](#docs)
   * [apigateway](#apigateway)
-  * [dynamodb](#dynamodb)
+  * [dynamodb](registry/dynamodb-model/README.md)
   * [eventgateway](#eventgateway)
   * [github](#github)
   * [github-webhook-receiver](#github-webhook-receiver)
