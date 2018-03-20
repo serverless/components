@@ -27,9 +27,7 @@ const createRole = async ({ name, service }) => {
 
   await BbPromise.delay(15000)
 
-  return {
-    arn: roleRes.Role.Arn
-  }
+  return roleRes.Role.Arn
 }
 
 const deleteRole = async (name) => {
@@ -42,37 +40,61 @@ const deleteRole = async (name) => {
     RoleName: name
   }).promise()
 
-  return {
-    arn: null
+  return null
+}
+
+const rollback = async (inputs, context) => {
+  if (!context.archive.name && context.state.name) {
+    context.log(`Removing Role: ${context.state.name}`)
+    await deleteRole(context.state.name)
+  } else if (context.archive.name && !context.state.name) {
+    context.log(`Creating Role: ${context.archive.name}`)
+    await createRole({ name: context.archive.name, service: inputs.service })
+  } else if (context.archive.name !== context.state.name) {
+    context.log(`Removing Role: ${context.state.name}`)
+    await deleteRole(context.state.name)
+    context.log(`Creating Role: ${context.archive.name}`)
+    await createRole({ name: context.archive.name, service: inputs.service })
   }
+  const outputs = { arn: context.archive.arn }
+  return outputs
 }
 
 const deploy = async (inputs, context) => {
-  let outputs = context.state
+  let state = {}
   if (!context.state.name && inputs.name) {
     context.log(`Creating Role: ${inputs.name}`)
-    outputs = await createRole(inputs)
+    state.arn = await createRole(inputs)
+    state.name = inputs.name
   } else if (!inputs.name && context.state.name) {
     context.log(`Removing Role: ${context.state.name}`)
-    outputs = await deleteRole(context.state.name)
+    state.arn = await deleteRole(context.state.name)
+    state.name = null
   } else if (context.state.name !== inputs.name) {
     context.log(`Removing Role: ${context.state.name}`)
     await deleteRole(context.state.name)
     context.log(`Creating Role: ${inputs.name}`)
-    outputs = await createRole(inputs)
+    state.arn = await createRole(inputs)
+    state.name = inputs.name
+  } else {
+    state = context.state // eslint-disable-line
   }
-  context.saveState({ ...inputs, ...outputs })
+  const outputs = {
+    arn: state.arn || 'abc'
+  }
+  context.saveState(state)
   return outputs
 }
 
 const remove = async (inputs, context) => {
   context.log(`Removing Role: ${context.state.name}`)
   const outputs = await deleteRole(context.state.name)
-  context.saveState()
+  context.saveState({ name: null, arn: null })
   return outputs
 }
 
 module.exports = {
   deploy,
-  remove
+  remove,
+  rollback
 }

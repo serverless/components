@@ -138,7 +138,7 @@ describe('Integration Test - Simple', () => {
       expect(stateFileContent).toEqual(expected)
     })
 
-    it('should save the current state if an error occurs during command execution', async () => {
+    it('should rollback to the previous state if an error occurs during command execution', async () => {
       // NOTE: we've added some logic in the function component so that it fails when the
       // third deployment is done
       // NOTE: the order of this test here is important since we're keeping and checking the
@@ -159,7 +159,7 @@ describe('Integration Test - Simple', () => {
           state: {
             id: 'id:iam:role:my-function',
             name: 'my-function',
-            deploymentCounter: 3
+            deploymentCounter: 2
           }
         },
         'simple:myFunction': {
@@ -186,6 +186,10 @@ describe('Integration Test - Simple', () => {
       })
       const stateFileContent = await fsp.readJsonAsync(testServiceStateFile)
       const expected = {
+        simple: {
+          type: 'simple',
+          state: {}
+        },
         'simple:myRole': {
           type: 'tests-integration-iam-mock',
           state: {}

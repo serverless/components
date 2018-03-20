@@ -3,11 +3,14 @@ const { keys, reduce } = require('ramda')
 const getRegistryRoot = require('../getRegistryRoot')
 const getState = require('../state/getState')
 
-const generateContext = (component, stateFile, options) => {
+const generateContext = (component, stateFile, archive, options, command) => {
   const { id, type } = component
   const context = {
     id,
+    type,
+    archive: getState(archive, id),
     state: getState(stateFile, id),
+    command,
     options,
     log: (message) => {
       if (!process.env.CI) {
@@ -16,9 +19,14 @@ const generateContext = (component, stateFile, options) => {
     },
     load: (type, alias) => { // eslint-disable-line no-shadow
       const childComponent = require(path.join(getRegistryRoot(), type)) // eslint-disable-line
-
       childComponent.id = `${id}:${alias}`
-      const childComponentContext = generateContext(childComponent, stateFile, options)
+      const childComponentContext = generateContext(
+        childComponent,
+        stateFile,
+        archive,
+        options,
+        command
+      )
 
       const fnNames = keys(childComponent)
 
