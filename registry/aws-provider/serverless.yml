@@ -1,0 +1,21 @@
+type: aws-provider
+
+inputTypes:
+  credentials:
+    type: object
+    required: true
+    properties:
+      accessKeyId:
+        type: string
+        required: true
+      secretAccessKey:
+        type: string
+        required: true
+      sessionToken:
+        type: string
+        required: false
+        default: ~
+  region:
+    type: string
+    required: false
+    default: us-east-1
