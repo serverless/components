@@ -157,7 +157,6 @@ async function deploy(inputs, context) {
     )
     outputs.url = outputs.apigateway.url
   }
-  console.log('REST API', JSON.stringify(outputs))
   return outputs
 }
 
