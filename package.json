@@ -43,10 +43,10 @@
     "node-where": "^1.1.0",
     "public-ip": "^2.4.0",
     "ramda": "^0.25.0",
-    "raven": "^2.4.2",
     "raml-validate": "^1.1.2",
-    "s3-client": "^4.4.1",
+    "raven": "^2.4.2",
     "rc": "^1.2.6",
+    "s3-client": "^4.4.1",
     "uuid": "^3.2.1",
     "write-file-atomic": "^2.3.0"
   },

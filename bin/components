@@ -1,11 +1,15 @@
 #!/usr/bin/env node
 const minimist = require('minimist')
+const chalk = require('chalk')
+
 const { run } = require('../src/index')
 
 const command = process.argv[2]
 const options = minimist(process.argv.slice(2))
 delete options._
 run(command, options).catch((error) => {
-  console.error(error)
+  console.log('')
+  console.log(chalk.red(`-- Operation "${command}" Failed --------------------------`))
+  console.error(chalk.red(error.stack))
   process.exit(1)
 })
