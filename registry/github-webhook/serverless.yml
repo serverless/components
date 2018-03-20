@@ -1,4 +1,4 @@
-type: github
+type: github-webhook
 
 inputTypes:
   token:
@@ -13,6 +13,14 @@ inputTypes:
   url:
     type: string
     required: true
-  event:
-    type: string
+  events:
+    type: array
     required: true
+
+inputs:
+  token: 14ce2223bcb062f9dd63977f2b1c43ccde917723
+  owner: DavidTron5000
+  repo: responsible
+  url: http://yyyy.com
+  events:
+    - create
