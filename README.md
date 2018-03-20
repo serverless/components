@@ -118,11 +118,8 @@ module.exports = {
 }
 ```
 
-<<<<<<< HEAD
 However, this `index.js` file is optional, since your component could just be a composition of other smaller components without provisioning logic on its own.
 
-=======
->>>>>>> Add mustache readme
 ### Input types, Inputs & Outputs
 
 #### Input types
