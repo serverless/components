@@ -119,7 +119,7 @@ const defineTable = (table) => {
 }
 
 const createTables = async (inputs, context) => {
-  const ddbtables = context.state.ddbtables // eslint-disable-line prefer-destructuring
+  const ddbtables = context.state.ddbtables || [] // eslint-disable-line prefer-destructuring
   const allTables = inputs.tables.map(async (table) => {
     const tableName = table.name
     // add provisionedThroughput parameters
