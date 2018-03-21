@@ -1,4 +1,4 @@
-type: s3-uplaoder-downloader
+type: s3-uploader-downloader
 
 components:
   filesBucket:
