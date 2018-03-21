@@ -1,4 +1,4 @@
-type: lambda
+type: aws-lambda
 
 inputTypes:
   name:
