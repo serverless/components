@@ -6,15 +6,17 @@ const pathParameterPattern = /{([^}]+?)}/g
 
 // "private" functions
 async function deployIamRole(inputs, context) {
-  const roleName = `${inputs.name}-iam-role`
-  const iamInputs = {
-    name: roleName,
-    service: 'apigateway.amazonaws.com'
-  }
+  // TODO: remove duplicate code
+  const name = `${inputs.name}-iam-role`
+  const service = 'apigateway.amazonaws.com'
 
-  const iamComponent = await context.load('aws-iam-role', 'iam')
-  const outputs = await iamComponent.deploy(iamInputs)
-  outputs.name = roleName
+  const iamComponent = await context.load('aws-iam-role', 'iam', {
+    name,
+    service
+  })
+  const outputs = await iamComponent.deploy()
+  outputs.name = name
+  outputs.service = service
   return outputs
 }
 
@@ -45,8 +47,8 @@ function getAwsApiGatewayInputs(inputs) {
 async function deployApiGateway(inputs, context) {
   const apiInputs = getAwsApiGatewayInputs(inputs)
 
-  const apiGatewayComponent = await context.load('aws-apigateway', 'apig')
-  const outputs = await apiGatewayComponent.deploy(apiInputs)
+  const apiGatewayComponent = await context.load('aws-apigateway', 'apig', apiInputs)
+  const outputs = await apiGatewayComponent.deploy()
   outputs.name = inputs.name
   return outputs
 }
@@ -82,20 +84,27 @@ async function deployEventGateway(inputs, context) {
 
   const mapIndexed = addIndex(map)
   const deployPromises = mapIndexed(
-    (input, index) => context.load('eventgateway', `eg-${index}`).then((eg) => eg.deploy(input)),
+    (input, index) => context.load('eventgateway', `eg-${index}`, input).then((eg) => eg.deploy()),
     eventGatewayInputs
   )
   return Promise.all(deployPromises)
 }
 
 async function removeIamRole(inputs, context) {
-  const iamComponent = await context.load('aws-iam-role', 'iam')
-  return iamComponent.remove(inputs)
+  // TODO: remove duplicate code
+  const name = `${inputs.name}-iam-role`
+  const service = 'apigateway.amazonaws.com'
+
+  const iamComponent = await context.load('aws-iam-role', 'iam', {
+    name,
+    service
+  })
+  return iamComponent.remove()
 }
 
 async function removeApiGateway(inputs, context) {
-  const apiGatewayComponent = await context.load('aws-apigateway', 'apig')
-  return apiGatewayComponent.remove(inputs)
+  const apiGatewayComponent = await context.load('aws-apigateway', 'apig', inputs)
+  return apiGatewayComponent.remove()
 }
 
 async function removeEventGateway(inputs, context) {
@@ -103,7 +112,7 @@ async function removeEventGateway(inputs, context) {
 
   const mapIndexed = addIndex(map)
   const removePromises = mapIndexed(
-    (input, index) => context.load('eventgateway', `eg-${index}`).then((eg) => eg.remove(input)),
+    (input, index) => context.load('eventgateway', `eg-${index}`, input).then((eg) => eg.remove()),
     eventGatewayInputs
   )
   return Promise.all(removePromises)
