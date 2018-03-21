@@ -1,5 +1,7 @@
 function deploy(inputs, context) {
-  const { name, role } = inputs
+  const {
+    name, memorySize, timeout, environment, role
+  } = inputs
   context.log(`Deploying function "${name}"`)
 
   const id = `id:function:${name}`
@@ -19,6 +21,9 @@ function deploy(inputs, context) {
     ...context.state,
     id,
     name,
+    memorySize,
+    timeout,
+    environment,
     role,
     deploymentCounter
   }

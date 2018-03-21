@@ -59,6 +59,7 @@ describe('Integration Test - Simple', () => {
           state: {
             id: 'id:iam:role:my-function',
             name: 'my-function',
+            service: 'my.function.service',
             deploymentCounter: 1
           }
         },
@@ -67,6 +68,14 @@ describe('Integration Test - Simple', () => {
           state: {
             id: 'id:function:my-function',
             name: 'my-function',
+            memorySize: 512,
+            timeout: 60,
+            environment: {
+              isMock: true,
+              variables: {
+                key1: 'value1'
+              }
+            },
             role: 'id:iam:role:my-function',
             deploymentCounter: 1
           }
@@ -90,6 +99,7 @@ describe('Integration Test - Simple', () => {
           state: {
             id: 'id:iam:role:my-function',
             name: 'my-function',
+            service: 'my.function.service',
             deploymentCounter: 2
           }
         },
@@ -98,6 +108,14 @@ describe('Integration Test - Simple', () => {
           state: {
             id: 'id:function:my-function',
             name: 'my-function',
+            memorySize: 512,
+            timeout: 60,
+            environment: {
+              isMock: true,
+              variables: {
+                key1: 'value1'
+              }
+            },
             role: 'id:iam:role:my-function',
             deploymentCounter: 2
           }
@@ -121,6 +139,7 @@ describe('Integration Test - Simple', () => {
           state: {
             id: 'id:iam:role:my-function',
             name: 'my-function',
+            service: 'my.function.service',
             deploymentCounter: 2
           }
         },
@@ -129,6 +148,14 @@ describe('Integration Test - Simple', () => {
           state: {
             id: 'id:function:my-function',
             name: 'my-function',
+            memorySize: 512,
+            timeout: 60,
+            environment: {
+              isMock: true,
+              variables: {
+                key1: 'value1'
+              }
+            },
             role: 'id:iam:role:my-function',
             deploymentCounter: 2,
             data: 'Hello World'
@@ -159,6 +186,7 @@ describe('Integration Test - Simple', () => {
           state: {
             id: 'id:iam:role:my-function',
             name: 'my-function',
+            service: 'my.function.service',
             deploymentCounter: 2
           }
         },
@@ -167,6 +195,14 @@ describe('Integration Test - Simple', () => {
           state: {
             id: 'id:function:my-function',
             name: 'my-function',
+            memorySize: 512,
+            timeout: 60,
+            environment: {
+              isMock: true,
+              variables: {
+                key1: 'value1'
+              }
+            },
             role: 'id:iam:role:my-function',
             deploymentCounter: 2,
             data: 'Hello World'

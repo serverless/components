@@ -1,5 +1,5 @@
 function deploy(inputs, context) {
-  const { name } = inputs
+  const { name, service } = inputs
   context.log(`Deploying role "${name}"`)
 
   const id = `id:iam:role:${name}`
@@ -14,6 +14,7 @@ function deploy(inputs, context) {
     ...context.state,
     id,
     name,
+    service,
     deploymentCounter
   }
   context.saveState(newState)
