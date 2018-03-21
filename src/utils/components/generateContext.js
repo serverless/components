@@ -19,9 +19,12 @@ const generateContext = (component, stateFile, archive, options, command) => {
     },
     load: (type, alias) => { // eslint-disable-line no-shadow
       const childComponent = require(path.join(getRegistryRoot(), type)) // eslint-disable-line
-      childComponent.id = `${id}:${alias}`
+      const childComponentObj = {
+        id: `${id}:${alias}`,
+        type
+      }
       const childComponentContext = generateContext(
-        childComponent,
+        childComponentObj,
         stateFile,
         archive,
         options,
@@ -47,6 +50,7 @@ const generateContext = (component, stateFile, archive, options, command) => {
         }
       }
       stateFile[this.id].state = state
+      stateFile[this.id].type = type
       this.state = state
     }
   }
