@@ -1,7 +1,6 @@
-const path = require('path')
 const { keys, reduce } = require('ramda')
-const getRegistryRoot = require('../getRegistryRoot')
 const getState = require('../state/getState')
+const findComponent = require('../findComponent')
 
 const generateContext = (component, stateFile, archive, options, command) => {
   const { id, type } = component
@@ -17,8 +16,9 @@ const generateContext = (component, stateFile, archive, options, command) => {
         process.stdin.write(`${message}\n`)
       }
     },
-    load: (type, alias) => { // eslint-disable-line no-shadow
-      const childComponent = require(path.join(getRegistryRoot(), type)) // eslint-disable-line
+    load: (loadType, alias) => {
+      // eslint-disable-line no-shadow
+      const childComponent = require(findComponent(loadType)) // eslint-disable-line
       childComponent.id = `${id}:${alias}`
       const childComponentContext = generateContext(
         childComponent,
@@ -30,15 +30,20 @@ const generateContext = (component, stateFile, archive, options, command) => {
 
       const fnNames = keys(childComponent)
 
-      const modifiedComponent = reduce((accum, fnName) => {
-        const childComponentFn = childComponent[fnName]
-        accum[fnName] = async (inputs) => childComponentFn(inputs, childComponentContext)
-        return accum
-      }, {}, fnNames)
+      const modifiedComponent = reduce(
+        (accum, fnName) => {
+          const childComponentFn = childComponent[fnName]
+          accum[fnName] = async (inputs) => childComponentFn(inputs, childComponentContext)
+          return accum
+        },
+        {},
+        fnNames
+      )
 
       return modifiedComponent
     },
-    saveState: function (state = {}) { // eslint-disable-line
+    saveState(state = {}) {
+      // eslint-disable-line
       // NOTE: set default values if information about component in stateFile is not yet present
       if (!stateFile[this.id]) {
         stateFile[this.id] = {

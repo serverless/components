@@ -290,6 +290,8 @@ The registry is not only constrained to serve components. Since components are f
 
 Looking into the future it could be possible to serve functions which are written in different languages through the registry.
 
+Additional directories for components can be added to your **.serverless.rc** file, located at `~/.serverless`. Add a top-level property `componentDirectories` to this JSON, with an array of paths, e.g. `"componentDirectories": ["/path/to/my/components"]`.
+
 ## Creating components
 
 A quick guide to help you build your kick-start component development.

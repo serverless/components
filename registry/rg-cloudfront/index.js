@@ -111,10 +111,10 @@ const createDistribution = async ({
     },
     DefaultRootObject: defaultRootObject,
     Logging: {
-      Bucket: loggingBucket,
-      Enabled: loggingEnabled,
-      IncludeCookies: loggingIncludeCookies,
-      Prefix: loggingPrefix
+      Bucket: loggingBucket || null,
+      Enabled: !!loggingEnabled,
+      IncludeCookies: !!loggingIncludeCookies,
+      Prefix: loggingPrefix || null
     },
     PriceClass: priceClass
   }

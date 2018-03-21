@@ -3,14 +3,14 @@ const getComponentsToRemove = require('./getComponentsToRemove')
 describe('#getComponentsToRemove()', () => {
   const stateFile = {
     'function-mock': {
-      type: 'function-mock',
+      type: 'tests-integration-function-mock',
       state: {
         memorySize: 512,
         timeout: 60
       }
     },
     'iam-mock': {
-      type: 'iam-mock',
+      type: 'tests-integration-function-mock',
       state: {
         service: 'some.serverless.service'
       }
@@ -34,12 +34,16 @@ describe('#getComponentsToRemove()', () => {
     const expected = {
       'function-mock': {
         id: 'function-mock',
-        type: 'function-mock',
+        type: 'tests-integration-function-mock',
         inputs: {},
         outputs: {},
         state: { memorySize: 512, timeout: 60 },
         dependencies: [],
-        fns: {}
+        fns: {
+          deploy: expect.any(Function),
+          remove: expect.any(Function),
+          invoke: expect.any(Function)
+        }
       }
     }
     const res = await getComponentsToRemove(stateFile, loadedComponents)

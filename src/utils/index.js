@@ -1,6 +1,6 @@
 const fs = require('./fs')
 const log = require('./log')
-const getRegistryRoot = require('./getRegistryRoot')
+const findComponent = require('./findComponent')
 const state = require('./state')
 const telemetry = require('./telemetry')
 const config = require('./config')
@@ -17,5 +17,5 @@ module.exports = {
   ...components,
   ...dag,
   log,
-  getRegistryRoot
+  findComponent
 }
