@@ -5,7 +5,14 @@ const getRegistryRoot = require('../getRegistryRoot')
 const getState = require('../state/getState')
 const fileExists = require('../fs/fileExists')
 
-const generateContext = (component, stateFile, archive, options, command, internallyManaged = false) => {
+const generateContext = (
+  component,
+  stateFile,
+  archive,
+  options,
+  command,
+  internallyManaged = false
+) => {
   const { id, type } = component
   const context = {
     id,
