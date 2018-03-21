@@ -10,7 +10,7 @@ const readFile = require('../fs/readFile')
 // const getLocation = require('./getLocation')
 
 module.exports = async (eventName, data = {}) => {
-  const trackingFilePath = path.join('..', '..', '..', 'tracking-config.json')
+  const trackingFilePath = path.resolve(__dirname, '..', '..', '..', 'tracking-config.json')
   const { trackingDisabled, frameworkId, userId } = await getConfig()
 
   // exit early if tracking disabled
@@ -31,10 +31,9 @@ module.exports = async (eventName, data = {}) => {
 
   const payload = {
     event: eventName,
-    frameworkId,
     userId: userId || uuid.v1(),
     // location: await getLocation(),
-    properties: data
+    properties: { frameworkId, ...data }
   }
 
   return analytics.track(payload)  // eslint-disable-line
