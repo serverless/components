@@ -72,7 +72,7 @@ const remove = async (inputs, context) => {
   if (!context.state.name) return {}
 
   context.log(`Removing Bucket: '${context.state.name}'`)
-  await deleteBucket(context.state.name)
+  await deleteBucket(context.state)
   context.saveState({})
   return {
     name: null
