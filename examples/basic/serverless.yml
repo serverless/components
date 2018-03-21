@@ -8,7 +8,8 @@ components:
       memory: 512
       timeout: 10
       handler: handler.handler
-      role: ${myRole.arn}
+      role:
+        arn: ${myRole.arn}
   myRole:
     type: aws-iam-role
     inputs:
