@@ -17,18 +17,17 @@ async function getComponentsToRemove(stateFile, loadedComponents) {
   }, stateFile)
   const componentIdsInServerlessYml = keys(loadedComponents)
   const componentsToRemove = difference(componentIdsInStateFile, componentIdsInServerlessYml)
-
-  return reduce(
-    async (accum, id) => {
-      const component = stateFile[id]
-      const { type } = component
-      // TODO: this code is used in other places as well --> DRY it
-      const componentRoot = path.join(getRegistryRoot(), type)
-      let fns = {}
-      if (await fileExists(path.join(componentRoot, 'index.js'))) {
-        fns = require(path.join(componentRoot, 'index.js')) // eslint-disable-line
-      }
-      accum[id] = {
+  const componentsInfo = componentsToRemove.map(async (id) => {
+    const component = stateFile[id]
+    const { type } = component
+    // TODO: this code is used in other places as well --> DRY it
+    const componentRoot = path.join(getRegistryRoot(), type)
+    let fns = {}
+    if (await fileExists(path.join(componentRoot, 'index.js'))) {
+      fns = require(path.join(componentRoot, 'index.js')) // eslint-disable-line
+    }
+    return {
+      [id]: {
         id,
         type,
         inputs: {},
@@ -37,11 +36,9 @@ async function getComponentsToRemove(stateFile, loadedComponents) {
         dependencies: [], // TODO: do we need to determine the dependencies here?
         fns
       }
-      return accum
-    },
-    {},
-    componentsToRemove
-  )
+    }
+  })
+  return Object.assign({}, ...(await Promise.all(componentsInfo)))
 }
 
 module.exports = getComponentsToRemove
