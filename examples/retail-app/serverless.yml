@@ -1,37 +1,39 @@
 type: retail-app
 
+inputs:
+  prefix: rgtest
+
 components:
   webFrontend:
     type: static-website
     inputs:
-      name: retail-frontend
+      name: ${input.prefix}-retail-frontend
       contentPath: ${self.path}/frontend
       templateValues:
         apiUrl: ${productsApi.url}
       contentIndex: index.htm
       contentError: error.htm
       hostingRegion: us-east-1
-      hostingDomain: serverless-retail-site-test.example.com
-      aliasDomain: www.serverless-retail-site-test.example.com
-
+      hostingDomain: serverless-${input.prefix}-retail-site-test.example.com
+      aliasDomain: www.serverless-${input.prefix}-retail-site-test.example.com
   createProduct:
     type: aws-lambda
     inputs:
-      name: retail-createProduct
+      name: ${input.prefix}-retail-createProduct
       memory: 512
       timeout: 10
       handler: code/products.create
   getProduct:
     type: aws-lambda
     inputs:
-      name: retail-getProduct
+      name: ${input.prefix}-retail-getProduct
       memory: 512
       timeout: 10
       handler: code/products.get
   listProducts:
     type: aws-lambda
     inputs:
-      name: retail-listProducts
+      name: ${input.prefix}-retail-listProducts
       memory: 512
       timeout: 10
       handler: code/products.list
@@ -39,7 +41,7 @@ components:
     type: rest-api
     inputs:
       gateway: aws-apigateway
-      name: retail-productsApi
+      name: ${input.prefix}-retail-productsApi
       routes:
         /products: # routes begin with a slash
           post: # HTTP method names are used to attach handlers
@@ -54,6 +56,24 @@ components:
 
         # multi-segment routes can be declared all at once
         /catalog/{...categories}: # catch-all path parameters use ellipses
-            get:
-              function: ${listProducts}
-              cors: true
+          get:
+            function: ${listProducts}
+            cors: true
+  productsDb:
+    type: aws-dynamodb
+    inputs:
+      region: us-east-1
+      tables:
+        - name: Product
+          hashKey: id
+          indexes:
+            - name: ProductIdIndex
+              type: global
+              hashKey: id
+          schema:
+            id: number
+            name: string
+            description: string
+            price: number
+          options:
+            timestamps: true
