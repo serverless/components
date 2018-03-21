@@ -51,6 +51,7 @@ describe('Integration Test - Programmatic usage', () => {
       const expected = {
         'programmatic-usage:myFunction:defaultRole': {
           type: 'tests-integration-iam-mock',
+          internallyManaged: true,
           state: {
             id: 'id:iam:role:my-function',
             name: 'my-function',
@@ -60,6 +61,7 @@ describe('Integration Test - Programmatic usage', () => {
         },
         'programmatic-usage:myFunction': {
           type: 'tests-integration-function-mock',
+          internallyManaged: false,
           state: {
             id: 'id:function:my-function',
             name: 'my-function',
@@ -93,15 +95,17 @@ describe('Integration Test - Programmatic usage', () => {
       const expected = {
         'programmatic-usage:myFunction:defaultRole': {
           type: 'tests-integration-iam-mock',
+          internallyManaged: true,
           state: {
             id: 'id:iam:role:my-function',
             name: 'my-function',
             service: 'default.serverless.service',
-            deploymentCounter: 1
+            deploymentCounter: 2
           }
         },
         'programmatic-usage:myFunction': {
           type: 'tests-integration-function-mock',
+          internallyManaged: false,
           state: {
             id: 'id:function:my-function',
             name: 'my-function',
@@ -118,7 +122,7 @@ describe('Integration Test - Programmatic usage', () => {
               id: 'id:iam:role:my-function',
               name: 'my-function',
               service: 'default.serverless.service',
-              deploymentCounter: 1
+              deploymentCounter: 2
             },
             deploymentCounter: 2
           }
@@ -139,6 +143,7 @@ describe('Integration Test - Programmatic usage', () => {
         },
         'programmatic-usage:myFunction:defaultRole': {
           type: 'tests-integration-iam-mock',
+          internallyManaged: true,
           state: {}
         },
         'programmatic-usage:myFunction': {

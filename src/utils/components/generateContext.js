@@ -6,7 +6,14 @@ const getState = require('../state/getState')
 const fileExists = require('../fs/fileExists')
 const log = require('../log')
 
-const generateContext = (component, stateFile, archive, options, command) => {
+const generateContext = (
+  component,
+  stateFile,
+  archive,
+  options,
+  command,
+  internallyManaged = false
+) => {
   const { id, type } = component
   const context = {
     id,
@@ -34,7 +41,8 @@ const generateContext = (component, stateFile, archive, options, command) => {
         stateFile,
         archive,
         options,
-        command
+        command,
+        true
       )
 
       // NOTE: this only returns an object containing the component functions
@@ -59,6 +67,7 @@ const generateContext = (component, stateFile, archive, options, command) => {
       if (!stateFile[this.id]) {
         stateFile[this.id] = {
           type,
+          internallyManaged,
           state: {}
         }
       }
