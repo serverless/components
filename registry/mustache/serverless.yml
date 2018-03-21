@@ -2,7 +2,7 @@ type: mustache
 
 inputTypes:
   sourcePath:
-    type: string,
+    type: string
     required: true
   values:
     type: object
