@@ -2,7 +2,7 @@ const path = require('path')
 const {
   difference, keys, reduce, isEmpty, forEachObjIndexed, union, not
 } = require('ramda')
-const getRegistryRoot = require('../getRegistryRoot')
+const findComponent = require('../findComponent')
 const { fileExists } = require('../fs')
 const getState = require('../state/getState')
 
@@ -28,7 +28,7 @@ async function getComponentsToRemove(stateFile, loadedComponents) {
         return accum
       }
       // TODO: this code is used in other places as well --> DRY it
-      const componentRoot = path.join(getRegistryRoot(), type)
+      const componentRoot = findComponent(type)
       let fns = {}
       const componentScript = path.join(componentRoot, 'index.js')
       if (await fileExists(componentScript)) {

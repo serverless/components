@@ -1,9 +1,9 @@
+const fsExtra = require('fs-extra')
 const getServerlessrcPath = require('./getServerlessrcPath')
 const createConfig = require('./createConfig')
-const fileExists = require('../fs/fileExists')
 
-module.exports = async () => {
-  if (!await fileExists(getServerlessrcPath())) {
+module.exports = () => {
+  if (!fsExtra.existsSync(getServerlessrcPath())) {
     createConfig()
   }
   return require('rc')('serverless') // eslint-disable-line
