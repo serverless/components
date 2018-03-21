@@ -11,7 +11,7 @@ async function getComponentsToRemove(stateFile, loadedComponents) {
   let componentIdsInStateFile = []
   forEachObjIndexed((value, key) => {
     const state = getState(stateFile, key)
-    if (not(isEmpty(state))) {
+    if (not(isEmpty(state)) && !value.internallyManaged) {
       componentIdsInStateFile = union(componentIdsInStateFile, [ key ])
     }
   }, stateFile)
