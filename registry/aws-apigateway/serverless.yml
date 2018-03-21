@@ -1,0 +1,12 @@
+type: aws-apigateway
+
+inputTypes:
+  name:
+    type: string
+    required: true
+  roleArn:
+    type: string
+    required: true
+  routes:
+    type: object
+    required: true

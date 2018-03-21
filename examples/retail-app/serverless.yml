@@ -2,7 +2,7 @@ type: retail-app
 
 components:
   webFrontend:
-    type: rg-staticweb
+    type: static-website
     inputs:
       name: retail-frontend
       contentPath: ${self.path}/frontend
@@ -15,21 +15,21 @@ components:
       aliasDomain: www.serverless-retail-site-test.example.com
 
   createProduct:
-    type: lambda
+    type: aws-lambda
     inputs:
       name: retail-createProduct
       memory: 512
       timeout: 10
       handler: code/products.create
   getProduct:
-    type: lambda
+    type: aws-lambda
     inputs:
       name: retail-getProduct
       memory: 512
       timeout: 10
       handler: code/products.get
   listProducts:
-    type: lambda
+    type: aws-lambda
     inputs:
       name: retail-listProducts
       memory: 512
@@ -38,7 +38,7 @@ components:
   productsApi:
     type: rest-api
     inputs:
-      gateway: apigateway
+      gateway: aws-apigateway
       name: retail-productsApi
       routes:
         /products: # routes begin with a slash

@@ -1,0 +1,16 @@
+type: s3-website-config
+
+inputTypes:
+  rootBucketName:
+    type: string
+    required: true
+  indexDocument:
+    type: string
+    default: index.html
+  errorDocument:
+    type: string
+    default: error.html
+  redirectBucketName:
+    type: string
+  redirectToHostName:
+    type: string

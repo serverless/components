@@ -1,9 +1,9 @@
-type: mustache
+type: aws-iam-policy
 
 inputTypes:
-  sourcePath:
+  name:
     type: string
     required: true
-  values:
+  document:
     type: object
-    required: false
+    required: true

@@ -1,0 +1,74 @@
+type: static-website
+
+inputTypes:
+  name:
+    type: string
+    required: true
+  contentPath:
+    type: string
+    default: ./site
+  templateValues:
+    type: object
+    default: {}
+  contentIndex:
+    type: string
+    default: index.html
+  contentError:
+    type: string
+    default: error.html
+  hostingRegion:
+    type: string
+    default: us-east-1
+  hostingDomain:
+    type: string
+    required: true
+  aliasDomain:
+    type: string
+    required: false
+
+components:
+  renderedFiles:
+    type: mustache
+    inputs:
+      sourcePath: ${input.contentPath}
+      values: ${input.templateValues}
+  rootDomainBucket:
+    type: aws-s3-bucket
+    inputs:
+      name: ${input.hostingDomain}
+  rootDomainBucketPolicy:
+    type: s3-policy
+    inputs:
+      bucketName: ${rootDomainBucket.name}
+  siteContentUploader:
+    type: s3-sync
+    inputs:
+      contentPath: ${renderedFiles.renderedFilePath}
+      bucketName: ${rootDomainBucket.name}
+  wwwDomainBucket:
+    type: aws-s3-bucket
+    inputs:
+      name: ${input.aliasDomain}
+  rootDomainBucketConfig:
+    type: s3-website-config
+    inputs:
+      rootBucketName: ${rootDomainBucket.name}
+      indexDocument: ${input.contentIndex}
+      errorDocument: ${input.contentError}
+      redirectBucketName: ${wwwDomainBucket.name}
+      redirectToHostName: ${input.hostingDomain}
+  siteCloudFrontConfig:
+    type: aws-cloudfront
+    inputs:
+      name: ${input.name}
+      defaultRootObject: ${input.contentIndex}
+      originId: ${rootDomainBucket.name}
+      originDomain: ${rootDomainBucket.name}.s3.amazonaws.com
+      aliasDomain: ${input.aliasDomain}
+      distributionEnabled: true
+  siteRoute53Config:
+    type: aws-route53
+    inputs:
+      name: ${input.name}
+      domainName: ${input.aliasDomain}
+      dnsName: ${siteCloudFrontConfig.distribution.domainName} # d111111abcdef8.cloudfront.net

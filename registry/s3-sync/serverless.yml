@@ -1,0 +1,9 @@
+type: s3-sync
+
+inputTypes:
+  contentPath:
+    type: string
+    required: true
+  bucketName:
+    type: string
+    required: true

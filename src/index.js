@@ -43,7 +43,6 @@ const run = async (command, options) => {
       options,
       true
     )
-    stateFile = archive
     throw error
   } finally {
     await writeStateFile(stateFile)

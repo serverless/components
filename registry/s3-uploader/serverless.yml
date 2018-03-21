@@ -1,26 +1,32 @@
-# TODO: move this to the "examples" directory
+# TODO: Make this more reusable
 type: s3-uploader
 
 inputTypes:
   name:
     type: string
     default: my-s3-uploader
+  eventGatewaySpace:
+    type: string
+    required: true
+  eventGatewayApiKey:
+    type: string
+    required: true
 
 components:
   uploaderLambda:
-    type: lambda
+    type: aws-lambda
     inputs:
       name: ${input.name}
       handler: uploader.handler
       env:
-        EVENT_GATEWAY_APIKEY: ${EVENT_GATEWAY_API_KEY}
-        BUCKET: serverless-components-eslam-files
+        EVENT_GATEWAY_APIKEY: ${inputs.eventGatewayApiKey}
+        BUCKET: serverless-components-files
   uploaderSubscription:
     type: eventgateway
     inputs:
       event: http
       method: POST
       path: ${input.name}
-      space: eslam
-      eventGatewayApiKey: s0m33v3ntg4t3w4y4p1k3y
+      space: ${inputs.eventGatewaySpace}
+      eventGatewayApiKey: ${inputs.eventGatewayApiKey}
       lambdaArn: ${uploaderLambda.arn}

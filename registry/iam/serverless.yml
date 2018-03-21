@@ -1,9 +1,0 @@
-type: iam
-
-inputTypes:
-  name:
-    type: string
-    required: true
-  service:
-    type: string
-    required: true

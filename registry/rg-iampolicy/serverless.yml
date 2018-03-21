@@ -1,9 +1,0 @@
-type: rg-iampolicy
-
-inputTypes:
-  name:
-    type: string
-    required: true
-  bucketName:
-    type: string
-    required: true

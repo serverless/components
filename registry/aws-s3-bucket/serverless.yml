@@ -1,0 +1,6 @@
+type: aws-s3-bucket
+
+inputTypes:
+  name:
+    type: string
+    required: true

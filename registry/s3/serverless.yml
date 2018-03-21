@@ -1,6 +1,0 @@
-type: s3
-
-inputTypes:
-  name:
-    type: string
-    required: true
