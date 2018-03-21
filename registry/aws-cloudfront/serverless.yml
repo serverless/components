@@ -20,10 +20,12 @@ inputTypes:
     default: false
   loggingBucket:
     type: string
+    default: ''
   loggingIncludeCookies:
     type: boolean
     default: false
   loggingPrefix:
     type: string
+    default: ''
   priceClass:
     type: string

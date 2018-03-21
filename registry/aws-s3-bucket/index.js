@@ -4,9 +4,9 @@ const AWS = require('aws-sdk')
 
 const S3 = new AWS.S3({ region: 'us-east-1' })
 
-const createBucket = async (name) => S3.createBucket({ Bucket: name }).promise()
+const createBucket = async ({ name }) => S3.createBucket({ Bucket: name }).promise()
 
-const deleteBucket = async (name) => {
+const deleteBucket = async ({ name }) => {
   const res = await S3.listObjectsV2({ Bucket: name }).promise()
 
   const objectsInBucket = []
@@ -31,17 +31,18 @@ const deleteBucket = async (name) => {
 }
 
 const deploy = async (inputs, context) => {
-  if (!context.state.name && inputs.name) {
+  const { state } = context
+  if (!state.name && inputs.name) {
     context.log(`Creating Bucket: '${inputs.name}'`)
-    await createBucket(inputs.name)
-  } else if (!inputs.name && context.state.name) {
-    context.log(`Removing Bucket: '${context.state.name}'`)
-    await deleteBucket(context.state.name)
-  } else if (context.state.name !== inputs.name) {
-    context.log(`Removing Bucket: '${context.state.name}'`)
-    await deleteBucket(context.state.name)
+    await createBucket(inputs)
+  } else if (!inputs.name && state.name) {
+    context.log(`Removing Bucket: '${state.name}'`)
+    await deleteBucket(state)
+  } else if (state.name !== inputs.name) {
+    context.log(`Removing Bucket: '${state.name}'`)
+    await deleteBucket(state)
     context.log(`Creating Bucket: '${inputs.name}'`)
-    await createBucket(inputs.name)
+    await createBucket(inputs)
   }
   const outputs = {
     name: inputs.name
@@ -50,19 +51,36 @@ const deploy = async (inputs, context) => {
   return outputs
 }
 
+const rollback = async (inputs, context) => {
+  const { archive, state } = context
+  if (!archive.name && state.name) {
+    context.log(`Removing Bucket: ${state.name}`)
+    await deleteBucket(state)
+  } else if (archive.name && !state.name) {
+    context.log(`Creating Bucket: ${archive.name}`)
+    await createBucket(archive)
+  } else if (archive.name !== state.name) {
+    context.log(`Removing Bucket: ${state.name}`)
+    await deleteBucket(state)
+    context.log(`Creating Bucket: ${archive.name}`)
+    await createBucket(archive)
+  }
+  return archive
+}
+
 const remove = async (inputs, context) => {
   if (!context.state.name) return {}
 
   context.log(`Removing Bucket: '${context.state.name}'`)
   await deleteBucket(context.state.name)
-  const outputs = {
+  context.saveState({})
+  return {
     name: null
   }
-  context.saveState({})
-  return outputs
 }
 
 module.exports = {
   deploy,
-  remove
+  remove,
+  rollback
 }
