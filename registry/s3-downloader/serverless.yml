@@ -1,24 +1,30 @@
-# TODO: move this to the "examples" directory
+# TODO: make this more reusable
 type: s3-downloader
 
 inputTypes:
   name:
     type: string
     default: my-s3-downloader
+  eventGatewaySpace:
+    type: string
+    required: true
+  eventGatewayApiKey:
+    type: string
+    required: true
 
 components:
   downloaderLambda:
-    type: lambda
+    type: aws-lambda
     inputs:
       name: ${input.name}
       handler: downloader.handler
       env:
-        EVENT_GATEWAY_APIKEY: ${EVENT_GATEWAY_API_KEY}
-        FILES_TABLE: serverless-components-eslam-files
+        EVENT_GATEWAY_APIKEY: ${inputs.eventGatewayApiKey}
+        FILES_TABLE: serverless-components-files
   downloaderSubscription:
     type: eventgateway
     inputs:
       event: fileUploaded
-      space: eslam
-      eventGatewayApiKey: s0m33v3ntg4t3w4y4p1k3y
+      space: ${inputs.eventGatewaySpace}
+      eventGatewayApiKey: ${inputs.eventGatewayApiKey}
       lambdaArn: ${downloaderLambda.arn}

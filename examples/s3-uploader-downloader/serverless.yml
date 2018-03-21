@@ -1,0 +1,19 @@
+type: s3-uploader-downloader
+
+components:
+  filesBucket:
+    type: aws-s3-bucket
+    inputs:
+      name: serverless-components-files
+  filesTable:
+    type: aws-dynamodb
+    inputs:
+      name: serverless-components-files
+  downloader:
+    type: s3-downloader
+    inputs:
+      name: downloader
+  uploader:
+    type: s3-uploader
+    inputs:
+      name: uploader

@@ -1,0 +1,6 @@
+type: s3-policy
+
+inputTypes:
+  bucketName:
+    type: string
+    required: true

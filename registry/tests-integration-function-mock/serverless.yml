@@ -6,10 +6,15 @@ inputTypes:
     required: true
   memorySize:
     type: number
-    required: true
+    default: 512
   timeout:
     type: number
-    required: true
+    default: 60
+  environment:
+    type: object
+    default:
+      isMock: true
+      variables:
+        key1: value1
   role:
     type: string
-    required: true

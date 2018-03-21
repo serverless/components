@@ -1,4 +1,4 @@
-type: tests-integration-iam-mock
+type: aws-iam-role
 
 inputTypes:
   name:
@@ -6,4 +6,7 @@ inputTypes:
     required: true
   service:
     type: string
-    default: default.serverless.service
+    required: true
+  policy:
+    type: object
+    required: false

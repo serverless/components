@@ -8,6 +8,7 @@ module.exports = async (componentId, components, stateFile, archive,
   const context = generateContext(component, stateFile, archive, options, command)
   if (rollback && typeof component.fns.rollback === 'function') {
     component.outputs = (await component.fns.rollback(component.inputs, context)) || {}
+    stateFile[componentId] = archive[componentId]
   } else if (typeof component.fns[command] === 'function') {
     component.outputs = (await component.fns[command](component.inputs, context)) || {}
   }

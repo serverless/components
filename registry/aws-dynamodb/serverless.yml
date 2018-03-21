@@ -1,0 +1,9 @@
+type: aws-dynamodb
+
+inputTypes:
+  region:
+    type: string
+    required: true
+  tables:
+    type: object[]
+    required: true

@@ -5,8 +5,6 @@ components:
     type: tests-integration-function-mock
     inputs:
       name: ${env.FUNCTION_NAME}
-      memorySize: 512
-      timeout: 100
       role: ${myRole.id}
   myRole:
     type: tests-integration-iam-mock
