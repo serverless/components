@@ -4,6 +4,7 @@ const getComponent = require('./getComponent')
 const getRegistryRoot = require('../getRegistryRoot')
 const getState = require('../state/getState')
 const fileExists = require('../fs/fileExists')
+const log = require('../log')
 
 const generateContext = (component, stateFile, archive, options, command) => {
   const { id, type } = component
@@ -14,11 +15,7 @@ const generateContext = (component, stateFile, archive, options, command) => {
     state: getState(stateFile, id),
     command,
     options,
-    log: (message) => {
-      if (!process.env.CI) {
-        process.stdin.write(`${message}\n`)
-      }
-    },
+    log,
     // eslint-disable-next-line no-shadow
     load: async (type, alias, inputs) => {
       const childComponentRootPath = path.join(getRegistryRoot(), type)

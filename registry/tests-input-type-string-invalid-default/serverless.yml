@@ -1,0 +1,6 @@
+type: tests-input-type-string-invaild-default
+
+inputTypes:
+  stringTypeWithInvalidDefault:
+    type: string
+    default: 123
