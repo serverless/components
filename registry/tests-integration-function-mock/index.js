@@ -1,7 +1,8 @@
-function deploy(inputs, context) {
+async function deploy(inputs, context) {
   const {
-    name, memorySize, timeout, environment, role
+    name, memorySize, timeout, environment
   } = inputs
+  let { role } = inputs
   context.log(`Deploying function "${name}"`)
 
   const id = `id:function:${name}`
@@ -17,6 +18,16 @@ function deploy(inputs, context) {
     throw new Error(`Failed to deploy function "${name}"`)
   }
 
+  // create a default role if no role is provided
+  let defaultRole = false
+  if (!role) {
+    defaultRole = await context.load('tests-integration-iam-mock', 'defaultRole', {
+      name: `${inputs.name}`
+    })
+    defaultRole = await defaultRole.deploy()
+    role = defaultRole.id
+  }
+
   const newState = {
     ...context.state,
     id,
@@ -25,7 +36,8 @@ function deploy(inputs, context) {
     timeout,
     environment,
     role,
-    deploymentCounter
+    deploymentCounter,
+    defaultRole
   }
   context.saveState(newState)
 
@@ -45,8 +57,17 @@ function invoke(inputs, context) {
   return newState
 }
 
-function remove(inputs, context) {
+async function remove(inputs, context) {
   context.log(`Removing function "${context.state.name}"`)
+
+  // remove the default role if used
+  if (context.state.defaultRole) {
+    const defaultRole = await context.load('tests-integration-iam-mock', 'defaultRole', {
+      name: context.state.defaultRole.name
+    })
+    await defaultRole.remove()
+  }
+
   context.saveState()
 }
 

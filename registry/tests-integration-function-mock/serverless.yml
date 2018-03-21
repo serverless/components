@@ -18,4 +18,3 @@ inputTypes:
         key1: value1
   role:
     type: string
-    required: true

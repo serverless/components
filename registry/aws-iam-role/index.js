@@ -82,7 +82,6 @@ const updateAssumeRolePolicy = async ({ name, service }) => {
   }).promise()
 }
 
-
 const rollback = async (inputs, context) => {
   const { archive, state } = context
   if (!archive.name && state.name) {
@@ -155,11 +154,8 @@ const deploy = async (inputs, context) => {
     }
   }
 
-  const outputs = {
-    arn: state.arn || 'abc'
-  }
   context.saveState(state)
-  return outputs
+  return state
 }
 
 const remove = async (inputs, context) => {

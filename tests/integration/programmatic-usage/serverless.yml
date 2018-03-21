@@ -1,0 +1,7 @@
+type: programmatic-usage
+
+components:
+  myFunction:
+    type: tests-integration-function-mock
+    inputs:
+      name: my-function

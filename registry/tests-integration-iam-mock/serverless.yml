@@ -6,4 +6,4 @@ inputTypes:
     required: true
   service:
     type: string
-    required: true
+    default: default.serverless.service

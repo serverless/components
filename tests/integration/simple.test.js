@@ -77,7 +77,8 @@ describe('Integration Test - Simple', () => {
               }
             },
             role: 'id:iam:role:my-function',
-            deploymentCounter: 1
+            deploymentCounter: 1,
+            defaultRole: false
           }
         }
       }
@@ -117,7 +118,8 @@ describe('Integration Test - Simple', () => {
               }
             },
             role: 'id:iam:role:my-function',
-            deploymentCounter: 2
+            deploymentCounter: 2,
+            defaultRole: false
           }
         }
       }
@@ -158,6 +160,7 @@ describe('Integration Test - Simple', () => {
             },
             role: 'id:iam:role:my-function',
             deploymentCounter: 2,
+            defaultRole: false,
             data: 'Hello World'
           }
         }
@@ -205,6 +208,7 @@ describe('Integration Test - Simple', () => {
             },
             role: 'id:iam:role:my-function',
             deploymentCounter: 2,
+            defaultRole: false,
             data: 'Hello World'
           }
         }

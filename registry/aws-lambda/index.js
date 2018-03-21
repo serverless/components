@@ -81,14 +81,13 @@ const deploy = async (inputs, context) => {
   const configuredRole = inputs.role
   let { defaultRole } = context.state
 
-  const defaultRoleComponent = context.load('aws-iam-role', 'defaultRole')
+  const defaultRoleComponent = await context.load('aws-iam-role', 'defaultRole', {
+    name: `${inputs.name}-execution-role`,
+    service: 'lambda.amazonaws.com'
+  })
 
   if (!configuredRole && !defaultRole) {
-    const iamInputs = {
-      name: `${inputs.name}-execution-role`,
-      service: 'lambda.amazonaws.com'
-    }
-    defaultRole = await defaultRoleComponent.deploy(iamInputs)
+    defaultRole = await defaultRoleComponent.deploy()
   }
 
   const role = configuredRole || defaultRole
@@ -120,7 +119,10 @@ const deploy = async (inputs, context) => {
 
 const remove = async (inputs, context) => {
   if (context.state.defaultRole) {
-    const defaultRoleComponent = context.load('aws-iam-role', 'defaultRole')
+    const defaultRoleComponent = await context.load('aws-iam-role', 'defaultRole', {
+      name: context.state.defaultRole.name,
+      service: context.state.defaultRole.service
+    })
     await defaultRoleComponent.remove()
   }
 
