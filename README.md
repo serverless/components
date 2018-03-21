@@ -43,22 +43,20 @@ Serverless Components can deploy anything, but they're biased toward SaaS & clou
   * [aws-iam-policy](#aws-iam-policy)
   * [aws-iam-role](#aws-iam-role)
   * [aws-lambda](#aws-lambda)
+  * [aws-route53](#aws-route53)
   * [aws-s3-bucket](#aws-s3-bucket)
   * [eventgateway](#eventgateway)
   * [github](#github)
   * [github-webhook-receiver](#github-webhook-receiver)
   * [rest-api](#rest-api)
-  * [rg-iamrole](#rg-iamrole)
-  * [rg-route53](#rg-route53)
-  * [rg-s3-website-config](#rg-s3-website-config)
-  * [rg-s3dirloader](#rg-s3dirloader)
-  * [rg-s3policy](#rg-s3policy)
-  * [rg-s3sync](#rg-s3sync)
-  * [rg-staticweb](#rg-staticweb)
-
+  * [s3-dirloader](#s3-dirloader)
   * [s3-downloader](#s3-downloader)
   * [s3-prototype](#s3-prototype)
+  * [s3-policy](#s3-policy)
+  * [s3-sync](#s3-sync)
   * [s3-uploader](#s3-uploader)
+  * [s3-website-config](#s3-website-config)
+  * [static-website](#static-website)
   * [tests-integration-function-mock](#tests-integration-function-mock)
   * [tests-integration-iam-mock](#tests-integration-iam-mock)
 
@@ -158,13 +156,13 @@ type: my-application
 
 components:
   myFunction:
-    type: lambda
+    type: aws-lambda
     inputs:
       memory: 512
       timeout: 300
 ```
 
-Given this `serverless.yml` you'd deploy a `lambda` function which would have a memory size of 512 and timeout of 300.
+Given this `serverless.yml` you'd deploy a `aws-lambda` function which would have a memory size of 512 and timeout of 300.
 
 #### Outputs
 
@@ -500,7 +498,52 @@ components:
             handler: ${helloWorldLambdaComponent}
 ```
 
-#### `dynamodb`
+
+#### `aws-cloudfront`
+
+##### Inputs
+
+| Name                    | Description                               | Type    |
+| ----------------------- | ----------------------------------------- | ------- |
+| `name`                  | The name                                  | String  |
+| `defaultRootObject`     | The default root object                   | String  |
+| `originDomain`          | The origin domain                         | String  |
+| `aliasDomain`           | The alias domain                          | String  |
+| `distributionEnabled`   | Whether the distribution is enabled       | Boolean |
+| `loggingEnabled`        | Whether loggig is enabled                 | Boolean |
+| `loggingBucket`         | The logging bucket                        | String  |
+| `loggingIncludeCookies` | Whether cookies are oncluded when logging | Boolean |
+| `loggingPrefix`         | The logging prefix                        | String  |
+| `priceClass`            | The price class                           | String  |
+
+##### Commands
+
+* `components deploy`
+* `components remove`
+
+##### Example
+
+```yml
+type: my-application
+
+components:
+  myCloudFront:
+    type: aws-cloudfront
+    inputs:
+      name: cf-bucketname  # sent to CallerReference
+      defaultRootObject: index.html
+      originDomain: bucketname.s3.amazonaws.com  # later accept a list
+      aliasDomain: www.example.com # later accept a list
+      distributionEnabled: false
+      loggingEnabled: false
+      loggingBucket: logbucket
+      loggingIncludeCookies: false
+      loggingPrefix: cf-bucketname-
+      priceClass: PriceClass_All # PriceClass_100 | PriceClass_200 | PriceClass_All
+```
+
+
+#### `aws-dynamodb`
 
 Creates / Removes an AWS DynamoDB table.
 
@@ -519,7 +562,7 @@ type: my-application
 
 components:
   myDynamoDBTable:
-    type: dynamodb
+    type: aws-dynamodb
     inputs:
       region: us-east-1
       deletionPolicy: Delete
@@ -554,7 +597,174 @@ components:
 
 ##### Example
 
-[See Default inputs](./registry/dynamodb)
+[See Default inputs](./registry/aws-dynamodb)
+
+
+
+#### `aws-iam-policy`
+
+##### Inputs
+
+| Name         | Description     | Type   |
+| ------------ | --------------- | ------ |
+| `name`       | The name        | String |
+| `bucketName` | The bucket name | String |
+
+##### Commands
+
+* `components deploy`
+* `components remove`
+
+##### Example
+
+```yml
+type: my-application
+
+components:
+  myIamPolicy:
+    type: aws-iam-policy
+    inputs:
+      name: default-role-name-goes-here
+      bucketName: some-unique-bucket-name
+```
+
+
+#### `aws-iam-role`
+
+Creates / Removes an AWS IAM role.
+
+##### Inputs
+
+| Name      | Description                                 | Type   |
+| --------- | ------------------------------------------- | ------ |
+| `name`    | The name for the IAM role                   | String |
+| `service` | The service this role should be created for | String |
+| `policy`  | The AWS policy to apply to this role        | Object |
+
+##### Commands
+
+* `components deploy`
+* `components remove`
+
+##### Example
+
+```yml
+type: my-application
+
+components:
+  myIamRole:
+    type: aws-iam-role
+    inputs:
+      name: role-name
+      service: lambda.amazonaws.com
+      policy:
+        arn: some-policy-arn
+```
+
+
+#### `aws-lambda`
+
+Creates / Removes an AWS Lambda function.
+
+##### Inputs
+
+| Name          | Description                          | Type   |
+| ------------- | ------------------------------------ | ------ |
+| `name`        | The functions name                   | String |
+| `memory`      | The functions memory size            | Number |
+| `timeout`     | The functions timeout                | Number |
+| `description` | The functions description            | String |
+| `handler`     | The functions handler                | String |
+| `role`        | The role `arn` the lambda should use | String |
+| `env`         | An object of env vars set at runtime | Object |
+
+##### Commands
+
+* `components deploy`
+* `components remove`
+
+##### Example
+
+```yml
+type: my-application
+
+components:
+  myLambda:
+    type: aws-lambda
+    inputs:
+      name: some-lambda-function
+      memory: 128
+      timeout: 10
+      description: dome description
+      handler: code.handler
+      role:
+        arn: arn:aws:iam::XXXXX:role/some-lambda-role
+```
+
+
+#### `aws-route53`
+
+##### Inputs
+
+| Name          | Description                    | Type    |
+| ------------- | ------------------------------ | ------- |
+| `name`        | The name                       | String  |
+| `domainName`  | The domain name                | String  |
+| `dnsName`     | The DNS name                   | String  |
+| `privateZone` | Whether this is a private zone | Boolean |
+| `vpcId`       | The VPCs Id                    | String  |
+| `vpcRegion`   | The VPSs region                | String  |
+
+##### Commands
+
+* `components deploy`
+* `components remove`
+
+##### Example
+
+```yml
+type: my-application
+
+components:
+  myRoute53:
+    type: aws-route53
+    inputs:
+      name: mydefaulthostedzone  # sent to CallerReference
+      domainName: www.defaultdomain.com
+      dnsName: d111111abcdef8.cloudfront.net
+      privateZone: false
+      vpcId: my-existing-vpc-id
+      vpcRegion: mydefaultvpcregion
+```
+
+
+#### `aws-s3-bucket`
+
+Creates / Removes an AWS S3 bucket.
+
+##### Inputs
+
+| Name   | Description     | Type   |
+| ------ | --------------- | ------ |
+| `name` | The bucket name | String |
+
+##### Commands
+
+* `components deploy`
+* `components remove`
+
+##### Example
+
+```yml
+type: my-application
+
+components:
+  myS3:
+    type: aws-s3-bucket
+    inputs:
+      name: default-bucket-name
+```
+
 
 #### `eventgateway`
 
@@ -596,6 +806,7 @@ components:
       lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
 ```
 
+
 #### `github`
 
 Creates / Removes a GitHub Webhook.
@@ -631,6 +842,7 @@ components:
       event: push
 ```
 
+
 #### `github-webhook-receiver`
 
 Creates / Tests / Removes a GitHub Webhook receiver.
@@ -661,72 +873,6 @@ components:
       url: https://my.endpoint
 ```
 
-#### `iam`
-
-Creates / Removes an AWS IAM role.
-
-##### Inputs
-
-| Name      | Description                                 | Type   |
-| --------- | ------------------------------------------- | ------ |
-| `name`    | The name for the IAM role                   | String |
-| `service` | The service this role should be created for | String |
-
-##### Commands
-
-* `components deploy`
-* `components remove`
-
-##### Example
-
-```yml
-type: my-application
-
-components:
-  myIam:
-    type: iam
-    inputs:
-      name: role-name
-      service: lambda.amazonaws.com
-```
-
-#### `lambda`
-
-Creates / Removes an AWS Lambda function.
-
-##### Inputs
-
-| Name          | Description                          | Type   |
-| ------------- | ------------------------------------ | ------ |
-| `name`        | The functions name                   | String |
-| `memory`      | The functions memory size            | Number |
-| `timeout`     | The functions timeout                | Number |
-| `description` | The functions description            | String |
-| `handler`     | The functions handler                | String |
-| `role`        | The role `arn` the lambda should use | String |
-
-##### Commands
-
-* `components deploy`
-* `components remove`
-
-##### Example
-
-```yml
-type: my-application
-
-components:
-  myLambda:
-    type: lambda
-    inputs:
-      name: some-lambda-function
-      memory: 128
-      timeout: 10
-      description: dome description
-      handler: code.handler
-      role:
-        arn: arn:aws:iam::XXXXX:role/some-lambda-role
-```
 
 #### `rest-api`
 
@@ -778,176 +924,8 @@ components:
             cors: true
 ```
 
-#### `rg-cloudfront`
 
-##### Inputs
-
-| Name                    | Description                               | Type    |
-| ----------------------- | ----------------------------------------- | ------- |
-| `name`                  | The name                                  | String  |
-| `defaultRootObject`     | The default root object                   | String  |
-| `originDomain`          | The origin domain                         | String  |
-| `aliasDomain`           | The alias domain                          | String  |
-| `distributionEnabled`   | Whether the distribution is enabled       | Boolean |
-| `loggingEnabled`        | Whether loggig is enabled                 | Boolean |
-| `loggingBucket`         | The logging bucket                        | String  |
-| `loggingIncludeCookies` | Whether cookies are oncluded when logging | Boolean |
-| `loggingPrefix`         | The logging prefix                        | String  |
-| `priceClass`            | The price class                           | String  |
-
-##### Commands
-
-* `components deploy`
-* `components remove`
-
-##### Example
-
-```yml
-type: my-application
-
-components:
-  myCloudFront:
-    type: rg-cloudfront
-    inputs:
-      name: cf-bucketname  # sent to CallerReference
-      defaultRootObject: index.html
-      originDomain: bucketname.s3.amazonaws.com  # later accept a list
-      aliasDomain: www.example.com # later accept a list
-      distributionEnabled: false
-      loggingEnabled: false
-      loggingBucket: logbucket
-      loggingIncludeCookies: false
-      loggingPrefix: cf-bucketname-
-      priceClass: PriceClass_All # PriceClass_100 | PriceClass_200 | PriceClass_All
-```
-
-
-#### `aws-iam-policy`
-
-##### Inputs
-
-| Name         | Description     | Type   |
-| ------------ | --------------- | ------ |
-| `name`       | The name        | String |
-| `bucketName` | The bucket name | String |
-
-##### Commands
-
-* `components deploy`
-* `components remove`
-
-##### Example
-
-```yml
-type: my-application
-
-components:
-  myIamPolicy:
-    type: aws-iam-policy
-    inputs:
-      name: default-role-name-goes-here
-      bucketName: some-unique-bucket-name
-```
-
-
-#### `aws-iam-role`
-
-##### Inputs
-
-| Name        | Description    | Type   |
-| ----------- | -------------- | ------ |
-| `name`      | The name       | String |
-| `service`   | The service    | String |
-| `policy`    | The policy     | String |
-
-##### Commands
-
-* `components deploy`
-* `components remove`
-
-##### Example
-
-```yml
-type: my-application
-
-components:
-  myIamRole:
-    type: aws-iam-role
-    inputs:
-      name: default-role-name-goes-here
-      service: lambda.amazonaws.com
-      policyArn: some-policy-arn
-```
-
-#### `rg-route53`
-
-##### Inputs
-
-| Name          | Description                    | Type    |
-| ------------- | ------------------------------ | ------- |
-| `name`        | The name                       | String  |
-| `domainName`  | The domain name                | String  |
-| `dnsName`     | The DNS name                   | String  |
-| `privateZone` | Whether this is a private zone | Boolean |
-| `vpcId`       | The VPCs Id                    | String  |
-| `vpcRegion`   | The VPSs region                | String  |
-
-##### Commands
-
-* `components deploy`
-* `components remove`
-
-##### Example
-
-```yml
-type: my-application
-
-components:
-  myRoute53:
-    type: rg-route53
-    inputs:
-      name: mydefaulthostedzone  # sent to CallerReference
-      domainName: www.defaultdomain.com
-      dnsName: d111111abcdef8.cloudfront.net
-      privateZone: false
-      vpcId: my-existing-vpc-id
-      vpcRegion: mydefaultvpcregion
-```
-
-#### `rg-website-config`
-
-##### Inputs
-
-| Name                 | Description                  | Type   |
-| -------------------- | ---------------------------- | ------ |
-| `rootBucketName`     | The root buckets name        | String |
-| `indexDocument`      | The index document           | String |
-| `errorDocument`      | The error document           | String |
-| `redirectBucketName` | The redirect bucket name     | String |
-| `redirectToHostName` | The redirect to the hostname | String |
-
-##### Commands
-
-* `components deploy`
-* `components remove`
-
-##### Example
-
-```yml
-type: my-application
-
-components:
-  myWebsiteConfig:
-    type: rg-website-config
-    inputs:
-      rootBucketName: default.com
-      indexDocument: index.html
-      errorDocument: error.html
-      redirectBucketName: www.default.com
-      redirectToHostName: default.com
-```
-
-#### `rg-s3dirloader`
+#### `s3-dirloader`
 
 ##### Inputs
 
@@ -968,129 +946,12 @@ type: my-application
 
 components:
   myS3DirLoader:
-    type: rg-s3dirloader
+    type: s3-dirloader
     inputs:
       contentPath: ./site
-      bucketName: rg-content-bucket
+      bucketName: content-bucket
 ```
 
-#### `rg-s3policy`
-
-##### Inputs
-
-| Name         | Description     | Type   |
-| ------------ | --------------- | ------ |
-| `bucketName` | The bucket name | String |
-
-##### Commands
-
-* `components deploy`
-* `components remove`
-
-##### Example
-
-```yml
-type: my-application
-
-components:
-  myS3Policy:
-    type: rg-s3policy
-    inputs:
-      bucketName: some-unique-bucket-name
-```
-
-#### `rg-s3sync`
-
-##### Inputs
-
-| Name          | Description      | Type   |
-| ------------- | ---------------- | ------ |
-| `contentPath` | The content path | String |
-| `bucketName`  | The bucket name  | String |
-
-##### Commands
-
-* `components deploy`
-* `components remove`
-
-##### Example
-
-```yml
-type: my-application
-
-components:
-  myS3Sync:
-    type: rg-s3sync
-    inputs:
-      contentPath: ./site
-      bucketName: rg-content-bucket
-```
-
-#### `rg-staticweb`
-
-##### Inputs
-
-| Name            | Description        | Type   |
-| --------------- | ------------------ | ------ |
-| `name`          | The name           | String |
-| `contentPath`   | The content path   | String |
-| `contentIndex`  | The content index  | String |
-| `contentError`  | The content error  | String |
-| `hostingRegion` | The hosting region | String |
-| `hostingDomain` | The hosting domain | String |
-| `aliasDomain`   | The alias domain   | String |
-
-##### Commands
-
-* `components deploy`
-* `components remove`
-
-##### Example
-
-**Note:** This example re-uses other components.
-
-```yml
-type: my-application
-
-components:
-  myStaticWeb:
-    type: rg-staticweb
-    inputs:
-      name: rgfamilysite
-      contentPath: ./site
-      contentIndex: index.html
-      contentError: error.html
-      hostingRegion: us-east-1
-      hostingDomain: rgfamily.com
-      aliasDomain: www.rgfamily.com
-```
-
-#### `s3`
-
-Creates / Removes an AWS S3 bucket.
-
-##### Inputs
-
-| Name   | Description     | Type   |
-| ------ | --------------- | ------ |
-| `name` | The bucket name | String |
-
-##### Commands
-
-* `components deploy`
-* `components remove`
-
-##### Example
-
-```yml
-type: my-application
-
-components:
-  myS3:
-    type: s3
-    inputs:
-      name: default-bucket-name
-```
 
 #### `s3-downloader`
 
@@ -1121,13 +982,14 @@ components:
       name: some-name
 ```
 
-#### `s3-prototype`
 
-Creates / Removes a component which wraps the, [`s3`](#s3), [`dynamodb`](#dynamodb), [`s3-downloader`](#s3-downloader) and [`s3-uploader`](#s3-uploader) components and creates an endpoint where files can be uploaded via the Event Gateway to an AWS S3 bucket. Once uploaded, meta information about the file will be logged in a DynamoDB table.
+#### `s3-policy`
 
 ##### Inputs
 
-* None
+| Name         | Description     | Type   |
+| ------------ | --------------- | ------ |
+| `bucketName` | The bucket name | String |
 
 ##### Commands
 
@@ -1136,15 +998,44 @@ Creates / Removes a component which wraps the, [`s3`](#s3), [`dynamodb`](#dynamo
 
 ##### Example
 
-**Note:** This example re-uses other components.
+```yml
+type: my-application
+
+components:
+  myS3Policy:
+    type: s3-policy
+    inputs:
+      bucketName: some-unique-bucket-name
+```
+
+
+#### `s3-sync`
+
+##### Inputs
+
+| Name          | Description      | Type   |
+| ------------- | ---------------- | ------ |
+| `contentPath` | The content path | String |
+| `bucketName`  | The bucket name  | String |
+
+##### Commands
+
+* `components deploy`
+* `components remove`
+
+##### Example
 
 ```yml
 type: my-application
 
 components:
-  myS3Prototype:
-    type: s3-prototype
+  myS3Sync:
+    type: s3-sync
+    inputs:
+      contentPath: ./site
+      bucketName: content-bucket
 ```
+
 
 #### `s3-uploader`
 
@@ -1173,18 +1064,18 @@ components:
       name: some-name
 ```
 
-#### `tests-integration-function-mock`
 
-A mock function used for integration tests. **PLEASE DON'T TOUCH THIS CODE**
+#### `s3-website-config`
 
 ##### Inputs
 
-| Name         | Description                 | Type   |
-| ------------ | --------------------------- | ------ |
-| `name`       | The functions name          | string |
-| `memorySize` | The functions memory size   | string |
-| `timeout`    | The functions timeout       | string |
-| `role`       | The role this function uses | string |
+| Name                 | Description                  | Type   |
+| -------------------- | ---------------------------- | ------ |
+| `rootBucketName`     | The root buckets name        | String |
+| `indexDocument`      | The index document           | String |
+| `errorDocument`      | The error document           | String |
+| `redirectBucketName` | The redirect bucket name     | String |
+| `redirectToHostName` | The redirect to the hostname | String |
 
 ##### Commands
 
@@ -1197,25 +1088,30 @@ A mock function used for integration tests. **PLEASE DON'T TOUCH THIS CODE**
 type: my-application
 
 components:
-  myMockFunction:
-    type: tests-integration-function-mock
+  myWebsiteConfig:
+    type: s3-website-config
     inputs:
-      name: some-name
-      memorySize: 512
-      timeout: 60
-      role: some.role.id
+      rootBucketName: default.com
+      indexDocument: index.html
+      errorDocument: error.html
+      redirectBucketName: www.default.com
+      redirectToHostName: default.com
 ```
 
-#### `tests-integration-iam-mock`
 
-A mock iam role used for integration tests. **PLEASE DON'T TOUCH THIS CODE**
+#### `static-website`
 
 ##### Inputs
 
-| Name      | Description                                 | Type   |
-| --------- | ------------------------------------------- | ------ |
-| `name`    | The functions name                          | string |
-| `service` | The service this role should be created for | string |
+| Name            | Description        | Type   |
+| --------------- | ------------------ | ------ |
+| `name`          | The name           | String |
+| `contentPath`   | The content path   | String |
+| `contentIndex`  | The content index  | String |
+| `contentError`  | The content error  | String |
+| `hostingRegion` | The hosting region | String |
+| `hostingDomain` | The hosting domain | String |
+| `aliasDomain`   | The alias domain   | String |
 
 ##### Commands
 
@@ -1224,13 +1120,20 @@ A mock iam role used for integration tests. **PLEASE DON'T TOUCH THIS CODE**
 
 ##### Example
 
+**Note:** This example re-uses other components.
+
 ```yml
 type: my-application
 
 components:
-  myMockRole:
-    type: tests-integration-iam-mock
+  myStaticWeb:
+    type: static-website
     inputs:
-      name: some-name
-      service: some.serverless.service
+      name: familysite
+      contentPath: ./site
+      contentIndex: index.html
+      contentError: error.html
+      hostingRegion: us-east-1
+      hostingDomain: myfamily.com
+      aliasDomain: www.myfamily.com
 ```

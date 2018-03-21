@@ -1,4 +1,4 @@
-type: staticweb
+type: static-website
 
 inputTypes:
   name:
@@ -33,24 +33,24 @@ components:
       sourcePath: ${input.contentPath}
       values: ${input.templateValues}
   rootDomainBucket:
-    type: s3
+    type: aws-s3-bucket
     inputs:
       name: ${input.hostingDomain}
   rootDomainBucketPolicy:
-    type: rg-s3policy
+    type: s3-policy
     inputs:
       bucketName: ${rootDomainBucket.name}
   siteContentUploader:
-    type: rg-s3sync
+    type: s3-sync
     inputs:
       contentPath: ${renderedFiles.renderedFilePath}
       bucketName: ${rootDomainBucket.name}
   wwwDomainBucket:
-    type: s3
+    type: aws-s3-bucket
     inputs:
       name: ${input.aliasDomain}
   rootDomainBucketConfig:
-    type: rg-s3-website-config
+    type: s3-website-config
     inputs:
       rootBucketName: ${rootDomainBucket.name}
       indexDocument: ${input.contentIndex}
@@ -58,7 +58,7 @@ components:
       redirectBucketName: ${wwwDomainBucket.name}
       redirectToHostName: ${input.hostingDomain}
   siteCloudFrontConfig:
-    type: rg-cloudfront
+    type: aws-cloudfront
     inputs:
       name: ${input.name}
       defaultRootObject: ${input.contentIndex}
@@ -67,7 +67,7 @@ components:
       aliasDomain: ${input.aliasDomain}
       distributionEnabled: true
   siteRoute53Config:
-    type: rg-route53
+    type: aws-route53
     inputs:
       name: ${input.name}
       domainName: ${input.aliasDomain}
