@@ -11,8 +11,8 @@ components:
       contentPath: ${self.path}/frontend
       templateValues:
         apiUrl: ${productsApi.url}
-      contentIndex: index.htm
-      contentError: error.htm
+      contentIndex: index.html
+      contentError: error.html
       hostingRegion: us-east-1
       hostingDomain: serverless-${input.prefix}-retail-site-test.example.com
       aliasDomain: www.serverless-${input.prefix}-retail-site-test.example.com
