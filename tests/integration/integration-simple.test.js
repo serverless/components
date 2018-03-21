@@ -187,7 +187,7 @@ describe('Integration Test - Simple', () => {
             id: 'id:iam:role:my-function',
             name: 'my-function',
             service: 'my.function.service',
-            deploymentCounter: 2
+            deploymentCounter: 4
           }
         },
         'simple:myFunction': {
