@@ -51,14 +51,12 @@ Serverless Components can deploy anything, but they're biased toward SaaS & clou
   * [rest-api](#rest-api)
   * [s3-dirloader](#s3-dirloader)
   * [s3-downloader](#s3-downloader)
-  * [s3-prototype](#s3-prototype)
   * [s3-policy](#s3-policy)
   * [s3-sync](#s3-sync)
   * [s3-uploader](#s3-uploader)
   * [s3-website-config](#s3-website-config)
   * [static-website](#static-website)
-  * [tests-integration-function-mock](#tests-integration-function-mock)
-  * [tests-integration-iam-mock](#tests-integration-iam-mock)
+
 
 ## Getting started
 
