@@ -1,4 +1,3 @@
-const path = require('path')
 const { keys, reduce } = require('ramda')
 const getState = require('../state/getState')
 const findComponent = require('../findComponent')
@@ -17,9 +16,9 @@ const generateContext = (component, stateFile, archive, options, command) => {
         process.stdin.write(`${message}\n`)
       }
     },
-    load: (type, alias) => {
+    load: (loadType, alias) => {
       // eslint-disable-line no-shadow
-      const childComponent = require(findComponent(type)) // eslint-disable-line
+      const childComponent = require(findComponent(loadType)) // eslint-disable-line
       childComponent.id = `${id}:${alias}`
       const childComponentContext = generateContext(
         childComponent,
