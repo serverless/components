@@ -20,6 +20,8 @@ Serverless Components can deploy anything, but they're biased toward SaaS & clou
 
 ![serverless components overview](https://s3.amazonaws.com/assets.github.serverless/serverless-components-overview-2.gif)
 
+• [Join the discussion on Slack - Serverless Contrib](https://join.slack.com/t/serverless-contrib/shared_invite/enQtMjI5NzY1ODM2MTc3LTRhNGRlMWQyZTdhY2Y1OGIzNTdhZWUyYTVjYzA4ZDNhMDcyOTVjZWU1YWVhODExMTgzMTVmYWY0MzdjZmRjODI) •
+
 ## Table of contents
 
 * [Getting started](#getting-started)
