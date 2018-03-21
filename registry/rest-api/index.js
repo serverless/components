@@ -146,7 +146,7 @@ async function deploy(inputs, context) {
   if (inputs.gateway === 'eventgateway') {
     outputs.eventgateway = await deployEventGateway(flatInputs, context)
     outputs.url = outputs.eventgateway.url
-  } else if (inputs.gateway === 'apigateway') {
+  } else if (inputs.gateway === 'aws-apigateway') {
     outputs.iam = await deployIamRole(inputs, context)
     outputs.apigateway = await deployApiGateway(
       {
@@ -163,7 +163,7 @@ async function deploy(inputs, context) {
 async function remove(inputs, context) {
   if (inputs.gateway === 'eventgateway') {
     await removeEventGateway(inputs, context)
-  } else if (inputs.gateway === 'apigateway') {
+  } else if (inputs.gateway === 'aws-apigateway') {
     await removeIamRole(inputs, context)
     await removeApiGateway(inputs, context)
   }
