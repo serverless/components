@@ -2,6 +2,8 @@
 
 const deploy = async (inputs, context) => {
   let outputs = context.state
+
+  // TODO: I need the generated child bucket ID to construct the real URL to return up the chain.
   const s3url = `http://${inputs.hostingDomain}.s3-website-${inputs.hostingRegion}.amazonaws.com`
 
   if (!context.state.name && inputs.name) {
@@ -22,7 +24,7 @@ const deploy = async (inputs, context) => {
     }
   }
   context.saveState({ ...inputs, ...outputs })
-  context.log(`Created Site with url: '${s3url}'`)
+  // TODO uncomment and log out real URL when we get it context.log(`Created Site with url: '${s3url}'`)
   return outputs
 }
 
