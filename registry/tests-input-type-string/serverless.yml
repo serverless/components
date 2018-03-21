@@ -1,0 +1,12 @@
+type: tests-input-type-string
+
+inputTypes:
+  stringTypeRequired:
+    type: string
+    required: true
+  stringTypeNotRequired:
+    type: string
+    required: false
+  stringTypeWithDefault:
+    type: string
+    default: 'baz'

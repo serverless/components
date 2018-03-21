@@ -24,9 +24,9 @@ module.exports = async (componentRoot, componentId, inputs) => {
     path: path.resolve(componentRoot).replace(/\/*$/, '')
   }, slsYml)
 
-  validateInputs(slsYml.id, slsYml.inputTypes, slsYml.inputs)
-
   slsYml.inputs = setInputDefaults(slsYml.inputTypes, slsYml.inputs)
+
+  validateInputs(slsYml.id, slsYml.inputTypes, slsYml.inputs)
 
   return slsYml
 }
