@@ -1,7 +1,7 @@
 {
-  "name": "@serverless-components/rest-api",
+  "name": "@serverless-components/s3-uploader",
   "version": "0.1.0",
-  "description": "REST API component.",
+  "description": "A Serverless Component for uploading files to s3",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -13,6 +13,7 @@
   "author": "serverless.com",
   "license": "Apache-2.0",
   "dependencies": {
-    "ramda": "^0.25.0"
+    "@serverless/fdk": "^0.7.1",
+    "parse-multipart": "^1.0.4"
   }
 }
