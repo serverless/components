@@ -100,7 +100,7 @@ describe('Integration Test - Programmatic usage', () => {
             id: 'id:iam:role:my-function',
             name: 'my-function',
             service: 'default.serverless.service',
-            deploymentCounter: 1
+            deploymentCounter: 2
           }
         },
         'programmatic-usage:myFunction': {
@@ -122,7 +122,7 @@ describe('Integration Test - Programmatic usage', () => {
               id: 'id:iam:role:my-function',
               name: 'my-function',
               service: 'default.serverless.service',
-              deploymentCounter: 1
+              deploymentCounter: 2
             },
             deploymentCounter: 2
           }
