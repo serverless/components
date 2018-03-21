@@ -1,6 +1,6 @@
 const path = require('path')
 const {
-  difference, keys, reduce, isEmpty, forEachObjIndexed, union, not
+  difference, keys, isEmpty, forEachObjIndexed, union, not
 } = require('ramda')
 const getRegistryRoot = require('../getRegistryRoot')
 const { fileExists } = require('../fs')
