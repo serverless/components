@@ -111,7 +111,7 @@ const rollback = async (inputs, context) => {
 const deploy = async (inputs, context) => {
   let { state } = context
 
-  if (!inputs.policy && !state.policy) {
+  if (!inputs.policy) {
     inputs = {
       ...inputs,
       policy: {
@@ -130,14 +130,14 @@ const deploy = async (inputs, context) => {
     }
   } else if (!inputs.name && state.name) {
     context.log(`Removing Role: ${state.name}`)
-    await deleteRole(state.name, state.policy)
+    await deleteRole(state)
     state = {
       ...state,
       name: null
     }
   } else if (state.name !== inputs.name) {
     context.log(`Removing Role: ${state.name}`)
-    await deleteRole(state.name)
+    await deleteRole(state)
     context.log(`Creating Role: ${inputs.name}`)
     const role = await createRole(inputs)
     state = {
@@ -166,7 +166,7 @@ const remove = async (inputs, context) => {
   if (!context.state.name) return {}
 
   context.log(`Removing Role: ${context.state.name}`)
-  const outputs = await deleteRole(context.state.name)
+  const outputs = await deleteRole(context.state)
   context.saveState({
     name: null,
     arn: null,
