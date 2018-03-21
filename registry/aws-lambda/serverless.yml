@@ -1,0 +1,24 @@
+type: lambda
+
+inputTypes:
+  name:
+    type: string
+    required: true
+  memory:
+    type: number
+    required: true
+  timeout:
+    type: number
+    required: true
+  description:
+    type: string
+    required: false
+  handler:
+    type: string
+    required: true
+  role:
+    type: object
+    required: false
+  env:
+    type: Object
+    required: false

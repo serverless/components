@@ -1,5 +1,5 @@
 {
-  "name": "@serverless/rest-api-component",
+  "name": "@serverless-components/rest-api",
   "version": "0.1.0",
   "description": "REST API component.",
   "main": "index.js",
@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "serverless.com",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "dependencies": {
     "ramda": "^0.25.0"
   }

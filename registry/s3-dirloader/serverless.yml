@@ -1,0 +1,9 @@
+type: s3-dirloader
+
+inputTypes:
+  contentPath:
+    type: string
+    required: true
+  bucketName:
+    type: string
+    required: true

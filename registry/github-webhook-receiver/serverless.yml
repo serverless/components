@@ -8,18 +8,18 @@ inputTypes:
 
 components:
 #  myTable:
-#    type: dynamodb
+#    type: aws-dynamodb
 #    inputs:
 #      name: github-webhook-receiver
   myFunction:
-    type: lambda
+    type: aws-lambda
     inputs:
       name: github-webhook-receiver-function
       memory: 512
       timeout: 10
       handler: code.handler
   myEndpoint:
-    type: apigateway
+    type: aws-apigateway
     inputs:
       name: github-webhook-receiver-api
       routes:

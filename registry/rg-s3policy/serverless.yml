@@ -1,6 +1,0 @@
-type: rg-s3policy
-
-inputTypes:
-  bucketName:
-    type: string
-    required: true

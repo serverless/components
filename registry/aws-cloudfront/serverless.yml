@@ -1,0 +1,29 @@
+type: aws-cloudfront
+
+inputTypes:
+  name:
+    type: string
+    required: true
+  defaultRootObject:
+    type: string
+    required: true
+  originDomain:
+    type: string
+    required: true
+  aliasDomain:
+    type: string
+  distributionEnabled:
+    type: boolean
+    default: false
+  loggingEnabled:
+    type: boolean
+    default: false
+  loggingBucket:
+    type: string
+  loggingIncludeCookies:
+    type: boolean
+    default: false
+  loggingPrefix:
+    type: string
+  priceClass:
+    type: string

@@ -1,0 +1,13 @@
+type: aws-iam-role
+
+inputTypes:
+  name:
+    type: string
+    required: true
+  service:
+    type: string
+    required: true
+  policy:
+    type: object
+    default:
+      arn: arn:aws:iam::aws:policy/AdministratorAccess

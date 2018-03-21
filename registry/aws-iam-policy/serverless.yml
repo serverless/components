@@ -1,0 +1,9 @@
+type: aws-iam-policy
+
+inputTypes:
+  name:
+    type: string
+    required: true
+  bucketName:
+    type: string
+    required: true

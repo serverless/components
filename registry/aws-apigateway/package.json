@@ -1,7 +1,7 @@
 {
-  "name": "@serverless-components/eventgateway",
+  "name": "@serverless-components/aws-apigateway",
   "version": "0.1.0",
-  "description": "Event Gateway Serverless Component.",
+  "description": "API Gateway Serverless Component.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -9,6 +9,7 @@
   "author": "serverless.com",
   "license": "Apache-2.0",
   "dependencies": {
-    "@serverless/event-gateway-sdk": "^0.2.0"
+    "aws-sdk": "^2.201.0",
+    "ramda": "^0.25.0"
   }
 }

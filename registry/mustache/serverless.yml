@@ -1,1 +1,9 @@
 type: mustache
+
+inputTypes:
+  sourcePath:
+    type: string,
+    required: true
+  values:
+    type: object
+    required: false

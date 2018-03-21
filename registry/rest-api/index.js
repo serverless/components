@@ -12,7 +12,7 @@ async function deployIamRole(inputs, context) {
     service: 'apigateway.amazonaws.com'
   }
 
-  const iamComponent = await context.load('iam', 'iam')
+  const iamComponent = await context.load('aws-iam-role', 'iam')
   const outputs = await iamComponent.deploy(iamInputs)
   outputs.name = roleName
   return outputs
@@ -45,7 +45,7 @@ function getAwsApiGatewayInputs(inputs) {
 async function deployApiGateway(inputs, context) {
   const apiInputs = getAwsApiGatewayInputs(inputs)
 
-  const apiGatewayComponent = await context.load('apigateway', 'apig')
+  const apiGatewayComponent = await context.load('aws-apigateway', 'apig')
   const outputs = await apiGatewayComponent.deploy(apiInputs)
   outputs.name = inputs.name
   return outputs
@@ -89,12 +89,12 @@ async function deployEventGateway(inputs, context) {
 }
 
 async function removeIamRole(inputs, context) {
-  const iamComponent = await context.load('iam', 'iam')
+  const iamComponent = await context.load('aws-iam-role', 'iam')
   return iamComponent.remove(inputs)
 }
 
 async function removeApiGateway(inputs, context) {
-  const apiGatewayComponent = await context.load('apigateway', 'apig')
+  const apiGatewayComponent = await context.load('aws-apigateway', 'apig')
   return apiGatewayComponent.remove(inputs)
 }
 

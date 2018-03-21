@@ -1,9 +1,0 @@
-type: rg-s3sync
-
-inputTypes:
-  contentPath:
-    type: string
-    required: true
-  bucketName:
-    type: string
-    required: true

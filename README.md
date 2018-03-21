@@ -37,16 +37,17 @@ Serverless Components can deploy anything, but they're biased toward SaaS & clou
   * [`index.js`](#index.js)
   * [Testing](#testing)
 * [Docs](#docs)
-  * [apigateway](#apigateway)
-  * [dynamodb](registry/dynamodb-model/README.md)
+  * [aws-apigateway](#aws-apigateway)
+  * [aws-cloudfront](#aws-cloudfront)
+  * [aws-dynamodb](registry/aws-dynamodb/README.md)
+  * [aws-iam-policy](#aws-iam-policy)
+  * [aws-iam-role](#aws-iam-role)
+  * [aws-lambda](#aws-lambda)
+  * [aws-s3-bucket](#aws-s3-bucket)
   * [eventgateway](#eventgateway)
   * [github](#github)
   * [github-webhook-receiver](#github-webhook-receiver)
-  * [iam](#iam)
-  * [lambda](#lambda)
   * [rest-api](#rest-api)
-  * [rg-cloudfront](#rg-cloudfront)
-  * [rg-iampolicy](#rg-iampolicy)
   * [rg-iamrole](#rg-iamrole)
   * [rg-route53](#rg-route53)
   * [rg-s3-website-config](#rg-s3-website-config)
@@ -54,7 +55,7 @@ Serverless Components can deploy anything, but they're biased toward SaaS & clou
   * [rg-s3policy](#rg-s3policy)
   * [rg-s3sync](#rg-s3sync)
   * [rg-staticweb](#rg-staticweb)
-  * [s3](#s3)
+
   * [s3-downloader](#s3-downloader)
   * [s3-prototype](#s3-prototype)
   * [s3-uploader](#s3-uploader)
@@ -83,7 +84,7 @@ components [Command]
 
 ### Components
 
-A component is the smallest unit of abstraction for your infrastructure. It could be a single small piece like an IAM role, or a larger piece that includes other small pieces, like [`github-webhook-receiver`](#github-webhook-receiver), which includes `lambda` (which itself includes `iam`), `apigateway` (which also includes `iam`), `dynamodb`, and `github-webhook`. So components could be composed with each other in a component dependency graph to build larger components.
+A component is the smallest unit of abstraction for your infrastructure. It could be a single small piece like an IAM role, or a larger piece that includes other small pieces, like [`github-webhook-receiver`](#github-webhook-receiver), which includes `aws-lambda` (which itself includes `aws-iam-role`), `aws-apigateway` (which also includes `aws-iam-role`), `aws-dynamodb`, and `github`. So components could be composed with each other in a component dependency graph to build larger components.
 
 You define a component using two files: `serverless.yml` for config, and `index.js` for the provisioning logic.
 
@@ -124,32 +125,28 @@ However, this `index.js` file is optional, since your component could just be a 
 
 #### Input types
 
-Input types are the description of the inputs your components receives. You supply those input types in the components `serverless.yml` file:
+Input types are the description of the inputs your components receives. You supply those `inputTypes` in the components `serverless.yml` file:
 
 ```yml
-type: some-component
+type: child-component
 
 inputTypes:
   name:
     type: string
     required: true
-    default: John Doe
+    default: John
 ```
 
-Or, if the component is being used as a child of another parent component, like the `lambda` component, the parent could supply those `inputTypes`, and they would overwrite the default `inputTypes` that are defined at the child level:
+When the component is being used as a child of another parent component, the parent will supply `inputs` and they can overwrite the defaults that are defined at the child level:
 
 ```yml
-type: lambda
+type: parent-component
 
-inputTypes:
-  memory:
-    type: number
-    required: true
-    default: 128
-  timeout:
-    type: number
-    required: true
-    default: 10
+components:
+  myChild:
+    type: child-component
+    inputs:
+      name: Jane  # This overrides the default of "John" from the inputType
 ```
 
 #### Inputs
@@ -191,18 +188,18 @@ module.exports = {
 }
 ```
 
-These outputs can then be referenced by other components. In this example we reference the function arn and pass it in to the `apigateway` component to setup a handler for the route.
+These outputs can then be referenced by other components. In this example we reference the function arn and pass it in to the `aws-apigateway` component to setup a handler for the route.
 
 ```yml
 type: my-application
 
 components:
   myFunction:
-    type: lambda
+    type: aws-lambda
     inputs:
       handler: code.handler
   myEndpoint:
-    type: apigateway
+    type: aws-apigateway
     inputs:
       routes:
         /github/webhook:
@@ -263,7 +260,7 @@ The component author / user doesn't have to worry about this graph at all. One j
 
 ### Custom Commands
 
-Other than the commpn in `deploy` and `remove` commands, you can add custom commands to add extra management for your component lifecycle. You do so by adding the corresponding function to the `index.js` file. Just like the other functions in `index.js`.
+Other than the common `deploy` and `remove` commands, you can add custom commands to add extra management for your component lifecycle. You do so by adding the corresponding function to the `index.js` file. Just like the other functions in `index.js`.
 
 The function receives `inputs` and `context` as parameters.
 
@@ -463,7 +460,7 @@ components remove
 
 ### Component Usage
 
-#### `apigateway`
+#### `aws-apigateway`
 
 Creates / Removes an API endpoint which is exposed via AWS API Gateway and connects directly to an AWS Lambda function.
 
@@ -487,20 +484,20 @@ type: my-application
 
 components:
   myApiGateway:
-    type: apigateway
+    type: aws-apigateway
     inputs:
-      name: apigateway
+      name: my-apigateway
       roleArn: arn:aws:iam::XXXXX:role/some-api-gateway-role
       routes:
         /hello:
           post:
-            lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
+            handler: ${helloPostLambdaComponent}
             cors: true
           get:
-            lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
+            handler: ${helloGetLambdaComponent}
         /hello/world:
           delete:
-            lambdaArn: arn:aws:lambda:us-east-1:XXXXX:function:some-lambda-function
+            handler: ${helloWorldLambdaComponent}
 ```
 
 #### `dynamodb`
@@ -824,7 +821,8 @@ components:
       priceClass: PriceClass_All # PriceClass_100 | PriceClass_200 | PriceClass_All
 ```
 
-#### `rg-iampolicy`
+
+#### `aws-iam-policy`
 
 ##### Inputs
 
@@ -845,13 +843,14 @@ type: my-application
 
 components:
   myIamPolicy:
-    type: rg-iampolicy
+    type: aws-iam-policy
     inputs:
       name: default-role-name-goes-here
       bucketName: some-unique-bucket-name
 ```
 
-#### `rg-iamrole`
+
+#### `aws-iam-role`
 
 ##### Inputs
 
@@ -859,7 +858,7 @@ components:
 | ----------- | -------------- | ------ |
 | `name`      | The name       | String |
 | `service`   | The service    | String |
-| `policyArn` | The policy ARN | String |
+| `policy`    | The policy     | String |
 
 ##### Commands
 
@@ -873,7 +872,7 @@ type: my-application
 
 components:
   myIamRole:
-    type: rg-iamrole
+    type: aws-iam-role
     inputs:
       name: default-role-name-goes-here
       service: lambda.amazonaws.com
