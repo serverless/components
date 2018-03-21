@@ -56,6 +56,7 @@ describe('Integration Test - Simple', () => {
       const expected = {
         'simple:myRole': {
           type: 'tests-integration-iam-mock',
+          internallyManaged: false,
           state: {
             id: 'id:iam:role:my-function',
             name: 'my-function',
@@ -65,6 +66,7 @@ describe('Integration Test - Simple', () => {
         },
         'simple:myFunction': {
           type: 'tests-integration-function-mock',
+          internallyManaged: false,
           state: {
             id: 'id:function:my-function',
             name: 'my-function',
@@ -97,6 +99,7 @@ describe('Integration Test - Simple', () => {
       const expected = {
         'simple:myRole': {
           type: 'tests-integration-iam-mock',
+          internallyManaged: false,
           state: {
             id: 'id:iam:role:my-function',
             name: 'my-function',
@@ -106,6 +109,7 @@ describe('Integration Test - Simple', () => {
         },
         'simple:myFunction': {
           type: 'tests-integration-function-mock',
+          internallyManaged: false,
           state: {
             id: 'id:function:my-function',
             name: 'my-function',
@@ -138,6 +142,7 @@ describe('Integration Test - Simple', () => {
       const expected = {
         'simple:myRole': {
           type: 'tests-integration-iam-mock',
+          internallyManaged: false,
           state: {
             id: 'id:iam:role:my-function',
             name: 'my-function',
@@ -147,6 +152,7 @@ describe('Integration Test - Simple', () => {
         },
         'simple:myFunction': {
           type: 'tests-integration-function-mock',
+          internallyManaged: false,
           state: {
             id: 'id:function:my-function',
             name: 'my-function',
@@ -186,6 +192,7 @@ describe('Integration Test - Simple', () => {
       const expected = {
         'simple:myRole': {
           type: 'tests-integration-iam-mock',
+          internallyManaged: false,
           state: {
             id: 'id:iam:role:my-function',
             name: 'my-function',
@@ -195,6 +202,7 @@ describe('Integration Test - Simple', () => {
         },
         'simple:myFunction': {
           type: 'tests-integration-function-mock',
+          internallyManaged: false,
           state: {
             id: 'id:function:my-function',
             name: 'my-function',
