@@ -4,3 +4,6 @@ inputTypes:
   name:
     type: string
     required: true
+  forceUniqueBucketName:
+    type: boolean
+    default: false
