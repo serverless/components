@@ -156,21 +156,24 @@ const createTables = async (inputs, context) => {
   })
 }
 
-const deleteTable = (state, tableName) => {
-  const table = findTableByName(state.tables, tableName)
-  const ddbtable = findOutputTableByName(state.ddbtables, tableName)
+const deleteTable = async (inputs, context, tableName) => {
+  const table = findTableByName(context.state.tables, tableName)
+  let ddbTables = context.state.ddbtables
   const model = defineTable(table)
   if (model) {
-    model.deleteTable((err) => {
-      if (err) {
-        console.log(`Error deleting table: '${tableName}'\n${err.message}`)
-        throw err.message
-      } else {
+    const deleteTableAsync = util.promisify(model.deleteTable)
+    deleteTableAsync()
+      .then(() => {
+        // Delete output state only for the specified table
+        ddbTables = removeOutputTableByName(context.state.ddbtables, tableName)
+        context.saveState({ ...inputs, ...ddbTables })
         console.log(`Deleted table: '${tableName}'`)
-      }
-    })
+      })
+      .catch((err) => {
+        throw err
+      })
   }
-  return ddbtable
+  return ddbTables
 }
 
 const insertItem = (state, tableName, data) => {
@@ -251,28 +254,28 @@ const remove = async (inputs, context) => {
   if (!context.state.tables ||
        context.state.tables.length === 0) return {}
 
+  let tableName
   if (context.options && context.options.tablename) {
-    const tableName = context.options.tablename
-    // if table does not exist in state -> ddbtables, bail
-    if (!findOutputTableByName(context.state.ddbtables, tableName)) {
-      context.log(`Table '${tableName}' does not exist`)
-      return {}
-    }
+    tableName = context.options.tablename
+  } else {
+    // TODO: when multiple tables are allowed, update to delete multiple tables
+    tableName = context.state.tables[0].name
+  }
+  let ddbTables = context.state.ddbtables
+  // if table does not exist in state -> ddbtables, bail
+  if (!findOutputTableByName(context.state.ddbtables, tableName)) {
+    context.log(`Table '${tableName}' does not exist`)
+  } else {
     // remove table
     context.log(`Removing table: '${tableName}'`)
     try {
-      deleteTable(context.state, tableName)
-      // Delete output state only for the specified table
-      const ddbTables = removeOutputTableByName(context.state.ddbtables, tableName)
-      context.saveState({ ...inputs, ...ddbTables })
+      ddbTables = await deleteTable(inputs, context, tableName)
     } catch (err) {
       context.log(`Error in removing table: '${tableName}'\n${err.message}`)
     }
-  } else {
-    context.log('Incorrect or insufficient parameters. \nUsage: remove --tablename <tablename>')
   }
 
-  return {}
+  return ddbTables
 }
 
 const insert = async (inputs, context) => {
