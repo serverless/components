@@ -1,0 +1,14 @@
+{
+  "name": "retail-app",
+  "version": "1.0.0",
+  "description": "An example retail application composed of a few serverless components. The  application has a frontend that displays a catalog of products. The backend relies on a REST API that in turn fetches data from a DynamoDB table. The application is deployable to AWS.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.212.1"
+  }
+}
