@@ -4,6 +4,6 @@ inputTypes:
   name:
     type: string
     required: true
-  bucketName:
-    type: string
+  document:
+    type: object
     required: true

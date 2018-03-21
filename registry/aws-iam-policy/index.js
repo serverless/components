@@ -5,23 +5,11 @@ const BbPromise = require('bluebird')
 
 const IAM = new AWS.IAM({ region: 'us-east-1' })
 
-const createPolicy = async ({ name, bucketName }) => {
-  const s3BucketPolicyDocument = {
-    Version: '2012-10-17',
-    Statement: [{
-      Effect: 'Allow',
-      Principal: {
-        AWS: '*'
-      },
-      Action: [ 's3:GetObject' ],
-      Resource: [ `arn:aws:s3:::${bucketName}/*` ]
-    }]
-  }
-
+const createPolicy = async ({ name, document }) => {
   const policyRes = await IAM.createPolicy({
     PolicyName: name,
     Path: '/',
-    PolicyDocument: JSON.stringify(s3BucketPolicyDocument)
+    PolicyDocument: JSON.stringify(document)
   }).promise()
   console.log(`Policy '${name}' created with arn: '${policyRes.Policy.Arn}'`)
 
@@ -32,9 +20,9 @@ const createPolicy = async ({ name, bucketName }) => {
   }
 }
 
-const deletePolicy = async (name, policyArn) => {
+const deletePolicy = async (name, arn) => {
   await IAM.deletePolicy({
-    PolicyArn: policyArn
+    PolicyArn: arn
   }).promise()
   console.log(`Policy '${name}' deleted.`)
 
@@ -50,7 +38,7 @@ const deploy = async (inputs, context) => {
     outputs = await createPolicy(inputs)
   } else if (!inputs.name && context.state.name) {
     context.log(`Removing Policy: ${context.state.name}`)
-    outputs = await deletePolicy(context.state.name, context.state.policyArn)
+    outputs = await deletePolicy(context.state.name, context.state.arn)
   } else if (context.state.name !== inputs.name) {
     context.log(`Removing Policy: ${context.state.name}`)
     await deletePolicy(context.state.name, context.state.arn)
@@ -65,7 +53,7 @@ const remove = async (inputs, context) => {
   if (!context.state.name) return {}
 
   context.log(`Removing Policy: ${context.state.name}`)
-  await deletePolicy(context.state.name, context.state.policyArn)
+  await deletePolicy(context.state.name, context.state.arn)
   context.saveState({})
   return {}
 }

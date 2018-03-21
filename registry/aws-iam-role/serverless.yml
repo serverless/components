@@ -9,5 +9,4 @@ inputTypes:
     required: true
   policy:
     type: object
-    default:
-      arn: arn:aws:iam::aws:policy/AdministratorAccess
+    required: false
