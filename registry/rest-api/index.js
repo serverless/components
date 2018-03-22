@@ -103,7 +103,8 @@ async function removeIamRole(inputs, context) {
 }
 
 async function removeApiGateway(inputs, context) {
-  const apiGatewayComponent = await context.load('aws-apigateway', 'apig', inputs)
+  const apiInputs = getAwsApiGatewayInputs(inputs)
+  const apiGatewayComponent = await context.load('aws-apigateway', 'apig', apiInputs)
   return apiGatewayComponent.remove()
 }
 
