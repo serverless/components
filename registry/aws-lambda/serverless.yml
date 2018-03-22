@@ -20,5 +20,5 @@ inputTypes:
     type: object
     required: false
   env:
-    type: Object
+    type: object
     required: false
