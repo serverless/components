@@ -20,6 +20,8 @@ Serverless Components can deploy anything, but they're biased toward SaaS & clou
 
 ![serverless components overview](https://s3.amazonaws.com/assets.github.serverless/serverless-components-overview-2.gif)
 
+• [Join the discussion on Slack - Serverless Contrib](https://join.slack.com/t/serverless-contrib/shared_invite/enQtMjI5NzY1ODM2MTc3LTRhNGRlMWQyZTdhY2Y1OGIzNTdhZWUyYTVjYzA4ZDNhMDcyOTVjZWU1YWVhODExMTgzMTVmYWY0MzdjZmRjODI) •
+
 ## Table of contents
 
 * [Getting started](#getting-started)
@@ -61,6 +63,7 @@ Serverless Components can deploy anything, but they're biased toward SaaS & clou
 ## Getting started
 
 **Note:** Make sure you have Node.js 8+ and npm installed on your machine
+Also please do join the _Components_ channel on our public [Serverless-Contrib Slack](https://serverless-contrib.slack.com/messages/C9U3RA55M) to continue the conversation.
 
 1. Setup
 1. `npm install --global serverless-components`
@@ -80,7 +83,8 @@ components [Command]
 
 ### Components
 
-A component is the smallest unit of abstraction for your infrastructure. It could be a single small piece like an IAM role, or a larger piece that includes other small pieces, like [`github-webhook-receiver`](#github-webhook-receiver), which includes `aws-lambda` (which itself includes `aws-iam-role`), `aws-apigateway` (which also includes `aws-iam-role`), `aws-dynamodb`, and `github`. So components could be composed with each other in a component dependency graph to build larger components.
+
+A component is the smallest unit of abstraction for your infrastructure. It can be a single small piece like an IAM role, or a larger piece that includes other small pieces, like [`github-webhook-receiver`](#github-webhook-receiver), which includes `aws-lambda` (which itself includes `aws-iam-role`), `aws-apigateway` (which also includes `aws-iam-role`), `aws-dynamodb`, and `github`. So components can be composed with each other in a component dependency graph to build larger components.
 
 You define a component using two files: `serverless.yml` for config, and `index.js` for the provisioning logic.
 
@@ -115,13 +119,14 @@ module.exports = {
 }
 ```
 
-However, this `index.js` file is optional, since your component could just be a composition of other smaller components without provisioning logic on its own.
+However, this `index.js` file is optional, since your component can just be a composition of other smaller components without provisioning logic on its own.
 
 ### Input types, Inputs & Outputs
 
 #### Input types
 
-Input types are the description of the inputs your components receives. You supply those `inputTypes` in the components `serverless.yml` file:
+
+Input types are the description of the inputs your component receives. You supply those `inputTypes` in the component's `serverless.yml` file:
 
 ```yml
 type: child-component
@@ -133,7 +138,8 @@ inputTypes:
     default: John
 ```
 
-When the component is being used as a child of another parent component, the parent will supply `inputs` and they can overwrite the defaults that are defined at the child level:
+
+Or, if the component is being used as a child of another parent component, the parent will supply `inputs` and they can overwrite the defaults that are defined at the child level:
 
 ```yml
 type: parent-component
@@ -147,7 +153,7 @@ components:
 
 #### Inputs
 
-Inputs are the configuration that are supplied to your components logic by the user. You define those inputs in the `serverless.yml` file where the component is used:
+Inputs are the configuration that are supplied to your components logic by the user. You define these inputs in the `serverless.yml` file where the component is used:
 
 ```yml
 type: my-application
@@ -160,13 +166,14 @@ components:
       timeout: 300
 ```
 
-Given this `serverless.yml` you'd deploy a `aws-lambda` function which would have a memory size of 512 and timeout of 300.
+Given this `serverless.yml` you would deploy a `aws-lambda` function with a memory size of 512 and timeout of 300.
 
 #### Outputs
 
-Your provisioning logic or the `deploy` method of your `index.js` file can optionally return an outputs object. This output can be referenced in `serverless.yml` as inputs to another component.
+Your provisioning logic, or the `deploy` method of your `index.js` file, can optionally return an `outputs` object. This output can be referenced in `serverless.yml` as inputs to another component.
 
 For example, the lambda component's deploy method returns outputs that look like this...
+
 **index.js**
 
 ```js
@@ -184,7 +191,7 @@ module.exports = {
 }
 ```
 
-These outputs can then be referenced by other components. In this example we reference the function arn and pass it in to the `aws-apigateway` component to setup a handler for the route.
+These outputs can then be referenced by other components. In this example we reference the function arn and pass it in to the `aws-apigateway` component to set up a handler for the route.
 
 ```yml
 type: my-application
@@ -205,13 +212,13 @@ components:
 
 ### State
 
-State can be acessed via the `context` object and represents a historical snapshot of what happened last time you ran a command such as `deploy`, `remove`, etc.
+State can be accessed via the `context` object and represents a historical snapshot of what happened the last time you ran a command such as `deploy`, `remove`, etc.
 
-The provisioning logic can use this state object and compare it with the current inputs, to make decisions whether to run deploy, update or remove.
+The provisioning logic can use this state object and compare it with the current inputs to make decisions around whether to run deploy, update or remove.
 
 The operation that will be fired depends on the inputs and how the provider works. Change in some inputs for some provider could trigger a create / remove while other inputs might trigger an update. It's up to the component to decide.
 
-Here's an example on how the lambda component decides what needs to be done based on the inputs and state:
+Here's an example demonstrating how a lambda component decides what needs to be done based on the inputs and state:
 
 ```js
 const deploy = (inputs, context) => {
@@ -248,15 +255,15 @@ The framework supports variables from the following sources:
 
 ### Graph
 
-When you start composing components together, each of those components use other nested components and all those components depend on each other with variable references you end up with a graph of components.
+Once you start composing components together with multiple levels of nesting, and all of these components depend on one another with variable references, you then end up with a graph of components.
 
-Internally, the framework constructs this dependency graph by analyzing the entire component structure and their variable references. With this dependency graph the framework is able to provision the required components in parallel whenever they don't depend on each other while waiting on other components that depend on components that haven't been provisioned yet.
+Internally, the framework constructs this dependency graph by analyzing the entire component structure and their variable references. With this dependency graph the framework is able to provision the required components in parallel whenever they either don't depend on each other, or are waiting on other components that haven't been provisioned yet.
 
-The component author / user doesn't have to worry about this graph at all. One just uses variables to reference the outputs which should be used and it'll just work.
+The component author / user doesn't have to worry about this graph at all, they just use variables to reference the outputs which should be used and it will just work.
 
 ### Custom Commands
 
-Other than the common `deploy` and `remove` commands, you can add custom commands to add extra management for your component lifecycle. You do so by adding the corresponding function to the `index.js` file. Just like the other functions in `index.js`.
+Other than the built in `deploy` and `remove` commands, you can also include custom commands to add extra management capability for your component lifecycle. This is achieved by adding the corresponding function to the `index.js` file, just like the other functions in `index.js`.
 
 The function receives `inputs` and `context` as parameters.
 
@@ -277,15 +284,15 @@ module.exports = {
 
 ### Registry
 
-The ["Serverless Registry"](./registry) is a core part in the implementation since it makes it possible to discover, publish and share existing components. For now, `serverless-components` ships with a number of built in components that are usable by type name.
+The ["Serverless Registry"](./registry) is a core part in the components implementation as it makes it possible to discover, publish and share existing components. For now, `serverless-components` ships with a number of built-in components that are usable by type name.
 
-The registry is not only constrained to serve components. Since components are functions it's possible to wrap existing business logic into functions and publish them to the registry as well.
+The registry is not only limited to serving components. Since components are functions, it's possible to wrap existing business logic into functions and publish them to the registry as well.
 
-Looking into the future it could be possible to serve functions which are written in different languages through the registry.
+Looking into the future, it will even be possible to serve functions which are written in different languages through the registry.
 
 ## Creating components
 
-A quick guide to help you build your kick-start component development.
+Here is a quick guide to help you kick-start your component development.
 
 **Note:** Make sure to re-visit the [core concepts](#concepts) above before you jump right into the component implementation.
 
@@ -293,7 +300,7 @@ A quick guide to help you build your kick-start component development.
 
 In this guide we'll build a simple `greeter` component which will greet us with a custom message when we run the `deploy`, `greet` or `remove` commands.
 
-The first step we need to take is to create a dedicated directory for our component. This directory will include all the necessary files for our component like its `serverless.yml` file, the `index.js` file (which includes the components logic) and files such as `package.json` to define its dependencies.
+First we need to create a dedicated directory for our component. This directory will include all the necessary files for our component, like its `serverless.yml` file, the `index.js` file (which includes the components logic), and files such as `package.json` to define its dependencies.
 
 Go ahead and create a `greeter` directory in the "Serverless Registry" directory located at [`registry`](./registry).
 
@@ -323,7 +330,7 @@ That's it for the component definition. Let's move on to the implementation of i
 
 The components logic is implemented with the help of an `index.js` file which is located in the root of the components directory. Go ahead and create an empty `index.js` file in the components root directory.
 
-Next up we'll implement the logic for the `deploy`, `greet` and `remove` commands. We do this by adding the respective functions in the file and exporting them so that the Frameworks CLI can pick them up (_Remember:_ only the exported functions are accessible via CLI commands).
+Then we'll implement the logic for the `deploy`, `greet` and `remove` commands. We do this by adding the respective functions into the file and exporting them so that the framework CLI can pick them up (_Remember:_ only the exported functions are accessible via CLI commands).
 
 Just paste the following code in the `index.js` file:
 
@@ -372,11 +379,11 @@ module.exports = {
 
 Let's take a closer look at the implementation.
 
-Right at the top we've define a "helper" function (this function is not exported at the bottom and can therefore only be used internally) we use to reduce code duplication. this `greetWithFullName` function gets the `inputs` and the `context` and logs a message which greets the user with his full name. Note that we're using the `log` function which is available at the `context` object instead of the native `console.log` function. The `context` object has other, very helpful functions and data attached to it.
+Right at the top we've defined a "helper" function we use to reduce code duplication (this function is not exported at the bottom and can therefore only be used internally). This `greetWithFullName` function gets `inputs` and `context`, and then logs a message which greets the user with his full name. Note that we're using the `log` function which is available at the `context` object instead of the native `console.log` function. The `context` object has other, very helpful functions and data attached to it.
 
-Next up we've defined the `deploy` function. This function is executed every time the user runs a `deploy` command since we've exported it at the bottom of the file. At first we re-use our `greetWithFullName` function to greet our user. Next up we check the state to see if we've already deployed previously. If that's the case we log out the timestamp of the last deployment. After that we get the current time and store it in an object which includes the `state`, the `inputs` and the new `deployedAt` timestamp. This object reflects our current state which we store. After that we return the object as outputs.
+Next up we've defined the `deploy` function. This function is executed every time the user runs a `deploy` command since we've exported it at the bottom of the file. At first we re-use our `greetWithFullName` function to greet our user. Then we check the state to see if we've already deployed it previously. If this is the case we log out the timestamp of the last deployment. After that we get the current time and store it in an object which includes the `state`, the `inputs` and the new `deployedAt` timestamp. This object reflects our current state, which we now store. After that we return the object as outputs.
 
-The `greet` function is a custom `command` function we use to extend the CLIs capabilities. Since we've exported it at the bottom of the file it'll be execute every time someone runs the `greet` command. The functionality is pretty straightforward. We just log out a different greeting using the `context.log` method and the `inputs`.
+The `greet` function is a custom `command` function we use to extend the CLI's capabilities. Since we've exported it at the bottom of the file it'll be executed every time someone runs the `greet` command. The functionality is pretty straightforward. We just log out a different greeting using the `context.log` method and the `inputs`.
 
 The last function we've defined in our components implementation is the `remove` function. Remove is also accessible from the CLI because we export it at the bottom of the file. The functions code is also pretty easy to understand. At first we greet our user with the `greetWithFullName` helper function. Next up we log a message that the removal was triggered and store an empty state (meaning that there's no more state information available). That's it.
 
@@ -403,7 +410,7 @@ components:
       lastName: ${env.LAST_NAME}
 ```
 
-If we take a closer look at the `serverless.yml` file we can see that our `lastName` config value depends on a variable called `LAST_NAME` which is fetched from the local environment. This means that we need to export this variable so that the Framework can pick it up and pass it down into our `inputs`:
+If we take a closer look at the `serverless.yml` file we can see that our `lastName` config value depends on a variable called `LAST_NAME` that is fetched from the local environment. This means that we need to export this variable so that the framework can pick it up and pass it down into our `inputs`:
 
 ```sh
 export LAST_NAME=Doe
