@@ -141,7 +141,7 @@
           var productTitle = "<div class='product-title'><h2>" + product.name + "</h2></div>"
           var productDescription = "<div class='product-desc'><p>" + product.description + "</p></div>"
           var productPrice = "<div class='product-price'>" + product.price + "</div>"
-          productList.append("<div class='product'>" + productTitle + productDescription + productPrice + "</div>")
+          productList.append("<div class='product' id='product-id-"+product.id+"'>" + productTitle + productDescription + productPrice + "</div>")
         }
       });
    });
