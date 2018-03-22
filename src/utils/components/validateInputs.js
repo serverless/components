@@ -12,11 +12,12 @@ function validateInputs(componentId, inputTypes, inputs) {
         const componentName = chalk.white(`"${component}"`)
         const header =
           i !== 0 ? '' : chalk.redBright.bold(`\nType error in component ${componentName}`)
-        const value = chalk.cyanBright(`"${error.value}"`)
+
+        const value = error.value
         const key = `${chalk.yellowBright(error.key)}`
         const suppliedType = typeof error.value
         const newLine = i === 0 ? '\n' : ''
-        return `${header}${newLine} - Input ${key} has \`${suppliedType}\` value of ${value} but expected the following: ${chalk.yellowBright(error.rule)} ${chalk.yellowBright(error.attr)}.\n`
+        return `${header}${newLine} - Input ${key} has \`${suppliedType}\` value of ${JSON.stringify(value)} but expected the following: ${chalk.yellowBright(error.rule)} ${chalk.yellowBright(error.attr)}.\n`
       })
     }
   }
