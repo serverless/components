@@ -6,8 +6,10 @@ const pathParameterPattern = /{([^}]+?)}/g
 
 // "private" functions
 async function deployIamRole(inputs, context) {
+  const hrtime = process.hrtime()
+  const postFix = `${hrtime[0]}x${hrtime[1]}`
   // TODO: remove duplicate code
-  const name = `${inputs.name}-iam-role`
+  const name = `${inputs.name}-iam-role-${postFix}`
   const service = 'apigateway.amazonaws.com'
 
   const iamComponent = await context.load('aws-iam-role', 'iam', {
