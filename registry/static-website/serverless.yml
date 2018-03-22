@@ -64,13 +64,13 @@ components:
     inputs:
       name: ${input.name}
       defaultRootObject: ${input.contentIndex}
-      originId: ${rootDomainBucket.name}
+      originId: ${input.hostingDomain}
       originDomain: ${rootDomainBucket.name}.s3.amazonaws.com
-      aliasDomain: ${wwwDomainBucket.name}
+      aliasDomain: ${input.aliasDomain}
       distributionEnabled: true
   siteRoute53Config:
     type: aws-route53
     inputs:
       name: ${input.name}
-      domainName: ${wwwDomainBucket.name}
+      domainName: ${input.aliasDomain}
       dnsName: ${siteCloudFrontConfig.distribution.domainName} # d111111abcdef8.cloudfront.net
