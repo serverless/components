@@ -128,9 +128,9 @@ describe('#executeGraph()', () => {
     executeComponent.mockImplementationOnce(() =>
       Promise((resolve) => {
         setTimeout(() => {
-          resolve()
+          resolve('myFunc')
         }, 0)
-      }).resolve('myFunc'))
+      }))
 
     await expect(executeGraph(graph, components, {}, {})).rejects.toThrow('myRole could not be deployed')
 
