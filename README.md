@@ -25,6 +25,7 @@ Serverless Components can deploy anything, but they're biased toward SaaS & clou
 ## Table of contents
 
 * [Getting started](#getting-started)
+* [Current limitations](#current-limitations)
 * [Concepts](#concepts)
   * [Components](#components)
   * [Input types, Inputs & Outputs](#input-types-inputs-outputs)
@@ -71,13 +72,28 @@ Also please do join the _Components_ channel on our public [Serverless-Contrib S
    * `export AWS_ACCESS_KEY_ID=my_access_key_id`
    * `export AWS_SECRET_ACCESS_KEY=my_secret_access_key`
 
-## Running Locally
+### Running Locally
 
 Run commands with
 
 ```
 components [Command]
 ```
+
+## Current limitations
+
+The following is a list with some limitations one should be aware of when using this project.
+**NOTE:** We're currently working on fixes for such issues and will announce them in our release notes / changelogs.
+
+### `us-east-1` only
+
+Right now the only supported region is `us-east-1`
+
+### No rollback support
+
+Rolling back your application into the previous, stable state is currently not supported.
+
+However the framework ensures that your state file always reflects the correct state of your infrastructure setup (even if something goes wrong during deployment / removal).
 
 ## Concepts
 
