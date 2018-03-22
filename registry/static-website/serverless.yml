@@ -36,6 +36,7 @@ components:
     type: aws-s3-bucket
     inputs:
       name: ${input.hostingDomain}
+      forceUniqueBucketName: true
   rootDomainBucketPolicy:
     type: s3-policy
     inputs:
@@ -49,6 +50,7 @@ components:
     type: aws-s3-bucket
     inputs:
       name: ${input.aliasDomain}
+      forceUniqueBucketName: true
   rootDomainBucketConfig:
     type: s3-website-config
     inputs:
@@ -56,7 +58,7 @@ components:
       indexDocument: ${input.contentIndex}
       errorDocument: ${input.contentError}
       redirectBucketName: ${wwwDomainBucket.name}
-      redirectToHostName: ${input.hostingDomain}
+      redirectToHostName: ${rootDomainBucket.name}
   siteCloudFrontConfig:
     type: aws-cloudfront
     inputs:
@@ -64,11 +66,11 @@ components:
       defaultRootObject: ${input.contentIndex}
       originId: ${rootDomainBucket.name}
       originDomain: ${rootDomainBucket.name}.s3.amazonaws.com
-      aliasDomain: ${input.aliasDomain}
+      aliasDomain: ${wwwDomainBucket.name}
       distributionEnabled: true
   siteRoute53Config:
     type: aws-route53
     inputs:
       name: ${input.name}
-      domainName: ${input.aliasDomain}
+      domainName: ${wwwDomainBucket.name}
       dnsName: ${siteCloudFrontConfig.distribution.domainName} # d111111abcdef8.cloudfront.net
