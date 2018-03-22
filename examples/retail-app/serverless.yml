@@ -1,39 +1,36 @@
 type: retail-app
 
-inputs:
-  prefix: rgtest
-
 components:
   webFrontend:
     type: static-website
     inputs:
-      name: ${input.prefix}-retail-frontend
+      name: retail-frontend
       contentPath: ${self.path}/frontend
       templateValues:
         apiUrl: ${productsApi.url}
       contentIndex: index.html
       contentError: error.html
       hostingRegion: us-east-1
-      hostingDomain: serverless-${input.prefix}-retail-site-test.example.com
-      aliasDomain: www.serverless-${input.prefix}-retail-site-test.example.com
+      hostingDomain: serverless-retail-site-test.example.com
+      aliasDomain: www.serverless-retail-site-test.example.com
   createProduct:
     type: aws-lambda
     inputs:
-      name: ${input.prefix}-retail-createProduct
+      name: retail-createProduct
       memory: 512
       timeout: 10
       handler: code/products.create
   getProduct:
     type: aws-lambda
     inputs:
-      name: ${input.prefix}-retail-getProduct
+      name: retail-getProduct
       memory: 512
       timeout: 10
       handler: code/products.get
   listProducts:
     type: aws-lambda
     inputs:
-      name: ${input.prefix}-retail-listProducts
+      name: retail-listProducts
       memory: 512
       timeout: 10
       handler: code/products.list
@@ -41,7 +38,7 @@ components:
     type: rest-api
     inputs:
       gateway: aws-apigateway
-      name: ${input.prefix}-retail-productsApi
+      name: retail-productsApi
       routes:
         /products: # routes begin with a slash
           post: # HTTP method names are used to attach handlers
