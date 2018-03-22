@@ -1,49 +1,61 @@
-const products = [
-  { id: '0', name: 'Phlebotinum', price: 3.99 },
-  { id: '1', name: 'Unobtainium', price: 9.99 },
-  { id: '2', name: 'Skub', price: 2.49 }
-]
+/* eslint-disable no-console */
+const dynasty = require('dynasty')({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: process.env.AWS_REGION
+})
 
 function create(evt, ctx, cb) {
-  cb(null, {
-    statusCode: 201,
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*'
-    },
-    body: 'created'
-  })
+  const productsTable = dynasty.table('products')
+  const data = JSON.parse(evt.body)
+  productsTable.insert(data)
+    .then((resp) => {
+      cb(null, {
+        statusCode: 201,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: resp
+      })
+    })
 }
 
 function get(evt, ctx, cb) {
+  const productsTable = dynasty.table('products')
   const id = parseInt(evt.pathParameters.id || 0, 10)
-  if (!products[id]) {
-    cb(null, {
-      statusCode: 404,
-      body: 'Product not found.'
+  productsTable.find(id)
+    .then((product) => {
+      cb(null, {
+        statusCode: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify(product)
+      })
     })
-    return
-  }
-
-  cb(null, {
-    statusCode: 200,
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*'
-    },
-    body: JSON.stringify(products[id])
-  })
+    .catch((err) => {
+      cb(null, {
+        statusCode: 404,
+        body: { message: `Product with '${id}' not found. Error: ${err}` }
+      })
+    })
 }
 
 function list(evt, ctx, cb) {
-  cb(null, {
-    statusCode: 200,
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*'
-    },
-    body: JSON.stringify(products)
-  })
+  const productsTable = dynasty.table('products')
+  productsTable.scan()
+    .then((products) => {
+      cb(null, {
+        statusCode: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify(products)
+      })
+    })
 }
 
 module.exports = { create, get, list }
