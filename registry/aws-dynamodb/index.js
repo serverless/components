@@ -163,7 +163,7 @@ const deleteTable = async (inputs, context, tableName) => {
   if (model) {
     const deleteTableAsync = util.promisify(model.deleteTable)
     await deleteTableAsync()
-    
+
     // Delete output state only for the specified table
     ddbTables = removeOutputTableByName(context.state.ddbtables, tableName)
     context.saveState({ ...inputs, ...ddbTables })
