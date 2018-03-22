@@ -103,7 +103,11 @@ async function removeIamRole(inputs, context) {
 }
 
 async function removeApiGateway(inputs, context) {
-  const apiInputs = getAwsApiGatewayInputs({ ...inputs, roleArn: context.state.roleArn, routes: {} })
+  const apiInputs = getAwsApiGatewayInputs({
+    ...inputs,
+    roleArn: context.state.roleArn,
+    routes: {}
+  })
   const apiGatewayComponent = await context.load('aws-apigateway', 'apig', apiInputs)
   return apiGatewayComponent.remove()
 }
@@ -156,7 +160,7 @@ async function deploy(inputs, context) {
   if (inputs.gateway === 'eventgateway') {
     outputs.eventgateway = await deployEventGateway(flatInputs, context)
     outputs.url = outputs.eventgateway.url
-    context.saveState({ })
+    context.saveState({})
   } else if (inputs.gateway === 'aws-apigateway') {
     outputs.iam = await deployIamRole(inputs, context)
     outputs.apigateway = await deployApiGateway(
