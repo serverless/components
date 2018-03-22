@@ -174,7 +174,7 @@ describe('Integration Test - Simple', () => {
       expect(stateFileContent).toEqual(expected)
     })
 
-    it('should rollback to the previous state if an error occurs during command execution', async () => {
+    it('should persist updated state if an error occurs during command execution', async () => {
       // NOTE: we've added some logic in the function component so that it fails when the
       // third deployment is done
       // NOTE: the order of this test here is important since we're keeping and checking the
@@ -197,7 +197,7 @@ describe('Integration Test - Simple', () => {
             id: 'id:iam:role:my-function',
             name: 'my-function',
             service: 'my.function.service',
-            deploymentCounter: 4
+            deploymentCounter: 3
           }
         },
         'simple:myFunction': {

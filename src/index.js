@@ -1,4 +1,4 @@
-const chalk = require('chalk')
+// const chalk = require('chalk')
 const { clone } = require('ramda')
 const utils = require('./utils')
 
@@ -6,13 +6,13 @@ const {
   errorReporter,
   getComponentsToUse,
   getComponentsToRemove,
-  getExecutedComponents,
+  // getExecutedComponents,
   buildGraph,
   executeGraph,
   readStateFile,
   writeStateFile,
-  trackDeployment,
-  log
+  trackDeployment
+  // log
 } = utils
 
 const run = async (command, options) => {
@@ -31,18 +31,22 @@ const run = async (command, options) => {
     await executeGraph(graph, components, stateFile, archive, command, options, false)
   } catch (error) {
     if (reporter) { reporter.captureException(error) }
-    log(chalk.red(`Error: ${error.message}. Rolling back...`))
-    const executedComponents = getExecutedComponents(components)
-    const executedComponentsGraph = await buildGraph(executedComponents, {}, command)
-    await executeGraph(
-      executedComponentsGraph,
-      executedComponents,
-      stateFile,
-      archive,
-      command,
-      options,
-      true
-    )
+
+    // DISABLING rollback for the launch.
+
+    // log(chalk.red(`Error: ${error.message}. Rolling back...`))
+    // const executedComponents = getExecutedComponents(components)
+    // const executedComponentsGraph = await buildGraph(executedComponents, {}, command)
+    // await executeGraph(
+    //   executedComponentsGraph,
+    //   executedComponents,
+    //   stateFile,
+    //   archive,
+    //   command,
+    //   options,
+    //   true
+    // )
+
     throw error
   } finally {
     await writeStateFile(stateFile)
