@@ -10,8 +10,11 @@ const execute = async (graph, components, stateFile,
     return graph
   }
 
-  await BbPromise.all(map(
-    async (componentId) => {
+  // using Bluebird promises here so that we can skip failures and inspect them
+  // later on when executing the graph in parallel and therefore save state in a
+  // consistent way
+  const ensuredExecutions = await BbPromise.map(leaves, async (componentId) => {
+    try {
       const node = graph.node(componentId)
       await executeComponent(
         componentId,
@@ -23,9 +26,19 @@ const execute = async (graph, components, stateFile,
         rollback
       )
       graph.removeNode(componentId)
+      return BbPromise.resolve(componentId).reflect()
+    } catch (error) {
+      return BbPromise.reject(error).reflect()
     }
-    , leaves
-  ))
+  })
+  // check if something went wrong while exeucting in parallel
+  // re-throw the captured rejection (if any)
+  map((promiseInspection) => {
+    if (promiseInspection.isRejected()) {
+      throw new Error(promiseInspection.reason())
+    }
+  }, ensuredExecutions)
+
   return execute(graph, components, stateFile, archive, command, options, rollback)
 }
 
