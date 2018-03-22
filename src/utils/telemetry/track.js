@@ -21,6 +21,8 @@ module.exports = async (eventName, data = {}) => {
 
   const { segmentWriteKey } = await readFile(trackingFilePath) // eslint-disable-line
 
+  if (!segmentWriteKey) return
+
   const analytics = new Analytics(segmentWriteKey)
 
 
