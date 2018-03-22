@@ -162,16 +162,12 @@ const deleteTable = async (inputs, context, tableName) => {
   const model = defineTable(table)
   if (model) {
     const deleteTableAsync = util.promisify(model.deleteTable)
-    deleteTableAsync()
-      .then(() => {
-        // Delete output state only for the specified table
-        ddbTables = removeOutputTableByName(context.state.ddbtables, tableName)
-        context.saveState({ ...inputs, ...ddbTables })
-        console.log(`Deleted table: '${tableName}'`)
-      })
-      .catch((err) => {
-        throw err
-      })
+    await deleteTableAsync()
+    
+    // Delete output state only for the specified table
+    ddbTables = removeOutputTableByName(context.state.ddbtables, tableName)
+    context.saveState({ ...inputs, ...ddbTables })
+    console.log(`Deleted table: '${tableName}'`)
   }
   return ddbTables
 }
