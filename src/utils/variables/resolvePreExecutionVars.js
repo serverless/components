@@ -27,6 +27,8 @@ module.exports = (selfProperties, slsYml) => {
               return selfProperties.path
             case 'self.serviceId':
               return selfProperties.serviceId
+            case 'self.instanceId':
+              return selfProperties.instanceId
             default:
               throw new Error(`No such property of self: ${reference}`)
           }

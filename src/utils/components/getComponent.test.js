@@ -13,7 +13,13 @@ describe('#getComponent()', () => {
           stringTypeWithDefault: 'baz'
         },
         {
-          serviceId: 'AsH3gefdfDSY'
+          serviceId: 'AsH3gefdfDSY',
+          'my-component': {
+            type: 'aws-function',
+            internallyManaged: false,
+            instanceId: 'AsH3gefdfDSY-cHA9jPi5lPQj',
+            state: {}
+          }
         }
       )
 
@@ -33,7 +39,13 @@ describe('#getComponent()', () => {
           stringTypeNotRequired: 'bar'
         },
         {
-          serviceId: 'AsH3gefdfDSY'
+          serviceId: 'AsH3gefdfDSY',
+          'my-component': {
+            type: 'aws-function',
+            internallyManaged: false,
+            instanceId: 'AsH3gefdfDSY-cHA9jPi5lPQj',
+            state: {}
+          }
         }
       )
 
@@ -55,7 +67,13 @@ describe('#getComponent()', () => {
             stringTypeWithDefault: 'baz'
           },
           {
-            serviceId: 'AsH3gefdfDSY'
+            serviceId: 'AsH3gefdfDSY',
+            'my-component': {
+              type: 'aws-function',
+              internallyManaged: false,
+              instanceId: 'AsH3gefdfDSY-cHA9jPi5lPQj',
+              state: {}
+            }
           }
         )
       } catch (err) {
@@ -74,7 +92,13 @@ describe('#getComponent()', () => {
           'test',
           {},
           {
-            serviceId: 'AsH3gefdfDSY'
+            serviceId: 'AsH3gefdfDSY',
+            'my-component': {
+              type: 'aws-function',
+              internallyManaged: false,
+              instanceId: 'AsH3gefdfDSY-cHA9jPi5lPQj',
+              state: {}
+            }
           }
         )
       } catch (err) {

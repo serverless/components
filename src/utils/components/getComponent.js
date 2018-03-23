@@ -5,6 +5,7 @@ const getServiceId = require('../state/getServiceId')
 
 const transformPostExecutionVars = require('../variables/transformPostExecutionVars')
 const resolvePreExecutionVars = require('../variables/resolvePreExecutionVars')
+const getInstanceId = require('./getInstanceId')
 const setInputDefaults = require('./setInputDefaults')
 const validateInputs = require('./validateInputs')
 
@@ -21,10 +22,14 @@ module.exports = async (componentRoot, componentId, inputs, stateFile) => {
 
   slsYml.inputs = { ...slsYml.inputs, ...inputs }
 
-  slsYml = await resolvePreExecutionVars({
-    path: path.resolve(componentRoot).replace(/\/*$/, ''),
-    serviceId: getServiceId(stateFile)
-  }, slsYml)
+  slsYml = await resolvePreExecutionVars(
+    {
+      path: path.resolve(componentRoot).replace(/\/*$/, ''),
+      serviceId: getServiceId(stateFile),
+      instanceId: getInstanceId(stateFile, slsYml.id)
+    },
+    slsYml
+  )
 
   slsYml.inputs = setInputDefaults(slsYml.inputTypes, slsYml.inputs)
 
