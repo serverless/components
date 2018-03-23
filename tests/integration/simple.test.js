@@ -103,7 +103,7 @@ describe('Integration Test - Simple', () => {
       })
       const stateFileContent = await fsp.readJsonAsync(testServiceStateFile)
       const stateFileKeys = Object.keys(stateFileContent)
-      expect(stateFileKeys.length).toEqual(3)
+      expect(stateFileKeys.length).toEqual(4)
       expect(stateFileContent).toHaveProperty('$.serviceId')
       expect(stateFileContent).toHaveProperty('simple:myRole')
       const myRoleObjectKeys = Object.keys(stateFileContent['simple:myRole'])
