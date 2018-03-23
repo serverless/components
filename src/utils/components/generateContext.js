@@ -30,7 +30,12 @@ const generateContext = (
       const childComponentRootPath = path.join(getRegistryRoot(), type)
       const childComponentId = `${id}:${alias}`
 
-      const childComponent = await getComponent(childComponentRootPath, childComponentId, inputs)
+      const childComponent = await getComponent(
+        childComponentRootPath,
+        childComponentId,
+        inputs,
+        stateFile
+      )
       // TODO: update the following once getComponent adds the properties automatically
       let fns = {}
       if (await fileExists(path.join(childComponentRootPath, 'index.js'))) {

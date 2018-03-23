@@ -13,7 +13,7 @@ const getComponentsToUse = async (
   componentId,
   components = {}
 ) => {
-  const slsYml = await getComponent(componentRoot, componentId, inputs)
+  const slsYml = await getComponent(componentRoot, componentId, inputs, stateFile)
 
   const dependencies = getDependencies(slsYml.inputs)
 

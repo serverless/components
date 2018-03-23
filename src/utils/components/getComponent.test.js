@@ -11,6 +11,9 @@ describe('#getComponent()', () => {
           stringTypeRequired: 'foo',
           stringTypeNotRequired: 'bar',
           stringTypeWithDefault: 'baz'
+        },
+        {
+          serviceId: 'AsH3gefdfDSY'
         }
       )
 
@@ -28,6 +31,9 @@ describe('#getComponent()', () => {
         {
           stringTypeRequired: 'foo',
           stringTypeNotRequired: 'bar'
+        },
+        {
+          serviceId: 'AsH3gefdfDSY'
         }
       )
 
@@ -47,6 +53,9 @@ describe('#getComponent()', () => {
           {
             stringTypeNotRequired: 'bar',
             stringTypeWithDefault: 'baz'
+          },
+          {
+            serviceId: 'AsH3gefdfDSY'
           }
         )
       } catch (err) {
@@ -63,7 +72,10 @@ describe('#getComponent()', () => {
         await getComponent(
           path.resolve(__dirname, '../../../registry/tests-input-type-string-invalid-default'),
           'test',
-          {}
+          {},
+          {
+            serviceId: 'AsH3gefdfDSY'
+          }
         )
       } catch (err) {
         error = err
