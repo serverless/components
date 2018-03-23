@@ -1,4 +1,4 @@
-const { assoc } = require('ramda')
+const { assocPath } = require('ramda')
 const getServiceId = require('./getServiceId')
 
 describe('#getServiceId()', () => {
@@ -15,8 +15,8 @@ describe('#getServiceId()', () => {
   }
 
   it('should return the serviceId', () => {
-    const serviceId = 'AsH3gefdfDSY'
-    const modifiedStateFileContent = assoc('serviceId', serviceId, stateFileContent)
+    const serviceId = 'pah732o2gj'
+    const modifiedStateFileContent = assocPath([ '$', 'serviceId' ], serviceId, stateFileContent)
 
     const res = getServiceId(modifiedStateFileContent)
     expect(res).toEqual(serviceId)

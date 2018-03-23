@@ -13,7 +13,7 @@ describe('#getComponent()', () => {
           stringTypeWithDefault: 'baz'
         },
         {
-          serviceId: 'AsH3gefdfDSY',
+          $: { serviceId: 'AsH3gefdfDSY' },
           'my-component': {
             type: 'aws-function',
             internallyManaged: false,
@@ -39,7 +39,7 @@ describe('#getComponent()', () => {
           stringTypeNotRequired: 'bar'
         },
         {
-          serviceId: 'AsH3gefdfDSY',
+          $: { serviceId: 'AsH3gefdfDSY' },
           'my-component': {
             type: 'aws-function',
             internallyManaged: false,
@@ -67,7 +67,7 @@ describe('#getComponent()', () => {
             stringTypeWithDefault: 'baz'
           },
           {
-            serviceId: 'AsH3gefdfDSY',
+            $: { serviceId: 'AsH3gefdfDSY' },
             'my-component': {
               type: 'aws-function',
               internallyManaged: false,
@@ -92,7 +92,7 @@ describe('#getComponent()', () => {
           'test',
           {},
           {
-            serviceId: 'AsH3gefdfDSY',
+            $: { serviceId: 'AsH3gefdfDSY' },
             'my-component': {
               type: 'aws-function',
               internallyManaged: false,

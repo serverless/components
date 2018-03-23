@@ -15,8 +15,7 @@ describe('#setServiceId()', () => {
 
   it('should set the serviceId property on the global state object', () => {
     const res = setServiceId(stateFileContent)
-    expect(res).toHaveProperty('$')
-    expect(res.$).toHaveProperty('serviceId')
-    expect(res.serviceId.length).not.toEqual(0)
+    expect(res).toHaveProperty('$.serviceId')
+    expect(res.$.serviceId.length).not.toEqual(0)
   })
 })
