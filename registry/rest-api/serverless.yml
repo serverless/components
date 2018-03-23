@@ -12,7 +12,8 @@ inputTypes:
     required: false
   name:
     type: string
-    required: true
+    required: false
+    default: api-${self.instanceId}
   routes:
     type: object
     required: true

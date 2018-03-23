@@ -4,18 +4,17 @@ const AWS = require('aws-sdk')
 
 const dynamo = new AWS.DynamoDB.DocumentClient({ region: 'us-east-1' })
 
+const tableName = process.env.productTableName
+
 function create(evt, ctx, cb) {
   // item = { id: 5, name: 'Phlebotinum', description: 'desc1', price: 3.99 }
   const item = JSON.parse(evt.body)
   dynamo.put({
     Item: item,
-    TableName: 'products'
+    TableName: tableName
   }, (err, resp) => {
     if (err) {
-      cb(null, {
-        statusCode: 500,
-        body: { message: `Error: ${err}` }
-      })
+      cb(err)
     } else {
       cb(null, {
         statusCode: 201,
@@ -35,13 +34,10 @@ function get(evt, ctx, cb) {
     Key: {
       id: vId
     },
-    TableName: 'products'
+    TableName: tableName
   }, (err, data) => {
     if (err) {
-      cb(null, {
-        statusCode: 404,
-        body: { message: `Product with '${vId}' not found. Error: ${err}` }
-      })
+      cb(err)
     } else {
       const product = data.Item
       cb(null, {
@@ -58,13 +54,10 @@ function get(evt, ctx, cb) {
 
 function list(evt, ctx, cb) {
   dynamo.scan({
-    TableName: 'products'
+    TableName: tableName
   }, (err, data) => {
     if (err) {
-      cb(null, {
-        statusCode: 500,
-        body: { message: `Error: ${err}` }
-      })
+      cb(err)
     } else {
       const products = data.Items
       cb(null, {

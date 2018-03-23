@@ -3,7 +3,8 @@ type: aws-apigateway
 inputTypes:
   name:
     type: string
-    required: true
+    required: false
+    default: apig-${self.instanceId}
   roleArn:
     type: string
     required: true

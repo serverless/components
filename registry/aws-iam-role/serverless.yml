@@ -3,7 +3,8 @@ type: aws-iam-role
 inputTypes:
   name:
     type: string
-    required: true
+    required: false
+    default: role-${self.instanceId}
   service:
     type: string
     required: true

@@ -81,11 +81,8 @@ const deploy = async (inputs, context) => {
   const configuredRole = inputs.role
   let { defaultRole } = context.state
 
-  const hrtime = process.hrtime()
-  const postFix = `${hrtime[0]}x${hrtime[1]}`
-
   const defaultRoleComponent = await context.load('aws-iam-role', 'defaultRole', {
-    name: `${inputs.name}-execution-role-${postFix}`,
+    name: `${inputs.name}-execution-role-${context.instanceId}`,
     service: 'lambda.amazonaws.com'
   })
 

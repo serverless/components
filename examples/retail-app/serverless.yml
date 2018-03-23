@@ -16,29 +16,34 @@ components:
   createProduct:
     type: aws-lambda
     inputs:
-      name: retail-createProduct
       memory: 512
       timeout: 10
       handler: code/products.create
+      env:
+        # TODO: Where is the S at the end coming from?
+        productTableName: product-${self.instanceId}s
   getProduct:
     type: aws-lambda
     inputs:
-      name: retail-getProduct
       memory: 512
       timeout: 10
       handler: code/products.get
+      env:
+        # TODO: Where is the S at the end coming from?
+        productTableName: product-${self.instanceId}s
   listProducts:
     type: aws-lambda
     inputs:
-      name: retail-listProducts
       memory: 512
       timeout: 10
       handler: code/products.list
+      env:
+        # TODO: Where is the S at the end coming from?
+        productTableName: product-${self.instanceId}s
   productsApi:
     type: rest-api
     inputs:
       gateway: aws-apigateway
-      name: retail-productsApi
       routes:
         /products: # routes begin with a slash
           post: # HTTP method names are used to attach handlers
@@ -61,7 +66,7 @@ components:
     inputs:
       region: us-east-1
       tables:
-        - name: products
+        - name: products-${self.instanceId}
           hashKey: id
           indexes:
             - name: ProductIdIndex
