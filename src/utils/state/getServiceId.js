@@ -1,7 +1,7 @@
 const generateServiceId = require('./generateServiceId')
 
 function getServiceId(stateFile) {
-  return stateFile.serviceId || generateServiceId()
+  return (stateFile.$ && stateFile.$.serviceId) || generateServiceId()
 }
 
 module.exports = getServiceId

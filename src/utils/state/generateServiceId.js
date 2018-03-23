@@ -1,7 +1,7 @@
 const getRandomId = require('../misc/getRandomId')
 
 function generateServiceId() {
-  return getRandomId(12)
+  return getRandomId(10)
 }
 
 module.exports = generateServiceId

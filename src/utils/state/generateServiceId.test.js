@@ -5,6 +5,6 @@ describe('#generateServiceId()', () => {
     const res = generateServiceId()
 
     expect(res).toMatch(/.+/)
-    expect(res.length).toEqual(12)
+    expect(res.length).toEqual(10)
   })
 })
