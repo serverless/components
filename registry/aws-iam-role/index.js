@@ -108,54 +108,55 @@ const rollback = async (inputs, context) => {
 }
 
 const deploy = async (inputs, context) => {
-  let { state } = context
-
-  if (!inputs.policy) {
-    inputs = {
-      ...inputs,
-      policy: {
-        arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
-      }
-    }
-  }
-
-  if (!state.name && inputs.name) {
-    context.log(`Creating Role: ${inputs.name}`)
-    const role = await createRole(inputs)
-    state = {
-      ...state,
-      ...role,
-      name: inputs.name
-    }
-  } else if (!inputs.name && state.name) {
-    context.log(`Removing Role: ${state.name}`)
-    await deleteRole(state)
-    state = {
-      ...state,
-      name: null
-    }
-  } else if (state.name !== inputs.name) {
-    context.log(`Removing Role: ${state.name}`)
-    await deleteRole(state)
-    context.log(`Creating Role: ${inputs.name}`)
-    const role = await createRole(inputs)
-    state = {
-      ...state,
-      ...role,
-      name: inputs.name
-    }
-  } else {
-    if (state.service !== inputs.service) {
-      await updateAssumeRolePolicy(inputs)
-    }
-    if (!equals(state.policy, inputs.policy)) {
-      await detachRolePolicy(state)
-      await attachRolePolicy(inputs)
-    }
-  }
-
-  context.saveState(state)
-  return state
+  return { some: 'output' }
+  // let { state } = context
+  //
+  // if (!inputs.policy) {
+  //   inputs = {
+  //     ...inputs,
+  //     policy: {
+  //       arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
+  //     }
+  //   }
+  // }
+  //
+  // if (!state.name && inputs.name) {
+  //   context.log(`Creating Role: ${inputs.name}`)
+  //   const role = await createRole(inputs)
+  //   state = {
+  //     ...state,
+  //     ...role,
+  //     name: inputs.name
+  //   }
+  // } else if (!inputs.name && state.name) {
+  //   context.log(`Removing Role: ${state.name}`)
+  //   await deleteRole(state)
+  //   state = {
+  //     ...state,
+  //     name: null
+  //   }
+  // } else if (state.name !== inputs.name) {
+  //   context.log(`Removing Role: ${state.name}`)
+  //   await deleteRole(state)
+  //   context.log(`Creating Role: ${inputs.name}`)
+  //   const role = await createRole(inputs)
+  //   state = {
+  //     ...state,
+  //     ...role,
+  //     name: inputs.name
+  //   }
+  // } else {
+  //   if (state.service !== inputs.service) {
+  //     await updateAssumeRolePolicy(inputs)
+  //   }
+  //   if (!equals(state.policy, inputs.policy)) {
+  //     await detachRolePolicy(state)
+  //     await attachRolePolicy(inputs)
+  //   }
+  // }
+  //
+  // context.saveState(state)
+  // return state
 }
 
 const remove = async (inputs, context) => {
