@@ -48,43 +48,61 @@ describe('Integration Test - Programmatic usage', () => {
         cwd: testServiceDir
       })
       const stateFileContent = await fsp.readJsonAsync(testServiceStateFile)
-      const expected = {
-        'programmatic-usage:myFunction:defaultRole': {
-          type: 'tests-integration-iam-mock',
-          internallyManaged: true,
-          state: {
-            id: 'id:iam:role:my-function',
-            name: 'my-function',
-            service: 'default.serverless.service',
-            deploymentCounter: 1
+      const stateFileKeys = Object.keys(stateFileContent)
+      expect(stateFileKeys.length).toEqual(4)
+      expect(stateFileContent).toHaveProperty('$.serviceId')
+      expect(stateFileContent).toHaveProperty('programmatic-usage:myFunction:defaultRole')
+      const myRoleObjectKeys = Object.keys(stateFileContent['programmatic-usage:myFunction:defaultRole'])
+      expect(myRoleObjectKeys.length).toEqual(4)
+      expect(stateFileContent['programmatic-usage:myFunction:defaultRole']).toHaveProperty('instanceId')
+      expect(stateFileContent['programmatic-usage:myFunction:defaultRole']).toHaveProperty(
+        'type',
+        'tests-integration-iam-mock'
+      )
+      expect(stateFileContent['programmatic-usage:myFunction:defaultRole']).toHaveProperty(
+        'internallyManaged',
+        true
+      )
+      expect(stateFileContent['programmatic-usage:myFunction:defaultRole']).toHaveProperty(
+        'state',
+        {
+          id: 'id:iam:role:my-function',
+          name: 'my-function',
+          service: 'default.serverless.service',
+          deploymentCounter: 1
+        }
+      )
+      const myFunctionObjectKeys = Object.keys(stateFileContent['programmatic-usage:myFunction'])
+      expect(myFunctionObjectKeys.length).toEqual(4)
+      expect(stateFileContent['programmatic-usage:myFunction']).toHaveProperty('instanceId')
+      expect(stateFileContent['programmatic-usage:myFunction']).toHaveProperty(
+        'type',
+        'tests-integration-function-mock'
+      )
+      expect(stateFileContent['programmatic-usage:myFunction']).toHaveProperty(
+        'internallyManaged',
+        false
+      )
+      expect(stateFileContent['programmatic-usage:myFunction']).toHaveProperty('state', {
+        id: 'id:function:my-function',
+        name: 'my-function',
+        memorySize: 512,
+        timeout: 60,
+        environment: {
+          isMock: true,
+          variables: {
+            key1: 'value1'
           }
         },
-        'programmatic-usage:myFunction': {
-          type: 'tests-integration-function-mock',
-          internallyManaged: false,
-          state: {
-            id: 'id:function:my-function',
-            name: 'my-function',
-            memorySize: 512,
-            timeout: 60,
-            environment: {
-              isMock: true,
-              variables: {
-                key1: 'value1'
-              }
-            },
-            role: 'id:iam:role:my-function',
-            defaultRole: {
-              id: 'id:iam:role:my-function',
-              name: 'my-function',
-              service: 'default.serverless.service',
-              deploymentCounter: 1
-            },
-            deploymentCounter: 1
-          }
-        }
-      }
-      expect(stateFileContent).toEqual(expected)
+        role: 'id:iam:role:my-function',
+        defaultRole: {
+          id: 'id:iam:role:my-function',
+          name: 'my-function',
+          service: 'default.serverless.service',
+          deploymentCounter: 1
+        },
+        deploymentCounter: 1
+      })
     })
 
     it('should re-deploy the "iam" and "function" components', async () => {
@@ -92,43 +110,61 @@ describe('Integration Test - Programmatic usage', () => {
         cwd: testServiceDir
       })
       const stateFileContent = await fsp.readJsonAsync(testServiceStateFile)
-      const expected = {
-        'programmatic-usage:myFunction:defaultRole': {
-          type: 'tests-integration-iam-mock',
-          internallyManaged: true,
-          state: {
-            id: 'id:iam:role:my-function',
-            name: 'my-function',
-            service: 'default.serverless.service',
-            deploymentCounter: 2
+      const stateFileKeys = Object.keys(stateFileContent)
+      expect(stateFileKeys.length).toEqual(4)
+      expect(stateFileContent).toHaveProperty('$.serviceId')
+      expect(stateFileContent).toHaveProperty('programmatic-usage:myFunction:defaultRole')
+      const myRoleObjectKeys = Object.keys(stateFileContent['programmatic-usage:myFunction:defaultRole'])
+      expect(myRoleObjectKeys.length).toEqual(4)
+      expect(stateFileContent['programmatic-usage:myFunction:defaultRole']).toHaveProperty('instanceId')
+      expect(stateFileContent['programmatic-usage:myFunction:defaultRole']).toHaveProperty(
+        'type',
+        'tests-integration-iam-mock'
+      )
+      expect(stateFileContent['programmatic-usage:myFunction:defaultRole']).toHaveProperty(
+        'internallyManaged',
+        true
+      )
+      expect(stateFileContent['programmatic-usage:myFunction:defaultRole']).toHaveProperty(
+        'state',
+        {
+          id: 'id:iam:role:my-function',
+          name: 'my-function',
+          service: 'default.serverless.service',
+          deploymentCounter: 2
+        }
+      )
+      const myFunctionObjectKeys = Object.keys(stateFileContent['programmatic-usage:myFunction'])
+      expect(myFunctionObjectKeys.length).toEqual(4)
+      expect(stateFileContent['programmatic-usage:myFunction']).toHaveProperty('instanceId')
+      expect(stateFileContent['programmatic-usage:myFunction']).toHaveProperty(
+        'type',
+        'tests-integration-function-mock'
+      )
+      expect(stateFileContent['programmatic-usage:myFunction']).toHaveProperty(
+        'internallyManaged',
+        false
+      )
+      expect(stateFileContent['programmatic-usage:myFunction']).toHaveProperty('state', {
+        id: 'id:function:my-function',
+        name: 'my-function',
+        memorySize: 512,
+        timeout: 60,
+        environment: {
+          isMock: true,
+          variables: {
+            key1: 'value1'
           }
         },
-        'programmatic-usage:myFunction': {
-          type: 'tests-integration-function-mock',
-          internallyManaged: false,
-          state: {
-            id: 'id:function:my-function',
-            name: 'my-function',
-            memorySize: 512,
-            timeout: 60,
-            environment: {
-              isMock: true,
-              variables: {
-                key1: 'value1'
-              }
-            },
-            role: 'id:iam:role:my-function',
-            defaultRole: {
-              id: 'id:iam:role:my-function',
-              name: 'my-function',
-              service: 'default.serverless.service',
-              deploymentCounter: 2
-            },
-            deploymentCounter: 2
-          }
-        }
-      }
-      expect(stateFileContent).toEqual(expected)
+        role: 'id:iam:role:my-function',
+        defaultRole: {
+          id: 'id:iam:role:my-function',
+          name: 'my-function',
+          service: 'default.serverless.service',
+          deploymentCounter: 2
+        },
+        deploymentCounter: 2
+      })
     })
 
     it('should remove the "iam" and "function" components', async () => {
@@ -136,22 +172,27 @@ describe('Integration Test - Programmatic usage', () => {
         cwd: testServiceDir
       })
       const stateFileContent = await fsp.readJsonAsync(testServiceStateFile)
-      const expected = {
-        'programmatic-usage': {
-          type: 'programmatic-usage',
-          state: {}
-        },
-        'programmatic-usage:myFunction:defaultRole': {
-          type: 'tests-integration-iam-mock',
-          internallyManaged: true,
-          state: {}
-        },
-        'programmatic-usage:myFunction': {
-          type: 'tests-integration-function-mock',
-          state: {}
-        }
-      }
-      expect(stateFileContent).toEqual(expected)
+      const stateFileKeys = Object.keys(stateFileContent)
+      expect(stateFileKeys.length).toEqual(4)
+      expect(stateFileContent).toHaveProperty('$.serviceId')
+      expect(stateFileContent).toHaveProperty('programmatic-usage:myFunction:defaultRole')
+      const myRoleObjectKeys = Object.keys(stateFileContent['programmatic-usage:myFunction:defaultRole'])
+      expect(myRoleObjectKeys.length).toEqual(4)
+      expect(stateFileContent['programmatic-usage:myFunction:defaultRole']).toHaveProperty(
+        'type',
+        'tests-integration-iam-mock'
+      )
+      expect(stateFileContent['programmatic-usage:myFunction:defaultRole']).toHaveProperty(
+        'state',
+        {}
+      )
+      const myFunctionObjectKeys = Object.keys(stateFileContent['programmatic-usage:myFunction'])
+      expect(myFunctionObjectKeys.length).toEqual(2)
+      expect(stateFileContent['programmatic-usage:myFunction']).toHaveProperty(
+        'type',
+        'tests-integration-function-mock'
+      )
+      expect(stateFileContent['programmatic-usage:myFunction']).toHaveProperty('state', {})
     })
   })
 })

@@ -1,7 +1,9 @@
 const path = require('path')
 const { prop, keys, reduce } = require('ramda')
 const getComponent = require('./getComponent')
+const getInstanceId = require('./getInstanceId')
 const getRegistryRoot = require('../getRegistryRoot')
+const getServiceId = require('../state/getServiceId')
 const getState = require('../state/getState')
 const fileExists = require('../fs/fileExists')
 const log = require('../log')
@@ -15,8 +17,12 @@ const generateContext = (
   internallyManaged = false
 ) => {
   const { id, type } = component
+  const serviceId = getServiceId(stateFile)
+  const instanceId = getInstanceId(stateFile, id)
   const context = {
     id,
+    serviceId,
+    instanceId,
     type,
     archive: getState(archive, id),
     state: getState(stateFile, id),
@@ -28,7 +34,12 @@ const generateContext = (
       const childComponentRootPath = path.join(getRegistryRoot(), type)
       const childComponentId = `${id}:${alias}`
 
-      const childComponent = await getComponent(childComponentRootPath, childComponentId, inputs)
+      const childComponent = await getComponent(
+        childComponentRootPath,
+        childComponentId,
+        inputs,
+        stateFile
+      )
       // TODO: update the following once getComponent adds the properties automatically
       let fns = {}
       if (await fileExists(path.join(childComponentRootPath, 'index.js'))) {
@@ -67,12 +78,16 @@ const generateContext = (
       if (!stateFile[this.id]) {
         stateFile[this.id] = {
           type,
+          instanceId,
           internallyManaged,
           state: {}
         }
       }
-      stateFile[this.id].state = state
+      // NOTE: this needs to be kept in sync with the prop definitions aboves
       stateFile[this.id].type = type
+      stateFile[this.id].instanceId = instanceId
+      stateFile[this.id].internallyManaged = internallyManaged
+      stateFile[this.id].state = state
       this.state = state
     }
   }

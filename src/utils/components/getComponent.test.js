@@ -11,6 +11,15 @@ describe('#getComponent()', () => {
           stringTypeRequired: 'foo',
           stringTypeNotRequired: 'bar',
           stringTypeWithDefault: 'baz'
+        },
+        {
+          $: { serviceId: 'AsH3gefdfDSY' },
+          'my-component': {
+            type: 'aws-function',
+            internallyManaged: false,
+            instanceId: 'AsH3gefdfDSY-cHA9jPi5lPQj',
+            state: {}
+          }
         }
       )
 
@@ -28,6 +37,15 @@ describe('#getComponent()', () => {
         {
           stringTypeRequired: 'foo',
           stringTypeNotRequired: 'bar'
+        },
+        {
+          $: { serviceId: 'AsH3gefdfDSY' },
+          'my-component': {
+            type: 'aws-function',
+            internallyManaged: false,
+            instanceId: 'AsH3gefdfDSY-cHA9jPi5lPQj',
+            state: {}
+          }
         }
       )
 
@@ -47,6 +65,15 @@ describe('#getComponent()', () => {
           {
             stringTypeNotRequired: 'bar',
             stringTypeWithDefault: 'baz'
+          },
+          {
+            $: { serviceId: 'AsH3gefdfDSY' },
+            'my-component': {
+              type: 'aws-function',
+              internallyManaged: false,
+              instanceId: 'AsH3gefdfDSY-cHA9jPi5lPQj',
+              state: {}
+            }
           }
         )
       } catch (err) {
@@ -63,7 +90,16 @@ describe('#getComponent()', () => {
         await getComponent(
           path.resolve(__dirname, '../../../registry/tests-input-type-string-invalid-default'),
           'test',
-          {}
+          {},
+          {
+            $: { serviceId: 'AsH3gefdfDSY' },
+            'my-component': {
+              type: 'aws-function',
+              internallyManaged: false,
+              instanceId: 'AsH3gefdfDSY-cHA9jPi5lPQj',
+              state: {}
+            }
+          }
         )
       } catch (err) {
         error = err

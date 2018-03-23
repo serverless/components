@@ -1,4 +1,5 @@
 const fs = require('./fs')
+const misc = require('./misc')
 const log = require('./log')
 const getRegistryRoot = require('./getRegistryRoot')
 const state = require('./state')
@@ -10,6 +11,7 @@ const variables = require('./variables')
 
 module.exports = {
   ...fs,
+  ...misc,
   ...state,
   ...telemetry,
   ...config,
