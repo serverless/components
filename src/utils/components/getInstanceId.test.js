@@ -4,6 +4,9 @@ const getInstanceId = require('./getInstanceId')
 describe('#getInstanceId()', () => {
   const componentId = 'myApp:myFunction'
   const stateFileContent = {
+    $: {
+      serviceId: 's3rv1ce'
+    },
     [componentId]: {
       type: 'aws-iam-function',
       internallyManaged: false,
