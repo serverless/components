@@ -10,6 +10,7 @@ const {
   buildGraph,
   executeGraph,
   readStateFile,
+  setServiceId,
   writeStateFile,
   trackDeployment
   // log
@@ -22,6 +23,7 @@ const run = async (command, options) => {
   let archive = {}
   try {
     stateFile = await readStateFile()
+    stateFile = setServiceId(stateFile)
     archive = clone(stateFile)
     const componentsToUse = await getComponentsToUse(stateFile)
     const componentsToRemove = await getComponentsToRemove(stateFile, componentsToUse)
@@ -30,7 +32,9 @@ const run = async (command, options) => {
     const graph = await buildGraph(componentsToUse, componentsToRemove, command)
     await executeGraph(graph, components, stateFile, archive, command, options, false)
   } catch (error) {
-    if (reporter) { reporter.captureException(error) }
+    if (reporter) {
+      reporter.captureException(error)
+    }
 
     // DISABLING rollback for the launch.
 
