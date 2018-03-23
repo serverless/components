@@ -83,8 +83,11 @@ const generateContext = (
           state: {}
         }
       }
-      stateFile[this.id].state = state
+      // NOTE: this needs to be kept in sync with the prop definitions aboves
       stateFile[this.id].type = type
+      stateFile[this.id].instanceId = instanceId
+      stateFile[this.id].internallyManaged = internallyManaged
+      stateFile[this.id].state = state
       this.state = state
     }
   }
