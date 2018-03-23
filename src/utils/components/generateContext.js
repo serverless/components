@@ -1,6 +1,7 @@
 const path = require('path')
 const { prop, keys, reduce } = require('ramda')
 const getComponent = require('./getComponent')
+const getInstanceId = require('./getInstanceId')
 const getRegistryRoot = require('../getRegistryRoot')
 const getServiceId = require('../state/getServiceId')
 const getState = require('../state/getState')
@@ -16,9 +17,12 @@ const generateContext = (
   internallyManaged = false
 ) => {
   const { id, type } = component
+  const serviceId = getServiceId(stateFile)
+  const instanceId = getInstanceId(stateFile, id)
   const context = {
     id,
-    serviceId: getServiceId(stateFile),
+    serviceId,
+    instanceId,
     type,
     archive: getState(archive, id),
     state: getState(stateFile, id),
@@ -74,6 +78,7 @@ const generateContext = (
       if (!stateFile[this.id]) {
         stateFile[this.id] = {
           type,
+          instanceId,
           internallyManaged,
           state: {}
         }
