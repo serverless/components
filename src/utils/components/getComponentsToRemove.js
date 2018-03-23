@@ -1,6 +1,6 @@
 const path = require('path')
 const {
-  difference, keys, isEmpty, forEachObjIndexed, union, not
+  difference, keys, isEmpty, forEachObjIndexed, union, not, pickBy
 } = require('ramda')
 const getRegistryRoot = require('../getRegistryRoot')
 const { fileExists } = require('../fs')
@@ -14,7 +14,7 @@ async function getComponentsToRemove(stateFile, loadedComponents) {
     if (not(isEmpty(state)) && !value.internallyManaged) {
       componentIdsInStateFile = union(componentIdsInStateFile, [ key ])
     }
-  }, stateFile)
+  }, pickBy((k) => k !== '$', stateFile))
   const componentIdsInServerlessYml = keys(loadedComponents)
   const componentsToRemove = difference(componentIdsInStateFile, componentIdsInServerlessYml)
   const componentsInfo = componentsToRemove.map(async (id) => {

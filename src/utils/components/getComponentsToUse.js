@@ -18,18 +18,16 @@ const getComponentsToUse = async (
   const dependencies = getDependencies(slsYml.inputs)
 
   const nestedComponents = await reduce(async (accum, componentAlias) => {
-    accum = await Promise.resolve(accum)
     const nestedComponentRoot = path.join(getRegistryRoot(), slsYml.components[componentAlias].type)
     const nestedComponentInputs = slsYml.components[componentAlias].inputs || {}
     const nestedComponentId = slsYml.components[componentAlias].id
-    accum = await getComponentsToUse(
+    return getComponentsToUse(
       stateFile,
       nestedComponentRoot,
       nestedComponentInputs,
       nestedComponentId,
-      accum
+      await accum
     )
-    return accum
   }, Promise.resolve(components), keys(slsYml.components) || [])
 
   let fns = {}
