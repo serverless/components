@@ -22,8 +22,8 @@ describe('#getServiceId()', () => {
     expect(res).toEqual(serviceId)
   })
 
-  it('should return undefined if no serviceId is defined', () => {
+  it('should generate a serviceId if none is defined', () => {
     const res = getServiceId(stateFileContent)
-    expect(res).toBeUndefined()
+    expect(res.length).not.toEqual(0)
   })
 })
