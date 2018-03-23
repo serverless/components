@@ -34,6 +34,7 @@
     "axios": "^0.17.1",
     "bluebird": "^3.5.1",
     "chalk": "^2.3.2",
+    "crypto-extra": "^0.4.0",
     "fs-extra": "^5.0.0",
     "graphlib": "^2.1.5",
     "js-yaml": "^3.10.0",

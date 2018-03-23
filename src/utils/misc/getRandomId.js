@@ -1,11 +1,8 @@
-const crypto = require('crypto')
+const crypto = require('crypto-extra')
 
 function getRandomId(length) {
-  // TODO: length should determine size of randomBytes (rather than slicing at the end)
-  return crypto
-    .randomBytes(256)
-    .toString('base64')
-    .slice(0, length)
+  const alphabet = '0123456789abcdefghijklmnopqrstuvwxyz'
+  return crypto.randomString(length, alphabet)
 }
 
 module.exports = getRandomId
