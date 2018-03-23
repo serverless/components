@@ -2,6 +2,7 @@ const path = require('path')
 const { prop, keys, reduce } = require('ramda')
 const getComponent = require('./getComponent')
 const getRegistryRoot = require('../getRegistryRoot')
+const getServiceId = require('../state/getServiceId')
 const getState = require('../state/getState')
 const fileExists = require('../fs/fileExists')
 const log = require('../log')
@@ -17,6 +18,7 @@ const generateContext = (
   const { id, type } = component
   const context = {
     id,
+    serviceId: getServiceId(stateFile),
     type,
     archive: getState(archive, id),
     state: getState(stateFile, id),

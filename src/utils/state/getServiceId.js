@@ -1,7 +1,5 @@
-const getRandomId = require('../misc/getRandomId')
-
-function getServiceId() {
-  return getRandomId(12)
+function getServiceId(stateFile) {
+  return stateFile.serviceId
 }
 
 module.exports = getServiceId

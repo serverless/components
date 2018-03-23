@@ -1,10 +1,29 @@
+const { assoc } = require('ramda')
 const getServiceId = require('./getServiceId')
 
 describe('#getServiceId()', () => {
-  it('should generate a unique service id with the length of 12 characters', () => {
-    const res = getServiceId()
+  const stateFileContent = {
+    'myApp:myFunction': {
+      type: 'aws-iam-function',
+      internallyManaged: false,
+      state: {
+        name: 'my-function',
+        memorySize: 512,
+        timeout: 60
+      }
+    }
+  }
 
-    expect(res).toMatch(/.+/)
-    expect(res.length).toEqual(12)
+  it('should return the serviceId', () => {
+    const serviceId = 'AsH3gefdfDSY'
+    const modifiedStateFileContent = assoc('serviceId', serviceId, stateFileContent)
+
+    const res = getServiceId(modifiedStateFileContent)
+    expect(res).toEqual(serviceId)
+  })
+
+  it('should return undefined if no serviceId is defined', () => {
+    const res = getServiceId(stateFileContent)
+    expect(res).toBeUndefined()
   })
 })
