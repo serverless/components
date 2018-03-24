@@ -105,7 +105,8 @@ const defineTable = (table) => {
   let params = {
     hashKey: table.hashKey,
     rangeKey: table.rangeKey,
-    schema: nativeSchema
+    schema: nativeSchema,
+    tableName: table.name
   }
   if (vIndexes) {
     params = { ...params, indexes: vIndexes }
