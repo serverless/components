@@ -1,5 +1,5 @@
 const path = require('path')
-const { prop, keys, reduce } = require('ramda')
+const { prop, keys, reduce, map } = require('ramda')
 const getComponent = require('./getComponent')
 const getInstanceId = require('./getInstanceId')
 const getRegistryRoot = require('../getRegistryRoot')
@@ -8,7 +8,18 @@ const getState = require('../state/getState')
 const fileExists = require('../fs/fileExists')
 const log = require('../log')
 
+const getChildrenPromises = (components, parentComponentId) => {
+  let { children } = components[parentComponentId]
+  if (!children) children = {}
+  const getPromise = async (childComponentId) => {
+    console.log(components[childComponentId])
+    if (!components[childComponentId].executed) return getPromise(childComponentId)
+    return components[childComponentId].outputs
+  }
+  return map((childComponentId) => () => getPromise(childComponentId), children)
+}
 const generateContext = (
+  components,
   component,
   stateFile,
   archive,
@@ -28,6 +39,7 @@ const generateContext = (
     state: getState(stateFile, id),
     command,
     options,
+    children: getChildrenPromises(components, id),
     log,
     // eslint-disable-next-line no-shadow
     load: async (type, alias, inputs) => {
@@ -48,6 +60,7 @@ const generateContext = (
       childComponent.fns = fns
 
       const childComponentContext = generateContext(
+        components,
         childComponent,
         stateFile,
         archive,

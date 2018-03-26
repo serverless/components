@@ -1,16 +1,12 @@
 type: my-project
 
 components:
-  myFunction:
-    type: aws-lambda
-    inputs:
-      name: some-function
-      memory: 512
-      timeout: 10
-      handler: handler.handler
-      role:
-        arn: ${myRole.arn}
   myRole:
+    type: aws-iam-role
+    inputs:
+      name: some-role
+      service: lambda.amazonaws.com
+  mySecondRole:
     type: aws-iam-role
     inputs:
       name: some-role

@@ -35,11 +35,17 @@ const getComponentsToUse = async (
     fns = require(path.join(componentRoot, 'index.js')) // eslint-disable-line
   }
 
+  const children = reduce((accum, componentAlias) => {
+    accum[componentAlias] = slsYml.components[componentAlias].id
+    return accum
+  }, {}, keys(slsYml.components) || [])
+
   components[slsYml.id] = {
     id: slsYml.id,
     type: slsYml.type,
     inputs: slsYml.inputs,
     outputs: {},
+    children, { myRole: 'my-projct:myRole '}
     state: getState(stateFile, slsYml.id),
     dependencies,
     fns
