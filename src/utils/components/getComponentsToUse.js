@@ -1,8 +1,15 @@
 const path = require('path')
-const { reduce, keys } = require('ramda')
+const {
+  assoc,
+  keys,
+  merge,
+  reduce
+} = require('ramda')
+const deferredPromise = require('../deferredPromise')
 const getRegistryRoot = require('../getRegistryRoot')
-const { fileExists } = require('../fs')
+const getChildrenIds = require('./getChildrenIds')
 const getComponent = require('./getComponent')
+const requireFns = require('./requireFns')
 const getDependencies = require('../variables/getDependencies')
 const getState = require('../state/getState')
 
@@ -13,38 +20,39 @@ const getComponentsToUse = async (
   componentId,
   components = {}
 ) => {
-  const slsYml = await getComponent(componentRoot, componentId, inputs, stateFile)
-
-  const dependencies = getDependencies(slsYml.inputs)
+  const component = await getComponent(componentRoot, componentId, inputs, stateFile)
 
   const nestedComponents = await reduce(async (accum, componentAlias) => {
-    const nestedComponentRoot = path.join(getRegistryRoot(), slsYml.components[componentAlias].type)
-    const nestedComponentInputs = slsYml.components[componentAlias].inputs || {}
-    const nestedComponentId = slsYml.components[componentAlias].id
-    return getComponentsToUse(
+    accum = await Promise.resolve(accum)
+    const nestedComponentRoot = path.join(
+      getRegistryRoot(),
+      component.components[componentAlias].type
+    )
+    const nestedComponentInputs = component.components[componentAlias].inputs || {}
+    const nestedComponentId = component.components[componentAlias].id
+    accum = await getComponentsToUse(
       stateFile,
       nestedComponentRoot,
       nestedComponentInputs,
       nestedComponentId,
       await accum
     )
-  }, Promise.resolve(components), keys(slsYml.components) || [])
+    return accum
+  }, Promise.resolve(components), keys(component.components) || [])
 
-  let fns = {}
-  if (await fileExists(path.join(componentRoot, 'index.js'))) {
-    fns = require(path.join(componentRoot, 'index.js')) // eslint-disable-line
-  }
-
-  components[slsYml.id] = {
-    id: slsYml.id,
-    type: slsYml.type,
-    inputs: slsYml.inputs,
+  components = assoc(component.id, {
+    id: component.id,
+    type: component.type,
+    inputs: component.inputs,
     outputs: {},
-    state: getState(stateFile, slsYml.id),
-    dependencies,
-    fns
-  }
-  return { ...components, ...nestedComponents }
+    state: getState(stateFile, component.id),
+    dependencies: getDependencies(component.inputs),
+    children: getChildrenIds(component) || {},
+    promise: deferredPromise(),
+    fns: requireFns(componentRoot)
+  }, components)
+
+  return merge(components, nestedComponents)
 }
 
 module.exports = getComponentsToUse

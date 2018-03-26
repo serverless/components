@@ -1,27 +1,30 @@
 const {
-  is, replace, match, forEachObjIndexed
+  append, concat, is, match, reduce, replace, values
 } = require('ramda')
-
 const regex = require('./getVariableSyntax')()
 const reservedNames = require('./reservedNames')
 
-module.exports = (inputs) => {
-  const dependencies = []
-
-  const iterate = (value) => {
+/**
+ * @param { Object<string, *> } inputs
+ * @returns { Array<string> }
+ */
+const getDependencies = (inputs) => {
+  const vals = is(Object, inputs) ? values(inputs) : inputs
+  return reduce((dependencies, value) => {
     if (is(Object, value) || is(Array, value)) {
-      return forEachObjIndexed(iterate, value)
+      return concat(dependencies, getDependencies(value))
     }
     if (is(String, value)) {
-      match(regex, value).forEach((reference) => {
-        const referencedVariable = replace(/[${}]/g, '', reference).split('.')
-        if (!reservedNames.includes(referencedVariable[0])) {
-          dependencies.push(referencedVariable[0])
+      return reduce((deps, reference) => {
+        const [ referencedVariable ] = replace(/[${}]/g, '', reference).split('.')
+        if (!reservedNames.includes(referencedVariable)) {
+          return append(referencedVariable, deps)
         }
-      })
+        return deps
+      }, dependencies, match(regex, value))
     }
-    return value
-  }
-  forEachObjIndexed(iterate, inputs)
-  return dependencies
+    return dependencies
+  }, [], vals)
 }
+
+module.exports = getDependencies
