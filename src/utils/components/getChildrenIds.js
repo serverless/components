@@ -1,6 +1,6 @@
-const { mapObjIndexed } = require('ramda')
+const { mapObjIndexed, prop } = require('ramda')
 
 const getChildrenIds = (component) =>
-  mapObjIndexed((child) => child.id, component.components)
+  mapObjIndexed((child) => child.id, prop('components', component))
 
 module.exports = getChildrenIds
