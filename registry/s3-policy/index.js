@@ -99,8 +99,8 @@ const deploy = async (inputs, context) => {
 const remove = async (inputs, context) => {
   if (!context.state.bucketName) return {}
 
-  // context.log(`Removing policy for bucket: '${context.state.bucketName}'`)
-  // const outputs = await unsetPolicyAndCors(context.state.bucketName)
+  context.log(`Removing policy for bucket: '${context.state.bucketName}'`)
+  await unsetPolicyAndCors(context.state.bucketName)
   context.saveState({})
   return {}
 }
