@@ -1,8 +1,15 @@
 const generateContext = require('./generateContext')
 const resolvePostExecutionVars = require('../variables/resolvePostExecutionVars')
 
-const executeComponent = async (componentId, components, stateFile, archive,
-  command, options, rollback = false) => {
+const executeComponent = async (
+  componentId,
+  components,
+  stateFile,
+  archive,
+  command,
+  options,
+  rollback = false
+) => {
   const component = components[componentId]
   component.inputs = resolvePostExecutionVars(component.inputs, components)
   const context = generateContext(components, component, stateFile, archive, options, command)

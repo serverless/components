@@ -20,7 +20,11 @@ module.exports = async (componentsToUse, componentsToRemove, command) => {
   forEachObjIndexed((component, componentId) => {
     if (not(isEmpty(component.dependencies))) {
       forEach((dependencyId) => {
-        graph.setEdge(componentId, dependencyId)
+        if (command === 'remove') {
+          graph.setEdge(dependencyId, componentId)
+        } else {
+          graph.setEdge(componentId, dependencyId)
+        }
       }, component.dependencies)
     }
   }, componentsToUse)
