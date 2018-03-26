@@ -20,7 +20,7 @@ components:
       timeout: 10
       handler: code/products.create
       env:
-        productTableName: product-${self.instanceId}
+        productTableName: products-${self.instanceId}
   getProduct:
     type: aws-lambda
     inputs:
@@ -28,7 +28,7 @@ components:
       timeout: 10
       handler: code/products.get
       env:
-        productTableName: product-${self.instanceId}
+        productTableName: products-${self.instanceId}
   listProducts:
     type: aws-lambda
     inputs:
@@ -36,7 +36,7 @@ components:
       timeout: 10
       handler: code/products.list
       env:
-        productTableName: product-${self.instanceId}
+        productTableName: products-${self.instanceId}
   productsApi:
     type: rest-api
     inputs:
