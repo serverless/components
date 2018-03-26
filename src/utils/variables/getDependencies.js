@@ -23,7 +23,7 @@ const getDependencies = (inputs) => {
         return deps
       }, dependencies, match(regex, value))
     }
-    return value
+    return dependencies
   }, [], vals)
 }
 
