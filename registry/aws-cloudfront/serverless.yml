@@ -15,7 +15,7 @@ inputTypes:
     type: string
   distributionEnabled:
     type: boolean
-    default: false
+    default: true
   loggingEnabled:
     type: boolean
     default: false
