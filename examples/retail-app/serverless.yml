@@ -61,7 +61,7 @@ components:
     inputs:
       region: us-east-1
       tables:
-        - name: Product
+        - name: products
           hashKey: id
           indexes:
             - name: ProductIdIndex
