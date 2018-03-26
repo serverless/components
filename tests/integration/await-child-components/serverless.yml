@@ -1,0 +1,7 @@
+type: await-child-components
+
+components:
+  myFunction:
+    type: tests-integration-function-mock
+    inputs:
+      name: my-function
