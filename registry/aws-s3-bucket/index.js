@@ -32,28 +32,12 @@ const deleteBucket = async ({ name }) => {
 
 const deploy = async (inputs, context) => {
   const { state } = context
-  const hasNameState = state.name
 
-  // Postfix bucketname
-  if (!hasNameState && inputs.forceUniqueBucketName) {
-    const hrtime = process.hrtime()
-    const postFix = `${hrtime[0]}x${hrtime[1]}`
-    context.log(`Setting bucketName postFix value '${inputs.name}-${postFix}'`)
-    inputs.name = `${inputs.name}-${postFix}`
-  }
-
-  if (!hasNameState && inputs.name) {
-    context.log(`Creating Bucket: '${inputs.name}'`)
-    await createBucket(inputs)
-  } else if (!inputs.name && state.name) {
-    context.log(`Removing Bucket: '${state.name}'`)
-    await deleteBucket(state)
-  } else if (state.name !== inputs.name) {
-    context.log(`Removing Bucket: '${state.name}'`)
-    await deleteBucket(state)
+  if (!state.name && inputs.name) {
     context.log(`Creating Bucket: '${inputs.name}'`)
     await createBucket(inputs)
   }
+
   const outputs = {
     name: inputs.name
   }

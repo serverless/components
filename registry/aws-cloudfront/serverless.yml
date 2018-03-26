@@ -3,7 +3,8 @@ type: aws-cloudfront
 inputTypes:
   name:
     type: string
-    required: true
+    required: false
+    default: dist-${self.instanceId}
   defaultRootObject:
     type: string
     required: true

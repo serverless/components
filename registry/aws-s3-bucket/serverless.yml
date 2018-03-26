@@ -3,7 +3,5 @@ type: aws-s3-bucket
 inputTypes:
   name:
     type: string
-    required: true
-  forceUniqueBucketName:
-    type: boolean
-    default: false
+    required: false
+    default: bucket-${self.instanceId}

@@ -3,7 +3,8 @@ type: aws-lambda
 inputTypes:
   name:
     type: string
-    required: true
+    required: false
+    default: func-${self.instanceId}
   memory:
     type: number
     required: true
