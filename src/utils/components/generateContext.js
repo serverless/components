@@ -2,6 +2,7 @@ const path = require('path')
 const { prop, keys, reduce } = require('ramda')
 const getComponent = require('./getComponent')
 const getInstanceId = require('./getInstanceId')
+const getChildrenPromises = require('./getChildrenPromises')
 const getRegistryRoot = require('../getRegistryRoot')
 const getServiceId = require('../state/getServiceId')
 const getState = require('../state/getState')
@@ -9,6 +10,7 @@ const fileExists = require('../fs/fileExists')
 const log = require('../log')
 
 const generateContext = (
+  components,
   component,
   stateFile,
   archive,
@@ -26,6 +28,7 @@ const generateContext = (
     type,
     archive: getState(archive, id),
     state: getState(stateFile, id),
+    children: getChildrenPromises(component, components),
     command,
     options,
     log,
@@ -48,6 +51,7 @@ const generateContext = (
       childComponent.fns = fns
 
       const childComponentContext = generateContext(
+        components,
         childComponent,
         stateFile,
         archive,

@@ -7,17 +7,24 @@ const telemetry = require('./telemetry')
 const config = require('./config')
 const components = require('./components')
 const dag = require('./dag')
+const mapIndexed = require('./mapIndexed')
+const reduceIndexed = require('./reduceIndexed')
+const reduceObjIndexed = require('./reduceObjIndexed')
 const variables = require('./variables')
 
 module.exports = {
+  ...components,
+  ...config,
+  ...dag,
   ...fs,
   ...misc,
   ...state,
   ...telemetry,
-  ...config,
   ...variables,
-  ...components,
-  ...dag,
+
+  getRegistryRoot,
   log,
-  getRegistryRoot
+  mapIndexed,
+  reduceIndexed,
+  reduceObjIndexed
 }
