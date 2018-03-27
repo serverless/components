@@ -52,38 +52,27 @@ describe('Integration Test - Programmatic usage', () => {
       expect(stateFileKeys.length).toEqual(4)
       expect(stateFileContent).toHaveProperty('$.serviceId')
       expect(stateFileContent).toHaveProperty('programmatic-usage:myFunction:defaultRole')
-      const myRoleObjectKeys = Object.keys(stateFileContent['programmatic-usage:myFunction:defaultRole'])
-      expect(myRoleObjectKeys.length).toEqual(4)
-      expect(stateFileContent['programmatic-usage:myFunction:defaultRole']).toHaveProperty('instanceId')
-      expect(stateFileContent['programmatic-usage:myFunction:defaultRole']).toHaveProperty(
-        'type',
-        'tests-integration-iam-mock'
-      )
-      expect(stateFileContent['programmatic-usage:myFunction:defaultRole']).toHaveProperty(
-        'internallyManaged',
-        true
-      )
-      expect(stateFileContent['programmatic-usage:myFunction:defaultRole']).toHaveProperty(
-        'state',
-        {
-          id: 'id:iam:role:my-function',
-          name: 'my-function',
-          service: 'default.serverless.service',
-          deploymentCounter: 1
-        }
-      )
-      const myFunctionObjectKeys = Object.keys(stateFileContent['programmatic-usage:myFunction'])
+      expect(stateFileContent.$.serviceId).not.toBeFalsy()
+      const defaultRole = stateFileContent['programmatic-usage:myFunction:defaultRole']
+      const defaultRoleObjectKeys = Object.keys(defaultRole)
+      expect(defaultRoleObjectKeys.length).toEqual(4)
+      expect(defaultRole).toHaveProperty('instanceId')
+      expect(defaultRole).toHaveProperty('type', 'tests-integration-iam-mock')
+      expect(defaultRole).toHaveProperty('internallyManaged', true)
+      expect(defaultRole).toHaveProperty('state', {
+        id: 'id:iam:role:my-function',
+        name: 'my-function',
+        service: 'default.serverless.service',
+        deploymentCounter: 1
+      })
+      expect(defaultRole.instanceId).not.toBeFalsy()
+      const myFunction = stateFileContent['programmatic-usage:myFunction']
+      const myFunctionObjectKeys = Object.keys(myFunction)
       expect(myFunctionObjectKeys.length).toEqual(4)
-      expect(stateFileContent['programmatic-usage:myFunction']).toHaveProperty('instanceId')
-      expect(stateFileContent['programmatic-usage:myFunction']).toHaveProperty(
-        'type',
-        'tests-integration-function-mock'
-      )
-      expect(stateFileContent['programmatic-usage:myFunction']).toHaveProperty(
-        'internallyManaged',
-        false
-      )
-      expect(stateFileContent['programmatic-usage:myFunction']).toHaveProperty('state', {
+      expect(myFunction).toHaveProperty('instanceId')
+      expect(myFunction).toHaveProperty('type', 'tests-integration-function-mock')
+      expect(myFunction).toHaveProperty('internallyManaged', false)
+      expect(myFunction).toHaveProperty('state', {
         id: 'id:function:my-function',
         name: 'my-function',
         memorySize: 512,
@@ -103,6 +92,7 @@ describe('Integration Test - Programmatic usage', () => {
         },
         deploymentCounter: 1
       })
+      expect(myFunction.instanceId).not.toBeFalsy()
     })
 
     it('should re-deploy the "iam" and "function" components', async () => {
@@ -114,38 +104,27 @@ describe('Integration Test - Programmatic usage', () => {
       expect(stateFileKeys.length).toEqual(4)
       expect(stateFileContent).toHaveProperty('$.serviceId')
       expect(stateFileContent).toHaveProperty('programmatic-usage:myFunction:defaultRole')
-      const myRoleObjectKeys = Object.keys(stateFileContent['programmatic-usage:myFunction:defaultRole'])
-      expect(myRoleObjectKeys.length).toEqual(4)
-      expect(stateFileContent['programmatic-usage:myFunction:defaultRole']).toHaveProperty('instanceId')
-      expect(stateFileContent['programmatic-usage:myFunction:defaultRole']).toHaveProperty(
-        'type',
-        'tests-integration-iam-mock'
-      )
-      expect(stateFileContent['programmatic-usage:myFunction:defaultRole']).toHaveProperty(
-        'internallyManaged',
-        true
-      )
-      expect(stateFileContent['programmatic-usage:myFunction:defaultRole']).toHaveProperty(
-        'state',
-        {
-          id: 'id:iam:role:my-function',
-          name: 'my-function',
-          service: 'default.serverless.service',
-          deploymentCounter: 2
-        }
-      )
-      const myFunctionObjectKeys = Object.keys(stateFileContent['programmatic-usage:myFunction'])
+      expect(stateFileContent.$.serviceId).not.toBeFalsy()
+      const defaultRole = stateFileContent['programmatic-usage:myFunction:defaultRole']
+      const defaultRoleObjectKeys = Object.keys(defaultRole)
+      expect(defaultRoleObjectKeys.length).toEqual(4)
+      expect(defaultRole).toHaveProperty('instanceId')
+      expect(defaultRole).toHaveProperty('type', 'tests-integration-iam-mock')
+      expect(defaultRole).toHaveProperty('internallyManaged', true)
+      expect(defaultRole).toHaveProperty('state', {
+        id: 'id:iam:role:my-function',
+        name: 'my-function',
+        service: 'default.serverless.service',
+        deploymentCounter: 2
+      })
+      expect(defaultRole.instanceId).not.toBeFalsy()
+      const myFunction = stateFileContent['programmatic-usage:myFunction']
+      const myFunctionObjectKeys = Object.keys(myFunction)
       expect(myFunctionObjectKeys.length).toEqual(4)
-      expect(stateFileContent['programmatic-usage:myFunction']).toHaveProperty('instanceId')
-      expect(stateFileContent['programmatic-usage:myFunction']).toHaveProperty(
-        'type',
-        'tests-integration-function-mock'
-      )
-      expect(stateFileContent['programmatic-usage:myFunction']).toHaveProperty(
-        'internallyManaged',
-        false
-      )
-      expect(stateFileContent['programmatic-usage:myFunction']).toHaveProperty('state', {
+      expect(myFunction).toHaveProperty('instanceId')
+      expect(myFunction).toHaveProperty('type', 'tests-integration-function-mock')
+      expect(myFunction).toHaveProperty('internallyManaged', false)
+      expect(myFunction).toHaveProperty('state', {
         id: 'id:function:my-function',
         name: 'my-function',
         memorySize: 512,
@@ -165,6 +144,7 @@ describe('Integration Test - Programmatic usage', () => {
         },
         deploymentCounter: 2
       })
+      expect(myFunction.instanceId).not.toBeFalsy()
     })
 
     it('should remove the "iam" and "function" components', async () => {
@@ -176,23 +156,17 @@ describe('Integration Test - Programmatic usage', () => {
       expect(stateFileKeys.length).toEqual(4)
       expect(stateFileContent).toHaveProperty('$.serviceId')
       expect(stateFileContent).toHaveProperty('programmatic-usage:myFunction:defaultRole')
-      const myRoleObjectKeys = Object.keys(stateFileContent['programmatic-usage:myFunction:defaultRole'])
-      expect(myRoleObjectKeys.length).toEqual(4)
-      expect(stateFileContent['programmatic-usage:myFunction:defaultRole']).toHaveProperty(
-        'type',
-        'tests-integration-iam-mock'
-      )
-      expect(stateFileContent['programmatic-usage:myFunction:defaultRole']).toHaveProperty(
-        'state',
-        {}
-      )
-      const myFunctionObjectKeys = Object.keys(stateFileContent['programmatic-usage:myFunction'])
+      expect(stateFileContent.$.serviceId).not.toBeFalsy()
+      const defaultRole = stateFileContent['programmatic-usage:myFunction:defaultRole']
+      const defaultRoleObjectKeys = Object.keys(defaultRole)
+      expect(defaultRoleObjectKeys.length).toEqual(4)
+      expect(defaultRole).toHaveProperty('type', 'tests-integration-iam-mock')
+      expect(defaultRole).toHaveProperty('state', {})
+      const myFunction = stateFileContent['programmatic-usage:myFunction']
+      const myFunctionObjectKeys = Object.keys(myFunction)
       expect(myFunctionObjectKeys.length).toEqual(2)
-      expect(stateFileContent['programmatic-usage:myFunction']).toHaveProperty(
-        'type',
-        'tests-integration-function-mock'
-      )
-      expect(stateFileContent['programmatic-usage:myFunction']).toHaveProperty('state', {})
+      expect(myFunction).toHaveProperty('type', 'tests-integration-function-mock')
+      expect(myFunction).toHaveProperty('state', {})
     })
   })
 })
