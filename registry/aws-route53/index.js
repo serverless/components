@@ -166,21 +166,21 @@ const removeRoute53ToCloudFrontDomainMapping = async (domainName, dnsName, hoste
 const deploy = async (inputs, context) => {
   let outputs = context.state
   if ((!context.state.hostedZone || !context.state.hostedZone.name) && inputs.domainName) {
-    context.log(`Creating Route53 to CloudFront mapping: '${inputs.domainName} => ${inputs.dnsName}'`)
+    context.log(`Creating Route53 mapping: '${inputs.domainName} => ${inputs.dnsName}'`)
     outputs = await addRoute53ToCloudFrontDomainMapping(inputs)
   } else if (!inputs.domainName && context.state.hostedZone.id) {
-    context.log(`Removing Route53 to CloudFront mapping: '${inputs.domainName} => ${inputs.dnsName}'`)
+    context.log(`Removing Route53 mapping: '${inputs.domainName} => ${inputs.dnsName}'`)
     await removeRoute53ToCloudFrontDomainMapping(
       inputs.domainName, inputs.dnsName,
       context.state.hostedZone.id
     )
   } else if (context.state.hostedZone && context.state.hostedZone.name !== inputs.domainName) {
-    context.log(`Removing Route53 to CloudFront mapping: '${inputs.domainName} => ${inputs.dnsName}'`)
+    context.log(`Removing Route53 mapping: '${inputs.domainName} => ${inputs.dnsName}'`)
     await removeRoute53ToCloudFrontDomainMapping(
       inputs.domainName, inputs.dnsName,
       context.state.hostedZone.id
     )
-    context.log(`Re-Creating Route53 to CloudFront mapping: '${inputs.domainName} => ${inputs.dnsName}'`)
+    context.log(`Re-Creating Route53 mapping: '${inputs.domainName} => ${inputs.dnsName}'`)
     outputs = await addRoute53ToCloudFrontDomainMapping(inputs)
   }
   context.saveState({ ...inputs, ...outputs })
@@ -190,7 +190,7 @@ const deploy = async (inputs, context) => {
 const remove = async (inputs, context) => {
   if (!context.state.name) return {}
 
-  context.log(`Removing Route53 to CloudFront mapping: '${context.state.hostedZone.name}' with id: '${context.state.hostedZone.id}'`)
+  context.log(`Removing Route53 mapping: '${context.state.hostedZone.name}' with id: '${context.state.hostedZone.id}'`)
   await removeRoute53ToCloudFrontDomainMapping(
     inputs.domainName,
     inputs.dnsName,

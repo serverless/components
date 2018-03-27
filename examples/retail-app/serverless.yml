@@ -11,8 +11,8 @@ components:
       contentIndex: index.html
       contentError: error.html
       hostingRegion: us-east-1
-      hostingDomain: serverless-retail-site-test.example.com
-      aliasDomain: www.serverless-retail-site-test.example.com
+      hostingDomain: retail-${self.serviceId}.example.com
+      aliasDomain: www.retail-${self.serviceId}.example.com
   createProduct:
     type: aws-lambda
     inputs:
@@ -20,7 +20,7 @@ components:
       timeout: 10
       handler: code/products.create
       env:
-        productTableName: products-${self.instanceId}
+        productTableName: products-${self.serviceId}
   getProduct:
     type: aws-lambda
     inputs:
@@ -28,7 +28,7 @@ components:
       timeout: 10
       handler: code/products.get
       env:
-        productTableName: products-${self.instanceId}
+        productTableName: products-${self.serviceId}
   listProducts:
     type: aws-lambda
     inputs:
@@ -36,7 +36,7 @@ components:
       timeout: 10
       handler: code/products.list
       env:
-        productTableName: products-${self.instanceId}
+        productTableName: products-${self.serviceId}
   productsApi:
     type: rest-api
     inputs:
@@ -63,7 +63,7 @@ components:
     inputs:
       region: us-east-1
       tables:
-        - name: products-${self.instanceId}
+        - name: products-${self.serviceId}
           hashKey: id
           indexes:
             - name: ProductIdIndex

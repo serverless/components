@@ -768,7 +768,6 @@ Creates / Removes an AWS S3 bucket.
 | Name   | Description     | Type   |
 | ------ | --------------- | ------ |
 | `name` | The bucket name | String |
-| `forceUniqueBucketName` | Force unique postFix on bucket name to avoid bucket name collisions | Boolean |
 
 
 ##### Commands
