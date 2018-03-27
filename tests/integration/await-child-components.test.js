@@ -50,13 +50,12 @@ describe('Integration Test - Await child components', () => {
       const stateFileContent = await fsp.readJsonAsync(testServiceStateFile)
       const stateFileKeys = Object.keys(stateFileContent)
       expect(stateFileKeys.length).toEqual(4)
-
       expect(stateFileContent).toHaveProperty('$.serviceId')
       expect(stateFileContent).toHaveProperty('await-child-components')
       expect(stateFileContent.$.serviceId).not.toBeFalsy()
       const awaitChildComponents = stateFileContent['await-child-components']
       const awaitChildComponentsObjectKeys = Object.keys(awaitChildComponents)
-      expect(awaitChildComponentsObjectKeys.length).toEqual(4)
+      expect(awaitChildComponentsObjectKeys.length).toEqual(5)
       expect(awaitChildComponents).toHaveProperty('instanceId')
       expect(awaitChildComponents).toHaveProperty('type', 'await-child-components')
       expect(awaitChildComponents).toHaveProperty('internallyManaged', false)
