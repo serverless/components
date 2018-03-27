@@ -42,7 +42,7 @@ describe('#executeComponent()', () => {
     }
     stateFile = {
       $: {
-        serviceId: 'AsH3gefdfDSY' // AsH3gefdfDSY-cHA9jPi5lPQj
+        serviceId: 'AsH3gefdfDSY'
       },
       myFunction: {
         type: 'aws-lambda',
