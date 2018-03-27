@@ -31,9 +31,27 @@ describe('aws-iam-role unit tests', () => {
       service: 'lambda.amazonaws.com'
     }
     const outputs = await iamComponent.deploy(inputs, iamContextMock)
-    console.log(outputs)
-    // expect(outputs.arn).toEqual('abc:xyz')
-    // expect(outputs.service).toEqual()
+    expect(outputs.name).toEqual(inputs.name)
+    expect(outputs.arn).toEqual('abc:xyz')
+    expect(outputs.service).toEqual(inputs.service)
+    expect(iamContextMock.provider.AWS.createRole).toBeCalled()
+    // todo check methods are called
+  })
+
+  it('should deploy iam component second time', async () => {
+    const inputs = {
+      name: 'some-role',
+      service: 'lambda.amazonaws.com'
+    }
+    iamContextMock.state = {
+      ...inputs,
+      arn: 'abc:xyz'
+    }
+    const outputs = await iamComponent.deploy(inputs, iamContextMock)
+    expect(outputs.name).toEqual(inputs.name)
+    expect(outputs.arn).toEqual('abc:xyz')
+    expect(outputs.service).toEqual(inputs.service)
+    // todo check methods are called
   })
 })
 
