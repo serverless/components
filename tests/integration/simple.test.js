@@ -261,12 +261,8 @@ describe('Integration Test - Simple', () => {
       expect(stateFileKeys.length).toEqual(4)
       expect(stateFileContent).toHaveProperty('$.serviceId')
       expect(stateFileContent).toHaveProperty('simple:myRole')
-      const myRoleObjectKeys = Object.keys(stateFileContent['simple:myRole'])
-      expect(myRoleObjectKeys.length).toEqual(2)
       expect(stateFileContent['simple:myRole']).toHaveProperty('type', 'tests-integration-iam-mock')
       expect(stateFileContent['simple:myRole']).toHaveProperty('state', {})
-      const myFunctionObjectKeys = Object.keys(stateFileContent['simple:myFunction'])
-      expect(myFunctionObjectKeys.length).toEqual(2)
       expect(stateFileContent['simple:myFunction']).toHaveProperty(
         'type',
         'tests-integration-function-mock'
