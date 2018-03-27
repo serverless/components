@@ -192,8 +192,8 @@ const remove = async (inputs, context) => {
 
   context.log(`Removing Route53 to CloudFront mapping: '${context.state.hostedZone.name}' with id: '${context.state.hostedZone.id}'`)
   await removeRoute53ToCloudFrontDomainMapping(
-    inputs.domainName,
-    inputs.dnsName,
+    context.state.domainName,
+    context.state.dnsName,
     context.state.hostedZone.id
   )
   context.saveState({})
