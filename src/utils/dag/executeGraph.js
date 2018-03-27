@@ -1,4 +1,3 @@
-const BbPromise = require('bluebird')
 const { isEmpty, map } = require('ramda')
 const executeComponent = require('../components/executeComponent')
 
@@ -10,34 +9,27 @@ const execute = async (graph, components, stateFile,
     return graph
   }
 
-  // using Bluebird promises here so that we can skip failures and inspect them
-  // later on when executing the graph in parallel and therefore save state in a
-  // consistent way
-  const ensuredExecutions = await BbPromise.map(leaves, async (componentId) => {
-    try {
-      const node = graph.node(componentId)
-      await executeComponent(
-        componentId,
-        components,
-        stateFile,
-        archive,
-        node.command,
-        options,
-        rollback
-      )
-      graph.removeNode(componentId)
-      return BbPromise.resolve(componentId).reflect()
-    } catch (error) {
-      return BbPromise.reject(error).reflect()
-    }
-  })
-  // check if something went wrong while exeucting in parallel
-  // re-throw the captured rejection (if any)
-  map((promiseInspection) => {
-    if (promiseInspection.isRejected()) {
-      throw new Error(promiseInspection.reason())
-    }
-  }, ensuredExecutions)
+  const executions = map(async (componentId) => {
+    const node = graph.node(componentId)
+    await executeComponent(
+      componentId,
+      components,
+      stateFile,
+      archive,
+      node.command,
+      options,
+      rollback
+    )
+    graph.removeNode(componentId)
+    return componentId
+  }, leaves)
+
+  // allow all executions to complete without terminating
+  const suppressErrors = (p) => p.catch(() => {})
+  await Promise.all(map(suppressErrors, executions))
+
+  // if any executions failed, throw the error
+  await Promise.all(executions)
 
   return execute(graph, components, stateFile, archive, command, options, rollback)
 }
