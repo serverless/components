@@ -1,5 +1,5 @@
 const {
-  is, replace, map, reduce, match
+  is, replace, map, path, match
 } = require('ramda')
 
 const regex = require('./getVariableSyntax')()
@@ -12,11 +12,7 @@ module.exports = (inputs, components) => {
     if (!reservedNames.includes(referencedComponentId)) {
       const componentVariables = components[referencedComponentId].outputs
       referencedVariable.splice(0, 1)
-      const resolvedValue = reduce(
-        (accum, key) => accum[key],
-        componentVariables,
-        referencedVariable
-      )
+      const resolvedValue = path(referencedVariable, componentVariables)
       return resolvedValue
     }
     return reference

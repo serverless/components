@@ -1,5 +1,5 @@
 const {
-  is, not, replace, contains, keys, map, reduce, match
+  is, not, replace, contains, keys, map, path, match
 } = require('ramda')
 
 const regex = require('./getVariableSyntax')()
@@ -42,7 +42,7 @@ module.exports = (selfProperties, slsYml) => {
             throw new Error(`Referenced input does not exist for variable ${referencedVariable.join('.')}`)
           }
           referencedVariable.splice(0, 1)
-          const resolvedValue = reduce((accum, key) => accum[key], inputs, referencedVariable)
+          const resolvedValue = path(referencedVariable, inputs)
           return resolvedValue
         }
 
