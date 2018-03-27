@@ -59,18 +59,18 @@ components:
       errorDocument: ${input.contentError}
       redirectBucketName: ${wwwDomainBucket.name}
       redirectToHostName: ${rootDomainBucket.name}
-  siteCloudFrontConfig:
-    type: aws-cloudfront
-    inputs:
-      name: ${input.name}
-      defaultRootObject: ${input.contentIndex}
-      originId: ${input.hostingDomain}
-      originDomain: ${rootDomainBucket.name}.s3.amazonaws.com
-      aliasDomain: ${input.aliasDomain}
-      distributionEnabled: true
+  # siteCloudFrontConfig:
+  #   type: aws-cloudfront
+  #   inputs:
+  #     name: ${input.name}
+  #     defaultRootObject: ${input.contentIndex}
+  #     originId: ${input.hostingDomain}
+  #     originDomain: ${rootDomainBucket.name}.s3.amazonaws.com
+  #     aliasDomain: ${input.aliasDomain}
+  #     distributionEnabled: true
   siteRoute53Config:
     type: aws-route53
     inputs:
-      name: ${input.name}
+      name: ${input.name}-site-${self.instanceId}
       domainName: ${input.aliasDomain}
-      dnsName: ${siteCloudFrontConfig.distribution.domainName} # d111111abcdef8.cloudfront.net
+      dnsName: ${rootDomainBucket.name}.s3.amazonaws.com # ${siteCloudFrontConfig.distribution.domainName}
