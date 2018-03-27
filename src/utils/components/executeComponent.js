@@ -1,5 +1,7 @@
+const { is } = require('ramda')
 const generateContext = require('./generateContext')
 const resolvePostExecutionVars = require('../variables/resolvePostExecutionVars')
+const getInputs = require('../state/getInputs')
 
 const executeComponent = async (
   componentId,
@@ -12,21 +14,31 @@ const executeComponent = async (
 ) => {
   const component = components[componentId]
   component.inputs = resolvePostExecutionVars(component.inputs, components)
-  const context = generateContext(components, component, stateFile, archive, options, command)
-  if (rollback && typeof component.fns.rollback === 'function') {
-    component.outputs = (await component.fns.rollback(component.inputs, context)) || {}
+
+  if (rollback) {
+    command = 'rollback'
     stateFile[componentId] = archive[componentId]
-  } else if (!rollback && typeof component.fns[command] === 'function') {
-    component.outputs = (await component.fns[command](component.inputs, context)) || {}
+  } else if (command === 'remove') {
+    component.inputs = getInputs(stateFile, componentId)
   }
+
+  const context = generateContext(components, component, stateFile, archive, options, command)
+  const func = component.fns[command]
+  if (is(Function, func)) {
+    component.outputs = (await func(component.inputs, context)) || {}
+    component.executed = true
+  }
+
   component.promise.resolve(component)
+
   if (command === 'remove') {
     stateFile[componentId] = {
       type: component.type,
       state: {}
     }
   }
-  component.executed = true
+
+  return component
 }
 
 module.exports = executeComponent

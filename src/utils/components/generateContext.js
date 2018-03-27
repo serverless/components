@@ -21,6 +21,7 @@ const generateContext = (
   const { id, type } = component
   const serviceId = getServiceId(stateFile)
   const instanceId = getInstanceId(stateFile, id)
+  const inputs = prop('inputs', component)
   const context = {
     id,
     serviceId,
@@ -84,6 +85,7 @@ const generateContext = (
           type,
           instanceId,
           internallyManaged,
+          inputs,
           state: {}
         }
       }
@@ -91,6 +93,7 @@ const generateContext = (
       stateFile[this.id].type = type
       stateFile[this.id].instanceId = instanceId
       stateFile[this.id].internallyManaged = internallyManaged
+      stateFile[this.id].inputs = inputs
       stateFile[this.id].state = state
       this.state = state
     }

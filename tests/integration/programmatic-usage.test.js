@@ -55,7 +55,7 @@ describe('Integration Test - Programmatic usage', () => {
       expect(stateFileContent.$.serviceId).not.toBeFalsy()
       const defaultRole = stateFileContent['programmatic-usage:myFunction:defaultRole']
       const defaultRoleObjectKeys = Object.keys(defaultRole)
-      expect(defaultRoleObjectKeys.length).toEqual(4)
+      expect(defaultRoleObjectKeys.length).toEqual(5)
       expect(defaultRole).toHaveProperty('instanceId')
       expect(defaultRole).toHaveProperty('type', 'tests-integration-iam-mock')
       expect(defaultRole).toHaveProperty('internallyManaged', true)
@@ -68,7 +68,7 @@ describe('Integration Test - Programmatic usage', () => {
       expect(defaultRole.instanceId).not.toBeFalsy()
       const myFunction = stateFileContent['programmatic-usage:myFunction']
       const myFunctionObjectKeys = Object.keys(myFunction)
-      expect(myFunctionObjectKeys.length).toEqual(4)
+      expect(myFunctionObjectKeys.length).toEqual(5)
       expect(myFunction).toHaveProperty('instanceId')
       expect(myFunction).toHaveProperty('type', 'tests-integration-function-mock')
       expect(myFunction).toHaveProperty('internallyManaged', false)
@@ -107,7 +107,7 @@ describe('Integration Test - Programmatic usage', () => {
       expect(stateFileContent.$.serviceId).not.toBeFalsy()
       const defaultRole = stateFileContent['programmatic-usage:myFunction:defaultRole']
       const defaultRoleObjectKeys = Object.keys(defaultRole)
-      expect(defaultRoleObjectKeys.length).toEqual(4)
+      expect(defaultRoleObjectKeys.length).toEqual(5)
       expect(defaultRole).toHaveProperty('instanceId')
       expect(defaultRole).toHaveProperty('type', 'tests-integration-iam-mock')
       expect(defaultRole).toHaveProperty('internallyManaged', true)
@@ -120,7 +120,7 @@ describe('Integration Test - Programmatic usage', () => {
       expect(defaultRole.instanceId).not.toBeFalsy()
       const myFunction = stateFileContent['programmatic-usage:myFunction']
       const myFunctionObjectKeys = Object.keys(myFunction)
-      expect(myFunctionObjectKeys.length).toEqual(4)
+      expect(myFunctionObjectKeys.length).toEqual(5)
       expect(myFunction).toHaveProperty('instanceId')
       expect(myFunction).toHaveProperty('type', 'tests-integration-function-mock')
       expect(myFunction).toHaveProperty('internallyManaged', false)
@@ -159,7 +159,7 @@ describe('Integration Test - Programmatic usage', () => {
       expect(stateFileContent.$.serviceId).not.toBeFalsy()
       const defaultRole = stateFileContent['programmatic-usage:myFunction:defaultRole']
       const defaultRoleObjectKeys = Object.keys(defaultRole)
-      expect(defaultRoleObjectKeys.length).toEqual(4)
+      expect(defaultRoleObjectKeys.length).toEqual(5)
       expect(defaultRole).toHaveProperty('type', 'tests-integration-iam-mock')
       expect(defaultRole).toHaveProperty('state', {})
       const myFunction = stateFileContent['programmatic-usage:myFunction']
