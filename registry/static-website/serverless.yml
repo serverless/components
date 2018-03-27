@@ -36,7 +36,6 @@ components:
     type: aws-s3-bucket
     inputs:
       name: ${input.hostingDomain}
-      forceUniqueBucketName: true
   rootDomainBucketPolicy:
     type: s3-policy
     inputs:
@@ -50,7 +49,6 @@ components:
     type: aws-s3-bucket
     inputs:
       name: ${input.aliasDomain}
-      forceUniqueBucketName: true
   rootDomainBucketConfig:
     type: s3-website-config
     inputs:
