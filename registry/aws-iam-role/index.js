@@ -1,10 +1,7 @@
-const AWS = require('aws-sdk')
 const BbPromise = require('bluebird')
-const { equals } = require('ramda')
+const R = require('ramda')
 
-const IAM = new AWS.IAM({ region: 'us-east-1' })
-
-const attachRolePolicy = async ({ name, policy }) => {
+const attachRolePolicy = async ({ name, policy }, IAM) => {
   await IAM.attachRolePolicy({
     RoleName: name,
     PolicyArn: policy.arn
@@ -20,7 +17,7 @@ const detachRolePolicy = async ({ name, policy }) => {
   }).promise()
 }
 
-const createRole = async ({ name, service, policy }) => {
+const createRole = async ({ name, service, policy }, IAM) => {
   const assumeRolePolicyDocument = {
     Version: '2012-10-17',
     Statement: {
@@ -40,7 +37,7 @@ const createRole = async ({ name, service, policy }) => {
   await attachRolePolicy({
     name,
     policy
-  })
+  }, IAM)
 
   return {
     arn: roleRes.Role.Arn,
@@ -99,7 +96,7 @@ const rollback = async (inputs, context) => {
     if (archive.service !== state.service) {
       await updateAssumeRolePolicy(archive)
     }
-    if (!equals(archive.policy, state.policy)) {
+    if (!R.equals(archive.policy, state.policy)) {
       await detachRolePolicy(state)
       await attachRolePolicy(archive)
     }
@@ -108,6 +105,7 @@ const rollback = async (inputs, context) => {
 }
 
 const deploy = async (inputs, context) => {
+  const IAM = new context.provider.AWS.IAM({ region: 'us-east-1' })
   let { state } = context
 
   if (!inputs.policy) {
@@ -121,7 +119,7 @@ const deploy = async (inputs, context) => {
 
   if (!state.name && inputs.name) {
     context.log(`Creating Role: ${inputs.name}`)
-    const role = await createRole(inputs)
+    const role = await createRole(inputs, IAM)
     state = {
       ...state,
       ...role,
@@ -148,7 +146,7 @@ const deploy = async (inputs, context) => {
     if (state.service !== inputs.service) {
       await updateAssumeRolePolicy(inputs)
     }
-    if (!equals(state.policy, inputs.policy)) {
+    if (!R.equals(state.policy, inputs.policy)) {
       await detachRolePolicy(state)
       await attachRolePolicy(inputs)
     }

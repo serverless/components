@@ -42,6 +42,7 @@
     "minimist": "^1.2.0",
     "node-fetch": "^2.1.1",
     "node-where": "^1.1.0",
+    "proxyquire": "^2.0.1",
     "public-ip": "^2.4.0",
     "ramda": "^0.25.0",
     "raml-validate": "^1.1.2",
