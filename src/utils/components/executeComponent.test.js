@@ -50,6 +50,11 @@ describe('#executeComponent()', () => {
           name: 'state-function-name',
           memorySize: 256,
           timeout: 10
+        },
+        inputs: {
+          name: 'state-inputs-function-name',
+          memorySize: 128,
+          timeout: 5
         }
       }
     }
@@ -63,6 +68,11 @@ describe('#executeComponent()', () => {
           name: 'archive-function-name',
           memorySize: 128,
           timout: 5
+        },
+        inputs: {
+          name: 'archive-inputs-function-name',
+          memorySize: 64,
+          timeout: 2
         }
       }
     }
@@ -138,9 +148,9 @@ describe('#executeComponent()', () => {
     )
     expect(res.executed).toEqual(true)
     expect(res.inputs).toEqual({
-      name: 'state-function-name',
-      memorySize: 256,
-      timeout: 10
+      name: 'state-inputs-function-name',
+      memorySize: 128,
+      timeout: 5
     })
     expect(res.outputs).toEqual({ result: 'removed' })
   })
