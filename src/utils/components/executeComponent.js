@@ -20,12 +20,6 @@ const executeComponent = async (
     component.outputs = (await component.fns[command](component.inputs, context)) || {}
   }
   component.promise.resolve(component)
-  if (command === 'remove') {
-    stateFile[componentId] = {
-      type: component.type,
-      state: {}
-    }
-  }
   component.executed = true
 }
 

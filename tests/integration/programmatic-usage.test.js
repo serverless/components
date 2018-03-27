@@ -186,8 +186,6 @@ describe('Integration Test - Programmatic usage', () => {
         'state',
         {}
       )
-      const myFunctionObjectKeys = Object.keys(stateFileContent['programmatic-usage:myFunction'])
-      expect(myFunctionObjectKeys.length).toEqual(2)
       expect(stateFileContent['programmatic-usage:myFunction']).toHaveProperty(
         'type',
         'tests-integration-function-mock'
