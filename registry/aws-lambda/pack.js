@@ -1,26 +1,32 @@
 const path = require('path')
 const archiver = require('archiver')
-const os = require('os')
+const BbPromise = require('bluebird')
 const fs = require('fs')
 
-module.exports = async () => {
-  const outputFileName = `${String(Date.now())}.zip`
-  const outputFilePath = path.join(os.tmpdir(), outputFileName)
-  return new Promise((resolve, reject) => { // eslint-disable-line
+const fsp = BbPromise.promisifyAll(fs)
 
+module.exports = async (outputDir) => {
+  const outputFileName = `${String(Date.now())}.zip`
+  const outputFilePath = path.join(outputDir, outputFileName)
+  return new Promise((resolve, reject) => {
     const output = fs.createWriteStream(outputFilePath)
     const archive = archiver('zip', {
       zlib: { level: 9 }
     })
 
+    output.on('open', () => {
+      archive.pipe(output)
+      archive.glob(
+        '**/*',
+        {
+          cwd: process.cwd()
+        },
+        {}
+      )
+      archive.finalize()
+    })
+
     archive.on('error', (err) => reject(err))
-    output.on('close', () => resolve(fs.readFileSync(outputFilePath)))
-
-    archive.pipe(output)
-
-    archive.glob('**/*', {
-      cwd: process.cwd()
-    }, {})
-    archive.finalize()
+    output.on('close', async () => resolve(await fsp.readFileAsync(outputFilePath)))
   })
 }
