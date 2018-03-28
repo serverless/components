@@ -23,6 +23,11 @@
     $.get(endpointUrl("/catalog/all"), function(products) {
       productList.empty()
       $(document).ready(function() {
+        if(products.length === 0) {
+          productList.append("<div>No available matching products.</div>")
+          return
+        }
+
         for(var i in products) {
           var product = products[i]
           var productTitle = "<div class='product-title'><h2>" + product.name + "</h2></div>"
