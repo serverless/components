@@ -13,5 +13,5 @@ components:
   myRole:
     type: aws-iam-role
     inputs:
-      name: some-brand-new-role
+      name: some-role
       service: lambda.amazonaws.com

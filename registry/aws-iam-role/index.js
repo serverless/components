@@ -1,5 +1,5 @@
 const BbPromise = require('bluebird')
-const R = require('ramda')
+const { equals } = require('ramda')
 
 const attachRolePolicy = async ({ name, policy }, IAM) => {
   await IAM.attachRolePolicy({
@@ -96,7 +96,7 @@ const rollback = async (inputs, context) => {
     if (archive.service !== state.service) {
       await updateAssumeRolePolicy(archive)
     }
-    if (!R.equals(archive.policy, state.policy)) {
+    if (!equals(archive.policy, state.policy)) {
       await detachRolePolicy(state)
       await attachRolePolicy(archive)
     }
@@ -146,7 +146,7 @@ const deploy = async (inputs, context) => {
     if (state.service !== inputs.service) {
       await updateAssumeRolePolicy(inputs, IAM)
     }
-    if (!R.equals(state.policy, inputs.policy)) {
+    if (!equals(state.policy, inputs.policy)) {
       await detachRolePolicy(state, IAM)
       await attachRolePolicy(inputs, IAM)
     }
