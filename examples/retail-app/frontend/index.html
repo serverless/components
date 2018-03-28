@@ -1,0 +1,37 @@
+<html>
+<head>
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+  <div class='page-wrapper'>
+    <h1 class='page-title'>Products</h1>
+    <div id="products">
+      <div class='loader-wrapper'>
+        <div class="loader" id="loader">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="endpointUrl.js"></script>
+  <script type="text/javascript">
+    var productList = $('#products')
+    $.get(endpointUrl("/catalog/all"), function(products) {
+      productList.empty()
+      $(document).ready(function() {
+        for(var i in products) {
+          var product = products[i]
+          var productTitle = "<div class='product-title'><h2>" + product.name + "</h2></div>"
+          var productDescription = "<div class='product-desc'><p>" + product.description + "</p></div>"
+          var productPrice = "<div class='product-price'>" + product.price + "</div>"
+          productList.append("<div class='product' id='product-id-"+product.id+"'>" + productTitle + productDescription + productPrice + "</div>")
+        }
+      });
+   });
+  </script>
+</body>
+</html>

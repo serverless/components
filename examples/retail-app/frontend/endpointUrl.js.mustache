@@ -1,0 +1,5 @@
+const endpointBaseUrl = "{{{apiUrl}}}".replace(/\/*$/, "")
+
+function endpointUrl(path) {
+  return endpointBaseUrl + path.replace(/^\/*/, "/")
+}
