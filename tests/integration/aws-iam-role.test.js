@@ -3,7 +3,7 @@ const path = require('path')
 const fse = require('fs-extra')
 const cp = require('child_process')
 const BbPromise = require('bluebird')
-
+const R = require('ramda')
 const fsp = BbPromise.promisifyAll(fse)
 const cpp = BbPromise.promisifyAll(cp)
 
@@ -45,4 +45,3 @@ describe('Integration Test - aws-iam-role', () => {
     }
   })
 })
-
