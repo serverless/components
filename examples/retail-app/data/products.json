@@ -1,0 +1,20 @@
+[
+  {
+    "id": 20,
+    "name": "Model A",
+    "description": "Our standard, highly reliable part.",
+    "price": "6.99"
+  },
+  {
+    "id": 21,
+    "name": "Model B",
+    "description": "A cost-reduced version of our classic offering, providing the highest value.",
+    "price": "4.99"
+  },
+  {
+    "id": 22,
+    "name": "Model A+",
+    "description": "A precision-milled, highly durable enhancement of the Model A for performance applications.",
+    "price": "8.99"
+  }
+]
