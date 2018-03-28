@@ -22,7 +22,7 @@ function create(evt, ctx, cb) {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*'
         },
-        body: resp
+        body: JSON.stringify(resp)
       })
     }
   })
