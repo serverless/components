@@ -50,7 +50,7 @@ const deleteRole = async ({ name, policy }, IAM) => {
   await detachRolePolicy({
     name,
     policy
-  })
+  }, IAM)
   await IAM.deleteRole({
     RoleName: name
   }).promise()
