@@ -1,31 +1,5 @@
 const iamComponent = require('./index')
 
-// const deployedIamContextMock = {
-//   archive: {
-//     arn: 'arn:aws:iam::377024778620:role/execution-role-xyz',
-//     service: 'lambda.amazonaws.com',
-//     policy: {
-//       arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
-//     },
-//     name: 'execution-role-xyz'
-//   },
-//   state: {
-//     arn: 'arn:aws:iam::377024778620:role/execution-role-xyz',
-//     service: 'lambda.amazonaws.com',
-//     policy: {
-//       arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
-//     },
-//     name: 'execution-role-xyz'
-//   },
-//   log: () => {},
-//   saveState: () => {},
-//   provider: {
-//     AWS: {
-//       IAM: IAM // eslint-disable-line
-//     }
-//   }
-// }
-
 describe('aws-iam-role unit tests', () => {
   it('should deploy iam component with no errors', async () => {
     const attachRolePolicyMock = jest.fn()
