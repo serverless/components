@@ -1,4 +1,13 @@
+const BbPromise = require('bluebird')
 const iamComponent = require('./index')
+
+jest.mock('bluebird', () => ({
+  delay: jest.fn(() => Promise.resolve())
+}))
+
+afterAll(() => {
+  BbPromise.delay.mockRestore()
+})
 
 describe('aws-iam-role unit tests', () => {
   it('should deploy iam component with no errors', async () => {
