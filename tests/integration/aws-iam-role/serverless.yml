@@ -1,8 +1,0 @@
-type: aws-iam-role-test
-
-components:
-  myRole:
-    type: aws-iam-role
-    inputs:
-      name: some-role
-      service: lambda.amazonaws.com

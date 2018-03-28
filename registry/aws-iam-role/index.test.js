@@ -1,106 +1,218 @@
 const iamComponent = require('./index')
 
-const IAM = function () {
-  return {
-    attachRolePolicy: () => ({
-      promise: jest.fn()
-    }),
-    detachRolePolicy: () => ({
-      promise: jest.fn()
-    }),
-    createRole: () => ({
-      promise: jest.fn().mockReturnValue({ Role: { Arn: 'abc:xyz' } })
-    }),
-    deleteRole: () => ({
-      promise: jest.fn().mockReturnValue({ Role: { Arn: 'abc:xyz' } })
-    })
-  }
-}
-
-const iamContextMock = {
-  state: {},
-  archive: {},
-  log: () => {},
-  saveState: () => {},
-  provider: {
-    AWS: {
-      IAM: IAM // eslint-disable-line
-    }
-  }
-}
-
-const deployedIamContextMock = {
-  archive: {
-    arn: 'arn:aws:iam::377024778620:role/execution-role-xyz',
-    service: 'lambda.amazonaws.com',
-    policy: {
-      arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
-    },
-    name: 'execution-role-xyz'
-  },
-  state: {
-    arn: 'arn:aws:iam::377024778620:role/execution-role-xyz',
-    service: 'lambda.amazonaws.com',
-    policy: {
-      arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
-    },
-    name: 'execution-role-xyz'
-  },
-  log: () => {},
-  saveState: () => {},
-  provider: {
-    AWS: {
-      IAM: IAM // eslint-disable-line
-    }
-  }
-}
-
+// const deployedIamContextMock = {
+//   archive: {
+//     arn: 'arn:aws:iam::377024778620:role/execution-role-xyz',
+//     service: 'lambda.amazonaws.com',
+//     policy: {
+//       arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
+//     },
+//     name: 'execution-role-xyz'
+//   },
+//   state: {
+//     arn: 'arn:aws:iam::377024778620:role/execution-role-xyz',
+//     service: 'lambda.amazonaws.com',
+//     policy: {
+//       arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
+//     },
+//     name: 'execution-role-xyz'
+//   },
+//   log: () => {},
+//   saveState: () => {},
+//   provider: {
+//     AWS: {
+//       IAM: IAM // eslint-disable-line
+//     }
+//   }
+// }
 
 describe('aws-iam-role unit tests', () => {
-  jest.setTimeout(20000)
-
   it('should deploy iam component with no errors', async () => {
+    const attachRolePolicyMock = jest.fn()
+    const detachRolePolicyMock = jest.fn()
+    const createRoleMock = jest.fn().mockReturnValue({ Role: { Arn: 'abc:xyz' } })
+    const deleteRoleMock = jest.fn().mockReturnValue({ Role: { Arn: null } })
+    const iamContextMock = {
+      state: {},
+      archive: {},
+      log: () => {},
+      saveState: () => {},
+      provider: {
+        AWS: {
+          IAM: function () { // eslint-disable-line
+            return {
+              attachRolePolicy: (obj) => ({
+                promise: () => attachRolePolicyMock(obj)
+              }),
+              detachRolePolicy: (obj) => ({
+                promise: () => detachRolePolicyMock(obj)
+              }),
+              createRole: (obj) => ({
+                promise: () => createRoleMock(obj)
+              }),
+              deleteRole: (obj) => ({
+                promise: () => deleteRoleMock(obj)
+              })
+            }
+          }
+        }
+      }
+    }
+
     const inputs = {
       name: 'some-role',
       service: 'lambda.amazonaws.com'
     }
 
     const outputs = await iamComponent.deploy(inputs, iamContextMock)
+
+    expect(createRoleMock).toBeCalled()
+    expect(attachRolePolicyMock).toBeCalled()
     expect(outputs.name).toEqual(inputs.name)
     expect(outputs.arn).toEqual('abc:xyz')
     expect(outputs.service).toEqual(inputs.service)
-    // todo check methods are called
   })
 
   it('should deploy iam component a second time with no errors', async () => {
+    const attachRolePolicyMock = jest.fn()
+    const detachRolePolicyMock = jest.fn()
+    const createRoleMock = jest.fn().mockReturnValue({ Role: { Arn: 'abc:xyz' } })
+    const deleteRoleMock = jest.fn().mockReturnValue({ Role: { Arn: null } })
     const inputs = {
       name: 'some-role',
       service: 'lambda.amazonaws.com'
     }
-    iamContextMock.state = {
-      ...inputs,
-      arn: 'abc:xyz'
+    const iamContextMock = {
+      state: {
+        ...inputs,
+        arn: 'abc:xyz',
+        policy: {
+          arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
+        }
+      },
+      archive: {},
+      log: () => {},
+      saveState: () => {},
+      provider: {
+        AWS: {
+          IAM: function () { // eslint-disable-line
+            return {
+              attachRolePolicy: (obj) => ({
+                promise: () => attachRolePolicyMock(obj)
+              }),
+              detachRolePolicy: (obj) => ({
+                promise: () => detachRolePolicyMock(obj)
+              }),
+              createRole: (obj) => ({
+                promise: () => createRoleMock(obj)
+              }),
+              deleteRole: (obj) => ({
+                promise: () => deleteRoleMock(obj)
+              })
+            }
+          }
+        }
+      }
     }
-    const outputs = await iamComponent.deploy(inputs, deployedIamContextMock)
+    const outputs = await iamComponent.deploy(inputs, iamContextMock)
+    expect(createRoleMock).not.toBeCalled()
+    expect(attachRolePolicyMock).not.toBeCalled()
     expect(outputs.name).toEqual(inputs.name)
     expect(outputs.arn).toEqual('abc:xyz')
     expect(outputs.service).toEqual(inputs.service)
-    // todo check methods are called
   })
 
 
   it('should remove a non-deployed component with no errors', async () => {
+    const attachRolePolicyMock = jest.fn()
+    const detachRolePolicyMock = jest.fn()
+    const createRoleMock = jest.fn().mockReturnValue({ Role: { Arn: 'abc:xyz' } })
+    const deleteRoleMock = jest.fn().mockReturnValue({ Role: { Arn: null } })
+    const iamContextMock = {
+      state: {},
+      archive: {},
+      log: () => {},
+      saveState: () => {},
+      provider: {
+        AWS: {
+          IAM: function () { // eslint-disable-line
+            return {
+              attachRolePolicy: (obj) => ({
+                promise: () => attachRolePolicyMock(obj)
+              }),
+              detachRolePolicy: (obj) => ({
+                promise: () => detachRolePolicyMock(obj)
+              }),
+              createRole: (obj) => ({
+                promise: () => createRoleMock(obj)
+              }),
+              deleteRole: (obj) => ({
+                promise: () => deleteRoleMock(obj)
+              })
+            }
+          }
+        }
+      }
+    }
     const inputs = {
       name: 'some-role',
       service: 'lambda.amazonaws.com'
     }
-    const outputs = await iamComponent.remove(inputs, deployedIamContextMock)
+    const outputs = await iamComponent.remove(inputs, iamContextMock)
+    expect(deleteRoleMock).not.toBeCalled()
+    expect(detachRolePolicyMock).not.toBeCalled()
+    expect(outputs).toEqual({})
+  })
+
+  it('should remove after a deployment with no errors', async () => {
+    const attachRolePolicyMock = jest.fn()
+    const detachRolePolicyMock = jest.fn()
+    const createRoleMock = jest.fn().mockReturnValue({ Role: { Arn: 'abc:xyz' } })
+    const deleteRoleMock = jest.fn().mockReturnValue({ Role: { Arn: null } })
+    const inputs = {
+      name: 'some-role',
+      service: 'lambda.amazonaws.com'
+    }
+    const iamContextMock = {
+      state: {
+        ...inputs,
+        arn: 'abc:xyz',
+        policy: {
+          arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
+        }
+      },
+      archive: {},
+      log: () => {},
+      saveState: () => {},
+      provider: {
+        AWS: {
+          IAM: function () { // eslint-disable-line
+            return {
+              attachRolePolicy: (obj) => ({
+                promise: () => attachRolePolicyMock(obj)
+              }),
+              detachRolePolicy: (obj) => ({
+                promise: () => detachRolePolicyMock(obj)
+              }),
+              createRole: (obj) => ({
+                promise: () => createRoleMock(obj)
+              }),
+              deleteRole: (obj) => ({
+                promise: () => deleteRoleMock(obj)
+              })
+            }
+          }
+        }
+      }
+    }
+    const outputs = await iamComponent.remove(inputs, iamContextMock)
+    expect(deleteRoleMock).toBeCalled()
+    expect(detachRolePolicyMock).toBeCalled()
     expect(outputs).toEqual({
-      "arn": null,
-      "policy": null,
-      "service": null,
+      arn: null,
+      policy: null,
+      service: null
     })
-    // todo check methods are called
   })
 })
 
