@@ -7,6 +7,9 @@ install:
 script:
 - npm run lint
 - npm test
+env:
+  SENTRY_DSN: https://17031d90871a4daebd4f261f2359b38f:9ce69587851c448b96893fb3794df20e@sentry.io/300239
+  SEGMENT_WRITE_KEY: jvOP27GTlIJubkJpRcDAa4uSfwCD03NI
 deploy:
   provider: npm
   email: services@serverless.com
