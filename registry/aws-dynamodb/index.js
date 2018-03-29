@@ -141,7 +141,7 @@ const createTables = async (inputs, context) => {
         const outputs = {
           ddbtables
         }
-        context.saveState({ ...inputs, ...outputs })
+        context.saveState(outputs)
         return obj
       })
       .catch((err) => {
@@ -158,7 +158,7 @@ const createTables = async (inputs, context) => {
 }
 
 const deleteTable = async (inputs, context, tableName) => {
-  const table = findTableByName(context.state.tables, tableName)
+  const table = findTableByName(inputs.tables, tableName)
   let ddbTables = context.state.ddbtables
   const model = defineTable(table)
   if (model) {
@@ -167,14 +167,14 @@ const deleteTable = async (inputs, context, tableName) => {
 
     // Delete output state only for the specified table
     ddbTables = removeOutputTableByName(context.state.ddbtables, tableName)
-    context.saveState({ ...inputs, ...ddbTables })
+    context.saveState({ ddbTables })
     console.log(`Deleted table: '${tableName}'`)
   }
   return ddbTables
 }
 
-const insertItem = (state, tableName, data) => {
-  const table = findTableByName(state.tables, tableName)
+const insertItem = (inputs, state, tableName, data) => {
+  const table = findTableByName(inputs.tables, tableName)
   const itemData = JSON.parse(data)
   const model = defineTable(table)
   let modelDataAttrs = {}
@@ -191,8 +191,8 @@ const insertItem = (state, tableName, data) => {
   return modelDataAttrs
 }
 
-const deleteItem = (state, tableName, data) => {
-  const table = findTableByName(state.tables, tableName)
+const deleteItem = (inputs, state, tableName, data) => {
+  const table = findTableByName(inputs.tables, tableName)
   const keyData = JSON.parse(data)
   const model = defineTable(table)
   if (model) {
@@ -207,8 +207,8 @@ const deleteItem = (state, tableName, data) => {
   return {}
 }
 
-const getItem = (state, tableName, data) => {
-  const table = findTableByName(state.tables, tableName)
+const getItem = (inputs, state, tableName, data) => {
+  const table = findTableByName(inputs.tables, tableName)
   const keyData = JSON.parse(data)
   const model = defineTable(table)
   let modelDataAttrs = {}
@@ -231,7 +231,7 @@ const deploy = async (inputs, context) => {
 
   if (!context.state ||
       !context.state.ddbtables ||
-      context.state.ddbtables.length !== context.state.tables.length) {
+      context.state.ddbtables.length !== inputs.tables.length) {
     // TODO: Fix creating multiple tables on deploy. Restrict to one table for now
     if (inputs.tables.length > 1) {
       context.log('Cannot deploy multiple tables at this time. Please update your inputs and try again...')
@@ -248,15 +248,15 @@ const deploy = async (inputs, context) => {
 }
 
 const remove = async (inputs, context) => {
-  if (!context.state.tables ||
-       context.state.tables.length === 0) return {}
+  if (!context.state.ddbtables ||
+       context.state.ddbtables.length === 0) return {}
 
   let tableName
   if (context.options && context.options.tablename) {
     tableName = context.options.tablename
   } else {
     // TODO: when multiple tables are allowed, update to delete multiple tables
-    tableName = context.state.tables[0].name
+    tableName = inputs.tables[0].name
   }
   let ddbTables = context.state.ddbtables
   // if table does not exist in state -> ddbtables, bail
@@ -278,11 +278,11 @@ const remove = async (inputs, context) => {
 const insert = async (inputs, context) => {
   let outputs = context.state
 
-  if (!context.state.tables ||
-       context.state.tables.length === 0) return {}
+  if (!context.state.ddbtables ||
+       context.state.ddbtables.length === 0) return {}
 
   if (context.options && context.options.tablename && context.options.itemdata) {
-    outputs = insertItem(context.state, context.options.tablename, context.options.itemdata)
+    outputs = insertItem(inputs, context.state, context.options.tablename, context.options.itemdata)
   } else {
     context.log('Incorrect or insufficient parameters. \nUsage: insert --tablename <tablename> --itemdata <data in json format>')
   }
@@ -292,11 +292,11 @@ const insert = async (inputs, context) => {
 const destroy = async (inputs, context) => {
   let outputs = context.state
 
-  if (!context.state.tables ||
-       context.state.tables.length === 0) return {}
+  if (!context.state.ddbtables ||
+       context.state.ddbtables.length === 0) return {}
 
   if (context.options && context.options.tablename && context.options.keydata) {
-    outputs = deleteItem(context.state, context.options.tablename, context.options.keydata)
+    outputs = deleteItem(inputs, context.state, context.options.tablename, context.options.keydata)
   } else {
     context.log('Incorrect or insufficient parameters. \nUsage: destroy --tablename <tablename> --keydata <hashkey and rangekey key/value pairs in json format>')
   }
@@ -306,11 +306,11 @@ const destroy = async (inputs, context) => {
 const get = async (inputs, context) => {
   let outputs = context.state
 
-  if (!context.state.tables ||
-       context.state.tables.length === 0) return {}
+  if (!context.state.ddbtables ||
+       context.state.ddbtables.length === 0) return {}
 
   if (context.options && context.options.tablename && context.options.keydata) {
-    outputs = getItem(context.state, context.options.tablename, context.options.keydata)
+    outputs = getItem(inputs, context.state, context.options.tablename, context.options.keydata)
   } else {
     context.log('Incorrect or insufficient parameters. \nUsage: get --tablename <tablename> --keydata <hashkey and rangekey key/value pairs in json format>')
   }
