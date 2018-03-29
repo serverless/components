@@ -14,9 +14,6 @@
     "url": "https://github.com/serverless/serverless-components/issues"
   },
   "homepage": "https://github.com/serverless/serverless-components#readme",
-  "publishConfig": {
-    "access": "public"
-  },
   "bin": {
     "components": "./bin/components"
   },
