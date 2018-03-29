@@ -19,6 +19,8 @@ module.exports = {
     'comma-dangle': ['error', 'never'],
     'func-names': 'off',
     'no-param-reassign': 'off',
+    'no-use-before-define': 'off',
+    'prefer-destructuring': 'off',
     semi: ['error', 'never'],
     'object-shorthand': 'off'
   }
