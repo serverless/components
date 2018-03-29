@@ -207,20 +207,25 @@ const deleteItem = (state, tableName, data) => {
   return {}
 }
 
-const getItem = (state, tableName, data) => {
+const getItem = async (state, tableName, data) => {
   const table = findTableByName(state.tables, tableName)
   const keyData = JSON.parse(data)
   const model = defineTable(table)
   let modelDataAttrs = {}
   if (model) {
-    model.get(keyData, (err, modelIns) => {
+    modelDataAttrs = await new Promise((resolve) => model.get(keyData, (err, modelIns) => {
       if (err) {
         console.log(`Error retrieving item from table: '${table.name}'\n${err.message}`)
+        resolve({})
+      } if (!modelIns) {
+        resolve({})
       } else {
-        modelDataAttrs = JSON.stringify(modelIns.attrs)
-        console.log(`Item retrieved from table: '${table.name}'\n${modelDataAttrs}`)
+        console.log('received', JSON.stringify(modelIns))
+        const result = JSON.stringify(modelIns.attrs)
+        console.log(`Item retrieved from table: '${table.name}'\n${result}`)
+        resolve(result)
       }
-    })
+    }))
   }
   return modelDataAttrs
 }
@@ -310,7 +315,7 @@ const get = async (inputs, context) => {
        context.state.tables.length === 0) return {}
 
   if (context.options && context.options.tablename && context.options.keydata) {
-    outputs = getItem(context.state, context.options.tablename, context.options.keydata)
+    outputs = await getItem(context.state, context.options.tablename, context.options.keydata)
   } else {
     context.log('Incorrect or insufficient parameters. \nUsage: get --tablename <tablename> --keydata <hashkey and rangekey key/value pairs in json format>')
   }
