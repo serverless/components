@@ -1,5 +1,5 @@
 const tmp = require('tmp')
-const fs = require('fs')
+const fs = require('fs-extra')
 const path = require('path')
 const mustache = require('mustache')
 const recursive = require('recursive-readdir')
@@ -19,6 +19,9 @@ const deploy = async (inputs) => {
         path.relative(sourcePath, source.replace(/\.mustache$/i, ''))
       )
 
+      // Ensure tmp directories exist
+      fs.ensureDirSync(path.dirname(destination))
+
       if (source.match(/\.mustache/i)) {
         const template = fs.readFileSync(source, { encoding: 'utf8' })
         const rendered = mustache.render(template, values)
@@ -26,6 +29,9 @@ const deploy = async (inputs) => {
           encoding: 'utf8'
         })
       } else {
+        // Ignore unnecessary files
+        if (source.includes('.DS_Store')) return
+
         fs.copyFileSync(source, destination)
       }
     })
