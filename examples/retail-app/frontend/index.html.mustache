@@ -56,12 +56,14 @@
         color: #ffffff;
         cursor: pointer;
       }
-      .content-wrapper {
+      .nav-wrapper, .page-wrapper {
         display: flex;
         max-width: 1020px;
         margin: 0 auto;
         padding: 0px 20px;
       }
+
+      /* Navigation */
       nav {
         padding: 20px 0px;
         background: #000000;
@@ -100,8 +102,10 @@
         justify-content: center;
         padding: 0px 10px;
       }
+
+      /* Page */
       .page-wrapper {
-        padding: 30px 0px;
+        flex-flow: row wrap;
       }
       .page-title {
         margin-bottom: 30px;
@@ -116,24 +120,22 @@
         flex-wrap: wrap;
       }
       .product {
-        width: 30%;
-        margin-right: 30px;
+        width: 100%;
         padding: 40px 35px;
-        background-color: #fdfefe;
-        margin-bottom: 50px;
-        margin-top: 0px;
-        box-shadow: 8px 12px 30px #b3b3b3;
-        color: #919495;
+        background-color: #ffffff;
+        border-radius: 0px;
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+        box-shadow: 0px 0px 4px #eaeaea;
+        color: #000000;
       }
-
       .product h2 {
         padding-top: 0px;
         margin-top: 0px;
-        color: #666869;
+        color: #F15953;
       }
-
       .product-price {
-        color: #666869;
+        color: #aaa;
         font-weight: 500;
         margin-top: 20px;
         display: block;
@@ -203,8 +205,9 @@
   </head>
   <body>
 
+    <!-- Navigation -->
     <nav>
-      <div class="content-wrapper">
+      <div class="nav-wrapper">
         <div class="logo-container">
           <div class="logo">
             <div class="serverless-font logo-top">serverless</div>
@@ -218,19 +221,23 @@
       </div>
     </nav>
 
+    <!-- Page Content -->
     <div class='page-wrapper'>
-      <div class="content-wrapper">
+      <div>
         <h1 class='page-title'>Products</h1>
-        <div id="products">
-          <div class='loader-wrapper'>
-            <div class="loader" id="loader">
-              <span></span>
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
+      </div>
+      <div id="products">
+
+        <!-- Loader -->
+        <div class='loader-wrapper'>
+          <div class="loader" id="loader">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
           </div>
         </div>
+
       </div>
     </div>
     <script type="text/javascript">
@@ -238,12 +245,16 @@
       $.get("{{{apiUrl}}}catalog/all", function(products) {
         productList.empty()
         $(document).ready(function() {
-          for(var i in products) {
-            var product = products[i]
-            var productTitle = "<div class='product-title'><h2>" + product.name + "</h2></div>"
-            var productDescription = "<div class='product-desc'><p>" + product.description + "</p></div>"
-            var productPrice = "<div class='product-price'>" + product.price + "</div>"
-            productList.append("<div class='product' id='product-id-"+product.id+"'>" + productTitle + productDescription + productPrice + "</div>")
+          if (products && products.length) {
+            for(var i in products) {
+              var product = products[i]
+              var productTitle = "<div class='product-title'><h2>" + product.name + "</h2></div>"
+              var productDescription = "<div class='product-desc'><p>" + product.description + "</p></div>"
+              var productPrice = "<div class='product-price'>$" + product.price + "</div>"
+              productList.append("<div class='product' id='product-id-"+product.id+"'>" + productTitle + productDescription + productPrice + "</div>")
+            }
+          } else {
+            productList.append("<div>No products found.</div>")
           }
         });
      });
