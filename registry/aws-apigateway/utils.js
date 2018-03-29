@@ -179,16 +179,20 @@ function getSwaggerDefinition(name, roleArn, routes) {
   return definition
 }
 
+function generateUrl(id, region = 'us-east-1', stage = 'dev') {
+  return `https://${id}.execute-api.${region}.amazonaws.com/${stage}`
+}
+
 function generateUrls(routes, restApiId) {
   const paths = keys(routes)
-  return map(
-    (path) =>
-      `https://${restApiId}.execute-api.us-east-1.amazonaws.com/dev/${path.replace(/^\/+/, '')}`,
-    paths
-  )
+  return map((path) => {
+    const baseUrl = generateUrl(restApiId)
+    return `${baseUrl}/${path.replace(/^\/+/, '')}`
+  }, paths)
 }
 
 module.exports = {
   getSwaggerDefinition,
+  generateUrl,
   generateUrls
 }

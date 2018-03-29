@@ -1,6 +1,6 @@
 const AWS = require('aws-sdk')
 const { equals } = require('ramda')
-const { getSwaggerDefinition, generateUrls } = require('./utils')
+const { getSwaggerDefinition, generateUrl, generateUrls } = require('./utils')
 
 const APIGateway = new AWS.APIGateway({ region: 'us-east-1' }) // TODO: make configurable
 
@@ -30,11 +30,12 @@ const createApi = async (params) => {
 
   await APIGateway.createDeployment({ restApiId: res.id, stageName: 'dev' }).promise()
 
+  const url = generateUrl(res.id)
   const urls = generateUrls(routes, res.id)
 
   const outputs = {
     id: res.id,
-    url: `https://${res.id}.execute-api.us-east-1.amazonaws.com/dev/`,
+    url,
     urls
   }
   return outputs
@@ -55,10 +56,12 @@ const updateApi = async (params) => {
 
   await APIGateway.createDeployment({ restApiId: id, stageName: 'dev' }).promise()
 
+  const url = generateUrl(id)
   const urls = generateUrls(routes, id)
 
   const outputs = {
     id,
+    url,
     urls
   }
   return outputs
