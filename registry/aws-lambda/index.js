@@ -82,7 +82,7 @@ const deploy = async (inputs, context) => {
   let { defaultRole } = context.state
 
   const defaultRoleComponent = await context.load('aws-iam-role', 'defaultRole', {
-    name: `${inputs.name}-execution-role-${context.instanceId}`,
+    name: `${inputs.name}-execution-role`,
     service: 'lambda.amazonaws.com'
   })
 
