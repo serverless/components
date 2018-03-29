@@ -1,3 +1,4 @@
+const os = require('os')
 const AWS = require('aws-sdk')
 const pack = require('./pack')
 
@@ -6,7 +7,7 @@ const lambda = new AWS.Lambda({ region: 'us-east-1' })
 const createLambda = async ({
   name, handler, memory, timeout, env, description
 }, role) => {
-  const pkg = await pack()
+  const pkg = await pack(os.tmpdir())
 
   const params = {
     FunctionName: name,
@@ -35,7 +36,7 @@ const createLambda = async ({
 const updateLambda = async ({
   name, handler, memory, timeout, env, description
 }, role) => {
-  const pkg = await pack()
+  const pkg = await pack(os.tmpdir())
   const functionCodeParams = {
     FunctionName: name,
     ZipFile: pkg,

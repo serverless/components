@@ -13,7 +13,12 @@
   "author": "serverless.com",
   "license": "Apache-2.0",
   "dependencies": {
+    "archiver": "^2.1.1",
     "aws-sdk": "^2.201.0",
-    "archiver": "^2.1.1"
+    "bluebird": "^3.5.1"
+  },
+  "devDependencies": {
+    "adm-zip": "^0.4.7",
+    "fs-extra": "^5.0.0"
   }
 }
