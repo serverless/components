@@ -13,6 +13,7 @@
   "author": "serverless",
   "license": "Apache-2.0",
   "dependencies": {
+    "fs-extra": "^5.0.0",
     "mustache": "^2.3.0",
     "recursive-readdir": "^2.2.2",
     "tmp": "0.0.33"
