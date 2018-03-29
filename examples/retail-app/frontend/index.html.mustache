@@ -30,6 +30,13 @@
         -moz-box-sizing: border-box;
         box-sizing: border-box;
       }
+      @font-face {
+        font-family: 'Serverless';
+        src: url('assets/fonts/serverless-regular.woff2') format('woff2'),
+            url('assets/fonts/serverless-regular.woff') format('woff');
+        font-weight: normal;
+        font-style: normal;
+      }
       html, body {
         font-family: Helvetica, Arial, sans-serif;
         background: #f3f3f3;
@@ -38,18 +45,72 @@
         margin: 0;
         padding: 0;
       }
+      h1, h2, h3, h4, h5, h6, .serverless-font {
+        font-family: 'Serverless';
+      }
+      a, a:visited {
+        color: #F15953;
+        text-decoration: none;
+      }
+      a:hover {
+        color: #ffffff;
+        cursor: pointer;
+      }
+      .content-wrapper {
+        display: flex;
+        max-width: 1020px;
+        margin: 0 auto;
+        padding: 0px 20px;
+      }
+      nav {
+        padding: 20px 0px;
+        background: #000000;
+        font-family: 'Serverless';
+      }
+      nav .logo-container {
+        width: 25%;
+      }
+      nav .logo {
+        display: flex;
+        flex-flow: row wrap;
+      }
+      nav .logo-top {
+        width: 100%;
+        text-align: left;
+        font-size:16px;
+        color: #F15953;
+        margin-bottom: -10px;
+      }
+      nav .logo-bottom {
+        width: 100%;
+        text-align: left;
+        font-size: 40px;
+        color: #ffffff;
+      }
+      nav .links {
+        display: flex;
+        justify-content: flex-end;
+        width: 75%;
+        list-style: none;
+        margin: 0;
+      }
+      nav .links li {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0px 10px;
+      }
       .page-wrapper {
-        padding: 30px 45px;
-        padding-top: 10px;
+        padding: 30px 0px;
       }
       .page-title {
         margin-bottom: 30px;
-        color: #444546;
+        color: #000000;
       }
       #products {
+        display: flex;
         width: 100%;
         max-width: 100%;
-        display: flex;
         align-items: flex-start;
         justify-content: flex-start;
         flex-wrap: wrap;
@@ -81,7 +142,7 @@
       /* LOADER */
       .loader-wrapper {
         display: block;
-        padding: 20px 0;
+        padding: 25px 0;
         margin: 1% 0 1% 1.6%;
       }
       #loader {
@@ -92,7 +153,7 @@
         display: inline-block;
         width: 5px;
         height: 20px;
-        background-color: #3498db;
+        background-color: #F15953;
       }
       #loader span:nth-child(1){
         animation: grow 1s ease-in-out infinite;
@@ -141,15 +202,33 @@
     </style>
   </head>
   <body>
+
+    <nav>
+      <div class="content-wrapper">
+        <div class="logo-container">
+          <div class="logo">
+            <div class="serverless-font logo-top">serverless</div>
+            <div class="serverless-font logo-bottom">retail</div>
+          </div>
+        </div>
+        <ul class="links">
+          <li><a href="#">home</a></li>
+          <li><a href="#">about</a></li>
+        </ul>
+      </div>
+    </nav>
+
     <div class='page-wrapper'>
-      <h1 class='page-title'>Products</h1>
-      <div id="products">
-        <div class='loader-wrapper'>
-          <div class="loader" id="loader">
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
+      <div class="content-wrapper">
+        <h1 class='page-title'>Products</h1>
+        <div id="products">
+          <div class='loader-wrapper'>
+            <div class="loader" id="loader">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
           </div>
         </div>
       </div>
