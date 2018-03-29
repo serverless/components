@@ -2,6 +2,8 @@
 
 An example retail application composed of a few serverless components. The  application has a frontend that displays a catalog of products. The backend relies on a REST API that in turn fetches data from a DynamoDB table. The application is deployable to AWS.
 
+**[Live Preview Here](https://s3.amazonaws.com/retail-cb2s100ejz.example.com/index.html)**
+
 ## Components
 
 The sample application is composed of the following components:
