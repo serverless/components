@@ -29,7 +29,6 @@ const deploy = async (inputs) => {
           encoding: 'utf8'
         })
       } else {
-
         // Ignore unnecessary files
         if (source.includes('.DS_Store')) return
 
