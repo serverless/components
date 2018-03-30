@@ -1139,6 +1139,7 @@ components:
 ##### Commands
 
 * `components deploy`
+* `components info`
 * `components remove`
 
 ##### Example
