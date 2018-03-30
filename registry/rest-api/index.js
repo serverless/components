@@ -218,7 +218,7 @@ async function info(inputs, context) {
       return `  ${urlObject.method} - ${joinedUrl}`
     }, urlObjects)
 
-    message = [ 'REST API successfully created:', ...printableUrls ].join('\n')
+    message = [ 'REST API resources:', ...printableUrls ].join('\n')
   } else {
     message = 'No REST API state information available. Have you deployed it?'
   }

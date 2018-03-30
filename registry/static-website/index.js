@@ -43,7 +43,7 @@ const remove = async (inputs, context) => {
 const info = (inputs, context) => {
   let message
   if (not(isEmpty(context.state))) {
-    message = [ 'Static Website successfully created:', `  ${context.state.url}` ].join('\n')
+    message = [ 'Static Website resources:', `  ${context.state.url}` ].join('\n')
   } else {
     message = 'No Static Website state information available. Have you deployed it?'
   }
