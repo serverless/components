@@ -21,7 +21,7 @@ describe('aws-iam-role unit tests', () => {
       log: () => {},
       saveState: () => {},
       provider: {
-        AWS: {
+        getSdk: () => ({
           IAM: function () { // eslint-disable-line
             return {
               attachRolePolicy: (obj) => ({
@@ -38,7 +38,7 @@ describe('aws-iam-role unit tests', () => {
               })
             }
           }
-        }
+        })
       }
     }
 
@@ -77,7 +77,7 @@ describe('aws-iam-role unit tests', () => {
       log: () => {},
       saveState: () => {},
       provider: {
-        AWS: {
+        getSdk: () => ({
           IAM: function () { // eslint-disable-line
             return {
               attachRolePolicy: (obj) => ({
@@ -94,7 +94,7 @@ describe('aws-iam-role unit tests', () => {
               })
             }
           }
-        }
+        })
       }
     }
     const outputs = await iamComponent.deploy(inputs, iamContextMock)
@@ -117,7 +117,7 @@ describe('aws-iam-role unit tests', () => {
       log: () => {},
       saveState: () => {},
       provider: {
-        AWS: {
+        getSdk: () => ({
           IAM: function () { // eslint-disable-line
             return {
               attachRolePolicy: (obj) => ({
@@ -134,7 +134,7 @@ describe('aws-iam-role unit tests', () => {
               })
             }
           }
-        }
+        })
       }
     }
     const inputs = {
@@ -168,7 +168,7 @@ describe('aws-iam-role unit tests', () => {
       log: () => {},
       saveState: () => {},
       provider: {
-        AWS: {
+        getSdk: () => ({
           IAM: function () { // eslint-disable-line
             return {
               attachRolePolicy: (obj) => ({
@@ -185,7 +185,7 @@ describe('aws-iam-role unit tests', () => {
               })
             }
           }
-        }
+        })
       }
     }
     const outputs = await iamComponent.remove(inputs, iamContextMock)

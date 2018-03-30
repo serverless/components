@@ -28,7 +28,7 @@ const generateContext = (
     serviceId,
     instanceId,
     provider: {
-      AWS
+      getSdk: () => AWS
     },
     type,
     archive: getState(archive, id),

@@ -105,7 +105,8 @@ const rollback = async (inputs, context) => {
 }
 
 const deploy = async (inputs, context) => {
-  const IAM = new context.provider.AWS.IAM({ region: 'us-east-1' })
+  const AWS = context.provider.getSdk()
+  const IAM = new AWS.IAM({ region: 'us-east-1' })
   let { state } = context
 
   if (!inputs.policy) {
@@ -157,7 +158,8 @@ const deploy = async (inputs, context) => {
 }
 
 const remove = async (inputs, context) => {
-  const IAM = new context.provider.AWS.IAM({ region: 'us-east-1' })
+  const AWS = context.provider.getSdk()
+  const IAM = new AWS.IAM({ region: 'us-east-1' })
   if (!context.state.name) return {}
 
   context.log(`Removing Role: ${context.state.name}`)
