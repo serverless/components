@@ -7,19 +7,19 @@ const BbPromise = require('bluebird')
 
 const fsp = BbPromise.promisifyAll(fs)
 
-module.exports = async (root) => {
-  const outputDir = os.tmpdir()
+module.exports = async (packagePath, tempPath) => {
+  // Set defaults
+  tempPath = tempPath || os.tmpdir()
+  packagePath = packagePath || process.cwd()
 
   /*
   * Ensure id includes datetime and unique string,
   * since packaging can happen in parallel
   */
+
   let outputFileName = crypto.randomBytes(3).toString('hex')
   outputFileName = `${String(Date.now())}-${outputFileName}.zip`
-  const outputFilePath = path.join(outputDir, outputFileName)
-
-  // Detect function package root or default to cwd
-  root = root || process.cwd()
+  const outputFilePath = path.join(tempPath, outputFileName)
 
   return new Promise((resolve, reject) => {
     const output = fs.createWriteStream(outputFilePath)
@@ -29,8 +29,7 @@ module.exports = async (root) => {
 
     output.on('open', () => {
       archive.pipe(output)
-      // archive.glob(root + '/**/*');
-      archive.directory(root, false)
+      archive.directory(packagePath, false)
       archive.finalize()
     })
 

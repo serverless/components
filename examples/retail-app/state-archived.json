@@ -1,0 +1,484 @@
+{
+  "$": {
+    "serviceId": "cb2s100ejz"
+  },
+  "retail-app": {
+    "instanceId": "cb2s100ejz-zm73z1de"
+  },
+  "retail-app:webFrontend": {
+    "instanceId": "cb2s100ejz-1ra0g7vs",
+    "type": "static-website",
+    "internallyManaged": false,
+    "inputs": {
+      "name": "retail-frontend",
+      "contentPath": "/Users/austen/projects/serverless-components/examples/retail-app/frontend",
+      "templateValues": {
+        "apiUrl": "https://yuul8k9igc.execute-api.us-east-1.amazonaws.com/dev/"
+      },
+      "contentIndex": "index.html",
+      "contentError": "error.html",
+      "hostingRegion": "us-east-1",
+      "hostingDomain": "retail-cb2s100ejz.example.com",
+      "aliasDomain": "www.retail-cb2s100ejz.example.com"
+    },
+    "state": {
+      "name": "retail-frontend",
+      "contentPath": "/Users/austen/projects/serverless-components/examples/retail-app/frontend",
+      "templateValues": {
+        "apiUrl": "https://yuul8k9igc.execute-api.us-east-1.amazonaws.com/dev/"
+      },
+      "contentIndex": "index.html",
+      "contentError": "error.html",
+      "hostingRegion": "us-east-1",
+      "hostingDomain": "retail-cb2s100ejz.example.com",
+      "aliasDomain": "www.retail-cb2s100ejz.example.com",
+      "url": "http://retail-cb2s100ejz.example.com.s3-website-us-east-1.amazonaws.com"
+    }
+  },
+  "retail-app:webFrontend:renderedFiles": {
+    "instanceId": "cb2s100ejz-nhzqkc4z"
+  },
+  "retail-app:webFrontend:rootDomainBucket": {
+    "instanceId": "cb2s100ejz-y0vcqedc",
+    "type": "aws-s3-bucket",
+    "internallyManaged": false,
+    "inputs": {
+      "name": "retail-cb2s100ejz.example.com"
+    },
+    "state": {
+      "name": "retail-cb2s100ejz.example.com"
+    }
+  },
+  "retail-app:webFrontend:rootDomainBucketPolicy": {
+    "instanceId": "cb2s100ejz-a4scwsez",
+    "type": "s3-policy",
+    "internallyManaged": false,
+    "inputs": {
+      "bucketName": "retail-cb2s100ejz.example.com"
+    },
+    "state": {
+      "bucketName": "retail-cb2s100ejz.example.com"
+    }
+  },
+  "retail-app:webFrontend:siteContentUploader": {
+    "instanceId": "cb2s100ejz-ix8nrwnj",
+    "type": "s3-sync",
+    "internallyManaged": false,
+    "inputs": {
+      "contentPath": "/var/folders/0g/5xlwt8nd1pn1vqspqhgw3mpw0000gn/T/tmp-19517frYp2QkLcFbh",
+      "bucketName": "retail-cb2s100ejz.example.com"
+    },
+    "state": {
+      "contentPath": "/var/folders/0g/5xlwt8nd1pn1vqspqhgw3mpw0000gn/T/tmp-19517frYp2QkLcFbh",
+      "bucketName": "retail-cb2s100ejz.example.com"
+    }
+  },
+  "retail-app:webFrontend:wwwDomainBucket": {
+    "instanceId": "cb2s100ejz-zktb82ow",
+    "type": "aws-s3-bucket",
+    "internallyManaged": false,
+    "inputs": {
+      "name": "www.retail-cb2s100ejz.example.com"
+    },
+    "state": {
+      "name": "www.retail-cb2s100ejz.example.com"
+    }
+  },
+  "retail-app:webFrontend:rootDomainBucketConfig": {
+    "instanceId": "cb2s100ejz-tq3afff6",
+    "type": "s3-website-config",
+    "internallyManaged": false,
+    "inputs": {
+      "rootBucketName": "retail-cb2s100ejz.example.com",
+      "indexDocument": "index.html",
+      "errorDocument": "error.html",
+      "redirectBucketName": "www.retail-cb2s100ejz.example.com",
+      "redirectToHostName": "retail-cb2s100ejz.example.com"
+    },
+    "state": {
+      "rootBucketName": "retail-cb2s100ejz.example.com",
+      "indexDocument": "index.html",
+      "errorDocument": "error.html",
+      "redirectBucketName": "www.retail-cb2s100ejz.example.com",
+      "redirectToHostName": "retail-cb2s100ejz.example.com"
+    }
+  },
+  "retail-app:createProduct": {
+    "instanceId": "cb2s100ejz-8ynfs3il",
+    "type": "aws-lambda",
+    "internallyManaged": false,
+    "inputs": {
+      "memory": 512,
+      "timeout": 10,
+      "handler": "code/products.create",
+      "env": {
+        "productTableName": "products-cb2s100ejz"
+      },
+      "name": "func-cb2s100ejz-8ynfs3il"
+    },
+    "state": {
+      "memory": 512,
+      "timeout": 10,
+      "handler": "code/products.create",
+      "env": {
+        "productTableName": "products-cb2s100ejz"
+      },
+      "name": "func-cb2s100ejz-8ynfs3il",
+      "arn": "arn:aws:lambda:us-east-1:810879231243:function:func-cb2s100ejz-8ynfs3il",
+      "roleArn": "arn:aws:iam::810879231243:role/func-cb2s100ejz-8ynfs3il-execution-role-cb2s100ejz-8ynfs3il",
+      "defaultRole": {
+        "arn": "arn:aws:iam::810879231243:role/func-cb2s100ejz-8ynfs3il-execution-role-cb2s100ejz-8ynfs3il",
+        "service": "lambda.amazonaws.com",
+        "policy": {
+          "arn": "arn:aws:iam::aws:policy/AdministratorAccess"
+        },
+        "name": "func-cb2s100ejz-8ynfs3il-execution-role-cb2s100ejz-8ynfs3il"
+      }
+    }
+  },
+  "retail-app:getProduct": {
+    "instanceId": "cb2s100ejz-6g3wdrzw",
+    "type": "aws-lambda",
+    "internallyManaged": false,
+    "inputs": {
+      "memory": 512,
+      "timeout": 10,
+      "handler": "code/products.get",
+      "env": {
+        "productTableName": "products-cb2s100ejz"
+      },
+      "name": "func-cb2s100ejz-6g3wdrzw"
+    },
+    "state": {
+      "memory": 512,
+      "timeout": 10,
+      "handler": "code/products.get",
+      "env": {
+        "productTableName": "products-cb2s100ejz"
+      },
+      "name": "func-cb2s100ejz-6g3wdrzw",
+      "arn": "arn:aws:lambda:us-east-1:810879231243:function:func-cb2s100ejz-6g3wdrzw",
+      "roleArn": "arn:aws:iam::810879231243:role/func-cb2s100ejz-6g3wdrzw-execution-role-cb2s100ejz-6g3wdrzw",
+      "defaultRole": {
+        "arn": "arn:aws:iam::810879231243:role/func-cb2s100ejz-6g3wdrzw-execution-role-cb2s100ejz-6g3wdrzw",
+        "service": "lambda.amazonaws.com",
+        "policy": {
+          "arn": "arn:aws:iam::aws:policy/AdministratorAccess"
+        },
+        "name": "func-cb2s100ejz-6g3wdrzw-execution-role-cb2s100ejz-6g3wdrzw"
+      }
+    }
+  },
+  "retail-app:listProducts": {
+    "instanceId": "cb2s100ejz-olty3at7",
+    "type": "aws-lambda",
+    "internallyManaged": false,
+    "inputs": {
+      "memory": 512,
+      "timeout": 10,
+      "handler": "code/products.list",
+      "env": {
+        "productTableName": "products-cb2s100ejz"
+      },
+      "name": "func-cb2s100ejz-olty3at7"
+    },
+    "state": {
+      "memory": 512,
+      "timeout": 10,
+      "handler": "code/products.list",
+      "env": {
+        "productTableName": "products-cb2s100ejz"
+      },
+      "name": "func-cb2s100ejz-olty3at7",
+      "arn": "arn:aws:lambda:us-east-1:810879231243:function:func-cb2s100ejz-olty3at7",
+      "roleArn": "arn:aws:iam::810879231243:role/func-cb2s100ejz-olty3at7-execution-role-cb2s100ejz-olty3at7",
+      "defaultRole": {
+        "arn": "arn:aws:iam::810879231243:role/func-cb2s100ejz-olty3at7-execution-role-cb2s100ejz-olty3at7",
+        "service": "lambda.amazonaws.com",
+        "policy": {
+          "arn": "arn:aws:iam::aws:policy/AdministratorAccess"
+        },
+        "name": "func-cb2s100ejz-olty3at7-execution-role-cb2s100ejz-olty3at7"
+      }
+    }
+  },
+  "retail-app:productsApi": {
+    "instanceId": "cb2s100ejz-du7iwr17",
+    "type": "rest-api",
+    "internallyManaged": false,
+    "inputs": {
+      "gateway": "aws-apigateway",
+      "routes": {
+        "/products": {
+          "post": {
+            "function": {
+              "arn": "arn:aws:lambda:us-east-1:810879231243:function:func-cb2s100ejz-8ynfs3il",
+              "roleArn": "arn:aws:iam::810879231243:role/func-cb2s100ejz-8ynfs3il-execution-role-cb2s100ejz-8ynfs3il"
+            },
+            "cors": true
+          },
+          "/{id}": {
+            "get": {
+              "function": {
+                "arn": "arn:aws:lambda:us-east-1:810879231243:function:func-cb2s100ejz-6g3wdrzw",
+                "roleArn": "arn:aws:iam::810879231243:role/func-cb2s100ejz-6g3wdrzw-execution-role-cb2s100ejz-6g3wdrzw"
+              },
+              "cors": true
+            }
+          }
+        },
+        "/catalog/{...categories}": {
+          "get": {
+            "function": {
+              "arn": "arn:aws:lambda:us-east-1:810879231243:function:func-cb2s100ejz-olty3at7",
+              "roleArn": "arn:aws:iam::810879231243:role/func-cb2s100ejz-olty3at7-execution-role-cb2s100ejz-olty3at7"
+            },
+            "cors": true
+          }
+        }
+      },
+      "name": "api-cb2s100ejz-du7iwr17"
+    },
+    "state": {
+      "roleArn": "arn:aws:iam::810879231243:role/api-cb2s100ejz-du7iwr17-iam-role-cb2s100ejz-du7iwr17"
+    }
+  },
+  "retail-app:productsDb": {
+    "instanceId": "cb2s100ejz-muhysome",
+    "type": "aws-dynamodb",
+    "internallyManaged": false,
+    "inputs": {
+      "region": "us-east-1",
+      "tables": [
+        {
+          "name": "products-cb2s100ejz",
+          "hashKey": "id",
+          "indexes": [
+            {
+              "name": "ProductIdIndex",
+              "type": "global",
+              "hashKey": "id"
+            }
+          ],
+          "schema": {
+            "id": "number",
+            "name": "string",
+            "description": "string",
+            "price": "number"
+          },
+          "options": {
+            "timestamps": true
+          }
+        }
+      ]
+    },
+    "state": {
+      "region": "us-east-1",
+      "tables": [
+        {
+          "name": "products-cb2s100ejz",
+          "hashKey": "id",
+          "indexes": [
+            {
+              "name": "ProductIdIndex",
+              "type": "global",
+              "hashKey": "id"
+            }
+          ],
+          "schema": {
+            "id": "number",
+            "name": "string",
+            "description": "string",
+            "price": "number"
+          },
+          "options": {
+            "timestamps": true
+          }
+        }
+      ],
+      "ddbtables": [
+        {
+          "products-cb2s100ejz": {
+            "TableDescription": {
+              "AttributeDefinitions": [
+                {
+                  "AttributeName": "id",
+                  "AttributeType": "N"
+                }
+              ],
+              "TableName": "products-cb2s100ejz",
+              "KeySchema": [
+                {
+                  "AttributeName": "id",
+                  "KeyType": "HASH"
+                }
+              ],
+              "TableStatus": "CREATING",
+              "CreationDateTime": "2018-03-29T02:21:17.383Z",
+              "ProvisionedThroughput": {
+                "NumberOfDecreasesToday": 0,
+                "ReadCapacityUnits": 1,
+                "WriteCapacityUnits": 1
+              },
+              "TableSizeBytes": 0,
+              "ItemCount": 0,
+              "TableArn": "arn:aws:dynamodb:us-east-1:810879231243:table/products-cb2s100ejz",
+              "TableId": "a1a49295-b1a2-438c-af63-e6e6d819cced",
+              "GlobalSecondaryIndexes": [
+                {
+                  "IndexName": "ProductIdIndex",
+                  "KeySchema": [
+                    {
+                      "AttributeName": "id",
+                      "KeyType": "HASH"
+                    }
+                  ],
+                  "Projection": {
+                    "ProjectionType": "ALL"
+                  },
+                  "IndexStatus": "CREATING",
+                  "ProvisionedThroughput": {
+                    "NumberOfDecreasesToday": 0,
+                    "ReadCapacityUnits": 1,
+                    "WriteCapacityUnits": 1
+                  },
+                  "IndexSizeBytes": 0,
+                  "ItemCount": 0,
+                  "IndexArn": "arn:aws:dynamodb:us-east-1:810879231243:table/products-cb2s100ejz/index/ProductIdIndex"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  },
+  "retail-app:createProduct:defaultRole": {
+    "instanceId": "cb2s100ejz-objebz19",
+    "type": "aws-iam-role",
+    "internallyManaged": true,
+    "inputs": {
+      "name": "func-cb2s100ejz-8ynfs3il-execution-role-cb2s100ejz-8ynfs3il",
+      "service": "lambda.amazonaws.com"
+    },
+    "state": {
+      "arn": "arn:aws:iam::810879231243:role/func-cb2s100ejz-8ynfs3il-execution-role-cb2s100ejz-8ynfs3il",
+      "service": "lambda.amazonaws.com",
+      "policy": {
+        "arn": "arn:aws:iam::aws:policy/AdministratorAccess"
+      },
+      "name": "func-cb2s100ejz-8ynfs3il-execution-role-cb2s100ejz-8ynfs3il"
+    }
+  },
+  "retail-app:listProducts:defaultRole": {
+    "instanceId": "cb2s100ejz-i9epyz7n",
+    "type": "aws-iam-role",
+    "internallyManaged": true,
+    "inputs": {
+      "name": "func-cb2s100ejz-olty3at7-execution-role-cb2s100ejz-olty3at7",
+      "service": "lambda.amazonaws.com"
+    },
+    "state": {
+      "arn": "arn:aws:iam::810879231243:role/func-cb2s100ejz-olty3at7-execution-role-cb2s100ejz-olty3at7",
+      "service": "lambda.amazonaws.com",
+      "policy": {
+        "arn": "arn:aws:iam::aws:policy/AdministratorAccess"
+      },
+      "name": "func-cb2s100ejz-olty3at7-execution-role-cb2s100ejz-olty3at7"
+    }
+  },
+  "retail-app:getProduct:defaultRole": {
+    "instanceId": "cb2s100ejz-ux2ia8n5",
+    "type": "aws-iam-role",
+    "internallyManaged": true,
+    "inputs": {
+      "name": "func-cb2s100ejz-6g3wdrzw-execution-role-cb2s100ejz-6g3wdrzw",
+      "service": "lambda.amazonaws.com"
+    },
+    "state": {
+      "arn": "arn:aws:iam::810879231243:role/func-cb2s100ejz-6g3wdrzw-execution-role-cb2s100ejz-6g3wdrzw",
+      "service": "lambda.amazonaws.com",
+      "policy": {
+        "arn": "arn:aws:iam::aws:policy/AdministratorAccess"
+      },
+      "name": "func-cb2s100ejz-6g3wdrzw-execution-role-cb2s100ejz-6g3wdrzw"
+    }
+  },
+  "retail-app:productsApi:iam": {
+    "instanceId": "cb2s100ejz-rhsdynfp",
+    "type": "aws-iam-role",
+    "internallyManaged": true,
+    "inputs": {
+      "name": "api-cb2s100ejz-du7iwr17-iam-role-cb2s100ejz-du7iwr17",
+      "service": "apigateway.amazonaws.com"
+    },
+    "state": {
+      "arn": "arn:aws:iam::810879231243:role/api-cb2s100ejz-du7iwr17-iam-role-cb2s100ejz-du7iwr17",
+      "service": "apigateway.amazonaws.com",
+      "policy": {
+        "arn": "arn:aws:iam::aws:policy/AdministratorAccess"
+      },
+      "name": "api-cb2s100ejz-du7iwr17-iam-role-cb2s100ejz-du7iwr17"
+    }
+  },
+  "retail-app:productsApi:apig": {
+    "instanceId": "cb2s100ejz-5bxb8j36",
+    "type": "aws-apigateway",
+    "internallyManaged": true,
+    "inputs": {
+      "name": "api-cb2s100ejz-du7iwr17",
+      "roleArn": "arn:aws:iam::810879231243:role/api-cb2s100ejz-du7iwr17-iam-role-cb2s100ejz-du7iwr17",
+      "routes": {
+        "products": {
+          "POST": {
+            "lambdaArn": "arn:aws:lambda:us-east-1:810879231243:function:func-cb2s100ejz-8ynfs3il",
+            "cors": true
+          }
+        },
+        "products/{id}": {
+          "GET": {
+            "lambdaArn": "arn:aws:lambda:us-east-1:810879231243:function:func-cb2s100ejz-6g3wdrzw",
+            "cors": true
+          }
+        },
+        "catalog/{categories+}": {
+          "GET": {
+            "lambdaArn": "arn:aws:lambda:us-east-1:810879231243:function:func-cb2s100ejz-olty3at7",
+            "cors": true
+          }
+        }
+      }
+    },
+    "state": {
+      "name": "api-cb2s100ejz-du7iwr17",
+      "roleArn": "arn:aws:iam::810879231243:role/api-cb2s100ejz-du7iwr17-iam-role-cb2s100ejz-du7iwr17",
+      "routes": {
+        "products": {
+          "POST": {
+            "lambdaArn": "arn:aws:lambda:us-east-1:810879231243:function:func-cb2s100ejz-8ynfs3il",
+            "cors": true
+          }
+        },
+        "products/{id}": {
+          "GET": {
+            "lambdaArn": "arn:aws:lambda:us-east-1:810879231243:function:func-cb2s100ejz-6g3wdrzw",
+            "cors": true
+          }
+        },
+        "catalog/{categories+}": {
+          "GET": {
+            "lambdaArn": "arn:aws:lambda:us-east-1:810879231243:function:func-cb2s100ejz-olty3at7",
+            "cors": true
+          }
+        }
+      },
+      "id": "yuul8k9igc",
+      "url": "https://yuul8k9igc.execute-api.us-east-1.amazonaws.com/dev/",
+      "urls": [
+        "https://yuul8k9igc.execute-api.us-east-1.amazonaws.com/dev/products",
+        "https://yuul8k9igc.execute-api.us-east-1.amazonaws.com/dev/products/{id}",
+        "https://yuul8k9igc.execute-api.us-east-1.amazonaws.com/dev/catalog/{categories+}"
+      ]
+    }
+  }
+}
