@@ -237,7 +237,6 @@ const deploy = async (inputs, context) => {
       context.log('Cannot deploy multiple tables at this time. Please update your inputs and try again...')
       return {}
     }
-    context.log('Creating table(s)...')
     try {
       outputs = await createTables(inputs, context)
     } catch (err) {
