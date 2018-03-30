@@ -6,20 +6,25 @@ describe('Component aws-apigateway - Utils', () => {
 
     it('should generate the API Gateway base url', () => {
       const res = generateUrl(restApiId)
-      expect(res).toEqual(`https://${restApiId}.execute-api.us-east-1.amazonaws.com/dev`)
+      expect(res).toEqual(`https://${restApiId}.execute-api.us-east-1.amazonaws.com/dev/`)
     })
 
     it('should be possible to set the region', () => {
       const region = 'eu-central-1'
       const res = generateUrl(restApiId, region)
-      expect(res).toEqual(`https://${restApiId}.execute-api.${region}.amazonaws.com/dev`)
+      expect(res).toEqual(`https://${restApiId}.execute-api.${region}.amazonaws.com/dev/`)
     })
 
     it('should be possible to set the stage', () => {
       const region = 'eu-west-1'
       const stage = 'prod'
       const res = generateUrl(restApiId, region, stage)
-      expect(res).toEqual(`https://${restApiId}.execute-api.${region}.amazonaws.com/${stage}`)
+      expect(res).toEqual(`https://${restApiId}.execute-api.${region}.amazonaws.com/${stage}/`)
+    })
+
+    it('should append a slash at the end of the generated url', () => {
+      const res = generateUrl(restApiId)
+      expect(res).toMatch(/^.+\/$/)
     })
   })
 
