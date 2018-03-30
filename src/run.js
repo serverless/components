@@ -27,16 +27,18 @@ const run = async (command, options) => {
     archive = clone(stateFile)
     const componentsToUse = await getComponentsToUse(stateFile)
     const componentsToRemove = await getComponentsToRemove(stateFile, componentsToUse)
-
-    components = {
-      ...componentsToUse,
-      ...componentsToRemove
-    }
-    if (command === 'deploy') {
-      trackDeployment(componentsToUse)
-    }
+    components = { ...componentsToUse, ...componentsToRemove }
+    if (command === 'deploy') trackDeployment(componentsToUse)
     const graph = await buildGraph(componentsToUse, componentsToRemove, command)
     await executeGraph(graph, components, stateFile, archive, command, options, false)
+    // run the "info" command on every component after a successful deployment
+    if (command === 'deploy') {
+      // NOTE: need to re-build the graph here since we're mutating it in "executeGraph"
+      // TODO: we should refactor this code later on
+      // eslint-disable-next-line no-shadow
+      const graph = await buildGraph(componentsToUse, componentsToRemove, 'info')
+      await executeGraph(graph, components, stateFile, archive, 'info', options, false)
+    }
   } catch (error) {
     if (reporter) {
       reporter.captureException(error)

@@ -913,6 +913,7 @@ Creates / Removes a RESTful API. Uses the specified gateway component behind the
 ##### Commands
 
 * `components deploy`
+* `components info`
 * `components remove`
 
 ##### Example
@@ -1138,6 +1139,7 @@ components:
 ##### Commands
 
 * `components deploy`
+* `components info`
 * `components remove`
 
 ##### Example
