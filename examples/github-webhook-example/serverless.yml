@@ -1,0 +1,18 @@
+type: github-webhook-example
+
+components:
+  webhookFunction:
+    type: aws-lambda
+    inputs:
+      memory: 512
+      timeout: 10
+      handler: code/handler.githubFunction
+  GithubWebhookAWS:
+    type: github-webhook-aws
+    inputs:
+      function: ${webhookFunction}
+      githubApiToken: xx
+      githubRepoOwner: DavidTron5000
+      githubRepoName: responsible
+      webhookTriggers:
+        - create
