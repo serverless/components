@@ -41,5 +41,5 @@ describe('#pack()', () => {
 
     expect(files.length)
     expect(zipFile).not.toBeFalsy()
-  })
+  }).timeout(10000)
 })
