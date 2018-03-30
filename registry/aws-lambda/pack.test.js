@@ -15,22 +15,12 @@ describe('#pack()', () => {
   beforeEach(async () => {
     tempPath = path.join(
       os.tmpdir(),
-      'tmpdirs-serverless-components',
-      'aws-lambda',
-      crypto.randomBytes(3).toString('hex')
+      crypto.randomBytes(6).toString('hex')
     )
     await fsp.ensureDirAsync(tempPath)
   })
 
-  afterEach(() => {
-  })
-
   it('should zip the aws-lambda component and return the zip file content', async () => {
-    fsp.writeJsonAsync(path.join(tempPath, 'foo.json'), {
-      key1: 'value1',
-      key2: 'value2'
-    })
-
     const zipRes = await pack(packagePath, tempPath)
     const zip = admZip(zipRes)
     const files = zip.getEntries().map((entry) => ({
@@ -41,5 +31,5 @@ describe('#pack()', () => {
 
     expect(files.length)
     expect(zipFile).not.toBeFalsy()
-  }).timeout(10000)
+  })
 })
