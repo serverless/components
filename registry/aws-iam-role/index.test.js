@@ -106,7 +106,7 @@ describe('aws-iam-role unit tests', () => {
   })
 
 
-  it('should remove a non-deployed component with no errors', async () => {
+  it('should remove a non-deployed iam component with no errors', async () => {
     const attachRolePolicyMock = jest.fn()
     const detachRolePolicyMock = jest.fn()
     const createRoleMock = jest.fn().mockReturnValue({ Role: { Arn: 'abc:xyz' } })

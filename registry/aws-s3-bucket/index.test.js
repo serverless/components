@@ -69,101 +69,52 @@ describe('aws-s3-bucket tests', () => {
     const outputs = await s3Component.deploy(inputs, s3ContextMock)
 
     expect(AWS.S3).toHaveBeenCalledTimes(1)
-    expect(AWS.mocks.createBucketMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.createBucketMock).toHaveBeenCalledTimes(1) // from the previous deploy
     expect(outputs.name).toEqual(inputs.name)
     expect(s3ContextMock.saveState).toHaveBeenCalledTimes(1)
   })
-  //
-  //
-  // it('should remove a non-deployed component with no errors', async () => {
-  //   const attachRolePolicyMock = jest.fn()
-  //   const detachRolePolicyMock = jest.fn()
-  //   const createRoleMock = jest.fn().mockReturnValue({ Role: { Arn: 'abc:xyz' } })
-  //   const deleteRoleMock = jest.fn().mockReturnValue({ Role: { Arn: null } })
-  //   const iamContextMock = {
-  //     state: {},
-  //     archive: {},
-  //     log: () => {},
-  //     saveState: () => {},
-  //     provider: {
-  //       AWS: {
-  //         IAM: function () { // eslint-disable-line
-  //           return {
-  //             attachRolePolicy: (obj) => ({
-  //               promise: () => attachRolePolicyMock(obj)
-  //             }),
-  //             detachRolePolicy: (obj) => ({
-  //               promise: () => detachRolePolicyMock(obj)
-  //             }),
-  //             createRole: (obj) => ({
-  //               promise: () => createRoleMock(obj)
-  //             }),
-  //             deleteRole: (obj) => ({
-  //               promise: () => deleteRoleMock(obj)
-  //             })
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-  //   const inputs = {
-  //     name: 'some-role',
-  //     service: 'lambda.amazonaws.com'
-  //   }
-  //   const outputs = await iamComponent.remove(inputs, iamContextMock)
-  //   expect(deleteRoleMock).not.toBeCalled()
-  //   expect(detachRolePolicyMock).not.toBeCalled()
-  //   expect(outputs).toEqual({})
-  // })
-  //
-  // it('should remove after a deployment with no errors', async () => {
-  //   const attachRolePolicyMock = jest.fn()
-  //   const detachRolePolicyMock = jest.fn()
-  //   const createRoleMock = jest.fn().mockReturnValue({ Role: { Arn: 'abc:xyz' } })
-  //   const deleteRoleMock = jest.fn().mockReturnValue({ Role: { Arn: null } })
-  //   const inputs = {
-  //     name: 'some-role',
-  //     service: 'lambda.amazonaws.com'
-  //   }
-  //   const iamContextMock = {
-  //     state: {
-  //       ...inputs,
-  //       arn: 'abc:xyz',
-  //       policy: {
-  //         arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
-  //       }
-  //     },
-  //     archive: {},
-  //     log: () => {},
-  //     saveState: () => {},
-  //     provider: {
-  //       AWS: {
-  //         IAM: function () { // eslint-disable-line
-  //           return {
-  //             attachRolePolicy: (obj) => ({
-  //               promise: () => attachRolePolicyMock(obj)
-  //             }),
-  //             detachRolePolicy: (obj) => ({
-  //               promise: () => detachRolePolicyMock(obj)
-  //             }),
-  //             createRole: (obj) => ({
-  //               promise: () => createRoleMock(obj)
-  //             }),
-  //             deleteRole: (obj) => ({
-  //               promise: () => deleteRoleMock(obj)
-  //             })
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-  //   const outputs = await iamComponent.remove(inputs, iamContextMock)
-  //   expect(deleteRoleMock).toBeCalled()
-  //   expect(detachRolePolicyMock).toBeCalled()
-  //   expect(outputs).toEqual({
-  //     arn: null,
-  //     policy: null,
-  //     service: null
-  //   })
-  // })
+
+  it('should remove a non-deployed s3 component with no errors', async () => {
+    const s3ContextMock = {
+      state: {},
+      archive: {},
+      log: () => {},
+      saveState: jest.fn()
+    }
+
+    const inputs = {
+      name: 'some-bucket-name'
+    }
+
+    const outputs = await s3Component.remove(inputs, s3ContextMock)
+
+    expect(AWS.S3).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.deleteBucketMock).toHaveBeenCalledTimes(0)
+    expect(AWS.mocks.listObjectsV2Mock).toHaveBeenCalledTimes(0)
+    expect(AWS.mocks.deleteObjectsMock).toHaveBeenCalledTimes(0)
+    expect(s3ContextMock.saveState).toHaveBeenCalledTimes(0)
+    expect(outputs).toEqual({})
+  })
+
+  it('should remove the s3 component after a deployment with no errors', async () => {
+    const s3ContextMock = {
+      state: { name: 'some-bucket-name' },
+      archive: {},
+      log: () => {},
+      saveState: jest.fn()
+    }
+
+    const inputs = {
+      name: 'some-bucket-name'
+    }
+
+    const outputs = await s3Component.remove(inputs, s3ContextMock)
+
+    expect(AWS.S3).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.deleteBucketMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.listObjectsV2Mock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.deleteObjectsMock).toHaveBeenCalledTimes(1)
+    expect(s3ContextMock.saveState).toHaveBeenCalledTimes(1)
+    expect(outputs).toEqual({ name: null })
+  })
 })
