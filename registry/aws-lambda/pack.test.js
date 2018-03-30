@@ -32,13 +32,11 @@ describe('#pack()', () => {
     })
 
     const zipRes = await pack(packagePath, tempPath)
-
     const zip = admZip(zipRes)
     const files = zip.getEntries().map((entry) => ({
       name: entry.entryName,
       content: entry.getData()
     }))
-
     const zipFile = files.filter((file) => file.name.match(/.+.zip/)).pop()
 
     expect(files.length)
