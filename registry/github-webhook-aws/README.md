@@ -1,1 +1,1 @@
-# Github webhook AWS Apigateway Component
+# Github Webhook on AWS API Gateway

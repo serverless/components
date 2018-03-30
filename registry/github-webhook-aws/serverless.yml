@@ -1,13 +1,16 @@
 type: github-webhook-aws
 
 inputTypes:
-  handler:
+  function:
     type: string
     required: true
   githubApiToken:
     type: string
     required: true
-  githubRepo:
+  githubRepoOwner:
+    type: string
+    required: true
+  githubRepoName:
     type: string
     required: true
   webhookTriggers:
@@ -15,17 +18,20 @@ inputTypes:
     required: true
 
 components:
-  myGithubFunction:
-    type: lambda
+  GithubWebhook:
+    type: github-webhook
     inputs:
-      name: myGithubFunction
-      memory: 512
-      timeout: 10
-      handler: code/handler.githubFunction
-
-inputs:
-  handler: ${myGithubFunction}
-  githubApiToken: xxx
-  githubRepo: https://github.com/DavidTron5000/responsible/
-  webhookTriggers:
-    - create
+      token: ${input.githubApiToken}
+      owner: ${input.githubRepoOwner}
+      repo: ${input.githubRepoName}
+      url: ${webhookEndpoint.url}/webhook
+      events: ${input.webhookTriggers}
+  webhookEndpoint:
+    type: rest-api
+    inputs:
+      gateway: aws-apigateway
+      routes:
+        /webhook: # routes begin with a slash
+          post: # HTTP method names are used to attach handlers
+            function: ${input.function}
+            cors: true
