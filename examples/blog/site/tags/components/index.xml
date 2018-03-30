@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Components on The Serverless Components</title>
+    <link>/tags/components/</link>
+    <description>Recent content in Components on The Serverless Components</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 15 Mar 2018 14:15:06 -0400</lastBuildDate>
+    
+	<atom:link href="/tags/components/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Hello Components</title>
+      <link>/post/hello-components/</link>
+      <pubDate>Thu, 15 Mar 2018 14:15:06 -0400</pubDate>
+      
+      <guid>/post/hello-components/</guid>
+      <description>Welcome to the amazing world of Serverless Components!
+Nulla bibendum Nulla bibendum eu lectus et ultrices. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur sed condimentum dui. Ut vitae pulvinar nunc. Aliquam erat volutpat. Quisque at hendrerit felis, sed consectetur lectus. Integer ut viverra neque, eget bibendum urna. Aliquam placerat suscipit dui eget feugiat. Fusce efficitur, justo at efficitur pulvinar, risus nisi iaculis ipsum, at viverra purus felis eget erat.</description>
+    </item>
+    
+    <item>
+      <title>How to Author Your First Component</title>
+      <link>/post/how-to-author-your-first-component/</link>
+      <pubDate>Thu, 29 Mar 2018 15:57:31 -0400</pubDate>
+      
+      <guid>/post/how-to-author-your-first-component/</guid>
+      <description>As Easy as Legos Sed vestibulum ipsum elit, ut rhoncus nisl dictum at. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Phasellus a malesuada nisi, vel molestie nulla. Nam laoreet pulvinar velit, eget egestas erat mollis ac. Nulla sollicitudin eros nec lectus scelerisque gravida. Donec eget erat mauris. Phasellus nulla velit, aliquet non purus in, auctor congue lacus. Proin blandit gravida velit eget volutpat. Nullam at tincidunt tortor.</description>
+    </item>
+    
+    <item>
+      <title>Why Serverless Components</title>
+      <link>/post/why-serverless-components/</link>
+      <pubDate>Sat, 17 Mar 2018 15:58:10 -0400</pubDate>
+      
+      <guid>/post/why-serverless-components/</guid>
+      <description>Many Reasons Why Mauris consequat, turpis et lobortis porttitor, elit metus blandit nisi, non bibendum odio orci vel ipsum. Nulla eu fermentum velit, cursus commodo mauris. In aliquam efficitur metus vel suscipit. Duis et purus eget massa mollis posuere. Interdum et malesuada fames ac ante ipsum primis in faucibus. In sit amet dictum felis. Integer vitae pretium tortor. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Serverless on The Serverless Components</title>
+    <link>/tags/serverless/</link>
+    <description>Recent content in Serverless on The Serverless Components</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 15 Mar 2018 14:15:06 -0400</lastBuildDate>
+    
+	<atom:link href="/tags/serverless/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Hello Components</title>
+      <link>/post/hello-components/</link>
+      <pubDate>Thu, 15 Mar 2018 14:15:06 -0400</pubDate>
+      
+      <guid>/post/hello-components/</guid>
+      <description>Welcome to the amazing world of Serverless Components!
+Nulla bibendum Nulla bibendum eu lectus et ultrices. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur sed condimentum dui. Ut vitae pulvinar nunc. Aliquam erat volutpat. Quisque at hendrerit felis, sed consectetur lectus. Integer ut viverra neque, eget bibendum urna. Aliquam placerat suscipit dui eget feugiat. Fusce efficitur, justo at efficitur pulvinar, risus nisi iaculis ipsum, at viverra purus felis eget erat.</description>
+    </item>
+    
+  </channel>
+</rss>

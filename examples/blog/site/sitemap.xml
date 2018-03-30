@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <url>
+    <loc>/post/hello-components/</loc>
+    <lastmod>2018-03-15T14:15:06-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/how-to-author-your-first-component/</loc>
+    <lastmod>2018-03-29T15:57:31-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/why-serverless-components/</loc>
+    <lastmod>2018-03-17T15:58:10-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/categories/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/components/</loc>
+    <lastmod>2018-03-15T14:15:06-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/how-to/</loc>
+    <lastmod>2018-03-29T15:57:31-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/post/</loc>
+    <lastmod>2018-03-15T14:15:06-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/serverless/</loc>
+    <lastmod>2018-03-15T14:15:06-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/</loc>
+    <lastmod>2018-03-15T14:15:06-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/</loc>
+    <lastmod>2018-03-15T14:15:06-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+</urlset>
