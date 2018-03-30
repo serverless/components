@@ -26,9 +26,6 @@ const deploy = async (inputs, context) => {
   context.saveState({ ...inputs, ...outputs })
   // TODO uncomment and log out real URL when
   // we get it context.log(`Created Site with url: '${s3url}'`)
-
-  info(inputs, context) // eslint-disable-line no-use-before-define
-
   return outputs
 }
 

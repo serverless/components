@@ -179,9 +179,6 @@ async function deploy(inputs, context) {
       url: outputs.url
     })
   }
-
-  info(inputs, context) // eslint-disable-line no-use-before-define
-
   return outputs
 }
 
