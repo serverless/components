@@ -10,14 +10,23 @@ const fsp = BbPromise.promisifyAll(fse)
 
 describe('#pack()', () => {
   let tempPath
-  const packagePath = __dirname
+  let packagePath
 
   beforeEach(async () => {
+    packagePath = path.join(
+      os.tmpdir(),
+      crypto.randomBytes(6).toString('hex')
+    )
     tempPath = path.join(
       os.tmpdir(),
       crypto.randomBytes(6).toString('hex')
     )
+    await fsp.ensureDirAsync(packagePath)
     await fsp.ensureDirAsync(tempPath)
+    fsp.writeJsonSync(path.join(packagePath, 'foo.json'), {
+      key1: 'value1',
+      key2: 'value2'
+    })
   })
 
   it('should zip the aws-lambda component and return the zip file content', async () => {
@@ -27,9 +36,12 @@ describe('#pack()', () => {
       name: entry.entryName,
       content: entry.getData()
     }))
-    const zipFile = files.filter((file) => file.name.match(/.+.zip/)).pop()
+    const jsonFile = files.filter((file) => file.name === 'foo.json').pop()
 
-    expect(files.length)
-    expect(zipFile).not.toBeFalsy()
+    expect(files.length == 1)
+    expect(JSON.parse(jsonFile.content.toString('utf8'))).toEqual({
+      key1: 'value1',
+      key2: 'value2'
+    })
   })
 })
