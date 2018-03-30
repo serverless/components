@@ -66,6 +66,7 @@ const deploy = async (inputs, context) => {
   // Util method for checking if state key values have changed
   const componentData = compareInputsToState(inputs, context.state)
   const inputsChanged = !componentData.isEqual
+  const defaultOutputs = { ...inputs, ...context.state }
 
   /* No state found, run create flow */
   if (!componentData.hasState) {
@@ -96,6 +97,12 @@ const deploy = async (inputs, context) => {
         context.log(`${diff}\n`)
       }
     })
+
+    // Need to bail if state doesn't have what we need
+    if (!webhookExists(context)) {
+      // No webhook id found. Bail
+      return defaultOutputs
+    }
 
     // If repo url has changed. Delete old webhook and make a new one in new repo
     if (componentData.keys.includes('repo') || componentData.keys.includes('owner')) {
@@ -130,11 +137,16 @@ const deploy = async (inputs, context) => {
   }
 
   // No Op. Return default
-  return { ...inputs, ...context.state }
+  return defaultOutputs
 }
 
 const remove = async (inputs, context) => {
+  const defaultOutputs = { ...inputs, ...context.state }
   context.log(`${context.type}: ◌ Removing Github Webhook from repo "${getRepoUrl(inputs)}"`)
+  if (!webhookExists(context)) {
+    // No webhook id found. Bail
+    return defaultOutputs
+  }
   const outputs = await deleteWebhook(context.state, context.state.github.id)
   context.log(`${context.type}: ✓ Removed Github Webhook from repo "${getRepoSlug(inputs)}"`)
   context.saveState()
@@ -147,6 +159,10 @@ function getRepoSlug(inputs) {
 
 function getRepoUrl(inputs) {
   return `https://github.com/${inputs.owner}/${inputs.repo}/settings/hooks`
+}
+
+function webhookExists(context) {
+  return context.state && context.state.github && context.state.github.id
 }
 
 // Util method to compare state values to inputs
