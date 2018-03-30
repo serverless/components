@@ -1,6 +1,6 @@
 {
   "name": "serverless-components",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "PoC for the next version of the Serverless Framework",
   "author": "Serverless, Inc.",
   "license": "Apache-2.0",
