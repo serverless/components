@@ -1,5 +1,8 @@
-const { addIndex, map, forEachObjIndexed } = require('ramda')
 const joinPath = require('path').join
+const { joinUrl } = require('./utils')
+const {
+  isEmpty, keys, union, not, addIndex, map, forEachObjIndexed
+} = require('ramda')
 
 const catchallParameterPattern = /{\.{3}([^}]+?)}/g
 const pathParameterPattern = /{([^}]+?)}/g
@@ -159,7 +162,7 @@ async function deploy(inputs, context) {
   if (inputs.gateway === 'eventgateway') {
     outputs.eventgateway = await deployEventGateway(flatInputs, context)
     outputs.url = outputs.eventgateway.url
-    context.saveState({})
+    context.saveState({ url: outputs.url })
   } else if (inputs.gateway === 'aws-apigateway') {
     outputs.iam = await deployIamRole(inputs, context)
     outputs.apigateway = await deployApiGateway(
@@ -170,7 +173,11 @@ async function deploy(inputs, context) {
       context
     )
     outputs.url = outputs.apigateway.url
-    context.saveState({ roleArn: outputs.iam.arn, apigArn: outputs.apigateway.arn })
+    context.saveState({
+      roleArn: outputs.iam.arn,
+      apigArn: outputs.apigateway.arn,
+      url: outputs.url
+    })
   }
   return outputs
 }
@@ -186,7 +193,37 @@ async function remove(inputs, context) {
   return {}
 }
 
+async function info(inputs, context) {
+  let message
+  if (not(isEmpty(context.state))) {
+    const baseUrl = context.state.url
+
+    const flattenedRoutes = flattenRoutes(inputs.routes)
+    let urlObjects = []
+    forEachObjIndexed((route, path) => {
+      const urlObject = {
+        path,
+        method: keys(route)
+          .pop()
+          .toUpperCase()
+      }
+      urlObjects = union(urlObjects, [ urlObject ])
+    }, flattenedRoutes)
+
+    const printableUrls = map((urlObject) => {
+      const joinedUrl = joinUrl(baseUrl, [ urlObject.path ])
+      return `  ${urlObject.method} - ${joinedUrl}`
+    }, urlObjects)
+
+    message = [ 'REST API successfully created:', ...printableUrls ].join('\n')
+  } else {
+    message = 'No REST API state information available. Have you deployed it?'
+  }
+  context.log(message)
+}
+
 module.exports = {
   deploy,
-  remove
+  remove,
+  info
 }
