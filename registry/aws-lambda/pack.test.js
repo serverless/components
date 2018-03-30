@@ -38,7 +38,7 @@ describe('#pack()', () => {
     }))
     const jsonFile = files.filter((file) => file.name === 'foo.json').pop()
 
-    expect(files.length == 1)
+    expect(files.length === 1)
     expect(JSON.parse(jsonFile.content.toString('utf8'))).toEqual({
       key1: 'value1',
       key2: 'value2'
