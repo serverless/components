@@ -1,13 +1,26 @@
 const path = require('path')
+const crypto = require('crypto')
+const fs = require('fs')
+const os = require('os')
 const archiver = require('archiver')
 const BbPromise = require('bluebird')
-const fs = require('fs')
 
 const fsp = BbPromise.promisifyAll(fs)
 
-module.exports = async (outputDir) => {
-  const outputFileName = `${String(Date.now())}.zip`
-  const outputFilePath = path.join(outputDir, outputFileName)
+module.exports = async (packagePath, tempPath) => {
+  // Set defaults
+  tempPath = tempPath || os.tmpdir()
+  packagePath = packagePath || process.cwd()
+
+  /*
+  * Ensure id includes datetime and unique string,
+  * since packaging can happen in parallel
+  */
+
+  let outputFileName = crypto.randomBytes(3).toString('hex')
+  outputFileName = `${String(Date.now())}-${outputFileName}.zip`
+  const outputFilePath = path.join(tempPath, outputFileName)
+
   return new Promise((resolve, reject) => {
     const output = fs.createWriteStream(outputFilePath)
     const archive = archiver('zip', {
@@ -16,13 +29,7 @@ module.exports = async (outputDir) => {
 
     output.on('open', () => {
       archive.pipe(output)
-      archive.glob(
-        '**/*',
-        {
-          cwd: process.cwd()
-        },
-        {}
-      )
+      archive.directory(packagePath, false)
       archive.finalize()
     })
 

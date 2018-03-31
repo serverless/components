@@ -18,7 +18,8 @@ components:
     inputs:
       memory: 512
       timeout: 10
-      handler: code/products.create
+      handler: products.create
+      root: ${self.path}/code
       env:
         productTableName: products-${self.serviceId}
   getProduct:
@@ -26,7 +27,8 @@ components:
     inputs:
       memory: 512
       timeout: 10
-      handler: code/products.get
+      handler: products.get
+      root: ${self.path}/code
       env:
         productTableName: products-${self.serviceId}
   listProducts:
@@ -34,7 +36,8 @@ components:
     inputs:
       memory: 512
       timeout: 10
-      handler: code/products.list
+      handler: products.list
+      root: ${self.path}/code
       env:
         productTableName: products-${self.serviceId}
   productsApi:

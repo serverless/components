@@ -1,13 +1,12 @@
-const os = require('os')
 const AWS = require('aws-sdk')
 const pack = require('./pack')
 
 const lambda = new AWS.Lambda({ region: 'us-east-1' })
 
 const createLambda = async ({
-  name, handler, memory, timeout, env, description
+  name, handler, memory, timeout, env, description, root
 }, role) => {
-  const pkg = await pack(os.tmpdir())
+  const pkg = await pack(root)
 
   const params = {
     FunctionName: name,
@@ -34,9 +33,9 @@ const createLambda = async ({
 }
 
 const updateLambda = async ({
-  name, handler, memory, timeout, env, description
+  name, handler, memory, timeout, env, description, root
 }, role) => {
-  const pkg = await pack(os.tmpdir())
+  const pkg = await pack(root)
   const functionCodeParams = {
     FunctionName: name,
     ZipFile: pkg,
@@ -78,7 +77,6 @@ const deleteLambda = async (name) => {
 
 const deploy = async (inputs, context) => {
   let outputs = {}
-
   const configuredRole = inputs.role
   let { defaultRole } = context.state
 

@@ -17,6 +17,9 @@ inputTypes:
   handler:
     type: string
     required: true
+  root:
+    type: string
+    required: false
   role:
     type: object
     required: false
