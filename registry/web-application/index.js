@@ -17,6 +17,7 @@ const deploy = async (inputs, context) => {
     prefix: true
   }, inputs.global || {})
   let state = {
+    name: i.name,
     back: {
       functions: {}
     }
@@ -72,7 +73,18 @@ const deploy = async (inputs, context) => {
   */
 
   context.log('')
-  context.log('finished')
+  context.log(state.name.charAt(0).toUpperCase() + state.name.slice(1))
+  context.log('')
+  context.log(' Status:')
+  context.log('')
+  context.log('   Successfully deployed')
+  context.log('')
+  context.log(' Functions:')
+  context.log('')
+  for (var f in state.back.functions) {
+    let fn = state.back.functions[f]
+    context.log(`    - ${fn.name}`)
+  }
   context.log('')
 
   return {}
