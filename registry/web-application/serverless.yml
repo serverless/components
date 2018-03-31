@@ -1,0 +1,16 @@
+type: web-application
+
+inputTypes:
+  name:
+    type: string
+    required: false
+  front:
+    type: object
+    required: false
+    default: ./app/frontend
+  back:
+    type: object
+    required: true
+  global:
+    type: object
+    required: false

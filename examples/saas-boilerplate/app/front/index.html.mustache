@@ -1,0 +1,263 @@
+<html>
+  <head>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="57x57" href="assets/favicons/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="assets/favicons/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="assets/favicons/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="assets/favicons/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="assets/favicons/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="assets/favicons/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="assets/favicons/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="assets/favicons/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/favicons/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/favicons/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="assets/favicons/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicons/favicon-16x16.png">
+    <link rel="manifest" href="/favicons/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/favicons/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- Styles -->
+    <style>
+      * {
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+      }
+      @font-face {
+        font-family: 'Serverless';
+        src: url('assets/fonts/serverless-regular.woff2') format('woff2'),
+            url('assets/fonts/serverless-regular.woff') format('woff');
+        font-weight: normal;
+        font-style: normal;
+      }
+      html, body {
+        font-family: Helvetica, Arial, sans-serif;
+        background: #f3f3f3;
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      h1, h2, h3, h4, h5, h6, .serverless-font {
+        font-family: 'Serverless';
+      }
+      a, a:visited {
+        color: #F15953;
+        text-decoration: none;
+      }
+      a:hover {
+        color: #ffffff;
+        cursor: pointer;
+      }
+      .nav-wrapper, .page-wrapper {
+        display: flex;
+        max-width: 1020px;
+        margin: 0 auto;
+        padding: 0px 20px;
+      }
+
+      /* Navigation */
+      nav {
+        padding: 20px 0px;
+        background: #000000;
+        font-family: 'Serverless';
+      }
+      nav .logo-container {
+        width: 25%;
+      }
+      nav .logo {
+        display: flex;
+        flex-flow: row wrap;
+      }
+      nav .logo-top {
+        width: 100%;
+        text-align: left;
+        font-size:16px;
+        color: #F15953;
+        margin-bottom: -10px;
+      }
+      nav .logo-bottom {
+        width: 100%;
+        text-align: left;
+        font-size: 40px;
+        color: #ffffff;
+      }
+      nav .links {
+        display: flex;
+        justify-content: flex-end;
+        width: 75%;
+        list-style: none;
+        margin: 0;
+      }
+      nav .links li {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0px 10px;
+      }
+
+      /* Page */
+      .page-wrapper {
+        flex-flow: row wrap;
+      }
+      .page-title {
+        margin-bottom: 30px;
+        color: #000000;
+      }
+      #products {
+        display: flex;
+        width: 100%;
+        max-width: 100%;
+        align-items: flex-start;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+      }
+      .product {
+        width: 100%;
+        padding: 40px 35px;
+        background-color: #ffffff;
+        border-radius: 0px;
+        margin-bottom: 20px;
+        border: 1px solid #d3d3d3;
+        box-shadow: 0px 0px 4px #eaeaea;
+        color: #000000;
+      }
+      .product h2 {
+        padding-top: 0px;
+        margin-top: 0px;
+        color: #F15953;
+      }
+      .product-price {
+        color: #aaa;
+        font-weight: 500;
+        margin-top: 20px;
+        display: block;
+      }
+
+      /* Loader */
+      .loader-wrapper {
+        display: block;
+        padding: 25px 0;
+        margin: 1% 0 1% 1.6%;
+      }
+      #loader {
+        top: 40px;
+        left: -2.5px;
+      }
+      #loader span{
+        display: inline-block;
+        width: 5px;
+        height: 20px;
+        background-color: #F15953;
+      }
+      #loader span:nth-child(1){
+        animation: grow 1s ease-in-out infinite;
+      }
+      #loader span:nth-child(2){
+        animation: grow 1s ease-in-out 0.15s infinite;
+      }
+      #loader span:nth-child(3){
+        animation: grow 1s ease-in-out 0.30s infinite;
+      }
+      #loader span:nth-child(4){
+        animation: grow 1s ease-in-out 0.45s infinite;
+      }
+      @keyframes grow{
+        0%, 100%{
+          -webkit-transform: scaleY(1);
+          -ms-transform: scaleY(1);
+          -o-transform: scaleY(1);
+          transform: scaleY(1);
+        }
+
+        50%{
+          -webkit-transform: scaleY(1.8);
+          -ms-transform: scaleY(1.8);
+          -o-transform: scaleY(1.8);
+          transform: scaleY(1.8);
+        }
+      }
+      @media (max-width: 990px) {
+        .product {
+          width: 45%;
+          margin-right: 30px;
+        }
+      }
+      @media (max-width: 768px) {
+        .page-wrapper {
+          padding: 30px 25px;
+          padding-top: 10px;
+        }
+        .product {
+          width: 100%;
+          margin-right: 0px;
+          margin-bottom: 30px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+
+    <!-- Navigation -->
+    <nav>
+      <div class="nav-wrapper">
+        <div class="logo-container">
+          <div class="logo">
+            <div class="serverless-font logo-top">serverless</div>
+            <div class="serverless-font logo-bottom">retail</div>
+          </div>
+        </div>
+        <ul class="links">
+          <li><a href="#">home</a></li>
+          <li><a href="#">about</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class='page-wrapper'>
+      <div>
+        <h1 class='page-title'>Products</h1>
+      </div>
+      <div id="products">
+
+        <!-- Loader -->
+        <div class='loader-wrapper'>
+          <div class="loader" id="loader">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <script type="text/javascript">
+      var productList = $('#products')
+      $.get("{{{apiUrl}}}catalog/all", function(products) {
+        productList.empty()
+        $(document).ready(function() {
+          if (products && products.length) {
+            for(var i in products) {
+              var product = products[i]
+              var productTitle = "<div class='product-title'><h2>" + product.name + "</h2></div>"
+              var productDescription = "<div class='product-desc'><p>" + product.description + "</p></div>"
+              var productPrice = "<div class='product-price'>$" + product.price + "</div>"
+              productList.append("<div class='product' id='product-id-"+product.id+"'>" + productTitle + productDescription + productPrice + "</div>")
+            }
+          } else {
+            productList.append("<div>No products found.</div>")
+          }
+        });
+     });
+    </script>
+  </body>
+</html>
