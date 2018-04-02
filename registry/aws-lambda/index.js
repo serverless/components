@@ -117,6 +117,8 @@ const deploy = async (inputs, context) => {
 }
 
 const remove = async (inputs, context) => {
+  if (!context.state.name) return { arn: null }
+
   if (context.state.defaultRole) {
     const defaultRoleComponent = await context.load('aws-iam-role', 'defaultRole', {
       name: context.state.defaultRole.name,
