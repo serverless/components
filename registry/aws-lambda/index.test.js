@@ -181,7 +181,8 @@ describe('aws-lambda tests', () => {
   })
 
   it('should deploy iam component when no role is provided', async () => {
-    const loadMock = jest.fn().mockReturnValue({ deploy: () => ({ arn: 'abc:xyz' }) })
+    const loadDeployMock = jest.fn().mockReturnValue({ arn: 'abc:xyz' })
+    const loadMock = jest.fn().mockReturnValue({ deploy: loadDeployMock })
     const lambdaContextMock = {
       state: {},
       archive: {},
@@ -204,9 +205,48 @@ describe('aws-lambda tests', () => {
       name: `${inputs.name}-execution-role`,
       service: 'lambda.amazonaws.com'
     })
+    expect(loadDeployMock).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.createFunctionMock).toHaveBeenCalledTimes(3)
     expect(outputs.arn).toEqual('abc:xyz')
     expect(outputs.roleArn).toEqual('abc:xyz')
+    expect(lambdaContextMock.saveState).toHaveBeenCalledTimes(1)
+  })
+
+  it('should remove iam component when no role is provided', async () => {
+    const loadRemoveMock = jest.fn().mockReturnValue({ arn: null })
+    const loadMock = jest.fn().mockReturnValue({ remove: loadRemoveMock })
+
+    const inputs = {
+      name: 'some-lambda-name',
+      memory: 512,
+      timeout: 10,
+      handler: 'handle.code'
+    }
+
+    const lambdaContextMock = {
+      state: {
+        name: 'some-lambda-name',
+        defaultRole: {
+          name: `${inputs.name}-execution-role`,
+          service: 'lambda.amazonaws.com'
+        }
+      },
+      archive: {},
+      log: () => {},
+      saveState: jest.fn(),
+      load: loadMock
+    }
+
+    const outputs = await lambdaComponent.remove(inputs, lambdaContextMock)
+
+    expect(AWS.Lambda).toHaveBeenCalledTimes(1)
+    expect(loadMock).toBeCalledWith('aws-iam-role', 'defaultRole', {
+      name: `${inputs.name}-execution-role`,
+      service: 'lambda.amazonaws.com'
+    })
+    expect(loadRemoveMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.deleteFunctionMock).toHaveBeenCalledTimes(3)
+    expect(outputs.arn).toEqual(null)
     expect(lambdaContextMock.saveState).toHaveBeenCalledTimes(1)
   })
 })
