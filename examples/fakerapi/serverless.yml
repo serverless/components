@@ -1,0 +1,19 @@
+type: faker-api
+
+components:
+  createFakerData:
+    type: aws-lambda
+    inputs:
+      memory: 512
+      timeout: 10
+      handler: faker.create
+      root: ${self.path}/code
+  fakerApi:
+    type: rest-api
+    inputs:
+      gateway: aws-apigateway
+      routes:
+        /faker:
+          post:
+            function: ${createFakerData}
+            cors: true
