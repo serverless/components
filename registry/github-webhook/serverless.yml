@@ -1,23 +1,23 @@
 type: github-webhook
 
 inputTypes:
-  token:
+  githubApiToken:
+    displayName: Github API Token
+    description: |
+      Github personal access token needed for access to the github API. [Create a token](https://github.com/settings/tokens)
     type: string
-    description: Github API Token
     required: true
-  owner:
+  githubRepo:
+    displayName: Github Repository
+    description: URL of github repo
     type: string
-    description: Github repo owner username
     required: true
-  repo:
+  payloadUrl:
     type: string
-    description: Github repo name
-    required: true
-  url:
-    type: string
-    description: URL of webhook
+    displayName: URL of webhook
     required: true
   events:
     type: array
+    displayName: Github webhook events
     description: What type of event(s) will trigger the webhook URL
     required: true

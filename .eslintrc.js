@@ -21,6 +21,7 @@ module.exports = {
     'no-param-reassign': 'off',
     'no-use-before-define': 'off',
     'prefer-destructuring': 'off',
+    'object-curly-newline': 'off',
     semi: ['error', 'never'],
     'object-shorthand': 'off'
   }

@@ -1,0 +1,16 @@
+{
+  "name": "github-webhook",
+  "version": "1.0.0",
+  "description": "<!-- AUTO-GENERATED-CONTENT:START (COMPONENT_TITLE) --> TITLE <!-- AUTO-GENERATED-CONTENT:END -->",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@octokit/rest": "^15.2.6",
+    "parse-github-url": "^1.0.2",
+    "ramda": "^0.25.0"
+  }
+}

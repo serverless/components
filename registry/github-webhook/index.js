@@ -1,20 +1,22 @@
 const octokit = require('@octokit/rest')()
 const R = require('ramda')
+const parseGithubUrl = require('parse-github-url')
 const diffValues = require('./diff')
 
-const createWebhook = async ({ token, owner, repo, url, events }) => { // eslint-disable-line
-
+const createWebhook = async ({ githubApiToken, githubRepo, payloadUrl, events }) => {
   octokit.authenticate({
     type: 'token',
-    token: token || process.env.GITHUB_TOKEN
+    token: githubApiToken || process.env.GITHUB_TOKEN
   })
+
+  const gh = parseGithubUrl(githubRepo)
 
   const params = {
     name: 'web',
-    owner: owner,
-    repo: repo,
+    owner: gh.owner,
+    repo: gh.name,
     config: {
-      url,
+      url: payloadUrl,
       content_type: 'json'
     },
     events: events,
@@ -26,20 +28,21 @@ const createWebhook = async ({ token, owner, repo, url, events }) => { // eslint
   return res.data
 }
 
-const updateWebhook = async ({ token, owner, repo, url, events }, id) => { // eslint-disable-line
-
+const updateWebhook = async ({ githubApiToken, githubRepo, payloadUrl, events }, id) => {
   octokit.authenticate({
     type: 'token',
-    token: token || process.env.GITHUB_TOKEN
+    token: githubApiToken || process.env.GITHUB_TOKEN
   })
+
+  const gh = parseGithubUrl(githubRepo)
 
   const params = {
     name: 'web',
     id: id,
-    owner: owner,
-    repo: repo,
+    owner: gh.owner,
+    repo: gh.name,
     config: {
-      url: url,
+      url: payloadUrl,
       content_type: 'json'
     },
     events: events,
@@ -51,13 +54,19 @@ const updateWebhook = async ({ token, owner, repo, url, events }, id) => { // es
   return res.data
 }
 
-const deleteWebhook = async ({ token, owner, repo }, id) => {
+const deleteWebhook = async ({ githubApiToken, githubRepo }, id) => {
   octokit.authenticate({
     type: 'token',
-    token: token || process.env.GITHUB_TOKEN
+    token: githubApiToken || process.env.GITHUB_TOKEN
   })
 
-  await octokit.repos.deleteHook({ owner, repo, id })
+  const gh = parseGithubUrl(githubRepo)
+
+  await octokit.repos.deleteHook({
+    owner: gh.owner,
+    repo: gh.name,
+    id: id
+  })
 
   return {}
 }
@@ -67,16 +76,17 @@ const deploy = async (inputs, context) => {
   const componentData = compareInputsToState(inputs, context.state)
   const inputsChanged = !componentData.isEqual
   const defaultOutputs = { ...inputs, ...context.state }
+  const githubData = parseGithubUrl(inputs.githubRepo)
 
   /* No state found, run create flow */
   if (!componentData.hasState) {
-    context.log(`${context.type}: ○ Creating Github Webhook for "${getRepoSlug(inputs)}"`)
+    context.log(`${context.type}: ○ Creating Github Webhook for "${githubData.repo}" repo`)
     const creationOutputs = await createWebhook(inputs)
     const creationOutputsData = {
       github: creationOutputs
     }
-    context.log(`${context.type}: ✓ Created Github Webhook for "${getRepoSlug(inputs)}"`)
-    context.log(`See hook in https://github.com/${inputs.owner}/${inputs.repo}/settings/hooks`)
+    context.log(`${context.type}: ✓ Created Github Webhook for "${githubData.repo}" repo`)
+    context.log(`See hook in https://github.com/${githubData.repo}/settings/hooks`)
     // Save state
     const createState = { ...inputs, ...creationOutputsData }
     context.saveState(createState)
@@ -85,7 +95,7 @@ const deploy = async (inputs, context) => {
 
   /* Has state, run update flow if inputsChanged */
   if (inputsChanged) {
-    context.log(`${context.type}: ○ Updating Github Webhook for "${getRepoSlug(inputs)}"\n`)
+    context.log(`${context.type}: ○ Updating Github Webhook for "${githubData.repo}"\n`)
 
     // Log out diffs
     componentData.keys.forEach((item) => {
@@ -93,8 +103,9 @@ const deploy = async (inputs, context) => {
       const currentState = componentData.diffs[item].state
       const diff = diffValues(newInput, currentState)
       if (diff) {
-        context.log(`${context.type}: Property "${item}" changed from '${currentState}' to '${newInput}'`)
+        context.log(`${context.type}: Property "${item}" changed`)
         context.log(`${diff}\n`)
+        //  from '${currentState}' to '${newInput}'
       }
     })
 
@@ -105,18 +116,19 @@ const deploy = async (inputs, context) => {
     }
 
     // If repo url has changed. Delete old webhook and make a new one in new repo
-    if (componentData.keys.includes('repo') || componentData.keys.includes('owner')) {
+    if (componentData.keys.includes('githubRepo')) {
       // First delete old webhook
-      context.log(`${context.type}: Delete old webhook "${context.state.owner}/${context.state.repo}"`)
+      const oldGithubData = parseGithubUrl(context.state.githubRepo)
+      context.log(`${context.type}: Delete old webhook in "${oldGithubData.repo}" repo`)
       await deleteWebhook(context.state, context.state.github.id)
       // Then create new webhook at new repo
-      context.log(`${context.type}: ○ Creating Github Webhook for "${getRepoSlug(inputs)}"`)
+      context.log(`${context.type}: ○ Creating Github Webhook for "${githubData.repo}" repo`)
       const creationOutputs = await createWebhook(inputs)
       const creationOutputsData = {
         github: creationOutputs
       }
-      context.log(`${context.type}: ✓ Created Github Webhook for "${getRepoSlug(inputs)}"`)
-      context.log(`   See hook in https://github.com/${inputs.owner}/${inputs.repo}/settings/hooks`)
+      context.log(`${context.type}: ✓ Created Github Webhook for "${githubData.repo}" repo`)
+      context.log(`   See hook in https://github.com/${githubData.repo}/settings/hooks`)
       // Save state
       const createState = { ...inputs, ...creationOutputsData }
       context.saveState(createState)
@@ -128,8 +140,8 @@ const deploy = async (inputs, context) => {
     const updateOutputsData = {
       github: updateOutputs
     }
-    context.log(`${context.type}: ✓ Updated Github Webhook in "${getRepoSlug(inputs)}"`)
-    context.log(`   See hook in ${getRepoUrl(inputs)}`)
+    context.log(`${context.type}: ✓ Updated Github Webhook in "${githubData.repo}" repo`)
+    context.log(`   See hook in https://github.com/${githubData.repo}/settings/hooks`)
     // Save state
     const updateState = { ...inputs, ...updateOutputsData }
     context.saveState(updateState)
@@ -142,23 +154,16 @@ const deploy = async (inputs, context) => {
 
 const remove = async (inputs, context) => {
   const defaultOutputs = { ...inputs, ...context.state }
-  context.log(`${context.type}: ◌ Removing Github Webhook from repo "${getRepoUrl(inputs)}"`)
+  const githubData = parseGithubUrl(inputs.githubRepo)
+  context.log(`${context.type}: ◌ Removing Github Webhook from repo "${githubData.repo}"`)
   if (!webhookExists(context)) {
     // No webhook id found. Bail
     return defaultOutputs
   }
   const outputs = await deleteWebhook(context.state, context.state.github.id)
-  context.log(`${context.type}: ✓ Removed Github Webhook from repo "${getRepoSlug(inputs)}"`)
+  context.log(`${context.type}: ✓ Removed Github Webhook from repo "${githubData.repo}"`)
   context.saveState()
   return outputs
-}
-
-function getRepoSlug(inputs) {
-  return `${inputs.owner}/${inputs.repo}`
-}
-
-function getRepoUrl(inputs) {
-  return `https://github.com/${inputs.owner}/${inputs.repo}/settings/hooks`
 }
 
 function webhookExists(context) {
