@@ -1,11 +1,8 @@
 {
   "name": "@serverless/github-webhook-aws",
   "version": "0.1.0",
-  "description": "REST API component.",
+  "description": "Github webhook component using AWS API gateway",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "author": "serverless.com",
   "license": "MIT"
 }
