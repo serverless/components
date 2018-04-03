@@ -11,7 +11,7 @@ components:
     type: github-webhook-aws
     inputs:
       function: ${webhookFunction}
-      githubRepo: DavidTron5000/other-repo
-      githubApiToken: xx
+      githubRepo: serverless/serverless
+      githubApiToken: xxxxxxxxxxxxx
       webhookTriggers:
         - create
