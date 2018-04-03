@@ -6,6 +6,8 @@ module.exports.githubFunction = (event, context, callback) => {
     headers: {
       'Content-Type': 'application/json'
     },
-    body: 'created'
+    body: JSON.stringify({
+      status: '⊂◉‿◉つ'
+    })
   })
 }
