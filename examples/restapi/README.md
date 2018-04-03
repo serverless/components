@@ -1,4 +1,4 @@
-# Faker
+# Example: Rest API
 
 An example REST API application composed of a few serverless components. The REST API exposes one route `POST /faker` that takes a `category`, a `item` and an optional `locale` attribute, and returns fake data. The application is deployable to AWS.
 
