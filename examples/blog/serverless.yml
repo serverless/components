@@ -6,7 +6,7 @@ components:
     inputs:
       name: blog-site
       contentPath: ${self.path}/site
-      templateValues: null
+      templateValues: {}
       contentIndex: index.html
       contentError: error.html
       hostingRegion: us-east-1
