@@ -26,7 +26,3 @@ To remove the application and delete all dependent resources automatically, simp
 ```
 $ components remove
 ```
-
-### Rollback
-
-If the `deploy` or `remove` commands fail for some reason, the system will automatically `rollback` to the previous _good state_ of the application.
