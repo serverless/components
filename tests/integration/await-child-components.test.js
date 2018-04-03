@@ -59,8 +59,12 @@ describe('Integration Test - Await child components', () => {
       expect(awaitChildComponents).toHaveProperty('instanceId')
       expect(awaitChildComponents).toHaveProperty('type', 'await-child-components')
       expect(awaitChildComponents).toHaveProperty('internallyManaged', false)
-      expect(awaitChildComponents).toHaveProperty('state')
-      expect(awaitChildComponents.state.myFunction).toHaveProperty('outputs', {
+      expect(awaitChildComponents).toHaveProperty(
+        'state.myFunction.state.id',
+        'id:function:my-function'
+      )
+      expect(awaitChildComponents).toHaveProperty('state.myFunction.state.deploymentCounter', 1)
+      expect(awaitChildComponents).toHaveProperty('state.myFunction.outputs', {
         id: 'id:function:my-function',
         name: 'my-function',
         memorySize: 512,
