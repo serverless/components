@@ -6,7 +6,7 @@ const diffValues = require('./diff')
 const createWebhook = async ({ githubApiToken, githubRepo, payloadUrl, events }) => {
   octokit.authenticate({
     type: 'token',
-    token: githubApiToken || process.env.GITHUB_TOKEN
+    token: githubApiToken
   })
 
   const gh = parseGithubUrl(githubRepo)
@@ -31,7 +31,7 @@ const createWebhook = async ({ githubApiToken, githubRepo, payloadUrl, events })
 const updateWebhook = async ({ githubApiToken, githubRepo, payloadUrl, events }, id) => {
   octokit.authenticate({
     type: 'token',
-    token: githubApiToken || process.env.GITHUB_TOKEN
+    token: githubApiToken
   })
 
   const gh = parseGithubUrl(githubRepo)
