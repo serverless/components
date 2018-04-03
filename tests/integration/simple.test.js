@@ -21,7 +21,7 @@ async function removeStateFiles(stateFiles) {
 describe('Integration Test - Simple', () => {
   jest.setTimeout(20000)
 
-  const testDir = path.dirname(require.main.filename)
+  const testDir = path.dirname(__filename)
   const componentsExec = path.join(testDir, '..', '..', 'bin', 'components')
   const testServiceDir = path.join(testDir, 'simple')
   const testServiceStateFile = path.join(testServiceDir, 'state.json')

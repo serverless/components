@@ -1,7 +1,7 @@
 const { is } = require('ramda')
 const generateContext = require('./generateContext')
 const resolvePostExecutionVars = require('../variables/resolvePostExecutionVars')
-const getInputs = require('../state/getInputs')
+const { getInputs, getState } = require('../state')
 
 const executeComponent = async (
   componentId,
@@ -28,6 +28,7 @@ const executeComponent = async (
     component.outputs = (await func(component.inputs, context)) || {}
     component.executed = true
   }
+  component.state = getState(stateFile, component.id)
 
   component.promise.resolve(component)
 
