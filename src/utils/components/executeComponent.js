@@ -13,7 +13,6 @@ const executeComponent = async (
   rollback = false
 ) => {
   const component = components[componentId]
-  const context = generateContext(components, component, stateFile, archive, options, command)
   component.inputs = resolvePostExecutionVars(component.inputs, components)
 
   if (rollback) {
@@ -21,6 +20,11 @@ const executeComponent = async (
     stateFile[componentId] = archive[componentId]
   } else if (command === 'remove') {
     component.inputs = getInputs(stateFile, componentId)
+  }
+
+  const context = generateContext(components, component, stateFile, archive, options, command)
+
+  if (command === 'remove') {
     if (isEmpty(context.state)) {
       return component
     }
