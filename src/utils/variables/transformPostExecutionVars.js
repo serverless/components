@@ -20,7 +20,6 @@ module.exports = (slsYml) => {
             console.log(`Error: Unable to find "${referencedComponentAlias}" variable reference in ${slsYml.type} component.
 Please double check spelling of reference in ${slsYml.type} component.`)
             /* eslint-enable */
-            // process.exit(1)
           }
           const componentId = slsYml.components[referencedComponentAlias].id
           referencedVariable[0] = componentId
