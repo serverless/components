@@ -4,7 +4,7 @@ node_js:
 - 8
 install:
 - npm install
-- pushd examples/fakerapi/code && npm install && popd
+- pushd examples/restapi/code && npm install && popd
 script:
 - npm run lint
 - npm test
