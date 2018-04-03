@@ -6,19 +6,22 @@ const util = require('util')
 
 dynamo.AWS.config.update({ region: 'us-east-1' })
 
-const findTableByName = (tables, tableName) => { // eslint-disable-line arrow-body-style
+const findTableByName = (tables, tableName) => {
+  // eslint-disable-line arrow-body-style
   if (!tables || tables.length === 0) return {}
-  return tables.filter((table) => (table.name === tableName))[0]
+  return tables.filter((table) => table.name === tableName)[0]
 }
 
-const findOutputTableByName = (tables, tableName) => { // eslint-disable-line arrow-body-style
+const findOutputTableByName = (tables, tableName) => {
+  // eslint-disable-line arrow-body-style
   if (!tables || tables.length === 0) return {}
-  return tables.filter((table) => (table[tableName]))[0]
+  return tables.filter((table) => table[tableName])[0]
 }
 
-const removeOutputTableByName = (tables, tableName) => { // eslint-disable-line arrow-body-style
+const removeOutputTableByName = (tables, tableName) => {
+  // eslint-disable-line arrow-body-style
   if (!tables || tables.length === 0) return { ddbtables: [] }
-  const val = tables.filter((table) => (!table[tableName]))[0]
+  const val = tables.filter((table) => !table[tableName])[0]
   if (val) {
     return { ddbtables: [ val ] }
   }
@@ -101,7 +104,7 @@ const defineTable = (table) => {
   const vIndexes = table.indexes
   const vSchema = table.schema
   const vOptions = table.options
-  const nativeSchema = (vSchema) ? convertInputSchemaToNativeSchema(vSchema) : null
+  const nativeSchema = vSchema ? convertInputSchemaToNativeSchema(vSchema) : null
   let params = {
     hashKey: table.hashKey,
     rangeKey: table.rangeKey,
@@ -177,18 +180,20 @@ const insertItem = (inputs, state, tableName, data) => {
   const table = findTableByName(inputs.tables, tableName)
   const itemData = JSON.parse(data)
   const model = defineTable(table)
-  let modelDataAttrs = {}
   if (model) {
-    model.create(itemData, (err, modelIns) => {
-      if (err) {
-        console.log(`Error inserting item to table: '${table.name}'\n${err.message}`)
-      } else {
-        modelDataAttrs = JSON.stringify(modelIns.attrs)
-        console.log(`Item inserted to table: '${table.name}'\n${modelDataAttrs}`)
-      }
+    return new Promise((resolve, reject) => {
+      model.create(itemData, (err, modelIns) => {
+        if (err) {
+          reject(new Error(`Error inserting item to table: '${table.name}'\n${err.message}`))
+        } else {
+          const modelDataAttrs = JSON.stringify(modelIns.attrs)
+          console.log(`Item inserted to table: '${table.name}'\n${modelDataAttrs}`)
+          resolve(modelDataAttrs)
+        }
+      })
     })
   }
-  return modelDataAttrs
+  return Promise.resolve({})
 }
 
 const deleteItem = (inputs, state, tableName, data) => {
@@ -196,42 +201,49 @@ const deleteItem = (inputs, state, tableName, data) => {
   const keyData = JSON.parse(data)
   const model = defineTable(table)
   if (model) {
-    model.destroy(keyData, (err) => {
-      if (err) {
-        console.log(`Error deleting item from table: '${table.name}'\n${err.message}`)
-      } else {
-        console.log(`Item deleted from table: '${table.name}'`)
-      }
+    return new Promise((resolve, reject) => {
+      model.destroy(keyData, (err) => {
+        if (err) {
+          reject(new Error(`Error deleting item from table: '${table.name}'\n${err.message}`))
+        } else {
+          console.log(`Item deleted from table: '${table.name}'`)
+          resolve()
+        }
+      })
     })
   }
-  return {}
+  return Promise.resolve({})
 }
 
 const getItem = (inputs, state, tableName, data) => {
   const table = findTableByName(inputs.tables, tableName)
   const keyData = JSON.parse(data)
   const model = defineTable(table)
-  let modelDataAttrs = {}
   if (model) {
-    model.get(keyData, (err, modelIns) => {
-      if (err) {
-        console.log(`Error retrieving item from table: '${table.name}'\n${err.message}`)
-      } else {
-        modelDataAttrs = JSON.stringify(modelIns.attrs)
-        console.log(`Item retrieved from table: '${table.name}'\n${modelDataAttrs}`)
-      }
+    return new Promise((resolve, reject) => {
+      model.get(keyData, (err, modelIns) => {
+        if (err) {
+          reject(new Error(`Error retrieving item from table: '${table.name}'\n${err.message}`))
+        } else {
+          const modelDataAttrs = JSON.stringify(modelIns.attrs)
+          console.log(`Item retrieved from table: '${table.name}'\n${modelDataAttrs}`)
+          resolve(modelDataAttrs)
+        }
+      })
     })
   }
-  return modelDataAttrs
+  return Promise.resolve({})
 }
 
 // Public methods
 const deploy = async (inputs, context) => {
   let outputs = context.state
 
-  if (!context.state ||
-      !context.state.ddbtables ||
-      context.state.ddbtables.length !== inputs.tables.length) {
+  if (
+    !context.state ||
+    !context.state.ddbtables ||
+    context.state.ddbtables.length !== inputs.tables.length
+  ) {
     // TODO: Fix creating multiple tables on deploy. Restrict to one table for now
     if (inputs.tables.length > 1) {
       context.log('Cannot deploy multiple tables at this time. Please update your inputs and try again...')
@@ -247,8 +259,7 @@ const deploy = async (inputs, context) => {
 }
 
 const remove = async (inputs, context) => {
-  if (!context.state.ddbtables ||
-       context.state.ddbtables.length === 0) return {}
+  if (!context.state.ddbtables || context.state.ddbtables.length === 0) return {}
 
   let tableName
   if (context.options && context.options.tablename) {
@@ -277,11 +288,15 @@ const remove = async (inputs, context) => {
 const insert = async (inputs, context) => {
   let outputs = context.state
 
-  if (!context.state.ddbtables ||
-       context.state.ddbtables.length === 0) return {}
+  if (!context.state.ddbtables || context.state.ddbtables.length === 0) return {}
 
   if (context.options && context.options.tablename && context.options.itemdata) {
-    outputs = insertItem(inputs, context.state, context.options.tablename, context.options.itemdata)
+    outputs = await insertItem(
+      inputs,
+      context.state,
+      context.options.tablename,
+      context.options.itemdata
+    )
   } else {
     context.log('Incorrect or insufficient parameters. \nUsage: insert --tablename <tablename> --itemdata <data in json format>')
   }
@@ -291,11 +306,15 @@ const insert = async (inputs, context) => {
 const destroy = async (inputs, context) => {
   let outputs = context.state
 
-  if (!context.state.ddbtables ||
-       context.state.ddbtables.length === 0) return {}
+  if (!context.state.ddbtables || context.state.ddbtables.length === 0) return {}
 
   if (context.options && context.options.tablename && context.options.keydata) {
-    outputs = deleteItem(inputs, context.state, context.options.tablename, context.options.keydata)
+    outputs = await deleteItem(
+      inputs,
+      context.state,
+      context.options.tablename,
+      context.options.keydata
+    )
   } else {
     context.log('Incorrect or insufficient parameters. \nUsage: destroy --tablename <tablename> --keydata <hashkey and rangekey key/value pairs in json format>')
   }
@@ -305,11 +324,15 @@ const destroy = async (inputs, context) => {
 const get = async (inputs, context) => {
   let outputs = context.state
 
-  if (!context.state.ddbtables ||
-       context.state.ddbtables.length === 0) return {}
+  if (!context.state.ddbtables || context.state.ddbtables.length === 0) return {}
 
   if (context.options && context.options.tablename && context.options.keydata) {
-    outputs = getItem(inputs, context.state, context.options.tablename, context.options.keydata)
+    outputs = await getItem(
+      inputs,
+      context.state,
+      context.options.tablename,
+      context.options.keydata
+    )
   } else {
     context.log('Incorrect or insufficient parameters. \nUsage: get --tablename <tablename> --keydata <hashkey and rangekey key/value pairs in json format>')
   }
