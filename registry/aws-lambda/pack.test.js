@@ -13,17 +13,11 @@ describe('#pack()', () => {
   let packagePath
 
   beforeEach(async () => {
-    packagePath = path.join(
-      os.tmpdir(),
-      crypto.randomBytes(6).toString('hex')
-    )
-    tempPath = path.join(
-      os.tmpdir(),
-      crypto.randomBytes(6).toString('hex')
-    )
+    packagePath = path.join(os.tmpdir(), crypto.randomBytes(6).toString('hex'))
+    tempPath = path.join(os.tmpdir(), crypto.randomBytes(6).toString('hex'))
     await fsp.ensureDirAsync(packagePath)
     await fsp.ensureDirAsync(tempPath)
-    fsp.writeJsonSync(path.join(packagePath, 'foo.json'), {
+    await fsp.writeJsonAsync(path.join(packagePath, 'foo.json'), {
       key1: 'value1',
       key2: 'value2'
     })
@@ -38,7 +32,7 @@ describe('#pack()', () => {
     }))
     const jsonFile = files.filter((file) => file.name === 'foo.json').pop()
 
-    expect(files.length === 1)
+    expect(files.length).toEqual(1)
     expect(JSON.parse(jsonFile.content.toString('utf8'))).toEqual({
       key1: 'value1',
       key2: 'value2'
