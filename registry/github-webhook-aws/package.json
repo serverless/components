@@ -1,0 +1,8 @@
+{
+  "name": "@serverless/github-webhook-aws",
+  "version": "0.1.0",
+  "description": "Github webhook component using AWS API gateway",
+  "main": "index.js",
+  "author": "serverless.com",
+  "license": "MIT"
+}

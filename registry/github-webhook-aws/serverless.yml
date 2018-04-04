@@ -1,0 +1,42 @@
+type: github-webhook-aws
+
+inputTypes:
+  function:
+    type: string
+    required: true
+  githubApiToken:
+    type: string
+    required: true
+    description: |
+      Github personal access token needed for access to the github API.
+      [Create a token](https://github.com/settings/tokens)
+    example: 2c5acc7de3b140ser3114fd40a24vd5ie3d843b5
+  githubRepo:
+    type: string
+    required: true
+    displayName: Github Repository
+    description: URL of github repo
+    example: https://github.com/serverless/serverless-components/
+  webhookTriggers:
+    type: array
+    required: true
+    example:
+      - create
+
+components:
+  GithubWebhook:
+    type: github-webhook
+    inputs:
+      githubApiToken: ${input.githubApiToken}
+      githubRepo: ${input.githubRepo}
+      payloadUrl: ${webhookEndpoint.url}/webhook
+      events: ${input.webhookTriggers}
+  webhookEndpoint:
+    type: rest-api
+    inputs:
+      gateway: aws-apigateway
+      routes:
+        /webhook: # routes begin with a slash
+          post: # HTTP method names are used to attach handlers
+            function: ${input.function}
+            cors: true

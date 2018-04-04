@@ -1,0 +1,31 @@
+type: github-webhook
+
+inputTypes:
+  githubApiToken:
+    type: string
+    required: true
+    displayName: Github API Token
+    description: |
+      Github personal access token needed for access to the github API.
+      [Create a token](https://github.com/settings/tokens)
+    example: 2c5acc7de3b140ser3114fd40a24vd5ie3d843b5
+  githubRepo:
+    type: string
+    required: true
+    displayName: Github Repository
+    description: URL of github repo
+    example: https://github.com/serverless/serverless-components/
+  payloadUrl:
+    type: string
+    required: true
+    displayName: Payload Url
+    example: https://your-webhook-url-to-trigger-from-repo.com/
+  events:
+    type: array
+    required: true
+    displayName: Github webhook events
+    description: |
+      What type of event(s) will trigger the webhook URL.
+      List of allowed events. For more details on events & payloads [see the docs](https://developer.github.com/v3/activity/events/types/)
+    example:
+      - create

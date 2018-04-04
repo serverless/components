@@ -19,6 +19,10 @@ module.exports = {
     'comma-dangle': ['error', 'never'],
     'func-names': 'off',
     'no-param-reassign': 'off',
-    semi: ['error', 'never']
+    'no-use-before-define': 'off',
+    'prefer-destructuring': 'off',
+    'object-curly-newline': 'off',
+    semi: ['error', 'never'],
+    'object-shorthand': 'off'
   }
 }
