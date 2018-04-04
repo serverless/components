@@ -26,12 +26,13 @@ module.exports = async (eventName, data = {}) => {
     throw new Error('Please provide an event name for tracking')
   }
 
+  const location = await getLocation()
 
   const payload = {
     event: eventName,
     userId: userId || frameworkId,
     location: await getLocation(),
-    properties: { frameworkId, ...data }
+    properties: { frameworkId, location, ...data }
   }
 
   return analytics.track(payload)  // eslint-disable-line
