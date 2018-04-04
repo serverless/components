@@ -25,14 +25,16 @@ describe('Integration Test - Simple', () => {
   const componentsExec = path.join(testDir, '..', '..', 'bin', 'components')
   const testServiceDir = path.join(testDir, 'simple')
   const testServiceStateFile = path.join(testServiceDir, 'state.json')
+  const testRemovalDir = path.join(testDir, 'retry-remove')
+  const testRemovalStateFile = path.join(testServiceDir, 'state.json')
   const FUNCTION_NAME = 'my-function'
 
   beforeAll(async () => {
-    await removeStateFiles([ testServiceStateFile ])
+    await removeStateFiles([ testServiceStateFile, testRemovalStateFile ])
   })
 
   afterAll(async () => {
-    await removeStateFiles([ testServiceStateFile ])
+    await removeStateFiles([ testServiceStateFile, testRemovalStateFile ])
   })
 
   describe('our test setup', () => {
@@ -276,10 +278,34 @@ describe('Integration Test - Simple', () => {
       expect(myRole).toHaveProperty('type', 'tests-integration-iam-mock')
       expect(myRole).toHaveProperty('state', {})
       const myFunction = stateFileContent['simple:myFunction']
-      const myFunctionObjectKeys = Object.keys(myFunction)
-      expect(myFunctionObjectKeys.length).toEqual(2)
       expect(myFunction).toHaveProperty('type', 'tests-integration-function-mock')
       expect(myFunction).toHaveProperty('state', {})
+    })
+  })
+
+  describe('when a component requires multiple removal attempts', () => {
+    it('deploys successfully', async () => {
+      await cpp.execAsync(`${componentsExec} deploy`, {
+        cwd: testRemovalDir
+      })
+      const stateFileContent = await fsp.readJsonAsync(testRemovalStateFile)
+      expect(stateFileContent).toHaveProperty('retry-remove.state.deployed', true)
+    })
+
+    it('keeps its state after the first remove', async () => {
+      await cpp.execAsync(`${componentsExec} remove`, {
+        cwd: testRemovalDir
+      })
+      const stateFileContent = await fsp.readJsonAsync(testRemovalStateFile)
+      expect(stateFileContent).toHaveProperty('retry-remove.state.deployed', true)
+    })
+
+    it('clears its state after the second remove', async () => {
+      await cpp.execAsync(`${componentsExec} remove`, {
+        cwd: testRemovalDir
+      })
+      const stateFileContent = await fsp.readJsonAsync(testRemovalStateFile)
+      expect(stateFileContent).not.toHaveProperty('retry-remove.state.deployed')
     })
   })
 })
