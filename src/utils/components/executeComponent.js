@@ -1,4 +1,6 @@
-const { is, isNil, isEmpty } = require('ramda')
+const {
+  not, is, isNil, isEmpty
+} = require('ramda')
 const generateContext = require('./generateContext')
 const resolvePostExecutionVars = require('../variables/resolvePostExecutionVars')
 const { getInputs, getState } = require('../state')
@@ -49,7 +51,7 @@ const executeComponent = async (
   kind of hackiness. There may be edge cases where this does not work, e.g.
   if the scripted component did not have any state keys to save in the first
   place, but for some reason still has complex removal logic. */
-  if (command === 'remove' && (!is(Function, func) || isNil(component.state))) {
+  if (command === 'remove' && (not(is(Function, func)) || isNil(component.state))) {
     stateFile[componentId] = {
       type: component.type,
       state: {}
