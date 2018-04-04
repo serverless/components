@@ -13,6 +13,16 @@ The sample application is composed of the following components:
 * **REST API**: It creates a REST API for the AWS API Gateway. It takes a structure for the routes, and maps Lambda functions provided to it. The `rest-api` component encapsulates all that functionality.
 * **DynamoDB table**: It creates a DynamoDB table with input parameters like name, keys, indexes, and a model schema. The `aws-dynamodb` component encapsulates all that functionality. See [docs](../../registry/aws-dynamodb/README.md) for details.
 
+
+## Getting Started
+**Note:** Make sure you have Node.js 8+ and npm installed on your machine
+
+1. `npm install --global serverless-components`
+1. Setup the environment variables
+   * `export AWS_ACCESS_KEY_ID=my_access_key_id`
+   * `export AWS_SECRET_ACCESS_KEY=my_secret_access_key`
+
+
 ## Operations
 
 ### Deploy
@@ -30,7 +40,3 @@ To remove the application and delete all dependent resources automatically, simp
 ```
 $ components remove
 ```
-
-### Rollback
-
-If the `deploy` or `remove` commands fail for some reason, the system will automatically `rollback` to the previous _good state_ of the application.
