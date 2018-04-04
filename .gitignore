@@ -14,6 +14,7 @@ results
 # node js
 node_modules
 npm-debug.log
+.npmrc
 
 # IntelliJ resources
 *.iml
