@@ -276,7 +276,7 @@ describe('Integration Test - Simple', () => {
       expect(stateFileContent.$.serviceId).not.toBeFalsy()
       const myRole = stateFileContent['simple:myRole']
       const myRoleObjectKeys = Object.keys(myRole)
-      expect(myRoleObjectKeys.length).toEqual(2)
+      expect(myRoleObjectKeys.length).toEqual(5)
       expect(myRole).toHaveProperty('type', 'tests-integration-iam-mock')
       expect(myRole).toHaveProperty('state', {})
       const myFunction = stateFileContent['simple:myFunction']
