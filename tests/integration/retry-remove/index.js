@@ -1,16 +1,20 @@
-module.exports = {
-  async deploy(inputs, context) {
-    throw new Error('aaaah')
-    console.log('what....')
-    context.saveState({ deployed: true, triedToRemove: false })
-    console.log('why....')
-  }
+async function deploy(inputs, context) {
+  context.saveState({ deployed: true, triedToRemove: false })
+  throw new Error('Soemthing went wrong during deployment...')
+}
 
-  async remove(inputs, context) {
-    if(triedToRemove) {
-      context.saveState()
-    } else {
-      context.saveState({ ...context.state, triedToRemove: true })
-    }
+async function remove(inputs, context) {
+  if (context.state.triedToRemove) {
+    context.saveState()
+  } else {
+    context.saveState({
+      ...context.state,
+      triedToRemove: true
+    })
   }
+}
+
+module.exports = {
+  deploy,
+  remove
 }
