@@ -1,13 +1,9 @@
-const uuid = require('uuid')
 const path = require('path')
 const Analytics = require('analytics-node')
 const getConfig = require('../config/getConfig')
 const fileExists = require('../fs/fileExists')
 const readFile = require('../fs/readFile')
-
-// commented out because fetching location adds 1-2 seconds delay
-// do we want it for tracking?
-// const getLocation = require('./getLocation')
+const getLocation = require('./getLocation')
 
 module.exports = async (eventName, data = {}) => {
   const trackingFilePath = path.resolve(__dirname, '..', '..', '..', 'tracking-config.json')
@@ -33,8 +29,8 @@ module.exports = async (eventName, data = {}) => {
 
   const payload = {
     event: eventName,
-    userId: userId || uuid.v1(),
-    // location: await getLocation(),
+    userId: userId || frameworkId,
+    location: await getLocation(),
     properties: { frameworkId, ...data }
   }
 

@@ -1,7 +1,10 @@
+const AWS = require('aws-sdk')
 const BbPromise = require('bluebird')
 const { equals } = require('ramda')
 
-const attachRolePolicy = async ({ name, policy }, IAM) => {
+const IAM = new AWS.IAM({ region: 'us-east-1' })
+
+const attachRolePolicy = async ({ name, policy }) => {
   await IAM.attachRolePolicy({
     RoleName: name,
     PolicyArn: policy.arn
@@ -10,14 +13,14 @@ const attachRolePolicy = async ({ name, policy }, IAM) => {
   return BbPromise.delay(15000)
 }
 
-const detachRolePolicy = async ({ name, policy }, IAM) => {
+const detachRolePolicy = async ({ name, policy }) => {
   await IAM.detachRolePolicy({
     RoleName: name,
     PolicyArn: policy.arn
   }).promise()
 }
 
-const createRole = async ({ name, service, policy }, IAM) => {
+const createRole = async ({ name, service, policy }) => {
   const assumeRolePolicyDocument = {
     Version: '2012-10-17',
     Statement: {
@@ -37,7 +40,7 @@ const createRole = async ({ name, service, policy }, IAM) => {
   await attachRolePolicy({
     name,
     policy
-  }, IAM)
+  })
 
   return {
     arn: roleRes.Role.Arn,
@@ -46,11 +49,11 @@ const createRole = async ({ name, service, policy }, IAM) => {
   }
 }
 
-const deleteRole = async ({ name, policy }, IAM) => {
+const deleteRole = async ({ name, policy }) => {
   await detachRolePolicy({
     name,
     policy
-  }, IAM)
+  })
   await IAM.deleteRole({
     RoleName: name
   }).promise()
@@ -62,7 +65,7 @@ const deleteRole = async ({ name, policy }, IAM) => {
   }
 }
 
-const updateAssumeRolePolicy = async ({ name, service }, IAM) => {
+const updateAssumeRolePolicy = async ({ name, service }) => {
   const assumeRolePolicyDocument = {
     Version: '2012-10-17',
     Statement: {
@@ -105,8 +108,6 @@ const rollback = async (inputs, context) => {
 }
 
 const deploy = async (inputs, context) => {
-  const AWS = context.provider.getSdk()
-  const IAM = new AWS.IAM({ region: 'us-east-1' })
   let { state } = context
 
   if (!inputs.policy) {
@@ -120,7 +121,7 @@ const deploy = async (inputs, context) => {
 
   if (!state.name && inputs.name) {
     context.log(`Creating Role: ${inputs.name}`)
-    const role = await createRole(inputs, IAM)
+    const role = await createRole(inputs)
     state = {
       ...state,
       ...role,
@@ -128,16 +129,16 @@ const deploy = async (inputs, context) => {
     }
   } else if (!inputs.name && state.name) {
     context.log(`Removing Role: ${state.name}`)
-    await deleteRole(state, IAM)
+    await deleteRole(state)
     state = {
       ...state,
       name: null
     }
   } else if (state.name !== inputs.name) {
     context.log(`Removing Role: ${state.name}`)
-    await deleteRole(state, IAM)
+    await deleteRole(state)
     context.log(`Creating Role: ${inputs.name}`)
-    const role = await createRole(inputs, IAM)
+    const role = await createRole(inputs)
     state = {
       ...state,
       ...role,
@@ -145,11 +146,11 @@ const deploy = async (inputs, context) => {
     }
   } else {
     if (state.service !== inputs.service) {
-      await updateAssumeRolePolicy(inputs, IAM)
+      await updateAssumeRolePolicy(inputs)
     }
     if (!equals(state.policy, inputs.policy)) {
-      await detachRolePolicy(state, IAM)
-      await attachRolePolicy(inputs, IAM)
+      await detachRolePolicy(state)
+      await attachRolePolicy(inputs)
     }
   }
 
@@ -158,12 +159,10 @@ const deploy = async (inputs, context) => {
 }
 
 const remove = async (inputs, context) => {
-  const AWS = context.provider.getSdk()
-  const IAM = new AWS.IAM({ region: 'us-east-1' })
   if (!context.state.name) return {}
 
   context.log(`Removing Role: ${context.state.name}`)
-  const outputs = await deleteRole(context.state, IAM)
+  const outputs = await deleteRole(context.state)
   context.saveState({
     name: null,
     arn: null,

@@ -1,5 +1,4 @@
 const path = require('path')
-const AWS = require('aws-sdk')
 const { prop, keys, reduce } = require('ramda')
 const getComponent = require('./getComponent')
 const getInstanceId = require('./getInstanceId')
@@ -27,9 +26,6 @@ const generateContext = (
     id,
     serviceId,
     instanceId,
-    provider: {
-      getSdk: () => AWS
-    },
     type,
     archive: getState(archive, id),
     state: getState(stateFile, id),
