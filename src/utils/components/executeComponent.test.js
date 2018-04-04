@@ -141,7 +141,7 @@ describe('#executeComponent()', () => {
   describe('when running "remove"', () => {
     const command = 'remove'
 
-    it('should treat removals differently', async () => {
+    it('should use the inputs stored in the state file', async () => {
       const res = await executeComponent(
         componentId,
         components,
