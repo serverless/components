@@ -29,7 +29,7 @@ components:
     type: github-webhook-aws
     inputs:
       githubApiToken: 2c5acc7de3b140ser3114fd40a24vd5ie3d843b5
-      githubRepo: 'https://github.com/serverless/serverless-components/'
+      githubRepo: 'https://github.com/serverless/components/'
       webhookTriggers:
         - create
 

@@ -14,7 +14,7 @@ inputTypes:
     required: true
     displayName: Github Repository
     description: URL of github repo
-    example: https://github.com/serverless/serverless-components/
+    example: https://github.com/serverless/components/
   payloadUrl:
     type: string
     required: true
