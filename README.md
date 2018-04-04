@@ -696,6 +696,7 @@ Creates / Removes an AWS Lambda function.
 | `timeout`     | The functions timeout                | Number |
 | `description` | The functions description            | String |
 | `handler`     | The functions handler                | String |
+| `root`        | The code root directory              | String |
 | `role`        | The role `arn` the lambda should use | String |
 | `env`         | An object of env vars set at runtime | Object |
 
@@ -718,6 +719,7 @@ components:
       timeout: 10
       description: dome description
       handler: code.handler
+      root: code
       role:
         arn: arn:aws:iam::XXXXX:role/some-lambda-role
 ```
