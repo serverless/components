@@ -10,13 +10,14 @@ describe('#executeComponent()', () => {
   const resolve = () => Promise.resolve('resolve')
   const reject = () => Promise.reject(new Error('reject'))
 
-  const componentId = 'myFunction'
   const options = {}
+  let componentId
   let components
   let stateFile
   let archive
 
   beforeEach(() => {
+    componentId = 'myFunction'
     components = {
       myFunction: {
         id: 'myFunction',
@@ -160,7 +161,6 @@ describe('#executeComponent()', () => {
 
     it('should skip the command if the state is an empty object', async () => {
       stateFile = assocPath([ 'myFunction', 'state' ], {}, stateFile)
-
       const res = await executeComponent(
         componentId,
         components,
@@ -176,6 +176,60 @@ describe('#executeComponent()', () => {
         timeout: 5
       })
       expect(res.outputs).toEqual({})
+    })
+
+    it('should reset the state file even if the component does not implement the remove logic', async () => {
+      componentId = 'myRole'
+      components = assocPath(
+        [ 'myRole' ],
+        {
+          id: 'myRole',
+          type: 'aws-iam-role',
+          inputs: {
+            service: 'inputs-serverless-service'
+          },
+          outputs: {},
+          state: {},
+          dependencies: [],
+          children: {},
+          promise: {
+            resolve,
+            reject
+          },
+          fns: {}
+        },
+        components
+      )
+      stateFile = assocPath(
+        [ 'myRole' ],
+        {
+          type: 'aws-iam-role',
+          state: {
+            service: 'state-serverless-service'
+          },
+          inputs: {
+            name: 'state-inputs-serverless-service'
+          }
+        },
+        stateFile
+      )
+      const res = await executeComponent(
+        componentId,
+        components,
+        stateFile,
+        archive,
+        command,
+        options
+      )
+      expect(res.executed).toBeFalsy()
+      expect(res.inputs).toEqual({
+        name: 'state-inputs-serverless-service'
+      })
+      expect(res.outputs).toEqual({})
+      expect(stateFile.myRole).toEqual({
+        type: 'aws-iam-role',
+        state: {}
+      })
     })
   })
 })
