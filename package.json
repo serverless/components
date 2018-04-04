@@ -1,6 +1,6 @@
 {
   "name": "serverless-components",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "PoC for the next version of the Serverless Framework",
   "author": "Serverless, Inc.",
   "license": "Apache-2.0",
@@ -8,12 +8,12 @@
   "preferGlobal": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/serverless/serverless-components"
+    "url": "https://github.com/serverless/components"
   },
   "bugs": {
-    "url": "https://github.com/serverless/serverless-components/issues"
+    "url": "https://github.com/serverless/components/issues"
   },
-  "homepage": "https://github.com/serverless/serverless-components#readme",
+  "homepage": "https://github.com/serverless/components#readme",
   "bin": {
     "components": "./bin/components"
   },
