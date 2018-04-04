@@ -1,4 +1,4 @@
-const { is } = require('ramda')
+const { is, isEmpty } = require('ramda')
 const generateContext = require('./generateContext')
 const resolvePostExecutionVars = require('../variables/resolvePostExecutionVars')
 const { getInputs, getState } = require('../state')
@@ -23,6 +23,13 @@ const executeComponent = async (
   }
 
   const context = generateContext(components, component, stateFile, archive, options, command)
+
+  if (command === 'remove') {
+    if (isEmpty(context.state)) {
+      return component
+    }
+  }
+
   const func = component.fns[command]
   if (is(Function, func)) {
     component.outputs = (await func(component.inputs, context)) || {}

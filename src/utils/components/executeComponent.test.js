@@ -1,3 +1,4 @@
+const { assocPath } = require('ramda')
 const executeComponent = require('./executeComponent')
 
 describe('#executeComponent()', () => {
@@ -136,22 +137,45 @@ describe('#executeComponent()', () => {
     expect(res.outputs).toEqual({ result: 'rolled back' })
   })
 
-  it('should treat removals differently', async () => {
+  describe('when running "remove"', () => {
     const command = 'remove'
-    const res = await executeComponent(
-      componentId,
-      components,
-      stateFile,
-      archive,
-      command,
-      options
-    )
-    expect(res.executed).toEqual(true)
-    expect(res.inputs).toEqual({
-      name: 'state-inputs-function-name',
-      memorySize: 128,
-      timeout: 5
+
+    it('should treat removals differently', async () => {
+      const res = await executeComponent(
+        componentId,
+        components,
+        stateFile,
+        archive,
+        command,
+        options
+      )
+      expect(res.executed).toEqual(true)
+      expect(res.inputs).toEqual({
+        name: 'state-inputs-function-name',
+        memorySize: 128,
+        timeout: 5
+      })
+      expect(res.outputs).toEqual({ result: 'removed' })
     })
-    expect(res.outputs).toEqual({ result: 'removed' })
+
+    it('should skip the command if the state is an empty object', async () => {
+      stateFile = assocPath([ 'myFunction', 'state' ], {}, stateFile)
+
+      const res = await executeComponent(
+        componentId,
+        components,
+        stateFile,
+        archive,
+        command,
+        options
+      )
+      expect(res.executed).toBeFalsy()
+      expect(res.inputs).toEqual({
+        name: 'state-inputs-function-name',
+        memorySize: 128,
+        timeout: 5
+      })
+      expect(res.outputs).toEqual({})
+    })
   })
 })
