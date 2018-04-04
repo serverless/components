@@ -39,7 +39,7 @@ const executeComponent = async (
 
   component.promise.resolve(component)
 
-  if (command === 'remove') {
+  if (command === 'remove' && !is(Function, func)) {
     stateFile[componentId] = {
       type: component.type,
       state: {}
