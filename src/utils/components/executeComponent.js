@@ -37,7 +37,9 @@ const executeComponent = async (
   }
   component.state = getState(stateFile, component.id)
 
-  component.promise.resolve(component)
+  if (component.promise) {
+    component.promise.resolve(component)
+  }
 
   if (command === 'remove') {
     stateFile[componentId] = {
