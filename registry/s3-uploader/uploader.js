@@ -1,13 +1,14 @@
 const AWS = require('aws-sdk') // eslint-disable-line
-const fdk = require('@serverless/fdk')
+const EventGatewaySDK = require('@serverless/event-gateway-sdk')
 const multipart = require('parse-multipart')
 
-const eventGateway = fdk.eventGateway({
-  url: 'https://eslam.eventgateway-dev.io/anything'
-})
 const s3 = new AWS.S3({ apiVersion: '2006-03-01' })
 
 module.exports.handler = (event, context, callback) => {
+  const eventGateway = new EventGatewaySDK({
+    url: 'http://myeventgateway.io',
+    space: 'prod'
+  })
   const boundary = multipart.getBoundary(event.data.headers['Content-Type'][0])
   const body = new Buffer(event.data.body, 'base64') // eslint-disable-line
   const parts = multipart.Parse(body, boundary)
@@ -19,6 +20,7 @@ module.exports.handler = (event, context, callback) => {
     Key: key,
     ContentType: parts[0].type
   }
+
   s3
     .putObject(params)
     .promise()
@@ -38,9 +40,9 @@ module.exports.handler = (event, context, callback) => {
         })
       }
 
-      callback(null, response)
+      return callback(null, response)
     })
     .catch(() => {
-      callback('Something went wrong')
+      return callback('Something went wrong')
     })
 }
