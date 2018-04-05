@@ -12,6 +12,19 @@ inputTypes:
     type: string
     required: true
 
+events:
+  resumeUploaded:
+    event-type: myapp.user.created
+    data:
+      foo: string
+      bar:
+        type: string
+    # cloud-events-version: 0.1
+    # content-type: application/json
+    # source: ""
+    # event-time: 1990-12-31T23:59:60Z
+    # event-id: 66dfc31d-6844-42fd-b1a7-a489a49f65f3
+
 components:
   uploaderLambda:
     type: aws-lambda
