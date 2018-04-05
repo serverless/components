@@ -1,10 +1,9 @@
 const { Graph } = require('graphlib')
-const {
-  forEach, keys, forEachObjIndexed, not, isEmpty
-} = require('ramda')
+const { forEach, keys, forEachObjIndexed, not, isEmpty } = require('ramda')
+const detectCircularDeps = require('./detectCircularDeps')
 
 module.exports = async (componentsToUse, componentsToRemove, command) => {
-  const graph = new Graph()
+  let graph = new Graph()
 
   // the components to remove
   forEach((componentId) => {
@@ -28,6 +27,8 @@ module.exports = async (componentsToUse, componentsToRemove, command) => {
       }, component.dependencies)
     }
   }, componentsToUse)
+
+  graph = detectCircularDeps(graph)
 
   return graph
 }
