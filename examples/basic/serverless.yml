@@ -12,5 +12,4 @@ components:
   myRole:
     type: aws-iam-role
     inputs:
-      name: my-idempotent-test
       service: lambda.amazonaws.com
