@@ -1,10 +1,21 @@
 const buildGraph = require('./buildGraph')
-const executeGraph = require('./executeGraph')
 
+jest.mock('../misc/handleSignalEvents')
 jest.mock('../components/executeComponent')
 const executeComponent = require('../components/executeComponent')
+const handleSignalEvents = require('../misc/handleSignalEvents')
+
+// this is used to easily control the state from within the tests
+let gracefulExitStatus = false
 
 executeComponent.mockImplementation(() => Promise.resolve('default-component-id'))
+handleSignalEvents.mockImplementation(() => ({
+  getGracefulExitStatus: () => gracefulExitStatus
+}))
+
+// NOTE: we need to require executeGraph here because handleSignalEvents
+// needs to be ready when executeGraph is required
+const executeGraph = require('./executeGraph')
 
 afterAll(() => {
   jest.restoreAllMocks()
@@ -135,5 +146,32 @@ describe('#executeGraph()', () => {
     await expect(executeGraph(graph, components, {}, {})).rejects.toThrow('myRole could not be deployed')
 
     expect(executeComponent).toHaveBeenCalledTimes(2)
+  })
+
+  it('should gracefully exit the current operation if user interrupts execution', async () => {
+    components = {
+      func: {
+        id: 'myFunc',
+        inputs: {
+          memorySize: 512,
+          timeout: 60
+        },
+        outputs: {},
+        state: {},
+        dependencies: [],
+        fns: {
+          deploy: () => {},
+          remove: () => {},
+          invoke: () => {}
+        }
+      }
+    }
+
+    gracefulExitStatus = true
+
+    await expect(executeGraph(graph, components, {}, {})).rejects.toThrow('gracefully exited')
+
+    // TODO: be more specific about the call count here
+    expect(executeComponent).toHaveBeenCalled()
   })
 })

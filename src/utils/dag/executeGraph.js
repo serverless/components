@@ -1,8 +1,18 @@
 const { isEmpty, map } = require('ramda')
+const handleSignalEvents = require('../misc/handleSignalEvents')
 const executeComponent = require('../components/executeComponent')
 
-const execute = async (graph, components, stateFile,
-  archive, command, options, rollback = false) => {
+const { getGracefulExitStatus } = handleSignalEvents()
+
+const execute = async (
+  graph,
+  components,
+  stateFile,
+  archive,
+  command,
+  options,
+  rollback = false
+) => {
   const leaves = graph.sinks()
 
   if (isEmpty(leaves)) {
@@ -21,7 +31,14 @@ const execute = async (graph, components, stateFile,
       rollback
     )
     graph.removeNode(componentId)
-    return componentId
+    return new Promise((resolve, reject) => {
+      const shouldGracefullyExit = getGracefulExitStatus()
+      if (shouldGracefullyExit) {
+        reject(new Error('Operation gracefully exited. State successfully persistet...'))
+      } else {
+        resolve(componentId)
+      }
+    })
   }, leaves)
 
   // allow all executions to complete without terminating

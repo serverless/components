@@ -11,14 +11,11 @@ const {
   setServiceId,
   readStateFile,
   writeStateFile,
-  trackDeployment,
-  handleSignalEvents
+  trackDeployment
   // log
 } = utils
 
 const run = async (command, options) => {
-  handleSignalEvents()
-
   const reporter = await errorReporter()
   let components = {}
   let stateFile = {}

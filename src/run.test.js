@@ -23,7 +23,6 @@ beforeEach(() => {
   utils.executeGraph.mockImplementation(() => Promise.resolve())
   utils.writeStateFile.mockImplementation(() => Promise.resolve())
   utils.errorReporter.mockImplementation(() => Promise.resolve())
-  utils.handleSignalEvents.mockImplementation(() => {})
 })
 
 describe('#run()', () => {
@@ -40,7 +39,6 @@ describe('#run()', () => {
       }
     })
 
-    expect(utils.handleSignalEvents).toHaveBeenCalled()
     expect(utils.getComponentsToUse).toHaveBeenCalled()
     expect(utils.getComponentsToRemove).toHaveBeenCalled()
     expect(utils.trackDeployment).not.toHaveBeenCalled()
@@ -57,7 +55,6 @@ describe('#run()', () => {
 
     await expect(run('some-command', {})).rejects.toThrow('something went wrong')
 
-    expect(utils.handleSignalEvents).toHaveBeenCalled()
     expect(utils.getComponentsToUse).toHaveBeenCalled()
     expect(utils.getComponentsToRemove).toHaveBeenCalled()
     expect(utils.trackDeployment).not.toHaveBeenCalled()
@@ -83,7 +80,6 @@ describe('#run()', () => {
         }
       })
 
-      expect(utils.handleSignalEvents).toHaveBeenCalled()
       expect(utils.getComponentsToUse).toHaveBeenCalled()
       expect(utils.getComponentsToRemove).toHaveBeenCalled()
       expect(utils.trackDeployment).toHaveBeenCalled()
