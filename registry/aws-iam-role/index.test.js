@@ -9,7 +9,12 @@ jest.mock('bluebird', () => ({
 jest.mock('aws-sdk', () => {
   const mocks = {
     createRoleMock: jest.fn().mockReturnValue({ Role: { Arn: 'abc:xyz' } }),
-    deleteRoleMock: jest.fn().mockReturnValue({ Role: { Arn: null } }),
+    deleteRoleMock: jest.fn().mockImplementation((params) => {
+      if (params.RoleName === 'some-already-removed-role') {
+        Promise.reject(new Error('Role not found'))
+      }
+      return Promise.resolve({ Role: { Arn: null } })
+    }),
     attachRolePolicyMock: jest.fn(),
     detachRolePolicyMock: jest.fn()
   }
@@ -129,6 +134,42 @@ describe('aws-iam-role unit tests', () => {
     expect(AWS.IAM).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.deleteRoleMock).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.detachRolePolicyMock).toHaveBeenCalledTimes(1)
+    expect(outputs).toEqual({
+      arn: null,
+      policy: null,
+      service: null
+    })
+  })
+
+  it('should update state when removing an already removed iam component', async () => {
+    const inputs = {
+      name: 'some-already-removed-role',
+      service: 'lambda.amazonaws.com'
+    }
+    const iamContextMock = {
+      state: {
+        ...inputs,
+        arn: 'abc:xyz',
+        policy: {
+          arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
+        }
+      },
+      archive: {},
+      log: () => {},
+      saveState: jest.fn()
+    }
+
+    const outputs = await iamComponent.remove(inputs, iamContextMock)
+
+    expect(AWS.IAM).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.deleteRoleMock).toHaveBeenCalledTimes(2)
+    expect(AWS.mocks.detachRolePolicyMock).toHaveBeenCalledTimes(2)
+    expect(iamContextMock.saveState).toBeCalledWith({
+      name: null,
+      arn: null,
+      service: null,
+      policy: null
+    })
     expect(outputs).toEqual({
       arn: null,
       policy: null,
