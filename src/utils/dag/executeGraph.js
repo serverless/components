@@ -31,14 +31,11 @@ const execute = async (
       rollback
     )
     graph.removeNode(componentId)
-    return new Promise((resolve, reject) => {
-      const shouldGracefullyExit = getGracefulExitStatus()
-      if (shouldGracefullyExit) {
-        reject(new Error('Operation gracefully exited. State successfully persistet...'))
-      } else {
-        resolve(componentId)
-      }
-    })
+    const shouldGracefullyExit = getGracefulExitStatus()
+    if (shouldGracefullyExit) {
+      throw new Error('Operation gracefully exited. State successfully persistet...')
+    }
+    return componentId
   }, leaves)
 
   // allow all executions to complete without terminating
