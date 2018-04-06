@@ -6,11 +6,13 @@ describe('#detectCircularDeps()', () => {
 
   beforeEach(() => {
     graph = new graphlib.Graph()
-    graph.setNode('myFunction')
+    graph.setNode('myRestApi')
     graph.setNode('myApiGateway')
+    graph.setNode('myFunction')
     graph.setNode('myRole')
+    graph.setEdge('myRestApi', 'myApiGateway')
+    graph.setEdge('myApiGateway', 'myFunction')
     graph.setEdge('myFunction', 'myRole')
-    graph.setEdge('myApiGateway', 'myRole')
   })
 
   describe('when not dealing with circular dependencies', () => {
@@ -22,10 +24,8 @@ describe('#detectCircularDeps()', () => {
 
   describe('when dealing with circular dependencies', () => {
     beforeEach(() => {
-      // circular dependency 1: myFunction <--> myRole
-      graph.setEdge('myRole', 'myFunction')
-      // circular dependency 2: myApiGateway <--> myRole
-      graph.setEdge('myRole', 'myApiGateway')
+      // circular dependency 2: myRestApi --> myApiGateway --> myFunction --> myRole
+      graph.setEdge('myRole', 'myRestApi')
     })
 
     it('should throw if it detects circular dependencies', () => {
@@ -33,7 +33,17 @@ describe('#detectCircularDeps()', () => {
     })
 
     it('should print the nodes which introduce circular dependencies', () => {
-      expect(() => detectCircularDeps(graph)).toThrow(/.+ --> .+/)
+      let returnedGraph
+      try {
+        returnedGraph = detectCircularDeps(graph)
+      } catch (error) {
+        const forwardArrows = error.message.split('-->').length - 1
+        const backwardArrows = error.message.split('<--').length - 1
+        expect(forwardArrows).toEqual(3)
+        expect(backwardArrows).toEqual(3)
+      } finally {
+        expect(returnedGraph).toBeFalsy()
+      }
     })
   })
 })
