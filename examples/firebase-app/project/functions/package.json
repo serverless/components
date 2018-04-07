@@ -1,0 +1,10 @@
+{
+  "name": "my-firebase-functions",
+  "private": true,
+  "description": "My Firebase Cloud Functions",
+  "main": "index.js",
+  "dependencies": {
+    "firebase-admin": "^5.8.2",
+    "firebase-functions": "^0.8.1"
+  }
+}

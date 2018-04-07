@@ -1,0 +1,15 @@
+type: firebase-database-realtime
+
+inputTypes:
+  project:
+    type: string
+    required: true
+    description: "Your firebase project id. You have to create your project ahead of time."
+  token:
+    type: string
+    required: true
+    description: "Path to your firebase access token"
+  path:
+    type: string
+    required: true
+    description: "Path to your firebase project"

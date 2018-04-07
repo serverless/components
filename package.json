@@ -34,6 +34,7 @@
     "chalk": "^2.3.2",
     "concordance": "^3.0.0",
     "crypto-extra": "^0.4.0",
+    "dotenv": "^5.0.1",
     "fs-extra": "^5.0.0",
     "graphlib": "^2.1.5",
     "js-yaml": "^3.10.0",

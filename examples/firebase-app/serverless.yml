@@ -1,0 +1,9 @@
+type: firebase-app
+
+components:
+  firebaseApp:
+    type: firebase
+    inputs:
+      project: ${env.FIREBASE_PROJECT_ID}
+      token: ${env.FIREBASE_TOKEN}
+      path: ${self.path}/project
