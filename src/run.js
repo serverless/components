@@ -3,6 +3,7 @@ const utils = require('./utils')
 
 const {
   errorReporter,
+  getComponentsFromStateFile,
   getComponentsToUse,
   getComponentsToRemove,
   // getExecutedComponents,
@@ -27,7 +28,12 @@ const run = async (command, options) => {
     stateFile = setServiceId(stateFile)
     // TODO BRN: If we're using immutable data, we shouldn't need to clone here
     archive = clone(stateFile)
-    const componentsToUse = await getComponentsToUse(stateFile)
+    let componentsToUse
+    if (command === 'remove') {
+      componentsToUse = await getComponentsFromStateFile(stateFile)
+    } else {
+      componentsToUse = await getComponentsToUse(stateFile)
+    }
     const componentsToRemove = await getComponentsToRemove(stateFile, componentsToUse)
     components = { ...componentsToUse, ...componentsToRemove }
     if (command === 'deploy') trackDeployment(componentsToUse)
