@@ -1,5 +1,4 @@
 const octokit = require('@octokit/rest')()
-const R = require('ramda')
 const parseGithubUrl = require('parse-github-url')
 const diffValues = require('./diff')
 
