@@ -1,5 +1,5 @@
 const path = require('path')
-const getRegistryRoot = require('../getRegistryRoot')
+const getComponentRootPath = require('./getComponentRootPath')
 const requireFns = require('./requireFns')
 
 function getComponentFunctions(type) {
@@ -9,7 +9,7 @@ function getComponentFunctions(type) {
   if (dirName === type) {
     componentRoot = cwd
   } else {
-    componentRoot = path.join(getRegistryRoot(), type)
+    componentRoot = getComponentRootPath(type)
   }
   return requireFns(componentRoot)
 }
