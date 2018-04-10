@@ -13,7 +13,7 @@ afterEach(() => {
 
 beforeEach(() => {
   utils.handleSignalEvents.mockImplementation(() => {})
-  utils.getComponentsToUse.mockImplementation(() =>
+  utils.getComponentsFromServerlessFile.mockImplementation(() =>
     Promise.resolve({ componentToUse: { id: 'component1', type: 'function' } }))
   utils.getComponentsToRemove.mockImplementation(() =>
     Promise.resolve({ componentToRemove: { id: 'component2', type: 'iam' } }))
@@ -41,7 +41,7 @@ describe('#run()', () => {
     })
 
     expect(utils.handleSignalEvents).toHaveBeenCalled()
-    expect(utils.getComponentsToUse).toHaveBeenCalled()
+    expect(utils.getComponentsFromServerlessFile).toHaveBeenCalled()
     expect(utils.getComponentsToRemove).toHaveBeenCalled()
     expect(utils.trackDeployment).not.toHaveBeenCalled()
     expect(utils.buildGraph).toHaveBeenCalledTimes(1)
@@ -58,7 +58,7 @@ describe('#run()', () => {
     await expect(run('some-command', {})).rejects.toThrow('something went wrong')
 
     expect(utils.handleSignalEvents).toHaveBeenCalled()
-    expect(utils.getComponentsToUse).toHaveBeenCalled()
+    expect(utils.getComponentsFromServerlessFile).toHaveBeenCalled()
     expect(utils.getComponentsToRemove).toHaveBeenCalled()
     expect(utils.trackDeployment).not.toHaveBeenCalled()
     expect(utils.buildGraph).toHaveBeenCalledTimes(1)
@@ -84,7 +84,7 @@ describe('#run()', () => {
       })
 
       expect(utils.handleSignalEvents).toHaveBeenCalled()
-      expect(utils.getComponentsToUse).toHaveBeenCalled()
+      expect(utils.getComponentsFromServerlessFile).toHaveBeenCalled()
       expect(utils.getComponentsToRemove).toHaveBeenCalled()
       expect(utils.trackDeployment).toHaveBeenCalled()
       expect(utils.buildGraph).toHaveBeenCalledTimes(2)

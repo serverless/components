@@ -4,7 +4,7 @@ const utils = require('./utils')
 const {
   errorReporter,
   getComponentsFromStateFile,
-  getComponentsToUse,
+  getComponentsFromServerlessFile,
   getComponentsToRemove,
   // getExecutedComponents,
   buildGraph,
@@ -32,7 +32,7 @@ const run = async (command, options) => {
     if (command === 'remove') {
       componentsToUse = await getComponentsFromStateFile(stateFile)
     } else {
-      componentsToUse = await getComponentsToUse(stateFile)
+      componentsToUse = await getComponentsFromServerlessFile(stateFile)
     }
     const componentsToRemove = await getComponentsToRemove(stateFile, componentsToUse)
     components = { ...componentsToUse, ...componentsToRemove }
