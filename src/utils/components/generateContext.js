@@ -3,10 +3,10 @@ const { prop, keys, reduce } = require('ramda')
 const getComponent = require('./getComponent')
 const getInstanceId = require('./getInstanceId')
 const getChildrenPromises = require('./getChildrenPromises')
+const getComponentFunctions = require('./getComponentFunctions')
 const getRegistryRoot = require('../getRegistryRoot')
 const getServiceId = require('../state/getServiceId')
 const getState = require('../state/getState')
-const fileExists = require('../fs/fileExists')
 const log = require('../log')
 
 const generateContext = (
@@ -44,12 +44,7 @@ const generateContext = (
         inputs,
         stateFile
       )
-      // TODO: update the following once getComponent adds the properties automatically
-      let fns = {}
-      if (await fileExists(path.join(childComponentRootPath, 'index.js'))) {
-        fns = require(path.join(childComponentRootPath, 'index.js')) // eslint-disable-line
-      }
-      childComponent.fns = fns
+      childComponent.fns = getComponentFunctions(type)
 
       const childComponentContext = generateContext(
         components,
