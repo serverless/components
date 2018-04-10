@@ -4,7 +4,7 @@ const deferredPromise = require('../deferredPromise')
 const getRegistryRoot = require('../getRegistryRoot')
 const getChildrenIds = require('./getChildrenIds')
 const getComponent = require('./getComponent')
-const requireFns = require('./requireFns')
+const getComponentFunctions = require('./getComponentFunctions')
 const getDependencies = require('../variables/getDependencies')
 const getState = require('../state/getState')
 
@@ -50,7 +50,7 @@ const getComponentsFromServerlessFile = async (
       dependencies: getDependencies(component.inputs),
       children: getChildrenIds(component) || {},
       promise: deferredPromise(),
-      fns: requireFns(componentRoot)
+      fns: getComponentFunctions(component.type)
     },
     components
   )
