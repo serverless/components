@@ -5,7 +5,7 @@ const {
   errorReporter,
   getComponentsFromStateFile,
   getComponentsFromServerlessFile,
-  getComponentsToRemove,
+  getOrphanedComponents,
   // getExecutedComponents,
   buildGraph,
   executeGraph,
@@ -34,7 +34,7 @@ const run = async (command, options) => {
     } else {
       componentsToUse = await getComponentsFromServerlessFile(stateFile)
     }
-    const componentsToRemove = await getComponentsToRemove(stateFile, componentsToUse)
+    const componentsToRemove = await getOrphanedComponents(stateFile, componentsToUse)
     components = { ...componentsToUse, ...componentsToRemove }
     if (command === 'deploy') trackDeployment(componentsToUse)
     const graph = await buildGraph(componentsToUse, componentsToRemove, command)

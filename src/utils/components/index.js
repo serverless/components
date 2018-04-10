@@ -5,8 +5,8 @@ const getComponent = require('./getComponent')
 const getComponentFunctions = require('./getComponentFunctions')
 const getComponentsFromServerlessFile = require('./getComponentsFromServerlessFile')
 const getComponentsFromStateFile = require('./getComponentsFromStateFile')
-const getComponentsToRemove = require('./getComponentsToRemove')
 const executeComponent = require('./executeComponent')
+const getOrphanedComponents = require('./getOrphanedComponents')
 const generateContext = require('./generateContext')
 
 module.exports = {
@@ -15,8 +15,8 @@ module.exports = {
   getComponentFunctions,
   getComponentsFromServerlessFile,
   getComponentsFromStateFile,
-  getComponentsToRemove,
   getExecutedComponents,
+  getOrphanedComponents,
   getComponent,
   executeComponent,
   generateContext

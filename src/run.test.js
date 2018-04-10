@@ -15,7 +15,7 @@ beforeEach(() => {
   utils.handleSignalEvents.mockImplementation(() => {})
   utils.getComponentsFromServerlessFile.mockImplementation(() =>
     Promise.resolve({ componentToUse: { id: 'component1', type: 'function' } }))
-  utils.getComponentsToRemove.mockImplementation(() =>
+  utils.getOrphanedComponents.mockImplementation(() =>
     Promise.resolve({ componentToRemove: { id: 'component2', type: 'iam' } }))
   utils.trackDeployment.mockImplementation(() => Promise.resolve())
   utils.buildGraph.mockImplementation(() => Promise.resolve())
@@ -42,7 +42,7 @@ describe('#run()', () => {
 
     expect(utils.handleSignalEvents).toHaveBeenCalled()
     expect(utils.getComponentsFromServerlessFile).toHaveBeenCalled()
-    expect(utils.getComponentsToRemove).toHaveBeenCalled()
+    expect(utils.getOrphanedComponents).toHaveBeenCalled()
     expect(utils.trackDeployment).not.toHaveBeenCalled()
     expect(utils.buildGraph).toHaveBeenCalledTimes(1)
     expect(utils.readStateFile).toHaveBeenCalled()
@@ -59,7 +59,7 @@ describe('#run()', () => {
 
     expect(utils.handleSignalEvents).toHaveBeenCalled()
     expect(utils.getComponentsFromServerlessFile).toHaveBeenCalled()
-    expect(utils.getComponentsToRemove).toHaveBeenCalled()
+    expect(utils.getOrphanedComponents).toHaveBeenCalled()
     expect(utils.trackDeployment).not.toHaveBeenCalled()
     expect(utils.buildGraph).toHaveBeenCalledTimes(1)
     expect(utils.readStateFile).toHaveBeenCalled()
@@ -85,7 +85,7 @@ describe('#run()', () => {
 
       expect(utils.handleSignalEvents).toHaveBeenCalled()
       expect(utils.getComponentsFromServerlessFile).toHaveBeenCalled()
-      expect(utils.getComponentsToRemove).toHaveBeenCalled()
+      expect(utils.getOrphanedComponents).toHaveBeenCalled()
       expect(utils.trackDeployment).toHaveBeenCalled()
       expect(utils.buildGraph).toHaveBeenCalledTimes(2)
       expect(utils.readStateFile).toHaveBeenCalled()
