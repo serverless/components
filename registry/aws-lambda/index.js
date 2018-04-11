@@ -76,6 +76,10 @@ const deleteLambda = async (name) => {
 }
 
 const deploy = async (inputs, context) => {
+  const componentData = context.utils.compareInputsToState(inputs, context.state)
+  const inputsChanged = !componentData.isEqual
+  const defaultOutputs = { ...inputs, ...context.state }
+
   let outputs = {}
   const configuredRole = inputs.role
   let { defaultRole } = context.state
@@ -91,18 +95,29 @@ const deploy = async (inputs, context) => {
 
   const role = configuredRole || defaultRole
 
-  if (inputs.name && !context.state.name) {
+  // /* No state found, run create flow */
+  if (!componentData.hasState) {
     context.log(`Creating Lambda: ${inputs.name}`)
-    outputs = await createLambda(inputs, role)
-  } else if (context.state.name && !inputs.name) {
-    context.log(`Removing Lambda: ${context.state.name}`)
-    outputs = await deleteLambda(context.state.name)
-  } else if (inputs.name !== context.state.name) {
-    context.log(`Removing Lambda: ${context.state.name}`)
-    await deleteLambda(context.state.name)
-    context.log(`Creating Lambda: ${inputs.name}`)
-    outputs = await createLambda(inputs, role)
-  } else {
+    const lambdaOutput = await createLambda(inputs, role)
+    const createOutputs = { ...inputs, ...lambdaOutput, defaultRole }
+    context.saveState(createOutputs)
+    return createOutputs
+  }
+
+  /* Has state, run update flow if inputsChanged */
+  if (inputsChanged) {
+    // If critical property 'name' changed, destroy and recreate new function
+    if (componentData.keys.includes('name')) {
+      context.log(`Removing Lambda: ${context.state.name}`)
+      await deleteLambda(context.state.name)
+      context.log(`Creating Lambda: ${inputs.name}`)
+      const lambdaOutput = await createLambda(inputs, role)
+      const createOutputs = { ...inputs, ...lambdaOutput, defaultRole }
+      context.saveState(createOutputs)
+      return outputs
+    }
+
+    // run normal update flow
     context.log(`Updating Lambda: ${inputs.name}`)
     outputs = await updateLambda(inputs, role)
   }
@@ -112,7 +127,11 @@ const deploy = async (inputs, context) => {
     defaultRole = null
   }
 
-  context.saveState({ ...inputs, ...outputs, defaultRole })
+  context.saveState({
+    ...inputs,
+    ...outputs,
+    defaultRole
+  })
   return outputs
 }
 
