@@ -11,7 +11,7 @@ jest.mock('aws-sdk', () => {
     createRoleMock: jest.fn().mockReturnValue({ Role: { Arn: 'abc:xyz' } }),
     deleteRoleMock: jest.fn().mockImplementation((params) => {
       if (params.RoleName === 'some-already-removed-role') {
-        Promise.reject(new Error('Role not found'))
+        return Promise.reject(new Error('Role not found'))
       }
       return Promise.resolve({ Role: { Arn: null } })
     }),
