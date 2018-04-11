@@ -4,9 +4,12 @@ inputTypes:
   name:
     type: string
     required: true
+    displayName: Site Name
+    description: logical name of the site
   contentPath:
     type: string
     default: ./site
+    description: relative path of a folder for the contents of the site like './site'
   templateValues:
     type: object
     default: {}
@@ -14,20 +17,25 @@ inputTypes:
   contentIndex:
     type: string
     default: index.html
+    description: the index page for the site like 'index.html'
   contentError:
     type: string
     default: error.html
+    description: the error page for the site like 'error.html'
   hostingRegion:
     type: string
     default: us-east-1
+    description: the AWS region where the site will be hosted like 'us-east-1'
   hostingDomain:
     type: string
     required: false
     default: site-${self.instanceId}.example.com
+    description: the domain name for the site like 'rgfamily.com'
   aliasDomain:
     type: string
     required: false
     default: www.site-${self.instanceId}.example.com
+    description: the alias domain for the site like 'www.rgfamily.com'
 
 components:
   renderedFiles:

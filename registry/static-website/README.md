@@ -15,17 +15,20 @@ Figure 1: Shows inter-dependencies between sub-components
 
 All components manage their own state and stores it in the `state.json` file.
 
-## Input Parameters
+<!-- AUTO-GENERATED-CONTENT:START (COMPONENT_INPUT_TYPES) -->
+## Input Types
+| Name | Type | Description |
+|:------ |:-----|:-----------------|
+| **hostingDomain**| `string` | the domain name for the site like 'rgfamily.com'
+| **aliasDomain**| `string` | the alias domain for the site like 'www.rgfamily.com'
+| **contentPath**| `string` | relative path of a folder for the contents of the site like './site'
+| **contentIndex**| `string` | the index page for the site like 'index.html'
+| **contentError**| `string` | the error page for the site like 'error.html'
+| **hostingRegion**| `string` | the AWS region where the site will be hosted like 'us-east-1'
+| **name**| `string`<br/>*required* | logical name of the site
+| **templateValues**| `object`<br/>*required* | templateValues
 
-The component requires a few input parameters to build the static website:
-
-* `name`: [logical name of the site]
-* `contentPath`: [relative path of a folder for the contents of the site like './site']
-* `contentIndex`: [the index page for the site like 'index.html']
-* `contentError`: [the error page for the site like 'error.html']
-* `hostingRegion`: [the AWS region where the site will be hosted like 'us-east-1']
-* `hostingDomain`: [the domain name for the site like 'rgfamily.com']
-* `aliasDomain`: [the alias domain for the site like 'www.rgfamily.com']
+<!-- AUTO-GENERATED-CONTENT:END -->
 
 ## Operations
 
