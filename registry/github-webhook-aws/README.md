@@ -1,5 +1,5 @@
 <!-- AUTO-GENERATED-CONTENT:START (COMPONENT_HEADER) -->
-# Github Webhook Aws
+# Github Webhook AWS
 
 Github webhook component using AWS API gateway
 <!-- AUTO-GENERATED-CONTENT:END -->

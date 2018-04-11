@@ -1,0 +1,12 @@
+{
+  "name": "@serverless-components/aws-route53",
+  "version": "0.1.0",
+  "description": "Provision AWS route53 definitions with serverless components",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/serverless/components"
+  },
+  "author": "serverless.com",
+  "license": "Apache-2.0"
+}

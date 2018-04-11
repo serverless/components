@@ -4,6 +4,36 @@ inputTypes:
   region:
     type: string
     required: true
+    displayName: DynamoDB Table Region
+    description: The region the table will be created in.
+    example: us-east-1
   tables:
     type: object[]
     required: true
+    displayName: DynamoDB Table Defintions
+    description: Array of AWS dynamoDB table definitions
+    example:
+      - name: BlogPost
+        hashKey: authorEmail
+        rangeKey: title
+        indexes:
+          - name: BlogTitleIndex
+            type: global
+            hashKey: title
+            rangeKey: createdAt
+        schema:
+          id: uuid
+          authorName: string
+          authorEmail:
+            type: email
+            options:
+              required: true
+          title: string
+          content: binary
+          tags: stringset
+          published:
+            type: boolean
+            options:
+              default: false
+        options:
+          timestamps: true

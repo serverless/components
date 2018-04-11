@@ -3,11 +3,26 @@ type: aws-route53
 inputTypes:
   domainName:
     type: string
+    displayName: Domain name
+    description: The domain name used in route 53
+    example: www.defaultdomain.com
   dnsName:
     type: string
+    displayName: DNS name
+    description: The DNS name used in route 53
+    example: d111111abcdef8.cloudfront.net
   privateZone:
     type: boolean
+    displayName: Private Zone
+    description: Whether this is a private zone
+    example: false
   vpcId:
     type: string
+    displayName: VPC Id
+    description: The VPC's Id
+    example: my-existing-vpc-id
   vpcRegion:
     type: string
+    displayName: VPC Region
+    description: The VPC's region
+    example: mydefaultvpcregion

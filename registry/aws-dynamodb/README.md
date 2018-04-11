@@ -4,6 +4,15 @@ The DynamoDB component takes one or more table models as input and provides a fu
 
 ## Input Parameters
 
+<!-- AUTO-GENERATED-CONTENT:START (COMPONENT_INPUT_TYPES) -->
+## Input Types
+| Name | Type | Description |
+|:------ |:-----|:-----------------|
+| **region**| `string`<br/>*required* | The region the table will be created in.
+| **tables**| `object[]`<br/>*required* | Array of AWS dynamoDB table definitions
+
+<!-- AUTO-GENERATED-CONTENT:END -->
+
 The component requires a few input parameters to manage the DynamoDB table(s):
 
 * `region`: *required* - `string`: AWS region where the table(s) will be created.
