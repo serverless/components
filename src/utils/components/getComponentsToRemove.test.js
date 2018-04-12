@@ -1,5 +1,5 @@
 const getComponentsToRemove = require('./getComponentsToRemove')
-const deferredPromise = require('../deferredPromise')
+// const deferredPromise = require('../deferredPromise')
 
 describe('#getComponentsToRemove()', () => {
   const stateFile = {
