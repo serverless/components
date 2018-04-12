@@ -1,5 +1,5 @@
 const path = require('path')
-const { assoc, keys, merge, reduce } = require('ramda')
+const { assoc, keys, mergeAll, map } = require('ramda')
 const deferredPromise = require('../deferredPromise')
 const getRegistryRoot = require('../getRegistryRoot')
 const getChildrenIds = require('./getChildrenIds')
@@ -12,34 +12,26 @@ const getComponentsFromServerlessFile = async (
   stateFile,
   componentRoot = process.cwd(),
   inputs = {},
-  componentId,
-  components = {}
+  componentId
 ) => {
   const component = await getComponent(componentRoot, componentId, inputs, stateFile)
 
-  const nestedComponents = await reduce(
-    async (accum, componentAlias) => {
-      accum = await Promise.resolve(accum)
-      const nestedComponentRoot = path.join(
-        getRegistryRoot(),
-        component.components[componentAlias].type
-      )
-      const nestedComponentInputs = component.components[componentAlias].inputs || {}
-      const nestedComponentId = component.components[componentAlias].id
-      accum = await getComponentsFromServerlessFile(
-        stateFile,
-        nestedComponentRoot,
-        nestedComponentInputs,
-        nestedComponentId,
-        await accum
-      )
-      return accum
-    },
-    Promise.resolve(components),
-    keys(component.components) || []
-  )
+  const nestedComponents = mergeAll(await Promise.all(map(async (componentAlias) => {
+    const nestedComponentRoot = path.join(
+      getRegistryRoot(),
+      component.components[componentAlias].type
+    )
+    const nestedComponentInputs = component.components[componentAlias].inputs || {}
+    const nestedComponentId = component.components[componentAlias].id
+    return getComponentsFromServerlessFile(
+      stateFile,
+      nestedComponentRoot,
+      nestedComponentInputs,
+      nestedComponentId
+    )
+  }, keys(component.components) || [])))
 
-  components = assoc(
+  return assoc(
     component.id,
     {
       id: component.id,
@@ -52,10 +44,8 @@ const getComponentsFromServerlessFile = async (
       promise: deferredPromise(),
       fns: getComponentFunctions(component.type)
     },
-    components
+    nestedComponents
   )
-
-  return merge(components, nestedComponents)
 }
 
 module.exports = getComponentsFromServerlessFile
