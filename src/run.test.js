@@ -17,11 +17,10 @@ beforeEach(() => {
     Promise.resolve({
       iamMock: { id: 'iam-mock-id', type: 'iam-mock' }
     }))
-  utils.getComponentsFromStateFile.mockImplementation(() =>
-    Promise.resolve({
-      iamMock: { id: 'iam-mock-id', type: 'iam-mock' },
-      functionMock: { id: 'function-mock-id', type: 'function-mock' }
-    }))
+  utils.getComponentsFromStateFile.mockImplementation(() => ({
+    iamMock: { id: 'iam-mock-id', type: 'iam-mock' },
+    functionMock: { id: 'function-mock-id', type: 'function-mock' }
+  }))
   utils.getOrphanedComponents.mockImplementation(() => ({
     functionMock: { id: 'function-mock-id', type: 'function-mock' }
   }))
