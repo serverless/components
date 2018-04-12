@@ -10,8 +10,8 @@ inputTypes:
   memory:
     type: number
     required: true
-    displayName: Lambda function name
-    description: The Lambda function name
+    displayName: Memory size
+    description: The functions memory size in Megabyte.
     example: 512
   timeout:
     type: number
@@ -29,8 +29,8 @@ inputTypes:
   handler:
     type: string
     required: true
-    displayName: Function code
-    description: The code for the Lambda function.
+    displayName: Handler
+    description: The path to the exported handler function.
     example: products.create
   root:
     type: string

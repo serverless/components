@@ -11,7 +11,7 @@ inputTypes:
     type: object[]
     required: true
     displayName: DynamoDB Table Defintions
-    description: Array of AWS dynamoDB table definitions
+    description: Array of AWS DynamoDB table definitions
     example:
       - name: BlogPost
         hashKey: authorEmail
