@@ -1,4 +1,5 @@
 const getComponentsToRemove = require('./getComponentsToRemove')
+// const deferredPromise = require('../deferredPromise')
 
 describe('#getComponentsToRemove()', () => {
   const stateFile = {
@@ -39,11 +40,12 @@ describe('#getComponentsToRemove()', () => {
         outputs: {},
         state: { memorySize: 512, timeout: 60 },
         dependencies: [],
+        // promise: deferredPromise(),
         fns: {}
       }
     }
     const res = await getComponentsToRemove(stateFile, loadedComponents)
-
+    delete res['function-mock'].promise
     expect(res).toEqual(expected)
   })
 })
