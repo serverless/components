@@ -8,5 +8,9 @@
     "url": "https://github.com/serverless/components"
   },
   "author": "serverless.com",
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "dependencies": {
+    "aws-sdk": "^2.224.1",
+    "bluebird": "^3.5.1"
+  }
 }
