@@ -40,12 +40,12 @@ describe('#getComponentsToRemove()', () => {
         outputs: {},
         state: { memorySize: 512, timeout: 60 },
         dependencies: [],
-        promise: deferredPromise(),
+        // promise: deferredPromise(),
         fns: {}
       }
     }
     const res = await getComponentsToRemove(stateFile, loadedComponents)
-
+    delete res.promise
     expect(res).toEqual(expected)
   })
 })
