@@ -1,9 +1,10 @@
 const octokit = require('@octokit/rest')()
-const R = require('ramda')
 const parseGithubUrl = require('parse-github-url')
 const diffValues = require('./diff')
 
-const createWebhook = async ({ githubApiToken, githubRepo, payloadUrl, events }) => {
+const createWebhook = async ({
+  githubApiToken, githubRepo, payloadUrl, events
+}) => {
   octokit.authenticate({
     type: 'token',
     token: githubApiToken
@@ -19,7 +20,7 @@ const createWebhook = async ({ githubApiToken, githubRepo, payloadUrl, events })
       url: payloadUrl,
       content_type: 'json'
     },
-    events: events,
+    events,
     active: true
   }
 
@@ -28,7 +29,9 @@ const createWebhook = async ({ githubApiToken, githubRepo, payloadUrl, events })
   return res.data
 }
 
-const updateWebhook = async ({ githubApiToken, githubRepo, payloadUrl, events }, id) => {
+const updateWebhook = async ({
+  githubApiToken, githubRepo, payloadUrl, events
+}, id) => {
   octokit.authenticate({
     type: 'token',
     token: githubApiToken
@@ -38,14 +41,14 @@ const updateWebhook = async ({ githubApiToken, githubRepo, payloadUrl, events },
 
   const params = {
     name: 'web',
-    id: id,
+    id,
     owner: gh.owner,
     repo: gh.name,
     config: {
       url: payloadUrl,
       content_type: 'json'
     },
-    events: events,
+    events,
     active: true
   }
 
@@ -65,7 +68,7 @@ const deleteWebhook = async ({ githubApiToken, githubRepo }, id) => {
   await octokit.repos.deleteHook({
     owner: gh.owner,
     repo: gh.name,
-    id: id
+    id
   })
 
   return {}
@@ -73,7 +76,7 @@ const deleteWebhook = async ({ githubApiToken, githubRepo }, id) => {
 
 const deploy = async (inputs, context) => {
   // Util method for checking if state key values have changed
-  const componentData = compareInputsToState(inputs, context.state)
+  const componentData = context.utils.compareInputsToState(inputs, context.state)
   const inputsChanged = !componentData.isEqual
   const defaultOutputs = { ...inputs, ...context.state }
   const githubData = parseGithubUrl(inputs.githubRepo)
@@ -101,7 +104,7 @@ const deploy = async (inputs, context) => {
     componentData.keys.forEach((item) => {
       const newInput = componentData.diffs[item].inputs
       const currentState = componentData.diffs[item].state
-      const diff = diffValues(newInput, currentState)
+      const diff = diffValues(currentState, newInput)
       if (diff) {
         context.log(`${context.type}: Property "${item}" changed`)
         context.log(`${diff}\n`)
@@ -168,41 +171,6 @@ const remove = async (inputs, context) => {
 
 function webhookExists(context) {
   return context.state && context.state.github && context.state.github.id
-}
-
-// Util method to compare state values to inputs
-function compareInputsToState(inputs, state) {
-  const hasState = !!Object.keys(state).length
-  const initialData = {
-    // If no state keys... no state
-    hasState: hasState,
-    // default everything is equal
-    isEqual: true,
-    // Keys that are different
-    keys: [],
-    // Values of the keys that are different
-    diffs: {}
-  }
-  return Object.keys(inputs).reduce((acc, current) => {
-    // if values not deep equal. There are changes
-    if (!R.equals(inputs[current], state[current])) {
-      return {
-        hasState: hasState,
-        isEqual: false,
-        keys: acc.keys.concat(current),
-        diffs: {
-          ...acc.diffs,
-          ...{
-            [`${current}`]: {
-              inputs: inputs[current],
-              state: state[current]
-            }
-          }
-        }
-      }
-    }
-    return acc
-  }, initialData)
 }
 
 module.exports = {

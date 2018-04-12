@@ -7,6 +7,7 @@ const getRegistryRoot = require('../getRegistryRoot')
 const getServiceId = require('../state/getServiceId')
 const getState = require('../state/getState')
 const fileExists = require('../fs/fileExists')
+const compareInputsToState = require('./compareInputsToState')
 const log = require('../log')
 
 const generateContext = (
@@ -33,6 +34,9 @@ const generateContext = (
     command,
     options,
     log,
+    utils: {
+      compareInputsToState
+    },
     // eslint-disable-next-line no-shadow
     load: async (type, alias, inputs) => {
       const childComponentRootPath = path.join(getRegistryRoot(), type)
