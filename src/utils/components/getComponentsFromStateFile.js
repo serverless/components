@@ -1,22 +1,24 @@
-const { forEachObjIndexed, map, not, isEmpty, union, pickBy, prop } = require('ramda')
+const { keys, reduce, not, isEmpty, append, pickBy, prop } = require('ramda')
+const reduceIndexed = require('../reduceIndexed')
 const getComponentFunctions = require('./getComponentFunctions')
 const getChildrenIds = require('./getChildrenIds')
 const getState = require('../state/getState')
 const getInputs = require('../state/getInputs')
 const deferredPromise = require('../deferredPromise')
 
-async function getComponentsFromStateFile(stateFile) {
-  let componentIds = []
-  forEachObjIndexed((value, key) => {
-    const state = getState(stateFile, key)
-    if (not(isEmpty(state)) && not(prop('internallyManaged', value))) {
-      componentIds = union(componentIds, [ key ])
+function getComponentsFromStateFile(stateFile) {
+  const componentIds = reduceIndexed((accum, stateFileKey) => {
+    const state = getState(stateFile, stateFileKey)
+    if (not(isEmpty(state)) && not(prop('internallyManaged', prop(stateFileKey, stateFile)))) {
+      return append(stateFileKey, accum)
     }
-  }, pickBy((k) => k !== '$', stateFile))
-  const componentsInfo = map(async (id) => {
+    return accum
+  }, [], keys(pickBy((v, k) => k !== '$', stateFile)))
+  return reduce((accum, id) => {
     const component = stateFile[id]
     const { type } = component
     return {
+      ...accum,
       [id]: {
         id,
         type,
@@ -29,8 +31,7 @@ async function getComponentsFromStateFile(stateFile) {
         fns: getComponentFunctions(type)
       }
     }
-  }, componentIds)
-  return Object.assign({}, ...(await Promise.all(componentsInfo)))
+  }, {}, componentIds)
 }
 
 module.exports = getComponentsFromStateFile

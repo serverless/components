@@ -44,7 +44,8 @@ describe('#getComponentsFromStateFile()', () => {
   }
 
   it('should extract and return the components from the state file', async () => {
-    const res = await getComponentsFromStateFile(stateFile)
+    const res = getComponentsFromStateFile(stateFile)
+    expect(Object.keys(res).length).toEqual(2)
     expect(res).toHaveProperty('function-mock')
     expect(res).toHaveProperty('iam-mock')
     const functionMock = res['function-mock']

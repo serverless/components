@@ -31,7 +31,7 @@ const run = async (command, options) => {
     let componentsToUse
     let orphanedComponents
     const serverlessFileComponents = await getComponentsFromServerlessFile(stateFile)
-    const stateFileComponents = await getComponentsFromStateFile(stateFile)
+    const stateFileComponents = getComponentsFromStateFile(stateFile)
     if (command === 'remove') {
       componentsToUse = stateFileComponents
       orphanedComponents = {}
