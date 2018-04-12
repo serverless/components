@@ -45,7 +45,7 @@ describe('#getComponentsToRemove()', () => {
       }
     }
     const res = await getComponentsToRemove(stateFile, loadedComponents)
-    delete res.promise
+    delete res['function-mock'].promise
     expect(res).toEqual(expected)
   })
 })
