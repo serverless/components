@@ -1,8 +1,14 @@
 const readline = require('readline')
 
 function handleSignalEvents() {
-  let gracefulExitStatus = false
-  let SIGINTCount = 0
+  // NOTE: instantiating this global variable here to keep track of the state
+  // usually global variables should be "considered harmful" but are a good fit in this case
+  global.signalEventHandling = {
+    SIGINTCount: 0,
+    shouldExitGracefully: false
+  }
+
+  let msg = 'Waiting for current operation to gracefully finish (this might some seconds)...'
 
   if (process.platform === 'win32') {
     const rl = readline.createInterface({
@@ -13,36 +19,34 @@ function handleSignalEvents() {
     rl.on('SIGINT', () => {
       process.emit('SIGINT')
     })
+    rl.on('SIGTERM', () => {
+      process.emit('SIGTERM')
+    })
+    rl.on('SIGBREAK', () => {
+      process.emit('SIGBREAK')
+    })
   }
 
   process.on('SIGINT', () => {
-    gracefulExitStatus = true
-    SIGINTCount += 1
-    const msg = [
-      'Waiting for current operation to gracefully finish (this might take some seconds)... Press CTRL + C again to force an exit',
-      'NOTE: Doing so might corrupt the applications state information!'
-    ].join('\n')
-    if (SIGINTCount < 2) {
+    global.signalEventHandling.SIGINTCount += 1
+    global.signalEventHandling.shouldExitGracefully = true
+    if (global.signalEventHandling.SIGINTCount < 2) {
+      msg = `${msg} Press CTRL + C again to force an exit\nNOTE: Doing so might corrupt the applications state information!`
       console.log(msg) // eslint-disable-line no-console
     } else {
-      gracefulExitStatus = false
-      process.exit()
+      process.exit(1)
     }
   })
 
-  // "public" functions which expose the state variables
-  function getGracefulExitStatus() {
-    return gracefulExitStatus
-  }
+  process.on('SIGTERM', () => {
+    global.signalEventHandling.shouldExitGracefully = true
+    console.log(msg) // eslint-disable-line no-console
+  })
 
-  function getSIGINTCount() {
-    return SIGINTCount
-  }
-
-  return {
-    getGracefulExitStatus,
-    getSIGINTCount
-  }
+  process.on('SIGBREAK', () => {
+    global.signalEventHandling.shouldExitGracefully = true
+    console.log(msg) // eslint-disable-line no-console
+  })
 }
 
 module.exports = handleSignalEvents

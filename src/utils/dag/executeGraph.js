@@ -1,8 +1,5 @@
 const { isEmpty, map } = require('ramda')
-const handleSignalEvents = require('../misc/handleSignalEvents')
 const executeComponent = require('../components/executeComponent')
-
-const { getGracefulExitStatus } = handleSignalEvents()
 
 const execute = async (
   graph,
@@ -31,9 +28,8 @@ const execute = async (
       rollback
     )
     graph.removeNode(componentId)
-    const shouldGracefullyExit = getGracefulExitStatus()
-    if (shouldGracefullyExit) {
-      throw new Error('Operation gracefully exited. State successfully persistet...')
+    if (global.signalEventHandling && global.signalEventHandling.shouldExitGracefully) {
+      throw new Error('Operation gracefully exited. State successfully persisted...')
     }
     return componentId
   }, leaves)
