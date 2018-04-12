@@ -5,7 +5,7 @@ function getOrphanedComponents(serverlessFileComponents, stateFileComponents) {
   const componentIdsInStateFile = keys(stateFileComponents)
 
   const orphanedComponentIds = difference(componentIdsInStateFile, componentIdsInServerlessFile)
-  return pick(orphanedComponentIds, { ...serverlessFileComponents, ...stateFileComponents })
+  return pick(orphanedComponentIds, stateFileComponents)
 }
 
 module.exports = getOrphanedComponents
