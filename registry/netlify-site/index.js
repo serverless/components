@@ -1,6 +1,216 @@
 /* eslint-disable no-console,comma-dangle */
 const fetch = require('node-fetch')
 const parseGithubUrl = require('parse-github-url')
+const R = require('ramda')
+
+/* Deploy logic */
+const deploy = async (inputs, context) => {
+  context.log('Deploying netlify site:')
+
+  const {
+    netlifyApiToken,
+    githubApiToken,
+    siteName,
+    siteDomain,
+    siteForceSSL,
+    siteRepo,
+    siteBuildCommand,
+    siteBuildDirectory,
+    siteRepoBranch,
+    siteRepoAllowedBranches,
+  } = inputs
+
+  const componentData = compareInputsToState(inputs, context.state)
+  const inputsChanged = !componentData.isEqual
+
+  const githubData = parseGithubUrl(siteRepo)
+
+  /* No state found, run create flow */
+  if (!componentData.hasState) {
+    console.log('run create')
+  }
+
+  if (inputsChanged) {
+    console.log('inputsChanged. Run updates')
+  }
+
+  /* 1. Create netlify deploy key `createNetlifyDeployKey` */
+  const netlifyDeployKey = await createNetlifyDeployKey({}, netlifyApiToken)
+
+  /* 2. Then add key to github repo https://api.github.com/repos/owner/repoName/keys */
+  const githubDeployKey = await addGithubDeployKey({
+    repo: githubData.repo,
+    key: netlifyDeployKey.public_key,
+    githubApiToken: githubApiToken // eslint-disable-line
+  })
+
+  /* 3. Then createNetlifySite with https://api.netlify.com/api/v1/sites */
+  let siteConfig = { // eslint-disable-line
+    name: siteName,
+  }
+
+  if (siteDomain) {
+    siteConfig.custom_domain = siteDomain
+  }
+
+  if (siteForceSSL) {
+    // siteConfig.force_ssl = siteForceSSL
+  }
+
+  const branch = siteRepoBranch || 'master'
+  const allowedBranches = siteRepoAllowedBranches || [ branch ]
+
+  // Set repo configuration
+  siteConfig.repo = {
+    deploy_key_id: netlifyDeployKey.id,
+    provider: 'github',
+    public_repo: false,
+    repo_branch: branch,
+    repo_path: githubData.repo,
+    repo_type: 'git',
+    repo_url: siteRepo,
+    allowed_branches: allowedBranches
+  }
+
+  // Set build command
+  if (siteBuildCommand) {
+    siteConfig.repo.cmd = siteBuildCommand
+  }
+
+  // Set build output directory
+  if (siteBuildDirectory) {
+    siteConfig.repo.dir = siteBuildDirectory
+  }
+
+  const netlifySite = await createNetlifySite(siteConfig, netlifyApiToken)
+  // console.log('netlifySite data', netlifySite)
+
+  /* 4. Then add github webhook to repo. https://api.github.com/repos/DavidTron5000/responsible/hooks */
+  const githubWebhookConfig = {
+    repo: githubData.repo
+  }
+  const githubWebhook = await addGithubWebhook(githubWebhookConfig, githubApiToken)
+  // console.log('githubWebhook data', githubWebhook)
+
+  /* 5. Then make netlify https://api.netlify.com/api/v1/hooks call */
+  const netlifyDeployCreatedWebhook = await createNetlifyWebhook({
+    site_id: netlifySite.site_id,
+    type: 'github_commit_status',
+    event: 'deploy_created',
+    data: {
+      access_token: githubApiToken
+    }
+  }, netlifyApiToken)
+
+  /* 6. Then make another netlify https://api.netlify.com/api/v1/hooks call */
+  const netlifyDeployFailedWebhook = await createNetlifyWebhook({
+    site_id: netlifySite.site_id,
+    type: 'github_commit_status',
+    event: 'deploy_failed',
+    data: {
+      access_token: githubApiToken
+    }
+  }, netlifyApiToken)
+
+  /* 7. Then make another netlify https://api.netlify.com/api/v1/hooks call */
+  const netlifyDeployBuildingWebhook = await createNetlifyWebhook({
+    site_id: netlifySite.site_id,
+    type: 'github_commit_status',
+    event: 'deploy_failed',
+    data: {
+      access_token: githubApiToken
+    }
+  }, netlifyApiToken)
+
+  /* return all API call data */
+  const outputs = {
+    githubDeployKeyData: githubDeployKey,
+    githubWebhookData: githubWebhook,
+    netlifyDeployKeyData: netlifyDeployKey,
+    netlifySiteData: netlifySite,
+    netlifyDeployCreatedWebhook: netlifyDeployCreatedWebhook, // eslint-disable-line
+    netlifyDeployFailedWebhook: netlifyDeployFailedWebhook, // eslint-disable-line
+    netlifyDeployBuildingWebhook: netlifyDeployBuildingWebhook // eslint-disable-line
+  }
+
+  context.log(`${context.type}: ✓ Created Netlify Site`)
+  // Save state
+  const updateState = { ...inputs, ...outputs }
+  context.saveState(updateState)
+
+  return outputs
+}
+
+const remove = async (inputs, context) => {
+  console.log('Removing netlify site:')
+  const {
+    netlifyApiToken,
+    githubApiToken,
+    siteRepo
+  } = inputs
+  const githubData = parseGithubUrl(siteRepo)
+
+  const { state } = context
+
+  if (!context || !Object.keys(state).length) {
+    throw new Error('No state data found')
+  }
+
+  /* Clean up netlify DeployCreated webhook */
+  if (state.netlifyDeployCreatedWebhook.id) {
+    await deleteNetlifyWebhook(
+      state.netlifyDeployCreatedWebhook.id,
+      netlifyApiToken
+    )
+  }
+
+  /* Clean up netlify DeployFailed webhook */
+  if (state.netlifyDeployFailedWebhook.id) {
+    await deleteNetlifyWebhook(
+      state.netlifyDeployFailedWebhook.id,
+      netlifyApiToken
+    )
+  }
+
+  /* Clean up netlify DeployBuilding webhook */
+  if (state.netlifyDeployBuildingWebhook.id) {
+    await deleteNetlifyWebhook(
+      state.netlifyDeployBuildingWebhook.id,
+      netlifyApiToken
+    )
+  }
+
+  /* Clean up github webhook */
+  if (state.githubWebhookData.id) {
+    await deleteGithubWebhook({
+      repo: githubData.repo,
+      hookId: state.githubWebhookData.id
+    }, githubApiToken)
+  }
+
+  /* Remove netlify Site */
+  if (state.netlifySiteData.site_id) {
+    await deleteNetlifySite(state.netlifySiteData.site_id, netlifyApiToken)
+  }
+
+  /* Clean up github deploy keys */
+  if (state.githubDeployKeyData.id) {
+    await deleteGithubDeployKey({
+      repo: githubData.repo,
+      id: state.githubDeployKeyData.id
+    }, githubApiToken)
+  }
+
+  /* Clean up netlify deploy keys */
+  if (state.netlifyDeployKeyData.id) {
+    await deleteNetlifyDeployKey(state.netlifyDeployKeyData.id, netlifyApiToken)
+  }
+
+  const outputs = {}
+  context.saveState()
+  return outputs
+}
+
 
 async function createNetlifyDeployKey(config, apiToken) {
   console.log('Creating netlify deploy key')
@@ -26,7 +236,7 @@ async function deleteNetlifyDeployKey(id, apiToken) {
     }),
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiToken}` // eslint-disable-line
+      Authorization: `Bearer ${apiToken}`
     },
   })
 
@@ -53,7 +263,7 @@ async function createNetlifySite(config, apiToken) {
       Authorization: `Bearer ${apiToken}`
     },
   })
-  console.log(response)
+  // console.log(response)
   return await response.json() // eslint-disable-line
 }
 
@@ -95,7 +305,14 @@ async function createNetlifyWebhook(config, netlifyApiToken) {
       Authorization: `Bearer ${netlifyApiToken}`
     },
   })
-  return await response.json() // eslint-disable-line
+
+  const data = await response.json()
+
+  if (response.status === 422) {
+    throw new Error(`Error in createNetlifyWebhook ${JSON.stringify(data)}`)
+  }
+
+  return data
 }
 
 async function deleteNetlifyWebhook(hookId, apiToken) {
@@ -199,189 +416,39 @@ async function deleteGithubWebhook(config, githubApiToken) {
   return response
 }
 
-/* Deploy logic */
-const deploy = async (inputs) => {
-  console.log('Deploying netlify site:')
-
-  const { netlifyApiToken, githubApiToken } = inputs
-
-  const siteInputs = inputs.siteSettings
-
-  /* TODO: handle input validations */
-  if (!siteInputs.repo || !siteInputs.repo.url) {
-    throw new Error('Need repo url')
+// Util method to compare state values to inputs
+function compareInputsToState(inputs, state) {
+  const hasState = !!Object.keys(state).length
+  const initialData = {
+    // If no state keys... no state
+    hasState: hasState,
+    // default everything is equal
+    isEqual: true,
+    // Keys that are different
+    keys: [],
+    // Values of the keys that are different
+    diffs: {}
   }
-
-  if (!netlifyApiToken) {
-    throw new Error('No netlifyApiToken found')
-  }
-
-  if (!githubApiToken) {
-    throw new Error('No githubApiToken found')
-  }
-
-  /* TODO: Check inputs if update or create */
-
-  /* TODO: If update run update() function instead and bail */
-
-  const githubData = parseGithubUrl(siteInputs.repo.url)
-
-  /* 1. Create netlify deploy key `createNetlifyDeployKey` */
-  const netlifyDeployKey = await createNetlifyDeployKey({}, netlifyApiToken)
-  // console.log('netlifyDeployKey data', netlifyDeployKey)
-
-  /* 2. Then add key to github repo https://api.github.com/repos/owner/repoName/keys */
-  const githubDeployKey = await addGithubDeployKey({
-    repo: githubData.repo,
-    key: netlifyDeployKey.public_key,
-    githubApiToken: githubApiToken // eslint-disable-line
-  })
-  // console.log('githubDeployKey data', githubDeployKey)
-
-  /* 3. Then createNetlifySite with https://api.netlify.com/api/v1/sites */
-  let siteConfig = { // eslint-disable-line
-    name: siteInputs.name,
-  }
-
-  if (siteInputs.customDomain) {
-    siteConfig.custom_domain = siteInputs.customDomain
-  }
-
-  if (siteInputs.forceSsl) {
-    // siteConfig.force_ssl = siteInputs.forceSsl
-  }
-
-  const branch = siteInputs.repo.branch || 'master'
-  const allowedBranches = siteInputs.repo.allowedBranchs || [ branch ]
-
-  // Set repo configuration
-  siteConfig.repo = {
-    deploy_key_id: netlifyDeployKey.id,
-    provider: 'github',
-    public_repo: false,
-    repo_branch: branch,
-    repo_path: githubData.repo,
-    repo_type: 'git',
-    repo_url: siteInputs.repo.url,
-    allowed_branches: allowedBranches
-  }
-
-  // Set build command
-  if (siteInputs.repo.buildCommand) {
-    siteConfig.repo.cmd = siteInputs.repo.buildCommand
-  }
-
-  // Set build output directory
-  if (siteInputs.repo.buildDirectory) {
-    siteConfig.repo.dir = siteInputs.repo.buildDirectory
-  }
-
-  const netlifySite = await createNetlifySite(siteConfig, netlifyApiToken)
-  // console.log('netlifySite data', netlifySite)
-
-  /* 4. Then add github webhook to repo. https://api.github.com/repos/DavidTron5000/responsible/hooks */
-  const githubWebhookConfig = {
-    repo: githubData.repo
-  }
-  const githubWebhook = await addGithubWebhook(githubWebhookConfig, githubApiToken)
-  // console.log('githubWebhook data', githubWebhook)
-
-  /* 5. Then make netlify https://api.netlify.com/api/v1/hooks call */
-  const netlifyDeployCreatedWebhook = await createNetlifyWebhook({
-    site_id: netlifySite.site_id,
-    type: 'github_commit_status',
-    event: 'deploy_created',
-    data: {
-      access_token: githubApiToken
+  return Object.keys(inputs).reduce((acc, current) => {
+    // if values not deep equal. There are changes
+    if (!R.equals(inputs[current], state[current])) {
+      return {
+        hasState: hasState,
+        isEqual: false,
+        keys: acc.keys.concat(current),
+        diffs: {
+          ...acc.diffs,
+          ...{
+            [`${current}`]: {
+              inputs: inputs[current],
+              state: state[current]
+            }
+          }
+        }
+      }
     }
-  }, netlifyApiToken)
-  // console.log('netlifyDeployCreatedWebhook data', netlifyDeployCreatedWebhook)
-
-  /* 6. Then make another netlify https://api.netlify.com/api/v1/hooks call */
-  const netlifyDeployFailedWebhook = await createNetlifyWebhook({
-    site_id: netlifySite.site_id,
-    type: 'github_commit_status',
-    event: 'deploy_failed',
-    data: {
-      access_token: githubApiToken
-    }
-  }, netlifyApiToken)
-
-  /* 7. Then make another netlify https://api.netlify.com/api/v1/hooks call */
-  const netlifyDeployBuildingWebhook = await createNetlifyWebhook({
-    site_id: netlifySite.site_id,
-    type: 'github_commit_status',
-    event: 'deploy_failed',
-    data: {
-      access_token: githubApiToken
-    }
-  }, netlifyApiToken)
-
-  /* return all API call data */
-  const outputs = {
-    githubDeployKeyData: githubDeployKey,
-    githubWebhookData: githubWebhook,
-    netlifyDeployKeyData: netlifyDeployKey,
-    netlifySiteData: netlifySite,
-    netlifyDeployCreatedWebhook: netlifyDeployCreatedWebhook, // eslint-disable-line
-    netlifyDeployFailedWebhook: netlifyDeployFailedWebhook, // eslint-disable-line
-    netlifyDeployBuildingWebhook: netlifyDeployBuildingWebhook // eslint-disable-line
-  }
-
-  return outputs
-}
-
-const remove = async (inputs, options) => {
-  console.log('Removing netlify site:')
-
-  const { netlifyApiToken, githubApiToken } = inputs
-  const siteInputs = inputs.siteSettings
-  const githubData = parseGithubUrl(siteInputs.repo.url)
-
-  if (!options || !Object.keys(options).length) {
-    throw new Error('No state data found')
-  }
-
-  /* Clean up netlify DeployCreated webhook */
-  await deleteNetlifyWebhook(
-    options.netlifyDeployCreatedWebhook.id,
-    netlifyApiToken
-  )
-  // console.log('deleteNetlifyDeployCreatedWebhook data', deleteNetlifyDeployCreatedWebhook)
-
-  /* Clean up netlify DeployFailed webhook */
-  await deleteNetlifyWebhook(
-    options.netlifyDeployFailedWebhook.id,
-    netlifyApiToken
-  )
-
-  /* Clean up netlify DeployBuilding webhook */
-  await deleteNetlifyWebhook(
-    options.netlifyDeployBuildingWebhook.id,
-    netlifyApiToken
-  )
-
-  /* Clean up github webhook */
-  await deleteGithubWebhook({
-    repo: githubData.repo,
-    hookId: options.githubWebhookData.id
-  }, githubApiToken)
-
-  /* Remove netlify Site */
-  await deleteNetlifySite(options.netlifySiteData.site_id, netlifyApiToken)
-
-  /* Clean up github deploy keys */
-  await deleteGithubDeployKey({
-    repo: githubData.repo,
-    id: options.githubDeployKeyData.id
-  }, githubApiToken)
-
-  /* Clean up netlify deploy keys */
-  await deleteNetlifyDeployKey(options.netlifyDeployKeyData.id, netlifyApiToken)
-
-  // return new outputs?
-  const outputs = {}
-  return outputs
+    return acc
+  }, initialData)
 }
 
 module.exports = {

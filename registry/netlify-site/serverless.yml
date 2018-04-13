@@ -1,17 +1,58 @@
 type: netlify-site
 
-# Inputs are WIP
-inputs:
-  netlifyApiToken: 65c098ca0e3bcd79f8ac466a3529250ab9e4da6e264b4a2897c903b9d0d17e67
-  githubApiToken: c7b108f271665419cfb84c8fb4d9853ae957f445
-  siteSettings:
-    name: my-awesome-site-lol-lol.netlify.com
-    customDomain: testing-lol-lol-lol.com
-    forceSsl: true # not in use
-    repo:
-      url: https://github.com/DavidTron5000/responsible
-      # buildCommand:
-      buildDirectory: demo
-      branch: other-branch
-      allowedBranchs:
-        - other-branch
+inputTypes:
+  netlifyApiToken:
+    type: string
+    required: true
+    displayName: Netlify Personal access token
+    description: |
+      Your personal access token from https://app.netlify.com/account/applications
+    example: xyz-123-netlify-token
+  githubApiToken:
+    type: string
+    required: true
+    displayName: Github API token
+    description: |
+      Your github API key from https://github.com/settings/tokens.
+      Github access token requires one of these scopes: repo:status, repo
+    example: abc-456-github-token
+  siteName:
+    type: string
+    required: true
+    displayName: Netlify Site Name
+    description: The netlify domain you will use for your site.
+    example: my-awesome-site.netlify.com
+  siteDomain:
+    type: string
+    required: true
+    displayName: Site Domain
+    description: The domain you will use to mask your netlify siteName.
+    example: dog-sweatpants.com
+  siteForceSSL:
+    type: boolean
+    required: true
+    displayName: Force SSL
+    description: Set to true if you want to force SSL connections
+  siteRepo:
+    type: string
+    required: true
+    displayName: Site Github Repo Url
+    description: The url of your site's repository in github
+    example: https://github.com/DavidWells/dog-sweatpants-frontend
+  siteBuildDirectory:
+    type: string
+    required: true
+    displayName: Site Build Directory
+    description: The output folder of your site's build
+    example: build
+  siteRepoBranch:
+    type: string
+    required: true
+    displayName: Site Repo Branch
+    description: The production branch that will trigger builds of the netlify site
+    example: master
+  siteRepoAllowedBranches:
+    type: array
+    displayName: Site Repo Branch
+    example:
+      - master
