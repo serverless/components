@@ -1,0 +1,17 @@
+type: netlify-site-example
+
+components:
+  myNetlifySite:
+    type: netlify-site
+    inputs:
+      netlifyApiToken: xxx
+      githubApiToken: ⊂◉‿◉つ
+      siteName: my-awesome-site-lol-lol.netlify.com
+      siteDomain: testing-lol-lol-lol.com
+      siteForceSSL: true # not in use
+      siteRepo: https://github.com/DavidTron5000/responsible
+      #siteBuildCommand: npm run build
+      siteBuildDirectory: demo
+      siteRepoBranch: other-branch
+      siteRepoAllowedBranches:
+          - other-branch
