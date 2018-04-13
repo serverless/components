@@ -39,27 +39,6 @@ Serverless Components can deploy anything, but they're biased toward SaaS & clou
   * [`serverless.yml`](#serverless.yml)
   * [`index.js`](#index.js)
   * [Testing](#testing)
-* [Docs](#docs)
-  * [aws-apigateway](#aws-apigateway)
-  * [aws-cloudfront](#aws-cloudfront)
-  * [aws-dynamodb](registry/aws-dynamodb/README.md)
-  * [aws-iam-policy](#aws-iam-policy)
-  * [aws-iam-role](#aws-iam-role)
-  * [aws-lambda](#aws-lambda)
-  * [aws-route53](#aws-route53)
-  * [aws-s3-bucket](#aws-s3-bucket)
-  * [eventgateway](#eventgateway)
-  * [github](#github)
-  * [github-webhook-receiver](#github-webhook-receiver)
-  * [rest-api](#rest-api)
-  * [s3-dirloader](#s3-dirloader)
-  * [s3-downloader](#s3-downloader)
-  * [s3-policy](#s3-policy)
-  * [s3-sync](#s3-sync)
-  * [s3-uploader](#s3-uploader)
-  * [s3-website-config](#s3-website-config)
-  * [static-website](#static-website)
-
 
 ## Getting started
 
