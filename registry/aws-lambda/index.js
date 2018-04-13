@@ -3,9 +3,7 @@ const pack = require('./pack')
 
 const lambda = new AWS.Lambda({ region: 'us-east-1' })
 
-const createLambda = async ({
-  name, handler, memory, timeout, env, description, root
-}, role) => {
+async function createLambda({ name, handler, memory, timeout, env, description, root }, role) {
   const pkg = await pack(root)
 
   const params = {
@@ -32,9 +30,7 @@ const createLambda = async ({
   }
 }
 
-const updateLambda = async ({
-  name, handler, memory, timeout, env, description, root
-}, role) => {
+async function updateLambda({ name, handler, memory, timeout, env, description, root }, role) {
   const pkg = await pack(root)
   const functionCodeParams = {
     FunctionName: name,
@@ -64,7 +60,7 @@ const updateLambda = async ({
   }
 }
 
-const deleteLambda = async (name) => {
+async function deleteLambda(name) {
   const params = {
     FunctionName: name
   }
@@ -75,7 +71,7 @@ const deleteLambda = async (name) => {
   }
 }
 
-const deploy = async (inputs, context) => {
+async function deploy(inputs, context) {
   let outputs = {}
   const configuredRole = inputs.role
   let { defaultRole } = context.state
@@ -116,7 +112,7 @@ const deploy = async (inputs, context) => {
   return outputs
 }
 
-const remove = async (inputs, context) => {
+async function remove(inputs, context) {
   if (!context.state.name) return { arn: null }
 
   if (context.state.defaultRole) {
@@ -128,8 +124,17 @@ const remove = async (inputs, context) => {
   }
 
   context.log(`Removing Lambda: ${context.state.name}`)
-  const outputs = await deleteLambda(context.state.name)
-  context.saveState()
+  const outputs = {
+    arn: null
+  }
+  try {
+    await deleteLambda(context.state.name)
+  } catch (error) {
+    if (!error.message.includes('Function not found')) {
+      throw new Error(error)
+    }
+  }
+  context.saveState(outputs)
   return outputs
 }
 
