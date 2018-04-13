@@ -1,8 +1,52 @@
-# WIP Netlify Site Component
+<!-- AUTO-GENERATED-CONTENT:START (COMPONENT_HEADER) -->
+# Netlify Site
 
-Adds a site to a netlify account and configures CI/CD through github
+Serverless component that provisions netlify sites
+<!-- AUTO-GENERATED-CONTENT:END -->
 
-Only github repo URLs are currently supported
+<!-- AUTO-GENERATED-CONTENT:START (TOC) -->
+- [Input Types](#input-types)
+- [Example](#example)
+- [Usage](#usage)
+<!-- AUTO-GENERATED-CONTENT:END -->
+
+<!-- AUTO-GENERATED-CONTENT:START (COMPONENT_INPUT_TYPES) -->
+## Input Types
+| Name | Type | Description |
+|:------ |:-----|:-----------------|
+| **siteRepoAllowedBranches**| `array` | Site Repo Branch
+| **netlifyApiToken**| `string`<br/>*required* | Your personal access token from https://app.netlify.com/account/applications<br/>
+| **githubApiToken**| `string`<br/>*required* | Your github API key from https://github.com/settings/tokens.<br/>Github access token requires one of these scopes: repo:status, repo<br/>
+| **siteName**| `string`<br/>*required* | The netlify domain you will use for your site.
+| **siteDomain**| `string`<br/>*required* | The domain you will use to mask your netlify siteName.
+| **siteForceSSL**| `boolean`<br/>*required* | Set to true if you want to force SSL connections
+| **siteRepo**| `string`<br/>*required* | The url of your site's repository in github
+| **siteBuildDirectory**| `string`<br/>*required* | The output folder of your site's build
+| **siteRepoBranch**| `string`<br/>*required* | The production branch that will trigger builds of the netlify site
+
+<!-- AUTO-GENERATED-CONTENT:END -->
+
+<!-- AUTO-GENERATED-CONTENT:START (COMPONENT_EXAMPLES) -->
+## Example
+```yml
+type: my-application
+components:
+  myNetlifySite:
+    type: netlify-site
+    inputs:
+      siteRepoAllowedBranches:
+        - master
+      netlifyApiToken: xyz-123-netlify-token
+      githubApiToken: abc-456-github-token
+      siteName: my-awesome-site.netlify.com
+      siteDomain: dog-sweatpants.com
+      siteRepo: 'https://github.com/DavidWells/dog-sweatpants-frontend'
+      siteBuildDirectory: build
+      siteRepoBranch: master
+
+```
+<!-- AUTO-GENERATED-CONTENT:END -->
+
 
 ## Usage
 
@@ -12,52 +56,6 @@ Only github repo URLs are currently supported
 
 3. [Create a github access token](https://blog.github.com/2013-05-16-personal-api-tokens/)
 
-4. Configure the values in `serverless.yml`
-
-    ```yml
-    type: netlify-site
-
-    # Inputs are WIP
-    inputs:
-      netlifyApiToken: xyz-123-999
-      githubApiToken: xyz-123-4532
-      siteSettings:
-        name: mysite.netlify.com
-        customDomain: lol.com
-        forceSsl: true
-        repo:
-          url: https://github.com/serverless/platform
-          buildCommand: npm run build
-          buildDirectory: demo
-          branch: master
-          allowedBranchs:
-            - master
-    ```
+4. Configure the input values in `serverless.yml`
 
 4. Run `node ../../bin/serverless deploy`
-
-Removal is not setup
-
-## Netlify API Docs
-
-- https://open-api.netlify.com/#!/default/createSite
-- https://github.com/netlify/open-api/blob/master/swagger.yml
-- https://www.netlify.com/docs/api/
-- https://www.netlify.com/docs/cli/
-
-Zip upload only netlify upload
-
-```
-curl -H 'Content-Type: application/zip' \
-     -H 'Authorization: Bearer my-netlify-api-access-token' \
-     --data-binary '@website.zip' \
-     https://api.netlify.com/api/v1/sites/mysite.netlify.com/deploys
-```
-
-## Terraform examples
-
-- https://github.com/ajcrites/times-tables/blob/c0b23af47ef48513935dd34201a8dab9b7c0d834/infrastructure/main.tf
-
-## Travis examples
-
-- https://github.com/Mallain23/vacation-app-react-capstone/blob/814468d0764abc83fbd547e332e76129ccca8c20/.travis.yml
