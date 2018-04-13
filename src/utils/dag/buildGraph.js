@@ -2,16 +2,16 @@ const { Graph } = require('graphlib')
 const { forEach, keys, forEachObjIndexed, not, isEmpty } = require('ramda')
 const detectCircularDeps = require('./detectCircularDeps')
 
-module.exports = async (componentsToUse, componentsToRemove, command) => {
+module.exports = async (componentsToUse, orphanedComponents, command) => {
   let graph = new Graph()
 
-  // the components to remove
+  // the orphaned components which should be auto-removed
   forEach((componentId) => {
     // NOTE: here we're hard-coding the association of removal with the remove command
     graph.setNode(componentId, { type: 'orphan', command: 'remove' })
-  }, keys(componentsToRemove))
+  }, keys(orphanedComponents))
 
-  // the components to use (everything other than 'remove')
+  // the used components
   forEach((componentId) => {
     graph.setNode(componentId, { type: 'main', command })
   }, keys(componentsToUse))
