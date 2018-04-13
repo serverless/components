@@ -4,7 +4,12 @@ const s3Component = require('./index')
 jest.mock('aws-sdk', () => {
   const mocks = {
     createBucketMock: jest.fn().mockReturnValue('bucket-abc'),
-    deleteBucketMock: jest.fn(),
+    deleteBucketMock: jest.fn().mockImplementation((params) => {
+      if (params.Bucket === 'some-already-removed-bucket') {
+        return Promise.reject(new Error('The specified bucket does not exist'))
+      }
+      return Promise.resolve()
+    }),
     listObjectsV2Mock: jest.fn().mockReturnValue({ Contents: [{ Key: 'abc' }] }),
     deleteObjectsMock: jest.fn()
   }
@@ -56,7 +61,9 @@ describe('aws-s3-bucket tests', () => {
 
   it('should deploy s3 component a second time with no errors', async () => {
     const s3ContextMock = {
-      state: { name: 'some-bucket-name' },
+      state: {
+        name: 'some-bucket-name'
+      },
       archive: {},
       log: () => {},
       saveState: jest.fn()
@@ -98,7 +105,9 @@ describe('aws-s3-bucket tests', () => {
 
   it('should remove the s3 component after a deployment with no errors', async () => {
     const s3ContextMock = {
-      state: { name: 'some-bucket-name' },
+      state: {
+        name: 'some-bucket-name'
+      },
       archive: {},
       log: () => {},
       saveState: jest.fn()
@@ -118,9 +127,35 @@ describe('aws-s3-bucket tests', () => {
     expect(outputs).toEqual({ name: null })
   })
 
+  it('should update the state when removing an already removed bucket component', async () => {
+    const s3ContextMock = {
+      state: {
+        name: 'some-bucket-name'
+      },
+      archive: {},
+      log: () => {},
+      saveState: jest.fn()
+    }
+
+    const inputs = {
+      name: 'some-already-removed-bucket'
+    }
+
+    const outputs = await s3Component.remove(inputs, s3ContextMock)
+
+    expect(AWS.S3).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.deleteBucketMock).toHaveBeenCalledTimes(2)
+    expect(AWS.mocks.listObjectsV2Mock).toHaveBeenCalledTimes(2)
+    expect(AWS.mocks.deleteObjectsMock).toHaveBeenCalledTimes(2)
+    expect(s3ContextMock.saveState).toHaveBeenCalledTimes(1)
+    expect(outputs).toEqual({ name: null })
+  })
+
   it('should update the bucket name when input name is changed', async () => {
     const s3ContextMock = {
-      state: { name: 'old-bucket-name' },
+      state: {
+        name: 'some-bucket-name'
+      },
       archive: {},
       log: () => {},
       saveState: jest.fn()
@@ -134,15 +169,15 @@ describe('aws-s3-bucket tests', () => {
 
     expect(AWS.S3).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.createBucketMock).toHaveBeenCalledTimes(2)
-    expect(AWS.mocks.deleteBucketMock).toHaveBeenCalledTimes(2)
-    expect(AWS.mocks.listObjectsV2Mock).toHaveBeenCalledTimes(2)
-    expect(AWS.mocks.deleteObjectsMock).toHaveBeenCalledTimes(2)
+    expect(AWS.mocks.deleteBucketMock).toHaveBeenCalledTimes(3)
+    expect(AWS.mocks.listObjectsV2Mock).toHaveBeenCalledTimes(3)
+    expect(AWS.mocks.deleteObjectsMock).toHaveBeenCalledTimes(3)
     expect(s3ContextMock.saveState).toHaveBeenCalledTimes(1)
     expect(outputs).toEqual({ name: inputs.name })
 
-    expect(AWS.mocks.createBucketMock.mock.calls[1][0])
-      .toEqual({ Bucket: inputs.name })
-    expect(AWS.mocks.deleteBucketMock.mock.calls[1][0])
-      .toEqual({ Bucket: s3ContextMock.state.name })
+    expect(AWS.mocks.createBucketMock.mock.calls[1][0]).toEqual({ Bucket: inputs.name })
+    expect(AWS.mocks.deleteBucketMock.mock.calls[1][0]).toEqual({
+      Bucket: s3ContextMock.state.name
+    })
   })
 })
