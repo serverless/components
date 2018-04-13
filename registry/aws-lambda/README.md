@@ -13,9 +13,9 @@ AWS Lambda Serverless Component
 ## Input Types
 | Name | Type | Description |
 |:------ |:-----|:-----------------|
-| **memory**| `number`<br/>*required* | The Lambda function name
+| **memory**| `number`<br/>*required* | The functions memory size in Megabyte.
 | **timeout**| `number`<br/>*required* | The function execution time at which Lambda should terminate the function
-| **handler**| `string`<br/>*required* | The code for the Lambda function.
+| **handler**| `string`<br/>*required* | The path to the exported handler function.
 | **name**| `string` | The Lambda function name
 | **description**| `string` | A short, user-defined function description.<br/>Lambda does not use this value. Assign a meaningful description as you see fit.<br/>
 | **root**| `string` | path to source code

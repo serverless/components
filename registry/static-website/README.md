@@ -19,8 +19,8 @@ All components manage their own state and stores it in the `state.json` file.
 ## Input Types
 | Name | Type | Description |
 |:------ |:-----|:-----------------|
-| **hostingDomain**| `string` | the domain name for the site like 'rgfamily.com'
-| **aliasDomain**| `string` | the alias domain for the site like 'www.rgfamily.com'
+| **hostingDomain**| `string` | the domain name for the site like 'serverless.com'
+| **aliasDomain**| `string` | the alias domain for the site like 'www.serverless.com'
 | **contentPath**| `string` | relative path of a folder for the contents of the site like './site'
 | **contentIndex**| `string` | the index page for the site like 'index.html'
 | **contentError**| `string` | the error page for the site like 'error.html'

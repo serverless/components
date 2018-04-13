@@ -30,12 +30,12 @@ inputTypes:
     type: string
     required: false
     default: site-${self.instanceId}.example.com
-    description: the domain name for the site like 'rgfamily.com'
+    description: the domain name for the site like 'serverless.com'
   aliasDomain:
     type: string
     required: false
     default: www.site-${self.instanceId}.example.com
-    description: the alias domain for the site like 'www.rgfamily.com'
+    description: the alias domain for the site like 'www.serverless.com'
 
 components:
   renderedFiles:

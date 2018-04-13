@@ -9,7 +9,7 @@ The DynamoDB component takes one or more table models as input and provides a fu
 | Name | Type | Description |
 |:------ |:-----|:-----------------|
 | **region**| `string`<br/>*required* | The region the table will be created in.
-| **tables**| `object[]`<br/>*required* | Array of AWS dynamoDB table definitions
+| **tables**| `object[]`<br/>*required* | Array of AWS DynamoDB table definitions
 
 <!-- AUTO-GENERATED-CONTENT:END -->
 
