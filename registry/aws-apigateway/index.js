@@ -42,9 +42,7 @@ const createApi = async (params) => {
 }
 
 const updateApi = async (params) => {
-  const {
-    name, roleArn, routes, id
-  } = params
+  const { name, roleArn, routes, id } = params
 
   const swagger = getSwaggerDefinition(name, roleArn, routes)
   const json = JSON.stringify(swagger)
@@ -93,8 +91,19 @@ const deploy = async (inputs, context) => {
 
 const remove = async (inputs, context) => {
   context.log(`Removing API Gateway: "${context.state.name}"`)
-  const outputs = await deleteApi({ name: context.state.name, id: context.state.id })
-  context.saveState()
+  const outputs = {
+    id: null,
+    url: null,
+    urls: null
+  }
+  try {
+    await deleteApi({ name: context.state.name, id: context.state.id })
+  } catch (error) {
+    if (!error.message.includes('Invalid REST API identifier specified')) {
+      throw new Error(error)
+    }
+  }
+  context.saveState(outputs)
   return outputs
 }
 
