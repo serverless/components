@@ -18,10 +18,11 @@
     "components": "./bin/components"
   },
   "scripts": {
+    "cleanse": "node ./scripts/cleanse.js",
     "components": "./bin/components",
     "lint": "eslint . --cache",
     "test": "jest .",
-    "docs": "node scripts/doc-gen.js",
+    "docs": "node ./scripts/doc-gen.js",
     "postinstall": "node ./scripts/postinstall.js",
     "prepublishOnly": "node ./scripts/prepublish.js"
   },

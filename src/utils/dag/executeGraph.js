@@ -1,8 +1,15 @@
 const { isEmpty, map } = require('ramda')
 const executeComponent = require('../components/executeComponent')
 
-const execute = async (graph, components, stateFile,
-  archive, command, options, rollback = false) => {
+const execute = async (
+  graph,
+  components,
+  stateFile,
+  archive,
+  command,
+  options,
+  rollback = false
+) => {
   const leaves = graph.sinks()
 
   if (isEmpty(leaves)) {
@@ -21,6 +28,9 @@ const execute = async (graph, components, stateFile,
       rollback
     )
     graph.removeNode(componentId)
+    if (global.signalEventHandling && global.signalEventHandling.shouldExitGracefully) {
+      throw new Error('Operation gracefully exited. State successfully persisted...')
+    }
     return componentId
   }, leaves)
 

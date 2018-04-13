@@ -2,6 +2,7 @@ const path = require('path')
 const {
   difference, keys, isEmpty, forEachObjIndexed, union, not, pickBy
 } = require('ramda')
+const deferredPromise = require('../deferredPromise')
 const getRegistryRoot = require('../getRegistryRoot')
 const { fileExists } = require('../fs')
 const getState = require('../state/getState')
@@ -33,6 +34,7 @@ async function getComponentsToRemove(stateFile, loadedComponents) {
         inputs: {},
         outputs: {},
         state: getState(stateFile, id),
+        promise: deferredPromise(),
         dependencies: [], // TODO: do we need to determine the dependencies here?
         fns
       }

@@ -161,14 +161,26 @@ const deploy = async (inputs, context) => {
 const remove = async (inputs, context) => {
   if (!context.state.name) return {}
 
-  context.log(`Removing Role: ${context.state.name}`)
-  const outputs = await deleteRole(context.state)
+  const outputs = {
+    policy: null,
+    service: null,
+    arn: null
+  }
+  try {
+    context.log(`Removing Role: ${context.state.name}`)
+    await deleteRole(context.state)
+  } catch (e) {
+    if (!e.message.includes('Role not found')) {
+      throw new Error(e)
+    }
+  }
   context.saveState({
     name: null,
     arn: null,
     service: null,
     policy: null
   })
+
   return outputs
 }
 

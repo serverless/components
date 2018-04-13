@@ -12,6 +12,7 @@ afterEach(() => {
 })
 
 beforeEach(() => {
+  utils.handleSignalEvents.mockImplementation(() => {})
   utils.getComponentsToUse.mockImplementation(() =>
     Promise.resolve({ componentToUse: { id: 'component1', type: 'function' } }))
   utils.getComponentsToRemove.mockImplementation(() =>
@@ -39,6 +40,7 @@ describe('#run()', () => {
       }
     })
 
+    expect(utils.handleSignalEvents).toHaveBeenCalled()
     expect(utils.getComponentsToUse).toHaveBeenCalled()
     expect(utils.getComponentsToRemove).toHaveBeenCalled()
     expect(utils.trackDeployment).not.toHaveBeenCalled()
@@ -55,6 +57,7 @@ describe('#run()', () => {
 
     await expect(run('some-command', {})).rejects.toThrow('something went wrong')
 
+    expect(utils.handleSignalEvents).toHaveBeenCalled()
     expect(utils.getComponentsToUse).toHaveBeenCalled()
     expect(utils.getComponentsToRemove).toHaveBeenCalled()
     expect(utils.trackDeployment).not.toHaveBeenCalled()
@@ -80,6 +83,7 @@ describe('#run()', () => {
         }
       })
 
+      expect(utils.handleSignalEvents).toHaveBeenCalled()
       expect(utils.getComponentsToUse).toHaveBeenCalled()
       expect(utils.getComponentsToRemove).toHaveBeenCalled()
       expect(utils.trackDeployment).toHaveBeenCalled()
