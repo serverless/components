@@ -52,8 +52,15 @@ const deploy = async (inputs, context) => {
 const remove = async (inputs, context) => {
   if (!context.state.name) return {}
 
-  context.log(`Removing Policy: ${context.state.name}`)
-  await deletePolicy(context.state.name, context.state.arn)
+  try {
+    context.log(`Removing Policy: ${context.state.name}`)
+    await deletePolicy(context.state.name, context.state.arn)
+  } catch (e) {
+    if (!e.message.includes('does not exist or is not attachable')) {
+      throw new Error(e)
+    }
+  }
+
   context.saveState({})
   return {}
 }

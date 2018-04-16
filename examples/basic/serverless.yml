@@ -13,7 +13,7 @@ components:
 #    type: aws-iam-role
 #    inputs:
 #      service: lambda.amazonaws.com
-  myBucket:
-    type: s3-policy
+  myPolicy:
+    type: aws-iam-policy
     inputs:
-      bucketName: eslam-idempotent-s3-bucket
+      name: eslam-idempotent-iam-policy
