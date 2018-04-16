@@ -4,9 +4,11 @@ const AWS = require('aws-sdk')
 
 const S3 = new AWS.S3({ region: 'us-east-1' })
 
-const createBucket = async ({ name }) => S3.createBucket({ Bucket: name }).promise()
+async function createBucket({ name }) {
+  return S3.createBucket({ Bucket: name }).promise()
+}
 
-const deleteBucket = async ({ name }) => {
+async function deleteBucket({ name }) {
   const res = await S3.listObjectsV2({ Bucket: name }).promise()
 
   const objectsInBucket = []
@@ -30,14 +32,14 @@ const deleteBucket = async ({ name }) => {
   return S3.deleteBucket({ Bucket: name }).promise()
 }
 
-const deploy = async (inputs, context) => {
+async function deploy(inputs, context) {
   const { state } = context
 
   if (!state.name && inputs.name) {
     context.log(`Creating Bucket: '${inputs.name}'`)
     await createBucket(inputs)
     context.saveState({ name: inputs.name })
-  } else if (state.name && inputs.name && (state.name !== inputs.name)) {
+  } else if (state.name && inputs.name && state.name !== inputs.name) {
     context.log(`Removing Bucket: '${state.name}'`)
     await deleteBucket(context.state)
     context.log(`Creating Bucket: '${inputs.name}'`)
@@ -51,7 +53,7 @@ const deploy = async (inputs, context) => {
   return outputs
 }
 
-const rollback = async (inputs, context) => {
+async function rollback(inputs, context) {
   const { archive, state } = context
   if (!archive.name && state.name) {
     context.log(`Removing Bucket: ${state.name}`)
@@ -68,15 +70,22 @@ const rollback = async (inputs, context) => {
   return archive
 }
 
-const remove = async (inputs, context) => {
+async function remove(inputs, context) {
   if (!context.state.name) return {}
 
   context.log(`Removing Bucket: '${context.state.name}'`)
-  await deleteBucket(context.state)
-  context.saveState({})
-  return {
+  const outputs = {
     name: null
   }
+  try {
+    await deleteBucket(context.state)
+  } catch (error) {
+    if (!error.message.includes('The specified bucket does not exist')) {
+      throw new Error(error)
+    }
+  }
+  context.saveState(outputs)
+  return outputs
 }
 
 module.exports = {
