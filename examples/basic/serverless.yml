@@ -14,6 +14,6 @@ components:
 #    inputs:
 #      service: lambda.amazonaws.com
   myBucket:
-    type: aws-s3-bucket
+    type: s3-policy
     inputs:
-      name: eslam-idempotent-s3-bucket
+      bucketName: eslam-idempotent-s3-bucket
