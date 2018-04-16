@@ -1,10 +1,10 @@
 const { keys, reduce, not, isEmpty, append, pickBy, prop } = require('ramda')
 const reduceIndexed = require('../reduceIndexed')
 const getComponentFunctions = require('./getComponentFunctions')
-const getComponentRootPath = require('./getComponentRootPath')
 const getChildrenIds = require('./getChildrenIds')
 const getState = require('../state/getState')
 const getInputs = require('../state/getInputs')
+const getRootPath = require('../state/getRootPath')
 const deferredPromise = require('../deferredPromise')
 
 function getComponentsFromStateFile(stateFile) {
@@ -18,7 +18,7 @@ function getComponentsFromStateFile(stateFile) {
   return reduce((accum, id) => {
     const component = stateFile[id]
     const { type } = component
-    const componentRoot = getComponentRootPath(type)
+    const rootPath = getRootPath(stateFile, id)
     return {
       ...accum,
       [id]: {
@@ -26,11 +26,12 @@ function getComponentsFromStateFile(stateFile) {
         type,
         inputs: getInputs(stateFile, id),
         outputs: {},
+        rootPath,
         state: getState(stateFile, id),
         dependencies: [], // TODO: do we need to determine the dependencies here?
         children: getChildrenIds(component),
         promise: deferredPromise(),
-        fns: getComponentFunctions(componentRoot)
+        fns: getComponentFunctions(rootPath)
       }
     }
   }, {}, componentIds)

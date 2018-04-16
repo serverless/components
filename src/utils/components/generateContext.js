@@ -17,7 +17,7 @@ const generateContext = (
   command,
   internallyManaged = false
 ) => {
-  const { id, type } = component
+  const { id, type, rootPath } = component
   const serviceId = getServiceId(stateFile)
   const instanceId = getInstanceId(stateFile, id)
   const inputs = prop('inputs', component)
@@ -29,6 +29,7 @@ const generateContext = (
     archive: getState(archive, id),
     state: getState(stateFile, id),
     children: getChildrenPromises(component, components),
+    rootPath,
     command,
     options,
     log,
@@ -44,6 +45,7 @@ const generateContext = (
         stateFile
       )
       childComponent.fns = getComponentFunctions(childComponentRootPath)
+      childComponent.rootPath = childComponentRootPath
 
       const childComponentContext = generateContext(
         components,
@@ -79,6 +81,7 @@ const generateContext = (
           type,
           instanceId,
           internallyManaged,
+          rootPath,
           inputs,
           state: {}
         }
@@ -87,6 +90,7 @@ const generateContext = (
       stateFile[this.id].type = type
       stateFile[this.id].instanceId = instanceId
       stateFile[this.id].internallyManaged = internallyManaged
+      stateFile[this.id].rootPath = rootPath
       stateFile[this.id].inputs = inputs
       stateFile[this.id].state = state
       this.state = state
