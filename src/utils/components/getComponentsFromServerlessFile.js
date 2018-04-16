@@ -38,7 +38,7 @@ const getComponentsFromServerlessFile = async (
       dependencies: getDependencies(component.inputs),
       children: getChildrenIds(component) || {},
       promise: deferredPromise(),
-      fns: getComponentFunctions(component.type)
+      fns: getComponentFunctions(componentRoot)
     },
     nestedComponents
   )

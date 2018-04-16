@@ -43,7 +43,7 @@ const generateContext = (
         inputs,
         stateFile
       )
-      childComponent.fns = getComponentFunctions(type)
+      childComponent.fns = getComponentFunctions(childComponentRootPath)
 
       const childComponentContext = generateContext(
         components,
