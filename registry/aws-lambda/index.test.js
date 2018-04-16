@@ -8,7 +8,12 @@ jest.mock('aws-sdk', () => {
     createFunctionMock: jest.fn().mockReturnValue({ FunctionArn: 'abc:xyz' }),
     updateFunctionConfigurationMock: jest.fn().mockReturnValue({ FunctionArn: 'abc:xyz' }),
     updateFunctionCodeMock: jest.fn().mockReturnValue({ FunctionArn: 'abc:xyz' }),
-    deleteFunctionMock: jest.fn()
+    deleteFunctionMock: jest.fn().mockImplementation((params) => {
+      if (params.FunctionName === 'some-already-removed-function') {
+        return Promise.reject(new Error('Function not found '))
+      }
+      return Promise.resolve()
+    })
   }
 
   const Lambda = {
@@ -246,6 +251,31 @@ describe('aws-lambda tests', () => {
     })
     expect(loadRemoveMock).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.deleteFunctionMock).toHaveBeenCalledTimes(3)
+    expect(outputs.arn).toEqual(null)
+    expect(lambdaContextMock.saveState).toHaveBeenCalledTimes(1)
+  })
+
+  it('should update state when removing an already removed function component', async () => {
+    const inputs = {
+      name: 'some-already-removed-function',
+      memory: 512,
+      timeout: 10,
+      handler: 'handler.code'
+    }
+
+    const lambdaContextMock = {
+      state: {
+        name: 'some-lambda-name'
+      },
+      archive: {},
+      log: () => {},
+      saveState: jest.fn()
+    }
+
+    const outputs = await lambdaComponent.remove(inputs, lambdaContextMock)
+
+    expect(AWS.Lambda).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.deleteFunctionMock).toHaveBeenCalledTimes(4)
     expect(outputs.arn).toEqual(null)
     expect(lambdaContextMock.saveState).toHaveBeenCalledTimes(1)
   })
