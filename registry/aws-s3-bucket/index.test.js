@@ -5,7 +5,12 @@ jest.mock('aws-sdk', () => {
   const mocks = {
     createBucketMock: jest.fn().mockReturnValue('bucket-abc'),
     deleteBucketMock: jest.fn(),
-    listObjectsV2Mock: jest.fn().mockReturnValue({ Contents: [{ Key: 'abc' }] }),
+    listObjectsV2Mock: jest.fn().mockImplementation((params) => {
+      if (params.Bucket === 'some-already-removed-bucket') {
+        return Promise.reject(new Error('The specified bucket does not exist'))
+      }
+      return Promise.resolve({ Contents: [{ Key: 'abc' }] })
+    }),
     deleteObjectsMock: jest.fn()
   }
 
@@ -144,5 +149,24 @@ describe('aws-s3-bucket tests', () => {
       .toEqual({ Bucket: inputs.name })
     expect(AWS.mocks.deleteBucketMock.mock.calls[1][0])
       .toEqual({ Bucket: s3ContextMock.state.name })
+  })
+
+  it('should update state when removing an already removed s3 component', async () => {
+    const inputs = {
+      name: 'some-already-removed-bucket'
+    }
+    const s3ContextMock = {
+      state: inputs,
+      archive: {},
+      log: () => {},
+      saveState: jest.fn()
+    }
+
+    const outputs = await s3Component.remove(inputs, s3ContextMock)
+
+    expect(AWS.S3).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.listObjectsV2Mock).toHaveBeenCalledTimes(3)
+    expect(s3ContextMock.saveState).toBeCalledWith({})
+    expect(outputs).toEqual({ name: null })
   })
 })
