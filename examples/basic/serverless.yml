@@ -13,7 +13,21 @@ components:
 #    type: aws-iam-role
 #    inputs:
 #      service: lambda.amazonaws.com
-  myPolicy:
-    type: aws-iam-policy
+  productsDb:
+    type: aws-dynamodb
     inputs:
-      name: eslam-idempotent-iam-policy
+      region: us-east-1
+      tables:
+        - name: products-${self.serviceId}
+          hashKey: id
+          indexes:
+            - name: ProductIdIndex
+              type: global
+              hashKey: id
+          schema:
+            id: number
+            name: string
+            description: string
+            price: number
+          options:
+            timestamps: true

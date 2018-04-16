@@ -278,7 +278,9 @@ const remove = async (inputs, context) => {
     try {
       ddbTables = await deleteTable(inputs, context, tableName)
     } catch (err) {
-      context.log(`Error in removing table: '${tableName}'\n${err.message}`)
+      if (!err.message.includes('Requested resource not found: Table:')) {
+        throw new Error(err)
+      }
     }
   }
 
