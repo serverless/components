@@ -5,5 +5,5 @@ inputTypes:
     type: string
     required: true
   tables:
-    type: object[]
+    type: object
     required: true
