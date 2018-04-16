@@ -1,15 +1,19 @@
 type: my-project
 
 components:
-  myFunction:
-    type: aws-lambda
+#  myFunction:
+#    type: aws-lambda
+#    inputs:
+#      memory: 512
+#      timeout: 10
+#      handler: handler.handler
+#      role:
+#        arn: ${myRole.arn}
+#  myRole:
+#    type: aws-iam-role
+#    inputs:
+#      service: lambda.amazonaws.com
+  myBucket:
+    type: aws-s3-bucket
     inputs:
-      memory: 512
-      timeout: 10
-      handler: handler.handler
-      role:
-        arn: ${myRole.arn}
-  myRole:
-    type: aws-iam-role
-    inputs:
-      service: lambda.amazonaws.com
+      name: eslam-idempotent-s3-bucket
