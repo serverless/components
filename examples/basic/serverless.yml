@@ -1,33 +1,15 @@
 type: my-project
 
 components:
-#  myFunction:
-#    type: aws-lambda
-#    inputs:
-#      memory: 512
-#      timeout: 10
-#      handler: handler.handler
-#      role:
-#        arn: ${myRole.arn}
-#  myRole:
-#    type: aws-iam-role
-#    inputs:
-#      service: lambda.amazonaws.com
-  productsDb:
-    type: aws-dynamodb
+  myFunction:
+    type: aws-lambda
     inputs:
-      region: us-east-1
-      tables:
-        - name: products-${self.serviceId}
-          hashKey: id
-          indexes:
-            - name: ProductIdIndex
-              type: global
-              hashKey: id
-          schema:
-            id: number
-            name: string
-            description: string
-            price: number
-          options:
-            timestamps: true
+      memory: 512
+      timeout: 10
+      handler: handler.handler
+      role:
+        arn: ${myRole.arn}
+  myRole:
+    type: aws-iam-role
+    inputs:
+      service: lambda.amazonaws.com
