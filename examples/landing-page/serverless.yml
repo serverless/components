@@ -1,0 +1,34 @@
+type: landing-page
+
+components:
+  landingPageFunction:
+    type: aws-lambda
+    inputs:
+      memory: 512
+      timeout: 10
+      handler: code/handler.landingPageFunction
+  apiEndpoint:
+    type: rest-api
+    inputs:
+      gateway: aws-apigateway
+      routes:
+        /sign-up:
+          post:
+            function: ${landingPageFunction}
+            cors: true
+  myNetlifySite:
+    type: netlify-site
+    inputs:
+      netlifyApiToken: abc
+      githubApiToken: 123
+      siteName: my-awesome-site-lol-lol.netlify.com
+      siteDomain: testing-lol-lol-lol.com
+      siteForceSSL: true # not in use
+      siteRepo: https://github.com/serverless/netlify-landing-page
+      siteBuildCommand: npm run build
+      siteBuildDirectory: build
+      siteRepoBranch: master
+      siteRepoAllowedBranches:
+          - master
+      siteEnvVars:
+        REACT_APP_SIGNUP_API: ${apiEndpoint.url}sign-up
