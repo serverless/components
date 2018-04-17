@@ -12,8 +12,8 @@ Provision AWS IAM Policies with serverless components
 ## Input Types
 | Name | Type | Description |
 |:------ |:-----|:-----------------|
-| **document**| `object`<br/>*required* | The JSON policy document that you want to use as the content for the new policy.
-| **name**| `string` | The friendly name of the policy.
+| **document**| `object`<br/>*required* | The JSON policy document that you want to use as the content for the new policy
+| **name**| `string` | The friendly name of the policy
 
 <!-- AUTO-GENERATED-CONTENT:END -->
 

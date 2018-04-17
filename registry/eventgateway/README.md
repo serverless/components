@@ -15,7 +15,7 @@ Event Gateway Serverless Component.
 |:------ |:-----|:-----------------|
 | **cors**| `boolean` | cors
 | **method**| `string` | method
-| **eventGatewayApiKey**| `string` | API key of your event gateway space.
+| **eventGatewayApiKey**| `string` | API key of your event gateway space
 | **event**| `string`<br/>*required* | event
 | **path**| `string`<br/>*required* | path
 | **space**| `string`<br/>*required* | space

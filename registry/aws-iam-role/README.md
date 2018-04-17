@@ -14,8 +14,8 @@ Provision AWS IAM Roles with serverless components
 | Name | Type | Description |
 |:------ |:-----|:-----------------|
 | **service**| `string`<br/>*required* | The name of the AWS service to create role for
-| **name**| `string` | The name of the role to create.
-| **policy**| `object` | The policy that grants an entity permission to assume the role.
+| **name**| `string` | The name of the role to create
+| **policy**| `object` | The policy that grants an entity permission to assume the role
 
 <!-- AUTO-GENERATED-CONTENT:END -->
 

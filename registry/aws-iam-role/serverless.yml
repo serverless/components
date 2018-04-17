@@ -5,7 +5,7 @@ inputTypes:
     type: string
     default: role-${self.instanceId}
     displayName: IAM role name
-    description: The name of the role to create.
+    description: The name of the role to create
   service:
     type: string
     required: true
@@ -15,4 +15,4 @@ inputTypes:
   policy:
     type: object
     displayName: IAM Role Policy
-    description: The policy that grants an entity permission to assume the role.
+    description: The policy that grants an entity permission to assume the role

@@ -19,13 +19,13 @@ All components manage their own state and stores it in the `state.json` file.
 ## Input Types
 | Name | Type | Description |
 |:------ |:-----|:-----------------|
-| **hostingDomain**| `string` | the domain name for the site like 'serverless.com'
-| **aliasDomain**| `string` | the alias domain for the site like 'www.serverless.com'
-| **contentPath**| `string` | relative path of a folder for the contents of the site like './site'
-| **contentIndex**| `string` | the index page for the site like 'index.html'
-| **contentError**| `string` | the error page for the site like 'error.html'
-| **hostingRegion**| `string` | the AWS region where the site will be hosted like 'us-east-1'
-| **name**| `string`<br/>*required* | logical name of the site
+| **hostingDomain**| `string` | The domain name for the site like 'serverless.com'
+| **aliasDomain**| `string` | The alias domain for the site like 'www.serverless.com'
+| **contentPath**| `string` | Relative path of a folder for the contents of the site like './site'
+| **contentIndex**| `string` | The index page for the site like 'index.html'
+| **contentError**| `string` | The error page for the site like 'error.html'
+| **hostingRegion**| `string` | The AWS region where the site will be hosted like 'us-east-1'
+| **name**| `string`<br/>*required* | Logical name of the site
 | **templateValues**| `object`<br/>*required* | templateValues
 
 <!-- AUTO-GENERATED-CONTENT:END -->
