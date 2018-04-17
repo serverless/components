@@ -5,13 +5,14 @@ components:
     type: netlify-site
     inputs:
       netlifyApiToken: xxx
-      githubApiToken: ⊂◉‿◉つ
+      githubApiToken: yyy
       siteName: my-awesome-site-lol-lol.netlify.com
       siteDomain: testing-lol-lol-lol.com
-      siteForceSSL: true # not in use
       siteRepo: https://github.com/DavidTron5000/responsible
-      #siteBuildCommand: npm run build
       siteBuildDirectory: demo
+      siteEnvVars:
+        foo: bar
+        baz: faas
       siteRepoBranch: other-branch
       siteRepoAllowedBranches:
           - other-branch
