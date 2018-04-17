@@ -14,8 +14,8 @@ Serverless component that provisions github webhooks
 ## Input Types
 | Name | Type | Description |
 |:------ |:-----|:-----------------|
-| **githubApiToken**| `string`<br/>*required* | Github personal access token needed for access to the github API.<br/>[Create a token](https://github.com/settings/tokens)<br/>
-| **githubRepo**| `string`<br/>*required* | URL of github repo
+| **githubApiToken**| `string`<br/>*required* | GitHub personal access token needed for access to the github API.<br/>[Create a token](https://github.com/settings/tokens)<br/>
+| **githubRepo**| `string`<br/>*required* | The GitHub repos URL
 | **payloadUrl**| `string`<br/>*required* | Payload Url
 | **events**| `array`<br/>*required* | What type of event(s) will trigger the webhook URL.<br/>List of allowed events. For more details on events & payloads [see the docs](https://developer.github.com/v3/activity/events/types/)<br/>
 
