@@ -8,8 +8,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/serverless/components"
+    "url": "git+https://github.com/serverless/components.git"
   },
   "author": "serverless.com",
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/serverless/components/issues"
+  },
+  "homepage": "https://github.com/serverless/components#readme",
+  "dependencies": {
+    "request": "^2.85.0"
+  },
+  "devDependencies": {}
 }

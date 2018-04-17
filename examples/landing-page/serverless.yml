@@ -7,6 +7,10 @@ components:
       memory: 512
       timeout: 10
       handler: code/handler.landingPageFunction
+      env:
+        MAILCHIMP_API_KEY: xyz-us11
+        MAILCHIMP_LIST_ID: lol-id-here
+        MAILCHIMP_REGION: us11
   apiEndpoint:
     type: rest-api
     inputs:
@@ -19,10 +23,10 @@ components:
   myNetlifySite:
     type: netlify-site
     inputs:
-      netlifyApiToken: abc
-      githubApiToken: 123
-      siteName: my-awesome-site-lol-lol.netlify.com
-      siteDomain: testing-lol-lol-lol.com
+      netlifyApiToken: xxxx
+      githubApiToken: yyyy
+      siteName: serverless-components.netlify.com
+      siteDomain: components.serverless.com
       siteForceSSL: true # not in use
       siteRepo: https://github.com/serverless/netlify-landing-page
       siteBuildCommand: npm run build
