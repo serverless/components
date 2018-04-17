@@ -22,6 +22,7 @@ Serverless component that provisions netlify sites
 | **siteForceSSL**| `boolean`<br/>*required* | Set to true if you want to force SSL connections
 | **siteRepo**| `string`<br/>*required* | The url of your site's repository in github
 | **siteBuildDirectory**| `string`<br/>*required* | The output folder of your site's build
+| **siteEnvironmentVariables**| `object`<br/>*required* | The variables used during netlify site build
 | **siteRepoBranch**| `string`<br/>*required* | The production branch that will trigger builds of the netlify site
 
 <!-- AUTO-GENERATED-CONTENT:END -->
@@ -42,6 +43,8 @@ components:
       siteDomain: dog-sweatpants.com
       siteRepo: 'https://github.com/DavidWells/dog-sweatpants-frontend'
       siteBuildDirectory: build
+      siteEnvironmentVariables:
+        foo: bar
       siteRepoBranch: master
 
 ```

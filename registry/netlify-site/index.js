@@ -18,6 +18,7 @@ const deploy = async (inputs, context) => {
     siteBuildDirectory,
     siteRepoBranch,
     siteRepoAllowedBranches,
+    siteEnvVars
   } = inputs
 
   const componentData = compareInputsToState(inputs, context.state)
@@ -80,6 +81,11 @@ const deploy = async (inputs, context) => {
   // Set build output directory
   if (siteBuildDirectory) {
     siteConfig.repo.dir = siteBuildDirectory
+  }
+
+  // Set build env vars
+  if (siteEnvVars) {
+    siteConfig.repo.env = siteEnvVars
   }
 
   const netlifySite = await createNetlifySite(siteConfig, netlifyApiToken)

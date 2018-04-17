@@ -45,6 +45,12 @@ inputTypes:
     displayName: Site Build Directory
     description: The output folder of your site's build
     example: build
+  siteEnvVars:
+    type: object
+    displayName: Site Build Env Variables
+    description: The variables used during netlify site build
+    example:
+      foo: bar
   siteRepoBranch:
     type: string
     required: true
