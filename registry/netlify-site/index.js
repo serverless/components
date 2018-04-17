@@ -28,11 +28,11 @@ const deploy = async (inputs, context) => {
 
   /* No state found, run create flow */
   if (!componentData.hasState) {
-    console.log('run create')
+    context.log('run create')
   }
 
   if (inputsChanged) {
-    console.log('inputsChanged. Run updates')
+    context.log('inputsChanged. Run updates')
   }
 
   /* 1. Create netlify deploy key `createNetlifyDeployKey` */
@@ -148,7 +148,7 @@ const deploy = async (inputs, context) => {
 }
 
 const remove = async (inputs, context) => {
-  console.log('Removing netlify site:')
+  context.log('Removing netlify site:')
   const {
     netlifyApiToken,
     githubApiToken,
