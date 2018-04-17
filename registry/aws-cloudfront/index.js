@@ -203,18 +203,12 @@ const deleteDistribution = async (distributionId) => {
   // disable distribution first
   const res = await toggleEnabledForDistribution(distributionId, false)
 
-  // delete distribution
-  try {
-    await CloudFront.deleteDistribution({
-      Id: distributionId,
-      IfMatch: res.distribution.eTag
-    }).promise()
-    console.log(`CloudFront distribution '${distributionId}' deletion initiated`)
-    return {}
-  } catch (err) {
-    console.log(`Error in deleting CloudFront distribution '${distributionId}'`, err.message)
-    return { error: err }
-  }
+  await CloudFront.deleteDistribution({
+    Id: distributionId,
+    IfMatch: res.distribution.eTag
+  }).promise()
+
+  console.log(`CloudFront distribution '${distributionId}' deletion initiated`)
 }
 
 
@@ -248,14 +242,19 @@ const deploy = async (inputs, context) => {
 const remove = async (inputs, context) => {
   if (!context.state.name) return {}
 
-  context.log(`Removing CloudFront distribution: '${context.state.name}' with id: '${context.state.distribution.id}'`)
-  const res = await deleteDistribution(
-    context.state.distribution.id,
-    context.state.distribution.eTag
-  )
-  if (!res.error) {
-    context.saveState({})
+  try {
+    context.log(`Removing CloudFront distribution: '${context.state.name}' with id: '${context.state.distribution.id}'`)
+    await deleteDistribution(
+      context.state.distribution.id,
+      context.state.distribution.eTag
+    )
+  } catch (e) {
+    if (!e.message.includes('The specified distribution does not exist')) {
+      throw new Error(e)
+    }
   }
+
+  context.saveState({})
   return {}
 }
 
