@@ -190,12 +190,18 @@ const deploy = async (inputs, context) => {
 const remove = async (inputs, context) => {
   if (!context.state.name) return {}
 
-  context.log(`Removing Route53 mapping: '${context.state.hostedZone.name}' with id: '${context.state.hostedZone.id}'`)
-  await removeRoute53ToCloudFrontDomainMapping(
-    inputs.domainName,
-    inputs.dnsName,
-    context.state.hostedZone.id
-  )
+  try {
+    context.log(`Removing Route53 mapping: '${context.state.hostedZone.name}' with id: '${context.state.hostedZone.id}'`)
+    await removeRoute53ToCloudFrontDomainMapping(
+      inputs.domainName,
+      inputs.dnsName,
+      context.state.hostedZone.id
+    )
+  } catch (e) {
+    if (!e.message.includes('No hosted zone found with ID')) {
+      throw new Error(e)
+    }
+  }
   context.saveState({})
   return {}
 }
