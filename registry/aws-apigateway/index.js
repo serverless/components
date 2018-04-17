@@ -92,8 +92,21 @@ const deploy = async (inputs, context) => {
 }
 
 const remove = async (inputs, context) => {
-  context.log(`Removing API Gateway: "${context.state.name}"`)
-  const outputs = await deleteApi({ name: context.state.name, id: context.state.id })
+  const outputs = {
+    id: null,
+    url: null,
+    urls: null
+  }
+
+  try {
+    context.log(`Removing API Gateway: "${context.state.name}"`)
+    await deleteApi({ name: context.state.name, id: context.state.id })
+  } catch (e) {
+    if (!e.message.includes('Invalid REST API identifier specified')) {
+      throw new Error(e)
+    }
+  }
+
   context.saveState()
   return outputs
 }

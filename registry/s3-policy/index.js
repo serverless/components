@@ -99,9 +99,17 @@ const deploy = async (inputs, context) => {
 const remove = async (inputs, context) => {
   if (!context.state.bucketName) return {}
 
-  context.log(`Removing policy for bucket: '${context.state.bucketName}'`)
-  await unsetPolicyAndCors(context.state.bucketName)
+  try {
+    context.log(`Removing policy for bucket: '${context.state.bucketName}'`)
+    await unsetPolicyAndCors(context.state.bucketName)
+  } catch (e) {
+    if (!e.message.includes('The specified bucket does not exist')) {
+      throw new Error(e)
+    }
+  }
+
   context.saveState({})
+
   return {}
 }
 
