@@ -199,7 +199,7 @@ const remove = async (inputs, context) => {
     )
   } catch (e) {
     if (!e.message.includes('No hosted zone found with ID')) {
-      throw new Error(e)
+      throw e
     }
   }
   context.saveState({})
