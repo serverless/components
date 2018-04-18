@@ -117,9 +117,11 @@ Also please do join the _Components_ channel on our public [Serverless-Contrib S
 ## Table of contents
 
 * [Getting started](#getting-started)
+* [Try it out](#try-it-out)
 * [Current limitations](#current-limitations)
 * [Concepts](#concepts)
   * [Components](#components)
+  * [Composition](#composition)
   * [Input types, Inputs & Outputs](#input-types-inputs-outputs)
   * [State](#state)
   * [Variables](#variables)
@@ -148,7 +150,6 @@ Also please do join the _Components_ channel on our public [Serverless-Contrib S
     * [eventgateway](./registry/eventgateway)
     * [github-webhook](./registry/github-webhook)
     * [github-webhook-aws](./registry/github-webhook-aws)
-    * [github-webhook-receiver](./registry/github-webhook-receiver)
     * [mustache](./registry/mustache)
     * [netlify-site](./registry/netlify-site)
     * [rest-api](#rest-api)
@@ -159,6 +160,14 @@ Also please do join the _Components_ channel on our public [Serverless-Contrib S
     * [s3-uploader](#s3-uploader)
     * [s3-website-config](#s3-website-config)
     * [static-website](#static-website)
+* [Examples](#examples)
+  * [Basic Lambda Example](./examples/basic)
+  * [Blog Example](./examples/blog)
+  * [Github Webhook Example](./examples/basic)
+  * [Landing Page Example](./examples/landing-page)
+  * [Netlify Site Example](./examples/netlify-site-example)
+  * [Rest API Example](./examples/restapi)
+  * [Retail App](./examples/retail-app)
 
 
 ## Getting started
@@ -175,9 +184,10 @@ Run commands with
 ```
 components [Command]
 ```
-Checkout the [CLI docs](#cli-usage)
+Checkout the [CLI docs](#cli-usage) for a list of all the available commands and instructions on how they work.
 
-### Trying it out
+
+## Trying it out
 
 The best way to give components a try is to deploy one of the examples. We recommend checking out our [retail-app example](./examples/retail-app) and to follow along with the instructions there.
 
@@ -202,11 +212,12 @@ However the framework ensures that your state file always reflects the correct s
 
 ### Components
 
-A component is the smallest unit of abstraction for your infrastructure. It can be a single small piece like an IAM role, or a larger piece that includes other small pieces, like [`github-webhook-receiver`](#github-webhook-receiver), which includes `aws-lambda` (which itself includes `aws-iam-role`), `aws-apigateway` (which also includes `aws-iam-role`), `aws-dynamodb`, and `github`. So components can be composed with each other in a component dependency graph to build larger components.
+A component is the smallest unit of abstraction for your infrastructure. It can be a single small piece like an IAM role, or a larger piece that includes other small pieces, like [`github-webhook-receiver`](#github-webhook-receiver), which includes `aws-lambda` (which itself includes `aws-iam-role`), `aws-apigateway` (which also includes `aws-iam-role`), `aws-dynamodb`, and `github-webhook`. So components can be composed with each other in a component dependency graph to build larger components.
 
 You define a component using two files: `serverless.yml` for config, and `index.js` for the provisioning logic.
 
-The `index.js` file exports multiple functions that take two arguments: `inputs` and `context`. Each exported function name reflects the CLI command which will invoke it (the `deploy` function will be executed when one runs `components deploy`).
+The `index.js` file exports a `deploy` function and a `remove` function, both of which take two arguments: `inputs` and `context`. Each exported function name reflects the CLI command which will invoke it (the `deploy` function will be executed when one runs `components deploy`).
+
 
 These two files look something like this:
 
@@ -232,8 +243,13 @@ const deploy = (inputs, context) => {
   // provisioning logic goes here
 }
 
+const remove = (inputs, context) => {
+  // de-provisioning logic goes here
+}
+
 module.exports = {
-  deploy // this is the command name which is exposed via the CLI
+  deploy,
+  remove
 }
 ```
 
@@ -242,12 +258,32 @@ However, this `index.js` file is optional, since your component can just be a co
 
 ### Composition
 
-Components can include other components in order to build up higher level use cases and expose
+Components can include other components in order to build up higher level use cases and expose a minimum amount of configuration.
+
+When composing components we simply include them in a `components` property within our own component. In this example, `my-component` composes an `aws-lambda` and an `aws-iam-role` component.
+
+```yaml
+type: my-component
+
+components:
+  myFunction:
+    type: aws-lambda
+    inputs:
+      memory: 512
+      timeout: 10
+      handler: handler.handler
+      role:
+        arn: ${myRole.arn}
+  myRole:
+    type: aws-iam-role
+    inputs:
+      service: lambda.amazonaws.com
+
+```
 
 ### Input types, Inputs & Outputs
 
 #### Input types
-
 
 Input types are the description of the inputs your component receives. You supply those `inputTypes` in the component's `serverless.yml` file:
 
@@ -285,8 +321,8 @@ components:
   myFunction:
     type: aws-lambda
     inputs:
-      memory: 512
-      timeout: 300
+      memory: 512 # This input sets the amount of memory the lambda function will use
+      timeout: 300 # This input sets the timeout for the aws-lambda function
 ```
 
 Given this `serverless.yml` you would deploy a `aws-lambda` function with a memory size of 512 and timeout of 300.
@@ -610,3 +646,13 @@ components remove
 * [s3-uploader](#s3-uploader)
 * [s3-website-config](#s3-website-config)
 * [static-website](#static-website)
+
+
+## Examples
+* [Basic Lambda Example](./examples/basic)
+* [Blog Example](./examples/blog)
+* [Github Webhook Example](./examples/basic)
+* [Landing Page Example](./examples/landing-page)
+* [Netlify Site Example](./examples/netlify-site-example)
+* [Rest API Example](./examples/restapi)
+* [Retail App](./examples/retail-app)
