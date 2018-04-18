@@ -8,8 +8,8 @@ components:
       timeout: 10
       handler: code/handler.landingPageFunction
       env:
-        MAILCHIMP_API_KEY: xyz-us11
-        MAILCHIMP_LIST_ID: lol-id-here
+        MAILCHIMP_API_KEY: my-mailchimp-api-key
+        MAILCHIMP_LIST_ID: my-mailchimp-list-id
         MAILCHIMP_REGION: us11
   apiEndpoint:
     type: rest-api
@@ -23,8 +23,8 @@ components:
   myNetlifySite:
     type: netlify-site
     inputs:
-      netlifyApiToken: xxxx
-      githubApiToken: yyyy
+      netlifyApiToken: my-netlify-api-token
+      githubApiToken: my-github-api-token
       siteName: serverless-components.netlify.com
       siteDomain: components.serverless.com
       siteForceSSL: true # not in use

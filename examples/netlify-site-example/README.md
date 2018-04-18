@@ -1,23 +1,23 @@
 # Netlify Site Example
 
-This is an example of using the netlify site component
+This is an example of using the Netlify site component.
 
 ## Usage
 
 ### Deploy
 
-1. Configure serverless.yml with your api keys and the site/app's github repository
+1. Configure `serverless.yml` with your API keys and the site / app's GitHub repository
 
-2. Run deploy command
+2. Run `deploy` command
 
-    ```bash
-    ../../bin/components deploy
-    ```
+```bash
+bin/components deploy
+```
 
 ### Remove
 
-2. Run remove command
+1. Run `remove` command
 
-    ```bash
-    ../../bin/components remove
-    ```
+```bash
+components remove
+```

@@ -14,6 +14,7 @@ Serverless component that provisions netlify sites
 ## Input Types
 | Name | Type | Description |
 |:------ |:-----|:-----------------|
+| **siteEnvVars**| `object` | The variables used during netlify site build
 | **siteRepoAllowedBranches**| `array` | Site Repo Branch
 | **netlifyApiToken**| `string`<br/>*required* | Your personal access token from https://app.netlify.com/account/applications<br/>
 | **githubApiToken**| `string`<br/>*required* | Your github API key from https://github.com/settings/tokens.<br/>Github access token requires one of these scopes: repo:status, repo<br/>
@@ -22,7 +23,6 @@ Serverless component that provisions netlify sites
 | **siteForceSSL**| `boolean`<br/>*required* | Set to true if you want to force SSL connections
 | **siteRepo**| `string`<br/>*required* | The url of your site's repository in github
 | **siteBuildDirectory**| `string`<br/>*required* | The output folder of your site's build
-| **siteEnvironmentVariables**| `object`<br/>*required* | The variables used during netlify site build
 | **siteRepoBranch**| `string`<br/>*required* | The production branch that will trigger builds of the netlify site
 
 <!-- AUTO-GENERATED-CONTENT:END -->
@@ -35,6 +35,8 @@ components:
   myNetlifySite:
     type: netlify-site
     inputs:
+      siteEnvVars:
+        foo: bar
       siteRepoAllowedBranches:
         - master
       netlifyApiToken: xyz-123-netlify-token
@@ -43,8 +45,6 @@ components:
       siteDomain: dog-sweatpants.com
       siteRepo: 'https://github.com/DavidWells/dog-sweatpants-frontend'
       siteBuildDirectory: build
-      siteEnvironmentVariables:
-        foo: bar
       siteRepoBranch: master
 
 ```

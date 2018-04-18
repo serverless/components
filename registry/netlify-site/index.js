@@ -89,14 +89,12 @@ const deploy = async (inputs, context) => {
   }
 
   const netlifySite = await createNetlifySite(siteConfig, netlifyApiToken)
-  // console.log('netlifySite data', netlifySite)
 
   /* 4. Then add github webhook to repo. https://api.github.com/repos/DavidTron5000/responsible/hooks */
   const githubWebhookConfig = {
     repo: githubData.repo
   }
   const githubWebhook = await addGithubWebhook(githubWebhookConfig, githubApiToken)
-  // console.log('githubWebhook data', githubWebhook)
 
   /* 5. Then make netlify https://api.netlify.com/api/v1/hooks call */
   const netlifyDeployCreatedWebhook = await createNetlifyWebhook({
@@ -269,7 +267,6 @@ async function createNetlifySite(config, apiToken) {
       Authorization: `Bearer ${apiToken}`
     },
   })
-  // console.log(response)
   return await response.json() // eslint-disable-line
 }
 

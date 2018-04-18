@@ -4,11 +4,11 @@ components:
   myNetlifySite:
     type: netlify-site
     inputs:
-      netlifyApiToken: xxx
-      githubApiToken: yyy
-      siteName: my-awesome-site-lol-lol.netlify.com
-      siteDomain: testing-lol-lol-lol.com
-      siteRepo: https://github.com/DavidTron5000/responsible
+      netlifyApiToken: my-netlify-api-token
+      githubApiToken: my-github-api-token
+      siteName: serverless-components.netlify.com
+      siteDomain: components.serverless.com
+      siteRepo: https://github.com/serverless/netlify-landing-page
       siteBuildDirectory: demo
       siteEnvVars:
         foo: bar
