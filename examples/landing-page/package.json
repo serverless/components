@@ -1,0 +1,23 @@
+{
+  "name": "landing-page",
+  "version": "0.1.0",
+  "description": "Landing Page",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/serverless/components.git"
+  },
+  "author": "serverless.com",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/serverless/components/issues"
+  },
+  "homepage": "https://github.com/serverless/components#readme",
+  "dependencies": {
+    "request": "^2.85.0"
+  },
+  "devDependencies": {}
+}
