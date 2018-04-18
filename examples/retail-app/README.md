@@ -9,14 +9,14 @@ An example retail application composed of a few serverless components. The appli
 **Note:** Make sure you have Node.js 8+ and npm installed on your machine
 
 1. `npm install --global serverless-components`
-1. Setup the environment variables
+2. Setup the environment variables
    * `export AWS_ACCESS_KEY_ID=my_access_key_id`
    * `export AWS_SECRET_ACCESS_KEY=my_secret_access_key`
-1. clone this repo to bring down the example code.
+3. clone this repo to bring down the example code.
   ```sh
   $ git clone https://github.com/serverless/components.git
   ```
-1. cd into this example
+4. cd into this example
   ```sh
   $ cd components/examples/retail-app
   ```
