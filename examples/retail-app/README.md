@@ -13,13 +13,13 @@ An example retail application composed of a few serverless components. The appli
    * `export AWS_ACCESS_KEY_ID=my_access_key_id`
    * `export AWS_SECRET_ACCESS_KEY=my_secret_access_key`
 1. clone this repo to bring down the example code.
-```sh
-$ git clone https://github.com/serverless/components.git
-```
+  ```sh
+  $ git clone https://github.com/serverless/components.git
+  ```
 1. cd into this example
-```sh
-$ cd components/examples/retail-app
-```
+  ```sh
+  $ cd components/examples/retail-app
+  ```
 
 ## Operations
 
