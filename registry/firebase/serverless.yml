@@ -1,4 +1,4 @@
-type: firebase-database-realtime
+type: firebase
 
 inputTypes:
   project:
@@ -13,3 +13,7 @@ inputTypes:
     type: string
     required: true
     description: "Path to your firebase project"
+  config:
+    type: object
+    required: false
+    description: "Config values to set for firebase function runtime"
