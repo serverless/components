@@ -250,7 +250,7 @@ const remove = async (inputs, context) => {
     )
   } catch (e) {
     if (e.message.includes('The distribution you are trying to delete has not been disabled')) {
-      console.log('Could not delete distribution as it is not disabled or is still being disabled. Please disable it or try again later.')
+      context.log('Could not delete distribution as it is not disabled or is still being disabled. Please disable it or try again later.')
       e.code = 'RETAIN_STATE'
       throw e
     } else if (!e.message.includes('The specified distribution does not exist')) {
