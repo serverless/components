@@ -20,7 +20,99 @@ Serverless Components can deploy anything, but they're biased toward SaaS & clou
 
 ![serverless components overview](https://s3.amazonaws.com/assets.github.serverless/serverless-components-overview-2.gif)
 
-• [Join the discussion on Slack - Serverless Contrib](https://join.slack.com/t/serverless-contrib/shared_invite/enQtMjI5NzY1ODM2MTc3LTRhNGRlMWQyZTdhY2Y1OGIzNTdhZWUyYTVjYzA4ZDNhMDcyOTVjZWU1YWVhODExMTgzMTVmYWY0MzdjZmRjODI) •
+
+## Example
+
+This example shows how an entire retail application can be assembled from components available. It provides the static frontend website, the rest API supporting the front end and the database backing the rest API. Checkout the full example [here](./examples/retail-app).
+
+```yaml
+type: retail-app
+
+components:
+  webFrontend:
+    type: static-website
+    inputs:
+      name: retail-frontend
+      contentPath: ${self.path}/frontend # define where to find the static files
+      # mustache templating is built in to the static-website component
+      templateValues:
+        apiUrl: ${productsApi.url}
+      contentIndex: index.html  
+
+  productsApi:
+    type: rest-api
+    inputs:
+      gateway: aws-apigateway
+      routes:
+        /products: # routes begin with a slash
+          post: # HTTP method names are used to attach handlers
+            function: ${createProduct}
+            cors: true
+
+          # sub-routes can be declared hierarchically
+          /{id}: # path parameters use curly braces
+            get:
+              function: ${getProduct}
+              cors: true # CORS can be allowed with this flag
+
+        # multi-segment routes can be declared all at once
+        /catalog/{...categories}: # catch-all path parameters use ellipses
+          get:
+            function: ${listProducts}
+            cors: true
+
+  createProduct:
+    type: aws-lambda
+    inputs:
+      handler: products.create
+      root: ${self.path}/code
+      env:
+        productTableName: products-${self.serviceId}
+  getProduct:
+    type: aws-lambda
+    inputs:
+      handler: products.get
+      root: ${self.path}/code
+      env:
+        productTableName: products-${self.serviceId}
+  listProducts:
+    type: aws-lambda
+    inputs:
+      handler: products.list
+      root: ${self.path}/code
+      env:
+        productTableName: products-${self.serviceId}
+
+  productsDb:
+    type: aws-dynamodb
+    inputs:
+      region: us-east-1
+      tables:
+        - name: products-${self.serviceId}
+          hashKey: id
+          indexes:
+            - name: ProductIdIndex
+              type: global
+              hashKey: id
+          schema:
+            id: number
+            name: string
+            description: string
+            price: number
+          options:
+            timestamps: true
+```
+
+[![serverless](http://public.serverless.com/badges/v3.svg)](http://www.serverless.com)
+[![Build Status](https://travis-ci.org/serverless/components.svg?branch=master)](https://travis-ci.org/serverless/components)
+[![npm version](https://badge.fury.io/js/serverless-components.svg)](https://badge.fury.io/js/serverless-components)
+[![dependencies](https://img.shields.io/david/serverless/serverless-components.svg)](https://www.npmjs.com/package/serverless-components)
+[![license](https://img.shields.io/npm/l/serverless-components.svg)](https://www.npmjs.com/package/serverless-components)
+
+[Website](http://www.serverless.com) • [Slack](https://join.slack.com/t/serverless-contrib/shared_invite/MjI5NzY1ODM2MTc3LTE1MDM0NDIyOTUtMDgxNTcxMTcxNg) • [Newsletter](http://eepurl.com/b8dv4P) • [Forum](http://forum.serverless.com) • [Meetups](https://www.meetup.com/pro/serverless/) • [Twitter](https://twitter.com/goserverless) • [We're Hiring](https://serverless.com/company/jobs/)
+
+Also please do join the _Components_ channel on our public [Serverless-Contrib Slack](https://serverless-contrib.slack.com/messages/C9U3RA55M) to continue the conversation.
+
 
 ## Table of contents
 
@@ -39,25 +131,56 @@ Serverless Components can deploy anything, but they're biased toward SaaS & clou
   * [`serverless.yml`](#serverless.yml)
   * [`index.js`](#index.js)
   * [Testing](#testing)
+* [Docs](#docs)
+  * [CLI Usage](#cli-usage)
+    * [deploy](#deploy)
+    * [info](#info)
+    * [remove](#remove)
+  * [Component Docs](#component-docs)
+    * [aws-apigateway](./registry/aws-apigateway)
+    * [aws-cloudfront](./registry/aws-cloudfront)
+    * [aws-dynamodb](./registry/aws-dynamodb)
+    * [aws-iam-policy](./registry/aws-iam-policy)
+    * [aws-iam-role](./registry/aws-iam-role)
+    * [aws-lambda](./registry/aws-lambda)
+    * [aws-route53](./registry/aws-route53)
+    * [aws-s3-bucket](./registry/aws-s3-bucket)
+    * [eventgateway](./registry/eventgateway)
+    * [github-webhook](./registry/github-webhook)
+    * [github-webhook-aws](./registry/github-webhook-aws)
+    * [github-webhook-receiver](./registry/github-webhook-receiver)
+    * [mustache](./registry/mustache)
+    * [netlify-site](./registry/netlify-site)
+    * [rest-api](#rest-api)
+    * [s3-dirloader](#s3-dirloader)
+    * [s3-downloader](#s3-downloader)
+    * [s3-policy](#s3-policy)
+    * [s3-sync](#s3-sync)
+    * [s3-uploader](#s3-uploader)
+    * [s3-website-config](#s3-website-config)
+    * [static-website](#static-website)
+
 
 ## Getting started
 
-**Note:** Make sure you have Node.js 8+ and npm installed on your machine
-Also please do join the _Components_ channel on our public [Serverless-Contrib Slack](https://serverless-contrib.slack.com/messages/C9U3RA55M) to continue the conversation.
+**Note:** Make sure you have Node.js 8+ and npm installed on your machine.
 
-1. Setup
 1. `npm install --global serverless-components`
 1. Setup the environment variables
    * `export AWS_ACCESS_KEY_ID=my_access_key_id`
    * `export AWS_SECRET_ACCESS_KEY=my_secret_access_key`
-
-### Running Locally
 
 Run commands with
 
 ```
 components [Command]
 ```
+Checkout the [CLI docs](#cli-usage)
+
+### Trying it out
+
+The best way to give components a try is to deploy one of the examples. We recommend checking out our [retail-app example](./examples/retail-app) and to follow along with the instructions there.
+
 
 ## Current limitations
 
@@ -74,10 +197,10 @@ Rolling back your application into the previous, stable state is currently not s
 
 However the framework ensures that your state file always reflects the correct state of your infrastructure setup (even if something goes wrong during deployment / removal).
 
+
 ## Concepts
 
 ### Components
-
 
 A component is the smallest unit of abstraction for your infrastructure. It can be a single small piece like an IAM role, or a larger piece that includes other small pieces, like [`github-webhook-receiver`](#github-webhook-receiver), which includes `aws-lambda` (which itself includes `aws-iam-role`), `aws-apigateway` (which also includes `aws-iam-role`), `aws-dynamodb`, and `github`. So components can be composed with each other in a component dependency graph to build larger components.
 
@@ -115,6 +238,11 @@ module.exports = {
 ```
 
 However, this `index.js` file is optional, since your component can just be a composition of other smaller components without provisioning logic on its own.
+
+
+### Composition
+
+Components can include other components in order to build up higher level use cases and expose
 
 ### Input types, Inputs & Outputs
 
@@ -427,31 +555,58 @@ Congratulations! You've successfully created your first Serverless component!
 
 Want to learn more? Make sure to take a look at all the different component implementations in the ["Serverless Registry"](./registry)!
 
+
 ## Docs
 
 ### CLI Usage
 
-#### Deployment
+#### deploy
 
 To deploy your app, run
 
-```
+```sh
 components deploy
 ```
 
-#### Updating
+To update an app at anytime, simply run deploy again
 
-* Change some components inputs
-* Then run
+#### info
 
+To get info about a deployed service, run
+
+```sh
+components info
 ```
-components deploy
-```
 
-#### Removal
+#### remove
 
 To remove your app, run
 
-```
+```sh
 components remove
 ```
+
+
+### Component Docs
+* [aws-apigateway](./registry/aws-apigateway)
+* [aws-cloudfront](./registry/aws-cloudfront)
+* [aws-dynamodb](./registry/aws-dynamodb)
+* [aws-iam-policy](./registry/aws-iam-policy)
+* [aws-iam-role](./registry/aws-iam-role)
+* [aws-lambda](./registry/aws-lambda)
+* [aws-route53](./registry/aws-route53)
+* [aws-s3-bucket](./registry/aws-s3-bucket)
+* [eventgateway](./registry/eventgateway)
+* [github-webhook](./registry/github-webhook)
+* [github-webhook-aws](./registry/github-webhook-aws)
+* [github-webhook-receiver](./registry/github-webhook-receiver)
+* [mustache](./registry/mustache)
+* [netlify-site](./registry/netlify-site)
+* [rest-api](#rest-api)
+* [s3-dirloader](#s3-dirloader)
+* [s3-downloader](#s3-downloader)
+* [s3-policy](#s3-policy)
+* [s3-sync](#s3-sync)
+* [s3-uploader](#s3-uploader)
+* [s3-website-config](#s3-website-config)
+* [static-website](#static-website)
