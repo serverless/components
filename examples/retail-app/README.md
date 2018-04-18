@@ -9,9 +9,17 @@ An example retail application composed of a few serverless components. The appli
 **Note:** Make sure you have Node.js 8+ and npm installed on your machine
 
 1. `npm install --global serverless-components`
-1. Setup the environment variables
+2. Setup the environment variables
    * `export AWS_ACCESS_KEY_ID=my_access_key_id`
    * `export AWS_SECRET_ACCESS_KEY=my_secret_access_key`
+3. clone this repo to bring down the example code.
+  ```sh
+  $ git clone https://github.com/serverless/components.git
+  ```
+4. cd into this example
+  ```sh
+  $ cd components/examples/retail-app
+  ```
 
 ## Operations
 
@@ -19,7 +27,7 @@ An example retail application composed of a few serverless components. The appli
 
 To deploy the application and create all dependent resources automatically, simply do:
 
-```
+```sh
 $ components deploy
 ```
 On `deploy`, the system executes each child component in parallel based on the dependencies:
@@ -57,11 +65,19 @@ The `retail-app` website can be accessed at the url: `http://retail-vwlchq8e57.e
 
 ![image](https://user-images.githubusercontent.com/8188/38950844-cc5c7138-4314-11e8-9134-ceb0b381fd5f.png)
 
+### Info
+
+After deployment you can run this command to get access to the static website location and api endpoints:
+
+```sh
+$ components info
+```
+
 ### Remove
 
 To remove the application and delete all dependent resources automatically, simply do:
 
-```
+```sh
 $ components remove
 ```
 
@@ -73,7 +89,7 @@ The `retail-app` application has the following structure:
 * `index.js`: the code file for the application
 * `code/`: code folder for the `aws-lambda` child component
 * `data/products.json`: seed data for products
-* `frontend/`: code folder for the `static-website` child component. 
+* `frontend/`: code folder for the `static-website` child component.
 
 ### Configuration
 
@@ -101,4 +117,3 @@ The `retail-app` application is composed of the following components:
 * **Lambda functions**: It creates three Lambda functions with the handler code provided to it. It creates default roles and attaches it to the individual Lambda functions. The `aws-lambda` component encapsulates all that functionality.
 * **REST API**: It creates a REST API for the AWS API Gateway. It takes a structure for the routes, and maps Lambda functions provided to it. The `rest-api` component encapsulates all that functionality.
 * **DynamoDB table**: It creates a DynamoDB table with input parameters like name, keys, indexes, and a model schema. The `aws-dynamodb` component encapsulates all that functionality. See [docs](../../registry/aws-dynamodb/README.md) for details.
-
