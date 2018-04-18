@@ -1,3 +1,4 @@
+const { relative } = require('path')
 const { prop, keys, reduce } = require('ramda')
 const getComponent = require('./getComponent')
 const getInstanceId = require('./getInstanceId')
@@ -75,13 +76,14 @@ const generateContext = (
       return modifiedComponent
     },
     saveState(state = {}) {
+      const relativeRootPath = relative(process.cwd(), rootPath)
       // NOTE: set default values if information about component in stateFile is not yet present
       if (!stateFile[this.id]) {
         stateFile[this.id] = {
           type,
           instanceId,
           internallyManaged,
-          rootPath,
+          rootPath: relativeRootPath,
           inputs,
           state: {}
         }
@@ -90,7 +92,7 @@ const generateContext = (
       stateFile[this.id].type = type
       stateFile[this.id].instanceId = instanceId
       stateFile[this.id].internallyManaged = internallyManaged
-      stateFile[this.id].rootPath = rootPath
+      stateFile[this.id].rootPath = relativeRootPath
       stateFile[this.id].inputs = inputs
       stateFile[this.id].state = state
       this.state = state

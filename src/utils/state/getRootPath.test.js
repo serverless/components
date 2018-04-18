@@ -1,20 +1,35 @@
+const { join } = require('path')
+const getTmpDir = require('../fs/getTmpDir')
 const getRootPath = require('./getRootPath')
 
 describe('#getRootPath()', () => {
+  let oldCwd
+  let tmpDirPath
   const stateFile = {
     'function-mock': {
       type: 'function-mock',
-      rootPath: 'registry-path/mocks/function-mock'
+      rootPath: join('registry-path', 'mocks', 'function-mock')
     },
     'iam-mock': {
       type: 'iam-mock',
-      rootPath: 'registry-path/mocks/iam-mock'
+      rootPath: join('registry-path', 'mocks', 'iam-mock')
     }
   }
 
-  it('should return the components root path if present', () => {
+  beforeEach(async () => {
+    tmpDirPath = await getTmpDir()
+    oldCwd = process.cwd()
+    process.chdir(tmpDirPath)
+  })
+
+  afterEach(() => {
+    process.chdir(oldCwd)
+  })
+
+  it('should return the components resolved root path if present', () => {
     const res = getRootPath(stateFile, 'function-mock')
-    expect(res).toEqual('registry-path/mocks/function-mock')
+    const expected = join(tmpDirPath, 'registry-path', 'mocks', 'function-mock')
+    expect(res).toEqual(expected)
   })
 
   it('should return null if no root path information is present', () => {
