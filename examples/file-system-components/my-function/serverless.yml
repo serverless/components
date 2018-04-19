@@ -1,0 +1,7 @@
+type: my-function
+
+inputTypes:
+  name:
+    type: string
+    required: false
+    default: my-function-${self.instanceId}

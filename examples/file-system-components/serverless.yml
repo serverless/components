@@ -1,0 +1,12 @@
+type: file-system-components
+
+components:
+  myCustomFunction:
+    type: ./my-function
+    inputs:
+      name: custom-function-name-${self.instanceId}
+  myTestRole:
+    type: tests-integration-iam-mock
+    inputs:
+      name: my-role-${self.instanceId}
+      service: my.custom.serverless.service
