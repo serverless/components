@@ -55,10 +55,11 @@ describe('Integration Test - Await child components', () => {
       expect(stateFileContent.$.serviceId).not.toBeFalsy()
       const awaitChildComponents = stateFileContent['await-child-components']
       const awaitChildComponentsObjectKeys = Object.keys(awaitChildComponents)
-      expect(awaitChildComponentsObjectKeys.length).toEqual(5)
+      expect(awaitChildComponentsObjectKeys.length).toEqual(6)
       expect(awaitChildComponents).toHaveProperty('instanceId')
       expect(awaitChildComponents).toHaveProperty('type', 'await-child-components')
       expect(awaitChildComponents).toHaveProperty('internallyManaged', false)
+      expect(awaitChildComponents).toHaveProperty('rootPath')
       expect(awaitChildComponents).toHaveProperty(
         'state.myFunction.state.id',
         'id:function:my-function'

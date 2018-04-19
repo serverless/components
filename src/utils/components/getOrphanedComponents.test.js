@@ -1,4 +1,3 @@
-// const deferredPromise = require('../deferredPromise')
 const getOrphanedComponents = require('./getOrphanedComponents')
 
 describe('#getOrphanedComponents()', () => {

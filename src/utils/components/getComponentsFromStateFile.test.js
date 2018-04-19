@@ -1,6 +1,10 @@
+const { join } = require('path')
+const getTmpDir = require('../fs/getTmpDir')
 const getComponentsFromStateFile = require('./getComponentsFromStateFile')
 
 describe('#getComponentsFromStateFile()', () => {
+  let oldCwd
+  let tmpDirPath
   const stateFile = {
     $: {
       serviceId: 'dmoh0ix898'
@@ -18,7 +22,8 @@ describe('#getComponentsFromStateFile()', () => {
       },
       state: {
         state: 'state-internally-managed'
-      }
+      },
+      rootPath: join('registry-path', 'mocks', 'internally-managed')
     },
     // NOTE: only the following state-objects should be used
     'function-mock': {
@@ -28,7 +33,8 @@ describe('#getComponentsFromStateFile()', () => {
       },
       state: {
         name: 'state-function-mock-name'
-      }
+      },
+      rootPath: join('registry-path', 'mocks', 'function-mock')
     },
     'iam-mock': {
       type: 'iam-mock',
@@ -39,9 +45,20 @@ describe('#getComponentsFromStateFile()', () => {
       state: {
         name: 'state-iam-mock-name',
         service: 'state.some.serverless.service'
-      }
+      },
+      rootPath: join('registry-path', 'mocks', 'iam-mock')
     }
   }
+
+  beforeEach(async () => {
+    tmpDirPath = await getTmpDir()
+    oldCwd = process.cwd()
+    process.chdir(tmpDirPath)
+  })
+
+  afterEach(() => {
+    process.chdir(oldCwd)
+  })
 
   it('should extract and return the components from the state file', async () => {
     const res = getComponentsFromStateFile(stateFile)
@@ -50,14 +67,18 @@ describe('#getComponentsFromStateFile()', () => {
     expect(res).toHaveProperty('iam-mock')
     const functionMock = res['function-mock']
     const iamMock = res['iam-mock']
-    expect(Object.keys(functionMock).length).toEqual(9)
-    expect(Object.keys(iamMock).length).toEqual(9)
+    expect(Object.keys(functionMock).length).toEqual(10)
+    expect(Object.keys(iamMock).length).toEqual(10)
     expect(functionMock).toHaveProperty('id', 'function-mock')
     expect(functionMock).toHaveProperty('type', 'function-mock')
     expect(functionMock).toHaveProperty('inputs', {
       name: 'inputs-function-mock-name'
     })
     expect(functionMock).toHaveProperty('outputs', {})
+    expect(functionMock).toHaveProperty(
+      'rootPath',
+      join(tmpDirPath, 'registry-path', 'mocks', 'function-mock')
+    )
     expect(functionMock).toHaveProperty('state', {
       name: 'state-function-mock-name'
     })
@@ -72,6 +93,10 @@ describe('#getComponentsFromStateFile()', () => {
       service: 'inputs.some.serverless.service'
     })
     expect(iamMock).toHaveProperty('outputs', {})
+    expect(iamMock).toHaveProperty(
+      'rootPath',
+      join(tmpDirPath, 'registry-path', 'mocks', 'iam-mock')
+    )
     expect(iamMock).toHaveProperty('state', {
       name: 'state-iam-mock-name',
       service: 'state.some.serverless.service'

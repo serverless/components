@@ -120,6 +120,7 @@ describe('#run()', () => {
         }
       })
 
+      expect(utils.handleSignalEvents).toHaveBeenCalled()
       expect(utils.getComponentsFromServerlessFile).toHaveBeenCalled()
       expect(utils.getComponentsFromStateFile).toHaveBeenCalled()
       expect(utils.getOrphanedComponents).not.toHaveBeenCalled()
