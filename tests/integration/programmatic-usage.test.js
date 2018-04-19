@@ -163,8 +163,6 @@ describe('Integration Test - Programmatic usage', () => {
       expect(defaultRole).toHaveProperty('type', 'tests-integration-iam-mock')
       expect(defaultRole).toHaveProperty('state', {})
       const myFunction = stateFileContent['programmatic-usage:myFunction']
-      const myFunctionObjectKeys = Object.keys(myFunction)
-      expect(myFunctionObjectKeys.length).toEqual(2)
       expect(myFunction).toHaveProperty('type', 'tests-integration-function-mock')
       expect(myFunction).toHaveProperty('state', {})
     })

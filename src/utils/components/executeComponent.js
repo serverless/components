@@ -1,4 +1,6 @@
-const { is, isEmpty } = require('ramda')
+const {
+  not, is, isNil, isEmpty
+} = require('ramda')
 const generateContext = require('./generateContext')
 const resolvePostExecutionVars = require('../variables/resolvePostExecutionVars')
 const { getInputs, getState } = require('../state')
@@ -39,7 +41,17 @@ const executeComponent = async (
 
   component.promise.resolve(component)
 
-  if (command === 'remove') {
+  /* TODO: This logic is complex. It's meant to wipe out extra keys in the state
+  file if a remove was successful, if either the removed component has no
+  script, or else the script emptied the state during remove. This is required
+  to prevent certain features from breaking (e.g. skip removed components when
+  removing again) while also providing the ability for a component to
+  selectively report that its removal is incomplete pending manual and needs to
+  be run again. We need some deep architectural refactors to eliminate this
+  kind of hackiness. There may be edge cases where this does not work, e.g.
+  if the scripted component did not have any state keys to save in the first
+  place, but for some reason still has complex removal logic. */
+  if (command === 'remove' && (not(is(Function, func)) || isNil(component.state))) {
     stateFile[componentId] = {
       type: component.type,
       state: {}
