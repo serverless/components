@@ -5,7 +5,14 @@ describe('#executeComponent()', () => {
   // using our own functions here since Jest mock functions
   // fail the is(Function, func) Ramda check
   const deploy = () => Promise.resolve({ result: 'deployed' })
-  const remove = () => Promise.resolve({ result: 'removed' })
+  const remove = (inputs, context) => {
+    if (context.state.RETAIN_STATE) {
+      const error = new Error('retain state error')
+      error.code = 'RETAIN_STATE'
+      return Promise.reject(error)
+    }
+    return Promise.resolve({ result: 'removed' })
+  }
   const rollback = () => Promise.resolve({ result: 'rolled back' })
   const resolve = () => Promise.resolve('resolve')
   const reject = () => Promise.reject(new Error('reject'))
@@ -176,6 +183,44 @@ describe('#executeComponent()', () => {
         timeout: 5
       })
       expect(res.outputs).toEqual({})
+    })
+
+    it('should flush state if remove is resolved', async () => {
+      stateFile = assocPath([ 'myFunction', 'state' ], { some: 'state' }, stateFile)
+
+      const res = await executeComponent(
+        componentId,
+        components,
+        stateFile,
+        archive,
+        command,
+        options
+      )
+      expect(res.executed).toEqual(true)
+      expect(res.outputs).toEqual({ result: 'removed' })
+      expect(stateFile.myFunction.state).toEqual({})
+      stateFile = assocPath([ 'myFunction', 'state' ], {}, stateFile)
+    })
+
+    it('should retain state if RETAIN_STATE error is thrown', async () => {
+      const retainedState = {
+        RETAIN_STATE: true,
+        abc: 'xyz'
+      }
+      stateFile = assocPath([ 'myFunction', 'state' ], retainedState, stateFile)
+
+      const res = await executeComponent(
+        componentId,
+        components,
+        stateFile,
+        archive,
+        command,
+        options
+      )
+      expect(res.executed).toEqual(true)
+      expect(res.outputs).toEqual({})
+      expect(stateFile.myFunction.state).toEqual(retainedState)
+      stateFile = assocPath([ 'myFunction', 'state' ], {}, stateFile)
     })
   })
 })
