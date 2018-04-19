@@ -62,5 +62,9 @@
     "jest": "^22.4.2",
     "markdown-magic": "^0.1.21",
     "prettier": "^1.10.2"
+  },
+  "jest": {
+    "coverageDirectory": "./coverage/",
+    "collectCoverage": true
   }
 }
