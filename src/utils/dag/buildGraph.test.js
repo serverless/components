@@ -94,7 +94,7 @@ describe('#buildGraph()', () => {
     }
   }
 
-  const componentsToRemove = {
+  const orphanedComponents = {
     orphanedRole: {
       id: 'myOrphanedRole',
       type: 'role',
@@ -113,7 +113,7 @@ describe('#buildGraph()', () => {
 
   it('should return a correct graphlib Graph', async () => {
     const command = 'deploy'
-    const graph = await buildGraph(componentsToUse, componentsToRemove, command)
+    const graph = await buildGraph(componentsToUse, orphanedComponents, command)
 
     const edges = graph.edges()
     const nodes = graph.nodes()
@@ -137,7 +137,7 @@ describe('#buildGraph()', () => {
     ]
     expect(nodeValueResults).toEqual(expectedNodeValueResult)
 
-    const componentKeys = union(keys(componentsToRemove), keys(componentsToUse))
+    const componentKeys = union(keys(orphanedComponents), keys(componentsToUse))
 
     expect(nodes).toEqual(componentKeys)
     expect(edges).toContainEqual(

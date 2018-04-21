@@ -2,7 +2,6 @@ const path = require('path')
 const { forEachObjIndexed } = require('ramda')
 const { readFile } = require('../fs')
 const getServiceId = require('../state/getServiceId')
-
 const transformPostExecutionVars = require('../variables/transformPostExecutionVars')
 const resolvePreExecutionVars = require('../variables/resolvePreExecutionVars')
 const getInstanceId = require('./getInstanceId')

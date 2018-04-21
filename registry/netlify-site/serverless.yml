@@ -1,0 +1,64 @@
+type: netlify-site
+
+inputTypes:
+  netlifyApiToken:
+    type: string
+    required: true
+    displayName: Netlify Personal access token
+    description: |
+      Your personal access token from https://app.netlify.com/account/applications
+    example: xyz-123-netlify-token
+  githubApiToken:
+    type: string
+    required: true
+    displayName: Github API token
+    description: |
+      Your github API key from https://github.com/settings/tokens.
+      Github access token requires one of these scopes: repo:status, repo
+    example: abc-456-github-token
+  siteName:
+    type: string
+    required: true
+    displayName: Netlify Site Name
+    description: The netlify domain you will use for your site.
+    example: my-awesome-site.netlify.com
+  siteDomain:
+    type: string
+    required: true
+    displayName: Site Domain
+    description: The domain you will use to mask your netlify siteName.
+    example: dog-sweatpants.com
+  siteForceSSL:
+    type: boolean
+    required: true
+    displayName: Force SSL
+    description: Set to true if you want to force SSL connections
+  siteRepo:
+    type: string
+    required: true
+    displayName: Site Github Repo Url
+    description: The url of your site's repository in github
+    example: https://github.com/DavidWells/dog-sweatpants-frontend
+  siteBuildDirectory:
+    type: string
+    required: true
+    displayName: Site Build Directory
+    description: The output folder of your site's build
+    example: build
+  siteEnvVars:
+    type: object
+    displayName: Site Build Env Variables
+    description: The variables used during netlify site build
+    example:
+      foo: bar
+  siteRepoBranch:
+    type: string
+    required: true
+    displayName: Site Repo Branch
+    description: The production branch that will trigger builds of the netlify site
+    example: master
+  siteRepoAllowedBranches:
+    type: array
+    displayName: Site Repo Branch
+    example:
+      - master

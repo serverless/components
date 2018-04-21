@@ -1,0 +1,10 @@
+type: my-slow-function
+
+inputTypes:
+  name:
+    type: string
+    required: false
+    default: my-slow-function-${self.instanceId}
+  role:
+    type: string
+    required: false

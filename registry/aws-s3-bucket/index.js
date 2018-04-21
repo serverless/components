@@ -71,8 +71,15 @@ const rollback = async (inputs, context) => {
 const remove = async (inputs, context) => {
   if (!context.state.name) return {}
 
-  context.log(`Removing Bucket: '${context.state.name}'`)
-  await deleteBucket(context.state)
+  try {
+    context.log(`Removing Bucket: '${context.state.name}'`)
+    await deleteBucket(context.state)
+  } catch (e) {
+    if (!e.message.includes('The specified bucket does not exist')) {
+      throw new Error(e)
+    }
+  }
+
   context.saveState({})
   return {
     name: null

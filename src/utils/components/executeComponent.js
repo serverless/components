@@ -31,15 +31,24 @@ const executeComponent = async (
   }
 
   const func = component.fns[command]
+  let retainState = false
   if (is(Function, func)) {
-    component.outputs = (await func(component.inputs, context)) || {}
+    try {
+      component.outputs = (await func(component.inputs, context)) || {}
+    } catch (e) {
+      if (command === 'remove' && e.code === 'RETAIN_STATE') {
+        retainState = true
+      } else {
+        throw e
+      }
+    }
     component.executed = true
   }
   component.state = getState(stateFile, component.id)
 
   component.promise.resolve(component)
 
-  if (command === 'remove') {
+  if (command === 'remove' && !retainState) {
     stateFile[componentId] = {
       type: component.type,
       state: {}

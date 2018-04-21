@@ -13,10 +13,17 @@ afterEach(() => {
 
 beforeEach(() => {
   utils.handleSignalEvents.mockImplementation(() => {})
-  utils.getComponentsToUse.mockImplementation(() =>
-    Promise.resolve({ componentToUse: { id: 'component1', type: 'function' } }))
-  utils.getComponentsToRemove.mockImplementation(() =>
-    Promise.resolve({ componentToRemove: { id: 'component2', type: 'iam' } }))
+  utils.getComponentsFromServerlessFile.mockImplementation(() =>
+    Promise.resolve({
+      iamMock: { id: 'iam-mock-id', type: 'iam-mock' }
+    }))
+  utils.getComponentsFromStateFile.mockImplementation(() => ({
+    iamMock: { id: 'iam-mock-id', type: 'iam-mock' },
+    functionMock: { id: 'function-mock-id', type: 'function-mock' }
+  }))
+  utils.getOrphanedComponents.mockImplementation(() => ({
+    functionMock: { id: 'function-mock-id', type: 'function-mock' }
+  }))
   utils.trackDeployment.mockImplementation(() => Promise.resolve())
   utils.buildGraph.mockImplementation(() => Promise.resolve())
   utils.readStateFile.mockImplementation(() => Promise.resolve())
@@ -30,19 +37,20 @@ describe('#run()', () => {
   it('should run the command on the graph', async () => {
     const res = await run('some-command', {})
     expect(res).toEqual({
-      componentToUse: {
-        id: 'component1',
-        type: 'function'
+      iamMock: {
+        id: 'iam-mock-id',
+        type: 'iam-mock'
       },
-      componentToRemove: {
-        id: 'component2',
-        type: 'iam'
+      functionMock: {
+        id: 'function-mock-id',
+        type: 'function-mock'
       }
     })
 
     expect(utils.handleSignalEvents).toHaveBeenCalled()
-    expect(utils.getComponentsToUse).toHaveBeenCalled()
-    expect(utils.getComponentsToRemove).toHaveBeenCalled()
+    expect(utils.getComponentsFromServerlessFile).toHaveBeenCalled()
+    expect(utils.getComponentsFromStateFile).toHaveBeenCalled()
+    expect(utils.getOrphanedComponents).toHaveBeenCalled()
     expect(utils.trackDeployment).not.toHaveBeenCalled()
     expect(utils.buildGraph).toHaveBeenCalledTimes(1)
     expect(utils.readStateFile).toHaveBeenCalled()
@@ -58,8 +66,9 @@ describe('#run()', () => {
     await expect(run('some-command', {})).rejects.toThrow('something went wrong')
 
     expect(utils.handleSignalEvents).toHaveBeenCalled()
-    expect(utils.getComponentsToUse).toHaveBeenCalled()
-    expect(utils.getComponentsToRemove).toHaveBeenCalled()
+    expect(utils.getComponentsFromServerlessFile).toHaveBeenCalled()
+    expect(utils.getComponentsFromStateFile).toHaveBeenCalled()
+    expect(utils.getOrphanedComponents).toHaveBeenCalled()
     expect(utils.trackDeployment).not.toHaveBeenCalled()
     expect(utils.buildGraph).toHaveBeenCalledTimes(1)
     expect(utils.readStateFile).toHaveBeenCalled()
@@ -73,24 +82,53 @@ describe('#run()', () => {
     it('should run "deploy", "info", track the deployment and write the state to disk', async () => {
       const res = await run('deploy', {})
       expect(res).toEqual({
-        componentToUse: {
-          id: 'component1',
-          type: 'function'
+        iamMock: {
+          id: 'iam-mock-id',
+          type: 'iam-mock'
         },
-        componentToRemove: {
-          id: 'component2',
-          type: 'iam'
+        functionMock: {
+          id: 'function-mock-id',
+          type: 'function-mock'
         }
       })
 
       expect(utils.handleSignalEvents).toHaveBeenCalled()
-      expect(utils.getComponentsToUse).toHaveBeenCalled()
-      expect(utils.getComponentsToRemove).toHaveBeenCalled()
+      expect(utils.getComponentsFromServerlessFile).toHaveBeenCalled()
+      expect(utils.getComponentsFromStateFile).toHaveBeenCalled()
+      expect(utils.getOrphanedComponents).toHaveBeenCalled()
       expect(utils.trackDeployment).toHaveBeenCalled()
       expect(utils.buildGraph).toHaveBeenCalledTimes(2)
       expect(utils.readStateFile).toHaveBeenCalled()
       expect(utils.setServiceId).toHaveBeenCalled()
       expect(utils.executeGraph).toHaveBeenCalledTimes(2)
+      expect(utils.writeStateFile).toHaveBeenCalled()
+      expect(utils.errorReporter).toHaveBeenCalled()
+    })
+  })
+
+  describe('when running "remove"', () => {
+    it('should run "remove" but should not run "info" neither track the deployment', async () => {
+      const res = await run('remove', {})
+      expect(res).toEqual({
+        iamMock: {
+          id: 'iam-mock-id',
+          type: 'iam-mock'
+        },
+        functionMock: {
+          id: 'function-mock-id',
+          type: 'function-mock'
+        }
+      })
+
+      expect(utils.handleSignalEvents).toHaveBeenCalled()
+      expect(utils.getComponentsFromServerlessFile).toHaveBeenCalled()
+      expect(utils.getComponentsFromStateFile).toHaveBeenCalled()
+      expect(utils.getOrphanedComponents).not.toHaveBeenCalled()
+      expect(utils.trackDeployment).not.toHaveBeenCalled()
+      expect(utils.buildGraph).toHaveBeenCalledTimes(1)
+      expect(utils.readStateFile).toHaveBeenCalled()
+      expect(utils.setServiceId).toHaveBeenCalled()
+      expect(utils.executeGraph).toHaveBeenCalledTimes(1)
       expect(utils.writeStateFile).toHaveBeenCalled()
       expect(utils.errorReporter).toHaveBeenCalled()
     })

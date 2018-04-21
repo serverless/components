@@ -1,6 +1,6 @@
 const path = require('path')
 
-const requireFns = (componentRoot) => {
+const getComponentFunctions = (componentRoot) => {
   let fns = {}
   try {
     fns = require(componentRoot) // eslint-disable-line global-require, import/no-dynamic-require
@@ -20,4 +20,4 @@ const requireFns = (componentRoot) => {
   return fns
 }
 
-module.exports = requireFns
+module.exports = getComponentFunctions

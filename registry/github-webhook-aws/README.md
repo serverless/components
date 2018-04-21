@@ -1,5 +1,5 @@
 <!-- AUTO-GENERATED-CONTENT:START (COMPONENT_HEADER) -->
-# Github Webhook Aws
+# Github Webhook AWS
 
 Github webhook component using AWS API gateway
 <!-- AUTO-GENERATED-CONTENT:END -->
@@ -14,8 +14,8 @@ Github webhook component using AWS API gateway
 | Name | Type | Description |
 |:------ |:-----|:-----------------|
 | **function**| `string`<br/>*required* | function
-| **githubApiToken**| `string`<br/>*required* | Github personal access token needed for access to the github API.<br/>[Create a token](https://github.com/settings/tokens)<br/>
-| **githubRepo**| `string`<br/>*required* | URL of github repo
+| **githubApiToken**| `string`<br/>*required* | GitHub personal access token needed for access to the GitHub API.<br/>[Create a token](https://github.com/settings/tokens)<br/>
+| **githubRepo**| `string`<br/>*required* | The GitHub repos URL
 | **webhookTriggers**| `array`<br/>*required* | webhookTriggers
 
 <!-- AUTO-GENERATED-CONTENT:END -->

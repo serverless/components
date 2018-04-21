@@ -21,7 +21,12 @@ const config = {
         console.log('description', description)
       }
 
-      return `# ${formatComponentName(path.basename(dir))}${description}`
+      const name = formatComponentName(path.basename(dir))
+      // capitalize AWS
+      const formattedName = name.replace(/Aws|Iam/g, (l) => {
+        return l.toUpperCase()
+      })
+      return `# ${formattedName}${description}`
     },
     COMPONENT_INPUT_TYPES(content, options, instance) {
       const json = getYamlConfig(instance)
@@ -37,6 +42,7 @@ const config = {
         // sort optional fields to the end of table
         return (types[a].required === types[b].required) ? -1 : 1
       }).forEach((type) => {
+        console.log(type)
         const info = types[type]
         const required = (info.required) ? '<br/>*required*' : ''
         const desc = info.description || info.displayName || type

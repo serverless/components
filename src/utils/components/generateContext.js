@@ -1,12 +1,12 @@
-const path = require('path')
+const { relative } = require('path')
 const { prop, keys, reduce } = require('ramda')
 const getComponent = require('./getComponent')
 const getInstanceId = require('./getInstanceId')
 const getChildrenPromises = require('./getChildrenPromises')
-const getRegistryRoot = require('../getRegistryRoot')
+const getComponentFunctions = require('./getComponentFunctions')
+const getComponentRootPath = require('./getComponentRootPath')
 const getServiceId = require('../state/getServiceId')
 const getState = require('../state/getState')
-const fileExists = require('../fs/fileExists')
 const log = require('../log')
 
 const generateContext = (
@@ -18,7 +18,7 @@ const generateContext = (
   command,
   internallyManaged = false
 ) => {
-  const { id, type } = component
+  const { id, type, rootPath } = component
   const serviceId = getServiceId(stateFile)
   const instanceId = getInstanceId(stateFile, id)
   const inputs = prop('inputs', component)
@@ -30,12 +30,13 @@ const generateContext = (
     archive: getState(archive, id),
     state: getState(stateFile, id),
     children: getChildrenPromises(component, components),
+    rootPath,
     command,
     options,
     log,
     // eslint-disable-next-line no-shadow
     load: async (type, alias, inputs) => {
-      const childComponentRootPath = path.join(getRegistryRoot(), type)
+      const childComponentRootPath = getComponentRootPath(type)
       const childComponentId = `${id}:${alias}`
 
       const childComponent = await getComponent(
@@ -44,12 +45,8 @@ const generateContext = (
         inputs,
         stateFile
       )
-      // TODO: update the following once getComponent adds the properties automatically
-      let fns = {}
-      if (await fileExists(path.join(childComponentRootPath, 'index.js'))) {
-        fns = require(path.join(childComponentRootPath, 'index.js')) // eslint-disable-line
-      }
-      childComponent.fns = fns
+      childComponent.fns = getComponentFunctions(childComponentRootPath)
+      childComponent.rootPath = childComponentRootPath
 
       const childComponentContext = generateContext(
         components,
@@ -79,12 +76,14 @@ const generateContext = (
       return modifiedComponent
     },
     saveState(state = {}) {
+      const relativeRootPath = relative(process.cwd(), rootPath)
       // NOTE: set default values if information about component in stateFile is not yet present
       if (!stateFile[this.id]) {
         stateFile[this.id] = {
           type,
           instanceId,
           internallyManaged,
+          rootPath: relativeRootPath,
           inputs,
           state: {}
         }
@@ -93,6 +92,7 @@ const generateContext = (
       stateFile[this.id].type = type
       stateFile[this.id].instanceId = instanceId
       stateFile[this.id].internallyManaged = internallyManaged
+      stateFile[this.id].rootPath = relativeRootPath
       stateFile[this.id].inputs = inputs
       stateFile[this.id].state = state
       this.state = state

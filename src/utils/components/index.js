@@ -1,18 +1,24 @@
 const generateInstanceId = require('./generateInstanceId')
-const getComponentsToUse = require('./getComponentsToUse')
 const getInstanceId = require('./getInstanceId')
 const getExecutedComponents = require('./getExecutedComponents')
 const getComponent = require('./getComponent')
-const getComponentsToRemove = require('./getComponentsToRemove')
+const getComponentFunctions = require('./getComponentFunctions')
+const getComponentRootPath = require('./getComponentRootPath')
+const getComponentsFromServerlessFile = require('./getComponentsFromServerlessFile')
+const getComponentsFromStateFile = require('./getComponentsFromStateFile')
 const executeComponent = require('./executeComponent')
+const getOrphanedComponents = require('./getOrphanedComponents')
 const generateContext = require('./generateContext')
 
 module.exports = {
   generateInstanceId,
-  getComponentsToUse,
   getInstanceId,
-  getComponentsToRemove,
+  getComponentFunctions,
+  getComponentRootPath,
+  getComponentsFromServerlessFile,
+  getComponentsFromStateFile,
   getExecutedComponents,
+  getOrphanedComponents,
   getComponent,
   executeComponent,
   generateContext

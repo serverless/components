@@ -8,14 +8,14 @@ inputTypes:
     type: string
     required: true
     description: |
-      Github personal access token needed for access to the github API.
+      GitHub personal access token needed for access to the GitHub API.
       [Create a token](https://github.com/settings/tokens)
     example: 2c5acc7de3b140ser3114fd40a24vd5ie3d843b5
   githubRepo:
     type: string
     required: true
-    displayName: Github Repository
-    description: URL of github repo
+    displayName: GitHub Repository
+    description: The GitHub repos URL
     example: https://github.com/serverless/components/
   webhookTriggers:
     type: array
