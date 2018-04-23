@@ -44,7 +44,7 @@ describe('Integration Test - Programmatic usage', () => {
 
   describe('when running through a typical component usage lifecycle', () => {
     it('should deploy the "iam" and "function" components', async () => {
-      await cpp.execAsync(`${componentsExec} deploy`, {
+      await cpp.execAsync(`node ${componentsExec} deploy`, {
         cwd: testServiceDir
       })
       const stateFileContent = await fsp.readJsonAsync(testServiceStateFile)
@@ -98,7 +98,7 @@ describe('Integration Test - Programmatic usage', () => {
     })
 
     it('should re-deploy the "iam" and "function" components', async () => {
-      await cpp.execAsync(`${componentsExec} deploy`, {
+      await cpp.execAsync(`node ${componentsExec} deploy`, {
         cwd: testServiceDir
       })
       const stateFileContent = await fsp.readJsonAsync(testServiceStateFile)
@@ -152,7 +152,7 @@ describe('Integration Test - Programmatic usage', () => {
     })
 
     it('should remove the "iam" and "function" components', async () => {
-      await cpp.execAsync(`${componentsExec} remove`, {
+      await cpp.execAsync(`node ${componentsExec} remove`, {
         cwd: testServiceDir
       })
       const stateFileContent = await fsp.readJsonAsync(testServiceStateFile)

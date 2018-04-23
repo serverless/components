@@ -45,7 +45,7 @@ describe('Integration Test - Simple', () => {
 
   describe('when running through a typical component usage lifecycle', () => {
     it('should deploy the "iam" and "function" components', async () => {
-      await cpp.execAsync(`${componentsExec} deploy`, {
+      await cpp.execAsync(`node ${componentsExec} deploy`, {
         cwd: testServiceDir,
         env: {
           ...process.env,
@@ -98,7 +98,7 @@ describe('Integration Test - Simple', () => {
     })
 
     it('should re-deploy the "iam" and "function" components', async () => {
-      await cpp.execAsync(`${componentsExec} deploy`, {
+      await cpp.execAsync(`node ${componentsExec} deploy`, {
         cwd: testServiceDir,
         env: {
           ...process.env,
@@ -151,7 +151,7 @@ describe('Integration Test - Simple', () => {
     })
 
     it('should invoke the "function" component with CLI options', async () => {
-      await cpp.execAsync(`${componentsExec} invoke --data "Hello World"`, {
+      await cpp.execAsync(`node ${componentsExec} invoke --data "Hello World"`, {
         cwd: testServiceDir,
         env: {
           ...process.env,
@@ -209,7 +209,7 @@ describe('Integration Test - Simple', () => {
       // third deployment is done
       // NOTE: the order of this test here is important since we're keeping and checking the
       // state file throughout the whole test suite
-      const cmd = cpp.execAsync(`${componentsExec} deploy`, {
+      const cmd = cpp.execAsync(`node ${componentsExec} deploy`, {
         cwd: testServiceDir,
         env: {
           ...process.env,
@@ -265,7 +265,7 @@ describe('Integration Test - Simple', () => {
     })
 
     it('should remove the "iam" and "function" components', async () => {
-      await cpp.execAsync(`${componentsExec} remove`, {
+      await cpp.execAsync(`node ${componentsExec} remove`, {
         cwd: testServiceDir,
         env: {
           ...process.env,

@@ -22,6 +22,7 @@
     "components": "./bin/components",
     "lint": "eslint . --cache",
     "test": "jest .",
+    "test:appveyor": "jest --testPathPattern=\"bin|examples|registry|src\" --colors --forceExit",
     "docs": "node ./scripts/doc-gen.js",
     "postinstall": "node ./scripts/postinstall.js",
     "prepublishOnly": "node ./scripts/prepublish.js"
