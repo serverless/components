@@ -1,9 +1,13 @@
 const path = require('path')
+const fileExistsSync = require('../fs/fileExistsSync')
 
 const getComponentFunctions = (componentRoot) => {
   let fns = {}
   try {
-    fns = require(componentRoot) // eslint-disable-line global-require, import/no-dynamic-require
+    const indexPath = path.resolve(componentRoot, 'index.js')
+    if (fileExistsSync(indexPath)) {
+      fns = require(componentRoot) // eslint-disable-line global-require, import/no-dynamic-require
+    }
   } catch (error) {
     const moduleName = error.message.split("'")[1]
     if (moduleName) {
@@ -15,7 +19,9 @@ const getComponentFunctions = (componentRoot) => {
         throw new Error(msg)
       }
     }
-  } // eslint-disable-line no-empty
+    // Do not swallow component code errors
+    throw error
+  }
   return fns
 }
 
