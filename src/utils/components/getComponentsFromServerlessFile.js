@@ -33,6 +33,7 @@ const getComponentsFromServerlessFile = async (
       id: component.id,
       type: component.type,
       inputs: component.inputs,
+      inputTypes: component.inputTypes,
       outputs: {},
       rootPath: componentRoot,
       state: getState(stateFile, component.id),
