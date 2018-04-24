@@ -1,6 +1,8 @@
 const path = require('path')
 const { forEachObjIndexed } = require('ramda')
 const { readFile } = require('../fs')
+const validateCoreVersion = require('../validateCoreVersion')
+
 const getServiceId = require('../state/getServiceId')
 const transformPostExecutionVars = require('../variables/transformPostExecutionVars')
 const resolvePreExecutionVars = require('../variables/resolvePreExecutionVars')
@@ -13,6 +15,7 @@ module.exports = async (componentRoot, componentId, inputs, stateFile) => {
   let slsYml = await readFile(path.join(componentRoot, 'serverless.yml'))
 
   validateVarsUsage(slsYml)
+  validateCoreVersion(slsYml.type, slsYml.core)
 
   slsYml.id = componentId || slsYml.type
 

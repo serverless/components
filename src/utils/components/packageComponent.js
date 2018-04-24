@@ -2,7 +2,8 @@ const path = require('path')
 const semver = require('semver')
 
 const { fileExists, readFile } = require('../fs')
-const { log } = require('../log')
+const log = require('../log')
+const validateCoreVersion = require('../validateCoreVersion')
 const pack = require('../pack')
 
 module.exports = async (options) => {
@@ -14,6 +15,8 @@ module.exports = async (options) => {
   }
 
   const slsYml = await readFile(slsYmlFilePath)
+
+  validateCoreVersion(slsYml.type, slsYml.core)
 
   if (semver.valid(slsYml.version) === null) {
     throw new Error('Please provide a valid version for your component')
@@ -27,9 +30,7 @@ module.exports = async (options) => {
     throw new Error('Please provide a valid format. Either a "zip" or a "tar"')
   }
 
-  const cleanVersion = semver.clean(slsYml.version)
-
-  const outputFileName = `${slsYml.type}@${cleanVersion}.${format}`
+  const outputFileName = `${slsYml.type}@${slsYml.version}.${format}`
   const outputFilePath = path.resolve(options.path, outputFileName)
 
   return pack(process.cwd(), outputFilePath, format)
