@@ -1,4 +1,5 @@
 type: github-webhook-example
+version: 0.0.1
 
 components:
   webhookFunction:

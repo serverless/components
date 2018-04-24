@@ -1,7 +1,8 @@
 const path = require('path')
-const semverRegex = require('semver-regex')
+const semver = require('semver')
 
 const { fileExists, readFile } = require('../fs')
+const { log } = require('../log')
 const pack = require('../pack')
 
 module.exports = async (options) => {
@@ -14,7 +15,7 @@ module.exports = async (options) => {
 
   const slsYml = await readFile(slsYmlFilePath)
 
-  if (!semverRegex().test(slsYml.version)) {
+  if (semver.valid(slsYml.version) === null) {
     throw new Error('Please provide a valid version for your component')
   }
 
@@ -26,9 +27,11 @@ module.exports = async (options) => {
     throw new Error('Please provide a valid format. Either a "zip" or a "tar"')
   }
 
-  const outputFileName = `${slsYml.type}@${slsYml.version}.${format}`
+  const cleanVersion = semver.clean(slsYml.version)
+
+  const outputFileName = `${slsYml.type}@${cleanVersion}.${format}`
   const outputFilePath = path.resolve(options.path, outputFileName)
 
   return pack(process.cwd(), outputFilePath, format)
-    .then(() => console.log(`Component has been packaged in ${outputFilePath}`)) // eslint-disable-line
+    .then(() => log(`Component has been packaged in ${outputFilePath}`)) // eslint-disable-line
 }

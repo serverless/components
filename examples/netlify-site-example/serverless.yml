@@ -1,4 +1,5 @@
 type: netlify-site-example
+version: 0.0.1
 
 components:
   myNetlifySite:

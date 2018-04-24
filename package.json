@@ -50,7 +50,7 @@
     "raven": "^2.4.2",
     "rc": "^1.2.6",
     "s3-client": "^4.4.1",
-    "semver-regex": "^2.0.0",
+    "semver": "^5.5.0",
     "uuid": "^3.2.1",
     "write-file-atomic": "^2.3.0"
   },
