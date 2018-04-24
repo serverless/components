@@ -12,6 +12,7 @@ inputTypes:
     type: string
     required: true
     displayName: GitHub API Token
+    critical: true
     description: |
       GitHub personal access token needed for access to the github API.
       [Create a token](https://github.com/settings/tokens)
@@ -22,6 +23,7 @@ inputTypes:
     displayName: Github Repository
     description: The GitHub repos URL
     example: https://github.com/serverless/components/
+    critical: true
   payloadUrl:
     type: string
     required: true
