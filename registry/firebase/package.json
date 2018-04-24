@@ -13,7 +13,7 @@
   "author": "serverless.com",
   "license": "Apache-2.0",
   "dependencies": {
-    "firebase-tools": "^3.18.2",
+    "firebase-tools": "^3.18.4",
     "winston": "^1.1.2"
   }
 }
