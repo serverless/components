@@ -36,7 +36,7 @@ components:
     inputs:
       githubApiToken: ${input.githubApiToken}
       githubRepo: ${input.githubRepo}
-      payloadUrl: ${webhookEndpoint.url}/webhook
+      payloadUrl: ${webhookEndpoint.url}webhook
       events: ${input.webhookTriggers}
   webhookEndpoint:
     type: rest-api
