@@ -44,7 +44,7 @@ describe('Integration Test - Await child components', () => {
 
   describe('when running through a typical component usage lifecycle', () => {
     it('should deploy the "function" component and await its deployment', async () => {
-      await cpp.execAsync(`${componentsExec} deploy`, {
+      await cpp.execAsync(`node ${componentsExec} deploy`, {
         cwd: testServiceDir
       })
       const stateFileContent = await fsp.readJsonAsync(testServiceStateFile)
@@ -89,7 +89,7 @@ describe('Integration Test - Await child components', () => {
     })
 
     it('should remove the "function" component', async () => {
-      await cpp.execAsync(`${componentsExec} remove`, {
+      await cpp.execAsync(`node ${componentsExec} remove`, {
         cwd: testServiceDir
       })
       const stateFileContent = await fsp.readJsonAsync(testServiceStateFile)
