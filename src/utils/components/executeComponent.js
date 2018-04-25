@@ -29,6 +29,7 @@ const executeComponent = async (
 
   if (command === 'remove') {
     if (isEmpty(context.state)) {
+      console.log('empty?')
       return component
     }
   }
@@ -36,12 +37,12 @@ const executeComponent = async (
   let retainState = false
   const fns = component.fns
   const hasDeployFunction = fns.deploy && is(Function, fns.deploy)
-  const hasCreateFunction = fns.create && is(Function, fns.create)
-  const hasDeleteFunction = fns.delete && is(Function, fns.delete)
-  const hasUpdateFunction = fns.update && is(Function, fns.update)
-  const hasStuff = hasDeployFunction || hasCreateFunction || hasDeleteFunction || hasUpdateFunction
-  // console.log('hasStuff', hasStuff, componentId)
-  if (command === 'deploy' && hasStuff) {
+  const hasCreateFunction = fns.Create && is(Function, fns.Create)
+  const hasDeleteFunction = fns.Delete && is(Function, fns.Delete)
+  const hasUpdateFunction = fns.Update && is(Function, fns.Update)
+  const hasMethods = hasDeployFunction || hasCreateFunction || hasDeleteFunction || hasUpdateFunction // eslint-disable-line
+
+  if (command === 'deploy' && hasMethods) {
     const deployFunction = hasDeployFunction ? fns.deploy : defaultDeploy
     try {
       component.outputs = (await deployFunction(component.inputs, context, component)) || {}
@@ -56,22 +57,23 @@ const executeComponent = async (
     component.executed = true
   }
 
-  /* turn off random exported commands
-  // const func = component.fns[command]
-  // let retainState = false
-  // if (is(Function, func)) {
-  //   try {
-  //     component.outputs = (await func(component.inputs, context)) || {}
-  //   } catch (e) {
-  //     if (command === 'remove' && e.code === 'RETAIN_STATE') {
-  //       retainState = true
-  //     } else {
-  //       throw e
+  //*
+  // turn off random exported commands
+  //   const func = component.fns[command]
+  //   //let retainState = false
+  //   if (is(Function, func)) {
+  //     try {
+  //       component.outputs = (await func(component.inputs, context)) || {}
+  //     } catch (e) {
+  //       if (command === 'remove' && e.code === 'RETAIN_STATE') {
+  //         retainState = true
+  //       } else {
+  //         throw e
+  //       }
   //     }
+  //     component.executed = true
   //   }
-  //   component.executed = true
-  // }
-  */
+  /**/
 
   component.state = getState(stateFile, component.id)
 
@@ -88,7 +90,6 @@ const executeComponent = async (
 }
 
 async function defaultDeploy(inputs, context, component) {
-  console.log('run defaultDeploy')
   const fns = component.fns
   const inputTypes = component.inputTypes
 
@@ -99,9 +100,9 @@ async function defaultDeploy(inputs, context, component) {
 
   const defaultOutputs = { ...inputs, ...context.state }
 
-  const hasCreateFunction = fns.create && is(Function, fns.create)
-  const hasDeleteFunction = fns.delete && is(Function, fns.delete)
-  const hasUpdateFunction = fns.update && is(Function, fns.update)
+  const hasCreateFunction = fns.Create && is(Function, fns.Create)
+  const hasDeleteFunction = fns.Delete && is(Function, fns.Delete)
+  const hasUpdateFunction = fns.Update && is(Function, fns.Update)
 
   if (!hasCreateFunction) {
     throw new Error(`${context.type} has no create function exported from file`)
@@ -115,9 +116,9 @@ async function defaultDeploy(inputs, context, component) {
 
   /* No state found, run create flow */
   if (!componentData.hasState) {
-    context.log(`${context.type}: ○ Creating resource "{context.type}"`)
-    const creationOutputs = await fns.create(inputs, context)
-    context.log(`${context.type}: ✓ Finished Created resource "{context.type}"`)
+    context.log(`${context.type}: ○ Creating resource "${context.type}"`)
+    const creationOutputs = await fns.Create(inputs, context)
+    context.log(`${context.type}: ✓ Finished Created resource "${context.type}"`)
     // Then Save state
     const createState = { ...inputs, ...creationOutputs }
     context.saveState(createState)
@@ -156,11 +157,11 @@ async function defaultDeploy(inputs, context, component) {
     if (criticalValueChanged) {
       context.log(`${context.type}: ○ Running Critical Update for "${context.type}"`)
       context.log(`${context.type}: ○ Removing old "${context.type}" resource`)
-      await fns.delete(inputs, context)
+      await fns.Delete(inputs, context)
       context.log(`${context.type}: ✓ Removed old "${context.type}" resource`)
       // Then create new webhook at new repo
       context.log(`${context.type}: ○ Creating new "${context.type}" resource`)
-      const creationOutputs = await fns.create(inputs, context)
+      const creationOutputs = await fns.Create(inputs, context)
       context.log(`${context.type}: ✓ Created new "${context.type}" resource`)
       // Save state
       const createState = { ...inputs, ...creationOutputs }
@@ -170,13 +171,14 @@ async function defaultDeploy(inputs, context, component) {
     }
     /* no critical value change. Run normal update */
     context.log(`${context.type}: ○ Running Update for "${context.type}"`)
-    const updateOutputs = await fns.update(inputs, context)
+    const updateOutputs = await fns.Update(inputs, context)
     // Save state
     const updateState = { ...inputs, ...updateOutputs }
     context.saveState(updateState)
     context.log(`${context.type}: ✓ Update Complete for "${context.type}"`)
     return updateState
   }
+  context.log(`${context.type}: No changes in ${context.type}. Skipping updates`)
   // NoOp. Return default
   return defaultOutputs
 }
