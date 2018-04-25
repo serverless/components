@@ -24,6 +24,10 @@ jest.mock('aws-sdk', () => {
   }
 })
 
+afterEach(() => {
+  AWS.mocks.getDistributionMock.mockClear()
+})
+
 afterAll(() => {
   jest.restoreAllMocks()
 })
@@ -68,6 +72,6 @@ describe('CloudFront Component Unit Tests', () => {
 
     await expect(cloudFrontComponent.remove(inputs, cloudFrontContextMock)).resolves.toEqual({})
     expect(AWS.CloudFront).toHaveBeenCalledTimes(1)
-    expect(AWS.mocks.getDistributionMock).toHaveBeenCalledTimes(2)
+    expect(AWS.mocks.getDistributionMock).toHaveBeenCalledTimes(1)
   })
 })
