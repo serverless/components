@@ -22,6 +22,10 @@ jest.mock('aws-sdk', () => {
   }
 })
 
+afterEach(() => {
+  AWS.mocks.changeResourceRecordSetsMock.mockClear()
+})
+
 afterAll(() => {
   jest.restoreAllMocks()
 })
