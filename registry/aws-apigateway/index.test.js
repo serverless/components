@@ -24,6 +24,10 @@ jest.mock('aws-sdk', () => {
   }
 })
 
+afterEach(() => {
+  AWS.mocks.deleteRestApiMock.mockClear()
+})
+
 afterAll(() => {
   jest.restoreAllMocks()
 })
@@ -69,7 +73,7 @@ describe('ApiGateway Component Unit Tests', () => {
 
     await expect(apigComponent.remove({}, apigContextMock)).resolves.toEqual(expectedOutputs)
     expect(AWS.APIGateway).toHaveBeenCalledTimes(1)
-    expect(AWS.mocks.deleteRestApiMock).toHaveBeenCalledTimes(2)
+    expect(AWS.mocks.deleteRestApiMock).toHaveBeenCalledTimes(1)
   })
 
   it('should throw an error if aws threw an error', async () => {
@@ -85,6 +89,6 @@ describe('ApiGateway Component Unit Tests', () => {
 
     await expect(apigComponent.remove({}, apigContextMock)).rejects.toThrow('some random aws error')
     expect(AWS.APIGateway).toHaveBeenCalledTimes(1)
-    expect(AWS.mocks.deleteRestApiMock).toHaveBeenCalledTimes(3)
+    expect(AWS.mocks.deleteRestApiMock).toHaveBeenCalledTimes(1)
   })
 })
