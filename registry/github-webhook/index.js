@@ -1,7 +1,7 @@
 const parseGithubUrl = require('parse-github-url')
 const { createWebhook, updateWebhook, deleteWebhook } = require('./github')
 
-const create = async (inputs, context) => {
+const Create = async (inputs, context) => {
   const githubData = parseGithubUrl(inputs.githubRepo)
   context.log(`${context.type}: ○ Creating Github Webhook for "${githubData.repo}" repo`)
   const creationOutputs = await createWebhook(inputs)
@@ -16,7 +16,7 @@ const create = async (inputs, context) => {
   return createState
 }
 
-const update = async (inputs, context) => {
+const Update = async (inputs, context) => {
   // Same repo, update the existing hook
   const githubData = parseGithubUrl(inputs.githubRepo)
   const updateOutputs = await updateWebhook(inputs, context.state.github.id)
@@ -31,7 +31,7 @@ const update = async (inputs, context) => {
   return updateState
 }
 
-const remove = async (inputs, context) => {
+const Delete = async (inputs, context) => {
   const defaultOutputs = { ...inputs, ...context.state }
   const githubData = parseGithubUrl(context.state.githubRepo)
   context.log(`${context.type}: ◌ Removing Github Webhook from repo "${githubData.repo}"`)
@@ -51,8 +51,7 @@ function webhookExists(context) {
 }
 
 module.exports = {
-  // deploy,
-  create,
-  update,
-  delete: remove
+  Create,
+  Update,
+  Delete
 }
