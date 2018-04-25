@@ -4,12 +4,15 @@ const { readFile } = require('../fs')
 const getServiceId = require('../state/getServiceId')
 const transformPostExecutionVars = require('../variables/transformPostExecutionVars')
 const resolvePreExecutionVars = require('../variables/resolvePreExecutionVars')
+const validateVarsUsage = require('../variables/validateVarsUsage')
 const getInstanceId = require('./getInstanceId')
 const setInputDefaults = require('./setInputDefaults')
 const validateInputs = require('./validateInputs')
 
 module.exports = async (componentRoot, componentId, inputs, stateFile) => {
   let slsYml = await readFile(path.join(componentRoot, 'serverless.yml'))
+
+  validateVarsUsage(slsYml)
 
   slsYml.id = componentId || slsYml.type
 

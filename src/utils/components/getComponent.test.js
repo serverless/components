@@ -108,5 +108,30 @@ describe('#getComponent()', () => {
         message: expect.stringMatching(/Type error in component/)
       })
     })
+
+    it('Test invalid variables usage', async () => {
+      let error
+      try {
+        await getComponent(
+          path.resolve(__dirname, '../../../registry/tests-invalid-variables-usage'),
+          'test',
+          {},
+          {
+            $: { serviceId: 'AsH3gefdfDSY' },
+            'my-component': {
+              type: 'aws-function',
+              internallyManaged: false,
+              instanceId: 'AsH3gefdfDSY-cHA9jPi5lPQj',
+              state: {}
+            }
+          }
+        )
+      } catch (err) {
+        error = err
+      }
+      expect(error).toMatchObject({
+        message: expect.stringMatching(/variable syntax cannot be used/)
+      })
+    })
   })
 })
