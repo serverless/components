@@ -30,10 +30,16 @@ describe('#packageComponent', () => {
     expect(fs.readFile).toBeCalledWith(slsYmlFilePath)
   })
 
-  it.only('validate output path', async () => {
+  it('validate output path', async () => {
     const options = {
       format: 'zip'
     }
-    expect(() => packageComponent(options)).rejects.toThrow('Please provide an output path for the package with the --path option')
+    let err
+    try {
+      await packageComponent(options)
+    } catch (e) {
+      err = e
+    }
+    expect(err.message).toEqual('Please provide an output path for the package with the --path option')
   })
 })
