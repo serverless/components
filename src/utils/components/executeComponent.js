@@ -29,7 +29,6 @@ const executeComponent = async (
 
   if (command === 'remove') {
     if (isEmpty(context.state)) {
-      console.log('empty?')
       return component
     }
   }
