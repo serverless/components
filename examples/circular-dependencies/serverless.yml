@@ -1,4 +1,5 @@
 type: circular-dependencies
+version: 0.0.1
 
 components:
   myLambda:

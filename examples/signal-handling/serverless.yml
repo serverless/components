@@ -1,4 +1,5 @@
 type: signal-handling
+version: 0.0.1
 
 components:
   mySlowFunction:

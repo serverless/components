@@ -9,6 +9,7 @@ const getComponentsFromStateFile = require('./getComponentsFromStateFile')
 const executeComponent = require('./executeComponent')
 const getOrphanedComponents = require('./getOrphanedComponents')
 const generateContext = require('./generateContext')
+const packageComponent = require('./packageComponent')
 
 module.exports = {
   generateInstanceId,
@@ -21,5 +22,6 @@ module.exports = {
   getOrphanedComponents,
   getComponent,
   executeComponent,
-  generateContext
+  generateContext,
+  packageComponent
 }

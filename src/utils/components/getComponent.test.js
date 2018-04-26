@@ -133,5 +133,28 @@ describe('#getComponent()', () => {
         message: expect.stringMatching(/variable syntax cannot be used/)
       })
     })
+
+    it('Test incompatible core version', async () => {
+      let error
+      try {
+        await getComponent(
+          path.resolve(__dirname, '../../../registry/tests-core-version-compatibility'),
+          'test',
+          {},
+          {
+            $: { serviceId: 'AsH3gefdfDSY' },
+            'my-component': {
+              type: 'aws-function',
+              internallyManaged: false,
+              instanceId: 'AsH3gefdfDSY-cHA9jPi5lPQj',
+              state: {}
+            }
+          }
+        )
+      } catch (err) {
+        error = err
+      }
+      expect(error.message).toEqual('The Serverless Components core is incompatible with component my-project')
+    })
   })
 })

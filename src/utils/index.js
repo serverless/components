@@ -11,6 +11,7 @@ const mapIndexed = require('./mapIndexed')
 const reduceIndexed = require('./reduceIndexed')
 const reduceObjIndexed = require('./reduceObjIndexed')
 const variables = require('./variables')
+const validateCoreVersion = require('./validateCoreVersion')
 
 module.exports = {
   ...components,
@@ -21,8 +22,8 @@ module.exports = {
   ...state,
   ...telemetry,
   ...variables,
-
   getRegistryRoot,
+  validateCoreVersion,
   log,
   mapIndexed,
   reduceIndexed,

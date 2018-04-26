@@ -1,4 +1,5 @@
 type: landing-page
+version: 0.0.1
 
 components:
   landingPageFunction:
