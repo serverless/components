@@ -25,7 +25,7 @@ describe('#pack()', () => {
 
   it('should package a directory and return the file path', async () => {
     const outputFilePath = path.join(outputDirPath, `${crypto.randomBytes(6).toString('hex')}.zip`)
-    const returnedoutputFilePath = await pack(inputDirPath, outputFilePath)
+    const returnedOutputFilePath = await pack(inputDirPath, outputFilePath)
     const zipRes = await fsp.readFileAsync(outputFilePath)
     const zip = admZip(zipRes)
     const files = zip.getEntries().map((entry) => ({
@@ -39,6 +39,6 @@ describe('#pack()', () => {
       key1: 'value1',
       key2: 'value2'
     })
-    expect(returnedoutputFilePath).toEqual(outputFilePath)
+    expect(returnedOutputFilePath).toEqual(outputFilePath)
   })
 })

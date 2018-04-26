@@ -29,7 +29,6 @@
   },
   "dependencies": {
     "@octokit/rest": "^14.0.5",
-    "adm-zip": "^0.4.8",
     "analytics-node": "^3.2.0",
     "archiver": "^2.1.1",
     "aws-sdk": "^2.214.1",
@@ -56,6 +55,7 @@
     "write-file-atomic": "^2.3.0"
   },
   "devDependencies": {
+    "adm-zip": "^0.4.9",
     "babel-jest": "^22.4.1",
     "eslint": "^4.18.1",
     "eslint-config-airbnb-base": "^12.1.0",
