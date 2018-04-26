@@ -56,24 +56,21 @@ const executeComponent = async (
     }
     component.executed = true
   }
-
-  //*
-  // turn off random exported commands
-  //   const func = component.fns[command]
-  //   //let retainState = false
-  //   if (is(Function, func)) {
-  //     try {
-  //       component.outputs = (await func(component.inputs, context)) || {}
-  //     } catch (e) {
-  //       if (command === 'remove' && e.code === 'RETAIN_STATE') {
-  //         retainState = true
-  //       } else {
-  //         throw e
-  //       }
-  //     }
-  //     component.executed = true
-  //   }
-  /**/
+  const hasRemoveFunction = fns.remove && is(Function, fns.remove)
+  const hasRemoveMethods = hasDeleteFunction || hasRemoveFunction
+  if (command === 'remove' && hasRemoveMethods) {
+    const removeFunction = hasRemoveFunction ? fns.remove : defaultRemove
+    try {
+      component.outputs = (await removeFunction(component.inputs, context, component)) || {}
+    } catch (e) {
+      if (command === 'remove' && e.code === 'RETAIN_STATE') {
+        retainState = true
+      } else {
+        throw e
+      }
+    }
+    component.executed = true
+  }
 
   component.state = getState(stateFile, component.id)
 
@@ -87,6 +84,27 @@ const executeComponent = async (
   }
 
   return component
+}
+
+async function defaultRemove(inputs, context, component) {
+  const fns = component.fns
+  // const inputTypes = component.inputTypes
+  // const componentData = compareInputsToState(inputs, context.state)
+  // console.log('component diff data', componentData)
+  // const inputsChanged = !componentData.isEqual
+  // console.log('inputs changed', inputsChanged)
+  const hasDeleteFunction = fns.Delete && is(Function, fns.Delete)
+
+  if (!hasDeleteFunction) {
+    throw new Error(`${context.type} has no delete function exported from file`)
+  }
+
+  context.log(`${context.type}: ○ Removing resource "${context.type}"`)
+  const deleteOutputs = await fns.Delete(inputs, context)
+  context.log(`${context.type}: ✓ Finished Removing resource "${context.type}"`)
+  // Then Save state
+  context.saveState()
+  return deleteOutputs
 }
 
 async function defaultDeploy(inputs, context, component) {
