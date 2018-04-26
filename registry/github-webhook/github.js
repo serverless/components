@@ -1,6 +1,9 @@
+/* eslint-disable no-console */
 const octokit = require('@octokit/rest')()
 const R = require('ramda')
 const parseGithubUrl = require('parse-github-url')
+
+const permissionsError = `Make sure you have repo and write:repo_hook, read:repo_hook privilegdes set` // eslint-disable-line
 
 const createWebhook = async ({ githubApiToken, githubRepo, payloadUrl, events }) => {
   octokit.authenticate({
@@ -50,10 +53,7 @@ const createWebhook = async ({ githubApiToken, githubRepo, payloadUrl, events })
     }
 
     if (e.code === 404) {
-      /*eslint-disable */
-      console.log(`You have incorrect token permissions.
-Make sure you have repo and write:repo_hook, read:repo_hook privilegdes set`)
-      /* eslint-enable */
+      console.log(`You have incorrect token permissions. ${permissionsError}`)
       throw e
     }
     // handle other errors here
@@ -89,10 +89,7 @@ const updateWebhook = async ({ githubApiToken, githubRepo, payloadUrl, events },
   } catch (e) {
     // If API errors
     if (e.code === 404) {
-      /* eslint-disable */
-      console.log(`You have incorrect token permissions.
-Make sure you have repo and write:repo_hook, read:repo_hook privilegdes set`)
-      /* eslint-enable */
+      console.log(`You have incorrect token permissions. ${permissionsError}`)
       throw e
     }
   }
@@ -117,10 +114,7 @@ const deleteWebhook = async ({ githubApiToken, githubRepo }, id) => {
   } catch (e) {
     // If API errors
     if (e.code === 404) {
-      /* eslint-disable */
-      console.log(`You have incorrect token permissions.
-Make sure you have repo and write:repo_hook, read:repo_hook privilegdes set`)
-      /* eslint-enable */
+      console.log(`You have incorrect token permissions. ${permissionsError}`)
       throw e
     }
   }
