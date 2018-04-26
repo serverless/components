@@ -1,4 +1,4 @@
-const R = require('ramda')
+const { equals } = require('ramda')
 
 /**
  * @typedef {Object} ComparedStateData
@@ -28,7 +28,7 @@ module.exports = function compareInputsToState(inputs, state) {
   }
   return Object.keys(inputs).reduce((acc, current) => {
     // if values not deep equal. There are changes
-    if (!R.equals(inputs[current], state[current])) {
+    if (!equals(inputs[current], state[current])) {
       return {
         hasState,
         isEqual: false,
