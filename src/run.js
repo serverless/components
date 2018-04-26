@@ -45,7 +45,9 @@ const run = async (command, options) => {
       orphanedComponents = getOrphanedComponents(serverlessFileComponents, stateFileComponents)
     }
     components = { ...componentsToUse, ...orphanedComponents }
-    if (command === 'deploy') trackDeployment(componentsToUse)
+    if (command === 'deploy') {
+      trackDeployment(componentsToUse)
+    }
     const graph = await buildGraph(componentsToUse, orphanedComponents, command)
     await executeGraph(graph, components, stateFile, archive, command, options, false)
     // run the "info" command on every component after a successful deployment
