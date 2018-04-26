@@ -105,45 +105,6 @@ describe('#executeComponent()', () => {
     expect(res.outputs).toEqual({ result: 'deployed' })
   })
 
-  it('should skip the command execution if the command is not available', async () => {
-    const command = 'invalid'
-    const res = await executeComponent(
-      componentId,
-      components,
-      stateFile,
-      archive,
-      command,
-      options
-    )
-    expect(res.executed).toBeFalsy()
-    expect(res.inputs).toEqual({
-      name: 'inputs-function-name',
-      memorySize: 512,
-      timeout: 60
-    })
-    expect(res.outputs).toEqual({})
-  })
-
-  it('should treat rollbacks differently', async () => {
-    const command = null
-    const res = await executeComponent(
-      componentId,
-      components,
-      stateFile,
-      archive,
-      command,
-      options,
-      true
-    )
-    expect(res.executed).toEqual(true)
-    expect(res.inputs).toEqual({
-      name: 'inputs-function-name',
-      memorySize: 512,
-      timeout: 60
-    })
-    expect(res.outputs).toEqual({ result: 'rolled back' })
-  })
-
   describe('when running "remove"', () => {
     const command = 'remove'
 
