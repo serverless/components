@@ -5,15 +5,13 @@ const Create = async (inputs, context) => {
   const githubData = parseGithubUrl(inputs.githubRepo)
   context.log(`${context.type}: ○ Creating Github Webhook for "${githubData.repo}" repo`)
   const creationOutputs = await createWebhook(inputs)
+  context.log(`${context.type}: ✓ Created Github Webhook for "${githubData.repo}" repo`)
+  context.log(`See hook in https://github.com/${githubData.repo}/settings/hooks`)
+  // return outputs for core to save
   const creationOutputsData = {
     github: creationOutputs
   }
-  context.log(`${context.type}: ✓ Created Github Webhook for "${githubData.repo}" repo`)
-  context.log(`See hook in https://github.com/${githubData.repo}/settings/hooks`)
-  // Save state
-  const createState = { ...inputs, ...creationOutputsData }
-  context.saveState(createState)
-  return createState
+  return { ...inputs, ...creationOutputsData }
 }
 
 const Update = async (inputs, context) => {
@@ -25,24 +23,22 @@ const Update = async (inputs, context) => {
   }
   context.log(`${context.type}: ✓ Updated Github Webhook in "${githubData.repo}" repo`)
   context.log(`   See hook in https://github.com/${githubData.repo}/settings/hooks`)
-  // Save state
-  const updateState = { ...inputs, ...updateOutputsData }
-  context.saveState(updateState)
-  return updateState
+  // return outputs for core to save
+  return { ...inputs, ...updateOutputsData }
 }
 
 const Delete = async (inputs, context) => {
-  const defaultOutputs = { ...inputs, ...context.state }
   const githubData = parseGithubUrl(context.state.githubRepo)
+  // TODO repo is gone from state so this fails. Handle at core?
   context.log(`${context.type}: ◌ Removing Github Webhook from repo "${githubData.repo}"`)
   if (!webhookExists(context)) {
     context.log('webhook not found')
     // No webhook id found. Bail
-    return defaultOutputs
+    return { ...context.state }
   }
   const outputs = await deleteWebhook(context.state, context.state.github.id)
   context.log(`${context.type}: ✓ Removed Github Webhook from repo "${githubData.repo}"`)
-  context.saveState()
+  // return outputs for core to save
   return outputs
 }
 
