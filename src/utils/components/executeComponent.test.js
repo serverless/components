@@ -111,7 +111,6 @@ describe('#executeComponent()', () => {
     })
     expect(res.outputs).toEqual({ result: 'deployed' })
   })
-
   it('should skip the command execution if the command is not available', async () => {
     const command = 'invalid'
     const res = await executeComponent(
