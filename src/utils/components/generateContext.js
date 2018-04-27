@@ -36,7 +36,7 @@ const generateContext = (
     log,
     // eslint-disable-next-line no-shadow
     load: async (type, alias, inputs) => {
-      const childComponentRootPath = getComponentRootPath(type)
+      const childComponentRootPath = await getComponentRootPath(type)
       const childComponentId = `${id}:${alias}`
 
       const childComponent = await getComponent(
