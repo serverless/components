@@ -10,6 +10,6 @@ module.exports = async (url) => {
   log(`Downloading component => ${url}`)
   return download(
     url, downloadedComponentRootPath,
-    { extract: true, filename: componentName, strip: 1 }
+    { extract: true, strip: 1 }
   )
 }
