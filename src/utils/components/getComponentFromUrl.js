@@ -3,7 +3,6 @@ const getComponentRootPathFromUrl = require('./getComponentRootPathFromUrl')
 const downloadComponent = require('./downloadComponent')
 
 module.exports = async (url) => {
-  console.log(url)
   const downloadedComponentRootPath = await getComponentRootPathFromUrl(url)
 
   if (await dirExists(downloadedComponentRootPath)) {
