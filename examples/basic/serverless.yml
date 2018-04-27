@@ -2,20 +2,15 @@ type: my-project
 version: 0.0.1
 
 components:
-  downloadedComponent:
-    type: https://github.com/eahefnawy/component-url-test/archive/master.zip
+  myFunction:
+    type: aws-lambda
     inputs:
-      test: abc
-#components:
-#  myFunction:
-#    type: aws-lambda
-#    inputs:
-#      memory: 512
-#      timeout: 10
-#      handler: handler.handler
-#      role:
-#        arn: ${myRole.arn}
-#  myRole:
-#    type: aws-iam-role
-#    inputs:
-#      service: lambda.amazonaws.com
+      memory: 512
+      timeout: 10
+      handler: handler.handler
+      role:
+        arn: ${myRole.arn}
+  myRole:
+    type: aws-iam-role
+    inputs:
+      service: lambda.amazonaws.com
