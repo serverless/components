@@ -379,8 +379,8 @@ The operation that will be fired depends on the inputs and how the provider work
 Here's an example demonstrating how a lambda component decides what needs to be done based on the `inputs` and `state` objects:
 
 ```js
-const deploy = (inputs, context) => {
-let outputs;
+const deploy = async (inputs, context) => {
+  let outputs;
   if (inputs.name && !context.state.name) {
     console.log(`Creating Lambda: ${inputs.name}`);
     outputs = await create(inputs);
