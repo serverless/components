@@ -1,12 +1,10 @@
 #!/usr/bin/env node
-const minimist = require('minimist')
-
+const parseArgs = require('minimist')
 const { run } = require('../src/index')
 
-const command = process.argv[2]
-const options = minimist(process.argv.slice(2))
-delete options._
-run(command, options).catch((error) => {
+const args = parseArgs(process.argv.slice(2))
+
+run(args).catch((error) => {
   console.error(error)
   process.exit(1)
 })
