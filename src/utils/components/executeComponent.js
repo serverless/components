@@ -35,14 +35,15 @@ const executeComponent = async (
 
   let retainState = false
   const fns = component.fns
+
+  /* Handle deploy command */
   const hasDeployFunction = fns.deploy && is(Function, fns.deploy)
   const hasCreateFunction = fns.Create && is(Function, fns.Create)
   const hasDeleteFunction = fns.Delete && is(Function, fns.Delete)
   const hasUpdateFunction = fns.Update && is(Function, fns.Update)
-  const hasMethods = hasDeployFunction || hasCreateFunction || hasDeleteFunction || hasUpdateFunction // eslint-disable-line
-
-  if (command === 'deploy' && hasMethods) {
-    const deployFunction = hasDeployFunction ? fns.deploy : defaultDeploy
+  const hasRequiredMethods = hasDeployFunction || hasCreateFunction || hasDeleteFunction || hasUpdateFunction // eslint-disable-line
+  if (command === 'deploy' && hasRequiredMethods) {
+    const deployFunction = (hasDeployFunction) ? fns.deploy : defaultDeploy
     try {
       component.outputs = (await deployFunction(component.inputs, context, component)) || {}
       validateTypes(component.id, component.outputTypes, component.outputs, { prefix: 'Output' })
@@ -55,6 +56,8 @@ const executeComponent = async (
     }
     component.executed = true
   }
+
+  /* Handle remove command */
   const hasRemoveFunction = fns.remove && is(Function, fns.remove)
   const hasRemoveMethods = hasDeleteFunction || hasRemoveFunction
   if (command === 'remove' && hasRemoveMethods) {
