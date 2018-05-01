@@ -1,8 +1,6 @@
+const { fileExists, getConfig, readFile } = require('@serverless/utils')
 const path = require('path')
 const Analytics = require('analytics-node')
-const getConfig = require('../config/getConfig')
-const fileExists = require('../fs/fileExists')
-const readFile = require('../fs/readFile')
 const getLocation = require('./getLocation')
 
 module.exports = async (eventName, data = {}) => {

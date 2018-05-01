@@ -1,6 +1,6 @@
+const { getTmpDir } = require('@serverless/utils')
 const path = require('path')
 const getRegistryRoot = require('../getRegistryRoot')
-const getTmpDir = require('../fs/getTmpDir')
 const getComponentRootPath = require('./getComponentRootPath')
 
 describe('#getComponentRootPath()', () => {
@@ -23,9 +23,9 @@ describe('#getComponentRootPath()', () => {
     let tmpDirPath
 
     beforeEach(async () => {
-      tmpDirPath = await getTmpDir()
       oldCwd = process.cwd()
-      process.chdir(tmpDirPath)
+      process.chdir(await getTmpDir())
+      tmpDirPath = process.cwd()
     })
 
     afterEach(() => {

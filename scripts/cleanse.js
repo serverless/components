@@ -14,10 +14,18 @@ fs.readdirSync(registry).forEach((mod) => {
     remove.stdout.on('data', (data) => {
       console.log(data.toString()) // eslint-disable-line no-console
     })
+    const removeLock = cp.spawn('rm', [ resolve(modPath, 'package-lock.json') ], { env: process.env })
+    removeLock.stdout.on('data', (data) => {
+      console.log(data.toString()) // eslint-disable-line no-console
+    })
   }
 })
 
 const remove = cp.spawn('rm', [ '-rf', resolve(__dirname, '..', 'node_modules') ], { env: process.env })
 remove.stdout.on('data', (data) => {
+  console.log(data.toString()) // eslint-disable-line no-console
+})
+const removeLock = cp.spawn('rm', [ resolve(__dirname, '..', 'package-lock.json') ], { env: process.env })
+removeLock.stdout.on('data', (data) => {
   console.log(data.toString()) // eslint-disable-line no-console
 })

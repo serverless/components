@@ -1,5 +1,5 @@
+const { getTmpDir } = require('@serverless/utils')
 const { join } = require('path')
-const getTmpDir = require('../fs/getTmpDir')
 const getRootPath = require('./getRootPath')
 
 describe('#getRootPath()', () => {
@@ -17,9 +17,9 @@ describe('#getRootPath()', () => {
   }
 
   beforeEach(async () => {
-    tmpDirPath = await getTmpDir()
     oldCwd = process.cwd()
-    process.chdir(tmpDirPath)
+    process.chdir(await getTmpDir())
+    tmpDirPath = process.cwd()
   })
 
   afterEach(() => {

@@ -1,5 +1,5 @@
+const { writeFile } = require('@serverless/utils')
 const path = require('path')
-const { writeFile } = require('../src/utils/fs')
 
 const trackingConfigFilePath = path.join(process.cwd(), 'tracking-config.json')
 

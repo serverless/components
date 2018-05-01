@@ -2,11 +2,8 @@ const path = require('path')
 const os = require('os')
 const crypto = require('crypto')
 const fse = require('fs-extra')
-const BbPromise = require('bluebird')
 const admZip = require('adm-zip')
 const pack = require('./pack')
-
-const fsp = BbPromise.promisifyAll(fse)
 
 describe('#pack()', () => {
   let outputDirPath
@@ -15,9 +12,9 @@ describe('#pack()', () => {
   beforeEach(async () => {
     inputDirPath = path.join(os.tmpdir(), crypto.randomBytes(6).toString('hex'))
     outputDirPath = path.join(os.tmpdir(), crypto.randomBytes(6).toString('hex'))
-    await fsp.ensureDirAsync(inputDirPath)
-    await fsp.ensureDirAsync(outputDirPath)
-    await fsp.writeJsonAsync(path.join(inputDirPath, 'foo.json'), {
+    await fse.ensureDir(inputDirPath)
+    await fse.ensureDir(outputDirPath)
+    await fse.writeJson(path.join(inputDirPath, 'foo.json'), {
       key1: 'value1',
       key2: 'value2'
     })
@@ -26,7 +23,7 @@ describe('#pack()', () => {
   it('should package a directory and return the file path', async () => {
     const outputFilePath = path.join(outputDirPath, `${crypto.randomBytes(6).toString('hex')}.zip`)
     const returnedOutputFilePath = await pack(inputDirPath, outputFilePath)
-    const zipRes = await fsp.readFileAsync(outputFilePath)
+    const zipRes = await fse.readFile(outputFilePath)
     const zip = admZip(zipRes)
     const files = zip.getEntries().map((entry) => ({
       name: entry.entryName,

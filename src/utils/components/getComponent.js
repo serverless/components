@@ -1,6 +1,6 @@
+const { readFile } = require('@serverless/utils')
 const path = require('path')
 const { forEachObjIndexed } = require('ramda')
-const { readFile } = require('../fs')
 const validateCoreVersion = require('../validateCoreVersion')
 
 const getServiceId = require('../state/getServiceId')

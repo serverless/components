@@ -1,14 +1,14 @@
 /* eslint-disable no-console */
 
+const { walkDirSync } = require('@serverless/utils')
 const AWS = require('aws-sdk')
-const utils = require('../../src/utils')
 const mime = require('mime-types')
 const fs = require('fs')
 
 const S3 = new AWS.S3({ region: 'us-east-1' })
 
 const uploadFiles = async ({ contentPath, bucketName }) => {
-  const filePaths = await utils.walkDirSync(contentPath)
+  const filePaths = await walkDirSync(contentPath)
   const uploadedFiles = filePaths.map(async (file) => {
     const cleanedFilePath = file.replace(`${contentPath.replace('./', '')}/`, '')
 

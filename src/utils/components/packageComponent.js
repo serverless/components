@@ -1,7 +1,7 @@
 const path = require('path')
 const semver = require('semver')
+const { fileExists, readFile } = require('@serverless/utils')
 
-const { fileExists, readFile } = require('../fs')
 const log = require('../log')
 const validateCoreVersion = require('../validateCoreVersion')
 const pack = require('../pack')
