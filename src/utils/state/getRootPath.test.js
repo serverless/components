@@ -1,5 +1,5 @@
 const { getTmpDir } = require('@serverless/utils')
-const { join, resolve } = require('path')
+const { join } = require('path')
 const getRootPath = require('./getRootPath')
 
 describe('#getRootPath()', () => {
