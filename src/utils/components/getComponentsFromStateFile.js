@@ -1,11 +1,10 @@
+const { deferredPromise, reduceIndexed } = require('@serverless/utils')
 const { keys, reduce, not, isEmpty, append, pickBy, prop } = require('ramda')
-const reduceIndexed = require('../reduceIndexed')
 const getComponentFunctions = require('./getComponentFunctions')
 const getChildrenIds = require('./getChildrenIds')
 const getState = require('../state/getState')
 const getInputs = require('../state/getInputs')
 const getRootPath = require('../state/getRootPath')
-const deferredPromise = require('../deferredPromise')
 
 function getComponentsFromStateFile(stateFile) {
   const componentIds = reduceIndexed((accum, stateFileKey) => {

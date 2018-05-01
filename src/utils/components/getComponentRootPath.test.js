@@ -1,6 +1,6 @@
 const { getTmpDir } = require('@serverless/utils')
 const path = require('path')
-const getRegistryRoot = require('../getRegistryRoot')
+const getRegistryRoot = require('../registry/getRegistryRoot')
 const getComponentRootPath = require('./getComponentRootPath')
 
 describe('#getComponentRootPath()', () => {

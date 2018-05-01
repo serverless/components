@@ -1,14 +1,10 @@
 const utils = require('@serverless/utils')
 const path = require('path')
 const packageComponent = require('./packageComponent')
-const pack = require('../pack')
-
-
-jest.mock('../pack')
-pack.mockImplementation(() => Promise.resolve())
 
 jest.mock('@serverless/utils', () => ({
   fileExists: jest.fn().mockReturnValue(Promise.resolve(true)),
+  packDir: jest.fn().mockReturnValue(Promise.resolve()),
   readFile: jest.fn().mockReturnValue(Promise.resolve({ type: 'my-project', version: '0.0.1' }))
 }))
 
@@ -26,7 +22,7 @@ describe('#packageComponent', () => {
     await packageComponent(options)
     const slsYmlFilePath = path.join(process.cwd(), 'serverless.yml')
     const outputFilePath = path.resolve(options.path, 'my-project@0.0.1.zip')
-    expect(pack).toBeCalledWith(process.cwd(), outputFilePath)
+    expect(utils.packDir).toBeCalledWith(process.cwd(), outputFilePath)
     expect(utils.fileExists).toBeCalledWith(slsYmlFilePath)
     expect(utils.readFile).toBeCalledWith(slsYmlFilePath)
   })

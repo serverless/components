@@ -1,6 +1,6 @@
 const path = require('path')
-const getRegistryRoot = require('../getRegistryRoot')
 const { isNil } = require('ramda')
+const getRegistryRoot = require('../registry/getRegistryRoot')
 
 function getComponentRootPath(type = null) {
   if (isNil(type)) {

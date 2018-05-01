@@ -1,8 +1,9 @@
+const { mapIndexed } = require('@serverless/utils')
 const joinPath = require('path').join
-const { joinUrl } = require('./utils')
 const {
-  isEmpty, keys, union, not, addIndex, map, forEachObjIndexed
+  isEmpty, keys, union, not, map, forEachObjIndexed
 } = require('ramda')
+const { joinUrl } = require('./utils')
 
 const catchallParameterPattern = /{\.{3}([^}]+?)}/g
 const pathParameterPattern = /{([^}]+?)}/g
@@ -83,8 +84,6 @@ function getEventGatewayInputs(inputs) {
 
 async function deployEventGateway(inputs, context) {
   const eventGatewayInputs = getEventGatewayInputs(inputs)
-
-  const mapIndexed = addIndex(map)
   const deployPromises = mapIndexed(
     (input, index) => context.load('eventgateway', `eg-${index}`, input).then((eg) => eg.deploy()),
     eventGatewayInputs
@@ -116,8 +115,6 @@ async function removeApiGateway(inputs, context) {
 
 async function removeEventGateway(inputs, context) {
   const eventGatewayInputs = getEventGatewayInputs(inputs)
-
-  const mapIndexed = addIndex(map)
   const removePromises = mapIndexed(
     (input, index) => context.load('eventgateway', `eg-${index}`, input).then((eg) => eg.remove()),
     eventGatewayInputs

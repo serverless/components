@@ -1,5 +1,5 @@
+const { deferredPromise } = require('@serverless/utils')
 const { assoc, keys, mergeAll, map } = require('ramda')
-const deferredPromise = require('../deferredPromise')
 const getChildrenIds = require('./getChildrenIds')
 const getComponent = require('./getComponent')
 const getComponentFunctions = require('./getComponentFunctions')

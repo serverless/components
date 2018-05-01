@@ -1,5 +1,5 @@
 const validateCoreVersion = require('./validateCoreVersion')
-const coreVersion = require('../../package.json').version
+const coreVersion = require('../../../package.json').version
 
 describe('#validateCoreVersion', () => {
   const componentType = 'my-component'

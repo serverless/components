@@ -1,6 +1,6 @@
-const { not } = require('ramda')
-const forEachIndexed = require('../misc/forEachIndexed')
+const { forEachIndexed } = require('@serverless/utils')
 const graphlib = require('graphlib')
+const { not } = require('ramda')
 
 function detectCircularDeps(graph) {
   const isAcyclic = graphlib.alg.isAcyclic(graph)

@@ -1,10 +1,8 @@
+const { fileExists, packDir, readFile } = require('@serverless/utils')
 const path = require('path')
 const semver = require('semver')
-const { fileExists, readFile } = require('@serverless/utils')
-
-const log = require('../log')
-const validateCoreVersion = require('../validateCoreVersion')
-const pack = require('../pack')
+const log = require('../logging/log')
+const validateCoreVersion = require('./validateCoreVersion')
 
 module.exports = async (options) => {
   const format = options.format || 'zip'
@@ -28,6 +26,6 @@ module.exports = async (options) => {
   const outputFileName = `${slsYml.type}@${slsYml.version}.${format}`
   const outputFilePath = path.resolve(options.path, outputFileName)
 
-  return pack(process.cwd(), outputFilePath)
+  return packDir(process.cwd(), outputFilePath)
     .then(() => log(`Component has been packaged in ${outputFilePath}`)) // eslint-disable-line
 }
