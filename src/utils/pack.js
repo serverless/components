@@ -1,6 +1,7 @@
-const path = require('path')
-const { fse, readFileIfExists } = require('./fs')
+const { readFileIfExists } = require('@serverless/utils')
 const archiver = require('archiver')
+const { createWriteStream } = require('fs-extra')
+const path = require('path')
 
 module.exports = async (inputDirPath, outputFilePath) => {
   const validFormats = [ 'zip', 'tar' ]
@@ -12,7 +13,7 @@ module.exports = async (inputDirPath, outputFilePath) => {
 
   const ignore = await readFileIfExists(path.join(inputDirPath, '.slsignore')) || []
   return new Promise((resolve, reject) => {
-    const output = fse.createWriteStream(outputFilePath)
+    const output = createWriteStream(outputFilePath)
     const archive = archiver(format, {
       zlib: { level: 9 }
     })

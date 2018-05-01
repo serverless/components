@@ -1,6 +1,5 @@
 const path = require('path')
-const fileExists = require('../fs/fileExists')
-const readFile = require('../fs/readFile')
+const { fileExists, readFile } = require('@serverless/utils')
 
 module.exports = async () => {
   const stateFilePath = path.join(process.cwd(), 'state.json')
@@ -8,6 +7,5 @@ module.exports = async () => {
   if (!await fileExists(stateFilePath)) {
     return {}
   }
-  const state = await readFile(stateFilePath)
-  return state
+  return readFile(stateFilePath)
 }

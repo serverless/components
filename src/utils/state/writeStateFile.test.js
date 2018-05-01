@@ -1,7 +1,7 @@
+const { getTmpDir } = require('@serverless/utils')
+const { readJson } = require('fs-extra')
 const path = require('path')
 const writeStateFile = require('./writeStateFile')
-const getTmpDir = require('../fs/getTmpDir')
-const fse = require('../fs/fse')
 
 describe('#writeStateFile()', () => {
   let oldCwd
@@ -42,7 +42,7 @@ describe('#writeStateFile()', () => {
 
   it('should write the content to disk', async () => {
     await writeStateFile(fileContent)
-    const stateFileContent = await fse.readJsonAsync(stateFilePath)
+    const stateFileContent = await readJson(stateFilePath)
     expect(stateFileContent).toEqual(fileContent)
   })
 })
