@@ -1,11 +1,11 @@
 # Development
 
-# Requirements
+## Requirements
 
-* node.js 8.0+
-* npm 5.0+
+* Node.js 8.0+
+* Npm 5.0+
 
-_NOTE:_ we recommend using nvm
+_NOTE:_ we recommend using [nvm](https://github.com/creationix/nvm)
 
 ```sh
 brew install nvm
@@ -21,7 +21,6 @@ cd components
 npm install
 ```
 
-
 ## Cleanse
 
 To wipe out all installed modules as well as package-lock.json files, use the `cleanse` script.
@@ -32,7 +31,6 @@ To cleanse the project
 npm run cleanse
 ```
 
-
 ## Tests
 
 Run tests for the project
@@ -40,7 +38,6 @@ Run tests for the project
 ```sh
 npm test
 ```
-
 
 ## Lint
 
