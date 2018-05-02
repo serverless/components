@@ -9,7 +9,7 @@ afterAll(() => {
 })
 
 afterEach(() => {
-  download.mockClear()
+  jest.clearAllMocks()
 })
 
 describe('#downloadComponent', () => {

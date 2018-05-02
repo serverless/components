@@ -1,4 +1,4 @@
-const { dirExists } = require('../fs')
+const { dirExists } = require('@serverless/utils')
 const getComponentRootPathFromUrl = require('./getComponentRootPathFromUrl')
 const downloadComponent = require('./downloadComponent')
 

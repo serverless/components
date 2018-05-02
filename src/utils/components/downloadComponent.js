@@ -1,7 +1,8 @@
 const download = require('download')
+const BbPromise = require('bluebird')
+const fse = BbPromise.promisifyAll(require('fs-extra'))
 const getComponentRootPathFromUrl = require('./getComponentRootPathFromUrl')
 const log = require('../log')
-const { fse } = require('../fs')
 
 module.exports = async (url) => {
   const downloadedComponentRootPath = await getComponentRootPathFromUrl(url)

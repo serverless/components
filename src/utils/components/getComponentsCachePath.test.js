@@ -1,20 +1,24 @@
+const BbPromise = require('bluebird')
 const path = require('path')
 const os = require('os')
-const fs = require('../fs')
 const getComponentsCachePath = require('./getComponentsCachePath')
 
-jest.mock('../fs', () => ({
-  fse: {
-    ensureDirAsync: jest.fn()
+jest.mock('bluebird', () => {
+  const mocks = {
+    ensureDirAsync: jest.fn().mockReturnValue(Promise.resolve(true))
   }
-}))
+  return {
+    mocks: mocks,
+    promisifyAll: () => mocks
+  }
+})
 
 afterAll(() => {
   jest.restoreAllMocks()
 })
 
 afterEach(() => {
-  fs.fse.ensureDirAsync.mockClear()
+  BbPromise.mocks.ensureDirAsync.mockClear()
 })
 
 describe('#getComponentsCachePath', () => {
@@ -22,6 +26,6 @@ describe('#getComponentsCachePath', () => {
     const expectedComponentsCachePath = path.join(os.homedir(), '.serverless', 'components', 'cache')
     const componentsCachePath = await getComponentsCachePath()
     expect(componentsCachePath).toEqual(expectedComponentsCachePath)
-    expect(fs.fse.ensureDirAsync).toBeCalledWith(expectedComponentsCachePath)
+    expect(BbPromise.mocks.ensureDirAsync).toBeCalledWith(expectedComponentsCachePath)
   })
 })

@@ -1,6 +1,7 @@
 const os = require('os')
 const path = require('path')
-const { fse } = require('../fs')
+const BbPromise = require('bluebird')
+const fse = BbPromise.promisifyAll(require('fs-extra'))
 
 module.exports = async () => {
   const componentsCachePath = path.join(os.homedir(), '.serverless', 'components', 'cache')

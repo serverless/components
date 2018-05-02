@@ -1,7 +1,8 @@
+const BbPromise = require('bluebird')
+const fse = BbPromise.promisifyAll(require('fs-extra'))
 const downloadComponent = require('./downloadComponent')
 const getComponentFromUrl = require('./getComponentFromUrl')
 const getComponentRootPathFromUrl = require('./getComponentRootPathFromUrl')
-const { fse } = require('../fs')
 
 jest.mock('./downloadComponent')
 
