@@ -18,7 +18,7 @@ afterAll(() => {
 })
 
 afterEach(() => {
-  BbPromise.mocks.ensureDirAsync.mockClear()
+  jest.clearAllMocks()
 })
 
 describe('#getComponentsCachePath', () => {

@@ -11,7 +11,7 @@ afterAll(() => {
 })
 
 afterEach(() => {
-  downloadComponent.mockClear()
+  jest.clearAllMocks()
 })
 
 describe('#getComponentFromUrl', () => {
