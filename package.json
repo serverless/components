@@ -21,6 +21,7 @@
     "cleanse": "node ./scripts/cleanse.js",
     "components": "./bin/components",
     "lint": "eslint . --cache",
+    "lint:staged": "lint-staged",
     "test": "jest .",
     "test:appveyor": "jest --testPathPattern=\"bin|examples|registry|src\" --colors --forceExit",
     "docs": "node ./scripts/doc-gen.js",
@@ -64,11 +65,17 @@
     "eslint-plugin-import": "^2.9.0",
     "eslint-plugin-prettier": "^2.6.0",
     "jest": "^22.4.2",
+    "lint-staged": "^7.0.4",
     "markdown-magic": "^0.1.21",
+    "pre-commit": "^1.2.2",
     "prettier": "^1.10.2"
   },
   "jest": {
     "coverageDirectory": "./coverage/",
     "collectCoverage": true
-  }
+  },
+  "lint-staged": {
+    "*.js": ["prettier --write --single-quote --trailing-comma es5", "eslint --fix", "git add"]
+  },
+  "pre-commit": ["lint:staged"]
 }
