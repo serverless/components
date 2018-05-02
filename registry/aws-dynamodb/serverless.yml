@@ -10,7 +10,7 @@ inputTypes:
   tables:
     type: object[]
     required: true
-    displayName: DynamoDB Table Defintions
+    displayName: DynamoDB Table Definitions
     description: Array of AWS DynamoDB table definitions
     example:
       - name: BlogPost
