@@ -1,5 +1,6 @@
 const path = require('path')
-const { fse } = require('./fs')
+const BbPromise = require('bluebird')
+const fse = BbPromise.promisifyAll(require('fs-extra'))
 const getRegistryRoot = require('./getRegistryRoot')
 
 const getRegistryComponentsRoots = async () => (await fse.readdirAsync(getRegistryRoot()))
