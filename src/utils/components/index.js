@@ -4,6 +4,7 @@ const getExecutedComponents = require('./getExecutedComponents')
 const getComponent = require('./getComponent')
 const getComponentFunctions = require('./getComponentFunctions')
 const getComponentRootPath = require('./getComponentRootPath')
+const getComponentsBucketRoot = require('./getComponentsBucketRoot')
 const getComponentsFromServerlessFile = require('./getComponentsFromServerlessFile')
 const getComponentsFromStateFile = require('./getComponentsFromStateFile')
 const executeComponent = require('./executeComponent')
@@ -15,6 +16,7 @@ module.exports = {
   generateInstanceId,
   getInstanceId,
   getComponentFunctions,
+  getComponentsBucketRoot,
   getComponentRootPath,
   getComponentsFromServerlessFile,
   getComponentsFromStateFile,
