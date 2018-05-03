@@ -12,11 +12,16 @@ const commands = {
     description: 'Get info about github webhook',
     handler: (inputs, state, options) => {
       if (!webhookExists(state)) {
-        getWebhook({
-          githubRepo: state.githubRepo,
-          webhookId: state.github.id,
-          githubApiToken: state.githubApiToken
-        }).then((data) => {
+        console.log('No webhook exists yet. Please run "components deploy"') // eslint-disable-line
+        return false
+      }
+
+      return getWebhook({
+        githubRepo: state.githubRepo,
+        webhookId: state.github.id,
+        githubApiToken: state.githubApiToken
+      })
+        .then((data) => {
           // if --json set it will output raw json
           if (options.json) {
             console.log(JSON.stringify(data.data)) // eslint-disable-line
@@ -28,12 +33,10 @@ const commands = {
             const values = data.data[key]
             console.log(`   ${key}: ${JSON.stringify(values)}`) // eslint-disable-line
           })
-        }).catch((e) => {
+        })
+        .catch((e) => {
           throw e
         })
-      } else {
-        console.log('No webhook exists yet. Please deploy') // eslint-disable-line
-      }
     },
     options: {
       json: {
@@ -78,7 +81,7 @@ const Delete = async (inputs, context) => {
   const githubData = parseGithubUrl(context.state.githubRepo)
   // TODO repo is gone from state so this fails. Handle at core?
   context.log(`${context.type}: ◌ Removing Github Webhook from repo "${githubData.repo}"`)
-  if (!webhookExists(context)) {
+  if (!webhookExists(context.state)) {
     context.log('webhook not found')
     // No webhook id found. Bail
     return { ...context.state }
@@ -89,8 +92,8 @@ const Delete = async (inputs, context) => {
   return outputs
 }
 
-function webhookExists(context) {
-  return context.state && context.state.github && context.state.github.id
+function webhookExists(state) {
+  return state && state.github && state.github.id
 }
 
 module.exports = {
@@ -99,9 +102,10 @@ module.exports = {
   Update,
   Delete,
   myCustomFunctionToDoStuff: (inputs, state, options) => {
-    console.log('This is an example of using handler.myCustomFunctionToDoStuff in a command in yaml') // eslint-disable-line
+    console.log('This is an example of using handler.myCustomFunctionToDoStuff in a command in yaml'
+    ) // eslint-disable-line
     console.log('It contains inputs, state, and cli options') // eslint-disable-line
-    console.log('inputs', inputs, state, options) // eslint-disable-line
+    console.log('inputs', inputs) // eslint-disable-line
     console.log('state', state) // eslint-disable-line
     console.log('options', options) // eslint-disable-line
   }

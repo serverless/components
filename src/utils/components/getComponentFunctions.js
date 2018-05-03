@@ -1,5 +1,5 @@
+const fs = require('fs')
 const path = require('path')
-const fileExistsSync = require('../fs/fileExistsSync')
 
 const getComponentFunctions = (componentRoot) => {
   let fns = {}
@@ -23,6 +23,15 @@ const getComponentFunctions = (componentRoot) => {
     throw error
   }
   return fns
+}
+
+function fileExistsSync(filePath) {
+  try {
+    const stats = fs.lstatSync(filePath)
+    return stats.isFile()
+  } catch (e) {
+    return false
+  }
 }
 
 module.exports = getComponentFunctions
