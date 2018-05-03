@@ -19,7 +19,7 @@ async function removeStateFiles(stateFiles) {
 }
 
 describe('Integration Test - Simple', () => {
-  jest.setTimeout(20000)
+  jest.setTimeout(40000)
 
   const testDir = path.dirname(__filename)
   const componentsExec = path.join(testDir, '..', '..', 'bin', 'components')
@@ -76,7 +76,10 @@ describe('Integration Test - Simple', () => {
       const myFunctionObjectKeys = Object.keys(myFunction)
       expect(myFunctionObjectKeys.length).toEqual(6)
       expect(myFunction).toHaveProperty('instanceId')
-      expect(myFunction).toHaveProperty('type', 'tests-integration-function-mock')
+      expect(myFunction).toHaveProperty(
+        'type',
+        'tests-integration-function-mock'
+      )
       expect(myFunction).toHaveProperty('internallyManaged', false)
       expect(myFunction).toHaveProperty('rootPath')
       expect(myFunction).toHaveProperty('state', {
@@ -129,7 +132,10 @@ describe('Integration Test - Simple', () => {
       const myFunctionObjectKeys = Object.keys(myFunction)
       expect(myFunctionObjectKeys.length).toEqual(6)
       expect(myFunction).toHaveProperty('instanceId')
-      expect(myFunction).toHaveProperty('type', 'tests-integration-function-mock')
+      expect(myFunction).toHaveProperty(
+        'type',
+        'tests-integration-function-mock'
+      )
       expect(myFunction).toHaveProperty('internallyManaged', false)
       expect(myFunction).toHaveProperty('rootPath')
       expect(myFunction).toHaveProperty('state', {
@@ -151,13 +157,16 @@ describe('Integration Test - Simple', () => {
     })
 
     it('should invoke the "function" component with CLI options', async () => {
-      await cpp.execAsync(`node ${componentsExec} invoke --data "Hello World"`, {
-        cwd: testServiceDir,
-        env: {
-          ...process.env,
-          FUNCTION_NAME
+      await cpp.execAsync(
+        `node ${componentsExec} invoke --data "Hello World"`,
+        {
+          cwd: testServiceDir,
+          env: {
+            ...process.env,
+            FUNCTION_NAME
+          }
         }
-      })
+      )
       const stateFileContent = await fsp.readJsonAsync(testServiceStateFile)
       const stateFileKeys = Object.keys(stateFileContent)
       expect(stateFileKeys.length).toEqual(4)
@@ -182,7 +191,10 @@ describe('Integration Test - Simple', () => {
       const myFunctionObjectKeys = Object.keys(myFunction)
       expect(myFunctionObjectKeys.length).toEqual(6)
       expect(myFunction).toHaveProperty('instanceId')
-      expect(myFunction).toHaveProperty('type', 'tests-integration-function-mock')
+      expect(myFunction).toHaveProperty(
+        'type',
+        'tests-integration-function-mock'
+      )
       expect(myFunction).toHaveProperty('internallyManaged', false)
       expect(myFunction).toHaveProperty('rootPath')
       expect(myFunction).toHaveProperty('state', {
@@ -242,7 +254,10 @@ describe('Integration Test - Simple', () => {
       const myFunctionObjectKeys = Object.keys(myFunction)
       expect(myFunctionObjectKeys.length).toEqual(6)
       expect(myFunction).toHaveProperty('instanceId')
-      expect(myFunction).toHaveProperty('type', 'tests-integration-function-mock')
+      expect(myFunction).toHaveProperty(
+        'type',
+        'tests-integration-function-mock'
+      )
       expect(myFunction).toHaveProperty('internallyManaged', false)
       expect(myFunction).toHaveProperty('rootPath')
       expect(myFunction).toHaveProperty('state', {
@@ -286,7 +301,10 @@ describe('Integration Test - Simple', () => {
       const myFunction = stateFileContent['simple:myFunction']
       const myFunctionObjectKeys = Object.keys(myFunction)
       expect(myFunctionObjectKeys.length).toEqual(2)
-      expect(myFunction).toHaveProperty('type', 'tests-integration-function-mock')
+      expect(myFunction).toHaveProperty(
+        'type',
+        'tests-integration-function-mock'
+      )
       expect(myFunction).toHaveProperty('state', {})
     })
   })
