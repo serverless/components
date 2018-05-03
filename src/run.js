@@ -1,5 +1,5 @@
 /* eslint no-console: 0 */
-const { clone, is, isEmpty, difference  } = require('ramda')
+const { clone, is, isEmpty, difference } = require('ramda')
 const path = require('path')
 const chalk = require('chalk')
 const { execSync } = require('child_process')
@@ -70,8 +70,6 @@ const run = async (command, options) => {
     }
 
     const stateFileComponents = getComponentsFromStateFile(stateFile)
-    // console.log('stateFileComponents', stateFileComponents)
-    // console.log('serverlessFileComponents', serverlessFileComponents)
 
     // If core command. Do it for everything
     // TODO refactor and run this elsewhere
