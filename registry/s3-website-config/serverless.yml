@@ -1,4 +1,11 @@
 type: s3-website-config
+version: 0.2.0
+core: 0.2.x
+
+description: "A Serverless Component for configuring the static-website component"
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
 
 inputTypes:
   rootBucketName:
