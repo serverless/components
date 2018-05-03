@@ -1,9 +1,8 @@
 const AWS = require('aws-sdk')
 const path = require('path')
 const BbPromise = require('bluebird')
-const os = require('os')
-const crypto = require('crypto')
-const { writeFile, readFile, fse } = require('@serverless/utils')
+const fs = require('fs')
+const { writeFile, readFile, getTmpDir } = require('@serverless/utils')
 
 const { getRegistryComponentsRoots, packageComponent } = require('../src/utils')
 
@@ -52,21 +51,18 @@ const trackingConfig = {
 }
 
 const uploadComponent = async (componentRoot) => {
-  const packageTempDirPath = path.join(os.tmpdir(), crypto.randomBytes(3).toString('hex'))
-  await fse.ensureDirAsync(packageTempDirPath)
+  const packageTempDirPath = await getTmpDir()
   const options = {
     format: FORMAT,
     path: packageTempDirPath,
     componentRoot
   }
   const packagePath = await packageComponent(options)
-  const componentPackage = await fse.readFileAsync(packagePath)
-  const componentFileName = path.basename(packagePath)
 
   const params = {
-    Body: componentPackage,
+    Body: fs.createReadStream(packagePath),
     Bucket: COMPONENTS_BUCKET,
-    Key: componentFileName
+    Key: path.basename(packagePath)
   }
 
   return s3.putObject(params).promise()
@@ -80,7 +76,7 @@ const uploadComponents = async () => {
   const s3Components = await getUploadedComponents()
 
   const componentsToUpload = await componentsRoots.reduce(async (accum, componentRoot) => {
-    accum = await Promise.resolve(accum)
+    accum = await BbPromise.resolve(accum)
     const slsYmlFilePath = path.join(componentRoot, 'serverless.yml')
     const slsYml = await readFile(slsYmlFilePath)
     const componentFileName = `${slsYml.type}@${slsYml.version}.${FORMAT}`
@@ -89,9 +85,9 @@ const uploadComponents = async () => {
       accum.push(componentRoot)
     }
     return accum
-  }, Promise.resolve([]))
+  }, BbPromise.resolve([]))
 
-  return BbPromise.all(componentsToUpload.map(uploadComponent))
+  return BbPromise.map(componentsToUpload, uploadComponent)
 }
 
 ;(async () => { // eslint-disable-line

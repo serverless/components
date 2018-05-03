@@ -31,6 +31,18 @@ describe('#packageComponent', () => {
     expect(utils.readFile).toBeCalledWith(slsYmlFilePath)
   })
 
+  it('should package component of the given root', async () => {
+    const options = {
+      path: './',
+      format: 'zip',
+      componentRoot: './someComponent'
+    }
+
+    await packageComponent(options)
+    const outputFilePath = path.resolve(options.path, 'my-project@0.0.1.zip')
+    expect(pack).toBeCalledWith(options.componentRoot, outputFilePath)
+  })
+
   it('validate output path', async () => {
     const options = {
       format: 'zip'
