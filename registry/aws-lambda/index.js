@@ -1,6 +1,7 @@
 const AWS = require('aws-sdk')
 const pack = require('./pack')
 const invoke = require('./commands/invoke')
+
 const lambda = new AWS.Lambda({ region: 'us-east-1' })
 
 async function createLambda({ name, handler, memory, timeout, env, description, root }, role) {
