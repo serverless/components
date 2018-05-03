@@ -5,6 +5,21 @@ const parseGithubUrl = require('parse-github-url')
 
 const permissionsError = `Make sure you have repo and write:repo_hook, read:repo_hook privilegdes set` // eslint-disable-line
 
+const getWebhook = function ({ githubRepo, webhookId, githubApiToken }) {
+  const gh = parseGithubUrl(githubRepo)
+
+  octokit.authenticate({
+    type: 'token',
+    token: githubApiToken
+  })
+
+  return octokit.repos.getHook({
+    owner: gh.owner,
+    repo: gh.name,
+    id: webhookId
+  })
+}
+
 const createWebhook = async ({ githubApiToken, githubRepo, payloadUrl, events }) => {
   octokit.authenticate({
     type: 'token',
@@ -125,5 +140,6 @@ const deleteWebhook = async ({ githubApiToken, githubRepo }, id) => {
 module.exports = {
   createWebhook,
   deleteWebhook,
-  updateWebhook
+  updateWebhook,
+  getWebhook
 }
