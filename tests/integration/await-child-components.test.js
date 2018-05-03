@@ -19,7 +19,7 @@ async function removeStateFiles(stateFiles) {
 }
 
 describe('Integration Test - Await child components', () => {
-  jest.setTimeout(20000)
+  jest.setTimeout(40000)
 
   const testDir = path.dirname(__filename)
   const componentsExec = path.join(testDir, '..', '..', 'bin', 'components')
@@ -57,14 +57,20 @@ describe('Integration Test - Await child components', () => {
       const awaitChildComponentsObjectKeys = Object.keys(awaitChildComponents)
       expect(awaitChildComponentsObjectKeys.length).toEqual(6)
       expect(awaitChildComponents).toHaveProperty('instanceId')
-      expect(awaitChildComponents).toHaveProperty('type', 'await-child-components')
+      expect(awaitChildComponents).toHaveProperty(
+        'type',
+        'await-child-components'
+      )
       expect(awaitChildComponents).toHaveProperty('internallyManaged', false)
       expect(awaitChildComponents).toHaveProperty('rootPath')
       expect(awaitChildComponents).toHaveProperty(
         'state.myFunction.state.id',
         'id:function:my-function'
       )
-      expect(awaitChildComponents).toHaveProperty('state.myFunction.state.deploymentCounter', 1)
+      expect(awaitChildComponents).toHaveProperty(
+        'state.myFunction.state.deploymentCounter',
+        1
+      )
       expect(awaitChildComponents).toHaveProperty('state.myFunction.outputs', {
         id: 'id:function:my-function',
         name: 'my-function',
@@ -101,7 +107,10 @@ describe('Integration Test - Await child components', () => {
       const awaitChildComponents = stateFileContent['await-child-components']
       const awaitChildComponentsObjectKeys = Object.keys(awaitChildComponents)
       expect(awaitChildComponentsObjectKeys.length).toEqual(2)
-      expect(awaitChildComponents).toHaveProperty('type', 'await-child-components')
+      expect(awaitChildComponents).toHaveProperty(
+        'type',
+        'await-child-components'
+      )
       expect(awaitChildComponents).toHaveProperty('state', {})
     })
   })
