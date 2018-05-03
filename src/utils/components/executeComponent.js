@@ -114,10 +114,7 @@ async function defaultDeploy(inputs, context, component) {
   const inputTypes = component.inputTypes
 
   const componentData = compareInputsToState(inputs, context.state)
-  // console.log('component diff data', componentData)
   const inputsChanged = !componentData.isEqual
-  // console.log('inputs changed', inputsChanged)
-
   const defaultOutputs = { ...inputs, ...context.state }
 
   const hasCreateFunction = fns.Create && is(Function, fns.Create)
@@ -153,13 +150,11 @@ async function defaultDeploy(inputs, context, component) {
       const inputData = inputTypes[inputKey]
       return inputData.critical
     })
-    // console.log('criticalValues', criticalValues)
 
     /* Then check if a critical value has changed */
     const criticalValueChanged = criticalValues.some((r) => { // eslint-disable-line
       return componentData.keys.includes(r)
     })
-    // console.log('criticalValueChanged', criticalValueChanged)
 
     // Log out diffs
     componentData.keys.forEach((item) => {
