@@ -21,6 +21,26 @@ cd components
 npm install
 ```
 
+## `USE_ESNEXT` environment variable
+
+You can export the `USE_ESNEXT` environment variable if you're using a Node.js version >=8 and want to work on the project without `build`ing / `watch`ing it.
+
+## Build
+
+To build the project
+
+```sh
+npm run build
+```
+
+## Watch
+
+To automatically re-build the project when files change
+
+```sh
+npm run watch
+```
+
 ## Cleanse
 
 To wipe out all installed modules as well as package-lock.json files, use the `cleanse` script.

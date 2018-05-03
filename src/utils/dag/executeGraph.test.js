@@ -135,7 +135,8 @@ describe('#executeGraph()', () => {
       })
     )
 
-    await expect(executeGraph(graph, components, {}, {})).rejects.toThrow(
+    await expect(executeGraph(graph, components, {}, {})).rejects.toHaveProperty(
+      'message',
       'myRole could not be deployed'
     )
 
@@ -172,7 +173,10 @@ describe('#executeGraph()', () => {
         }
       }
 
-      await expect(executeGraph(graph, components, {}, {})).rejects.toThrow('gracefully exited')
+      await expect(executeGraph(graph, components, {}, {})).rejects.toHaveProperty(
+        'message',
+        'Operation gracefully exited. State successfully persisted...'
+      )
 
       // TODO: be more specific about the call count here
       expect(executeComponent).toHaveBeenCalled()

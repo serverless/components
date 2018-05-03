@@ -107,7 +107,7 @@ const remove = async (inputs, context) => {
     await deleteApi({ name: context.state.name, id: context.state.id })
   } catch (e) {
     if (!e.message.includes('Invalid REST API identifier specified')) {
-      throw new Error(e)
+      throw e
     }
   }
 

@@ -4,7 +4,7 @@
   "description": "An easier way to build applications with cloud services",
   "author": "Serverless, Inc. <hello@serverless.com> (https://serverless.com)",
   "license": "Apache-2.0",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "preferGlobal": true,
   "repository": "github:serverless/components",
   "bugs": {
@@ -15,11 +15,14 @@
     "components": "./bin/components"
   },
   "scripts": {
+    "build": "babel src --out-dir dist --source-maps --copy-files --ignore '**/node_modules' --ignore '**/*.test.js'",
+    "watch": "babel --watch src --out-dir dist --source-maps --copy-files --ignore '**/node_modules' --ignore '**/*.test.js'",
     "cleanse": "node ./scripts/cleanse.js",
     "components": "./bin/components",
     "lint": "eslint . --fix --cache",
     "lint:staged": "lint-staged",
     "test": "jest .",
+    "test:travis": "jest . --runInBand --forceExit",
     "test:appveyor": "jest --testPathPattern=\"bin|examples|registry|src\" --colors --forceExit",
     "docs": "node ./scripts/doc-gen.js",
     "postinstall": "node ./scripts/postinstall.js",
@@ -31,6 +34,11 @@
     "analytics-node": "^3.2.0",
     "aws-sdk": "^2.214.1",
     "axios": "^0.17.1",
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
     "bluebird": "^3.5.1",
     "chalk": "^2.3.2",
     "concordance": "^3.0.0",
@@ -64,10 +72,19 @@
   },
   "jest": {
     "coverageDirectory": "./coverage/",
-    "collectCoverage": true
+    "collectCoverage": true,
+    "testEnvironment": "node",
+    "setupFiles": [
+      "<rootDir>/.jest.init.js"
+    ]
   },
   "lint-staged": {
-    "*.js": ["eslint --fix .", "git add -A"]
+    "*.js": [
+      "eslint --fix .",
+      "git add -A"
+    ]
   },
-  "pre-commit": ["lint:staged"]
+  "pre-commit": [
+    "lint:staged"
+  ]
 }

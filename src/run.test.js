@@ -65,7 +65,10 @@ describe('#run()', () => {
   it('should report any errors to Sentry while still writing the state to disk', async () => {
     utils.executeGraph.mockImplementation(() => Promise.reject(new Error('something went wrong')))
 
-    await expect(run('some-command', { projectPath })).rejects.toThrow('something went wrong')
+    await expect(run('some-command', { projectPath })).rejects.toHaveProperty(
+      'message',
+      'something went wrong'
+    )
 
     expect(utils.handleSignalEvents).toHaveBeenCalled()
     expect(utils.getComponentsFromServerlessFile.mock.calls[0][1]).toEqual(projectPath)

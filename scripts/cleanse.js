@@ -1,39 +1,72 @@
+/* eslint-disable no-console */
+/* eslint-disable-next-line */
+'use strict'
+
 const fs = require('fs')
-const { join, resolve } = require('path')
+const join = require('path').join
+const resolve = require('path').resolve
 const cp = require('child_process')
+const BbPromise = require('bluebird')
 
-// get registry path
-const registry = resolve(__dirname, join('..', 'registry'))
+const registryPath = resolve(__dirname, join('..', 'registry'))
+const componentDirs = fs.readdirSync(registryPath)
 
-fs.readdirSync(registry).forEach((mod) => {
-  const modPath = join(registry, mod)
+BbPromise.map(componentDirs, (componentDir) => {
+  // eslint-disable-line consistent-return
+  const componentDirPath = join(registryPath, componentDir)
 
-  // ensure path has a node_modules folder
-  if (fs.existsSync(join(modPath, 'node_modules'))) {
-    const remove = cp.spawn('rm', ['-rf', join(modPath, 'node_modules')], {
+  if (!fs.lstatSync(componentDirPath).isDirectory()) return BbPromise.resolve()
+
+  if (fs.existsSync(join(componentDirPath, 'node_modules'))) {
+    const removeNodeModules = cp.spawn('rm', ['-rf', join(componentDirPath, 'node_modules')], {
       env: process.env
     })
-    remove.stdout.on('data', (data) => {
-      console.log(data.toString()) // eslint-disable-line no-console
+    removeNodeModules.stdout.on('data', (data) => {
+      console.log(data.toString())
     })
-    const removeLock = cp.spawn('rm', [resolve(modPath, 'package-lock.json')], {
+    const removeDist = cp.spawn('rm', ['-rf', join(componentDirPath, 'dist')], {
+      env: process.env
+    })
+    removeDist.stdout.on('data', (data) => {
+      console.log(data.toString())
+    })
+    const removeLock = cp.spawn('rm', [resolve(componentDirPath, 'package-lock.json')], {
       env: process.env
     })
     removeLock.stdout.on('data', (data) => {
-      console.log(data.toString()) // eslint-disable-line no-console
+      console.log(data.toString())
     })
   }
 })
 
-const remove = cp.spawn('rm', ['-rf', resolve(__dirname, '..', 'node_modules')], {
+const removeRegistryNodeModules = cp.spawn('rm', ['-rf', resolve(registryPath, 'node_modules')], {
   env: process.env
 })
-remove.stdout.on('data', (data) => {
-  console.log(data.toString()) // eslint-disable-line no-console
+removeRegistryNodeModules.stdout.on('data', (data) => {
+  console.log(data.toString())
 })
-const removeLock = cp.spawn('rm', [resolve(__dirname, '..', 'package-lock.json')], {
+const removeRegistryLock = cp.spawn('rm', [resolve(__dirname, '..', 'package-lock.json')], {
   env: process.env
 })
-removeLock.stdout.on('data', (data) => {
-  console.log(data.toString()) // eslint-disable-line no-console
+removeRegistryLock.stdout.on('data', (data) => {
+  console.log(data.toString())
+})
+
+const removeRootNodeModules = cp.spawn('rm', ['-rf', resolve(__dirname, '..', 'node_modules')], {
+  env: process.env
+})
+removeRootNodeModules.stdout.on('data', (data) => {
+  console.log(data.toString())
+})
+const removeDist = cp.spawn('rm', ['-rf', resolve(__dirname, '..', 'dist')], {
+  env: process.env
+})
+removeDist.stdout.on('data', (data) => {
+  console.log(data.toString())
+})
+const removeRootLock = cp.spawn('rm', [resolve(__dirname, '..', 'package-lock.json')], {
+  env: process.env
+})
+removeRootLock.stdout.on('data', (data) => {
+  console.log(data.toString())
 })

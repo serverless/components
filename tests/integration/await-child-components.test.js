@@ -39,15 +39,18 @@ describe('Integration Test - Await child components', () => {
       })
       const stateFileContent = await fsp.readJsonAsync(testServiceStateFile)
       const stateFileKeys = Object.keys(stateFileContent)
-      expect(stateFileKeys.length).toEqual(4)
+      expect(stateFileKeys.length).toEqual(5)
       expect(stateFileContent).toHaveProperty('$.serviceId')
-      expect(stateFileContent).toHaveProperty('await-child-components')
+      expect(stateFileContent).toHaveProperty('await-child-components:awaitChildComponents')
       expect(stateFileContent.$.serviceId).not.toBeFalsy()
-      const awaitChildComponents = stateFileContent['await-child-components']
+      const awaitChildComponents = stateFileContent['await-child-components:awaitChildComponents']
       const awaitChildComponentsObjectKeys = Object.keys(awaitChildComponents)
       expect(awaitChildComponentsObjectKeys.length).toEqual(6)
       expect(awaitChildComponents).toHaveProperty('instanceId')
-      expect(awaitChildComponents).toHaveProperty('type', 'await-child-components')
+      expect(awaitChildComponents).toHaveProperty(
+        'type',
+        'tests-integration-await-child-components'
+      )
       expect(awaitChildComponents).toHaveProperty('internallyManaged', false)
       expect(awaitChildComponents).toHaveProperty('rootPath')
       expect(awaitChildComponents).toHaveProperty(
@@ -84,14 +87,17 @@ describe('Integration Test - Await child components', () => {
       })
       const stateFileContent = await fsp.readJsonAsync(testServiceStateFile)
       const stateFileKeys = Object.keys(stateFileContent)
-      expect(stateFileKeys.length).toEqual(4)
+      expect(stateFileKeys.length).toEqual(5)
       expect(stateFileContent).toHaveProperty('$.serviceId')
-      expect(stateFileContent).toHaveProperty('await-child-components')
+      expect(stateFileContent).toHaveProperty('await-child-components:awaitChildComponents')
       expect(stateFileContent.$.serviceId).not.toBeFalsy()
-      const awaitChildComponents = stateFileContent['await-child-components']
+      const awaitChildComponents = stateFileContent['await-child-components:awaitChildComponents']
       const awaitChildComponentsObjectKeys = Object.keys(awaitChildComponents)
       expect(awaitChildComponentsObjectKeys.length).toEqual(2)
-      expect(awaitChildComponents).toHaveProperty('type', 'await-child-components')
+      expect(awaitChildComponents).toHaveProperty(
+        'type',
+        'tests-integration-await-child-components'
+      )
       expect(awaitChildComponents).toHaveProperty('state', {})
     })
   })

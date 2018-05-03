@@ -158,7 +158,7 @@ describe('#executeComponent()', () => {
 
     await expect(
       executeComponent(componentId, components, stateFile, archive, command, options)
-    ).rejects.toThrow('Type error(s)')
+    ).rejects.toHaveProperty('message')
   })
 
   describe('when running "remove"', () => {

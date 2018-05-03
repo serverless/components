@@ -1,3 +1,6 @@
+/* eslint-disable-next-line */
+'use strict'
+
 const AWS = require('aws-sdk')
 const path = require('path')
 const BbPromise = require('bluebird')
@@ -25,7 +28,8 @@ const excludedComponents = [
   'tests-input-type-string',
   'tests-input-type-string-invalid-default',
   'tests-integration-function-mock',
-  'tests-integration-iam-mock'
+  'tests-integration-iam-mock',
+  'tests-integration-await-child-components'
 ]
 
 const config = {

@@ -206,7 +206,7 @@ describe('Integration Test - Simple', () => {
           FUNCTION_NAME
         }
       })
-      await expect(cmd).rejects.toThrow('Failed to deploy function "my-function"')
+      await expect(cmd).rejects.toHaveProperty('message')
 
       const stateFileContent = await fsp.readJsonAsync(testServiceStateFile)
       const stateFileKeys = Object.keys(stateFileContent)

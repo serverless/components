@@ -1,17 +1,19 @@
 environment:
   matrix:
+    - NODEJS_VERSION: '4'
+    - NODEJS_VERSION: '6'
     - NODEJS_VERSION: '8'
+    - NODEJS_VERSION: '10'
 
 install:
   - ps: Install-Product node $env:NODEJS_VERSION
-  - npm install --global npm@latest
   - set PATH=%APPDATA%\npm;%PATH%
-  - npm install
+  - cmd: appveyor-retry npm install
 
 test_script:
   - node --version
   - npm --version
-  # NOTE: we only inlcude specific directories and skip integration tests on AppVeyor
+  - npm run lint
   - npm run test:appveyor
 
 matrix:
