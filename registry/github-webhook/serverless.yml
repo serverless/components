@@ -7,6 +7,13 @@ license: Apache-2.0
 author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
 repository: "github:serverless/components"
 
+commands:
+  yolo:
+    command: yolo
+    description: Say motivating stuff
+    shortcut: i
+    handler: index.myCustomFunctionToDoStuff
+
 inputTypes:
   githubApiToken:
     type: string

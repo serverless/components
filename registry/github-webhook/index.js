@@ -32,7 +32,7 @@ const commands = {
           throw e
         })
       } else {
-        console.log('No webhook exists yet. Please deploy')
+        console.log('No webhook exists yet. Please deploy') // eslint-disable-line
       }
     },
     options: {
@@ -98,7 +98,11 @@ module.exports = {
   Create,
   Update,
   Delete,
-  myCustomFunctionToDoStuff: (inputs, state, opts) => {
-    console.log('run the function hehehe')
+  myCustomFunctionToDoStuff: (inputs, state, options) => {
+    console.log('This is an example of using handler.myCustomFunctionToDoStuff in a command in yaml') // eslint-disable-line
+    console.log('It contains inputs, state, and cli options') // eslint-disable-line
+    console.log('inputs', inputs, state, options) // eslint-disable-line
+    console.log('state', state) // eslint-disable-line
+    console.log('options', options) // eslint-disable-line
   }
 }
