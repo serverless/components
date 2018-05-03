@@ -1,6 +1,6 @@
 const AWS = require('aws-sdk')
 const pack = require('./pack')
-
+const invoke = require('./commands/invoke')
 const lambda = new AWS.Lambda({ region: 'us-east-1' })
 
 async function createLambda(
@@ -146,5 +146,18 @@ async function remove(inputs, context) {
 
 module.exports = {
   deploy,
-  remove
+  remove,
+  commands: {
+    invoke: {
+      command: 'invoke',
+      description: 'invoke function',
+      handler: invoke,
+      options: {
+        data: {
+          description: 'Json payload',
+          shortcut: 'd'
+        }
+      }
+    }
+  }
 }
