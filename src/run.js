@@ -1,4 +1,5 @@
-const { clone, is, isEmpty, dissoc } = require('ramda')
+/* eslint no-console: 0 */
+const { clone, is, isEmpty, difference  } = require('ramda')
 const path = require('path')
 const chalk = require('chalk')
 const { execSync } = require('child_process')
@@ -19,14 +20,11 @@ const {
   // log
 } = require('./utils')
 
-const run = async (args) => {
+const run = async (command, options) => {
   handleSignalEvents()
   if (command === 'package') {
     return packageComponent(options)
   }
-  const command = args._.join(' ')
-  const options = dissoc('_', args)
-
   const reporter = await errorReporter()
   let components = {}
   let stateFile = {}
@@ -40,20 +38,14 @@ const run = async (args) => {
     let orphanedComponents
     const serverlessFileComponents = await getComponentsFromServerlessFile(stateFile)
 
-    const removeByIndex = (array, index) => { // eslint-disable-line
-      return array.filter((_, i) => { // eslint-disable-line
-        return i !== index
-      })
-    }
+    const rootComponentName = getRootComponentName(serverlessFileComponents)
 
     const availableCommands = Object.keys(serverlessFileComponents).reduce((acc, curr) => {
-      const componentPath = curr.split(':')
-      const key = removeByIndex(componentPath, 0).join(':')
-
+      const key = curr.replace(`${rootComponentName}:`, '')
       const comp = serverlessFileComponents[curr]
       if (comp.commands) {
-        // Set root component '' as 'root'
-        const finalKey = key || 'root'
+        // Set root component key as 'root'
+        const finalKey = (key === rootComponentName) ? 'root' : key
         acc[finalKey] = {
           commands: comp.commands,
           rootPath: comp.rootPath
@@ -62,7 +54,8 @@ const run = async (args) => {
       return acc
     }, {})
 
-    if (!command || command === 'help' || options.h || options.help) {
+    // Show help if no command or help flag used without any component names
+    if (!command || command === 'help' || (!command && options.h) || (!command && options.help)) {
       console.log(`
  ██████╗ ██████╗ ███╗   ███╗██████╗  ██████╗ ███╗   ██╗███████╗███╗   ██╗████████╗███████╗
 ██╔════╝██╔═══██╗████╗ ████║██╔══██╗██╔═══██╗████╗  ██║██╔════╝████╗  ██║╚══██╔══╝██╔════╝
@@ -71,31 +64,16 @@ const run = async (args) => {
 ╚██████╗╚██████╔╝██║ ╚═╝ ██║██║     ╚██████╔╝██║ ╚████║███████╗██║ ╚████║   ██║   ███████║
  ╚═════╝ ╚═════╝ ╚═╝     ╚═╝╚═╝      ╚═════╝ ╚═╝  ╚═══╝╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝
                                                                                           `) // eslint-disable-line
-      console.log(`${chalk.whiteBright.bold('Here are the current available commands:')}`)
-      console.log()
       // Todo refactor programatic declaration of core commands
-      const coreCommands = [ 'remove', 'deploy' ]
-      coreCommands.forEach((k) => {
-        const cmd = `${k}`
-        console.log(` ${chalk.whiteBright(cmd)}`)
-      })
-      Object.keys(availableCommands).forEach((k) => {
-        const cdata = availableCommands[k]
-        if (!isEmpty(cdata.commands)) {
-          Object.keys(cdata.commands).forEach((c) => {
-            const cmd = `${k} ${c}`
-            const cmdInfo = cdata.commands[c]
-            console.log(` ${chalk.redBright(cmd)} - ${cmdInfo.description}`)
-          })
-        }
-      })
-      console.log()
-      console.log(`Run a command like this "${chalk.whiteBright('component deploy')}"`)
+      logAllCommandsHelp(availableCommands)
+      return false
     }
 
     const stateFileComponents = getComponentsFromStateFile(stateFile)
+    // console.log('stateFileComponents', stateFileComponents)
+    // console.log('serverlessFileComponents', serverlessFileComponents)
 
-    // If core command
+    // If core command. Do it for everything
     // TODO refactor and run this elsewhere
     if (command === 'remove' || command === 'deploy') {
       if (command === 'remove') {
@@ -121,7 +99,10 @@ const run = async (args) => {
       }
     } else {
       // Do the CLI command from individual component
-      await doCommand(command, options, availableCommands)
+      await doCommand(command, options, availableCommands, {
+        componentStateData: stateFileComponents,
+        rootComponentName: rootComponentName
+      })
     }
   } catch (error) {
     if (reporter) {
@@ -150,33 +131,85 @@ const run = async (args) => {
   return components
 }
 
-async function doCommand(cmd, options, availableCommands) {
+async function doCommand(cmd, options, availableCommands, data) {
   const parts = cmd.split(' ')
+
+  const componentKey = parts[0]
+  const commandData = availableCommands[componentKey]
+  const currentCommand = parts[1]
+
+  if (!commandData) {
+    console.log(`No ${componentKey} component found`) // eslint-disable-line
+    console.log() // eslint-disable-line
+    logAllCommandsHelp(availableCommands)
+    return false
+  }
+
   /* singular "core" command */
   if (parts.length === 1) {
     // SOLO command
+    if (!currentCommand || options.help || options.h) {
+      console.log()
+      const msg = `Here are the current available commands for ${componentKey}:`
+      console.log(`${chalk.whiteBright.bold(msg)}`)
+      console.log()
+      logCommandHelp(componentKey, commandData.commands)
+    }
   }
 
   /* command targeting sub components */
   if (parts.length > 1) {
-    const componentKey = parts[0]
-    const currentCommand = parts[1]
+    const componentName = (componentKey === 'root') ? data.rootComponentName : `${data.rootComponentName}:${componentKey}`
 
-    if (!availableCommands[componentKey]) {
-      console.log(`No ${componentKey} component found`) // eslint-disable-line
+    const rootComponentInfo = {}
+    // TODO cmds in root component have all state/inputs should we pass them into commands?
+    const currentComponentData = data.componentStateData[componentName] || rootComponentInfo
+
+    const currentComponentInputs = currentComponentData.inputs
+    const currentComponentState = currentComponentData.state
+
+    const componentCommands = commandData.commands
+    const componentRootPath = commandData.rootPath
+
+    if (!commandData.commands) {
+      console.log(`No commands found for "${componentKey}" component`) // eslint-disable-line
       return false
     }
-    const componentCommands = availableCommands[componentKey].commands
-    const componentRootPath = availableCommands[componentKey].rootPath
 
-    if (!componentCommands) {
-      console.log(`No commands found for "${componentKey}" component`) // eslint-disable-line
+    /* Show help on "component name help", "component name --help" & "component name -h" */
+    if (currentCommand === 'help' || (!currentCommand && options.help) || (!currentCommand && options.h)) {
+      console.log()
+      console.log(currentCommand)
+      const msg = `Here are the current available commands for ${componentKey}:`
+      console.log(`${chalk.whiteBright.bold(msg)}`)
+      console.log()
+      logCommandHelp(componentKey, commandData.commands)
       return false
     }
 
     if (!componentCommands[currentCommand]) {
       console.log(`No "${currentCommand}" command found for ${componentKey} component`)  // eslint-disable-line
+      console.log() // eslint-disable-line
+      logCommandHelp(componentKey, commandData.commands)
       return false
+    }
+
+    // validate options passed in
+    const commandOptions = componentCommands[currentCommand].options
+    if (commandOptions && !isEmpty(options)) {
+      const optionsWithShortcuts = Object.keys(commandOptions).reduce((acc, curr) => {
+        const cmdData = commandOptions[curr]
+        if (cmdData.shortcut) {
+          acc[cmdData.shortcut] = options[curr]
+        }
+        acc[curr] = options[curr]
+        return acc
+      }, {})
+      // Diff the options + shortcut config with passed in options
+      const unknownOptions = difference(Object.keys(options), Object.keys(optionsWithShortcuts))
+      if (!isEmpty(unknownOptions)) {
+        throw new Error(`Unknown option ${JSON.stringify(unknownOptions)}`)
+      }
     }
 
     /* Function or CLI command to run */
@@ -189,11 +222,12 @@ async function doCommand(cmd, options, availableCommands) {
 
     // 1. if function, run function
     if (is(Function, handler)) {
-      return handler('lol', 'foo', options)
+      return handler(currentComponentInputs, currentComponentState, options)
     }
 
     // 2. if is shell script, run shell script
     if (hasWhiteSpace(handler)) {
+      // TODO pass in currentComponentInputs, currentComponentState, options?
       execSync(handler, { stdio: [ process.stdin, process.stdout, process.stderr ] })
       return false
     }
@@ -210,7 +244,7 @@ async function doCommand(cmd, options, availableCommands) {
     }
 
     if (functions && functions[exportedFunction] && is(Function, functions[exportedFunction])) {
-      return functions[exportedFunction]('lol', 'foo', options)
+      return functions[exportedFunction](currentComponentInputs, currentComponentState, options)
     }
 
     // 4. Future, handle raw files or other runtime via stdin
@@ -218,8 +252,41 @@ async function doCommand(cmd, options, availableCommands) {
   return false
 }
 
+/* pluck root component name */
+function getRootComponentName(serverlessFileComponents) {
+  const component = Object.keys(serverlessFileComponents)[0].split(':')
+  return component[0]
+}
+
 function hasWhiteSpace(s) {
   return s.indexOf(' ') >= 0
+}
+
+function logAllCommandsHelp(availableCommands) {
+  console.log(`${chalk.whiteBright.bold('Here are the current available commands:')}`)
+  console.log()
+  const coreCommands = [ 'remove', 'deploy' ]
+  coreCommands.forEach((k) => {
+    const cmd = `${k}`
+    console.log(` ${chalk.whiteBright(cmd)}`)
+  })
+  Object.keys(availableCommands).forEach((k) => {
+    const cdata = availableCommands[k]
+    if (!isEmpty(cdata.commands)) {
+      logCommandHelp(k, cdata.commands)
+    }
+  })
+  console.log()
+  console.log(`Run a command like this "${chalk.whiteBright('components deploy')}"`)
+}
+
+function logCommandHelp(componentKey, commands) {
+  Object.keys(commands).forEach((c) => {
+    const cmd = `${componentKey} ${c}`
+    const cmdInfo = commands[c]
+    console.log(` ${chalk.redBright(cmd)} - ${cmdInfo.description}`)
+    // Todo log out options
+  })
 }
 
 function exportedFunctions(filePath) {
