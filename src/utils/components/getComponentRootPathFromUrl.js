@@ -1,9 +1,13 @@
 const path = require('path')
+const crypto = require('crypto')
 const getComponentsCachePath = require('./getComponentsCachePath')
 
 module.exports = async (url) => {
   const componentsCachePath = await getComponentsCachePath()
-  const componentName = url.substr(url.lastIndexOf('/') + 1).slice(0, -4)
-  const downloadedComponentRootPath = path.join(componentsCachePath, componentName)
+  const urlHash = crypto
+    .createHash('sha256')
+    .update(url)
+    .digest('hex')
+  const downloadedComponentRootPath = path.join(componentsCachePath, urlHash)
   return downloadedComponentRootPath
 }
