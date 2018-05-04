@@ -5,65 +5,60 @@ const getComponentsFromStateFile = require('./getComponentsFromStateFile')
 describe('#getComponentsFromStateFile()', () => {
   let oldCwd
   let tmpDirPath
-  let stateFile
-
-  beforeEach(async () => {
-    tmpDirPath = await getTmpDir()
-    oldCwd = process.cwd()
-    stateFile = {
-      $: {
-        serviceId: 'dmoh0ix898'
+  const stateFile = {
+    $: {
+      serviceId: 'dmoh0ix898'
+    },
+    'empty-state': {
+      type: 'empty-state',
+      inputs: {},
+      state: {}
+    },
+    'internally-managed': {
+      type: 'internally-managed',
+      internallyManaged: true,
+      inputs: {
+        name: 'inputs-internally-managed'
       },
-      'empty-state': {
-        type: 'empty-state',
-        inputs: {},
-        state: {}
+      state: {
+        state: 'state-internally-managed'
       },
-      'internally-managed': {
-        type: 'internally-managed',
-        internallyManaged: true,
-        inputs: {
-          name: 'inputs-internally-managed'
-        },
-        state: {
-          state: 'state-internally-managed'
-        },
-        rootPath: join(tmpDirPath, 'registry-path', 'mocks', 'internally-managed')
+      rootPath: join(
+        tmpDirPath,
+        'registry-path',
+        'mocks',
+        'internally-managed'
+      )
+    },
+    // NOTE: only the following state-objects should be used
+    'function-mock': {
+      type: 'function-mock',
+      inputs: {
+        name: 'inputs-function-mock-name'
       },
-      // NOTE: only the following state-objects should be used
-      'function-mock': {
-        type: 'function-mock',
-        inputs: {
-          name: 'inputs-function-mock-name'
-        },
-        state: {
-          name: 'state-function-mock-name'
-        },
-        rootPath: join(tmpDirPath, 'registry-path', 'mocks', 'function-mock')
+      state: {
+        name: 'state-function-mock-name'
       },
-      'iam-mock': {
-        type: 'iam-mock',
-        inputs: {
-          name: 'inputs-iam-mock-name',
-          service: 'inputs.some.serverless.service'
-        },
-        state: {
-          name: 'state-iam-mock-name',
-          service: 'state.some.serverless.service'
-        },
-        rootPath: join(tmpDirPath, 'registry-path', 'mocks', 'iam-mock')
-      }
+      rootPath: join(tmpDirPath, 'registry-path', 'mocks', 'function-mock')
+    },
+    'iam-mock': {
+      type: 'iam-mock',
+      inputs: {
+        name: 'inputs-iam-mock-name',
+        service: 'inputs.some.serverless.service'
+      },
+      state: {
+        name: 'state-iam-mock-name',
+        service: 'state.some.serverless.service'
+      },
+      rootPath: join(tmpDirPath, 'registry-path', 'mocks', 'iam-mock')
     }
-<<<<<<< HEAD
   }
 
   beforeEach(async () => {
     oldCwd = process.cwd()
     process.chdir(await getTmpDir())
     tmpDirPath = process.cwd()
-=======
-    process.chdir(tmpDirPath)
->>>>>>> fix test
   })
 
   afterEach(() => {
