@@ -17,7 +17,7 @@ async function getComponentRootPath(type = null) {
   } else if (urlRegex({ exact: true }).test(type)) {
     return getComponentFromUrl(type)
   } else if (type.match(registryRegex)) {
-    const url = `${getComponentsBucketRoot}/${type}.zip`
+    const url = `${getComponentsBucketRoot()}/${type}.zip`
     return getComponentFromUrl(url)
   } else if (type.match(/(.+\/)+/)) {
     return path.resolve(type)
