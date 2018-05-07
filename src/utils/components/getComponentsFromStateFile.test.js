@@ -5,60 +5,61 @@ const getComponentsFromStateFile = require('./getComponentsFromStateFile')
 describe('#getComponentsFromStateFile()', () => {
   let oldCwd
   let tmpDirPath
-  const stateFile = {
-    $: {
-      serviceId: 'dmoh0ix898'
-    },
-    'empty-state': {
-      type: 'empty-state',
-      inputs: {},
-      state: {}
-    },
-    'internally-managed': {
-      type: 'internally-managed',
-      internallyManaged: true,
-      inputs: {
-        name: 'inputs-internally-managed'
-      },
-      state: {
-        state: 'state-internally-managed'
-      },
-      rootPath: join(
-        tmpDirPath,
-        'registry-path',
-        'mocks',
-        'internally-managed'
-      )
-    },
-    // NOTE: only the following state-objects should be used
-    'function-mock': {
-      type: 'function-mock',
-      inputs: {
-        name: 'inputs-function-mock-name'
-      },
-      state: {
-        name: 'state-function-mock-name'
-      },
-      rootPath: join(tmpDirPath, 'registry-path', 'mocks', 'function-mock')
-    },
-    'iam-mock': {
-      type: 'iam-mock',
-      inputs: {
-        name: 'inputs-iam-mock-name',
-        service: 'inputs.some.serverless.service'
-      },
-      state: {
-        name: 'state-iam-mock-name',
-        service: 'state.some.serverless.service'
-      },
-      rootPath: join(tmpDirPath, 'registry-path', 'mocks', 'iam-mock')
-    }
-  }
+  let stateFile
 
   beforeEach(async () => {
     oldCwd = process.cwd()
     process.chdir(await getTmpDir())
     tmpDirPath = process.cwd()
+    stateFile = {
+      $: {
+        serviceId: 'dmoh0ix898'
+      },
+      'empty-state': {
+        type: 'empty-state',
+        inputs: {},
+        state: {}
+      },
+      'internally-managed': {
+        type: 'internally-managed',
+        internallyManaged: true,
+        inputs: {
+          name: 'inputs-internally-managed'
+        },
+        state: {
+          state: 'state-internally-managed'
+        },
+        rootPath: join(
+          tmpDirPath,
+          'registry-path',
+          'mocks',
+          'internally-managed'
+        )
+      },
+      // NOTE: only the following state-objects should be used
+      'function-mock': {
+        type: 'function-mock',
+        inputs: {
+          name: 'inputs-function-mock-name'
+        },
+        state: {
+          name: 'state-function-mock-name'
+        },
+        rootPath: join(tmpDirPath, 'registry-path', 'mocks', 'function-mock')
+      },
+      'iam-mock': {
+        type: 'iam-mock',
+        inputs: {
+          name: 'inputs-iam-mock-name',
+          service: 'inputs.some.serverless.service'
+        },
+        state: {
+          name: 'state-iam-mock-name',
+          service: 'state.some.serverless.service'
+        },
+        rootPath: join(tmpDirPath, 'registry-path', 'mocks', 'iam-mock')
+      }
+    }
   })
 
   afterEach(() => {
