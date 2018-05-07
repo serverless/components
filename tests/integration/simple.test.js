@@ -258,8 +258,7 @@ describe('Integration Test - Simple', () => {
         },
         role: 'id:iam:role:my-function',
         deploymentCounter: 2,
-        defaultRole: false,
-        data: 'Hello World'
+        defaultRole: false
       })
       expect(myFunction.instanceId).not.toBeFalsy()
     })
