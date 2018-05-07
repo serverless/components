@@ -8,7 +8,8 @@ const pack = require('../pack')
 
 module.exports = async (options) => {
   const format = options.format || 'zip'
-  const slsYmlFilePath = path.join(process.cwd(), 'serverless.yml')
+  const componentRoot = options.componentRoot || process.cwd()
+  const slsYmlFilePath = path.join(componentRoot, 'serverless.yml')
   if (!await fileExists(slsYmlFilePath)) {
     throw new Error('The package command can only be run inside a component directory')
   }
@@ -28,6 +29,9 @@ module.exports = async (options) => {
   const outputFileName = `${slsYml.type}@${slsYml.version}.${format}`
   const outputFilePath = path.resolve(options.path, outputFileName)
 
-  return pack(process.cwd(), outputFilePath)
-    .then(() => log(`Component has been packaged in ${outputFilePath}`)) // eslint-disable-line
+  await pack(componentRoot, outputFilePath)
+
+  log(`Component has been packaged in ${outputFilePath}`)
+
+  return outputFilePath
 }

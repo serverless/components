@@ -1,4 +1,5 @@
 type: tests-input-type-string-invaild-default
+version: 0.0.1
 
 inputTypes:
   stringTypeWithInvalidDefault:
