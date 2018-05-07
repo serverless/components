@@ -156,66 +156,6 @@ describe('Integration Test - Simple', () => {
       expect(myFunction.instanceId).not.toBeFalsy()
     })
 
-    it('should invoke the "function" component with CLI options', async () => {
-      await cpp.execAsync(
-        `node ${componentsExec} invoke --data "Hello World"`,
-        {
-          cwd: testServiceDir,
-          env: {
-            ...process.env,
-            FUNCTION_NAME
-          }
-        }
-      )
-      const stateFileContent = await fsp.readJsonAsync(testServiceStateFile)
-      const stateFileKeys = Object.keys(stateFileContent)
-      expect(stateFileKeys.length).toEqual(4)
-      expect(stateFileContent).toHaveProperty('$.serviceId')
-      expect(stateFileContent).toHaveProperty('simple:myRole')
-      expect(stateFileContent.$.serviceId).not.toBeFalsy()
-      const myRole = stateFileContent['simple:myRole']
-      const myRoleObjectKeys = Object.keys(myRole)
-      expect(myRoleObjectKeys.length).toEqual(6)
-      expect(myRole).toHaveProperty('instanceId')
-      expect(myRole).toHaveProperty('type', 'tests-integration-iam-mock')
-      expect(myRole).toHaveProperty('internallyManaged', false)
-      expect(myRole).toHaveProperty('rootPath')
-      expect(myRole).toHaveProperty('state', {
-        id: 'id:iam:role:my-function',
-        name: 'my-function',
-        service: 'my.function.service',
-        deploymentCounter: 2
-      })
-      expect(myRole.instanceId).not.toBeFalsy()
-      const myFunction = stateFileContent['simple:myFunction']
-      const myFunctionObjectKeys = Object.keys(myFunction)
-      expect(myFunctionObjectKeys.length).toEqual(6)
-      expect(myFunction).toHaveProperty('instanceId')
-      expect(myFunction).toHaveProperty(
-        'type',
-        'tests-integration-function-mock'
-      )
-      expect(myFunction).toHaveProperty('internallyManaged', false)
-      expect(myFunction).toHaveProperty('rootPath')
-      expect(myFunction).toHaveProperty('state', {
-        id: 'id:function:my-function',
-        name: 'my-function',
-        memorySize: 512,
-        timeout: 60,
-        environment: {
-          isMock: true,
-          variables: {
-            key1: 'value1'
-          }
-        },
-        role: 'id:iam:role:my-function',
-        deploymentCounter: 2,
-        defaultRole: false,
-        data: 'Hello World'
-      })
-      expect(myFunction.instanceId).not.toBeFalsy()
-    })
-
     it('should persist updated state if an error occurs during command execution', async () => {
       // NOTE: we've added some logic in the function component so that it fails when the
       // third deployment is done
@@ -273,8 +213,7 @@ describe('Integration Test - Simple', () => {
         },
         role: 'id:iam:role:my-function',
         deploymentCounter: 2,
-        defaultRole: false,
-        data: 'Hello World'
+        defaultRole: false
       })
       expect(myFunction.instanceId).not.toBeFalsy()
     })
