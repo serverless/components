@@ -8,13 +8,14 @@ const { getRegistryComponentsRoots, packageComponent } = require('../src/utils')
 
 const trackingConfigFilePath = path.join(process.cwd(), 'tracking-config.json')
 
-const SENTRY_DSN = process.env.SENTRY_DSN
-const SEGMENT_WRITE_KEY = process.env.SEGMENT_WRITE_KEY
-
-const COMPONENTS_BUCKET = process.env.COMPONENTS_BUCKET
-const COMPONENTS_BUCKET_REGION = process.env.COMPONENTS_BUCKET_REGION
-const COMPONENTS_BUCKET_API_KEY = process.env.COMPONENTS_BUCKET_API_KEY
-const COMPONENTS_BUCKET_API_SECRET = process.env.COMPONENTS_BUCKET_API_SECRET
+const {
+  SENTRY_DSN,
+  SEGMENT_WRITE_KEY,
+  COMPONENTS_BUCKET,
+  COMPONENTS_BUCKET_REGION,
+  COMPONENTS_BUCKET_API_KEY,
+  COMPONENTS_BUCKET_API_SECRET
+} = process.env
 
 const FORMAT = 'zip'
 
@@ -39,10 +40,9 @@ const s3 = new AWS.S3(config)
 if (!SENTRY_DSN) throw new Error('SENTRY_DSN env var not set')
 if (!SEGMENT_WRITE_KEY) throw new Error('SEGMENT_WRITE_KEY env var not set')
 if (!COMPONENTS_BUCKET) throw new Error('COMPONENTS_BUCKET env var not set')
-if (!COMPONENTS_BUCKET_REGION) throw new Error('COMPONENTS_BUCKET_REGION env var not set')
-if (!COMPONENTS_BUCKET_API_KEY) throw new Error('COMPONENTS_BUCKET_API_KEY env var not set')
-if (!COMPONENTS_BUCKET_API_SECRET) throw new Error('COMPONENTS_BUCKET_API_SECRET env var not set')
-
+if (!COMPONENTS_BUCKET_REGION) { throw new Error('COMPONENTS_BUCKET_REGION env var not set') }
+if (!COMPONENTS_BUCKET_API_KEY) { throw new Error('COMPONENTS_BUCKET_API_KEY env var not set') }
+if (!COMPONENTS_BUCKET_API_SECRET) { throw new Error('COMPONENTS_BUCKET_API_SECRET env var not set') }
 
 const trackingConfig = {
   sentryDSN: SENTRY_DSN,
@@ -68,29 +68,36 @@ const uploadComponent = async (componentRoot) => {
   return s3.putObject(params).promise()
 }
 
-const getUploadedComponents = async () => (await s3.listObjectsV2({ Bucket: COMPONENTS_BUCKET })
-  .promise()).Contents.map((obj) => path.basename(obj.Key))
+const getUploadedComponents = async () =>
+  (await s3
+    .listObjectsV2({ Bucket: COMPONENTS_BUCKET })
+    .promise()).Contents.map((obj) => path.basename(obj.Key))
 
 const uploadComponents = async () => {
   const componentsRoots = await getRegistryComponentsRoots()
   const s3Components = await getUploadedComponents()
 
-  const componentsToUpload = await componentsRoots.reduce(async (accum, componentRoot) => {
-    accum = await BbPromise.resolve(accum)
-    const slsYmlFilePath = path.join(componentRoot, 'serverless.yml')
-    const slsYml = await readFile(slsYmlFilePath)
-    const componentFileName = `${slsYml.type}@${slsYml.version}.${FORMAT}`
-    if (!s3Components.includes(componentFileName)
-      && !excludedComponents.includes(path.basename(componentRoot))) {
-      accum.push(componentRoot)
-    }
-    return accum
-  }, BbPromise.resolve([]))
+  const componentsToUpload = await componentsRoots.reduce(
+    async (accum, componentRoot) => {
+      accum = await BbPromise.resolve(accum)
+      const slsYmlFilePath = path.join(componentRoot, 'serverless.yml')
+      const slsYml = await readFile(slsYmlFilePath)
+      const componentFileName = `${slsYml.type}@${slsYml.version}.${FORMAT}`
+      if (
+        !s3Components.includes(componentFileName) &&
+        !excludedComponents.includes(path.basename(componentRoot))
+      ) {
+        accum.push(componentRoot)
+      }
+      return accum
+    },
+    BbPromise.resolve([])
+  )
 
   return BbPromise.map(componentsToUpload, uploadComponent)
-}
-
-;(async () => { // eslint-disable-line
+};
+(async () => {
+  // eslint-disable-line
   await writeFile(trackingConfigFilePath, trackingConfig)
   await uploadComponents()
 })()
