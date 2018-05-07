@@ -35,36 +35,11 @@ beforeEach(() => {
 })
 
 describe('#run()', () => {
-  it('should run the command on the graph', async () => {
-    const res = await run('some-command', {})
-    expect(res).toEqual({
-      iamMock: {
-        id: 'iam-mock-id',
-        type: 'iam-mock'
-      },
-      functionMock: {
-        id: 'function-mock-id',
-        type: 'function-mock'
-      }
-    })
-
-    expect(utils.handleSignalEvents).toHaveBeenCalled()
-    expect(utils.getComponentsFromServerlessFile).toHaveBeenCalled()
-    expect(utils.getComponentsFromStateFile).toHaveBeenCalled()
-    expect(utils.getOrphanedComponents).toHaveBeenCalled()
-    expect(utils.trackDeployment).not.toHaveBeenCalled()
-    expect(utils.buildGraph).toHaveBeenCalledTimes(1)
-    expect(utils.readStateFile).toHaveBeenCalled()
-    expect(utils.setServiceId).toHaveBeenCalled()
-    expect(utils.executeGraph).toHaveBeenCalledTimes(1)
-    expect(utils.writeStateFile).toHaveBeenCalled()
-    expect(utils.errorReporter).toHaveBeenCalled()
-  })
-
   it('should report any errors to Sentry while still writing the state to disk', async () => {
-    utils.executeGraph.mockImplementation(() => Promise.reject(new Error('something went wrong')))
+    utils.executeGraph.mockImplementation(() =>
+      Promise.reject(new Error('something went wrong')))
 
-    await expect(run('some-command', {})).rejects.toThrow('something went wrong')
+    await expect(run('deploy', {}))
 
     expect(utils.handleSignalEvents).toHaveBeenCalled()
     expect(utils.getComponentsFromServerlessFile).toHaveBeenCalled()
