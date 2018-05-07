@@ -8,6 +8,6 @@ const command = args._.join(' ')
 const options = dissoc('_', args)
 
 run(command, options).catch((error) => {
-  console.error(error)
+  console.error(error) // eslint-disable-line
   process.exit(1)
 })
