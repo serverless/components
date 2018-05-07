@@ -4,9 +4,13 @@ const path = require('path')
 const getComponentFunctions = (componentRoot) => {
   let fns = {}
   try {
-    const indexPath = path.resolve(componentRoot, 'index.js')
-    if (fileExistsSync(indexPath)) {
-      fns = require(componentRoot) // eslint-disable-line global-require, import/no-dynamic-require
+    if (componentRoot && typeof componentRoot === 'string') {
+      const indexPath = path.resolve(componentRoot, 'index.js')
+      if (fileExistsSync(indexPath)) {
+        /* eslint-disable global-require, import/no-dynamic-require */
+        fns = require(componentRoot)
+        /* eslint-enable */
+      }
     }
   } catch (error) {
     const moduleName = error.message.split("'")[1]
