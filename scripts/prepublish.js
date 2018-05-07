@@ -40,9 +40,15 @@ const s3 = new AWS.S3(config)
 if (!SENTRY_DSN) throw new Error('SENTRY_DSN env var not set')
 if (!SEGMENT_WRITE_KEY) throw new Error('SEGMENT_WRITE_KEY env var not set')
 if (!COMPONENTS_BUCKET) throw new Error('COMPONENTS_BUCKET env var not set')
-if (!COMPONENTS_BUCKET_REGION) { throw new Error('COMPONENTS_BUCKET_REGION env var not set') }
-if (!COMPONENTS_BUCKET_API_KEY) { throw new Error('COMPONENTS_BUCKET_API_KEY env var not set') }
-if (!COMPONENTS_BUCKET_API_SECRET) { throw new Error('COMPONENTS_BUCKET_API_SECRET env var not set') }
+if (!COMPONENTS_BUCKET_REGION) {
+  throw new Error('COMPONENTS_BUCKET_REGION env var not set')
+}
+if (!COMPONENTS_BUCKET_API_KEY) {
+  throw new Error('COMPONENTS_BUCKET_API_KEY env var not set')
+}
+if (!COMPONENTS_BUCKET_API_SECRET) {
+  throw new Error('COMPONENTS_BUCKET_API_SECRET env var not set')
+}
 
 const trackingConfig = {
   sentryDSN: SENTRY_DSN,
@@ -62,7 +68,8 @@ const uploadComponent = async (componentRoot) => {
   const params = {
     Body: fs.createReadStream(packagePath),
     Bucket: COMPONENTS_BUCKET,
-    Key: path.basename(packagePath)
+    Key: path.basename(packagePath),
+    ACL: 'public-read'
   }
 
   return s3.putObject(params).promise()
