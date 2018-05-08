@@ -8,7 +8,10 @@ const pack = require('../pack')
 
 module.exports = async (options) => {
   const format = options.format || 'zip'
-  const componentPath = options.path || process.cwd()
+  let componentPath = options.path || process.cwd()
+  if (!path.isAbsolute(componentPath)) {
+    componentPath = path.resolve(process.cwd(), componentPath)
+  }
   const slsYmlFilePath = path.join(componentPath, 'serverless.yml')
   if (!(await fileExists(slsYmlFilePath))) {
     throw new Error(`Could not find a serverless.yml file in ${componentPath}`)

@@ -3,36 +3,65 @@ const path = require('path')
 const packageComponent = require('./packageComponent')
 const pack = require('../pack')
 
-
 jest.mock('../pack')
-pack.mockImplementation(() => Promise.resolve())
 
 jest.mock('@serverless/utils', () => ({
   fileExists: jest.fn().mockReturnValue(Promise.resolve(true)),
-  readFile: jest.fn().mockReturnValue(Promise.resolve({ type: 'my-project', version: '0.0.1' }))
+  readFile: jest
+    .fn()
+    .mockReturnValue(Promise.resolve({ type: 'my-project', version: '0.0.1' }))
 }))
 
-afterAll(() => {
+afterEach(() => {
   jest.restoreAllMocks()
 })
 
 describe('#packageComponent', () => {
-  it('should package component', async () => {
+  it('should package component at given realtive path', async () => {
+    pack.mockImplementation(() => Promise.resolve())
+    utils.fileExists.mockReturnValue(Promise.resolve(true))
+    utils.readFile.mockReturnValue(Promise.resolve({ type: 'my-project', version: '0.0.1' }))
+
     const options = {
-      path: './',
+      path: './some-path',
       format: 'zip'
     }
 
     await packageComponent(options)
-    const slsYmlFilePath = path.join(process.cwd(), 'serverless.yml')
-    const outputFilePath = path.resolve(options.path, 'my-project@0.0.1.zip')
-    expect(pack).toBeCalledWith(process.cwd(), outputFilePath)
+    const componentPath = path.resolve(process.cwd(), './some-path')
+    const slsYmlFilePath = path.join(componentPath, 'serverless.yml')
+    const outputFilePath = path.resolve(componentPath, 'my-project@0.0.1.zip')
+    expect(pack).toBeCalledWith(componentPath, outputFilePath)
     expect(utils.fileExists).toBeCalledWith(slsYmlFilePath)
     expect(utils.readFile).toBeCalledWith(slsYmlFilePath)
   })
 
-  it('validate output path', async () => {
+  it('should package component at given absolute path', async () => {
+    pack.mockImplementation(() => Promise.resolve())
+    utils.fileExists.mockReturnValue(Promise.resolve(true))
+    utils.readFile.mockReturnValue(Promise.resolve({ type: 'my-project', version: '0.0.1' }))
+
     const options = {
+      path: '/home/some-path',
+      format: 'zip'
+    }
+
+    await packageComponent(options)
+    const componentPath = '/home/some-path'
+    const slsYmlFilePath = path.join(componentPath, 'serverless.yml')
+    const outputFilePath = path.resolve(componentPath, 'my-project@0.0.1.zip')
+    expect(pack).toBeCalledWith(componentPath, outputFilePath)
+    expect(utils.fileExists).toBeCalledWith(slsYmlFilePath)
+    expect(utils.readFile).toBeCalledWith(slsYmlFilePath)
+  })
+
+  it('validate package path', async () => {
+    pack.mockImplementation(() => Promise.resolve())
+    utils.fileExists.mockReturnValue(Promise.resolve(false))
+
+    const componentPath = '/home/some-path'
+    const options = {
+      path: componentPath,
       format: 'zip'
     }
     let err
@@ -41,6 +70,6 @@ describe('#packageComponent', () => {
     } catch (e) {
       err = e
     }
-    expect(err.message).toEqual('Please provide an output path for the package with the --path option')
+    expect(err.message).toEqual(`Could not find a serverless.yml file in ${componentPath}`)
   })
 })
