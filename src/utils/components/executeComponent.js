@@ -24,7 +24,14 @@ const executeComponent = async (
     component.inputs = getInputs(stateFile, componentId)
   }
 
-  const context = generateContext(components, component, stateFile, archive, options, command)
+  const context = generateContext(
+    components,
+    component,
+    stateFile,
+    archive,
+    options,
+    command
+  )
 
   if (command === 'remove') {
     if (isEmpty(context.state)) {
@@ -40,11 +47,16 @@ const executeComponent = async (
   const hasCreateFunction = fns.Create && is(Function, fns.Create)
   const hasDeleteFunction = fns.Delete && is(Function, fns.Delete)
   const hasUpdateFunction = fns.Update && is(Function, fns.Update)
-  const hasRequiredMethods = hasDeployFunction || hasCreateFunction || hasDeleteFunction || hasUpdateFunction // eslint-disable-line
+  const hasRequiredMethods =
+    hasDeployFunction ||
+    hasCreateFunction ||
+    hasDeleteFunction ||
+    hasUpdateFunction // eslint-disable-line
   if (command === 'deploy' && hasRequiredMethods) {
-    const deployFunction = (hasDeployFunction) ? fns.deploy : defaultDeploy
+    const deployFunction = hasDeployFunction ? fns.deploy : defaultDeploy
     try {
-      component.outputs = (await deployFunction(component.inputs, context, component)) || {}
+      component.outputs =
+        (await deployFunction(component.inputs, context, component)) || {}
     } catch (e) {
       if (command === 'remove' && e.code === 'RETAIN_STATE') {
         retainState = true
@@ -59,9 +71,10 @@ const executeComponent = async (
   const hasRemoveFunction = fns.remove && is(Function, fns.remove)
   const hasRemoveMethods = hasDeleteFunction || hasRemoveFunction
   if (command === 'remove' && hasRemoveMethods) {
-    const removeFunction = (hasRemoveFunction) ? fns.remove : defaultRemove
+    const removeFunction = hasRemoveFunction ? fns.remove : defaultRemove
     try {
-      component.outputs = (await removeFunction(component.inputs, context, component)) || {}
+      component.outputs =
+        (await removeFunction(component.inputs, context, component)) || {}
     } catch (e) {
       if (command === 'remove' && e.code === 'RETAIN_STATE') {
         retainState = true
@@ -88,11 +101,6 @@ const executeComponent = async (
 
 async function defaultRemove(inputs, context, component) {
   const fns = component.fns
-  // const inputTypes = component.inputTypes
-  // const componentData = compareInputsToState(inputs, context.state)
-  // console.log('component diff data', componentData)
-  // const inputsChanged = !componentData.isEqual
-  // console.log('inputs changed', inputsChanged)
   const hasDeleteFunction = fns.Delete && is(Function, fns.Delete)
 
   if (!hasDeleteFunction) {
@@ -150,9 +158,9 @@ async function defaultDeploy(inputs, context, component) {
     })
 
     /* Then check if a critical value has changed */
-    const criticalValueChanged = criticalValues.some((r) => { // eslint-disable-line
-      return componentData.keys.includes(r)
-    })
+    const criticalValueChanged = criticalValues.some((r) =>
+      // eslint-disable-line
+      componentData.keys.includes(r))
 
     // Log out diffs
     componentData.keys.forEach((item) => {
