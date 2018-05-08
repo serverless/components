@@ -1,4 +1,5 @@
 type: tests-integration-iam-mock
+version: 0.0.1
 
 inputTypes:
   name:

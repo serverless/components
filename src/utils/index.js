@@ -1,6 +1,7 @@
 const misc = require('./misc')
 const log = require('./log')
 const getRegistryRoot = require('./getRegistryRoot')
+const getRegistryComponentsRoots = require('./getRegistryComponentsRoots')
 const state = require('./state')
 const telemetry = require('./telemetry')
 const components = require('./components')
@@ -19,6 +20,7 @@ module.exports = {
   ...telemetry,
   ...variables,
   getRegistryRoot,
+  getRegistryComponentsRoots,
   validateCoreVersion,
   log,
   mapIndexed,

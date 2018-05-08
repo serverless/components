@@ -28,7 +28,9 @@ module.exports = async (options) => {
   const outputFileName = `${slsYml.type}@${slsYml.version}.${format}`
   const outputFilePath = path.resolve(componentPath, outputFileName)
 
-  return pack(componentPath, outputFilePath).then(() =>
-    log(`Component has been packaged in ${outputFilePath}`)
-  ) // eslint-disable-line
+  await pack(componentPath, outputFilePath)
+
+  log(`Component has been packaged in ${outputFilePath}`)
+
+  return outputFilePath
 }

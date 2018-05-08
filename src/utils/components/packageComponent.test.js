@@ -6,10 +6,8 @@ const pack = require('../pack')
 jest.mock('../pack')
 
 jest.mock('@serverless/utils', () => ({
-  fileExists: jest.fn().mockReturnValue(Promise.resolve(true)),
-  readFile: jest
-    .fn()
-    .mockReturnValue(Promise.resolve({ type: 'my-project', version: '0.0.1' }))
+  fileExists: jest.fn(),
+  readFile: jest.fn()
 }))
 
 afterEach(() => {
