@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 const parseArgs = require('minimist')
-const { dissoc } = require('ramda')
-const { run } = require('../src/index')
+const dissoc = require('ramda').dissoc
+const run = require('../src/index').run
 
 const args = parseArgs(process.argv.slice(2))
 const command = args._.join(' ')
