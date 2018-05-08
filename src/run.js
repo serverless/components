@@ -222,7 +222,6 @@ async function doCommand(cmd, options, availableCommands, data) {
       (!currentCommand && options.h)
     ) {
       console.log()
-      console.log(currentCommand)
       const msg = `Here are the current available commands for ${componentKey}:`
       console.log(`${chalk.whiteBright.bold(msg)}`)
       console.log()
