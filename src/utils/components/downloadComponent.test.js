@@ -17,6 +17,8 @@ describe('#downloadComponent', () => {
     const url = 'https://example.com/test.zip'
     const downloadedComponentRootPath = await getComponentRootPathFromUrl(url)
     await downloadComponent(url)
-    expect(download).toBeCalledWith(url, downloadedComponentRootPath, { extract: true, strip: 1 })
+    expect(download).toBeCalledWith(url, downloadedComponentRootPath, {
+      extract: true
+    })
   })
 })

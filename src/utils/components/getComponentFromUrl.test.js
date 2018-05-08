@@ -1,4 +1,5 @@
 const BbPromise = require('bluebird')
+const path = require('path')
 const fse = BbPromise.promisifyAll(require('fs-extra'))
 const downloadComponent = require('./downloadComponent')
 const getComponentFromUrl = require('./getComponentFromUrl')
@@ -16,7 +17,7 @@ afterEach(() => {
 
 describe('#getComponentFromUrl', () => {
   it('should download component', async () => {
-    const componentName = String((new Date()).getTime())
+    const componentName = String(new Date().getTime())
     const url = `https://example.com/${componentName}.zip`
     const downloadedComponentRootPath = await getComponentFromUrl(url)
     const expectedDownloadedComponentRootPath = await getComponentRootPathFromUrl(url)
@@ -28,6 +29,10 @@ describe('#getComponentFromUrl', () => {
     const url = 'https://example.com/test.zip'
     const expectedDownloadedComponentRootPath = await getComponentRootPathFromUrl(url)
     await fse.ensureDirAsync(expectedDownloadedComponentRootPath)
+    await fse.writeFileAsync(
+      path.join(expectedDownloadedComponentRootPath, 'serverless.yml'),
+      {}
+    )
     const downloadedComponentRootPath = await getComponentFromUrl(url)
     expect(downloadedComponentRootPath).toEqual(expectedDownloadedComponentRootPath)
     expect(downloadComponent).not.toBeCalled()
