@@ -43,7 +43,7 @@ const executeComponent = async (
   const hasUpdateFunction = fns.Update && is(Function, fns.Update)
   const hasRequiredMethods = hasDeployFunction || hasCreateFunction || hasDeleteFunction || hasUpdateFunction // eslint-disable-line
   if (command === 'deploy' && hasRequiredMethods) {
-    const deployFunction = (hasDeployFunction) ? fns.deploy : defaultDeploy
+    const deployFunction = hasDeployFunction ? fns.deploy : defaultDeploy
     try {
       component.outputs = (await deployFunction(component.inputs, context, component)) || {}
       validateTypes(component.id, component.outputTypes, component.outputs, { prefix: 'Output' })
@@ -90,11 +90,6 @@ const executeComponent = async (
 
 async function defaultRemove(inputs, context, component) {
   const fns = component.fns
-  // const inputTypes = component.inputTypes
-  // const componentData = compareInputsToState(inputs, context.state)
-  // console.log('component diff data', componentData)
-  // const inputsChanged = !componentData.isEqual
-  // console.log('inputs changed', inputsChanged)
   const hasDeleteFunction = fns.Delete && is(Function, fns.Delete)
 
   if (!hasDeleteFunction) {
@@ -152,9 +147,10 @@ async function defaultDeploy(inputs, context, component) {
     })
 
     /* Then check if a critical value has changed */
-    const criticalValueChanged = criticalValues.some((r) => { // eslint-disable-line
-      return componentData.keys.includes(r)
-    })
+    const criticalValueChanged = criticalValues.some((r) =>
+      // eslint-disable-line
+      componentData.keys.includes(r)
+    )
 
     // Log out diffs
     componentData.keys.forEach((item) => {
