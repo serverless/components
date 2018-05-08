@@ -2,7 +2,7 @@ const AWS = require('aws-sdk')
 const path = require('path')
 const BbPromise = require('bluebird')
 const fs = require('fs')
-const { writeFile, readFile, getTmpDir } = require('@serverless/utils')
+const { writeFile, readFile } = require('@serverless/utils')
 
 const { getRegistryComponentsRoots, packageComponent } = require('../src/utils')
 
@@ -57,11 +57,9 @@ const trackingConfig = {
 }
 
 const uploadComponent = async (componentRoot) => {
-  const packageTempDirPath = await getTmpDir()
   const options = {
     format: FORMAT,
-    path: packageTempDirPath,
-    componentRoot
+    path: componentRoot
   }
   const packagePath = await packageComponent(options)
 
