@@ -11,6 +11,7 @@ const executeComponent = require('./executeComponent')
 const getOrphanedComponents = require('./getOrphanedComponents')
 const generateContext = require('./generateContext')
 const packageComponent = require('./packageComponent')
+const validateTypes = require('./validateTypes')
 
 module.exports = {
   generateInstanceId,
@@ -25,5 +26,6 @@ module.exports = {
   getComponent,
   executeComponent,
   generateContext,
-  packageComponent
+  packageComponent,
+  validateTypes
 }

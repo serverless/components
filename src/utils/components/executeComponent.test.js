@@ -33,7 +33,14 @@ describe('#executeComponent()', () => {
           memorySize: 512,
           timeout: 60
         },
+        inputTypes: {},
         outputs: {},
+        outputTypes: {
+          result: {
+            type: 'string',
+            required: true
+          }
+        },
         state: {},
         dependencies: [],
         children: {},
@@ -142,6 +149,14 @@ describe('#executeComponent()', () => {
       timeout: 60
     })
     expect(res.outputs).toEqual({ result: 'rolled back' })
+  })
+
+  it('should throw if outputs do not match output types', async () => {
+    const command = 'deploy'
+    const deploy = () => Promise.resolve({ invalid: 'type' }) // eslint-disable-line no-shadow
+    components = assocPath([ 'myFunction', 'fns', 'deploy' ], deploy, components)
+
+    await expect(executeComponent(componentId, components, stateFile, archive, command, options)).rejects.toThrow('Type error(s)')
   })
 
   describe('when running "remove"', () => {

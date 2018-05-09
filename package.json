@@ -66,12 +66,7 @@
     "collectCoverage": true
   },
   "lint-staged": {
-    "*.js": [
-      "eslint --fix .",
-      "git add -A"
-    ]
+    "*.js": ["eslint --fix .", "git add -A"]
   },
-  "pre-commit": [
-    "lint:staged"
-  ]
+  "pre-commit": ["lint:staged"]
 }

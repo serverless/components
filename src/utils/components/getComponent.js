@@ -8,7 +8,7 @@ const validateVarsUsage = require('../variables/validateVarsUsage')
 const getInstanceId = require('./getInstanceId')
 const setInputDefaults = require('./setInputDefaults')
 const validateCoreVersion = require('./validateCoreVersion')
-const validateInputs = require('./validateInputs')
+const validateTypes = require('./validateTypes')
 
 module.exports = async (componentRoot, componentId, inputs, stateFile) => {
   let slsYml = await readFile(path.join(componentRoot, 'serverless.yml'))
@@ -37,7 +37,7 @@ module.exports = async (componentRoot, componentId, inputs, stateFile) => {
 
   slsYml.inputs = setInputDefaults(slsYml.inputTypes, slsYml.inputs)
 
-  validateInputs(slsYml.id, slsYml.inputTypes, slsYml.inputs)
+  validateTypes(slsYml.id, slsYml.inputTypes, slsYml.inputs)
 
   return slsYml
 }
