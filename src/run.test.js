@@ -3,6 +3,8 @@ const utils = require('./utils')
 
 jest.mock('./utils')
 
+const projectDirPath = process.cwd()
+
 afterAll(() => {
   jest.restoreAllMocks()
 })
@@ -36,7 +38,7 @@ beforeEach(() => {
 
 describe('#run()', () => {
   it('should run the command on the graph', async () => {
-    const res = await run('some-command', {})
+    const res = await run(projectDirPath, 'some-command', {})
     expect(res).toEqual({
       iamMock: {
         id: 'iam-mock-id',
@@ -64,7 +66,7 @@ describe('#run()', () => {
   it('should report any errors to Sentry while still writing the state to disk', async () => {
     utils.executeGraph.mockImplementation(() => Promise.reject(new Error('something went wrong')))
 
-    await expect(run('some-command', {})).rejects.toThrow('something went wrong')
+    await expect(run(projectDirPath, 'some-command', {})).rejects.toThrow('something went wrong')
 
     expect(utils.handleSignalEvents).toHaveBeenCalled()
     expect(utils.getComponentsFromServerlessFile).toHaveBeenCalled()
@@ -81,7 +83,7 @@ describe('#run()', () => {
 
   describe('when running "deploy"', () => {
     it('should run "deploy", "info", track the deployment and write the state to disk', async () => {
-      const res = await run('deploy', {})
+      const res = await run(projectDirPath, 'deploy', {})
       expect(res).toEqual({
         iamMock: {
           id: 'iam-mock-id',
@@ -109,7 +111,7 @@ describe('#run()', () => {
 
   describe('when running "remove"', () => {
     it('should run "remove" but should not run "info" neither track the deployment', async () => {
-      const res = await run('remove', {})
+      const res = await run(projectDirPath, 'remove', {})
       expect(res).toEqual({
         iamMock: {
           id: 'iam-mock-id',

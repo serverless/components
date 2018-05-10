@@ -19,7 +19,7 @@ const {
   // log
 } = utils
 
-const run = async (command, options) => {
+const run = async (projectDirPath, command, options) => {
   if (command === 'package') {
     return packageComponent(options)
   }
@@ -29,13 +29,16 @@ const run = async (command, options) => {
   let stateFile = {}
   let archive = {}
   try {
-    stateFile = await readStateFile()
+    stateFile = await readStateFile(projectDirPath)
     stateFile = setServiceId(stateFile)
     // TODO BRN: If we're using immutable data, we shouldn't need to clone here
     archive = clone(stateFile)
     let componentsToUse
     let orphanedComponents
-    const serverlessFileComponents = await getComponentsFromServerlessFile(stateFile)
+    const serverlessFileComponents = await getComponentsFromServerlessFile(
+      stateFile,
+      projectDirPath
+    )
     const stateFileComponents = getComponentsFromStateFile(stateFile)
     if (command === 'remove') {
       componentsToUse = stateFileComponents
@@ -78,7 +81,7 @@ const run = async (command, options) => {
 
     throw error
   } finally {
-    await writeStateFile(stateFile)
+    await writeStateFile(projectDirPath, stateFile)
   }
   return components
 }

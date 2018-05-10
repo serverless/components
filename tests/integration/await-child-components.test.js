@@ -2,21 +2,11 @@ const path = require('path')
 const fse = require('fs-extra')
 const cp = require('child_process')
 const BbPromise = require('bluebird')
+const { fileExists } = require('@serverless/utils')
+const { removeFiles } = require('../helpers')
 
 const fsp = BbPromise.promisifyAll(fse)
 const cpp = BbPromise.promisifyAll(cp)
-
-// test helper methods
-async function hasFile(filePath) {
-  return fsp
-    .statAsync(filePath)
-    .then(() => true)
-    .catch(() => false)
-}
-
-async function removeStateFiles(stateFiles) {
-  return BbPromise.map(stateFiles, (stateFile) => fsp.removeAsync(stateFile))
-}
 
 describe('Integration Test - Await child components', () => {
   jest.setTimeout(40000)
@@ -27,16 +17,16 @@ describe('Integration Test - Await child components', () => {
   const testServiceStateFile = path.join(testServiceDir, 'state.json')
 
   beforeAll(async () => {
-    await removeStateFiles([testServiceStateFile])
+    await removeFiles([testServiceStateFile])
   })
 
   afterAll(async () => {
-    await removeStateFiles([testServiceStateFile])
+    await removeFiles([testServiceStateFile])
   })
 
   describe('our test setup', () => {
     it('should not have any state files', async () => {
-      const testServiceHasStateFile = await hasFile(testServiceStateFile)
+      const testServiceHasStateFile = await fileExists(testServiceStateFile)
 
       expect(testServiceHasStateFile).toEqual(false)
     })
