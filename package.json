@@ -36,6 +36,7 @@
     "chalk": "^2.3.2",
     "concordance": "^3.0.0",
     "crypto-extra": "^0.4.0",
+    "download": "^6.2.5",
     "fs-extra": "^5.0.0",
     "graphlib": "^2.1.5",
     "js-yaml": "^3.10.0",
@@ -50,6 +51,7 @@
     "rc": "^1.2.6",
     "s3-client": "^4.4.1",
     "semver": "^5.5.0",
+    "url-regex": "^4.1.1",
     "uuid": "^3.2.1",
     "write-file-atomic": "^2.3.0"
   },

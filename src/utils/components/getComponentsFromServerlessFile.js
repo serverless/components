@@ -9,14 +9,15 @@ const getState = require('../state/getState')
 
 const getComponentsFromServerlessFile = async (
   stateFile,
-  componentRoot = getComponentRootPath(),
+  componentRoot = process.cwd(),
   inputs = {},
   componentId
 ) => {
   const component = await getComponent(componentRoot, componentId, inputs, stateFile)
 
   const nestedComponents = mergeAll(await Promise.all(map(async (componentAlias) => {
-    const nestedComponentRoot = getComponentRootPath(component.components[componentAlias].type)
+    const nestedComponentRoot =
+      await getComponentRootPath(component.components[componentAlias].type)
     const nestedComponentInputs = component.components[componentAlias].inputs || {}
     const nestedComponentId = component.components[componentAlias].id
     return getComponentsFromServerlessFile(
