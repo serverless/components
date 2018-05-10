@@ -30,6 +30,14 @@ All components manage their own state and stores it in the `state.json` file.
 
 <!-- AUTO-GENERATED-CONTENT:END -->
 
+<!-- AUTO-GENERATED-CONTENT:START (COMPONENT_OUTPUT_TYPES) -->
+## Output Types
+| Name | Type | Description |
+|:------ |:-----|:-----------------|
+| **url**| `string` | The static websites URL
+
+<!-- AUTO-GENERATED-CONTENT:END -->
+
 ## Operations
 
 The component exposes operations via two commands - `deploy` and `remove`.

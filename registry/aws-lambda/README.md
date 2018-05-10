@@ -6,6 +6,7 @@ AWS Lambda Serverless Component
 
 <!-- AUTO-GENERATED-CONTENT:START (TOC) -->
 - [Input Types](#input-types)
+- [Output Types](#output-types)
 - [Example](#example)
 <!-- AUTO-GENERATED-CONTENT:END -->
 
@@ -22,6 +23,15 @@ AWS Lambda Serverless Component
 | **root**| `string` | Path to source code
 | **role**| `object` | The Amazon Resource Name (ARN) of the IAM role that Lambda assumes<br/>when it executes your function to access any other Amazon Web Services (AWS) resources<br/>
 | **env**| `object` | Lambda functions environment's configuration settings
+
+<!-- AUTO-GENERATED-CONTENT:END -->
+
+<!-- AUTO-GENERATED-CONTENT:START (COMPONENT_OUTPUT_TYPES) -->
+## Output Types
+| Name | Type | Description |
+|:------ |:-----|:-----------------|
+| **arn**| `string` | The Lambda functions arn
+| **roleArn**| `string` | The arn of the created / managed role the Lambda function uses
 
 <!-- AUTO-GENERATED-CONTENT:END -->
 

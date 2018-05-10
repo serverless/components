@@ -1,7 +1,7 @@
 <!-- AUTO-GENERATED-CONTENT:START (COMPONENT_HEADER) -->
-# AWS Apigateway
+# S3 Policy
 
-Provision AWS API Gateway with serverless components.
+A Serverless Component for AWS S3 Policy Documents
 <!-- AUTO-GENERATED-CONTENT:END -->
 
 <!-- AUTO-GENERATED-CONTENT:START (TOC) -->
@@ -13,9 +13,7 @@ Provision AWS API Gateway with serverless components.
 ## Input Types
 | Name | Type | Description |
 |:------ |:-----|:-----------------|
-| **roleArn**| `string`<br/>*required* | AWS Arn role for API gateway to assume
-| **routes**| `object`<br/>*required* | Declaration of routes
-| **name**| `string` | Name of API gateway in AWS console
+| **bucketName**| `string`<br/>*required* | bucketName
 
 <!-- AUTO-GENERATED-CONTENT:END -->
 
@@ -23,9 +21,7 @@ Provision AWS API Gateway with serverless components.
 ## Output Types
 | Name | Type | Description |
 |:------ |:-----|:-----------------|
-| **id**| `string` | API Gateways id
-| **url**| `string` | The API Gateways base URL
-| **urls**| `array` | All the generated API Gateway URLs
+| **bucketName**| `string` | The S3 bucket name
 
 <!-- AUTO-GENERATED-CONTENT:END -->
 

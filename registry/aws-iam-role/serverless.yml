@@ -23,3 +23,17 @@ inputTypes:
     type: object
     displayName: IAM Role Policy
     description: The policy that grants an entity permission to assume the role
+
+outputTypes:
+  name:
+    type: string
+    description: The name of the role
+  arn:
+    type: string
+    description: The role arn
+  service:
+    type: string
+    description: The name of the AWS service this role is created for
+  policy:
+    type: object
+    description: The policy that grants entity permission to assume the role

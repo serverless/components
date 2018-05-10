@@ -33,3 +33,11 @@ inputTypes:
     displayName: VPC Region
     description: The VPC's region
     example: mydefaultvpcregion
+
+outputTypes:
+  hostedZone:
+    type: object
+    description: The hosted zone configuration
+  changeRecordSet:
+    type: object
+    description: The change record set

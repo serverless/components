@@ -6,6 +6,7 @@ Serverless component that provisions github webhooks
 
 <!-- AUTO-GENERATED-CONTENT:START (TOC) -->
 - [Input Types](#input-types)
+- [Output Types](#output-types)
 - [Example](#example)
 - [Github Webhook Event Types](#github-webhook-event-types)
 <!-- AUTO-GENERATED-CONTENT:END -->
@@ -18,6 +19,14 @@ Serverless component that provisions github webhooks
 | **githubRepo**| `string`<br/>*required* | The GitHub repos URL
 | **payloadUrl**| `string`<br/>*required* | Payload Url
 | **events**| `array`<br/>*required* | What type of event(s) will trigger the webhook URL.<br/>List of allowed events. For more details on events & payloads [see the docs](https://developer.github.com/v3/activity/events/types/)<br/>
+
+<!-- AUTO-GENERATED-CONTENT:END -->
+
+<!-- AUTO-GENERATED-CONTENT:START (COMPONENT_OUTPUT_TYPES) -->
+## Output Types
+| Name | Type | Description |
+|:------ |:-----|:-----------------|
+| **github**| `object` | The GitHub Webhook configuration
 
 <!-- AUTO-GENERATED-CONTENT:END -->
 

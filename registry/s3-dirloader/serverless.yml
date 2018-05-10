@@ -14,3 +14,8 @@ inputTypes:
   bucketName:
     type: string
     required: true
+
+outputTypes:
+  files:
+    type: any
+    description: The files in the S3 bucket directory

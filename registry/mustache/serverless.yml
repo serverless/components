@@ -14,3 +14,8 @@ inputTypes:
   values:
     type: object
     required: false
+
+outputTypes:
+  renderedFilePath:
+    type: string
+    description: The path to the rendered file(s)

@@ -6,6 +6,7 @@ Github webhook component using AWS API gateway
 
 <!-- AUTO-GENERATED-CONTENT:START (TOC) -->
 - [Input Types](#input-types)
+- [Output Types](#output-types)
 - [Example](#example)
 <!-- AUTO-GENERATED-CONTENT:END -->
 
@@ -17,6 +18,17 @@ Github webhook component using AWS API gateway
 | **githubApiToken**| `string`<br/>*required* | GitHub personal access token needed for access to the GitHub API.<br/>[Create a token](https://github.com/settings/tokens)<br/>
 | **githubRepo**| `string`<br/>*required* | The GitHub repos URL
 | **webhookTriggers**| `array`<br/>*required* | webhookTriggers
+
+<!-- AUTO-GENERATED-CONTENT:END -->
+
+<!-- AUTO-GENERATED-CONTENT:START (COMPONENT_OUTPUT_TYPES) -->
+## Output Types
+| Name | Type | Description |
+|:------ |:-----|:-----------------|
+| **function**| `string` | The function which is used for this WebHook
+| **githubApiToken**| `string` | GitHub personal access token needed for access to the GitHub API.
+| **githubRepo**| `string` | The GitHub repos URL
+| **webhookTriggers**| `array` | The WebHook triggers which are used
 
 <!-- AUTO-GENERATED-CONTENT:END -->
 

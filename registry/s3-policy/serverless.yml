@@ -11,3 +11,8 @@ inputTypes:
   bucketName:
     type: string
     required: true
+
+outputTypes:
+  bucketName:
+    type: string
+    description: The S3 bucket name

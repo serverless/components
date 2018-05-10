@@ -36,3 +36,8 @@ inputTypes:
       List of allowed events. For more details on events & payloads [see the docs](https://developer.github.com/v3/activity/events/types/)
     example:
       - create
+
+outputTypes:
+  github:
+    type: object
+    description: The GitHub Webhook configuration

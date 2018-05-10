@@ -1,7 +1,7 @@
 <!-- AUTO-GENERATED-CONTENT:START (COMPONENT_HEADER) -->
-# AWS Apigateway
+# S3 Dirloader
 
-Provision AWS API Gateway with serverless components.
+S3 directory loader
 <!-- AUTO-GENERATED-CONTENT:END -->
 
 <!-- AUTO-GENERATED-CONTENT:START (TOC) -->
@@ -13,9 +13,8 @@ Provision AWS API Gateway with serverless components.
 ## Input Types
 | Name | Type | Description |
 |:------ |:-----|:-----------------|
-| **roleArn**| `string`<br/>*required* | AWS Arn role for API gateway to assume
-| **routes**| `object`<br/>*required* | Declaration of routes
-| **name**| `string` | Name of API gateway in AWS console
+| **contentPath**| `string`<br/>*required* | contentPath
+| **bucketName**| `string`<br/>*required* | bucketName
 
 <!-- AUTO-GENERATED-CONTENT:END -->
 
@@ -23,9 +22,7 @@ Provision AWS API Gateway with serverless components.
 ## Output Types
 | Name | Type | Description |
 |:------ |:-----|:-----------------|
-| **id**| `string` | API Gateways id
-| **url**| `string` | The API Gateways base URL
-| **urls**| `array` | All the generated API Gateway URLs
+| **files**| `any` | The files in the S3 bucket directory
 
 <!-- AUTO-GENERATED-CONTENT:END -->
 
