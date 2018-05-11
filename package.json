@@ -17,7 +17,7 @@
   "scripts": {
     "cleanse": "node ./scripts/cleanse.js",
     "components": "./bin/components",
-    "lint": "eslint . --cache",
+    "lint": "eslint . --fix --cache",
     "lint:staged": "lint-staged",
     "test": "jest .",
     "test:appveyor": "jest --testPathPattern=\"bin|examples|registry|src\" --colors --forceExit",

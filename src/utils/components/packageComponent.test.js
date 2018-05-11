@@ -24,9 +24,10 @@ describe('#packageComponent', () => {
     }
 
     await packageComponent(options)
-    const slsYmlFilePath = path.join(options.path, 'serverless.yml')
-    const outputFilePath = path.resolve(options.path, 'my-project@0.0.1.zip')
-    expect(utils.packDir).toBeCalledWith(options.path, outputFilePath)
+    const componentPath = `${process.cwd()}/some-path`
+    const slsYmlFilePath = path.join(componentPath, 'serverless.yml')
+    const outputFilePath = path.resolve(componentPath, 'my-project@0.0.1.zip')
+    expect(utils.packDir).toBeCalledWith(componentPath, outputFilePath)
     expect(utils.fileExists).toBeCalledWith(slsYmlFilePath)
     expect(utils.readFile).toBeCalledWith(slsYmlFilePath)
   })
