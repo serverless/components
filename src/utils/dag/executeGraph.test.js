@@ -53,7 +53,7 @@ describe('#executeGraph()', () => {
         },
         outputs: {},
         state: {},
-        dependencies: [ 'role' ],
+        dependencies: ['role'],
         fns: {
           deploy: () => {},
           remove: () => {},
@@ -125,15 +125,19 @@ describe('#executeGraph()', () => {
     }
 
     executeComponent.mockImplementationOnce(() =>
-      Promise.reject(new Error('myRole could not be deployed')))
+      Promise.reject(new Error('myRole could not be deployed'))
+    )
     executeComponent.mockImplementationOnce(() =>
       Promise((resolve) => {
         setTimeout(() => {
           resolve('myFunc')
         }, 0)
-      }))
+      })
+    )
 
-    await expect(executeGraph(graph, components, {}, {})).rejects.toThrow('myRole could not be deployed')
+    await expect(executeGraph(graph, components, {}, {})).rejects.toThrow(
+      'myRole could not be deployed'
+    )
 
     expect(executeComponent).toHaveBeenCalledTimes(2)
   })

@@ -1,4 +1,11 @@
 type: aws-iam-policy
+version: 0.2.0
+core: 0.2.x
+
+description: "Provision AWS IAM Policies with serverless components"
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
 
 inputTypes:
   name:

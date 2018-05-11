@@ -1,8 +1,4 @@
-const reservedNames = [
-  'input',
-  'env',
-  'self'
-]
+const reservedNames = ['input', 'env', 'self']
 
 Object.freeze(reservedNames)
 

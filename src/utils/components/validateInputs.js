@@ -16,7 +16,9 @@ function validateInputs(componentId, inputTypes, inputs) {
         const key = `${chalk.yellowBright(error.key)}`
         const suppliedType = typeof error.value
         const newLine = i === 0 ? '\n' : ''
-        return `${header}${newLine} - Input ${key} has \`${suppliedType}\` value of ${value} but expected the following: ${chalk.yellowBright(error.rule)} ${chalk.yellowBright(error.attr)}.\n`
+        return `${header}${newLine} - Input ${key} has \`${suppliedType}\` value of ${value} but expected the following: ${chalk.yellowBright(
+          error.rule
+        )} ${chalk.yellowBright(error.attr)}.\n`
       })
     }
   }

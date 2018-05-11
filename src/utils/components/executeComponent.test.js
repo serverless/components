@@ -166,7 +166,7 @@ describe('#executeComponent()', () => {
     })
 
     it('should skip the command if the state is an empty object', async () => {
-      stateFile = assocPath([ 'myFunction', 'state' ], {}, stateFile)
+      stateFile = assocPath(['myFunction', 'state'], {}, stateFile)
 
       const res = await executeComponent(
         componentId,
@@ -186,7 +186,7 @@ describe('#executeComponent()', () => {
     })
 
     it('should flush state if remove is resolved', async () => {
-      stateFile = assocPath([ 'myFunction', 'state' ], { some: 'state' }, stateFile)
+      stateFile = assocPath(['myFunction', 'state'], { some: 'state' }, stateFile)
 
       const res = await executeComponent(
         componentId,
@@ -199,7 +199,7 @@ describe('#executeComponent()', () => {
       expect(res.executed).toEqual(true)
       expect(res.outputs).toEqual({ result: 'removed' })
       expect(stateFile.myFunction.state).toEqual({})
-      stateFile = assocPath([ 'myFunction', 'state' ], {}, stateFile)
+      stateFile = assocPath(['myFunction', 'state'], {}, stateFile)
     })
 
     it('should retain state if RETAIN_STATE error is thrown', async () => {
@@ -207,7 +207,7 @@ describe('#executeComponent()', () => {
         RETAIN_STATE: true,
         abc: 'xyz'
       }
-      stateFile = assocPath([ 'myFunction', 'state' ], retainedState, stateFile)
+      stateFile = assocPath(['myFunction', 'state'], retainedState, stateFile)
 
       const res = await executeComponent(
         componentId,
@@ -220,7 +220,7 @@ describe('#executeComponent()', () => {
       expect(res.executed).toEqual(true)
       expect(res.outputs).toEqual({})
       expect(stateFile.myFunction.state).toEqual(retainedState)
-      stateFile = assocPath([ 'myFunction', 'state' ], {}, stateFile)
+      stateFile = assocPath(['myFunction', 'state'], {}, stateFile)
     })
   })
 })

@@ -12,7 +12,9 @@ describe('#validateInputs()', () => {
   it('should throw if inputs do not match input types', () => {
     const inputs = { name: 1234 }
 
-    expect(() => validateInputs(componentId, inputTypes, inputs)).toThrowError('Type error in component')
+    expect(() => validateInputs(componentId, inputTypes, inputs)).toThrowError(
+      'Type error in component'
+    )
   })
 
   it('should not throw if inputs match input types', () => {

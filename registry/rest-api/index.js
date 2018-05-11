@@ -1,8 +1,6 @@
 const { mapIndexed } = require('@serverless/utils')
 const joinPath = require('path').join
-const {
-  isEmpty, keys, union, not, map, forEachObjIndexed
-} = require('ramda')
+const { isEmpty, keys, union, not, map, forEachObjIndexed } = require('ramda')
 const { joinUrl } = require('./utils')
 
 const catchallParameterPattern = /{\.{3}([^}]+?)}/g
@@ -39,7 +37,10 @@ function getAwsApiGatewayInputs(inputs) {
     forEachObjIndexed((methodObject, method) => {
       const normalizedMethod = method.toUpperCase()
 
-      routeObject[normalizedMethod] = { lambdaArn: methodObject.function.arn, ...methodObject }
+      routeObject[normalizedMethod] = {
+        lambdaArn: methodObject.function.arn,
+        ...methodObject
+      }
       delete routeObject[normalizedMethod].function
     }, methods)
   }, inputs.routes)
@@ -130,9 +131,13 @@ function flattenRoutes(routes) {
         doFlatten(value, joinPath(basePath, key))
       } else {
         if (
-          ![ 'any', 'delete', 'get', 'head', 'options', 'patch', 'post', 'put' ].includes(key.toLowerCase())
+          !['any', 'delete', 'get', 'head', 'options', 'patch', 'post', 'put'].includes(
+            key.toLowerCase()
+          )
         ) {
-          throw new Error(`Configuration key "${key}" was interpreted as an HTTP method because it does not start with a slash, but it is not a valid method.`)
+          throw new Error(
+            `Configuration key "${key}" was interpreted as an HTTP method because it does not start with a slash, but it is not a valid method.`
+          )
         }
         if (flattened[basePath]) {
           if (flattened[basePath][key]) {
@@ -204,15 +209,15 @@ async function info(inputs, context) {
           .pop()
           .toUpperCase()
       }
-      urlObjects = union(urlObjects, [ urlObject ])
+      urlObjects = union(urlObjects, [urlObject])
     }, flattenedRoutes)
 
     const printableUrls = map((urlObject) => {
-      const joinedUrl = joinUrl(baseUrl, [ urlObject.path ])
+      const joinedUrl = joinUrl(baseUrl, [urlObject.path])
       return `  ${urlObject.method} - ${joinedUrl}`
     }, urlObjects)
 
-    message = [ 'REST API resources:', ...printableUrls ].join('\n')
+    message = ['REST API resources:', ...printableUrls].join('\n')
   } else {
     message = 'No REST API state information available. Have you deployed it?'
   }

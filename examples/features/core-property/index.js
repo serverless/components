@@ -1,5 +1,5 @@
 function deploy(inputs, context) {
-  context.log(`Deploying custom function "${inputs.name}"...`)
+  context.log(`Deploying custom component "${inputs.name}"...`)
   const newState = {
     ...context.state,
     updatedAt: +new Date()
@@ -9,7 +9,7 @@ function deploy(inputs, context) {
 }
 
 function remove(inputs, context) {
-  context.log(`Removing custom function "${inputs.name}"...`)
+  context.log(`Removing custom component "${inputs.name}"...`)
   context.saveState()
 }
 

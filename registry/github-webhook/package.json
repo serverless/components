@@ -1,10 +1,11 @@
 {
   "name": "github-webhook",
-  "version": "1.0.0",
-  "description": "Serverless component that provisions github webhooks",
+  "version": "0.2.0",
+  "private": true,
   "main": "index.js",
-  "author": "",
-  "license": "MIT",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "dependencies": {
     "@octokit/rest": "^15.2.6",
     "parse-github-url": "^1.0.2",

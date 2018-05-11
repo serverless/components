@@ -14,6 +14,8 @@ describe('#validateCoreVersion', () => {
   })
 
   it('should throw an error if not compatible with core version', () => {
-    expect(() => validateCoreVersion(componentType, 'incompatible.version')).toThrow(`The Serverless Components core is incompatible with component ${componentType}`)
+    expect(() => validateCoreVersion(componentType, 'incompatible.version')).toThrow(
+      `The Serverless Components core is incompatible with component ${componentType}`
+    )
   })
 })

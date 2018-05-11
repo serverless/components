@@ -132,10 +132,10 @@ describe('aws-lambda tests', () => {
     expect(outputs.arn).toEqual('abc:xyz')
     expect(outputs.roleArn).toEqual('abc:xyz')
     expect(lambdaContextMock.saveState).toHaveBeenCalledTimes(1)
-    expect(AWS.mocks.createFunctionMock.mock.calls[0][0].FunctionName)
-      .toEqual(inputs.name)
-    expect(AWS.mocks.deleteFunctionMock.mock.calls[0][0].FunctionName)
-      .toEqual(lambdaContextMock.state.name)
+    expect(AWS.mocks.createFunctionMock.mock.calls[0][0].FunctionName).toEqual(inputs.name)
+    expect(AWS.mocks.deleteFunctionMock.mock.calls[0][0].FunctionName).toEqual(
+      lambdaContextMock.state.name
+    )
   })
 
   it('should remove lambda after deployment with no errors', async () => {

@@ -1,4 +1,5 @@
 type: tests-input-type-string
+version: 0.0.1
 
 inputTypes:
   stringTypeRequired:

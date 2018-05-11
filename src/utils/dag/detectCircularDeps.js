@@ -6,7 +6,7 @@ function detectCircularDeps(graph) {
   const isAcyclic = graphlib.alg.isAcyclic(graph)
   if (not(isAcyclic)) {
     const cycles = graphlib.alg.findCycles(graph)
-    let msg = [ 'Your serverless.yml file has circular dependencies:' ]
+    let msg = ['Your serverless.yml file has circular dependencies:']
     forEachIndexed((cycle, index) => {
       let fromAToB = cycle.join(' --> ')
       fromAToB = `${(index += 1)}. ${fromAToB}`

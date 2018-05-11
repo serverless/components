@@ -1,14 +1,11 @@
 {
   "name": "netlify-site",
-  "version": "1.0.0",
-  "description": "Serverless component that provisions netlify sites",
+  "version": "0.2.0",
+  "private": true,
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "MIT",
   "dependencies": {
     "node-fetch": "^2.0.0",
     "parse-github-url": "^1.0.2",

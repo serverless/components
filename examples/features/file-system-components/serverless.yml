@@ -2,10 +2,10 @@ type: file-system-components
 version: 0.0.1
 
 components:
-  myCustomFunction:
-    type: ./my-function
+  myCustomComponent:
+    type: ./my-component
     inputs:
-      name: custom-function-name-${self.instanceId}
+      name: custom-component-name-${self.instanceId}
   myTestRole:
     type: tests-integration-iam-mock
     inputs:

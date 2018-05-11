@@ -12,7 +12,8 @@ module.exports = {
         } else {
           resolve(JSON.parse(data))
         }
-      }))
+      })
+    )
 
     if (products.length > 0) {
       const tablename = `products-${context.serviceId}`

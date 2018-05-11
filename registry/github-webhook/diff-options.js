@@ -72,7 +72,7 @@ const colorTheme = {
   string: {
     open: ansiStyles.white.open,
     close: ansiStyles.white.close,
-    line: { open: forceColor.white('\''), close: forceColor.white('\'') },
+    line: { open: forceColor.white("'"), close: forceColor.white("'") },
     multiline: { start: forceColor.white('`'), end: forceColor.white('`') },
     controlPicture: ansiStyles.grey,
     diff: {

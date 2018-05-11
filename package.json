@@ -1,15 +1,12 @@
 {
   "name": "serverless-components",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "An easier way to build applications with cloud services",
-  "author": "Serverless, Inc.",
+  "author": "Serverless, Inc. <hello@serverless.com> (https://serverless.com)",
   "license": "Apache-2.0",
   "main": "src/index.js",
   "preferGlobal": true,
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/serverless/components"
-  },
+  "repository": "github:serverless/components",
   "bugs": {
     "url": "https://github.com/serverless/components/issues"
   },
@@ -21,6 +18,7 @@
     "cleanse": "node ./scripts/cleanse.js",
     "components": "./bin/components",
     "lint": "eslint . --cache",
+    "lint:staged": "lint-staged",
     "test": "jest .",
     "test:appveyor": "jest --testPathPattern=\"bin|examples|registry|src\" --colors --forceExit",
     "docs": "node ./scripts/doc-gen.js",
@@ -36,6 +34,7 @@
     "bluebird": "^3.5.1",
     "chalk": "^2.3.2",
     "concordance": "^3.0.0",
+    "download": "^6.2.5",
     "fs-extra": "^5.0.0",
     "graphlib": "^2.1.5",
     "js-yaml": "^3.10.0",
@@ -47,21 +46,32 @@
     "raml-validate": "^1.1.2",
     "raven": "^2.4.2",
     "s3-client": "^4.4.1",
-    "semver": "^5.5.0"
+    "semver": "^5.5.0",
+    "url-regex": "^4.1.1"
   },
   "devDependencies": {
     "babel-jest": "^22.4.1",
     "eslint": "^4.18.1",
-    "eslint-config-airbnb-base": "^12.1.0",
     "eslint-config-prettier": "^2.9.0",
     "eslint-plugin-import": "^2.9.0",
     "eslint-plugin-prettier": "^2.6.0",
     "jest": "^22.4.2",
+    "lint-staged": "^7.0.4",
     "markdown-magic": "^0.1.21",
-    "prettier": "^1.10.2"
+    "pre-commit": "^1.2.2",
+    "prettier": "^1.12.1"
   },
   "jest": {
     "coverageDirectory": "./coverage/",
     "collectCoverage": true
-  }
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix .",
+      "git add -A"
+    ]
+  },
+  "pre-commit": [
+    "lint:staged"
+  ]
 }

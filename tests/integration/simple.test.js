@@ -19,7 +19,7 @@ async function removeStateFiles(stateFiles) {
 }
 
 describe('Integration Test - Simple', () => {
-  jest.setTimeout(20000)
+  jest.setTimeout(40000)
 
   const testDir = path.dirname(__filename)
   const componentsExec = path.join(testDir, '..', '..', 'bin', 'components')
@@ -28,11 +28,11 @@ describe('Integration Test - Simple', () => {
   const FUNCTION_NAME = 'my-function'
 
   beforeAll(async () => {
-    await removeStateFiles([ testServiceStateFile ])
+    await removeStateFiles([testServiceStateFile])
   })
 
   afterAll(async () => {
-    await removeStateFiles([ testServiceStateFile ])
+    await removeStateFiles([testServiceStateFile])
   })
 
   describe('our test setup', () => {

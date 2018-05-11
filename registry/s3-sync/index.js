@@ -19,14 +19,22 @@ const syncDirFiles = async ({ contentPath, bucketName }) => {
     }
   }
   const uploader = client.uploadDir(params)
-  uploader.on('fileUploadEnd', (localFilePath, s3Key) => { // eslint-disable-line no-unused-vars
+  uploader.on('fileUploadEnd', (localFilePath, s3Key) => {
+    // eslint-disable-line no-unused-vars
     console.log(`Uploading file: '${localFilePath}' ...`)
   })
   uploader.on('error', (err) => {
     console.error('Error syncing files:', err.stack)
   })
   uploader.on('end', () => {
-    console.log('Objects Found:', uploader.objectsFound, ', Files Found:', uploader.filesFound, ', Files Deleted:', uploader.deleteTotal)
+    console.log(
+      'Objects Found:',
+      uploader.objectsFound,
+      ', Files Found:',
+      uploader.filesFound,
+      ', Files Deleted:',
+      uploader.deleteTotal
+    )
   })
   return {}
 }

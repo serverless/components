@@ -1,6 +1,4 @@
-const {
-  prop, isEmpty, has, forEachObjIndexed, isNil
-} = require('ramda')
+const { prop, isEmpty, has, forEachObjIndexed, isNil } = require('ramda')
 
 function setInputDefaults(inputTypes, inputs) {
   // TODO: make code immutable / functional

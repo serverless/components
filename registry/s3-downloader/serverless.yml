@@ -1,5 +1,12 @@
 # TODO: make this more reusable
 type: s3-downloader
+version: 0.2.0
+core: 0.2.x
+
+description: "A Serverless Component for downloading file when they are added to s3"
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
 
 inputTypes:
   name:

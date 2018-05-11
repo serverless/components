@@ -1,0 +1,7 @@
+type: my-component
+
+inputTypes:
+  name:
+    type: string
+    required: false
+    default: my-component-${self.instanceId}
