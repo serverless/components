@@ -65,7 +65,6 @@ describe('aws-lambda tests', () => {
       name: 'some-lambda-name',
       memory: 512,
       timeout: 10,
-      runtime: 'nodejs8.10',
       handler: 'handle.code',
       role: {
         arn: 'abc:xyz'
@@ -85,7 +84,6 @@ describe('aws-lambda tests', () => {
       MemorySize: 512,
       Publish: true,
       Role: 'abc:xyz',
-      Runtime: 'nodejs8.10',
       Timeout: 10
     }))
     expect(outputs.arn).toEqual('abc:xyz')
@@ -93,7 +91,48 @@ describe('aws-lambda tests', () => {
     expect(lambdaContextMock.saveState).toHaveBeenCalledTimes(1)
   })
 
-  it('should update lambda code and config with no errors', async () => {
+  it('should deploy lambda component using custom runtime with no errors', async () => {
+    const lambdaContextMock = {
+      state: {},
+      archive: {},
+      log: () => {},
+      saveState: jest.fn(),
+      load: jest.fn()
+    }
+
+    const inputs = {
+      name: 'some-lambda-name',
+      memory: 512,
+      timeout: 10,
+      runtime: 'nodejs6.10',
+      handler: 'handle.code',
+      role: {
+        arn: 'abc:xyz'
+      }
+    }
+
+    const outputs = await lambdaComponent.deploy(inputs, lambdaContextMock)
+
+    expect(AWS.Lambda).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.createFunctionMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.createFunctionMock).toBeCalledWith(expect.objectContaining({
+      Code: { ZipFile: undefined },
+      Description: undefined,
+      Environment: { Variables: undefined },
+      FunctionName: 'some-lambda-name',
+      Handler: 'handle.code',
+      MemorySize: 512,
+      Publish: true,
+      Role: 'abc:xyz',
+      Runtime: 'nodejs6.10',
+      Timeout: 10
+    }))
+    expect(outputs.arn).toEqual('abc:xyz')
+    expect(outputs.roleArn).toEqual('abc:xyz')
+    expect(lambdaContextMock.saveState).toHaveBeenCalledTimes(1)
+  })
+
+  it('should update lambda code with custom runtime and config with no errors', async () => {
     const lambdaContextMock = {
       state: { name: 'some-lambda-name' },
       archive: {},
@@ -106,7 +145,6 @@ describe('aws-lambda tests', () => {
       name: 'some-lambda-name',
       memory: 512,
       timeout: 10,
-      runtime: 'nodejs8.10',
       handler: 'handle.code',
       role: {
         arn: 'abc:xyz'
@@ -136,7 +174,6 @@ describe('aws-lambda tests', () => {
       name: 'some-new-lambda-name',
       memory: 512,
       timeout: 10,
-      runtime: 'nodejs8.10',
       handler: 'handle.code',
       role: {
         arn: 'abc:xyz'
@@ -151,11 +188,10 @@ describe('aws-lambda tests', () => {
     expect(outputs.arn).toEqual('abc:xyz')
     expect(outputs.roleArn).toEqual('abc:xyz')
     expect(lambdaContextMock.saveState).toHaveBeenCalledTimes(1)
-
-    const functionName =
-      AWS.mocks.createFunctionMock.mock.calls[0][0].FunctionName
-    expect(functionName).toEqual(inputs.name)
-    expect(functionName).toEqual(lambdaContextMock.state.name)
+    expect(AWS.mocks.createFunctionMock.mock.calls[0][0].FunctionName).toEqual(inputs.name)
+    const deleteFunctionName =
+      AWS.mocks.deleteFunctionMock.mock.calls[0][0].FunctionName
+    expect(deleteFunctionName).toEqual(lambdaContextMock.state.name)
   })
 
   it('should remove lambda after deployment with no errors', async () => {
@@ -171,7 +207,6 @@ describe('aws-lambda tests', () => {
       name: 'some-lambda-name',
       memory: 512,
       timeout: 10,
-      runtime: 'nodejs8.10',
       handler: 'handle.code',
       role: {
         arn: 'abc:xyz'
@@ -199,7 +234,6 @@ describe('aws-lambda tests', () => {
       name: 'some-lambda-name',
       memory: 512,
       timeout: 10,
-      runtime: 'nodejs8.10',
       handler: 'handle.code',
       role: {
         arn: 'abc:xyz'
@@ -229,7 +263,6 @@ describe('aws-lambda tests', () => {
       name: 'some-lambda-name',
       memory: 512,
       timeout: 10,
-      runtime: 'nodejs8.10',
       handler: 'handle.code'
     }
 
@@ -255,7 +288,6 @@ describe('aws-lambda tests', () => {
       name: 'some-lambda-name',
       memory: 512,
       timeout: 10,
-      runtime: 'nodejs8.10',
       handler: 'handle.code'
     }
 
@@ -291,7 +323,6 @@ describe('aws-lambda tests', () => {
       name: 'some-already-removed-function',
       memory: 512,
       timeout: 10,
-      runtime: 'nodejs8.10',
       handler: 'handler.code'
     }
 

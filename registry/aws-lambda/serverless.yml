@@ -29,6 +29,7 @@ inputTypes:
   runtime:
     type: string
     required: true
+    default: nodejs8.10
     displayName: Function runtime
     description: |
       Runtime for the function.
