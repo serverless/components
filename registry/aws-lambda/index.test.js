@@ -132,7 +132,7 @@ describe('aws-lambda tests', () => {
     expect(lambdaContextMock.saveState).toHaveBeenCalledTimes(1)
   })
 
-  it('should update lambda code with custom runtime and config with no errors', async () => {
+  it('should update lambda code and config with no errors', async () => {
     const lambdaContextMock = {
       state: { name: 'some-lambda-name' },
       archive: {},
@@ -155,6 +155,56 @@ describe('aws-lambda tests', () => {
 
     expect(AWS.Lambda).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.updateFunctionConfigurationMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.updateFunctionConfigurationMock).toBeCalledWith(expect.objectContaining({
+      Description: undefined,
+      Environment: { Variables: undefined },
+      FunctionName: 'some-lambda-name',
+      Handler: 'handle.code',
+      MemorySize: 512,
+      Role: 'abc:xyz',
+      Runtime: undefined,
+      Timeout: 10
+    }))
+    expect(AWS.mocks.updateFunctionCodeMock).toHaveBeenCalledTimes(1)
+    expect(outputs.arn).toEqual('abc:xyz')
+    expect(outputs.roleArn).toEqual('abc:xyz')
+    expect(lambdaContextMock.saveState).toHaveBeenCalledTimes(1)
+  })
+
+  it('should update lambda code with custom runtime and config with no errors', async () => {
+    const lambdaContextMock = {
+      state: { name: 'some-lambda-name' },
+      archive: {},
+      log: () => {},
+      saveState: jest.fn(),
+      load: jest.fn()
+    }
+
+    const inputs = {
+      name: 'some-lambda-name',
+      memory: 512,
+      timeout: 10,
+      runtime: 'nodejs6.10',
+      handler: 'handle.code',
+      role: {
+        arn: 'abc:xyz'
+      }
+    }
+
+    const outputs = await lambdaComponent.deploy(inputs, lambdaContextMock)
+
+    expect(AWS.Lambda).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.updateFunctionConfigurationMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.updateFunctionConfigurationMock).toBeCalledWith(expect.objectContaining({
+      Description: undefined,
+      Environment: { Variables: undefined },
+      FunctionName: 'some-lambda-name',
+      Handler: 'handle.code',
+      MemorySize: 512,
+      Role: 'abc:xyz',
+      Runtime: 'nodejs6.10',
+      Timeout: 10
+    }))
     expect(AWS.mocks.updateFunctionCodeMock).toHaveBeenCalledTimes(1)
     expect(outputs.arn).toEqual('abc:xyz')
     expect(outputs.roleArn).toEqual('abc:xyz')
