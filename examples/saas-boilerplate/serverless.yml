@@ -1,0 +1,46 @@
+type: saas-boilerplate
+
+components:
+
+  # Component - Web Application
+  app:
+    type: web-application
+    inputs:
+      name: saas-boilerplate
+
+      # Globals
+      global:
+        prefix: true
+        runtime: nodejs6.10
+        env:
+
+      # Frontend
+      front:
+        assets: ${self.path}/app/front
+
+      # Backend
+      back:
+        usersCreate:
+          code: users.create
+          events:
+            - http:
+                path: users
+                method: post
+        usersRead:
+          code: users.read
+          events:
+            - http:
+                path: users
+                method: read
+        usersUpdate:
+          code: users.update
+          events:
+            - http:
+                path: users
+                method: put
+        usersDelete:
+          code: users.delete
+          events:
+            - http:
+                path: users
+                method: delete
