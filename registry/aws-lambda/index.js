@@ -8,7 +8,6 @@ async function createLambda(
   role
 ) {
   const pkg = await pack(root)
-  console.log('here', runtime)
   const params = {
     FunctionName: name,
     Code: {
