@@ -16,10 +16,10 @@ inputTypes:
     example: myProject-functionName-${self.instanceId}
   runtime:
     type: string
-    default: node8.10
+    default: nodejs8.10
     displayName: AWS Lambda Runtime
     description: The runtime or language of your AWS Lambda function
-    example: node.js8.10
+    example: nodejs8.10
   memory:
     type: number
     required: true
