@@ -36,7 +36,7 @@ const executeComponent = async (
   if (is(Function, func)) {
     try {
       component.outputs = (await func(component.inputs, context)) || {}
-      validateTypes(component.id, component.outputTypes, component.outputs)
+      validateTypes(component.id, component.outputTypes, component.outputs, { prefix: 'Output' })
     } catch (e) {
       if (command === 'remove' && e.code === 'RETAIN_STATE') {
         retainState = true

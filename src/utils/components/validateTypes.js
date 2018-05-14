@@ -2,7 +2,7 @@ const validate = require('raml-validate')()
 const chalk = require('chalk')
 const { forEach, prop, append } = require('ramda')
 
-function validateTypes(componentId, propTypes, props) {
+function validateTypes(componentId, propTypes, props, opts = { prefix: 'Type' }) {
   let errorMessages = []
   if (propTypes && props) {
     const schema = validate({ ...propTypes }, 'RAML10')
@@ -16,7 +16,9 @@ function validateTypes(componentId, propTypes, props) {
         const value = chalk.cyanBright(`"${error.value}"`)
         const key = `${chalk.yellowBright(error.key)}`
         const suppliedType = typeof error.value
-        const msg = `  - ${key} has \`${suppliedType}\` value of ${value} but expected the following: ${chalk.yellowBright(error.rule)} ${chalk.yellowBright(error.attr)}.\n`
+        const msg = `  - ${
+          opts.prefix
+        } ${key} has \`${suppliedType}\` value of ${value} but expected the following: ${chalk.yellowBright(error.rule)} ${chalk.yellowBright(error.attr)}.\n`
         errorMessages = append(msg, errorMessages)
       }, prop('errors', validation))
     }

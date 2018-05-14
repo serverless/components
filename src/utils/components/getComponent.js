@@ -37,7 +37,7 @@ module.exports = async (componentRoot, componentId, inputs, stateFile) => {
 
   slsYml.inputs = setInputDefaults(slsYml.inputTypes, slsYml.inputs)
 
-  validateTypes(slsYml.id, slsYml.inputTypes, slsYml.inputs)
+  validateTypes(slsYml.id, slsYml.inputTypes, slsYml.inputs, { prefix: 'Input' })
 
   return slsYml
 }
