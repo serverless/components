@@ -14,7 +14,6 @@ const getDistribution = async (distributionId) => {
 }
 
 const getDistributionConfig = async (distributionId) => {
-  // eslint-disable-line no-unused-vars
   const distConfigRes = await CloudFront.getDistributionConfig({
     Id: distributionId
   }).promise()
@@ -22,9 +21,7 @@ const getDistributionConfig = async (distributionId) => {
   return distConfigRes
 }
 
-const timestamp = () =>
-  // eslint-disable-line arrow-body-style
-  Math.floor(Date.now() / 1000)
+const timestamp = () => Math.floor(Date.now() / 1000)
 
 // [] Create Create Distribution
 //    Origin Domain Name => siteurl (without scheme) (Origins)
