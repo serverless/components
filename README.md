@@ -653,7 +653,7 @@ components remove
 
 * [Basic Lambda Example](./examples/basic)
 * [Blog Example](./examples/blog)
-* [Github Webhook Example](./examples/basic)
+* [Github Webhook Example](./examples/github-webhook-example)
 * [Landing Page Example](./examples/landing-page)
 * [Netlify Site Example](./examples/netlify-site-example)
 * [Rest API Example](./examples/restapi)
