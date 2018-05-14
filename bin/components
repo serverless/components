@@ -1,12 +1,13 @@
 #!/usr/bin/env node
-const minimist = require('minimist')
+const parseArgs = require('minimist')
+const dissoc = require('ramda').dissoc
+const run = require('../src/index').run
 
-const { run } = require('../src/index')
+const args = parseArgs(process.argv.slice(2))
+const command = args._.join(' ')
+const options = dissoc('_', args)
 
-const command = process.argv[2]
-const options = minimist(process.argv.slice(2))
-delete options._
 run(command, options).catch((error) => {
-  console.error(error)
+  console.error(error) // eslint-disable-line
   process.exit(1)
 })
