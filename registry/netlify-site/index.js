@@ -46,8 +46,9 @@ const deploy = async (inputs, context) => {
   })
 
   /* 3. Then createNetlifySite with https://api.netlify.com/api/v1/sites */
-  let siteConfig = { // eslint-disable-line
-    name: siteName,
+  const siteConfig = {
+    // eslint-disable-line
+    name: siteName
   }
 
   if (siteDomain) {
@@ -59,7 +60,7 @@ const deploy = async (inputs, context) => {
   }
 
   const branch = siteRepoBranch || 'master'
-  const allowedBranches = siteRepoAllowedBranches || [ branch ]
+  const allowedBranches = siteRepoAllowedBranches || [branch]
 
   // Set repo configuration
   siteConfig.repo = {
@@ -97,34 +98,43 @@ const deploy = async (inputs, context) => {
   const githubWebhook = await addGithubWebhook(githubWebhookConfig, githubApiToken)
 
   /* 5. Then make netlify https://api.netlify.com/api/v1/hooks call */
-  const netlifyDeployCreatedWebhook = await createNetlifyWebhook({
-    site_id: netlifySite.site_id,
-    type: 'github_commit_status',
-    event: 'deploy_created',
-    data: {
-      access_token: githubApiToken
-    }
-  }, netlifyApiToken)
+  const netlifyDeployCreatedWebhook = await createNetlifyWebhook(
+    {
+      site_id: netlifySite.site_id,
+      type: 'github_commit_status',
+      event: 'deploy_created',
+      data: {
+        access_token: githubApiToken
+      }
+    },
+    netlifyApiToken
+  )
 
   /* 6. Then make another netlify https://api.netlify.com/api/v1/hooks call */
-  const netlifyDeployFailedWebhook = await createNetlifyWebhook({
-    site_id: netlifySite.site_id,
-    type: 'github_commit_status',
-    event: 'deploy_failed',
-    data: {
-      access_token: githubApiToken
-    }
-  }, netlifyApiToken)
+  const netlifyDeployFailedWebhook = await createNetlifyWebhook(
+    {
+      site_id: netlifySite.site_id,
+      type: 'github_commit_status',
+      event: 'deploy_failed',
+      data: {
+        access_token: githubApiToken
+      }
+    },
+    netlifyApiToken
+  )
 
   /* 7. Then make another netlify https://api.netlify.com/api/v1/hooks call */
-  const netlifyDeployBuildingWebhook = await createNetlifyWebhook({
-    site_id: netlifySite.site_id,
-    type: 'github_commit_status',
-    event: 'deploy_failed',
-    data: {
-      access_token: githubApiToken
-    }
-  }, netlifyApiToken)
+  const netlifyDeployBuildingWebhook = await createNetlifyWebhook(
+    {
+      site_id: netlifySite.site_id,
+      type: 'github_commit_status',
+      event: 'deploy_failed',
+      data: {
+        access_token: githubApiToken
+      }
+    },
+    netlifyApiToken
+  )
 
   /* return all API call data */
   const outputs = {
@@ -147,11 +157,7 @@ const deploy = async (inputs, context) => {
 
 const remove = async (inputs, context) => {
   context.log('Removing netlify site:')
-  const {
-    netlifyApiToken,
-    githubApiToken,
-    siteRepo
-  } = inputs
+  const { netlifyApiToken, githubApiToken, siteRepo } = inputs
   const githubData = parseGithubUrl(siteRepo)
 
   const { state } = context
@@ -162,34 +168,28 @@ const remove = async (inputs, context) => {
 
   /* Clean up netlify DeployCreated webhook */
   if (state.netlifyDeployCreatedWebhook.id) {
-    await deleteNetlifyWebhook(
-      state.netlifyDeployCreatedWebhook.id,
-      netlifyApiToken
-    )
+    await deleteNetlifyWebhook(state.netlifyDeployCreatedWebhook.id, netlifyApiToken)
   }
 
   /* Clean up netlify DeployFailed webhook */
   if (state.netlifyDeployFailedWebhook.id) {
-    await deleteNetlifyWebhook(
-      state.netlifyDeployFailedWebhook.id,
-      netlifyApiToken
-    )
+    await deleteNetlifyWebhook(state.netlifyDeployFailedWebhook.id, netlifyApiToken)
   }
 
   /* Clean up netlify DeployBuilding webhook */
   if (state.netlifyDeployBuildingWebhook.id) {
-    await deleteNetlifyWebhook(
-      state.netlifyDeployBuildingWebhook.id,
-      netlifyApiToken
-    )
+    await deleteNetlifyWebhook(state.netlifyDeployBuildingWebhook.id, netlifyApiToken)
   }
 
   /* Clean up github webhook */
   if (state.githubWebhookData.id) {
-    await deleteGithubWebhook({
-      repo: githubData.repo,
-      hookId: state.githubWebhookData.id
-    }, githubApiToken)
+    await deleteGithubWebhook(
+      {
+        repo: githubData.repo,
+        hookId: state.githubWebhookData.id
+      },
+      githubApiToken
+    )
   }
 
   /* Remove netlify Site */
@@ -199,10 +199,13 @@ const remove = async (inputs, context) => {
 
   /* Clean up github deploy keys */
   if (state.githubDeployKeyData.id) {
-    await deleteGithubDeployKey({
-      repo: githubData.repo,
-      id: state.githubDeployKeyData.id
-    }, githubApiToken)
+    await deleteGithubDeployKey(
+      {
+        repo: githubData.repo,
+        id: state.githubDeployKeyData.id
+      },
+      githubApiToken
+    )
   }
 
   /* Clean up netlify deploy keys */
@@ -214,7 +217,6 @@ const remove = async (inputs, context) => {
   context.saveState()
   return outputs
 }
-
 
 async function createNetlifyDeployKey(config, apiToken) {
   console.log('Creating netlify deploy key')
@@ -241,7 +243,7 @@ async function deleteNetlifyDeployKey(id, apiToken) {
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${apiToken}`
-    },
+    }
   })
 
   // response.ok
@@ -265,7 +267,7 @@ async function createNetlifySite(config, apiToken) {
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${apiToken}`
-    },
+    }
   })
   return await response.json() // eslint-disable-line
 }
@@ -281,7 +283,7 @@ async function deleteNetlifySite(id, apiToken) {
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${apiToken}`
-    },
+    }
   })
 
   // response.ok
@@ -306,7 +308,7 @@ async function createNetlifyWebhook(config, netlifyApiToken) {
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${netlifyApiToken}`
-    },
+    }
   })
 
   const data = await response.json()
@@ -329,7 +331,7 @@ async function deleteNetlifyWebhook(hookId, apiToken) {
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${apiToken}`
-    },
+    }
   })
 
   // response.ok
@@ -357,7 +359,7 @@ async function addGithubDeployKey(config) {
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${config.githubApiToken}`
-    },
+    }
   })
   return await response.json() // eslint-disable-line
 }
@@ -370,7 +372,7 @@ async function deleteGithubDeployKey(config, githubApiToken) {
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${githubApiToken}`
-    },
+    }
   })
 
   if (response.status === 404) {
@@ -392,7 +394,7 @@ async function addGithubWebhook(config, githubApiToken) {
     body: JSON.stringify({
       name: 'web',
       active: true,
-      events: [ 'delete', 'push', 'pull_request' ],
+      events: ['delete', 'push', 'pull_request'],
       config: {
         url: 'https://api.netlify.com/hooks/github',
         content_type: 'json'
@@ -401,7 +403,7 @@ async function addGithubWebhook(config, githubApiToken) {
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${githubApiToken}`
-    },
+    }
   })
   return await response.json() // eslint-disable-line
 }
@@ -414,7 +416,7 @@ async function deleteGithubWebhook(config, githubApiToken) {
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${githubApiToken}`
-    },
+    }
   })
   return response
 }

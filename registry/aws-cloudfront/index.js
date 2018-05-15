@@ -13,7 +13,7 @@ const getDistribution = async (distributionId) => {
   return distRes
 }
 
-const getDistributionConfig = async (distributionId) => { // eslint-disable-line no-unused-vars
+const getDistributionConfig = async (distributionId) => {
   const distConfigRes = await CloudFront.getDistributionConfig({
     Id: distributionId
   }).promise()
@@ -21,9 +21,7 @@ const getDistributionConfig = async (distributionId) => { // eslint-disable-line
   return distConfigRes
 }
 
-const timestamp = () => { // eslint-disable-line arrow-body-style
-  return Math.floor(Date.now() / 1000)
-}
+const timestamp = () => Math.floor(Date.now() / 1000)
 
 // [] Create Create Distribution
 //    Origin Domain Name => siteurl (without scheme) (Origins)
@@ -42,9 +40,17 @@ const timestamp = () => { // eslint-disable-line arrow-body-style
 //    Distribution State => Enabled
 
 const createDistribution = async ({
-  name, defaultRootObject, originId, originDomain,
-  aliasDomain, distributionEnabled, loggingEnabled, loggingBucket,
-  loggingIncludeCookies, loggingPrefix, priceClass
+  name,
+  defaultRootObject,
+  originId,
+  originDomain,
+  aliasDomain,
+  distributionEnabled,
+  loggingEnabled,
+  loggingBucket,
+  loggingIncludeCookies,
+  loggingPrefix,
+  priceClass
 }) => {
   const callerReference = `${name}-${timestamp()}`
 
@@ -69,16 +75,10 @@ const createDistribution = async ({
       },
       ViewerProtocolPolicy: 'allow-all',
       AllowedMethods: {
-        Items: [
-          'GET',
-          'HEAD'
-        ],
+        Items: ['GET', 'HEAD'],
         Quantity: 2,
         CachedMethods: {
-          Items: [
-            'GET',
-            'HEAD'
-          ],
+          Items: ['GET', 'HEAD'],
           Quantity: 2
         }
       },
@@ -105,9 +105,7 @@ const createDistribution = async ({
     },
     Aliases: {
       Quantity: 1,
-      Items: [
-        aliasDomain
-      ]
+      Items: [aliasDomain]
     },
     DefaultRootObject: defaultRootObject,
     Logging: {
@@ -211,24 +209,33 @@ const deleteDistribution = async (distributionId) => {
   console.log(`CloudFront distribution '${distributionId}' deletion initiated`)
 }
 
-
 const deploy = async (inputs, context) => {
   let outputs = context.state
   if (!context.state.distribution && inputs.name) {
     context.log(`Creating CloudFront distribution: '${inputs.name}'`)
     outputs = await createDistribution(inputs)
   } else if (!inputs.name && context.state.distribution.id) {
-    context.log(`Removing CloudFront distribution: '${context.state.name}' with id: '${context.state.distribution.id}'`)
+    context.log(
+      `Removing CloudFront distribution: '${context.state.name}' with id: ` +
+        `'${context.state.distribution.id}'`
+    )
     await deleteDistribution(context.state.distribution.id)
   } else if (context.state.name !== inputs.name && context.state.distribution) {
-    context.log(`Removing CloudFront distribution: '${context.state.name}' with id: '${context.state.distribution.id}'`)
+    context.log(
+      `Removing CloudFront distribution: '${context.state.name}' with id: '${
+        context.state.distribution.id
+      }'`
+    )
     const res = await deleteDistribution(context.state.distribution.id)
     if (!res.error) {
       context.log(`Creating CloudFront distribution: '${inputs.name}'`)
       outputs = await createDistribution(inputs)
     }
-  } else if (context.state.name && context.state.distribution &&
-             inputs.distributionEnabled !== context.state.distribution.distConfig.enabled) {
+  } else if (
+    context.state.name &&
+    context.state.distribution &&
+    inputs.distributionEnabled !== context.state.distribution.distConfig.enabled
+  ) {
     context.log(`Toggling CloudFront distribution to '${inputs.distributionEnabled}'`)
     outputs = await toggleEnabledForDistribution(
       context.state.distribution.id,
@@ -243,14 +250,17 @@ const remove = async (inputs, context) => {
   if (!context.state.name) return {}
 
   try {
-    context.log(`Removing CloudFront distribution: '${context.state.name}' with id: '${context.state.distribution.id}'`)
-    await deleteDistribution(
-      context.state.distribution.id,
-      context.state.distribution.eTag
+    context.log(
+      `Removing CloudFront distribution: '${context.state.name}' with id: '${
+        context.state.distribution.id
+      }'`
     )
+    await deleteDistribution(context.state.distribution.id, context.state.distribution.eTag)
   } catch (e) {
     if (e.message.includes('The distribution you are trying to delete has not been disabled')) {
-      context.log('Could not delete distribution as it is not disabled or is still being disabled. Please disable it or try again later.')
+      context.log(
+        'Could not delete distribution as it is not disabled or is still being disabled. Please disable it or try again later.'
+      )
       e.code = 'RETAIN_STATE'
       throw e
     } else if (!e.message.includes('The specified distribution does not exist')) {

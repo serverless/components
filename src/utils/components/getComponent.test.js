@@ -154,7 +154,9 @@ describe('#getComponent()', () => {
       } catch (err) {
         error = err
       }
-      expect(error.message).toEqual('The Serverless Components core is incompatible with component my-project')
+      expect(error.message).toEqual(
+        'The Serverless Components core is incompatible with component my-project'
+      )
     })
   })
 })

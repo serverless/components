@@ -11,10 +11,7 @@ describe('#getComponentRootPathFromUrl', () => {
       .createHash('sha256')
       .update(url)
       .digest('hex')
-    const expectedDownloadedComponentRootPath = path.join(
-      componentsCachePath,
-      urlHash
-    )
+    const expectedDownloadedComponentRootPath = path.join(componentsCachePath, urlHash)
     const downloadedComponentRootPath = await getComponentRootPathFromUrl(url)
     expect(downloadedComponentRootPath).toEqual(expectedDownloadedComponentRootPath)
   })

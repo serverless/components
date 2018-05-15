@@ -2,7 +2,7 @@ const getVariableSyntax = require('./getVariableSyntax')
 
 // "private" functions
 function checkForViolations(serverlessYml) {
-  const forbiddenProperties = [ 'type', 'version' ]
+  const forbiddenProperties = ['type', 'version']
   const varSyntax = getVariableSyntax()
 
   return forbiddenProperties.some((property) => {

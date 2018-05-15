@@ -58,9 +58,7 @@ async function updateLambda(
   }
 
   await lambda.updateFunctionCode(functionCodeParams).promise()
-  const res = await lambda
-    .updateFunctionConfiguration(functionConfigParams)
-    .promise()
+  const res = await lambda.updateFunctionConfiguration(functionConfigParams).promise()
 
   return {
     arn: res.FunctionArn,
@@ -84,14 +82,10 @@ async function deploy(inputs, context) {
   const configuredRole = inputs.role
   let { defaultRole } = context.state
 
-  const defaultRoleComponent = await context.load(
-    'aws-iam-role',
-    'defaultRole',
-    {
-      name: `${inputs.name}-execution-role`,
-      service: 'lambda.amazonaws.com'
-    }
-  )
+  const defaultRoleComponent = await context.load('aws-iam-role', 'defaultRole', {
+    name: `${inputs.name}-execution-role`,
+    service: 'lambda.amazonaws.com'
+  })
 
   if (!configuredRole && !defaultRole) {
     defaultRole = await defaultRoleComponent.deploy()
@@ -128,14 +122,10 @@ async function remove(inputs, context) {
   if (!context.state.name) return { arn: null }
 
   if (context.state.defaultRole) {
-    const defaultRoleComponent = await context.load(
-      'aws-iam-role',
-      'defaultRole',
-      {
-        name: context.state.defaultRole.name,
-        service: context.state.defaultRole.service
-      }
-    )
+    const defaultRoleComponent = await context.load('aws-iam-role', 'defaultRole', {
+      name: context.state.defaultRole.name,
+      service: context.state.defaultRole.service
+    })
     await defaultRoleComponent.remove()
   }
 

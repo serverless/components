@@ -4,7 +4,7 @@ const deploy = (inputs, context) => {
 }
 
 const remove = (inputs, context) => {
-  context.saveState({ })
+  context.saveState({})
 }
 
 module.exports = {

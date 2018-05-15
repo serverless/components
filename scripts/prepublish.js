@@ -74,34 +74,31 @@ const uploadComponent = async (componentRoot) => {
 }
 
 const getUploadedComponents = async () =>
-  (await s3
-    .listObjectsV2({ Bucket: COMPONENTS_BUCKET })
-    .promise()).Contents.map((obj) => path.basename(obj.Key))
+  (await s3.listObjectsV2({ Bucket: COMPONENTS_BUCKET }).promise()).Contents.map((obj) =>
+    path.basename(obj.Key)
+  )
 
 const uploadComponents = async () => {
   const componentsRoots = await getRegistryComponentsRoots()
   const s3Components = await getUploadedComponents()
 
-  const componentsToUpload = await componentsRoots.reduce(
-    async (accum, componentRoot) => {
-      accum = await BbPromise.resolve(accum)
-      const slsYmlFilePath = path.join(componentRoot, 'serverless.yml')
-      const slsYml = await readFile(slsYmlFilePath)
-      const componentFileName = `${slsYml.type}@${slsYml.version}.${FORMAT}`
-      if (
-        !s3Components.includes(componentFileName) &&
-        !excludedComponents.includes(path.basename(componentRoot))
-      ) {
-        accum.push(componentRoot)
-      }
-      return accum
-    },
-    BbPromise.resolve([])
-  )
+  const componentsToUpload = await componentsRoots.reduce(async (accum, componentRoot) => {
+    accum = await BbPromise.resolve(accum)
+    const slsYmlFilePath = path.join(componentRoot, 'serverless.yml')
+    const slsYml = await readFile(slsYmlFilePath)
+    const componentFileName = `${slsYml.type}@${slsYml.version}.${FORMAT}`
+    if (
+      !s3Components.includes(componentFileName) &&
+      !excludedComponents.includes(path.basename(componentRoot))
+    ) {
+      accum.push(componentRoot)
+    }
+    return accum
+  }, BbPromise.resolve([]))
 
   return BbPromise.map(componentsToUpload, uploadComponent)
-};
-(async () => {
+}
+;(async () => {
   // eslint-disable-line
   await writeFile(trackingConfigFilePath, trackingConfig)
   await uploadComponents()

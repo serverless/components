@@ -1,6 +1,4 @@
-const {
-  forEachObjIndexed, keys, map, set, lensPath
-} = require('ramda')
+const { forEachObjIndexed, keys, map, set, lensPath } = require('ramda')
 
 // TODO: remove hardcoding of region (e.g. like us-east-1)
 
@@ -23,7 +21,7 @@ function getDefaultResponses(useCors) {
   if (useCors) {
     let defaultResponsesWithCors = { ...defaultResponses }
     defaultResponsesWithCors = set(
-      lensPath([ 200 ]),
+      lensPath([200]),
       {
         headers: {
           'Access-Control-Allow-Headers': {
@@ -62,7 +60,7 @@ function getApiGatewayIntegration(roleArn, uri, useCors) {
   if (useCors) {
     let apiGatewayIntegrationWithCors = { ...apiGatewayIntegration }
     apiGatewayIntegrationWithCors = set(
-      lensPath([ 'x-amazon-apigateway-integration', 'responses', 'default', 'responseParameters' ]),
+      lensPath(['x-amazon-apigateway-integration', 'responses', 'default', 'responseParameters']),
       {
         'method.response.header.Access-Control-Allow-Headers':
           "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'",
@@ -80,9 +78,9 @@ function getCorsOptionsConfig() {
   return {
     summary: 'CORS support',
     description: 'Enable CORS by returning correct headers',
-    consumes: [ 'application/json' ],
-    produces: [ 'application/json' ],
-    tags: [ 'CORS' ],
+    consumes: ['application/json'],
+    produces: ['application/json'],
+    tags: ['CORS'],
     'x-amazon-apigateway-integration': {
       type: 'mock',
       requestTemplates: {
@@ -148,9 +146,9 @@ function getSwaggerDefinition(name, roleArn, routes) {
 
       const apiGatewayIntegration = getApiGatewayIntegration(roleArn, uri, isCorsEnabled)
       const defaultResponses = getDefaultResponses(isCorsEnabled)
-      updatedMethods = set(lensPath([ normalizedMethod ]), apiGatewayIntegration, updatedMethods)
+      updatedMethods = set(lensPath([normalizedMethod]), apiGatewayIntegration, updatedMethods)
       updatedMethods = set(
-        lensPath([ normalizedMethod, 'responses' ]),
+        lensPath([normalizedMethod, 'responses']),
         defaultResponses,
         updatedMethods
       )
@@ -158,11 +156,11 @@ function getSwaggerDefinition(name, roleArn, routes) {
 
     if (enableCorsOnPath) {
       const corsOptionsMethod = getCorsOptionsConfig()
-      updatedMethods = set(lensPath([ 'options' ]), corsOptionsMethod, updatedMethods)
+      updatedMethods = set(lensPath(['options']), corsOptionsMethod, updatedMethods)
     }
 
     // set the paths
-    paths = set(lensPath([ normalizedPath ]), updatedMethods, paths)
+    paths = set(lensPath([normalizedPath]), updatedMethods, paths)
   }, routes)
 
   const definition = {
@@ -171,9 +169,9 @@ function getSwaggerDefinition(name, roleArn, routes) {
       title: name,
       version: new Date().toISOString()
     },
-    schemes: [ 'https' ],
-    consumes: [ 'application/json' ],
-    produces: [ 'application/json' ],
+    schemes: ['https'],
+    consumes: ['application/json'],
+    produces: ['application/json'],
     paths
   }
   return definition

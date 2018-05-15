@@ -6,12 +6,8 @@ jest.mock('./pack', () => jest.fn())
 jest.mock('aws-sdk', () => {
   const mocks = {
     createFunctionMock: jest.fn().mockReturnValue({ FunctionArn: 'abc:xyz' }),
-    updateFunctionConfigurationMock: jest
-      .fn()
-      .mockReturnValue({ FunctionArn: 'abc:xyz' }),
-    updateFunctionCodeMock: jest
-      .fn()
-      .mockReturnValue({ FunctionArn: 'abc:xyz' }),
+    updateFunctionConfigurationMock: jest.fn().mockReturnValue({ FunctionArn: 'abc:xyz' }),
+    updateFunctionCodeMock: jest.fn().mockReturnValue({ FunctionArn: 'abc:xyz' }),
     deleteFunctionMock: jest.fn().mockImplementation((params) => {
       if (params.FunctionName === 'some-already-removed-function') {
         return Promise.reject(new Error('Function not found '))
@@ -75,17 +71,19 @@ describe('aws-lambda tests', () => {
 
     expect(AWS.Lambda).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.createFunctionMock).toHaveBeenCalledTimes(1)
-    expect(AWS.mocks.createFunctionMock).toBeCalledWith(expect.objectContaining({
-      Code: { ZipFile: undefined },
-      Description: undefined,
-      Environment: { Variables: undefined },
-      FunctionName: 'some-lambda-name',
-      Handler: 'handle.code',
-      MemorySize: 512,
-      Publish: true,
-      Role: 'abc:xyz',
-      Timeout: 10
-    }))
+    expect(AWS.mocks.createFunctionMock).toBeCalledWith(
+      expect.objectContaining({
+        Code: { ZipFile: undefined },
+        Description: undefined,
+        Environment: { Variables: undefined },
+        FunctionName: 'some-lambda-name',
+        Handler: 'handle.code',
+        MemorySize: 512,
+        Publish: true,
+        Role: 'abc:xyz',
+        Timeout: 10
+      })
+    )
     expect(outputs.arn).toEqual('abc:xyz')
     expect(outputs.roleArn).toEqual('abc:xyz')
     expect(lambdaContextMock.saveState).toHaveBeenCalledTimes(1)
@@ -115,18 +113,20 @@ describe('aws-lambda tests', () => {
 
     expect(AWS.Lambda).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.createFunctionMock).toHaveBeenCalledTimes(1)
-    expect(AWS.mocks.createFunctionMock).toBeCalledWith(expect.objectContaining({
-      Code: { ZipFile: undefined },
-      Description: undefined,
-      Environment: { Variables: undefined },
-      FunctionName: 'some-lambda-name',
-      Handler: 'handle.code',
-      MemorySize: 512,
-      Publish: true,
-      Role: 'abc:xyz',
-      Runtime: 'nodejs6.10',
-      Timeout: 10
-    }))
+    expect(AWS.mocks.createFunctionMock).toBeCalledWith(
+      expect.objectContaining({
+        Code: { ZipFile: undefined },
+        Description: undefined,
+        Environment: { Variables: undefined },
+        FunctionName: 'some-lambda-name',
+        Handler: 'handle.code',
+        MemorySize: 512,
+        Publish: true,
+        Role: 'abc:xyz',
+        Runtime: 'nodejs6.10',
+        Timeout: 10
+      })
+    )
     expect(outputs.arn).toEqual('abc:xyz')
     expect(outputs.roleArn).toEqual('abc:xyz')
     expect(lambdaContextMock.saveState).toHaveBeenCalledTimes(1)
@@ -155,16 +155,18 @@ describe('aws-lambda tests', () => {
 
     expect(AWS.Lambda).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.updateFunctionConfigurationMock).toHaveBeenCalledTimes(1)
-    expect(AWS.mocks.updateFunctionConfigurationMock).toBeCalledWith(expect.objectContaining({
-      Description: undefined,
-      Environment: { Variables: undefined },
-      FunctionName: 'some-lambda-name',
-      Handler: 'handle.code',
-      MemorySize: 512,
-      Role: 'abc:xyz',
-      Runtime: undefined,
-      Timeout: 10
-    }))
+    expect(AWS.mocks.updateFunctionConfigurationMock).toBeCalledWith(
+      expect.objectContaining({
+        Description: undefined,
+        Environment: { Variables: undefined },
+        FunctionName: 'some-lambda-name',
+        Handler: 'handle.code',
+        MemorySize: 512,
+        Role: 'abc:xyz',
+        Runtime: undefined,
+        Timeout: 10
+      })
+    )
     expect(AWS.mocks.updateFunctionCodeMock).toHaveBeenCalledTimes(1)
     expect(outputs.arn).toEqual('abc:xyz')
     expect(outputs.roleArn).toEqual('abc:xyz')
@@ -195,16 +197,18 @@ describe('aws-lambda tests', () => {
 
     expect(AWS.Lambda).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.updateFunctionConfigurationMock).toHaveBeenCalledTimes(1)
-    expect(AWS.mocks.updateFunctionConfigurationMock).toBeCalledWith(expect.objectContaining({
-      Description: undefined,
-      Environment: { Variables: undefined },
-      FunctionName: 'some-lambda-name',
-      Handler: 'handle.code',
-      MemorySize: 512,
-      Role: 'abc:xyz',
-      Runtime: 'nodejs6.10',
-      Timeout: 10
-    }))
+    expect(AWS.mocks.updateFunctionConfigurationMock).toBeCalledWith(
+      expect.objectContaining({
+        Description: undefined,
+        Environment: { Variables: undefined },
+        FunctionName: 'some-lambda-name',
+        Handler: 'handle.code',
+        MemorySize: 512,
+        Role: 'abc:xyz',
+        Runtime: 'nodejs6.10',
+        Timeout: 10
+      })
+    )
     expect(AWS.mocks.updateFunctionCodeMock).toHaveBeenCalledTimes(1)
     expect(outputs.arn).toEqual('abc:xyz')
     expect(outputs.roleArn).toEqual('abc:xyz')
@@ -239,8 +243,7 @@ describe('aws-lambda tests', () => {
     expect(outputs.roleArn).toEqual('abc:xyz')
     expect(lambdaContextMock.saveState).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.createFunctionMock.mock.calls[0][0].FunctionName).toEqual(inputs.name)
-    const deleteFunctionName =
-      AWS.mocks.deleteFunctionMock.mock.calls[0][0].FunctionName
+    const deleteFunctionName = AWS.mocks.deleteFunctionMock.mock.calls[0][0].FunctionName
     expect(deleteFunctionName).toEqual(lambdaContextMock.state.name)
   })
 

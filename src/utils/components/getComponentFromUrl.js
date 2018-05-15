@@ -6,9 +6,7 @@ const downloadComponent = require('./downloadComponent')
 module.exports = async (url) => {
   const downloadedComponentRootPath = await getComponentRootPathFromUrl(url)
 
-  if (
-    await fileExists(path.join(downloadedComponentRootPath, 'serverless.yml'))
-  ) {
+  if (await fileExists(path.join(downloadedComponentRootPath, 'serverless.yml'))) {
     return downloadedComponentRootPath
   }
 
