@@ -1,4 +1,5 @@
 type: await-child-components
+version: 0.0.1
 
 components:
   myFunction:
