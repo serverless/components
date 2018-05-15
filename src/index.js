@@ -1,7 +1,7 @@
 const run = require('./run')
-const utils = require('./utils')
+const commands = require('./commands')
 
 module.exports = {
-  ...utils,
-  run
+  run,
+  ...commands
 }
