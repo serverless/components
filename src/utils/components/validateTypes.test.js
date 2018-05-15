@@ -12,7 +12,9 @@ describe('#validateTypes()', () => {
   it('should throw if props do not match prop types', () => {
     const props = { name: 1234 }
 
-    expect(() => validateTypes(componentId, propTypes, props)).toThrowError('Type error(s) in component')
+    expect(() => validateTypes(componentId, propTypes, props)).toThrowError(
+      'Type error(s) in component'
+    )
   })
 
   it('should not throw if props match prop types', () => {

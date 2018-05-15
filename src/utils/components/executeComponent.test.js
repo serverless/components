@@ -154,9 +154,11 @@ describe('#executeComponent()', () => {
   it('should throw if outputs do not match output types', async () => {
     const command = 'deploy'
     const deploy = () => Promise.resolve({ invalid: 'type' }) // eslint-disable-line no-shadow
-    components = assocPath([ 'myFunction', 'fns', 'deploy' ], deploy, components)
+    components = assocPath(['myFunction', 'fns', 'deploy'], deploy, components)
 
-    await expect(executeComponent(componentId, components, stateFile, archive, command, options)).rejects.toThrow('Type error(s)')
+    await expect(
+      executeComponent(componentId, components, stateFile, archive, command, options)
+    ).rejects.toThrow('Type error(s)')
   })
 
   describe('when running "remove"', () => {

@@ -66,28 +66,56 @@ describe('#getComponent()', () => {
     })
 
     it('Test required with no default throws', async () => {
-      await expect(getComponent(
-        inputTypeStringComponentPath,
-        'test',
-        {
-          stringTypeNotRequired: 'bar',
-          stringTypeWithDefault: 'baz'
-        },
-        {
-          $: { serviceId: 'AsH3gefdfDSY' },
-          'my-component': {
-            type: 'aws-function',
-            internallyManaged: false,
-            instanceId: 'AsH3gefdfDSY-cHA9jPi5lPQj',
-            state: {}
+      await expect(
+        getComponent(
+          inputTypeStringComponentPath,
+          'test',
+          {
+            stringTypeNotRequired: 'bar',
+            stringTypeWithDefault: 'baz'
+          },
+          {
+            $: { serviceId: 'AsH3gefdfDSY' },
+            'my-component': {
+              type: 'aws-function',
+              internallyManaged: false,
+              instanceId: 'AsH3gefdfDSY-cHA9jPi5lPQj',
+              state: {}
+            }
           }
-        }
-      )).rejects.toThrow('Type error(s) in component')
+        )
+      ).rejects.toThrow('Type error(s) in component')
     })
 
     it('Test invalid default for string type', async () => {
-      await expect(getComponent(
-        inputTypeStringInvalidDefaultComponentPath,
+      await expect(
+        getComponent(
+          inputTypeStringInvalidDefaultComponentPath,
+          'test',
+          {},
+          {
+            $: { serviceId: 'AsH3gefdfDSY' },
+            'my-component': {
+              type: 'aws-function',
+              internallyManaged: false,
+              instanceId: 'AsH3gefdfDSY-cHA9jPi5lPQj',
+              state: {}
+            }
+          }
+        )
+      ).rejects.toThrow('Type error(s) in component')
+    })
+  })
+
+  it('Test invalid variables usage', async () => {
+    const invalidVariablesUsageComponentPath = path.join(
+      registryPath,
+      'tests-invalid-variables-usage'
+    )
+
+    await expect(
+      getComponent(
+        invalidVariablesUsageComponentPath,
         'test',
         {},
         {
@@ -99,30 +127,8 @@ describe('#getComponent()', () => {
             state: {}
           }
         }
-      )).rejects.toThrow('Type error(s) in component')
-    })
-  })
-
-  it('Test invalid variables usage', async () => {
-    const invalidVariablesUsageComponentPath = path.join(
-      registryPath,
-      'tests-invalid-variables-usage'
-    )
-
-    await expect(getComponent(
-      invalidVariablesUsageComponentPath,
-      'test',
-      {},
-      {
-        $: { serviceId: 'AsH3gefdfDSY' },
-        'my-component': {
-          type: 'aws-function',
-          internallyManaged: false,
-          instanceId: 'AsH3gefdfDSY-cHA9jPi5lPQj',
-          state: {}
-        }
-      }
-    )).rejects.toThrow('variable syntax cannot be used')
+      )
+    ).rejects.toThrow('variable syntax cannot be used')
   })
 
   it('Test incompatible core version', async () => {
@@ -131,19 +137,21 @@ describe('#getComponent()', () => {
       'tests-core-version-compatibility'
     )
 
-    await expect(getComponent(
-      coreVersionCompatibilityComponentPath,
-      'test',
-      {},
-      {
-        $: { serviceId: 'AsH3gefdfDSY' },
-        'my-component': {
-          type: 'aws-function',
-          internallyManaged: false,
-          instanceId: 'AsH3gefdfDSY-cHA9jPi5lPQj',
-          state: {}
+    await expect(
+      getComponent(
+        coreVersionCompatibilityComponentPath,
+        'test',
+        {},
+        {
+          $: { serviceId: 'AsH3gefdfDSY' },
+          'my-component': {
+            type: 'aws-function',
+            internallyManaged: false,
+            instanceId: 'AsH3gefdfDSY-cHA9jPi5lPQj',
+            state: {}
+          }
         }
-      }
-    )).rejects.toThrow('core is incompatible with component my-project')
+      )
+    ).rejects.toThrow('core is incompatible with component my-project')
   })
 })

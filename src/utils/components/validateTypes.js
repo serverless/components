@@ -18,7 +18,9 @@ function validateTypes(componentId, propTypes, props, opts = { prefix: 'Type' })
         const suppliedType = typeof error.value
         const msg = `  - ${
           opts.prefix
-        } ${key} has \`${suppliedType}\` value of ${value} but expected the following: ${chalk.yellowBright(error.rule)} ${chalk.yellowBright(error.attr)}.\n`
+        } ${key} has \`${suppliedType}\` value of ${value} but expected the following: ${chalk.yellowBright(
+          error.rule
+        )} ${chalk.yellowBright(error.attr)}.\n`
         errorMessages = append(msg, errorMessages)
       }, prop('errors', validation))
     }
