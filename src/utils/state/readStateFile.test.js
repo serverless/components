@@ -6,7 +6,7 @@ describe('#readStateFile()', () => {
   let oldCwd
   let tmpDirPath
   let stateFilePath
-  let projectDirPath
+  let projectPath
 
   const fileContent = {
     $: { serviceId: 'AsH3gefdfDSY' },
@@ -33,7 +33,7 @@ describe('#readStateFile()', () => {
     tmpDirPath = await getTmpDir()
     stateFilePath = path.join(tmpDirPath, 'state.json')
     await writeFile(stateFilePath, fileContent)
-    projectDirPath = tmpDirPath
+    projectPath = tmpDirPath
     oldCwd = process.cwd()
     process.chdir(tmpDirPath)
   })
@@ -43,13 +43,13 @@ describe('#readStateFile()', () => {
   })
 
   it('should read the projects state file if present', async () => {
-    const res = await readStateFile(projectDirPath)
+    const res = await readStateFile(projectPath)
     expect(res).toEqual(fileContent)
   })
 
   it('should return an empty object if the project does not contain a state file', async () => {
-    projectDirPath = await getTmpDir()
-    const res = await readStateFile(projectDirPath)
+    projectPath = await getTmpDir()
+    const res = await readStateFile(projectPath)
     expect(res).toEqual({})
   })
 })

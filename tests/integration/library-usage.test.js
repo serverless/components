@@ -34,7 +34,7 @@ describe('Integration Test - Library Usage', () => {
 
   describe('when running through a typical component usage lifecycle', () => {
     it('should deploy the "iam" component', async () => {
-      await run(testServiceDir, 'deploy')
+      await run('deploy', { projectPath: testServiceDir })
       const stateFileContent = await fsp.readJsonAsync(testServiceStateFile)
       const stateFileKeys = Object.keys(stateFileContent)
       expect(stateFileKeys.length).toEqual(3)
@@ -58,7 +58,7 @@ describe('Integration Test - Library Usage', () => {
     })
 
     it('should re-deploy the "iam" component', async () => {
-      await run(testServiceDir, 'deploy')
+      await run('deploy', { projectPath: testServiceDir })
       const stateFileContent = await fsp.readJsonAsync(testServiceStateFile)
       const stateFileKeys = Object.keys(stateFileContent)
       expect(stateFileKeys.length).toEqual(3)
@@ -82,7 +82,7 @@ describe('Integration Test - Library Usage', () => {
     })
 
     it('should package the "iam" component', async () => {
-      await run(testServiceDir, 'package', { path: testServiceDir })
+      await run('package', { path: testServiceDir, projectPath: testServiceDir })
       const testServiceHasZipFile = await fileExists(testServiceZipFile)
       expect(testServiceHasZipFile).toEqual(true)
       // the state should not change
@@ -109,7 +109,7 @@ describe('Integration Test - Library Usage', () => {
     })
 
     it('should remove the "iam" and "function" components', async () => {
-      await run(testServiceDir, 'remove')
+      await run('remove', { projectPath: testServiceDir })
       const stateFileContent = await fsp.readJsonAsync(testServiceStateFile)
       const stateFileKeys = Object.keys(stateFileContent)
       expect(stateFileKeys.length).toEqual(3)

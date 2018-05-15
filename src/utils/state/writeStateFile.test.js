@@ -7,7 +7,7 @@ describe('#writeStateFile()', () => {
   let oldCwd
   let tmpDirPath
   let stateFilePath
-  let projectDirPath
+  let projectPath
 
   const fileContent = {
     $: { serviceId: 'AsH3gefdfDSY' },
@@ -33,7 +33,7 @@ describe('#writeStateFile()', () => {
   beforeEach(async () => {
     tmpDirPath = await getTmpDir()
     stateFilePath = path.join(tmpDirPath, 'state.json')
-    projectDirPath = tmpDirPath
+    projectPath = tmpDirPath
     oldCwd = process.cwd()
     process.chdir(tmpDirPath)
   })
@@ -43,7 +43,7 @@ describe('#writeStateFile()', () => {
   })
 
   it('should write the content to disk', async () => {
-    await writeStateFile(projectDirPath, fileContent)
+    await writeStateFile(projectPath, fileContent)
     const stateFileContent = await readJson(stateFilePath)
     expect(stateFileContent).toEqual(fileContent)
   })
