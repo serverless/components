@@ -1,8 +1,9 @@
 const path = require('path')
 const getComponent = require('./getComponent')
+const getRegistryRoot = require('../registry/getRegistryRoot')
 
 describe('#getComponent()', () => {
-  const registryPath = path.join(__dirname, '..', '..', '..', 'registry')
+  const registryPath = getRegistryRoot()
 
   describe('inputType string', () => {
     const inputTypeStringComponentPath = path.join(registryPath, 'tests-input-type-string')
