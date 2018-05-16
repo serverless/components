@@ -141,6 +141,10 @@ Also please do join the _Components_ channel on our public [Serverless-Contrib S
     * [deploy](#deploy)
     * [info](#info)
     * [remove](#remove)
+  * [Programmatic usage](#programmatic-usage)
+    * [deploy](#deploy)
+    * [package](#package)
+    * [remove](#remove)
   * [Component Docs](#component-docs)
     * [aws-apigateway](./registry/aws-apigateway)
     * [aws-cloudfront](./registry/aws-cloudfront)
@@ -648,6 +652,70 @@ To remove your app, run
 ```sh
 components remove
 ```
+
+### Programmatic Usage
+
+Aside from using Serverless Components via the CLI you can also use the Framework programmatically.
+
+Different commands are available via an exposed API. Working with Serverless Components programmatically is as easy as:
+
+```js
+const path = require('path')
+const { pkg, deploy, remove } = require('serverless-components')
+
+const projectPath = path.join('my', 'project')
+
+async function runWorkflow() {
+  console.log('Packaging service...')
+  await pkg({ projectPath, path: projectPath })
+  console.log('Deploying service...')
+  await deploy({ projectPath })
+  console.log('Re-deploying service...')
+  await deploy({ projectPath })
+  console.log('Removing service...')
+  await remove({ projectPath })
+}
+
+runWorkflow()
+```
+
+#### deploy
+
+The `deploy` API makes it possible to deploy a service.
+
+`await deploy(options)`
+
+Options:
+
+* `projectPath` - `string` - Path to the root of the project (defaults to `cwd`)
+* `serverlessFileComponents` - `object` - Components usually coming from a `serverless.yml` file
+* `stateFileComponents` - `object` - Components usually coming from a `state.json` file
+
+#### package
+
+The `pkg` API makes it possible to package a project which creates a deployment artifact.
+
+`await pkg(options)`
+
+Options:
+
+* `projectPath` - `string` - Path to the root of the project (defaults to `cwd`)
+* `serverlessFileComponents` - `object` - Components usually coming from a `serverless.yml` file
+* `stateFileComponents` - `object` - Components usually coming from a `state.json` file
+* `path` - `string` - Path to the project where the `serverless.yml` file can be found
+* `format` - `string` - The desired file format (`zip` or `tar`)
+
+#### remove
+
+The `remove` API makes it possible to remove a deployed service.
+
+`await remove(options)`
+
+Options:
+
+* `projectPath` - `string` - Path to the root of the project (defaults to `cwd`)
+* `serverlessFileComponents` - `object` - Components usually coming from a `serverless.yml` file
+* `stateFileComponents` - `object` - Components usually coming from a `state.json` file
 
 ### Component Docs
 
