@@ -1,9 +1,8 @@
+const { difference } = require('ramda')
 const run = require('./run')
 const utils = require('./utils')
 
 jest.mock('./utils')
-
-const projectPath = process.cwd()
 
 afterAll(() => {
   jest.restoreAllMocks()
@@ -13,20 +12,23 @@ afterEach(() => {
   jest.resetAllMocks()
 })
 
+const projectPath = process.cwd()
+const serverlessFileComponents = {
+  iamMock: { id: 'iam-mock-id', type: 'iam-mock' }
+}
+const stateFileComponents = {
+  iamMock: { id: 'iam-mock-id', type: 'iam-mock' },
+  functionMock: { id: 'function-mock-id', type: 'function-mock' }
+}
+const orphanedComponents = difference(serverlessFileComponents, stateFileComponents)
+
 beforeEach(() => {
   utils.handleSignalEvents.mockImplementation(() => {})
   utils.getComponentsFromServerlessFile.mockImplementation(() =>
-    Promise.resolve({
-      iamMock: { id: 'iam-mock-id', type: 'iam-mock' }
-    })
+    Promise.resolve(serverlessFileComponents)
   )
-  utils.getComponentsFromStateFile.mockImplementation(() => ({
-    iamMock: { id: 'iam-mock-id', type: 'iam-mock' },
-    functionMock: { id: 'function-mock-id', type: 'function-mock' }
-  }))
-  utils.getOrphanedComponents.mockImplementation(() => ({
-    functionMock: { id: 'function-mock-id', type: 'function-mock' }
-  }))
+  utils.getComponentsFromStateFile.mockImplementation(() => stateFileComponents)
+  utils.getOrphanedComponents.mockImplementation(() => orphanedComponents)
   utils.trackDeployment.mockImplementation(() => Promise.resolve())
   utils.buildGraph.mockImplementation(() => Promise.resolve())
   utils.readStateFile.mockImplementation(() => Promise.resolve())
@@ -43,10 +45,6 @@ describe('#run()', () => {
       iamMock: {
         id: 'iam-mock-id',
         type: 'iam-mock'
-      },
-      functionMock: {
-        id: 'function-mock-id',
-        type: 'function-mock'
       }
     })
 
@@ -81,6 +79,32 @@ describe('#run()', () => {
     expect(utils.errorReporter).toHaveBeenCalled()
   })
 
+  it('should prefer components passed in via options', async () => {
+    const res = await run('some-commands', {
+      projectPath,
+      serverlessFileComponents,
+      stateFileComponents
+    })
+    expect(res).toEqual({
+      iamMock: {
+        id: 'iam-mock-id',
+        type: 'iam-mock'
+      }
+    })
+
+    expect(utils.handleSignalEvents).toHaveBeenCalled()
+    expect(utils.getComponentsFromServerlessFile).not.toHaveBeenCalled()
+    expect(utils.getComponentsFromStateFile).not.toHaveBeenCalled()
+    expect(utils.getOrphanedComponents).toHaveBeenCalled()
+    expect(utils.trackDeployment).not.toHaveBeenCalled()
+    expect(utils.buildGraph).toHaveBeenCalledTimes(1)
+    expect(utils.readStateFile).toHaveBeenCalled()
+    expect(utils.setServiceId).toHaveBeenCalled()
+    expect(utils.executeGraph).toHaveBeenCalledTimes(1)
+    expect(utils.writeStateFile).toHaveBeenCalled()
+    expect(utils.errorReporter).toHaveBeenCalled()
+  })
+
   describe('when running "deploy"', () => {
     it('should run "deploy", "info", track the deployment and write the state to disk', async () => {
       const res = await run('deploy', { projectPath })
@@ -88,10 +112,6 @@ describe('#run()', () => {
         iamMock: {
           id: 'iam-mock-id',
           type: 'iam-mock'
-        },
-        functionMock: {
-          id: 'function-mock-id',
-          type: 'function-mock'
         }
       })
 

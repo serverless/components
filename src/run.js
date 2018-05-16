@@ -1,4 +1,4 @@
-const { clone } = require('ramda')
+const { clone, isNil, isEmpty } = require('ramda')
 
 const utils = require('./utils')
 
@@ -36,8 +36,14 @@ const run = async (command, options) => {
     archive = clone(stateFile)
     let componentsToUse
     let orphanedComponents
-    const serverlessFileComponents = await getComponentsFromServerlessFile(stateFile, projectPath)
-    const stateFileComponents = getComponentsFromStateFile(stateFile)
+    let serverlessFileComponents = options.serverlessFileComponents
+    let stateFileComponents = options.stateFileComponents
+    if (isNil(serverlessFileComponents) || isEmpty(serverlessFileComponents)) {
+      serverlessFileComponents = await getComponentsFromServerlessFile(stateFile, projectPath)
+    }
+    if (isNil(stateFileComponents) || isEmpty(stateFileComponents)) {
+      stateFileComponents = getComponentsFromStateFile(stateFile)
+    }
     if (command === 'remove') {
       componentsToUse = stateFileComponents
       orphanedComponents = {}
