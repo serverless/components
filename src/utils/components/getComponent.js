@@ -1,14 +1,13 @@
 const { readFile } = require('@serverless/utils')
 const path = require('path')
 const { forEachObjIndexed } = require('ramda')
-const validateCoreVersion = require('../validateCoreVersion')
-
 const getServiceId = require('../state/getServiceId')
 const transformPostExecutionVars = require('../variables/transformPostExecutionVars')
 const resolvePreExecutionVars = require('../variables/resolvePreExecutionVars')
 const validateVarsUsage = require('../variables/validateVarsUsage')
 const getInstanceId = require('./getInstanceId')
 const setInputDefaults = require('./setInputDefaults')
+const validateCoreVersion = require('./validateCoreVersion')
 const validateInputs = require('./validateInputs')
 
 module.exports = async (componentRoot, componentId, inputs, stateFile) => {

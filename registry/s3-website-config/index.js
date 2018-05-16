@@ -5,8 +5,11 @@ const AWS = require('aws-sdk')
 const S3 = new AWS.S3({ region: 'us-east-1' })
 
 const setBucketForWebsiteConfig = async ({
-  rootBucketName, indexDocument, errorDocument,
-  redirectBucketName, redirectToHostName // eslint-disable-line no-unused-vars
+  rootBucketName,
+  indexDocument,
+  errorDocument,
+  redirectBucketName,
+  redirectToHostName // eslint-disable-line no-unused-vars
 }) => {
   const params = {
     Bucket: rootBucketName,
@@ -24,8 +27,11 @@ const setBucketForWebsiteConfig = async ({
 }
 
 const setBucketForRedirection = async ({
-  rootBucketName, indexDocument, errorDocument, // eslint-disable-line no-unused-vars
-  redirectBucketName, redirectToHostName
+  rootBucketName,
+  indexDocument,
+  errorDocument, // eslint-disable-line no-unused-vars
+  redirectBucketName,
+  redirectToHostName
 }) => {
   const params = {
     Bucket: redirectBucketName,

@@ -13,7 +13,10 @@ describe('#getChildrenIds()', () => {
       }
     }
     const res = getChildrenIds(component)
-    expect(res).toEqual({ childA: 'sub-component-a', childB: 'sub-component-b' })
+    expect(res).toEqual({
+      childA: 'sub-component-a',
+      childB: 'sub-component-b'
+    })
   })
 
   it('should return an empty object if no children ids can be found', () => {

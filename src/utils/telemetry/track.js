@@ -8,8 +8,12 @@ module.exports = async (eventName, data = {}) => {
   const { trackingDisabled, frameworkId, userId } = await getConfig()
 
   // exit early if tracking disabled
-  if (trackingDisabled || !await fileExists(trackingFilePath)
-    || process.env.CI || process.env.TRAVIS) {
+  if (
+    trackingDisabled ||
+    !(await fileExists(trackingFilePath)) ||
+    process.env.CI ||
+    process.env.TRAVIS
+  ) {
     return
   }
 
@@ -18,7 +22,6 @@ module.exports = async (eventName, data = {}) => {
   if (!segmentWriteKey) return
 
   const analytics = new Analytics(segmentWriteKey)
-
 
   if (!eventName) {
     throw new Error('Please provide an event name for tracking')
@@ -33,5 +36,5 @@ module.exports = async (eventName, data = {}) => {
     properties: { frameworkId, location, ...data }
   }
 
-  return analytics.track(payload)  // eslint-disable-line
+  return analytics.track(payload) // eslint-disable-line
 }

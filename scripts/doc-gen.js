@@ -23,7 +23,7 @@ const config = {
 
       const name = formatComponentName(path.basename(dir))
       // capitalize AWS
-      const formattedName = name.replace(/Aws|Iam/g, (l) => {
+      const formattedName = name.replace(/Aws|Iam/g, l => {
         return l.toUpperCase()
       })
       return `# ${formattedName}${description}`
@@ -34,21 +34,23 @@ const config = {
         return content
       }
       const types = json.inputTypes
-      let md = '## Input Types\n';
-      md += '| Name | Type | Description |\n';
-      md += '|:------ |:-----|:-----------------|\n';
+      let md = '## Input Types\n'
+      md += '| Name | Type | Description |\n'
+      md += '|:------ |:-----|:-----------------|\n'
       // loop over properties
-      Object.keys(types).sort((a, b) => {
-        // sort optional fields to the end of table
-        return (types[a].required === types[b].required) ? -1 : 1
-      }).forEach((type) => {
-        console.log(type)
-        const info = types[type]
-        const required = (info.required) ? '<br/>*required*' : ''
-        const desc = info.description || info.displayName || type
-        const cleanDesc = desc.replace(/(\r\n|\n|\r)/gm, "<br/>")
-        md += `| **${type}**| \`${info.type}\`${required} | ${cleanDesc}\n`
-      })
+      Object.keys(types)
+        .sort((a, b) => {
+          // sort optional fields to the end of table
+          return types[a].required === types[b].required ? -1 : 1
+        })
+        .forEach(type => {
+          console.log(type)
+          const info = types[type]
+          const required = info.required ? '<br/>*required*' : ''
+          const desc = info.description || info.displayName || type
+          const cleanDesc = desc.replace(/(\r\n|\n|\r)/gm, '<br/>')
+          md += `| **${type}**| \`${info.type}\`${required} | ${cleanDesc}\n`
+        })
 
       return md
     },
@@ -70,24 +72,26 @@ const config = {
       const types = json.inputTypes
       let values = {}
       // loop over properties
-      Object.keys(types).sort((a, b) => {
-        // sort optional fields to the end of table
-        return (types[a].required === types[b].required) ? -1 : 1
-      }).forEach((type) => {
-        const info = types[type]
-        if (info.example) {
-          values[type] = info.example
-        }
-      })
+      Object.keys(types)
+        .sort((a, b) => {
+          // sort optional fields to the end of table
+          return types[a].required === types[b].required ? -1 : 1
+        })
+        .forEach(type => {
+          const info = types[type]
+          if (info.example) {
+            values[type] = info.example
+          }
+        })
 
       yml.components[logicalName].inputs = values
       // console.log(util.inspect(yml, false, null))
 
       const contents = yaml.safeDump(yml)
-      const header = '## Example\n';
+      const header = '## Example\n'
       let ymlOutput = content
       if (contents && Object.keys(values).length) {
-        ymlOutput =`${header}\`\`\`yml
+        ymlOutput = `${header}\`\`\`yml
 ${contents}
 \`\`\``
       }
@@ -115,7 +119,7 @@ function getYamlConfig(instance) {
     return false
   }
 
-  const finalPath = (yamlExists) ? yamlPath : ymlPath
+  const finalPath = yamlExists ? yamlPath : ymlPath
 
   const json = parseYaml(finalPath)
   return json
@@ -131,7 +135,7 @@ function dashToCamel(str) {
   })
 }
 
-function formatComponentName (string) {
+function formatComponentName(string) {
   return toTitleCase(string.replace(/-/g, ' '))
 }
 

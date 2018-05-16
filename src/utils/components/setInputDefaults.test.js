@@ -108,12 +108,12 @@ describe('#setInputDefaults()', () => {
       const inputTypes = {
         languages: {
           type: 'array',
-          default: [ 'german', 'english' ]
+          default: ['german', 'english']
         }
       }
       const inputs = {}
       const expected = {
-        languages: [ 'german', 'english' ]
+        languages: ['german', 'english']
       }
       const res = setInputDefaults(inputTypes, inputs)
       expect(res).toEqual(expected)
@@ -126,7 +126,7 @@ describe('#setInputDefaults()', () => {
           default: {
             size: 12,
             gender: 'male',
-            languages: [ 'german', 'english' ],
+            languages: ['german', 'english'],
             family: {
               brother: 'Luke',
               sister: 'Lana'
@@ -139,7 +139,7 @@ describe('#setInputDefaults()', () => {
         props: {
           size: 12,
           gender: 'male',
-          languages: [ 'german', 'english' ],
+          languages: ['german', 'english'],
           family: {
             brother: 'Luke',
             sister: 'Lana'

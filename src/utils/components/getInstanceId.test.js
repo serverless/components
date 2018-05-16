@@ -21,7 +21,7 @@ describe('#getInstanceId()', () => {
   it('should return the instanceId', () => {
     const instanceId = 'cHA9jPi5lPQj'
     const modifiedStateFileContent = assocPath(
-      [ 'myApp:myFunction', 'instanceId' ],
+      ['myApp:myFunction', 'instanceId'],
       instanceId,
       stateFileContent
     )

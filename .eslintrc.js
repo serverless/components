@@ -1,15 +1,23 @@
 module.exports = {
   root: true,
-  extends: 'airbnb-base',
-  plugins: ['import'],
+  extends: 'prettier',
+  plugins: ['import', 'prettier'],
   env: {
+    es6: true,
     node: true,
     jest: true
+  },
+  parserOptions: {
+    ecmaVersion: 2017,
+    sourceType: 'module',
+    ecmaFeatures: {
+      experimentalObjectRestSpread: true,
+    },
   },
   rules: {
     'array-bracket-spacing': [
       'error',
-      'always',
+      'never',
       {
         objectsInArrays: false,
         arraysInArrays: false
@@ -23,6 +31,7 @@ module.exports = {
     'prefer-destructuring': 'off',
     'object-curly-newline': 'off',
     semi: ['error', 'never'],
-    'object-shorthand': 'off'
+    'object-shorthand': 'off',
+    'prettier/prettier': 'error'
   }
 }

@@ -27,11 +27,11 @@ describe('Integration Test - Simple', () => {
   const testServiceStateFile = path.join(testServiceDir, 'state.json')
 
   beforeAll(async () => {
-    await removeStateFiles([ testServiceStateFile ])
+    await removeStateFiles([testServiceStateFile])
   })
 
   afterAll(async () => {
-    await removeStateFiles([ testServiceStateFile ])
+    await removeStateFiles([testServiceStateFile])
   })
 
   describe('our test setup', () => {
@@ -74,10 +74,7 @@ describe('Integration Test - Simple', () => {
       const myFunctionObjectKeys = Object.keys(myFunction)
       expect(myFunctionObjectKeys.length).toEqual(6)
       expect(myFunction).toHaveProperty('instanceId')
-      expect(myFunction).toHaveProperty(
-        'type',
-        'tests-integration-function-mock'
-      )
+      expect(myFunction).toHaveProperty('type', 'tests-integration-function-mock')
       expect(myFunction).toHaveProperty('internallyManaged', false)
       expect(myFunction).toHaveProperty('rootPath')
       expect(myFunction).toHaveProperty('state', {
@@ -129,10 +126,7 @@ describe('Integration Test - Simple', () => {
       const myFunctionObjectKeys = Object.keys(myFunction)
       expect(myFunctionObjectKeys.length).toEqual(6)
       expect(myFunction).toHaveProperty('instanceId')
-      expect(myFunction).toHaveProperty(
-        'type',
-        'tests-integration-function-mock'
-      )
+      expect(myFunction).toHaveProperty('type', 'tests-integration-function-mock')
       expect(myFunction).toHaveProperty('internallyManaged', false)
       expect(myFunction).toHaveProperty('rootPath')
       expect(myFunction).toHaveProperty('state', {
@@ -162,7 +156,7 @@ describe('Integration Test - Simple', () => {
             ...process.env
           }
         }
-      )
+      })
       const stateFileContent = await fsp.readJsonAsync(testServiceStateFile)
       const stateFileKeys = Object.keys(stateFileContent)
       expect(stateFileKeys.length).toEqual(4)
@@ -187,10 +181,7 @@ describe('Integration Test - Simple', () => {
       const myFunctionObjectKeys = Object.keys(myFunction)
       expect(myFunctionObjectKeys.length).toEqual(6)
       expect(myFunction).toHaveProperty('instanceId')
-      expect(myFunction).toHaveProperty(
-        'type',
-        'tests-integration-function-mock'
-      )
+      expect(myFunction).toHaveProperty('type', 'tests-integration-function-mock')
       expect(myFunction).toHaveProperty('internallyManaged', false)
       expect(myFunction).toHaveProperty('rootPath')
       expect(myFunction).toHaveProperty('state', {
@@ -249,10 +240,7 @@ describe('Integration Test - Simple', () => {
       const myFunctionObjectKeys = Object.keys(myFunction)
       expect(myFunctionObjectKeys.length).toEqual(6)
       expect(myFunction).toHaveProperty('instanceId')
-      expect(myFunction).toHaveProperty(
-        'type',
-        'tests-integration-function-mock'
-      )
+      expect(myFunction).toHaveProperty('type', 'tests-integration-function-mock')
       expect(myFunction).toHaveProperty('internallyManaged', false)
       expect(myFunction).toHaveProperty('rootPath')
       expect(myFunction).toHaveProperty('state', {
@@ -295,10 +283,7 @@ describe('Integration Test - Simple', () => {
       const myFunction = stateFileContent['simple:myFunction']
       const myFunctionObjectKeys = Object.keys(myFunction)
       expect(myFunctionObjectKeys.length).toEqual(2)
-      expect(myFunction).toHaveProperty(
-        'type',
-        'tests-integration-function-mock'
-      )
+      expect(myFunction).toHaveProperty('type', 'tests-integration-function-mock')
       expect(myFunction).toHaveProperty('state', {})
     })
   })

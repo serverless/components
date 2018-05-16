@@ -3,7 +3,10 @@ const pack = require('./pack')
 
 const lambda = new AWS.Lambda({ region: 'us-east-1' })
 
-async function createLambda({ name, handler, memory, timeout, env, description, root }, role) {
+async function createLambda(
+  { name, handler, memory, timeout, runtime, env, description, root },
+  role
+) {
   const pkg = await pack(root)
 
   const params = {
@@ -16,7 +19,7 @@ async function createLambda({ name, handler, memory, timeout, env, description, 
     MemorySize: memory,
     Publish: true,
     Role: role.arn,
-    Runtime: 'nodejs6.10',
+    Runtime: runtime,
     Timeout: timeout,
     Environment: {
       Variables: env
@@ -30,7 +33,10 @@ async function createLambda({ name, handler, memory, timeout, env, description, 
   }
 }
 
-async function updateLambda({ name, handler, memory, timeout, env, description, root }, role) {
+async function updateLambda(
+  { name, handler, memory, timeout, runtime, env, description, root },
+  role
+) {
   const pkg = await pack(root)
   const functionCodeParams = {
     FunctionName: name,
@@ -44,7 +50,7 @@ async function updateLambda({ name, handler, memory, timeout, env, description, 
     Handler: handler,
     MemorySize: memory,
     Role: role.arn,
-    Runtime: 'nodejs6.10',
+    Runtime: runtime,
     Timeout: timeout,
     Environment: {
       Variables: env

@@ -152,10 +152,12 @@ describe('aws-s3-bucket tests', () => {
     expect(s3ContextMock.saveState).toHaveBeenCalledTimes(1)
     expect(outputs).toEqual({ name: inputs.name })
 
-    expect(AWS.mocks.createBucketMock.mock.calls[0][0])
-      .toEqual({ Bucket: inputs.name })
-    expect(AWS.mocks.deleteBucketMock.mock.calls[0][0])
-      .toEqual({ Bucket: s3ContextMock.state.name })
+    expect(AWS.mocks.createBucketMock.mock.calls[0][0]).toEqual({
+      Bucket: inputs.name
+    })
+    expect(AWS.mocks.deleteBucketMock.mock.calls[0][0]).toEqual({
+      Bucket: s3ContextMock.state.name
+    })
   })
 
   it('should update state when removing an already removed s3 component', async () => {

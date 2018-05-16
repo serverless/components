@@ -12,9 +12,9 @@ const Route53 = new AWS.Route53({ apiVersion: '2013-04-01' })
 // of NameServers that CreateHostedZone returns in DelegationSet.
 
 // Helper methods
-const timestamp = () => { // eslint-disable-line arrow-body-style
-  return Math.floor(Date.now() / 1000)
-}
+const timestamp = () =>
+  // eslint-disable-line arrow-body-style
+  Math.floor(Date.now() / 1000)
 
 const createHostedZone = async (name, domainName, privateZone, vpcId, vpcRegion) => {
   const callerReference = `${name}-${timestamp()}`
@@ -142,7 +142,12 @@ const deleteAliasRecordSetForCloudFront = async (domainName, dnsName, hostedZone
 }
 
 const addRoute53ToCloudFrontDomainMapping = async ({
-  name, domainName, dnsName, privateZone, vpcId, vpcRegion
+  name,
+  domainName,
+  dnsName,
+  privateZone,
+  vpcId,
+  vpcRegion
 }) => {
   const res1 = await createHostedZone(name, domainName, privateZone, vpcId, vpcRegion)
   const res2 = await upsertAliasRecordSetForCloudFront(domainName, dnsName, res1.hostedZone.id)
@@ -171,13 +176,15 @@ const deploy = async (inputs, context) => {
   } else if (!inputs.domainName && context.state.hostedZone.id) {
     context.log(`Removing Route53 mapping: '${inputs.domainName} => ${inputs.dnsName}'`)
     await removeRoute53ToCloudFrontDomainMapping(
-      inputs.domainName, inputs.dnsName,
+      inputs.domainName,
+      inputs.dnsName,
       context.state.hostedZone.id
     )
   } else if (context.state.hostedZone && context.state.hostedZone.name !== inputs.domainName) {
     context.log(`Removing Route53 mapping: '${inputs.domainName} => ${inputs.dnsName}'`)
     await removeRoute53ToCloudFrontDomainMapping(
-      inputs.domainName, inputs.dnsName,
+      inputs.domainName,
+      inputs.dnsName,
       context.state.hostedZone.id
     )
     context.log(`Re-Creating Route53 mapping: '${inputs.domainName} => ${inputs.dnsName}'`)
@@ -191,7 +198,11 @@ const remove = async (inputs, context) => {
   if (!context.state.name) return {}
 
   try {
-    context.log(`Removing Route53 mapping: '${context.state.hostedZone.name}' with id: '${context.state.hostedZone.id}'`)
+    context.log(
+      `Removing Route53 mapping: '${context.state.hostedZone.name}' with id: '${
+        context.state.hostedZone.id
+      }'`
+    )
     await removeRoute53ToCloudFrontDomainMapping(
       inputs.domainName,
       inputs.dnsName,

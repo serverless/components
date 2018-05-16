@@ -27,11 +27,11 @@ describe('Integration Test - Await child components', () => {
   const testServiceStateFile = path.join(testServiceDir, 'state.json')
 
   beforeAll(async () => {
-    await removeStateFiles([ testServiceStateFile ])
+    await removeStateFiles([testServiceStateFile])
   })
 
   afterAll(async () => {
-    await removeStateFiles([ testServiceStateFile ])
+    await removeStateFiles([testServiceStateFile])
   })
 
   describe('our test setup', () => {
@@ -57,20 +57,14 @@ describe('Integration Test - Await child components', () => {
       const awaitChildComponentsObjectKeys = Object.keys(awaitChildComponents)
       expect(awaitChildComponentsObjectKeys.length).toEqual(6)
       expect(awaitChildComponents).toHaveProperty('instanceId')
-      expect(awaitChildComponents).toHaveProperty(
-        'type',
-        'await-child-components'
-      )
+      expect(awaitChildComponents).toHaveProperty('type', 'await-child-components')
       expect(awaitChildComponents).toHaveProperty('internallyManaged', false)
       expect(awaitChildComponents).toHaveProperty('rootPath')
       expect(awaitChildComponents).toHaveProperty(
         'state.myFunction.state.id',
         'id:function:my-function'
       )
-      expect(awaitChildComponents).toHaveProperty(
-        'state.myFunction.state.deploymentCounter',
-        1
-      )
+      expect(awaitChildComponents).toHaveProperty('state.myFunction.state.deploymentCounter', 1)
       expect(awaitChildComponents).toHaveProperty('state.myFunction.outputs', {
         id: 'id:function:my-function',
         name: 'my-function',
@@ -107,10 +101,7 @@ describe('Integration Test - Await child components', () => {
       const awaitChildComponents = stateFileContent['await-child-components']
       const awaitChildComponentsObjectKeys = Object.keys(awaitChildComponents)
       expect(awaitChildComponentsObjectKeys.length).toEqual(2)
-      expect(awaitChildComponents).toHaveProperty(
-        'type',
-        'await-child-components'
-      )
+      expect(awaitChildComponents).toHaveProperty('type', 'await-child-components')
       expect(awaitChildComponents).toHaveProperty('state', {})
     })
   })

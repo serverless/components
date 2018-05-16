@@ -16,7 +16,7 @@ describe('#getServiceId()', () => {
 
   it('should return the serviceId', () => {
     const serviceId = 'pah732o2gj'
-    const modifiedStateFileContent = assocPath([ '$', 'serviceId' ], serviceId, stateFileContent)
+    const modifiedStateFileContent = assocPath(['$', 'serviceId'], serviceId, stateFileContent)
 
     const res = getServiceId(modifiedStateFileContent)
     expect(res).toEqual(serviceId)

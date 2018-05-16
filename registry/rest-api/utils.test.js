@@ -8,21 +8,21 @@ describe('Component rest-api - Utils', () => {
     const part2 = '/bar'
     const part3 = 'baz'
 
-    const res = joinUrl(baseUrl, [ part1, part2, part3 ])
+    const res = joinUrl(baseUrl, [part1, part2, part3])
     expect(res).toEqual('http://example.com/foo/bar/baz')
   })
 
   it('should be able to join parts with leading slashes', () => {
     const part1 = '/bar'
 
-    const res = joinUrl(baseUrl, [ part1 ])
+    const res = joinUrl(baseUrl, [part1])
     expect(res).toEqual('http://example.com/bar')
   })
 
   it('should be able to join parts with trailing slashes', () => {
     const part1 = 'bar/'
 
-    const res = joinUrl(baseUrl, [ part1 ])
+    const res = joinUrl(baseUrl, [part1])
     expect(res).toEqual('http://example.com/bar')
   })
 })

@@ -16,7 +16,8 @@ beforeEach(() => {
   utils.getComponentsFromServerlessFile.mockImplementation(() =>
     Promise.resolve({
       iamMock: { id: 'iam-mock-id', type: 'iam-mock' }
-    }))
+    })
+  )
   utils.getComponentsFromStateFile.mockImplementation(() => ({
     iamMock: { id: 'iam-mock-id', type: 'iam-mock' },
     functionMock: { id: 'function-mock-id', type: 'function-mock' }
