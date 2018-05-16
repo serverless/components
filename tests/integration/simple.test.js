@@ -25,7 +25,6 @@ describe('Integration Test - Simple', () => {
   const componentsExec = path.join(testDir, '..', '..', 'bin', 'components')
   const testServiceDir = path.join(testDir, 'simple')
   const testServiceStateFile = path.join(testServiceDir, 'state.json')
-  const FUNCTION_NAME = 'my-function'
 
   beforeAll(async () => {
     await removeStateFiles([ testServiceStateFile ])
@@ -48,8 +47,7 @@ describe('Integration Test - Simple', () => {
       await cpp.execAsync(`node ${componentsExec} deploy`, {
         cwd: testServiceDir,
         env: {
-          ...process.env,
-          FUNCTION_NAME
+          ...process.env
         }
       })
       const stateFileContent = await fsp.readJsonAsync(testServiceStateFile)
@@ -104,8 +102,7 @@ describe('Integration Test - Simple', () => {
       await cpp.execAsync(`node ${componentsExec} deploy`, {
         cwd: testServiceDir,
         env: {
-          ...process.env,
-          FUNCTION_NAME
+          ...process.env
         }
       })
       const stateFileContent = await fsp.readJsonAsync(testServiceStateFile)
@@ -162,8 +159,7 @@ describe('Integration Test - Simple', () => {
         {
           cwd: testServiceDir,
           env: {
-            ...process.env,
-            FUNCTION_NAME
+            ...process.env
           }
         }
       )
@@ -224,8 +220,7 @@ describe('Integration Test - Simple', () => {
       const cmd = cpp.execAsync(`node ${componentsExec} deploy`, {
         cwd: testServiceDir,
         env: {
-          ...process.env,
-          FUNCTION_NAME
+          ...process.env
         }
       })
       await expect(cmd).rejects.toThrow('Failed to deploy function "my-function"')
@@ -283,8 +278,7 @@ describe('Integration Test - Simple', () => {
       await cpp.execAsync(`node ${componentsExec} remove`, {
         cwd: testServiceDir,
         env: {
-          ...process.env,
-          FUNCTION_NAME
+          ...process.env
         }
       })
       const stateFileContent = await fsp.readJsonAsync(testServiceStateFile)
