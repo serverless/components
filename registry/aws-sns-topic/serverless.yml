@@ -18,7 +18,7 @@ inputTypes:
     type: object
     required: false
     displayName: SNS Delivery Policy
-    description: The name of your SNS topic
+    description: The delivery policy for your SNS topic
     example:
       http:
         defaultHealthyRetryPolicy:
