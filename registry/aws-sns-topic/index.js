@@ -29,15 +29,16 @@ const updateTopicAttributes = async ({ displayName, policy, deliveryPolicy, topi
     []
   )
   await Promise.all(
-    topicAttributes.map((topicAttribute) =>
-      sns
+    topicAttributes.map((topicAttribute) => {
+      const value = Object.values(topicAttribute)[0]
+      return sns
         .setTopicAttributes({
           TopicArn: topicArn,
           AttributeName: capitalize(Object.keys(topicAttribute)[0]),
-          AttributeValue: Object.values(topicAttribute)[0]
+          AttributeValue: typeof value !== 'string' ? JSON.stringify(value) : value
         })
         .promise()
-    )
+    })
   )
   return topicAttributes.reduce((result, value) => {
     return Object.assign({ [Object.keys(value)[0]]: Object.values(value)[0] }, result)
@@ -56,7 +57,7 @@ const remove = async (inputs, context) => {
   await removeSNSTopic(context.state)
   context.saveState({})
   return {
-    topicArn: null
+    arn: null
   }
 }
 
@@ -69,7 +70,10 @@ const deploy = async (inputs, context) => {
   } else if (state.name && state.name === inputs.name) {
     // if input name and state name is same, update only topic attributes
     context.log(`Updating SNS topic: '${inputs.name}'`)
-    newState = await updateTopicAttributes(Object.assign({ topicArn: state.topicArn }, inputs))
+    newState = Object.assign(
+      await updateTopicAttributes(Object.assign({ topicArn: state.topicArn }, inputs)),
+      { name: inputs.name, topicArn: state.topicArn }
+    )
   } else {
     // topic name is changes, first remove the old topic then create a new one
     await remove(state, context)
@@ -79,7 +83,7 @@ const deploy = async (inputs, context) => {
   context.saveState(newState)
 
   return {
-    topicArn: newState.topicArn
+    arn: newState.topicArn
   }
 }
 

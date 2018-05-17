@@ -11,7 +11,24 @@ inputTypes:
   displayName:
     type: string
     required: false
-    default: sns-${self.instanceId}
     displayName: SNS Topic Display Name
     description: The display name of your SNS topic
     example: My SNS display name
+  deliveryPolicy:
+    type: object
+    required: false
+    displayName: SNS Delivery Policy
+    description: The name of your SNS topic
+    example:
+      http:
+        defaultHealthyRetryPolicy:
+          minDelayTarget: 20
+          maxDelayTarget: 20
+          numRetries: 3
+          numMaxDelayRetries: 0
+          numNoDelayRetries: 0
+          numMinDelayRetries: 2
+          backoffFunction: linear
+        disableSubscriptionOverrides: true
+        defaultThrottlePolicy:
+          maxReceivesPerSecond: 3
