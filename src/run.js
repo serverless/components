@@ -20,7 +20,10 @@ const {
 } = utils
 
 const run = async (command, options) => {
-  const { projectPath } = options
+  options.projectPath = options.projectPath || process.cwd()
+  const projectPath = options.projectPath
+  let serverlessFileComponents = options.serverlessFileComponents
+  let stateFileComponents = options.stateFileComponents
   if (command === 'package') {
     return packageComponent(options)
   }
@@ -36,8 +39,6 @@ const run = async (command, options) => {
     archive = clone(stateFile)
     let componentsToUse
     let orphanedComponents
-    let serverlessFileComponents = options.serverlessFileComponents
-    let stateFileComponents = options.stateFileComponents
     if (isNil(serverlessFileComponents) || isEmpty(serverlessFileComponents)) {
       serverlessFileComponents = await getComponentsFromServerlessFile(stateFile, projectPath)
     }
