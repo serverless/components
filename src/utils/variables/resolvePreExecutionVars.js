@@ -1,6 +1,4 @@
-const {
-  is, not, replace, contains, keys, map, path, match
-} = require('ramda')
+const { is, not, replace, contains, keys, map, path, match } = require('ramda')
 
 const regex = require('./getVariableSyntax')()
 
@@ -39,7 +37,9 @@ module.exports = (selfProperties, slsYml) => {
           const inputs = slsYml.inputs // eslint-disable-line
 
           if (not(contains(referencedInput, keys(inputs)))) {
-            throw new Error(`Referenced input does not exist for variable ${referencedVariable.join('.')}`)
+            throw new Error(
+              `Referenced input does not exist for variable ${referencedVariable.join('.')}`
+            )
           }
           referencedVariable.splice(0, 1)
           const resolvedValue = path(referencedVariable, inputs)

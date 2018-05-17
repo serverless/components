@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "@serverless/utils": "0.0.2",
     "ramda": "^0.25.0"
   }
 }

@@ -1,7 +1,5 @@
 async function deploy(inputs, context) {
-  const {
-    name, memorySize, timeout, environment
-  } = inputs
+  const { name, memorySize, timeout, environment } = inputs
   let { role } = inputs
   context.log(`Deploying function "${name}"`)
 

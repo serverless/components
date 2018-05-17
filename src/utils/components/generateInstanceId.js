@@ -1,7 +1,7 @@
-const getRandomId = require('../misc/getRandomId')
+const { generateRandomId } = require('@serverless/utils')
 
 function generateInstanceId(serviceId) {
-  const suffixId = getRandomId(8)
+  const suffixId = generateRandomId(8)
   return `${serviceId}-${suffixId}`
 }
 

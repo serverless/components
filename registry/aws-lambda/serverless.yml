@@ -26,6 +26,15 @@ inputTypes:
     displayName: Function timeout
     description: The function execution time at which Lambda should terminate the function
     example: 3
+  runtime:
+    type: string
+    required: true
+    default: nodejs8.10
+    displayName: Function runtime
+    description: |
+      Runtime for the function.
+      Possible values are java8, nodejs6.10, nodejs8.10, python2.7, python3.6 and dotnetcore1.0
+    example: nodejs8.10
   description:
     type: string
     displayName: Lambda function description

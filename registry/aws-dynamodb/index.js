@@ -23,7 +23,7 @@ const removeOutputTableByName = (tables, tableName) => {
   if (!tables || tables.length === 0) return { ddbtables: [] }
   const val = tables.filter((table) => !table[tableName])[0]
   if (val) {
-    return { ddbtables: [ val ] }
+    return { ddbtables: [val] }
   }
   return { ddbtables: [] }
 }
@@ -246,7 +246,9 @@ const deploy = async (inputs, context) => {
   ) {
     // TODO: Fix creating multiple tables on deploy. Restrict to one table for now
     if (inputs.tables.length > 1) {
-      context.log('Cannot deploy multiple tables at this time. Please update your inputs and try again...')
+      context.log(
+        'Cannot deploy multiple tables at this time. Please update your inputs and try again...'
+      )
       return {}
     }
     try {
@@ -300,7 +302,9 @@ const insert = async (inputs, context) => {
       context.options.itemdata
     )
   } else {
-    context.log('Incorrect or insufficient parameters. \nUsage: insert --tablename <tablename> --itemdata <data in json format>')
+    context.log(
+      'Incorrect or insufficient parameters. \nUsage: insert --tablename <tablename> --itemdata <data in json format>'
+    )
   }
   return outputs
 }
@@ -318,7 +322,9 @@ const destroy = async (inputs, context) => {
       context.options.keydata
     )
   } else {
-    context.log('Incorrect or insufficient parameters. \nUsage: destroy --tablename <tablename> --keydata <hashkey and rangekey key/value pairs in json format>')
+    context.log(
+      'Incorrect or insufficient parameters. \nUsage: destroy --tablename <tablename> --keydata <hashkey and rangekey key/value pairs in json format>'
+    )
   }
   return outputs
 }
@@ -336,7 +342,9 @@ const get = async (inputs, context) => {
       context.options.keydata
     )
   } else {
-    context.log('Incorrect or insufficient parameters. \nUsage: get --tablename <tablename> --keydata <hashkey and rangekey key/value pairs in json format>')
+    context.log(
+      'Incorrect or insufficient parameters. \nUsage: get --tablename <tablename> --keydata <hashkey and rangekey key/value pairs in json format>'
+    )
   }
   return outputs
 }

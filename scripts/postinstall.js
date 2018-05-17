@@ -23,7 +23,7 @@ fs.readdirSync(registry).forEach((mod) => {
   const npmCmd = os.platform().startsWith('win') ? 'npm.cmd' : 'npm'
 
   // install folder
-  const install = cp.spawn(npmCmd, [ 'i' ], { env: process.env, cwd: modPath })
+  const install = cp.spawn(npmCmd, ['i'], { env: process.env, cwd: modPath })
   install.stdout.on('data', (data) => {
     console.log(data.toString()) // eslint-disable-line no-console
   })

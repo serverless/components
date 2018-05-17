@@ -1,6 +1,4 @@
-const {
-  is, replace, map, path, match
-} = require('ramda')
+const { is, replace, map, path, match } = require('ramda')
 
 const regex = require('./getVariableSyntax')()
 const reservedNames = require('./reservedNames')

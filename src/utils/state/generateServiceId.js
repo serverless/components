@@ -1,7 +1,7 @@
-const getRandomId = require('../misc/getRandomId')
+const { generateRandomId } = require('@serverless/utils')
 
 function generateServiceId() {
-  return getRandomId(10)
+  return generateRandomId(10)
 }
 
 module.exports = generateServiceId

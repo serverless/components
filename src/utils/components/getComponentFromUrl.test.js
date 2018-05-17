@@ -29,10 +29,7 @@ describe('#getComponentFromUrl', () => {
     const url = 'https://example.com/test.zip'
     const expectedDownloadedComponentRootPath = await getComponentRootPathFromUrl(url)
     await fse.ensureDirAsync(expectedDownloadedComponentRootPath)
-    await fse.writeFileAsync(
-      path.join(expectedDownloadedComponentRootPath, 'serverless.yml'),
-      {}
-    )
+    await fse.writeFileAsync(path.join(expectedDownloadedComponentRootPath, 'serverless.yml'), {})
     const downloadedComponentRootPath = await getComponentFromUrl(url)
     expect(downloadedComponentRootPath).toEqual(expectedDownloadedComponentRootPath)
     expect(downloadComponent).not.toBeCalled()

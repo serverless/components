@@ -31,7 +31,9 @@ module.exports.create = function create(evt, ctx, cb) {
       body: JSON.stringify(fakeData)
     })
   } catch (err) {
-    const errBody = { message: `Invalid category: '${category}' or item: '${item}' combination.` }
+    const errBody = {
+      message: `Invalid category: '${category}' or item: '${item}' combination.`
+    }
     console.log('Error: ', errBody)
     cb(null, {
       statusCode: 500,

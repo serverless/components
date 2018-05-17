@@ -15,6 +15,7 @@ AWS Lambda Serverless Component
 |:------ |:-----|:-----------------|
 | **memory**| `number`<br/>*required* | The functions memory size in Megabyte
 | **timeout**| `number`<br/>*required* | The function execution time at which Lambda should terminate the function
+| **runtime**| `string`<br/>*required* | Runtime for the function.<br/>Possible values are java8, nodejs6.10, nodejs8.10, python2.7, python3.6 and dotnetcore1.0<br/>
 | **handler**| `string`<br/>*required* | The path to the exported handler function
 | **name**| `string` | The Lambda function name
 | **description**| `string` | A short, user-defined function description.<br/>Lambda does not use this value. Assign a meaningful description as you see fit<br/>
@@ -34,6 +35,7 @@ components:
     inputs:
       memory: 512
       timeout: 3
+      runtime: nodejs8.10
       handler: products.create
       name: 'myProject-functionName-${self.instanceId}'
       description: The function that does XYZ to ABC

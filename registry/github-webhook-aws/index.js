@@ -1,4 +1,3 @@
-
 async function deploy(inputs, context) {
   return { ...inputs, ...context }
 }

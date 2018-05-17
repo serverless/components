@@ -23,7 +23,12 @@ afterEach(() => {
 
 describe('#getComponentsCachePath', () => {
   it('should return components cache path and create it if it does not exist', async () => {
-    const expectedComponentsCachePath = path.join(os.homedir(), '.serverless', 'components', 'cache')
+    const expectedComponentsCachePath = path.join(
+      os.homedir(),
+      '.serverless',
+      'components',
+      'cache'
+    )
     const componentsCachePath = await getComponentsCachePath()
     expect(componentsCachePath).toEqual(expectedComponentsCachePath)
     expect(BbPromise.mocks.ensureDirAsync).toBeCalledWith(expectedComponentsCachePath)

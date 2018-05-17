@@ -1,10 +1,9 @@
 const path = require('path')
+const { isNil } = require('ramda')
 const urlRegex = require('url-regex')
-
-const getRegistryRoot = require('../getRegistryRoot')
 const getComponentFromUrl = require('./getComponentFromUrl')
 const getComponentsBucketRoot = require('./getComponentsBucketRoot')
-const { isNil } = require('ramda')
+const getRegistryRoot = require('../registry/getRegistryRoot')
 
 const typeRegexDefinition = '[a-zA-Zd](?:[a-zA-Zd]|(-|_)(?=[a-zA-Zd])){0,38}'
 const semVerDefinition =

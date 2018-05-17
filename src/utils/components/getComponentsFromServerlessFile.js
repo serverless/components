@@ -1,5 +1,5 @@
+const { deferredPromise } = require('@serverless/utils')
 const { assoc, keys, mergeAll, map } = require('ramda')
-const deferredPromise = require('../deferredPromise')
 const getChildrenIds = require('./getChildrenIds')
 const getComponent = require('./getComponent')
 const getComponentFunctions = require('./getComponentFunctions')
@@ -15,18 +15,23 @@ const getComponentsFromServerlessFile = async (
 ) => {
   const component = await getComponent(componentRoot, componentId, inputs, stateFile)
 
-  const nestedComponents = mergeAll(await Promise.all(map(async (componentAlias) => {
-    const nestedComponentRoot =
-      await getComponentRootPath(component.components[componentAlias].type)
-    const nestedComponentInputs = component.components[componentAlias].inputs || {}
-    const nestedComponentId = component.components[componentAlias].id
-    return getComponentsFromServerlessFile(
-      stateFile,
-      nestedComponentRoot,
-      nestedComponentInputs,
-      nestedComponentId
+  const nestedComponents = mergeAll(
+    await Promise.all(
+      map(async (componentAlias) => {
+        const nestedComponentRoot = await getComponentRootPath(
+          component.components[componentAlias].type
+        )
+        const nestedComponentInputs = component.components[componentAlias].inputs || {}
+        const nestedComponentId = component.components[componentAlias].id
+        return getComponentsFromServerlessFile(
+          stateFile,
+          nestedComponentRoot,
+          nestedComponentInputs,
+          nestedComponentId
+        )
+      }, keys(component.components) || [])
     )
-  }, keys(component.components) || [])))
+  )
 
   return assoc(
     component.id,

@@ -1,5 +1,5 @@
 const validateCoreVersion = require('./validateCoreVersion')
-const coreVersion = require('../../package.json').version
+const coreVersion = require('../../../package.json').version
 
 describe('#validateCoreVersion', () => {
   const componentType = 'my-component'
@@ -14,6 +14,8 @@ describe('#validateCoreVersion', () => {
   })
 
   it('should throw an error if not compatible with core version', () => {
-    expect(() => validateCoreVersion(componentType, 'incompatible.version')).toThrow(`The Serverless Components core is incompatible with component ${componentType}`)
+    expect(() => validateCoreVersion(componentType, 'incompatible.version')).toThrow(
+      `The Serverless Components core is incompatible with component ${componentType}`
+    )
   })
 })

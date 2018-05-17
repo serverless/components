@@ -37,7 +37,7 @@ const deploy = async (inputs, context) => {
     context.log(`Creating Bucket: '${inputs.name}'`)
     await createBucket(inputs)
     context.saveState({ name: inputs.name })
-  } else if (state.name && inputs.name && (state.name !== inputs.name)) {
+  } else if (state.name && inputs.name && state.name !== inputs.name) {
     context.log(`Removing Bucket: '${state.name}'`)
     await deleteBucket(context.state)
     context.log(`Creating Bucket: '${inputs.name}'`)

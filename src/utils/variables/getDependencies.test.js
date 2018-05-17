@@ -19,6 +19,6 @@ describe('#getDependencies()', () => {
   it('should return the component dependencies listed in inputs', () => {
     const res = getDependencies(inputs)
 
-    expect(res).toEqual([ 'some-service:lambdaRole', 'some-service:productsTable' ])
+    expect(res).toEqual(['some-service:lambdaRole', 'some-service:productsTable'])
   })
 })
