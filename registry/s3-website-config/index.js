@@ -8,7 +8,7 @@ const setBucketForWebsiteConfig = async ({
   rootBucketName,
   indexDocument,
   errorDocument,
-  redirectBucketName,
+  redirectBucketName, // eslint-disable-line no-unused-vars
   redirectToHostName // eslint-disable-line no-unused-vars
 }) => {
   const params = {
@@ -27,8 +27,8 @@ const setBucketForWebsiteConfig = async ({
 }
 
 const setBucketForRedirection = async ({
-  rootBucketName,
-  indexDocument,
+  rootBucketName, // eslint-disable-line no-unused-vars
+  indexDocument, // eslint-disable-line no-unused-vars
   errorDocument, // eslint-disable-line no-unused-vars
   redirectBucketName,
   redirectToHostName
