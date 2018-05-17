@@ -1,5 +1,7 @@
 <!-- AUTO-GENERATED-CONTENT:START (COMPONENT_HEADER) -->
 # AWS Sns Topic
+
+Provision AWS SNS Topic with serverless components
 <!-- AUTO-GENERATED-CONTENT:END -->
 
 <!-- AUTO-GENERATED-CONTENT:START (TOC) -->

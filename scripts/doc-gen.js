@@ -22,10 +22,15 @@ const config = {
       let description = ''
       const json = getYamlConfig(instance)
       if (json && json.description) {
-        description = `\n\n${json.description}`
+        description = `${json.description}`
       }
 
-      return `# ${formattedName}${description}`
+      if (!description) {
+        const configJson = getYamlConfig(instance)
+        description = configJson.description
+      }
+
+      return `# ${formattedName}\n\n${description}`
     },
     COMPONENT_INPUT_TYPES(content, options, instance) {
       const json = getYamlConfig(instance)
