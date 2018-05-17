@@ -44,3 +44,8 @@ inputTypes:
               default: false
         options:
           timestamps: true
+
+outputTypes:
+  ddbtables:
+    type: array
+    description: Array containing information about all the deployed DynamoDB tables

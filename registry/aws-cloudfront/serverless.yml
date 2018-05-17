@@ -37,3 +37,8 @@ inputTypes:
     default: ''
   priceClass:
     type: string
+
+outputTypes:
+  distribution:
+    type: object
+    description: Information about the CloudFront distributed

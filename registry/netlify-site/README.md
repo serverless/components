@@ -6,6 +6,7 @@ Serverless component that provisions netlify sites
 
 <!-- AUTO-GENERATED-CONTENT:START (TOC) -->
 - [Input Types](#input-types)
+- [Output Types](#output-types)
 - [Example](#example)
 - [Usage](#usage)
 <!-- AUTO-GENERATED-CONTENT:END -->
@@ -24,6 +25,20 @@ Serverless component that provisions netlify sites
 | **siteRepo**| `string`<br/>*required* | The url of your site's repository in github
 | **siteBuildDirectory**| `string`<br/>*required* | The output folder of your site's build
 | **siteRepoBranch**| `string`<br/>*required* | The production branch that will trigger builds of the netlify site
+
+<!-- AUTO-GENERATED-CONTENT:END -->
+
+<!-- AUTO-GENERATED-CONTENT:START (COMPONENT_OUTPUT_TYPES) -->
+## Output Types
+| Name | Type | Description |
+|:------ |:-----|:-----------------|
+| **githubDeployKeyData**| `string` | The GitHub deploy key
+| **githubWebhookData**| `any` | Information about the GitHub Webhook
+| **netlifyDeployKeyData**| `any` | Information about the Netlify deploy key
+| **netlifySiteData**| `any` | Information about the Netlify site data
+| **netlifyDeployCreatedWebhook**| `any` | Information about the Netlify deploy created Webhook
+| **netlifyDeployFailedWebhook**| `any` | Information about the Netlify deploy failed Webhook
+| **netlifyDeployBuildingWebhook**| `any` | Information about the Netlify deploy building Webhook
 
 <!-- AUTO-GENERATED-CONTENT:END -->
 

@@ -14,3 +14,11 @@ inputTypes:
   bucketName:
     type: string
     required: true
+
+outputTypes:
+  contentPath:
+    type: string
+    description: The path to the content
+  bucketName:
+    type: string
+    description: The S3 bucket name

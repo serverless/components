@@ -10,22 +10,19 @@ const config = {
   transforms: {
     COMPONENT_HEADER(content, options, instance) {
       const dir = path.dirname(path.resolve(instance.originalPath))
-      const packageJsonPath = path.join(dir, 'package.json')
-
-      const packageJsonExists = fileExists(packageJsonPath)
-      let description = ''
-      if (packageJsonExists) {
-        const packageContents = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'))
-        console.log(packageContents)
-        description = `\n\n${packageContents.description}`
-        console.log('description', description)
-      }
 
       const name = formatComponentName(path.basename(dir))
       // capitalize AWS
-      const formattedName = name.replace(/Aws|Iam/g, l => {
+      const formattedName = name.replace(/Aws|Iam/g, (l) => {
         return l.toUpperCase()
       })
+
+      let description = ''
+      const json = getYamlConfig(instance)
+      if (json && json.description) {
+        description = `\n\n${json.description}`
+      }
+
       return `# ${formattedName}${description}`
     },
     COMPONENT_INPUT_TYPES(content, options, instance) {
@@ -43,8 +40,35 @@ const config = {
           // sort optional fields to the end of table
           return types[a].required === types[b].required ? -1 : 1
         })
-        .forEach(type => {
-          console.log(type)
+        .forEach((type) => {
+          const info = types[type]
+          const required = info.required ? '<br/>*required*' : ''
+          const desc = info.description || info.displayName || type
+          const cleanDesc = desc.replace(/(\r\n|\n|\r)/gm, '<br/>')
+          md += `| **${type}**| \`${info.type}\`${required} | ${cleanDesc}\n`
+        })
+
+      return md
+    },
+    COMPONENT_OUTPUT_TYPES(content, options, instance) {
+      const json = getYamlConfig(instance)
+      if (!json) {
+        return content
+      }
+      const types = json.outputTypes
+      if (!types) {
+        return content
+      }
+      let md = '## Output Types\n'
+      md += '| Name | Type | Description |\n'
+      md += '|:------ |:-----|:-----------------|\n'
+      // loop over properties
+      Object.keys(types)
+        .sort((a, b) => {
+          // sort optional fields to the end of table
+          return types[a].required === types[b].required ? -1 : 1
+        })
+        .forEach((type) => {
           const info = types[type]
           const required = info.required ? '<br/>*required*' : ''
           const desc = info.description || info.displayName || type
@@ -77,7 +101,7 @@ const config = {
           // sort optional fields to the end of table
           return types[a].required === types[b].required ? -1 : 1
         })
-        .forEach(type => {
+        .forEach((type) => {
           const info = types[type]
           if (info.example) {
             values[type] = info.example
@@ -85,7 +109,6 @@ const config = {
         })
 
       yml.components[logicalName].inputs = values
-      // console.log(util.inspect(yml, false, null))
 
       const contents = yaml.safeDump(yml)
       const header = '## Example\n'
@@ -126,7 +149,7 @@ function getYamlConfig(instance) {
 }
 
 function toTitleCase(str) {
-  return str.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase())
+  return str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase())
 }
 
 function dashToCamel(str) {

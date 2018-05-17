@@ -30,6 +30,20 @@ inputTypes:
     example:
       - create
 
+outputTypes:
+  function:
+    type: string
+    description: The function which is used for this WebHook
+  githubApiToken:
+    type: string
+    description: GitHub personal access token needed for access to the GitHub API.
+  githubRepo:
+    type: string
+    description: The GitHub repos URL
+  webhookTriggers:
+    type: array
+    description: The WebHook triggers which are used
+
 components:
   GithubWebhook:
     type: github-webhook

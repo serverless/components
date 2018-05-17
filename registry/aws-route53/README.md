@@ -6,6 +6,7 @@ Provision AWS route53 definitions with serverless components
 
 <!-- AUTO-GENERATED-CONTENT:START (TOC) -->
 - [Input Types](#input-types)
+- [Output Types](#output-types)
 - [Example](#example)
 <!-- AUTO-GENERATED-CONTENT:END -->
 
@@ -18,6 +19,15 @@ Provision AWS route53 definitions with serverless components
 | **privateZone**| `boolean` | Whether this is a private zone
 | **vpcId**| `string` | The VPC's Id
 | **vpcRegion**| `string` | The VPC's region
+
+<!-- AUTO-GENERATED-CONTENT:END -->
+
+<!-- AUTO-GENERATED-CONTENT:START (COMPONENT_OUTPUT_TYPES) -->
+## Output Types
+| Name | Type | Description |
+|:------ |:-----|:-----------------|
+| **hostedZone**| `object` | The hosted zone configuration
+| **changeRecordSet**| `object` | The change record set
 
 <!-- AUTO-GENERATED-CONTENT:END -->
 

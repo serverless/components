@@ -65,3 +65,11 @@ inputTypes:
     example:
       foo: true
       tableName: products-${self.serviceId}
+
+outputTypes:
+  arn:
+    type: string
+    description: The Lambda functions arn
+  roleArn:
+    type: string
+    description: The arn of the created / managed role the Lambda function uses

@@ -21,3 +21,20 @@ inputTypes:
     type: string
   redirectToHostName:
     type: string
+
+outputTypes:
+  rootBucketName:
+    type: string
+    description: The root bucket name
+  indexDocument:
+    type: string
+    description: The used index document
+  errorDocument:
+    type: string
+    description: The used error document
+  redirectBucketName:
+    type: string
+    description: The name of the S3 redirect bucket
+  redirectToHostName:
+    type: string
+    description: The hostname for the redirect

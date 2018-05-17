@@ -13,5 +13,10 @@ inputTypes:
     required: false
     default: bucket-${self.instanceId}
     displayName: S3 Bucket Name
-    description: The name of your s3 bucket. Name must be globally unique in AWS
+    description: The name of your S3 bucket. Name must be globally unique in AWS
     example: my-project-bucket-${self.instanceId}
+
+outputTypes:
+  name:
+    type: string
+    description: The S3 bucket name

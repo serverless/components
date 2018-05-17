@@ -90,3 +90,8 @@ components:
       name: ${input.name}-site-${self.instanceId}
       domainName: ${input.aliasDomain}
       dnsName: ${siteCloudFrontConfig.distribution.domainName}
+
+outputTypes:
+  url:
+    type: string
+    description: The static websites URL

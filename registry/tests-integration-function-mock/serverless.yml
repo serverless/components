@@ -19,3 +19,21 @@ inputTypes:
         key1: value1
   role:
     type: string
+
+outputTypes:
+  id:
+    type: string
+  name:
+    type: string
+  memorySize:
+    type: number
+  timeout:
+    type: number
+  environment:
+    type: object
+  role:
+    type: string
+  deploymentCounter:
+    type: number
+  defaultRole:
+    type: any

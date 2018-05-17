@@ -1,11 +1,20 @@
 const path = require('path')
 const getComponent = require('./getComponent')
+const getRegistryRoot = require('../registry/getRegistryRoot')
 
 describe('#getComponent()', () => {
+  const registryPath = getRegistryRoot()
+
   describe('inputType string', () => {
+    const inputTypeStringComponentPath = path.join(registryPath, 'tests-input-type-string')
+    const inputTypeStringInvalidDefaultComponentPath = path.join(
+      registryPath,
+      'tests-input-type-string-invalid-default'
+    )
+
     it('Test setting all string types', async () => {
       const instance = await getComponent(
-        path.resolve(__dirname, '../../../registry/tests-input-type-string'),
+        inputTypeStringComponentPath,
         'test',
         {
           stringTypeRequired: 'foo',
@@ -32,7 +41,7 @@ describe('#getComponent()', () => {
 
     it('Test default string types', async () => {
       const instance = await getComponent(
-        path.resolve(__dirname, '../../../registry/tests-input-type-string'),
+        inputTypeStringComponentPath,
         'test',
         {
           stringTypeRequired: 'foo',
@@ -57,10 +66,9 @@ describe('#getComponent()', () => {
     })
 
     it('Test required with no default throws', async () => {
-      let error
-      try {
-        await getComponent(
-          path.resolve(__dirname, '../../../registry/tests-input-type-string'),
+      await expect(
+        getComponent(
+          inputTypeStringComponentPath,
           'test',
           {
             stringTypeNotRequired: 'bar',
@@ -76,19 +84,13 @@ describe('#getComponent()', () => {
             }
           }
         )
-      } catch (err) {
-        error = err
-      }
-      expect(error).toMatchObject({
-        message: expect.stringMatching(/Type error in component/)
-      })
+      ).rejects.toThrow('Type error(s) in component')
     })
 
     it('Test invalid default for string type', async () => {
-      let error
-      try {
-        await getComponent(
-          path.resolve(__dirname, '../../../registry/tests-input-type-string-invalid-default'),
+      await expect(
+        getComponent(
+          inputTypeStringInvalidDefaultComponentPath,
           'test',
           {},
           {
@@ -101,62 +103,55 @@ describe('#getComponent()', () => {
             }
           }
         )
-      } catch (err) {
-        error = err
-      }
-      expect(error).toMatchObject({
-        message: expect.stringMatching(/Type error in component/)
-      })
+      ).rejects.toThrow('Type error(s) in component')
     })
+  })
 
-    it('Test invalid variables usage', async () => {
-      let error
-      try {
-        await getComponent(
-          path.resolve(__dirname, '../../../registry/tests-invalid-variables-usage'),
-          'test',
-          {},
-          {
-            $: { serviceId: 'AsH3gefdfDSY' },
-            'my-component': {
-              type: 'aws-function',
-              internallyManaged: false,
-              instanceId: 'AsH3gefdfDSY-cHA9jPi5lPQj',
-              state: {}
-            }
-          }
-        )
-      } catch (err) {
-        error = err
-      }
-      expect(error).toMatchObject({
-        message: expect.stringMatching(/variable syntax cannot be used/)
-      })
-    })
+  it('Test invalid variables usage', async () => {
+    const invalidVariablesUsageComponentPath = path.join(
+      registryPath,
+      'tests-invalid-variables-usage'
+    )
 
-    it('Test incompatible core version', async () => {
-      let error
-      try {
-        await getComponent(
-          path.resolve(__dirname, '../../../registry/tests-core-version-compatibility'),
-          'test',
-          {},
-          {
-            $: { serviceId: 'AsH3gefdfDSY' },
-            'my-component': {
-              type: 'aws-function',
-              internallyManaged: false,
-              instanceId: 'AsH3gefdfDSY-cHA9jPi5lPQj',
-              state: {}
-            }
+    await expect(
+      getComponent(
+        invalidVariablesUsageComponentPath,
+        'test',
+        {},
+        {
+          $: { serviceId: 'AsH3gefdfDSY' },
+          'my-component': {
+            type: 'aws-function',
+            internallyManaged: false,
+            instanceId: 'AsH3gefdfDSY-cHA9jPi5lPQj',
+            state: {}
           }
-        )
-      } catch (err) {
-        error = err
-      }
-      expect(error.message).toEqual(
-        'The Serverless Components core is incompatible with component my-project'
+        }
       )
-    })
+    ).rejects.toThrow('variable syntax cannot be used')
+  })
+
+  it('Test incompatible core version', async () => {
+    const coreVersionCompatibilityComponentPath = path.join(
+      registryPath,
+      'tests-core-version-compatibility'
+    )
+
+    await expect(
+      getComponent(
+        coreVersionCompatibilityComponentPath,
+        'test',
+        {},
+        {
+          $: { serviceId: 'AsH3gefdfDSY' },
+          'my-component': {
+            type: 'aws-function',
+            internallyManaged: false,
+            instanceId: 'AsH3gefdfDSY-cHA9jPi5lPQj',
+            state: {}
+          }
+        }
+      )
+    ).rejects.toThrow('core is incompatible with component my-project')
   })
 })
