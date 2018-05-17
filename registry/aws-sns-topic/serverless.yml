@@ -1,5 +1,10 @@
 type: aws-sns-topic
 
+description: "Provision AWS SNS Topic with serverless components"
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
+
 inputTypes:
   name:
     type: string
