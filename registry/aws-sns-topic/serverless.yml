@@ -1,0 +1,17 @@
+type: aws-sns-topic
+
+inputTypes:
+  name:
+    type: string
+    required: true
+    default: sns-${self.instanceId}
+    description: The name of your SNS topic
+    displayName: SNS Topic Name
+    example: my-project-sns-${self.instanceId}
+  displayName:
+    type: string
+    required: false
+    default: sns-${self.instanceId}
+    displayName: SNS Topic Display Name
+    description: The display name of your SNS topic
+    example: My SNS display name
