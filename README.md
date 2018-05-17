@@ -326,31 +326,32 @@ Given this `serverless.yml` you would deploy a `aws-lambda` function with a memo
 Output types are the description of the outputs your component returns. You supply those `outputTypes` in the component's `serverless.yml` file:
 
 ```yaml
-type: my-component
+type: aws-lambda
 
 outputTypes:
-  firstName:
+  name:
     type: string
-    required: true # firstName will always be returned
-  lastName:
+  arn:
     type: string
 ```
 
 #### Outputs
 
-Your provisioning logic, or the `deploy` method of your `index.js` file, can optionally return an `outputs` object. This output can be referenced in `serverless.yml` as inputs to other components.
+Your provisioning logic, or the `deploy` method of your `index.js` file, should return an `outputs` object that matches the outputTypes declared in your component's `serverless.yml` file. This output can be referenced in `serverless.yml` as inputs to other components.
 
-For example, the lambda component's `deploy` method returns outputs that look like this:
+For example, the above `aws-lambda` component's `deploy` method returns outputs that look like this:
 
 **index.js**
 
 ```js
 const deploy = (inputs, context) => {
   // lambda provisioning logic
+  const res = doLambdaDeploy()
 
   // return outputs
   return {
-    arn: res.FunctionArn
+    arn: res.FunctionArn,
+    name: res.FunctionName
   }
 }
 
