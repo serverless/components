@@ -27,7 +27,7 @@ components:
   myAwsSnsTopic:
     type: aws-sns-topic
     inputs:
-      displayName: My SNS display name
+      displayName: My SNS Topic display name
       deliveryPolicy:
         http:
           defaultHealthyRetryPolicy:

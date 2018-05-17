@@ -18,7 +18,7 @@ inputTypes:
     required: false
     displayName: SNS Topic Display Name
     description: The display name of your SNS topic
-    example: My SNS display name
+    example: My SNS Topic display name
   deliveryPolicy:
     type: object
     required: false

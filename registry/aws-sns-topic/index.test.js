@@ -9,7 +9,7 @@ jest.mock('aws-sdk', () => {
     updateTopicAttributesMock: jest.fn((value) => ({
       TopicArn: `arn:aws:sns:us-east-1:000000000000:${value.Name}`
     })),
-    deleteSNSTopicMock: jest.fn()
+    removeSNSTopicMock: jest.fn()
   }
 
   const SNS = {
@@ -20,7 +20,7 @@ jest.mock('aws-sdk', () => {
       promise: () => mocks.updateTopicAttributesMock(obj)
     }),
     deleteTopic: (obj) => ({
-      promise: () => mocks.deleteSNSTopicMock(obj)
+      promise: () => mocks.removeSNSTopicMock(obj)
     })
   }
   return {
@@ -32,7 +32,7 @@ jest.mock('aws-sdk', () => {
 afterEach(() => {
   AWS.mocks.createSNSTopicMock.mockClear(),
     AWS.mocks.updateTopicAttributesMock.mockClear(),
-    AWS.mocks.deleteSNSTopicMock.mockClear()
+    AWS.mocks.removeSNSTopicMock.mockClear()
 })
 
 afterAll(() => {
@@ -55,7 +55,6 @@ describe('aws-sns-topic tests', () => {
     const outputs = await snsTopicComponent.deploy(inputs, snsTopicContextMock)
 
     expect(AWS.SNS).toHaveBeenCalledTimes(1)
-    expect(AWS.mocks.deleteSNSTopicMock).toHaveBeenCalledTimes(0)
     expect(AWS.mocks.createSNSTopicMock).toHaveBeenCalledTimes(1)
     expect(outputs.arn).toEqual(`arn:aws:sns:us-east-1:000000000000:${inputs.name}`)
     expect(snsTopicContextMock.saveState).toHaveBeenCalledTimes(2)
@@ -115,7 +114,7 @@ describe('aws-sns-topic tests', () => {
     const outputs = await snsTopicComponent.deploy(inputs, snsTopicContextMock)
 
     expect(AWS.SNS).toHaveBeenCalledTimes(1)
-    expect(AWS.mocks.deleteSNSTopicMock).toHaveBeenCalledTimes(0)
+    expect(AWS.mocks.removeSNSTopicMock).toHaveBeenCalledTimes(0)
     expect(AWS.mocks.updateTopicAttributesMock).toHaveBeenCalledTimes(2)
     expect(outputs.arn).toEqual(`arn:aws:sns:us-east-1:000000000000:${inputs.name}`)
     expect(snsTopicContextMock.saveState).toHaveBeenCalledTimes(1)
@@ -139,13 +138,14 @@ describe('aws-sns-topic tests', () => {
     const outputs = await snsTopicComponent.deploy(inputs, snsTopicContextMock)
 
     expect(AWS.SNS).toHaveBeenCalledTimes(1)
-    expect(AWS.mocks.deleteSNSTopicMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.removeSNSTopicMock).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.createSNSTopicMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.updateTopicAttributesMock).toHaveBeenCalledTimes(0)
     expect(outputs.arn).toEqual(`arn:aws:sns:us-east-1:000000000000:${inputs.name}`)
     expect(snsTopicContextMock.saveState).toHaveBeenCalledTimes(3)
   })
 
-  it('should rename sns topic component with no errors', async () => {
+  it('should delete sns topic component with no errors', async () => {
     const snsTopicContextMock = {
       state: {
         topicArn: 'arn:aws:sns:us-east-1:000000000000:some-sns-topic-name',
@@ -163,7 +163,7 @@ describe('aws-sns-topic tests', () => {
     const outputs = await snsTopicComponent.remove(inputs, snsTopicContextMock)
 
     expect(AWS.SNS).toHaveBeenCalledTimes(1)
-    expect(AWS.mocks.deleteSNSTopicMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.removeSNSTopicMock).toHaveBeenCalledTimes(1)
     expect(outputs.arn).toEqual(null)
     expect(snsTopicContextMock.saveState).toHaveBeenCalledTimes(1)
   })
