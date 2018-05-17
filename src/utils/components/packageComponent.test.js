@@ -19,6 +19,7 @@ describe('#packageComponent', () => {
     utils.readFile.mockReturnValue(Promise.resolve({ type: 'my-project', version: '0.0.1' }))
 
     const options = {
+      projectPath: process.cwd(),
       path: './some-path',
       format: 'zip'
     }
@@ -38,6 +39,7 @@ describe('#packageComponent', () => {
     utils.readFile.mockReturnValue(Promise.resolve({ type: 'my-project', version: '0.0.1' }))
 
     const options = {
+      projectPath: process.cwd(),
       path: '/home/some-path',
       format: 'zip'
     }
@@ -57,6 +59,7 @@ describe('#packageComponent', () => {
 
     const componentPath = '/home/some-path'
     const options = {
+      projectPath: process.cwd(),
       path: componentPath,
       format: 'zip'
     }

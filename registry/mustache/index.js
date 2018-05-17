@@ -4,9 +4,9 @@ const path = require('path')
 const mustache = require('mustache')
 const recursive = require('recursive-readdir')
 
-const deploy = async (inputs) => {
+const deploy = async (inputs, context) => {
   const values = inputs.values || {}
-  const sourcePath = inputs.sourcePath || process.cwd()
+  const sourcePath = inputs.sourcePath || context.projectPath
 
   const tmpDir = tmp.dirSync()
   const tmpPath = tmpDir.name

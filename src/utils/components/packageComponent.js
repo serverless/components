@@ -6,7 +6,7 @@ const validateCoreVersion = require('./validateCoreVersion')
 
 module.exports = async (options) => {
   const format = options.format || 'zip'
-  let componentPath = options.path || process.cwd()
+  let componentPath = options.path || options.projectPath
   if (!path.isAbsolute(componentPath)) {
     componentPath = path.resolve(process.cwd(), componentPath)
   }

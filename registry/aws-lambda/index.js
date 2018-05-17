@@ -5,9 +5,11 @@ const lambda = new AWS.Lambda({ region: 'us-east-1' })
 
 async function createLambda(
   { name, handler, memory, timeout, runtime, env, description, root },
+  { projectPath },
   role
 ) {
-  const pkg = await pack(root)
+  const path = root || projectPath
+  const pkg = await pack(path)
 
   const params = {
     FunctionName: name,
@@ -35,9 +37,11 @@ async function createLambda(
 
 async function updateLambda(
   { name, handler, memory, timeout, runtime, env, description, root },
+  { projectPath },
   role
 ) {
-  const pkg = await pack(root)
+  const path = root || projectPath
+  const pkg = await pack(path)
   const functionCodeParams = {
     FunctionName: name,
     ZipFile: pkg,
@@ -95,7 +99,7 @@ async function deploy(inputs, context) {
 
   if (inputs.name && !context.state.name) {
     context.log(`Creating Lambda: ${inputs.name}`)
-    outputs = await createLambda(inputs, role)
+    outputs = await createLambda(inputs, context, role)
   } else if (context.state.name && !inputs.name) {
     context.log(`Removing Lambda: ${context.state.name}`)
     outputs = await deleteLambda(context.state.name)
@@ -103,10 +107,10 @@ async function deploy(inputs, context) {
     context.log(`Removing Lambda: ${context.state.name}`)
     await deleteLambda(context.state.name)
     context.log(`Creating Lambda: ${inputs.name}`)
-    outputs = await createLambda(inputs, role)
+    outputs = await createLambda(inputs, context, role)
   } else {
     context.log(`Updating Lambda: ${inputs.name}`)
-    outputs = await updateLambda(inputs, role)
+    outputs = await updateLambda(inputs, context, role)
   }
 
   if (configuredRole && defaultRole) {

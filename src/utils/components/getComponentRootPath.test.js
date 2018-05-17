@@ -17,24 +17,4 @@ describe('#getComponentRootPath()', () => {
     const expected = path.resolve(type)
     expect(res).toEqual(expected)
   })
-
-  describe('when no component "type" propert parameter is provided', () => {
-    let oldCwd
-    let tmpDirPath
-
-    beforeEach(async () => {
-      oldCwd = process.cwd()
-      process.chdir(await getTmpDir())
-      tmpDirPath = process.cwd()
-    })
-
-    afterEach(() => {
-      process.chdir(oldCwd)
-    })
-
-    it('should default to the cwd if no parameter is provided', async () => {
-      const res = await getComponentRootPath()
-      expect(res).toEqual(tmpDirPath)
-    })
-  })
 })

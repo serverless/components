@@ -10,7 +10,6 @@ const fsp = BbPromise.promisifyAll(fs)
 module.exports = async (packagePath, tempPath) => {
   // Set defaults
   tempPath = tempPath || os.tmpdir()
-  packagePath = packagePath || process.cwd()
 
   /*
   * Ensure id includes datetime and unique string,

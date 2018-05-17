@@ -9,7 +9,7 @@ const getState = require('../state/getState')
 
 const getComponentsFromServerlessFile = async (
   stateFile,
-  componentRoot = process.cwd(),
+  componentRoot,
   inputs = {},
   componentId
 ) => {
