@@ -10,10 +10,11 @@ const getState = require('../state/getState')
 const getComponentsFromServerlessFile = async (
   stateFile,
   componentRoot,
+  slsYml = null,
   inputs = {},
   componentId
 ) => {
-  const component = await getComponent(componentRoot, componentId, inputs, stateFile)
+  const component = await getComponent(componentRoot, componentId, inputs, stateFile, slsYml)
 
   const nestedComponents = mergeAll(
     await Promise.all(
@@ -26,6 +27,7 @@ const getComponentsFromServerlessFile = async (
         return getComponentsFromServerlessFile(
           stateFile,
           nestedComponentRoot,
+          null,
           nestedComponentInputs,
           nestedComponentId
         )

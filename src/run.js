@@ -21,9 +21,7 @@ const {
 
 const run = async (command, options) => {
   options.projectPath = options.projectPath || process.cwd()
-  const projectPath = options.projectPath
-  let serverlessFileComponents = options.serverlessFileComponents
-  let stateFileComponents = options.stateFileComponents
+  const { projectPath, serverlessFileObject } = options
   if (command === 'package') {
     return packageComponent(options)
   }
@@ -39,12 +37,17 @@ const run = async (command, options) => {
     archive = clone(stateFile)
     let componentsToUse
     let orphanedComponents
-    if (isNil(serverlessFileComponents) || isEmpty(serverlessFileComponents)) {
+    let serverlessFileComponents
+    if (!isNil(serverlessFileObject) && !isEmpty(serverlessFileObject)) {
+      serverlessFileComponents = await getComponentsFromServerlessFile(
+        stateFile,
+        projectPath,
+        serverlessFileObject
+      )
+    } else {
       serverlessFileComponents = await getComponentsFromServerlessFile(stateFile, projectPath)
     }
-    if (isNil(stateFileComponents) || isEmpty(stateFileComponents)) {
-      stateFileComponents = getComponentsFromStateFile(stateFile)
-    }
+    const stateFileComponents = getComponentsFromStateFile(stateFile)
     if (command === 'remove') {
       componentsToUse = stateFileComponents
       orphanedComponents = {}

@@ -154,4 +154,47 @@ describe('#getComponent()', () => {
       )
     ).rejects.toThrow('core is incompatible with component my-project')
   })
+
+  it('Test passed-in serverless.yml component object', async () => {
+    const myComponent = {
+      type: 'my-component',
+      version: '0.1.0',
+      inputTypes: {
+        foo: {
+          type: 'string',
+          required: true
+        },
+        bar: {
+          type: 'string',
+          required: false
+        }
+      }
+    }
+
+    const instance = await getComponent(
+      process.cwd(),
+      'test',
+      {
+        foo: 'bar',
+        baz: 'qux'
+      },
+      {
+        $: { serviceId: 'AsH3gefdfDSY' },
+        'my-component': {
+          type: 'my-component',
+          internallyManaged: false,
+          instanceId: 'AsH3gefdfDSY-cHA9jPi5lPQj',
+          state: {}
+        }
+      },
+      myComponent
+    )
+
+    expect(instance.type).toEqual('my-component')
+    expect(instance.version).toEqual('0.1.0')
+    expect(instance.inputs).toEqual({
+      foo: 'bar',
+      baz: 'qux'
+    })
+  })
 })

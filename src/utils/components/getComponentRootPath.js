@@ -1,5 +1,4 @@
 const path = require('path')
-const { isNil } = require('ramda')
 const urlRegex = require('url-regex')
 const getComponentFromUrl = require('./getComponentFromUrl')
 const getComponentsBucketRoot = require('./getComponentsBucketRoot')

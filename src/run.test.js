@@ -49,7 +49,8 @@ describe('#run()', () => {
     })
 
     expect(utils.handleSignalEvents).toHaveBeenCalled()
-    expect(utils.getComponentsFromServerlessFile).toHaveBeenCalled()
+    expect(utils.getComponentsFromServerlessFile.mock.calls[0][1]).toEqual(projectPath)
+    expect(utils.getComponentsFromServerlessFile.mock.calls[0][2]).toBeFalsy() // no serverlessFileObject
     expect(utils.getComponentsFromStateFile).toHaveBeenCalled()
     expect(utils.getOrphanedComponents).toHaveBeenCalled()
     expect(utils.trackDeployment).not.toHaveBeenCalled()
@@ -67,7 +68,8 @@ describe('#run()', () => {
     await expect(run('some-command', { projectPath })).rejects.toThrow('something went wrong')
 
     expect(utils.handleSignalEvents).toHaveBeenCalled()
-    expect(utils.getComponentsFromServerlessFile).toHaveBeenCalled()
+    expect(utils.getComponentsFromServerlessFile.mock.calls[0][1]).toEqual(projectPath)
+    expect(utils.getComponentsFromServerlessFile.mock.calls[0][2]).toBeFalsy() // no serverlessFileObject
     expect(utils.getComponentsFromStateFile).toHaveBeenCalled()
     expect(utils.getOrphanedComponents).toHaveBeenCalled()
     expect(utils.trackDeployment).not.toHaveBeenCalled()
@@ -79,11 +81,17 @@ describe('#run()', () => {
     expect(utils.errorReporter).toHaveBeenCalled()
   })
 
-  it('should prefer components passed in via options', async () => {
+  it('should support serverless.yml file object passed in via options', async () => {
+    const serverlessFileObject = {
+      type: 'my-app',
+      version: '0.1.0',
+      components: {
+        iamMock: { id: 'iam-mock-id', type: 'iam-mock' }
+      }
+    }
     const res = await run('some-commands', {
       projectPath,
-      serverlessFileComponents,
-      stateFileComponents
+      serverlessFileObject
     })
     expect(res).toEqual({
       iamMock: {
@@ -93,8 +101,11 @@ describe('#run()', () => {
     })
 
     expect(utils.handleSignalEvents).toHaveBeenCalled()
-    expect(utils.getComponentsFromServerlessFile).not.toHaveBeenCalled()
-    expect(utils.getComponentsFromStateFile).not.toHaveBeenCalled()
+    // NOTE: we don't check for the first argument (which is the state object) since the empty
+    // state object is created on the fly and differs from the one we'd check against here
+    expect(utils.getComponentsFromServerlessFile.mock.calls[0][1]).toEqual(projectPath)
+    expect(utils.getComponentsFromServerlessFile.mock.calls[0][2]).toEqual(serverlessFileObject)
+    expect(utils.getComponentsFromStateFile).toHaveBeenCalled()
     expect(utils.getOrphanedComponents).toHaveBeenCalled()
     expect(utils.trackDeployment).not.toHaveBeenCalled()
     expect(utils.buildGraph).toHaveBeenCalledTimes(1)
@@ -116,7 +127,8 @@ describe('#run()', () => {
       })
 
       expect(utils.handleSignalEvents).toHaveBeenCalled()
-      expect(utils.getComponentsFromServerlessFile).toHaveBeenCalled()
+      expect(utils.getComponentsFromServerlessFile.mock.calls[0][1]).toEqual(projectPath)
+      expect(utils.getComponentsFromServerlessFile.mock.calls[0][2]).toBeFalsy() // no serverlessFileObject
       expect(utils.getComponentsFromStateFile).toHaveBeenCalled()
       expect(utils.getOrphanedComponents).toHaveBeenCalled()
       expect(utils.trackDeployment).toHaveBeenCalled()
@@ -144,7 +156,8 @@ describe('#run()', () => {
       })
 
       expect(utils.handleSignalEvents).toHaveBeenCalled()
-      expect(utils.getComponentsFromServerlessFile).toHaveBeenCalled()
+      expect(utils.getComponentsFromServerlessFile.mock.calls[0][1]).toEqual(projectPath)
+      expect(utils.getComponentsFromServerlessFile.mock.calls[0][2]).toBeFalsy() // no serverlessFileObject
       expect(utils.getComponentsFromStateFile).toHaveBeenCalled()
       expect(utils.getOrphanedComponents).not.toHaveBeenCalled()
       expect(utils.trackDeployment).not.toHaveBeenCalled()
