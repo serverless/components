@@ -6,6 +6,7 @@ Provision AWS SNS Topic with serverless components
 
 <!-- AUTO-GENERATED-CONTENT:START (TOC) -->
 - [Input Types](#input-types)
+- [Output Types](#output-types)
 - [Example](#example)
 <!-- AUTO-GENERATED-CONTENT:END -->
 
@@ -14,8 +15,17 @@ Provision AWS SNS Topic with serverless components
 | Name | Type | Description |
 |:------ |:-----|:-----------------|
 | **displayName**| `string` | The display name of your SNS topic
+| **policy**| `object` | The policy for your SNS topic
 | **deliveryPolicy**| `object` | The delivery policy for your SNS topic
 | **name**| `string`<br/>*required* | The name of your SNS topic
+
+<!-- AUTO-GENERATED-CONTENT:END -->
+
+<!-- AUTO-GENERATED-CONTENT:START (COMPONENT_OUTPUT_TYPES) -->
+## Output Types
+| Name | Type | Description |
+|:------ |:-----|:-----------------|
+| **arn**| `string` | The topic arn
 
 <!-- AUTO-GENERATED-CONTENT:END -->
 
