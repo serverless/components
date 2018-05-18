@@ -19,6 +19,11 @@ inputTypes:
     displayName: SNS Topic Display Name
     description: The display name of your SNS topic
     example: My SNS Topic display name
+  policy:
+    type: object
+    required: false
+    displayName: SNS Policy
+    description: The policy for your SNS topic
   deliveryPolicy:
     type: object
     required: false
@@ -37,3 +42,8 @@ inputTypes:
         disableSubscriptionOverrides: true
         defaultThrottlePolicy:
           maxReceivesPerSecond: 3
+
+outputTypes:
+  arn:
+    type: string
+    description: The topic arn
