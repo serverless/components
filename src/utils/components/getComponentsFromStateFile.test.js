@@ -29,12 +29,7 @@ describe('#getComponentsFromStateFile()', () => {
         state: {
           state: 'state-internally-managed'
         },
-        rootPath: join(
-          tmpDirPath,
-          'registry-path',
-          'mocks',
-          'internally-managed'
-        )
+        rootPath: join(tmpDirPath, 'registry-path', 'mocks', 'internally-managed')
       },
       // NOTE: only the following state-objects should be used
       'function-mock': {

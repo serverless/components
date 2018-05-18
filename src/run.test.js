@@ -36,8 +36,7 @@ beforeEach(() => {
 
 describe('#run()', () => {
   it('should report any errors to Sentry while still writing the state to disk', async () => {
-    utils.executeGraph.mockImplementation(() =>
-      Promise.reject(new Error('something went wrong')))
+    utils.executeGraph.mockImplementation(() => Promise.reject(new Error('something went wrong')))
 
     await expect(run('deploy', {}))
     expect(utils.handleSignalEvents).toHaveBeenCalled()

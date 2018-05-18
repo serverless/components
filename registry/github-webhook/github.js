@@ -5,7 +5,7 @@ const parseGithubUrl = require('parse-github-url')
 
 const permissionsError = `Make sure you have repo and write:repo_hook, read:repo_hook privilegdes set` // eslint-disable-line
 
-const getWebhook = function ({ githubRepo, webhookId, githubApiToken }) {
+const getWebhook = function({ githubRepo, webhookId, githubApiToken }) {
   const gh = parseGithubUrl(githubRepo)
 
   octokit.authenticate({
@@ -57,7 +57,7 @@ const createWebhook = async ({ githubApiToken, githubRepo, payloadUrl, events })
 
       if (hooks.data) {
         const match = hooks.data.filter((h) => { // eslint-disable-line
-          const urlMatch = (h.config.url === payloadUrl)
+          const urlMatch = h.config.url === payloadUrl
           const eventsMatch = R.equals(h.events, events)
           return urlMatch && eventsMatch
         })

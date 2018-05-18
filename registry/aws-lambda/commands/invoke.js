@@ -21,7 +21,9 @@ function invoke(inputs, state, options) {
     .then((response) => {
       if (response.FunctionError === 'Handled' || response.FunctionError === 'Unhandled') {
         const errorMessage = response.Payload.ErrorMesage
-        throw new Error(`Lambda "${functionName}" threw an Error during invocation: ${errorMessage}`)
+        throw new Error(
+          `Lambda "${functionName}" threw an Error during invocation: ${errorMessage}`
+        )
       }
       return response
     })

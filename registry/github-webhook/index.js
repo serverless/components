@@ -1,10 +1,5 @@
 const parseGithubUrl = require('parse-github-url')
-const {
-  createWebhook,
-  updateWebhook,
-  deleteWebhook,
-  getWebhook
-} = require('./github')
+const { createWebhook, updateWebhook, deleteWebhook, getWebhook } = require('./github')
 
 const commands = {
   info: {
@@ -102,8 +97,7 @@ module.exports = {
   Update,
   Delete,
   myCustomFunctionToDoStuff: (inputs, state, options) => {
-    console.log('This is an example of using handler.myCustomFunctionToDoStuff in a command in yaml'
-    ) // eslint-disable-line
+    console.log('This is an example of using handler.myCustomFunctionToDoStuff in a command in yaml') // eslint-disable-line
     console.log('It contains inputs, state, and cli options') // eslint-disable-line
     console.log('inputs', inputs) // eslint-disable-line
     console.log('state', state) // eslint-disable-line

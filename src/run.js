@@ -42,38 +42,22 @@ const run = async (command, options) => {
 
     const rootComponentName = getRootComponentName(serverlessFileComponents)
 
-    const availableCommands = Object.keys(serverlessFileComponents).reduce(
-      (acc, curr) => {
-        const key = curr.replace(`${rootComponentName}:`, '')
-        const comp = serverlessFileComponents[curr]
-        if (comp.commands) {
-          // Set root component key as 'root'
-          const finalKey = key === rootComponentName ? 'root' : key
-          acc[finalKey] = {
-            commands: comp.commands,
-            rootPath: comp.rootPath
-          }
+    const availableCommands = Object.keys(serverlessFileComponents).reduce((acc, curr) => {
+      const key = curr.replace(`${rootComponentName}:`, '')
+      const comp = serverlessFileComponents[curr]
+      if (comp.commands) {
+        // Set root component key as 'root'
+        const finalKey = key === rootComponentName ? 'root' : key
+        acc[finalKey] = {
+          commands: comp.commands,
+          rootPath: comp.rootPath
         }
-        return acc
-      },
-      {}
-    )
+      }
+      return acc
+    }, {})
 
     // Show help if no command or help flag used without any component names
-    if (
-      !command ||
-      command === 'help' ||
-      (!command && options.h) ||
-      (!command && options.help)
-    ) {
-      console.log(`
- ██████╗ ██████╗ ███╗   ███╗██████╗  ██████╗ ███╗   ██╗███████╗███╗   ██╗████████╗███████╗
-██╔════╝██╔═══██╗████╗ ████║██╔══██╗██╔═══██╗████╗  ██║██╔════╝████╗  ██║╚══██╔══╝██╔════╝
-██║     ██║   ██║██╔████╔██║██████╔╝██║   ██║██╔██╗ ██║█████╗  ██╔██╗ ██║   ██║   ███████╗
-██║     ██║   ██║██║╚██╔╝██║██╔═══╝ ██║   ██║██║╚██╗██║██╔══╝  ██║╚██╗██║   ██║   ╚════██║
-╚██████╗╚██████╔╝██║ ╚═╝ ██║██║     ╚██████╔╝██║ ╚████║███████╗██║ ╚████║   ██║   ███████║
- ╚═════╝ ╚═════╝ ╚═╝     ╚═╝╚═╝      ╚═════╝ ╚═╝  ╚═══╝╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝
-                                                                                          `) // eslint-disable-line
+    if (!command || command === 'help' || (!command && options.h) || (!command && options.help)) {
       // Todo refactor programatic declaration of core commands
       logAllCommandsHelp(availableCommands)
       return false
@@ -89,48 +73,21 @@ const run = async (command, options) => {
         orphanedComponents = {}
       } else {
         componentsToUse = serverlessFileComponents
-        orphanedComponents = getOrphanedComponents(
-          serverlessFileComponents,
-          stateFileComponents
-        )
+        orphanedComponents = getOrphanedComponents(serverlessFileComponents, stateFileComponents)
       }
       components = { ...componentsToUse, ...orphanedComponents }
       if (command === 'deploy') {
         trackDeployment(componentsToUse)
       }
-      const graph = await buildGraph(
-        componentsToUse,
-        orphanedComponents,
-        command
-      )
-      await executeGraph(
-        graph,
-        components,
-        stateFile,
-        archive,
-        command,
-        options,
-        false
-      )
+      const graph = await buildGraph(componentsToUse, orphanedComponents, command)
+      await executeGraph(graph, components, stateFile, archive, command, options, false)
       // run the "info" command on every component after a successful deployment
       if (command === 'deploy') {
         // NOTE: need to re-build the graph here since we're mutating it in "executeGraph"
         // TODO: we should refactor this code later on
         // eslint-disable-next-line no-shadow
-        const graph = await buildGraph(
-          componentsToUse,
-          orphanedComponents,
-          'info'
-        )
-        await executeGraph(
-          graph,
-          components,
-          stateFile,
-          archive,
-          'info',
-          options,
-          false
-        )
+        const graph = await buildGraph(componentsToUse, orphanedComponents, 'info')
+        await executeGraph(graph, components, stateFile, archive, 'info', options, false)
       }
     } else {
       // Do the CLI command from individual component
@@ -195,14 +152,11 @@ async function doCommand(cmd, options, availableCommands, data) {
   /* command targeting sub components */
   if (parts.length > 1) {
     const componentName =
-      componentKey === 'root'
-        ? data.rootComponentName
-        : `${data.rootComponentName}:${componentKey}`
+      componentKey === 'root' ? data.rootComponentName : `${data.rootComponentName}:${componentKey}`
 
     const rootComponentInfo = {}
     // TODO cmds in root component have all state/inputs should we pass them into commands?
-    const currentComponentData =
-      data.componentStateData[componentName] || rootComponentInfo
+    const currentComponentData = data.componentStateData[componentName] || rootComponentInfo
 
     const currentComponentInputs = currentComponentData.inputs
     const currentComponentState = currentComponentData.state
@@ -230,8 +184,7 @@ async function doCommand(cmd, options, availableCommands, data) {
     }
 
     if (!componentCommands[currentCommand]) {
-      console.log(`No "${currentCommand}" command found for ${componentKey} component`
-      ) // eslint-disable-line
+      console.log(`No "${currentCommand}" command found for ${componentKey} component`) // eslint-disable-line
       console.log() // eslint-disable-line
       logCommandHelp(componentKey, commandData.commands)
       return false
@@ -240,22 +193,16 @@ async function doCommand(cmd, options, availableCommands, data) {
     // validate options passed in
     const commandOptions = componentCommands[currentCommand].options
     if (commandOptions && !isEmpty(options)) {
-      const optionsWithShortcuts = Object.keys(commandOptions).reduce(
-        (acc, curr) => {
-          const cmdData = commandOptions[curr]
-          if (cmdData.shortcut) {
-            acc[cmdData.shortcut] = options[curr]
-          }
-          acc[curr] = options[curr]
-          return acc
-        },
-        {}
-      )
+      const optionsWithShortcuts = Object.keys(commandOptions).reduce((acc, curr) => {
+        const cmdData = commandOptions[curr]
+        if (cmdData.shortcut) {
+          acc[cmdData.shortcut] = options[curr]
+        }
+        acc[curr] = options[curr]
+        return acc
+      }, {})
       // Diff the options + shortcut config with passed in options
-      const unknownOptions = difference(
-        Object.keys(options),
-        Object.keys(optionsWithShortcuts)
-      )
+      const unknownOptions = difference(Object.keys(options), Object.keys(optionsWithShortcuts))
       if (!isEmpty(unknownOptions)) {
         throw new Error(`Unknown option ${JSON.stringify(unknownOptions)}`)
       }
@@ -265,7 +212,8 @@ async function doCommand(cmd, options, availableCommands, data) {
     const handler = componentCommands[currentCommand].handler
 
     if (!handler) {
-      console.log(`No 'handler' found for "${componentKey}" component. Please specify a function to run or shell script to execute`
+      console.log(
+        `No 'handler' found for "${componentKey}" component. Please specify a function to run or shell script to execute`
       ) // eslint-disable-line
       return false
     }
@@ -279,7 +227,7 @@ async function doCommand(cmd, options, availableCommands, data) {
     if (hasWhiteSpace(handler)) {
       // TODO pass in currentComponentInputs, currentComponentState, options?
       execSync(handler, {
-        stdio: [ process.stdin, process.stdout, process.stderr ]
+        stdio: [process.stdin, process.stdout, process.stderr]
       })
       return false
     }
@@ -291,21 +239,12 @@ async function doCommand(cmd, options, availableCommands, data) {
     const handlerPath = path.resolve(componentRootPath, fileName)
     const functions = exportedFunctions(handlerPath)
     if (functions && !functions[exportedFunction]) {
-      console.log(`No ${handler} file export found in ${handlerPath} for ${componentKey} component`
-      ) // eslint-disable-line
+      console.log(`No ${handler} file export found in ${handlerPath} for ${componentKey} component`) // eslint-disable-line
       return false
     }
 
-    if (
-      functions &&
-      functions[exportedFunction] &&
-      is(Function, functions[exportedFunction])
-    ) {
-      return functions[exportedFunction](
-        currentComponentInputs,
-        currentComponentState,
-        options
-      )
+    if (functions && functions[exportedFunction] && is(Function, functions[exportedFunction])) {
+      return functions[exportedFunction](currentComponentInputs, currentComponentState, options)
     }
 
     // 4. Future, handle raw files or other runtime via stdin
