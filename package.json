@@ -34,6 +34,7 @@
     "bluebird": "^3.5.1",
     "chalk": "^2.3.2",
     "concordance": "^3.0.0",
+    "dotenv": "^5.0.1",
     "download": "^6.2.5",
     "fs-extra": "^5.0.0",
     "graphlib": "^2.1.5",

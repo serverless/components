@@ -124,6 +124,7 @@ Also please do join the _Components_ channel on our public [Serverless-Contrib S
   * [Output types & Outputs](#output-types--outputs)
   * [State](#state)
   * [Variables](#variables)
+  * [Setting Environment Variables](#env-variables)
   * [Graph](#graph)
   * [Custom commands](#custom-commands)
   * [Registry](#registry)
@@ -422,6 +423,19 @@ The framework supports variables from the following sources:
 * **Environment Variables:** for example, `${env.GITHUB_TOKEN}`
 * **Output:** for example: `${myEndpoint.url}`, where `myEndpoint` is the component alias as defined in `serverless.yml`, and `url` is a property in the outputs object that is returned from the `myEndpoint` provisioning function.
 * **Self:** for example, `${self.path}/frontend`, where `self.path` evaluates to the absolute path of the component's root folder.
+
+### Setting Environment Variables
+
+The framework supports two types of environment variables:
+
+* **.env File:** Create a .env file in the root directory of your project. Add environment-specific variables on new lines in the form of NAME=VALUE. For example:
+```
+SOME_ENV=foo
+```
+* **CLI** Running the command like this:
+```
+SOME_ENV=foo components deploy
+```
 
 ### Graph
 
