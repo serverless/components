@@ -1,4 +1,4 @@
-type: envLoad
+type: env-load
 
 components:
   myFunction:
