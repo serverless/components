@@ -13,6 +13,7 @@ const getDistribution = async (distributionId) => {
   return distRes
 }
 
+// eslint-disable-next-line no-unused-vars
 const getDistributionConfig = async (distributionId) => {
   const distConfigRes = await CloudFront.getDistributionConfig({
     Id: distributionId

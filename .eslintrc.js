@@ -11,8 +11,8 @@ module.exports = {
     ecmaVersion: 2017,
     sourceType: 'module',
     ecmaFeatures: {
-      experimentalObjectRestSpread: true,
-    },
+      experimentalObjectRestSpread: true
+    }
   },
   rules: {
     'array-bracket-spacing': [
@@ -26,10 +26,13 @@ module.exports = {
     'arrow-parens': ['error', 'always'],
     'comma-dangle': ['error', 'never'],
     'func-names': 'off',
-    'no-param-reassign': 'off',
     'no-use-before-define': 'off',
     'prefer-destructuring': 'off',
+    'no-console': 'error',
+    'no-shadow': 'error',
+    'no-undef': 'error',
     'object-curly-newline': 'off',
+    'no-unused-vars': 'error',
     semi: ['error', 'never'],
     'object-shorthand': 'off',
     'prettier/prettier': 'error'

@@ -19,7 +19,7 @@ const syncDirFiles = async ({ contentPath, bucketName }) => {
     }
   }
   const uploader = client.uploadDir(params)
-  uploader.on('fileUploadEnd', (localFilePath, s3Key) => {
+  uploader.on('fileUploadEnd', (localFilePath) => {
     // eslint-disable-line no-unused-vars
     console.log(`Uploading file: '${localFilePath}' ...`)
   })
