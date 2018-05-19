@@ -39,7 +39,7 @@ components:
     inputs:
       displayName: My SNS Topic display name
       policy:
-        Version: 2008-10-17T00:00:00.000Z
+        Version: '2008-10-17'
         Id: policy_id
         Statement:
           - Effect: Allow

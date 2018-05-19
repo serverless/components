@@ -25,7 +25,7 @@ inputTypes:
     displayName: SNS Policy
     description: The policy for your SNS topic
     example:
-      Version: 2008-10-17
+      Version: "2008-10-17"
       Id: policy_id
       Statement:
       - Effect: Allow
@@ -45,7 +45,7 @@ inputTypes:
         Resource: arn:aws:sns:us-east-1:000000000000:my-sns-topic
         Condition:
           StringEquals:
-            AWS:SourceOwner: '000000000000'
+            AWS:SourceOwner: "000000000000"
   deliveryPolicy:
     type: object
     required: false
