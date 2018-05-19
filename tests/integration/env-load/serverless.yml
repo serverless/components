@@ -1,0 +1,8 @@
+type: env-load
+
+components:
+  myFunction:
+    type: tests-integration-function-mock
+    inputs:
+      name: ${env.FUNCTION_NAME}
+      role: role

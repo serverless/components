@@ -1,7 +1,7 @@
+const { fileExists, readFile } = require('@serverless/utils')
 const path = require('path')
 const raven = require('raven')
 const pkg = require('../../../package.json')
-const { fileExists, readFile } = require('../fs')
 
 async function errorReporter() {
   const trackingConfigFilePath = path.join('..', '..', 'tracking-config.json')

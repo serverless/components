@@ -34,6 +34,13 @@ jest.mock('aws-sdk', () => {
   }
 })
 
+afterEach(() => {
+  AWS.mocks.createBucketMock.mockClear()
+  AWS.mocks.deleteBucketMock.mockClear()
+  AWS.mocks.listObjectsV2Mock.mockClear()
+  AWS.mocks.deleteObjectsMock.mockClear()
+})
+
 afterAll(() => {
   jest.restoreAllMocks()
 })
@@ -74,7 +81,7 @@ describe('aws-s3-bucket tests', () => {
     const outputs = await s3Component.deploy(inputs, s3ContextMock)
 
     expect(AWS.S3).toHaveBeenCalledTimes(1)
-    expect(AWS.mocks.createBucketMock).toHaveBeenCalledTimes(1) // from the previous deploy
+    expect(AWS.mocks.createBucketMock).toHaveBeenCalledTimes(0)
     expect(outputs.name).toEqual(inputs.name)
     expect(s3ContextMock.saveState).toHaveBeenCalledTimes(0)
   })
@@ -138,17 +145,19 @@ describe('aws-s3-bucket tests', () => {
     const outputs = await s3Component.deploy(inputs, s3ContextMock)
 
     expect(AWS.S3).toHaveBeenCalledTimes(1)
-    expect(AWS.mocks.createBucketMock).toHaveBeenCalledTimes(2)
-    expect(AWS.mocks.deleteBucketMock).toHaveBeenCalledTimes(2)
-    expect(AWS.mocks.listObjectsV2Mock).toHaveBeenCalledTimes(2)
-    expect(AWS.mocks.deleteObjectsMock).toHaveBeenCalledTimes(2)
+    expect(AWS.mocks.createBucketMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.deleteBucketMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.listObjectsV2Mock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.deleteObjectsMock).toHaveBeenCalledTimes(1)
     expect(s3ContextMock.saveState).toHaveBeenCalledTimes(1)
     expect(outputs).toEqual({ name: inputs.name })
 
-    expect(AWS.mocks.createBucketMock.mock.calls[1][0])
-      .toEqual({ Bucket: inputs.name })
-    expect(AWS.mocks.deleteBucketMock.mock.calls[1][0])
-      .toEqual({ Bucket: s3ContextMock.state.name })
+    expect(AWS.mocks.createBucketMock.mock.calls[0][0]).toEqual({
+      Bucket: inputs.name
+    })
+    expect(AWS.mocks.deleteBucketMock.mock.calls[0][0]).toEqual({
+      Bucket: s3ContextMock.state.name
+    })
   })
 
   it('should update state when removing an already removed s3 component', async () => {
@@ -165,7 +174,7 @@ describe('aws-s3-bucket tests', () => {
     const outputs = await s3Component.remove(inputs, s3ContextMock)
 
     expect(AWS.S3).toHaveBeenCalledTimes(1)
-    expect(AWS.mocks.listObjectsV2Mock).toHaveBeenCalledTimes(3)
+    expect(AWS.mocks.listObjectsV2Mock).toHaveBeenCalledTimes(1)
     expect(s3ContextMock.saveState).toBeCalledWith({})
     expect(outputs).toEqual({ name: null })
   })

@@ -6,6 +6,7 @@ Provision AWS s3 buckets with serverless components
 
 <!-- AUTO-GENERATED-CONTENT:START (TOC) -->
 - [Input Types](#input-types)
+- [Output Types](#output-types)
 - [Example](#example)
 <!-- AUTO-GENERATED-CONTENT:END -->
 
@@ -13,7 +14,15 @@ Provision AWS s3 buckets with serverless components
 ## Input Types
 | Name | Type | Description |
 |:------ |:-----|:-----------------|
-| **name**| `string` | The name of your s3 bucket. Name must be globally unique in AWS
+| **name**| `string` | The name of your S3 bucket. Name must be globally unique in AWS
+
+<!-- AUTO-GENERATED-CONTENT:END -->
+
+<!-- AUTO-GENERATED-CONTENT:START (COMPONENT_OUTPUT_TYPES) -->
+## Output Types
+| Name | Type | Description |
+|:------ |:-----|:-----------------|
+| **name**| `string` | The S3 bucket name
 
 <!-- AUTO-GENERATED-CONTENT:END -->
 

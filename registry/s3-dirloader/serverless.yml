@@ -1,4 +1,11 @@
 type: s3-dirloader
+version: 0.2.0
+core: 0.2.x
+
+description: "S3 directory loader"
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
 
 inputTypes:
   contentPath:
@@ -7,3 +14,8 @@ inputTypes:
   bucketName:
     type: string
     required: true
+
+outputTypes:
+  files:
+    type: any
+    description: The files in the S3 bucket directory

@@ -1,4 +1,11 @@
 type: static-website
+version: 0.2.0
+core: 0.2.x
+
+description: "Static Website component."
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
 
 inputTypes:
   name:
@@ -68,18 +75,23 @@ components:
       errorDocument: ${input.contentError}
       redirectBucketName: ${wwwDomainBucket.name}
       redirectToHostName: ${rootDomainBucket.name}
-  # siteCloudFrontConfig:
-  #   type: aws-cloudfront
-  #   inputs:
-  #     name: ${input.name}
-  #     defaultRootObject: ${input.contentIndex}
-  #     originId: ${input.hostingDomain}
-  #     originDomain: ${rootDomainBucket.name}.s3.amazonaws.com
-  #     aliasDomain: ${input.aliasDomain}
-  #     distributionEnabled: true
-  # siteRoute53Config:
-  #   type: aws-route53
-  #   inputs:
-  #     name: ${input.name}-site-${self.instanceId}
-  #     domainName: ${input.aliasDomain}
-  #     dnsName: ${siteCloudFrontConfig.distribution.domainName}
+  siteCloudFrontConfig:
+    type: aws-cloudfront
+    inputs:
+      name: ${input.name}
+      defaultRootObject: ${input.contentIndex}
+      originId: ${input.hostingDomain}
+      originDomain: ${rootDomainBucket.name}.s3.amazonaws.com
+      aliasDomain: ${input.aliasDomain}
+      distributionEnabled: true
+  siteRoute53Config:
+    type: aws-route53
+    inputs:
+      name: ${input.name}-site-${self.instanceId}
+      domainName: ${input.aliasDomain}
+      dnsName: ${siteCloudFrontConfig.distribution.domainName}
+
+outputTypes:
+  url:
+    type: string
+    description: The static websites URL

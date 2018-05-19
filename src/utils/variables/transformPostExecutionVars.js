@@ -1,6 +1,4 @@
-const {
-  is, replace, map
-} = require('ramda')
+const { is, replace, map } = require('ramda')
 
 const regex = require('./getVariableSyntax')()
 const reservedNames = require('./reservedNames')
@@ -17,7 +15,9 @@ module.exports = (slsYml) => {
         if (!reservedNames.includes(referencedComponentAlias)) {
           if (!slsYml.components[referencedComponentAlias]) {
             /* eslint-disable */
-            console.log(`Error: Unable to find "${referencedComponentAlias}" variable reference in ${slsYml.type} component.
+            console.log(`Error: Unable to find "${referencedComponentAlias}" variable reference in ${
+              slsYml.type
+            } component.
 Please double check spelling of reference in ${slsYml.type} component.`)
             /* eslint-enable */
           }

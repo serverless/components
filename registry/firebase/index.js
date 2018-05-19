@@ -1,20 +1,14 @@
 const { fork } = require('child_process')
-const firebase = require('firebase-tools')
-const logger = require('firebase-tools/lib/logger')
-const { resolve } = require('path')
-const { equals } = require('ramda')
-const ComponentsLogger = require('./ComponentsLogger')
-
+const path = require('path')
 
 const runCommand = async (type, inputs, context) => {
-  const command = fork(resolve(__dirname, 'command.js'), [], {
+  const command = fork(path.resolve(__dirname, 'command.js'), [], {
     cwd: process.cwd(),
     env: {}
   })
 
   const promise = new Promise((resolve, reject) => {
     command.on('close', (code) => {
-      console.log('close received')
       if (code) {
         return reject(new Error(`firebase command errored with code ${code}`))
       }
@@ -29,7 +23,6 @@ const runCommand = async (type, inputs, context) => {
   })
   return promise
 }
-
 
 const deploy = async (inputs, context) => {
   let outputs = {}

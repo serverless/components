@@ -1,4 +1,11 @@
 type: aws-route53
+version: 0.2.0
+core: 0.2.x
+
+description: "Provision AWS route53 definitions with serverless components"
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
 
 inputTypes:
   domainName:
@@ -26,3 +33,11 @@ inputTypes:
     displayName: VPC Region
     description: The VPC's region
     example: mydefaultvpcregion
+
+outputTypes:
+  hostedZone:
+    type: object
+    description: The hosted zone configuration
+  changeRecordSet:
+    type: object
+    description: The change record set

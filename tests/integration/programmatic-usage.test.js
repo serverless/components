@@ -19,7 +19,7 @@ async function removeStateFiles(stateFiles) {
 }
 
 describe('Integration Test - Programmatic usage', () => {
-  jest.setTimeout(20000)
+  jest.setTimeout(40000)
 
   const testDir = path.dirname(__filename)
   const componentsExec = path.join(testDir, '..', '..', 'bin', 'components')
@@ -27,11 +27,11 @@ describe('Integration Test - Programmatic usage', () => {
   const testServiceStateFile = path.join(testServiceDir, 'state.json')
 
   beforeAll(async () => {
-    await removeStateFiles([ testServiceStateFile ])
+    await removeStateFiles([testServiceStateFile])
   })
 
   afterAll(async () => {
-    await removeStateFiles([ testServiceStateFile ])
+    await removeStateFiles([testServiceStateFile])
   })
 
   describe('our test setup', () => {
@@ -44,7 +44,7 @@ describe('Integration Test - Programmatic usage', () => {
 
   describe('when running through a typical component usage lifecycle', () => {
     it('should deploy the "iam" and "function" components', async () => {
-      await cpp.execAsync(`${componentsExec} deploy`, {
+      await cpp.execAsync(`node ${componentsExec} deploy`, {
         cwd: testServiceDir
       })
       const stateFileContent = await fsp.readJsonAsync(testServiceStateFile)
@@ -98,7 +98,7 @@ describe('Integration Test - Programmatic usage', () => {
     })
 
     it('should re-deploy the "iam" and "function" components', async () => {
-      await cpp.execAsync(`${componentsExec} deploy`, {
+      await cpp.execAsync(`node ${componentsExec} deploy`, {
         cwd: testServiceDir
       })
       const stateFileContent = await fsp.readJsonAsync(testServiceStateFile)
@@ -152,7 +152,7 @@ describe('Integration Test - Programmatic usage', () => {
     })
 
     it('should remove the "iam" and "function" components', async () => {
-      await cpp.execAsync(`${componentsExec} remove`, {
+      await cpp.execAsync(`node ${componentsExec} remove`, {
         cwd: testServiceDir
       })
       const stateFileContent = await fsp.readJsonAsync(testServiceStateFile)

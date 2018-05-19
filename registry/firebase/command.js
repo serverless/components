@@ -1,28 +1,28 @@
 const firebase = require('firebase-tools')
 const logger = require('firebase-tools/lib/logger')
-const { equals, keys, map, prop } = require('ramda')
+const { keys, map, prop } = require('ramda')
 const ComponentsLogger = require('./ComponentsLogger')
 
 const setupLogger = () => {
-  logger
-    .add(ComponentsLogger, {
-      level: process.env.DEBUG ? "debug" : "info",
-      showLevel: false,
-      colorize: true,
-      context: {
-        log: (...args) => {
-          console.log(...args)
-        }
+  logger.add(ComponentsLogger, {
+    level: process.env.DEBUG ? 'debug' : 'info',
+    showLevel: false,
+    colorize: true,
+    context: {
+      log: (...args) => {
+        console.log(...args) // eslint-disable-line no-console
       }
-    })
+    }
+  })
 }
 
-const convertConfig = (config) => map((key) => {
-  const value = prop(key, config)
-  return `${key}=${JSON.stringify(value)}`
-}, keys(config))
+const convertConfig = (config) =>
+  map((key) => {
+    const value = prop(key, config)
+    return `${key}=${JSON.stringify(value)}`
+  }, keys(config))
 
-const configSet = async (inputs, state) => {
+const configSet = async (inputs) => {
   setupLogger()
   await firebase.functions.config.set(convertConfig(inputs.config), {
     project: inputs.project,
@@ -31,7 +31,7 @@ const configSet = async (inputs, state) => {
   })
 }
 
-const deploy = async (inputs, state) => {
+const deploy = async (inputs) => {
   setupLogger()
   await firebase.deploy({
     project: inputs.project,
@@ -39,7 +39,6 @@ const deploy = async (inputs, state) => {
     cwd: inputs.path
   })
 }
-
 
 const commands = {
   configSet,
@@ -54,7 +53,7 @@ process.on('message', (message) => {
   command(message.inputs, message.state)
     .then(() => process.exit())
     .catch((error) => {
-      console.error(error)
+      console.error(error) // eslint-disable-line no-console
       process.exit(1)
     })
 })

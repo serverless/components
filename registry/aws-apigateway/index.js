@@ -28,7 +28,10 @@ const createApi = async (params) => {
     body: Buffer.from(json, 'utf8')
   }).promise()
 
-  await APIGateway.createDeployment({ restApiId: res.id, stageName: 'dev' }).promise()
+  await APIGateway.createDeployment({
+    restApiId: res.id,
+    stageName: 'dev'
+  }).promise()
 
   const url = generateUrl(res.id)
   const urls = generateUrls(routes, res.id)
@@ -42,9 +45,7 @@ const createApi = async (params) => {
 }
 
 const updateApi = async (params) => {
-  const {
-    name, roleArn, routes, id
-  } = params
+  const { name, roleArn, routes, id } = params
 
   const swagger = getSwaggerDefinition(name, roleArn, routes)
   const json = JSON.stringify(swagger)
@@ -54,7 +55,10 @@ const updateApi = async (params) => {
     body: Buffer.from(json, 'utf8')
   }).promise()
 
-  await APIGateway.createDeployment({ restApiId: id, stageName: 'dev' }).promise()
+  await APIGateway.createDeployment({
+    restApiId: id,
+    stageName: 'dev'
+  }).promise()
 
   const url = generateUrl(id)
   const urls = generateUrls(routes, id)

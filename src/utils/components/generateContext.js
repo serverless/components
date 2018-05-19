@@ -5,9 +5,9 @@ const getInstanceId = require('./getInstanceId')
 const getChildrenPromises = require('./getChildrenPromises')
 const getComponentFunctions = require('./getComponentFunctions')
 const getComponentRootPath = require('./getComponentRootPath')
+const log = require('../logging/log')
 const getServiceId = require('../state/getServiceId')
 const getState = require('../state/getState')
-const log = require('../log')
 
 const generateContext = (
   components,
@@ -36,7 +36,7 @@ const generateContext = (
     log,
     // eslint-disable-next-line no-shadow
     load: async (type, alias, inputs) => {
-      const childComponentRootPath = getComponentRootPath(type)
+      const childComponentRootPath = await getComponentRootPath(type)
       const childComponentId = `${id}:${alias}`
 
       const childComponent = await getComponent(

@@ -1,7 +1,6 @@
 const winston = require('winston')
 
 class ComponentsLogger extends winston.Transport {
-
   constructor(options) {
     super()
     this.name = 'ComponentsLogger'
@@ -9,7 +8,7 @@ class ComponentsLogger extends winston.Transport {
     this.context = options.context
   }
 
-  log (level, msg, meta, callback) {
+  log(level, msg, meta, callback) {
     this.context.log(msg)
     callback(null, true)
   }

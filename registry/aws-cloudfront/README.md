@@ -6,6 +6,7 @@ Provision AWS Cloudfront distributions with serverless components
 
 <!-- AUTO-GENERATED-CONTENT:START (TOC) -->
 - [Input Types](#input-types)
+- [Output Types](#output-types)
 <!-- AUTO-GENERATED-CONTENT:END -->
 
 <!-- AUTO-GENERATED-CONTENT:START (COMPONENT_INPUT_TYPES) -->
@@ -22,6 +23,14 @@ Provision AWS Cloudfront distributions with serverless components
 | **defaultRootObject**| `string`<br/>*required* | defaultRootObject
 | **originDomain**| `string`<br/>*required* | originDomain
 | **name**| `string` | name
+
+<!-- AUTO-GENERATED-CONTENT:END -->
+
+<!-- AUTO-GENERATED-CONTENT:START (COMPONENT_OUTPUT_TYPES) -->
+## Output Types
+| Name | Type | Description |
+|:------ |:-----|:-----------------|
+| **distribution**| `object` | Information about the CloudFront distributed
 
 <!-- AUTO-GENERATED-CONTENT:END -->
 

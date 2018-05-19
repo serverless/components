@@ -30,7 +30,7 @@ const phoneNumberProps = [
   'voiceFallbackUrl',
   'voiceMethod',
   'voiceUrl',
-  'emergencyStatus'
+  'emergencyStatus',
   'emergencyAddressSid'
 ]
 
@@ -38,8 +38,7 @@ const updatePhoneNumber = async (params) => {
   const { accountSid, authToken, sid, ...inputs } = params
 
   const client = twilio(accountSid, authToken)
-  const phoneNumber = await client.incomingPhoneNumbers(sid)
-    .update(inputs)
+  const phoneNumber = await client.incomingPhoneNumbers(sid).update(inputs)
   return pick(phoneNumberProps, phoneNumber)
 }
 
@@ -61,13 +60,8 @@ const createPhoneNumber = async (params) => {
       })
     }
   }
-  try {
-    const phoneNumber = await client.incomingPhoneNumbers.create(inputs)
-    return pick(phoneNumberProps, phoneNumber)
-  } catch (error) {
-    console.log('create error:', error)
-    throw error
-  }
+  const phoneNumber = await client.incomingPhoneNumbers.create(inputs)
+  return pick(phoneNumberProps, phoneNumber)
 }
 
 const deletePhoneNumber = async (params) => {

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const dotenv = require('dotenv')
 const minimist = require('minimist')
+require('dotenv').config()
 
 const { run } = require('../src/index')
 

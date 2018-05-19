@@ -1,15 +1,20 @@
+const { readFile } = require('@serverless/utils')
 const path = require('path')
 const { forEachObjIndexed } = require('ramda')
-const { readFile } = require('../fs')
 const getServiceId = require('../state/getServiceId')
 const transformPostExecutionVars = require('../variables/transformPostExecutionVars')
 const resolvePreExecutionVars = require('../variables/resolvePreExecutionVars')
+const validateVarsUsage = require('../variables/validateVarsUsage')
 const getInstanceId = require('./getInstanceId')
 const setInputDefaults = require('./setInputDefaults')
-const validateInputs = require('./validateInputs')
+const validateCoreVersion = require('./validateCoreVersion')
+const validateTypes = require('./validateTypes')
 
 module.exports = async (componentRoot, componentId, inputs, stateFile) => {
   let slsYml = await readFile(path.join(componentRoot, 'serverless.yml'))
+
+  validateVarsUsage(slsYml)
+  validateCoreVersion(slsYml.type, slsYml.core)
 
   slsYml.id = componentId || slsYml.type
 
@@ -32,7 +37,7 @@ module.exports = async (componentRoot, componentId, inputs, stateFile) => {
 
   slsYml.inputs = setInputDefaults(slsYml.inputTypes, slsYml.inputs)
 
-  validateInputs(slsYml.id, slsYml.inputTypes, slsYml.inputs)
+  validateTypes(slsYml.id, slsYml.inputTypes, slsYml.inputs, { prefix: 'Input' })
 
   return slsYml
 }

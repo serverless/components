@@ -1,4 +1,11 @@
 type: github-webhook
+version: 0.2.0
+core: 0.2.x
+
+description: "Serverless component that provisions github webhooks"
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
 
 inputTypes:
   githubApiToken:
@@ -29,3 +36,8 @@ inputTypes:
       List of allowed events. For more details on events & payloads [see the docs](https://developer.github.com/v3/activity/events/types/)
     example:
       - create
+
+outputTypes:
+  github:
+    type: object
+    description: The GitHub Webhook configuration

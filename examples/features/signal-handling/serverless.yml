@@ -1,0 +1,13 @@
+type: signal-handling
+version: 0.0.1
+
+components:
+  mySlowFunction:
+    type: ./my-slow-function
+    inputs:
+      role: ${myRole.id}
+  myRole:
+    type: tests-integration-iam-mock
+    inputs:
+      name: my-role-${self.instanceId}
+      service: my.function.service

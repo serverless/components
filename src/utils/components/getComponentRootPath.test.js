@@ -1,19 +1,19 @@
+const { getTmpDir } = require('@serverless/utils')
 const path = require('path')
-const getRegistryRoot = require('../getRegistryRoot')
-const getTmpDir = require('../fs/getTmpDir')
+const getRegistryRoot = require('../registry/getRegistryRoot')
 const getComponentRootPath = require('./getComponentRootPath')
 
 describe('#getComponentRootPath()', () => {
-  it('should return a registry path if "type" parameter does not include path information', () => {
+  it('should return a registry path if "type" parameter does not include path information', async () => {
     const type = 'function-mock'
-    const res = getComponentRootPath(type)
+    const res = await getComponentRootPath(type)
     const expected = path.join(getRegistryRoot(), type)
     expect(res).toEqual(expected)
   })
 
-  it('should detect if "type" parameter includes path to local file system', () => {
+  it('should detect if "type" parameter includes path to local file system', async () => {
     const type = './my-custom-component'
-    const res = getComponentRootPath(type)
+    const res = await getComponentRootPath(type)
     const expected = path.resolve(type)
     expect(res).toEqual(expected)
   })
@@ -23,17 +23,17 @@ describe('#getComponentRootPath()', () => {
     let tmpDirPath
 
     beforeEach(async () => {
-      tmpDirPath = await getTmpDir()
       oldCwd = process.cwd()
-      process.chdir(tmpDirPath)
+      process.chdir(await getTmpDir())
+      tmpDirPath = process.cwd()
     })
 
     afterEach(() => {
       process.chdir(oldCwd)
     })
 
-    it('should default to the cwd if no parameter is provided', () => {
-      const res = getComponentRootPath()
+    it('should default to the cwd if no parameter is provided', async () => {
+      const res = await getComponentRootPath()
       expect(res).toEqual(tmpDirPath)
     })
   })

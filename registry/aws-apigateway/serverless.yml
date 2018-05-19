@@ -1,4 +1,11 @@
 type: aws-apigateway
+version: 0.2.0
+core: 0.2.x
+
+description: "Provision AWS API Gateway with serverless components."
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
 
 inputTypes:
   name:
@@ -13,3 +20,14 @@ inputTypes:
     type: object
     required: true
     description: Declaration of routes
+
+outputTypes:
+  id:
+    type: string
+    description: API Gateways id
+  url:
+    type: string
+    description: The API Gateways base URL
+  urls:
+    type: array
+    description: All the generated API Gateway URLs

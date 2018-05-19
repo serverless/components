@@ -7,7 +7,9 @@ jest.mock('aws-sdk', () => {
       if (params.Id === 'doesNotExist') {
         return Promise.reject(new Error('The specified distribution does not exist'))
       } else if (params.Id === 'disabled') {
-        return Promise.reject(new Error('The distribution you are trying to delete has not been disabled'))
+        return Promise.reject(
+          new Error('The distribution you are trying to delete has not been disabled')
+        )
       }
       return Promise.resolve()
     })
@@ -22,6 +24,10 @@ jest.mock('aws-sdk', () => {
     mocks,
     CloudFront: jest.fn().mockImplementation(() => CloudFront)
   }
+})
+
+afterEach(() => {
+  AWS.mocks.getDistributionMock.mockClear()
 })
 
 afterAll(() => {
@@ -45,7 +51,10 @@ describe('CloudFront Component Unit Tests', () => {
 
     const inputs = {}
 
-    await expect(cloudFrontComponent.remove(inputs, cloudFrontContextMock)).rejects.toHaveProperty('code', 'RETAIN_STATE')
+    await expect(cloudFrontComponent.remove(inputs, cloudFrontContextMock)).rejects.toHaveProperty(
+      'code',
+      'RETAIN_STATE'
+    )
     expect(AWS.CloudFront).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.getDistributionMock).toHaveBeenCalledTimes(1)
   })
@@ -68,6 +77,6 @@ describe('CloudFront Component Unit Tests', () => {
 
     await expect(cloudFrontComponent.remove(inputs, cloudFrontContextMock)).resolves.toEqual({})
     expect(AWS.CloudFront).toHaveBeenCalledTimes(1)
-    expect(AWS.mocks.getDistributionMock).toHaveBeenCalledTimes(2)
+    expect(AWS.mocks.getDistributionMock).toHaveBeenCalledTimes(1)
   })
 })

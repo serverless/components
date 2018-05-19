@@ -1,4 +1,5 @@
 type: s3-uploader-downloader
+version: 0.0.1
 
 components:
   filesBucket:

@@ -7,3 +7,4 @@ services:
     volumes:
       - .:/app
       - ~/.aws/:/root/.aws
+      - ~/.gitconfig:/root/.gitconfig

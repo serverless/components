@@ -33,7 +33,14 @@ describe('#executeComponent()', () => {
           memorySize: 512,
           timeout: 60
         },
+        inputTypes: {},
         outputs: {},
+        outputTypes: {
+          result: {
+            type: 'string',
+            required: true
+          }
+        },
         state: {},
         dependencies: [],
         children: {},
@@ -144,6 +151,16 @@ describe('#executeComponent()', () => {
     expect(res.outputs).toEqual({ result: 'rolled back' })
   })
 
+  it('should throw if outputs do not match output types', async () => {
+    const command = 'deploy'
+    const deploy = () => Promise.resolve({ invalid: 'type' }) // eslint-disable-line no-shadow
+    components = assocPath(['myFunction', 'fns', 'deploy'], deploy, components)
+
+    await expect(
+      executeComponent(componentId, components, stateFile, archive, command, options)
+    ).rejects.toThrow('Type error(s)')
+  })
+
   describe('when running "remove"', () => {
     const command = 'remove'
 
@@ -166,7 +183,7 @@ describe('#executeComponent()', () => {
     })
 
     it('should skip the command if the state is an empty object', async () => {
-      stateFile = assocPath([ 'myFunction', 'state' ], {}, stateFile)
+      stateFile = assocPath(['myFunction', 'state'], {}, stateFile)
 
       const res = await executeComponent(
         componentId,
@@ -186,7 +203,7 @@ describe('#executeComponent()', () => {
     })
 
     it('should flush state if remove is resolved', async () => {
-      stateFile = assocPath([ 'myFunction', 'state' ], { some: 'state' }, stateFile)
+      stateFile = assocPath(['myFunction', 'state'], { some: 'state' }, stateFile)
 
       const res = await executeComponent(
         componentId,
@@ -199,7 +216,7 @@ describe('#executeComponent()', () => {
       expect(res.executed).toEqual(true)
       expect(res.outputs).toEqual({ result: 'removed' })
       expect(stateFile.myFunction.state).toEqual({})
-      stateFile = assocPath([ 'myFunction', 'state' ], {}, stateFile)
+      stateFile = assocPath(['myFunction', 'state'], {}, stateFile)
     })
 
     it('should retain state if RETAIN_STATE error is thrown', async () => {
@@ -207,7 +224,7 @@ describe('#executeComponent()', () => {
         RETAIN_STATE: true,
         abc: 'xyz'
       }
-      stateFile = assocPath([ 'myFunction', 'state' ], retainedState, stateFile)
+      stateFile = assocPath(['myFunction', 'state'], retainedState, stateFile)
 
       const res = await executeComponent(
         componentId,
@@ -220,7 +237,7 @@ describe('#executeComponent()', () => {
       expect(res.executed).toEqual(true)
       expect(res.outputs).toEqual({})
       expect(stateFile.myFunction.state).toEqual(retainedState)
-      stateFile = assocPath([ 'myFunction', 'state' ], {}, stateFile)
+      stateFile = assocPath(['myFunction', 'state'], {}, stateFile)
     })
   })
 })

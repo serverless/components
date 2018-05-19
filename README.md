@@ -20,7 +20,6 @@ Serverless Components can deploy anything, but they're biased toward SaaS & clou
 
 ![serverless components overview](https://s3.amazonaws.com/assets.github.serverless/serverless-components-overview-2.gif)
 
-
 ## Example
 
 This example shows how an entire retail application can be assembled from components available. It provides the static frontend website, the REST API supporting the frontend and the database backing the REST API. Checkout the full example [here](./examples/retail-app).
@@ -113,7 +112,6 @@ components:
 
 Also please do join the _Components_ channel on our public [Serverless-Contrib Slack](https://serverless-contrib.slack.com/messages/C9U3RA55M) to continue the conversation.
 
-
 ## Table of Contents
 
 * [Getting Started](#getting-started)
@@ -122,9 +120,11 @@ Also please do join the _Components_ channel on our public [Serverless-Contrib S
 * [Concepts](#concepts)
   * [Components](#components)
   * [Composition](#composition)
-  * [Input types, Inputs & Outputs](#input-types-inputs--outputs)
+  * [Input types & Inputs](#input-types--inputs)
+  * [Output types & Outputs](#output-types--outputs)
   * [State](#state)
   * [Variables](#variables)
+  * [Setting Environment Variables](#env-variables)
   * [Graph](#graph)
   * [Custom commands](#custom-commands)
   * [Registry](#registry)
@@ -169,28 +169,26 @@ Also please do join the _Components_ channel on our public [Serverless-Contrib S
   * [Rest API Example](./examples/restapi)
   * [Retail App](./examples/retail-app)
 
-
 ## Getting Started
 
 **Note:** Make sure you have Node.js 8+ and npm installed on your machine.
 
-1. `npm install --global serverless-components`
-1. Setup the environment variables
-   * `export AWS_ACCESS_KEY_ID=my_access_key_id`
-   * `export AWS_SECRET_ACCESS_KEY=my_secret_access_key`
+1.  `npm install --global serverless-components`
+1.  Setup the environment variables
+    * `export AWS_ACCESS_KEY_ID=my_access_key_id`
+    * `export AWS_SECRET_ACCESS_KEY=my_secret_access_key`
 
 Run commands with:
 
 ```
 components [Command]
 ```
-Checkout the [CLI docs](#cli-usage) for a list of all the available commands and instructions on how they work.
 
+Checkout the [CLI docs](#cli-usage) for a list of all the available commands and instructions on how they work.
 
 ## Trying it out
 
 The best way to give components a try is to deploy one of the examples. We recommend checking out our [retail-app example](./examples/retail-app) and to follow along with the instructions there.
-
 
 ## Current Limitations
 
@@ -207,7 +205,6 @@ Rolling back your application into the previous, stable state is currently not s
 
 However the framework ensures that your state file always reflects the correct state of your infrastructure setup (even if something goes wrong during deployment / removal).
 
-
 ## Concepts
 
 ### Components
@@ -217,7 +214,6 @@ A component is the smallest unit of abstraction for your infrastructure. It can 
 You define a component using two files: `serverless.yml` for config, and `index.js` for the provisioning logic.
 
 The `index.js` file exports a `deploy` function and a `remove` function, both of which take two arguments: `inputs` and `context`. Each exported function name reflects the CLI command which will invoke it (the `deploy` function will be executed when one runs `components deploy`).
-
 
 These two files look something like this:
 
@@ -255,7 +251,6 @@ module.exports = {
 
 However, this `index.js` file is optional, since your component can just be a composition of other smaller components without provisioning logic on its own.
 
-
 ### Composition
 
 Components can include other components in order to build up higher level use cases and expose a minimum amount of configuration.
@@ -280,7 +275,7 @@ components:
       service: lambda.amazonaws.com
 ```
 
-### Input types, Inputs & Outputs
+### Input types & Inputs
 
 #### Input types
 
@@ -295,7 +290,6 @@ inputTypes:
     required: true
     default: John
 ```
-
 
 Or, if the component is being used as a child of another parent component, the parent will supply `inputs` and they can override the defaults that are defined at the child level:
 
@@ -326,21 +320,39 @@ components:
 
 Given this `serverless.yml` you would deploy a `aws-lambda` function with a memory size of 512 and timeout of 300.
 
+### Output types & Outputs
+
+#### Output types
+
+Output types are the description of the outputs your component returns. You supply those `outputTypes` in the component's `serverless.yml` file:
+
+```yaml
+type: aws-lambda
+
+outputTypes:
+  name:
+    type: string
+  arn:
+    type: string
+```
+
 #### Outputs
 
-Your provisioning logic, or the `deploy` method of your `index.js` file, can optionally return an `outputs` object. This output can be referenced in `serverless.yml` as inputs to other components.
+Your provisioning logic, or the `deploy` method of your `index.js` file, should return an `outputs` object that matches the outputTypes declared in your component's `serverless.yml` file. This output can be referenced in `serverless.yml` as inputs to other components.
 
-For example, the lambda component's `deploy` method returns outputs that look like this:
+For example, the above `aws-lambda` component's `deploy` method returns outputs that look like this:
 
 **index.js**
 
 ```js
 const deploy = (inputs, context) => {
   // lambda provisioning logic
+  const res = doLambdaDeploy()
 
   // return outputs
   return {
-    arn: res.FunctionArn
+    arn: res.FunctionArn,
+    name: res.FunctionName
   }
 }
 
@@ -379,24 +391,24 @@ The operation that will be fired depends on the inputs and how the provider work
 Here's an example demonstrating how a lambda component decides what needs to be done based on the `inputs` and `state` objects:
 
 ```js
-const deploy = (inputs, context) => {
-let outputs;
+const deploy = async (inputs, context) => {
+  let outputs
   if (inputs.name && !context.state.name) {
-    console.log(`Creating Lambda: ${inputs.name}`);
-    outputs = await create(inputs);
+    console.log(`Creating Lambda: ${inputs.name}`)
+    outputs = await create(inputs)
   } else if (context.state.name && !inputs.name) {
-    console.log(`Removing Lambda: ${context.state.name}`);
-    outputs = await remove(context.state.name);
+    console.log(`Removing Lambda: ${context.state.name}`)
+    outputs = await remove(context.state.name)
   } else if (inputs.name !== context.state.name) {
-    console.log(`Removing Lambda: ${context.state.name}`);
-    await remove(context.state.name);
-    console.log(`Creating Lambda: ${inputs.name}`);
-    outputs = await create(inputs);
+    console.log(`Removing Lambda: ${context.state.name}`)
+    await remove(context.state.name)
+    console.log(`Creating Lambda: ${inputs.name}`)
+    outputs = await create(inputs)
   } else {
-    console.log(`Updating Lambda: ${inputs.name}`);
-    outputs = await update(inputs);
+    console.log(`Updating Lambda: ${inputs.name}`)
+    outputs = await update(inputs)
   }
-  return outputs;
+  return outputs
 }
 
 module.exports = {
@@ -411,6 +423,19 @@ The framework supports variables from the following sources:
 * **Environment Variables:** for example, `${env.GITHUB_TOKEN}`
 * **Output:** for example: `${myEndpoint.url}`, where `myEndpoint` is the component alias as defined in `serverless.yml`, and `url` is a property in the outputs object that is returned from the `myEndpoint` provisioning function.
 * **Self:** for example, `${self.path}/frontend`, where `self.path` evaluates to the absolute path of the component's root folder.
+
+### Setting Environment Variables
+
+The framework supports two types of environment variables:
+
+* **.env File:** Create a .env file in the root directory of your project. Add environment-specific variables on new lines in the form of NAME=VALUE. For example:
+```
+SOME_ENV=foo
+```
+* **CLI** Running the command like this:
+```
+SOME_ENV=foo components deploy
+```
 
 ### Graph
 
@@ -591,7 +616,6 @@ Congratulations! You've successfully created your first Serverless component!
 
 Want to learn more? Make sure to take a look at all the different component implementations in the [Serverless Registry](./registry)!
 
-
 ## Docs
 
 ### CLI Usage
@@ -622,7 +646,6 @@ To remove your app, run
 components remove
 ```
 
-
 ### Component Docs
 
 * [aws-apigateway](./registry/aws-apigateway)
@@ -648,12 +671,11 @@ components remove
 * [s3-website-config](./registry/s3-website-config)
 * [static-website](./registry/static-website)
 
-
 ## Examples
 
 * [Basic Lambda Example](./examples/basic)
 * [Blog Example](./examples/blog)
-* [Github Webhook Example](./examples/basic)
+* [Github Webhook Example](./examples/github-webhook-example)
 * [Landing Page Example](./examples/landing-page)
 * [Netlify Site Example](./examples/netlify-site-example)
 * [Rest API Example](./examples/restapi)

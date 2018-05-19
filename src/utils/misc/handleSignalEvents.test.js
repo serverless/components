@@ -31,7 +31,7 @@ describe('#handleSignalEvents()', () => {
     const SIGNAL = 'SIGINT'
 
     beforeEach(() => {
-      process.removeAllListeners([ SIGNAL ])
+      process.removeAllListeners([SIGNAL])
     })
 
     it('should ask for a confirmation (emitting signal a second time) before exiting', (done) => {
@@ -82,7 +82,7 @@ describe('#handleSignalEvents()', () => {
     const SIGNAL = 'SIGTERM'
 
     beforeEach(() => {
-      process.removeAllListeners([ SIGNAL ])
+      process.removeAllListeners([SIGNAL])
     })
 
     it('should exit the process after receiving the signal', (done) => {
@@ -117,7 +117,7 @@ describe('#handleSignalEvents()', () => {
     const SIGNAL = 'SIGBREAK'
 
     beforeEach(() => {
-      process.removeAllListeners([ SIGNAL ])
+      process.removeAllListeners([SIGNAL])
     })
 
     it('should exit the process after receiving the signal', (done) => {

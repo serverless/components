@@ -1,4 +1,5 @@
 const { clone } = require('ramda')
+
 const utils = require('./utils')
 
 const {
@@ -13,11 +14,15 @@ const {
   readStateFile,
   writeStateFile,
   trackDeployment,
-  handleSignalEvents
+  handleSignalEvents,
+  packageComponent
   // log
 } = utils
 
 const run = async (command, options) => {
+  if (command === 'package') {
+    return packageComponent(options)
+  }
   handleSignalEvents()
   const reporter = await errorReporter()
   let components = {}

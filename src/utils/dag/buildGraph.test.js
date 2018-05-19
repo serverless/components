@@ -12,7 +12,7 @@ describe('#buildGraph()', () => {
       },
       outputs: {},
       state: {},
-      dependencies: [ 'role', 'func' ],
+      dependencies: ['role', 'func'],
       fns: {
         deploy: () => {},
         remove: () => {}
@@ -27,7 +27,7 @@ describe('#buildGraph()', () => {
       },
       outputs: {},
       state: {},
-      dependencies: [ 'role' ],
+      dependencies: ['role'],
       fns: {
         deploy: () => {},
         remove: () => {},

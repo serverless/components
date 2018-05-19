@@ -1,4 +1,11 @@
 type: github-webhook-aws
+version: 0.2.0
+core: 0.2.x
+
+description: "Github webhook component using AWS API gateway"
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
 
 inputTypes:
   function:
@@ -22,6 +29,20 @@ inputTypes:
     required: true
     example:
       - create
+
+outputTypes:
+  function:
+    type: string
+    description: The function which is used for this WebHook
+  githubApiToken:
+    type: string
+    description: GitHub personal access token needed for access to the GitHub API.
+  githubRepo:
+    type: string
+    description: The GitHub repos URL
+  webhookTriggers:
+    type: array
+    description: The WebHook triggers which are used
 
 components:
   GithubWebhook:

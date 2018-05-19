@@ -6,6 +6,7 @@ Event Gateway Serverless Component.
 
 <!-- AUTO-GENERATED-CONTENT:START (TOC) -->
 - [Input Types](#input-types)
+- [Output Types](#output-types)
 - [Example](#example)
 <!-- AUTO-GENERATED-CONTENT:END -->
 
@@ -20,6 +21,15 @@ Event Gateway Serverless Component.
 | **path**| `string`<br/>*required* | path
 | **space**| `string`<br/>*required* | space
 | **lambdaArn**| `string`<br/>*required* | The ARN of the lambda function being called by the event gateway
+
+<!-- AUTO-GENERATED-CONTENT:END -->
+
+<!-- AUTO-GENERATED-CONTENT:START (COMPONENT_OUTPUT_TYPES) -->
+## Output Types
+| Name | Type | Description |
+|:------ |:-----|:-----------------|
+| **subscriptionId**| `string` | The generated subscription id
+| **url**| `string` | The generated URL
 
 <!-- AUTO-GENERATED-CONTENT:END -->
 

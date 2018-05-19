@@ -1,8 +1,9 @@
+const { join } = require('path')
 const getComponentFunctions = require('./getComponentFunctions')
 
 describe('#getComponentFunctions()', () => {
   it('should silently fail if component entry point could not be loaded', () => {
-    const componentRoot = './registry/some-component'
+    const componentRoot = join('registry', 'some-component')
     expect(() => getComponentFunctions(componentRoot)).not.toThrowError()
   })
 

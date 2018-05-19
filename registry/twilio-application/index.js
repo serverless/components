@@ -28,13 +28,8 @@ const createTwilioApplication = async (params) => {
   const { accountSid, authToken, ...inputs } = params
 
   const client = twilio(accountSid, authToken)
-  try {
-    const application = await client.applications.create(inputs)
-    return pick(applicationProps, application)
-  } catch (error) {
-    console.log('create error:', error)
-    throw error
-  }
+  const application = await client.applications.create(inputs)
+  return pick(applicationProps, application)
 }
 
 const deleteTwilioApplication = async (params) => {
@@ -51,8 +46,7 @@ const updateTwilioApplication = async (params) => {
   const { accountSid, authToken, sid, ...inputs } = params
 
   const client = twilio(accountSid, authToken)
-  const application = await client.applications(sid)
-    .update(inputs)
+  const application = await client.applications(sid).update(inputs)
   return pick(applicationProps, application)
 }
 

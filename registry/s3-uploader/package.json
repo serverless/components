@@ -1,17 +1,11 @@
 {
   "name": "@serverless-components/s3-uploader",
-  "version": "0.1.0",
-  "description": "A Serverless Component for uploading files to s3",
+  "version": "0.2.0",
+  "private": true,
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/serverless/components"
-  },
-  "author": "serverless.com",
-  "license": "Apache-2.0",
   "dependencies": {
     "@serverless/fdk": "^0.7.1",
     "parse-multipart": "^1.0.4"

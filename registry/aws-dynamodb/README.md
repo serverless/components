@@ -2,14 +2,20 @@
 
 The DynamoDB component takes one or more table models as input and provides a full CRUD functionality for the data for the tables.
 
-## Input Parameters
-
 <!-- AUTO-GENERATED-CONTENT:START (COMPONENT_INPUT_TYPES) -->
 ## Input Types
 | Name | Type | Description |
 |:------ |:-----|:-----------------|
 | **region**| `string`<br/>*required* | The region the table will be created in.
 | **tables**| `object[]`<br/>*required* | Array of AWS DynamoDB table definitions
+
+<!-- AUTO-GENERATED-CONTENT:END -->
+
+<!-- AUTO-GENERATED-CONTENT:START (COMPONENT_OUTPUT_TYPES) -->
+## Output Types
+| Name | Type | Description |
+|:------ |:-----|:-----------------|
+| **ddbtables**| `array` | Array containing information about all the deployed DynamoDB tables
 
 <!-- AUTO-GENERATED-CONTENT:END -->
 

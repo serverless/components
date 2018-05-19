@@ -44,9 +44,7 @@ function getRegion(params) {
 }
 
 async function registerFunction(params) {
-  const {
-    egInstance, functionId, lambdaArn, region
-  } = params
+  const { egInstance, functionId, lambdaArn, region } = params
   const credentials = getCredentials()
   return egInstance.registerFunction({
     functionId,
@@ -65,9 +63,7 @@ async function deleteFunction(params) {
 }
 
 async function subscribe(params) {
-  const {
-    egInstance, functionId, event, path, method, cors, space
-  } = params
+  const { egInstance, functionId, event, path, method, cors, space } = params
 
   // TODO: remove mutation
   // eslint-disable-next-line no-param-reassign
@@ -104,9 +100,7 @@ async function listSubscriptions(params) {
 }
 
 async function create(params) {
-  const {
-    egInstance, functionId, lambdaArn, event, path, method, cors, space, region
-  } = params
+  const { egInstance, functionId, lambdaArn, event, path, method, cors, space, region } = params
   await registerFunction({
     egInstance,
     functionId,
@@ -129,9 +123,7 @@ async function create(params) {
 }
 
 async function update(params) {
-  const {
-    egInstance, functionId, event, path, method, cors, space, subscriptionId
-  } = params
+  const { egInstance, functionId, event, path, method, cors, space, subscriptionId } = params
   await unsubscribe({ egInstance, subscriptionId })
   const res = await subscribe({
     egInstance,
@@ -172,14 +164,18 @@ async function deploy(inputs, context) {
   let outputs = {}
   if (shouldCreate) {
     if (inputs.event === 'http') {
-      context.log(`Creating Event Gateway Subscription: ${inputs.method} ${inputs.path} --> "${functionId}"`)
+      context.log(
+        `Creating Event Gateway Subscription: ${inputs.method} ${inputs.path} --> "${functionId}"`
+      )
     } else {
       context.log(`Creating Event Gateway Subscription: ${inputs.path} --> "${functionId}"`)
     }
     outputs = await create(inputs)
   } else if (shouldUpdate) {
     if (inputs.event === 'http') {
-      context.log(`Updating Event Gateway Subscription: ${inputs.method} ${inputs.path} --> "${functionId}"`)
+      context.log(
+        `Updating Event Gateway Subscription: ${inputs.method} ${inputs.path} --> "${functionId}"`
+      )
     } else {
       context.log(`Updating Event Gateway Subscription: ${inputs.path} --> "${functionId}"`)
     }
@@ -215,8 +211,13 @@ async function remove(inputs, context) {
   const shouldRemove = context.state.subscriptionId
 
   if (shouldRemove) {
-    context.log(`Removing Event Gateway Subscription: ${context.state.subscriptionId} --> "${functionId}"`)
-    await unsubscribe({ egInstance, subscriptionId: context.state.subscriptionId })
+    context.log(
+      `Removing Event Gateway Subscription: ${context.state.subscriptionId} --> "${functionId}"`
+    )
+    await unsubscribe({
+      egInstance,
+      subscriptionId: context.state.subscriptionId
+    })
     try {
       await deleteFunction({ egInstance, functionId })
     } catch (error) {

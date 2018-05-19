@@ -39,6 +39,13 @@ jest.mock('aws-sdk', () => {
   }
 })
 
+afterEach(() => {
+  AWS.mocks.createRoleMock.mockClear()
+  AWS.mocks.deleteRoleMock.mockClear()
+  AWS.mocks.attachRolePolicyMock.mockClear()
+  AWS.mocks.detachRolePolicyMock.mockClear()
+})
+
 afterAll(() => {
   BbPromise.delay.mockRestore()
 })
@@ -86,8 +93,8 @@ describe('aws-iam-role unit tests', () => {
     }
     const outputs = await iamComponent.deploy(inputs, iamContextMock)
     expect(AWS.IAM).toHaveBeenCalledTimes(1)
-    expect(AWS.mocks.createRoleMock).toHaveBeenCalledTimes(1)
-    expect(AWS.mocks.attachRolePolicyMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.createRoleMock).not.toBeCalled()
+    expect(AWS.mocks.attachRolePolicyMock).not.toBeCalled()
     expect(outputs.name).toEqual(inputs.name)
     expect(outputs.arn).toEqual('abc:xyz')
     expect(outputs.service).toEqual(inputs.service)
@@ -162,8 +169,8 @@ describe('aws-iam-role unit tests', () => {
     const outputs = await iamComponent.remove(inputs, iamContextMock)
 
     expect(AWS.IAM).toHaveBeenCalledTimes(1)
-    expect(AWS.mocks.deleteRoleMock).toHaveBeenCalledTimes(2)
-    expect(AWS.mocks.detachRolePolicyMock).toHaveBeenCalledTimes(2)
+    expect(AWS.mocks.deleteRoleMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.detachRolePolicyMock).toHaveBeenCalledTimes(1)
     expect(iamContextMock.saveState).toBeCalledWith({
       name: null,
       arn: null,

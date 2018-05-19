@@ -1,5 +1,5 @@
+const { getTmpDir } = require('@serverless/utils')
 const { join } = require('path')
-const getTmpDir = require('../fs/getTmpDir')
 const getComponentsFromStateFile = require('./getComponentsFromStateFile')
 
 describe('#getComponentsFromStateFile()', () => {
@@ -51,9 +51,9 @@ describe('#getComponentsFromStateFile()', () => {
   }
 
   beforeEach(async () => {
-    tmpDirPath = await getTmpDir()
     oldCwd = process.cwd()
-    process.chdir(tmpDirPath)
+    process.chdir(await getTmpDir())
+    tmpDirPath = process.cwd()
   })
 
   afterEach(() => {

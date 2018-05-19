@@ -19,7 +19,7 @@ async function removeStateFiles(stateFiles) {
 }
 
 describe('Integration Test - Simple', () => {
-  jest.setTimeout(20000)
+  jest.setTimeout(40000)
 
   const testDir = path.dirname(__filename)
   const componentsExec = path.join(testDir, '..', '..', 'bin', 'components')
@@ -28,11 +28,11 @@ describe('Integration Test - Simple', () => {
   const FUNCTION_NAME = 'my-function'
 
   beforeAll(async () => {
-    await removeStateFiles([ testServiceStateFile ])
+    await removeStateFiles([testServiceStateFile])
   })
 
   afterAll(async () => {
-    await removeStateFiles([ testServiceStateFile ])
+    await removeStateFiles([testServiceStateFile])
   })
 
   describe('our test setup', () => {
@@ -45,7 +45,7 @@ describe('Integration Test - Simple', () => {
 
   describe('when running through a typical component usage lifecycle', () => {
     it('should deploy the "iam" and "function" components', async () => {
-      await cpp.execAsync(`${componentsExec} deploy`, {
+      await cpp.execAsync(`node ${componentsExec} deploy`, {
         cwd: testServiceDir,
         env: {
           ...process.env,
@@ -98,7 +98,7 @@ describe('Integration Test - Simple', () => {
     })
 
     it('should re-deploy the "iam" and "function" components', async () => {
-      await cpp.execAsync(`${componentsExec} deploy`, {
+      await cpp.execAsync(`node ${componentsExec} deploy`, {
         cwd: testServiceDir,
         env: {
           ...process.env,
@@ -151,7 +151,7 @@ describe('Integration Test - Simple', () => {
     })
 
     it('should invoke the "function" component with CLI options', async () => {
-      await cpp.execAsync(`${componentsExec} invoke --data "Hello World"`, {
+      await cpp.execAsync(`node ${componentsExec} invoke --data "Hello World"`, {
         cwd: testServiceDir,
         env: {
           ...process.env,
@@ -209,7 +209,7 @@ describe('Integration Test - Simple', () => {
       // third deployment is done
       // NOTE: the order of this test here is important since we're keeping and checking the
       // state file throughout the whole test suite
-      const cmd = cpp.execAsync(`${componentsExec} deploy`, {
+      const cmd = cpp.execAsync(`node ${componentsExec} deploy`, {
         cwd: testServiceDir,
         env: {
           ...process.env,
@@ -265,7 +265,7 @@ describe('Integration Test - Simple', () => {
     })
 
     it('should remove the "iam" and "function" components', async () => {
-      await cpp.execAsync(`${componentsExec} remove`, {
+      await cpp.execAsync(`node ${componentsExec} remove`, {
         cwd: testServiceDir,
         env: {
           ...process.env,
