@@ -65,23 +65,6 @@ describe('aws-sns-topic tests', () => {
       state: {
         topicArn: 'arn:aws:sns:us-east-1:000000000000:some-sns-topic-name',
         name: 'some-sns-topic-name',
-        deliveryPolicy: {
-          http: {
-            defaultHealthyRetryPolicy: {
-              minDelayTarget: 18,
-              maxDelayTarget: 19,
-              numRetries: 8,
-              numMaxDelayRetries: 2,
-              numNoDelayRetries: 2,
-              numMinDelayRetries: 2,
-              backoffFunction: 'arithmetic'
-            },
-            disableSubscriptionOverrides: true,
-            defaultThrottlePolicy: {
-              maxReceivesPerSecond: 3
-            }
-          }
-        },
         displayName: 'MySNSTopic'
       },
       archive: {},
@@ -91,31 +74,56 @@ describe('aws-sns-topic tests', () => {
 
     const inputs = {
       name: 'some-sns-topic-name',
+      policy: {
+        Version: '2008-10-17',
+        Id: 'policy_id',
+        Statement: [
+          {
+            Effect: 'Allow',
+            Sid: 'statement_id',
+            Principal: { AWS: '*' },
+            Action: ['SNS:Publish'],
+            Resource: 'arn:aws:sns:us-east-1:000000000000:my-sns-topic'
+          }
+        ]
+      },
       deliveryPolicy: {
         http: {
           defaultHealthyRetryPolicy: {
-            minDelayTarget: 18,
-            maxDelayTarget: 19,
-            numRetries: 8,
-            numMaxDelayRetries: 2,
-            numNoDelayRetries: 2,
-            numMinDelayRetries: 2,
             backoffFunction: 'arithmetic'
-          },
-          disableSubscriptionOverrides: true,
-          defaultThrottlePolicy: {
-            maxReceivesPerSecond: 3
           }
         }
       },
-      displayName: 'MySNSTopic'
+      displayName: 'NewSNSTopic'
     }
 
     const outputs = await snsTopicComponent.deploy(inputs, snsTopicContextMock)
 
     expect(AWS.SNS).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.removeSNSTopicMock).toHaveBeenCalledTimes(0)
-    expect(AWS.mocks.updateTopicAttributesMock).toHaveBeenCalledTimes(2)
+    expect(AWS.mocks.updateTopicAttributesMock).toHaveBeenCalledTimes(3)
+    expect(AWS.mocks.updateTopicAttributesMock).toBeCalledWith(
+      expect.objectContaining({
+        AttributeName: 'DeliveryPolicy',
+        AttributeValue: '{"http":{"defaultHealthyRetryPolicy":{"backoffFunction":"arithmetic"}}}',
+        TopicArn: 'arn:aws:sns:us-east-1:000000000000:some-sns-topic-name'
+      })
+    )
+    expect(AWS.mocks.updateTopicAttributesMock).toBeCalledWith(
+      expect.objectContaining({
+        AttributeName: 'Policy',
+        AttributeValue:
+          '{"Version":"2008-10-17","Id":"policy_id","Statement":[{"Effect":"Allow","Sid":"statement_id","Principal":{"AWS":"*"},"Action":["SNS:Publish"],"Resource":"arn:aws:sns:us-east-1:000000000000:my-sns-topic"}]}',
+        TopicArn: 'arn:aws:sns:us-east-1:000000000000:some-sns-topic-name'
+      })
+    )
+    expect(AWS.mocks.updateTopicAttributesMock).toBeCalledWith(
+      expect.objectContaining({
+        AttributeName: 'DisplayName',
+        AttributeValue: 'NewSNSTopic',
+        TopicArn: 'arn:aws:sns:us-east-1:000000000000:some-sns-topic-name'
+      })
+    )
     expect(outputs.arn).toEqual(`arn:aws:sns:us-east-1:000000000000:${inputs.name}`)
     expect(snsTopicContextMock.saveState).toHaveBeenCalledTimes(1)
   })
