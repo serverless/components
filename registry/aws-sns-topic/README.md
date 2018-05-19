@@ -38,6 +38,28 @@ components:
     type: aws-sns-topic
     inputs:
       displayName: My SNS Topic display name
+      policy:
+        Version: 2008-10-17T00:00:00.000Z
+        Id: policy_id
+        Statement:
+          - Effect: Allow
+            Sid: statement_id
+            Principal:
+              AWS: '*'
+            Action:
+              - 'SNS:Publish'
+              - 'SNS:RemovePermission'
+              - 'SNS:SetTopicAttributes'
+              - 'SNS:DeleteTopic'
+              - 'SNS:ListSubscriptionsByTopic'
+              - 'SNS:GetTopicAttributes'
+              - 'SNS:Receive'
+              - 'SNS:AddPermission'
+              - 'SNS:Subscribe'
+            Resource: 'arn:aws:sns:us-east-1:000000000000:my-sns-topic'
+            Condition:
+              StringEquals:
+                'AWS:SourceOwner': '000000000000'
       deliveryPolicy:
         http:
           defaultHealthyRetryPolicy:
