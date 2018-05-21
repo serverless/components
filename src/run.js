@@ -1,5 +1,5 @@
 /* eslint no-console: 0 */
-const { clone, is, isEmpty, difference } = require('ramda')
+const { clone, reduce, is, isEmpty, difference } = require('ramda')
 const path = require('path')
 const chalk = require('chalk')
 const utils = require('./utils')
@@ -42,19 +42,23 @@ const run = async (command, options) => {
 
     const rootComponentName = getRootComponentName(serverlessFileComponents)
 
-    const availableCommands = Object.keys(serverlessFileComponents).reduce((acc, curr) => {
-      const key = curr.replace(`${rootComponentName}:`, '')
-      const comp = serverlessFileComponents[curr]
-      if (comp.commands) {
-        // Set root component key as 'root'
-        const finalKey = key === rootComponentName ? 'root' : key
-        acc[finalKey] = {
-          commands: comp.commands,
-          rootPath: comp.rootPath
+    const availableCommands = reduce(
+      (acc, curr) => {
+        const key = curr.replace(`${rootComponentName}:`, '')
+        const comp = serverlessFileComponents[curr]
+        if (comp.commands) {
+          // Set root component key as 'root'
+          const finalKey = key === rootComponentName ? 'root' : key
+          acc[finalKey] = {
+            commands: comp.commands,
+            rootPath: comp.rootPath
+          }
         }
-      }
-      return acc
-    }, {})
+        return acc
+      },
+      {},
+      Object.keys(serverlessFileComponents)
+    )
 
     // Show help if no command or help flag used without any component names
     if (!command || command === 'help' || (!command && options.h) || (!command && options.help)) {
@@ -193,14 +197,18 @@ async function doCommand(cmd, options, availableCommands, data) {
     // validate options passed in
     const commandOptions = componentCommands[currentCommand].options
     if (commandOptions && !isEmpty(options)) {
-      const optionsWithShortcuts = Object.keys(commandOptions).reduce((acc, curr) => {
-        const cmdData = commandOptions[curr]
-        if (cmdData.shortcut) {
-          acc[cmdData.shortcut] = options[curr]
-        }
-        acc[curr] = options[curr]
-        return acc
-      }, {})
+      const optionsWithShortcuts = reduce(
+        (acc, curr) => {
+          const cmdData = commandOptions[curr]
+          if (cmdData.shortcut) {
+            acc[cmdData.shortcut] = options[curr]
+          }
+          acc[curr] = options[curr]
+          return acc
+        },
+        {},
+        Object.keys(commandOptions)
+      )
       // Diff the options + shortcut config with passed in options
       const unknownOptions = difference(Object.keys(options), Object.keys(optionsWithShortcuts))
       if (!isEmpty(unknownOptions)) {

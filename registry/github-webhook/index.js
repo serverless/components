@@ -5,33 +5,29 @@ const commands = {
   info: {
     command: 'info',
     description: 'Get info about github webhook',
-    handler: (inputs, state, options) => {
+    handler: async (inputs, state, options) => {
       if (!webhookExists(state)) {
         console.log('No webhook exists yet. Please run "components deploy"') // eslint-disable-line
         return false
       }
 
-      return getWebhook({
+      const data = await getWebhook({
         githubRepo: state.githubRepo,
         webhookId: state.github.id,
         githubApiToken: state.githubApiToken
       })
-        .then((data) => {
-          // if --json set it will output raw json
-          if (options.json) {
-            console.log(JSON.stringify(data.data)) // eslint-disable-line
-            return
-          }
-          // Default console.log nice output
-          console.log('Github webhook info:') // eslint-disable-line
-          Object.keys(data.data).forEach((key) => {
-            const values = data.data[key]
-            console.log(`   ${key}: ${JSON.stringify(values)}`) // eslint-disable-line
-          })
-        })
-        .catch((e) => {
-          throw e
-        })
+
+      // if --json set it will output raw json
+      if (options.json) {
+        console.log(JSON.stringify(data.data)) // eslint-disable-line
+        return
+      }
+      // Default console.log nice output
+      console.log('Github webhook info:') // eslint-disable-line
+      Object.keys(data.data).forEach((key) => {
+        const values = data.data[key]
+        console.log(`   ${key}: ${JSON.stringify(values)}`) // eslint-disable-line
+      })
     },
     options: {
       json: {
