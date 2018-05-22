@@ -3,7 +3,7 @@
 const AWS = require('aws-sdk')
 const S3 = require('s3-client')
 
-const awsS3 = new AWS.S3({ region: 'us-east-1' })
+const awsS3 = new AWS.S3({ region: process.env.AWS_DEFAULT_REGION || 'us-east-1' })
 const client = S3.createClient({
   s3Client: awsS3
 })

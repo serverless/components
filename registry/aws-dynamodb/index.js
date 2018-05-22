@@ -4,7 +4,7 @@ const dynamo = require('dynamodb')
 const Joi = require('joi')
 const util = require('util')
 
-dynamo.AWS.config.update({ region: 'us-east-1' })
+dynamo.AWS.config.update({ region: process.env.AWS_DEFAULT_REGION || 'us-east-1' })
 
 const findTableByName = (tables, tableName) => {
   // eslint-disable-line arrow-body-style

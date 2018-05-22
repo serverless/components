@@ -2,7 +2,7 @@ const AWS = require('aws-sdk')
 const BbPromise = require('bluebird')
 const { equals } = require('ramda')
 
-const IAM = new AWS.IAM({ region: 'us-east-1' })
+const IAM = new AWS.IAM({ region: process.env.AWS_DEFAULT_REGION || 'us-east-1' })
 
 const attachRolePolicy = async ({ name, policy }) => {
   await IAM.attachRolePolicy({

@@ -2,7 +2,7 @@ const AWS = require('aws-sdk')
 const { equals } = require('ramda')
 const { getSwaggerDefinition, generateUrl, generateUrls } = require('./utils')
 
-const APIGateway = new AWS.APIGateway({ region: 'us-east-1' }) // TODO: make configurable
+const APIGateway = new AWS.APIGateway({ region: process.env.AWS_DEFAULT_REGION || 'us-east-1' })
 
 const deleteApi = async (params) => {
   const { id } = params
