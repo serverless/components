@@ -8,13 +8,42 @@ jest.mock('@serverless/utils', () => ({
   readFile: jest.fn()
 }))
 
-afterEach(() => {
+afterAll(() => {
   jest.restoreAllMocks()
 })
 
-describe('#packageComponent', () => {
-  it('should package component at given realtive path', async () => {
+afterEach(() => {
+  jest.resetAllMocks()
+})
+
+describe('#packageComponent()', () => {
+  beforeEach(() => {
     utils.packDir.mockImplementation(() => Promise.resolve())
+  })
+
+  it('should package a component based on a serverlessFileObject', async () => {
+    const options = {
+      projectPath: process.cwd(),
+      path: './some-path',
+      format: 'zip',
+      serverlessFileObject: {
+        type: 'my-project',
+        version: '0.0.1',
+        components: {
+          iamMock: { id: 'iam-mock-id', type: 'iam-mock' }
+        }
+      }
+    }
+
+    await packageComponent(options)
+    const componentPath = path.join(process.cwd(), 'some-path')
+    const outputFilePath = path.resolve(componentPath, 'my-project@0.0.1.zip')
+    expect(utils.packDir).toBeCalledWith(componentPath, outputFilePath)
+    expect(utils.fileExists).not.toBeCalled()
+    expect(utils.readFile).not.toBeCalled()
+  })
+
+  it('should package component at given relative path', async () => {
     utils.fileExists.mockReturnValue(Promise.resolve(true))
     utils.readFile.mockReturnValue(Promise.resolve({ type: 'my-project', version: '0.0.1' }))
 
@@ -34,7 +63,6 @@ describe('#packageComponent', () => {
   })
 
   it('should package component at given absolute path', async () => {
-    utils.packDir.mockImplementation(() => Promise.resolve())
     utils.fileExists.mockReturnValue(Promise.resolve(true))
     utils.readFile.mockReturnValue(Promise.resolve({ type: 'my-project', version: '0.0.1' }))
 
@@ -54,7 +82,6 @@ describe('#packageComponent', () => {
   })
 
   it('validate package path', async () => {
-    utils.packDir.mockImplementation(() => Promise.resolve())
     utils.fileExists.mockReturnValue(Promise.resolve(false))
 
     const componentPath = '/home/some-path'
