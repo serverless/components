@@ -17,6 +17,7 @@ Provision AWS SNS Topic with serverless components
 | **displayName**| `string` | The display name of your SNS topic
 | **policy**| `object` | The policy for your SNS topic
 | **deliveryPolicy**| `object` | The delivery policy for your SNS topic
+| **deliveryStatusAttributes**| `array` | Delivery status attributes for your SNS topic
 | **name**| `string`<br/>*required* | The name of your SNS topic
 
 <!-- AUTO-GENERATED-CONTENT:END -->
@@ -73,6 +74,19 @@ components:
           disableSubscriptionOverrides: true
           defaultThrottlePolicy:
             maxReceivesPerSecond: 3
+      deliveryStatusAttributes:
+        - ApplicationSuccessFeedbackRoleArn: 'arn:aws:iam::000000000000:role/sns-success-feedback-role'
+          ApplicationSuccessFeedbackSampleRate: 100
+          ApplicationFailureFeedbackRoleArn: 'arn:aws:iam::000000000000:role/sns-failure-feedback-role'
+        - HTTPSuccessFeedbackRoleArn: 'arn:aws:iam::000000000000:role/sns-success-feedback-role'
+          HTTPSuccessFeedbackSampleRate: 100
+          HTTPFailureFeedbackRoleArn: 'arn:aws:iam::000000000000:role/sns-failure-feedback-role'
+        - LambdaSuccessFeedbackRoleArn: 'arn:aws:iam::000000000000:role/sns-success-feedback-role'
+          LambdaSuccessFeedbackSampleRate: 100
+          LambdaFailureFeedbackRoleArn: 'arn:aws:iam::000000000000:role/sns-success-feedback-role'
+        - SQSSuccessFeedbackRoleArn: 'arn:aws:iam::000000000000:role/sns-success-feedback-role'
+          SQSSuccessFeedbackSampleRate: 100
+          SQSFailureFeedbackRoleArn: 'arn:aws:iam::000000000000:role/sns-success-feedback-role'
       name: 'my-project-sns-${self.instanceId}'
 
 ```
