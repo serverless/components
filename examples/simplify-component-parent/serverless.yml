@@ -1,0 +1,14 @@
+type: simplify-component-parent
+version: 0.0.1
+
+commands:
+  parent:
+    description: parent custom command
+    shortcut: p
+    handler: index.parent
+
+#components:
+# simplifyComponent:
+#   type: ../simplify-component
+#   inputs:
+#     test: abc

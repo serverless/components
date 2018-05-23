@@ -1,0 +1,8 @@
+type: simplify-component
+version: 0.0.1
+
+commands:
+  myYml:
+    description: custom yml command
+    shortcut: y
+    handler: index.customYml
