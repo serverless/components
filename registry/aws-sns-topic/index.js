@@ -19,7 +19,6 @@ const sns = new AWS.SNS({ region: 'us-east-1' })
 
 const capitalize = (string) => `${string.charAt(0).toUpperCase()}${string.slice(1)}`
 const first = (array) => (Array.isArray(array) ? array[0] : array)
-
 const resolveInSequence = async (functionsToExecute) =>
   reduce(
     (promise, functionToExecute) =>
@@ -51,19 +50,21 @@ const createSNSTopic = async (
 
 const concatInputsAndState = (inputs = [], state = []) => {
   const attributeKeys = map((item) => first(keys(item)), inputs)
-  return concat(
-    inputs,
-    reduce(
-      (attributes, attribute) => {
-        const key = first(keys(attribute))
-        if (!contains(key, attributeKeys)) {
-          // return empty string to "unset" removed value
-          return concat(attributes, [{ [key]: '' }])
-        }
-        return attributes
-      },
-      [],
-      state
+  return filter((item) => isNil(find(equals(item))(state || [])))(
+    concat(
+      inputs,
+      reduce(
+        (attributes, attribute) => {
+          const key = first(keys(attribute))
+          if (!contains(key, attributeKeys)) {
+            // return empty string to "unset" removed value
+            return concat(attributes, [{ [key]: '' }])
+          }
+          return attributes
+        },
+        [],
+        state
+      )
     )
   )
 }
@@ -81,11 +82,12 @@ const updateAttributes = async (
     [{ displayName }, { policy }, { deliveryPolicy }]
   )
 
-  const stateTopicAttributes = [
+  const stateTopicAttributes = filter((item) => !isNil(first(values(item))))([
     { displayName: state.displayName },
     { policy: state.policy },
     { deliveryPolicy: state.deliveryPolicy }
-  ]
+  ])
+
   // @todo: alert policy cannot be "unset"
   // combine inputs and check if something is removed
   const topicAttributesToUpdate = concatInputsAndState(topicAttributes, stateTopicAttributes)
@@ -101,9 +103,10 @@ const updateAttributes = async (
   )
 
   // combine inputs and check if something is removed and select only ones that differs in state and inputs
-  const deliveryStatusAttributesToUpdate = filter((item) =>
-    isNil(find(equals(item))(state.deliveryStatusAttributes || []))
-  )(concatInputsAndState(flatDeliveryStatusAttributes, state.deliveryStatusAttributes))
+  const deliveryStatusAttributesToUpdate = concatInputsAndState(
+    flatDeliveryStatusAttributes,
+    state.deliveryStatusAttributes
+  )
 
   // update delivery status attributes
   await updateDeliveryStatusAttributes({
