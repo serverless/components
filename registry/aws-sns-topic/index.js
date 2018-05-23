@@ -50,7 +50,7 @@ const createSNSTopic = async (
 
 const concatInputsAndState = (inputs = [], state = []) => {
   const attributeKeys = map((item) => first(keys(item)), inputs)
-  return filter((item) => isNil(find(equals(item))(state || [])))(
+  return filter((item) => isNil(find(equals(item))(state)))(
     concat(
       inputs,
       reduce(
@@ -88,7 +88,7 @@ const updateAttributes = async (
     { deliveryPolicy: state.deliveryPolicy }
   ])
 
-  // @todo: alert policy cannot be "unset"
+  // @todo: alert that policy cannot be "unset"
   // combine inputs and check if something is removed
   const topicAttributesToUpdate = concatInputsAndState(topicAttributes, stateTopicAttributes)
 
@@ -139,7 +139,7 @@ const updateTopicAttributes = async ({ topicAttributes, topicArn }) =>
 
 const updateDeliveryStatusAttributes = async ({ deliveryStatusAttributes, topicArn }) =>
   // run update requests sequentially because setTopicAttributes
-  // fails to update when rate exceeds
+  // fails to update when rate exceeds https://github.com/serverless/components/issues/174#issuecomment-390463523
   resolveInSequence(
     map(
       (topicAttribute) => () => {
@@ -177,6 +177,7 @@ const deploy = async (inputs, context) => {
   if (!state.name && inputs.name) {
     // if no name stored to state, create a new topic
     newState = await createSNSTopic(inputs, context)
+    context.log(`SNS topic '${newState.name}' created with arn: '${newState.topicArn}'`)
   } else if (state.name && state.name === inputs.name) {
     // if input name and state name is same, update only topic attributes
     context.log(`Updating SNS topic: '${inputs.name}'`)
@@ -184,10 +185,12 @@ const deploy = async (inputs, context) => {
       name: inputs.name,
       topicArn: state.topicArn
     })
+    context.log(`SNS topic '${newState.name}' updated`)
   } else {
     // topic name is changes, first remove the old topic then create a new one
     await remove(state, context)
     newState = await createSNSTopic(inputs, context)
+    context.log(`SNS topic '${state.name} renamed to '${newState.name}'`)
   }
 
   context.saveState(newState)
