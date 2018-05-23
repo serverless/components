@@ -64,6 +64,24 @@ inputTypes:
         disableSubscriptionOverrides: true
         defaultThrottlePolicy:
           maxReceivesPerSecond: 3
+  deliveryStatusAttributes:
+    type: array
+    required: false
+    displayName: SNS Delivery Status Attributes
+    description: Delivery status attributes for your SNS topic
+    example:
+      - ApplicationSuccessFeedbackRoleArn: arn:aws:iam::000000000000:role/sns-success-feedback-role
+        ApplicationSuccessFeedbackSampleRate: 100
+        ApplicationFailureFeedbackRoleArn: arn:aws:iam::000000000000:role/sns-failure-feedback-role
+      - HTTPSuccessFeedbackRoleArn: arn:aws:iam::000000000000:role/sns-success-feedback-role
+        HTTPSuccessFeedbackSampleRate: 100
+        HTTPFailureFeedbackRoleArn: arn:aws:iam::000000000000:role/sns-failure-feedback-role
+      - LambdaSuccessFeedbackRoleArn: arn:aws:iam::000000000000:role/sns-success-feedback-role
+        LambdaSuccessFeedbackSampleRate: 100
+        LambdaFailureFeedbackRoleArn: arn:aws:iam::000000000000:role/sns-success-feedback-role
+      - SQSSuccessFeedbackRoleArn: arn:aws:iam::000000000000:role/sns-success-feedback-role
+        SQSSuccessFeedbackSampleRate: 100
+        SQSFailureFeedbackRoleArn: arn:aws:iam::000000000000:role/sns-success-feedback-role
 
 outputTypes:
   arn:
