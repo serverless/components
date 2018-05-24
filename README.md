@@ -1,5 +1,8 @@
 ![serverless components logo](https://s3.amazonaws.com/assets.github.serverless/serverless-components-readme-2.gif)
 
+[We're Hiring!](https://serverless.com/company/jobs/) • 
+[Newsletter](http://eepurl.com/b8dv4P) • [Forum](http://forum.serverless.com) • [Meetups](https://github.com/serverless-meetups/main) • [Twitter](https://twitter.com/goserverless) 
+
 ## Overview
 
 ### Easy
