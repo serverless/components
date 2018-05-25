@@ -2,7 +2,7 @@ const { is, isEmpty } = require('ramda')
 const generateContext = require('./generateContext')
 const validateTypes = require('./validateTypes')
 const resolvePostExecutionVars = require('../variables/resolvePostExecutionVars')
-const { getInputs, getState } = require('../state')
+const { getInputs, getState, getOutputs } = require('../state')
 
 const executeComponent = async (
   componentId,
@@ -35,8 +35,7 @@ const executeComponent = async (
   let retainState = false
   if (is(Function, func)) {
     try {
-      component.outputs = (await func(component.inputs, context)) || {}
-      validateTypes(component.id, component.outputTypes, component.outputs, { prefix: 'Output' })
+      await func(component.inputs, context)
     } catch (e) {
       if (command === 'remove' && e.code === 'RETAIN_STATE') {
         retainState = true
@@ -47,6 +46,8 @@ const executeComponent = async (
     component.executed = true
   }
   component.state = getState(stateFile, component.id)
+  component.outputs = getOutputs(stateFile, component.id)
+  validateTypes(component.id, component.outputTypes, component.outputs, { prefix: 'Output' })
 
   component.promise.resolve(component)
 
