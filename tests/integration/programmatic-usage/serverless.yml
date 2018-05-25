@@ -1,4 +1,5 @@
 type: programmatic-usage
+version: 0.0.1
 
 components:
   myFunction:

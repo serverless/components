@@ -19,6 +19,7 @@ const generateContext = (
   internallyManaged = false
 ) => {
   const { id, type, rootPath } = component
+  const { projectPath } = options
   const serviceId = getServiceId(stateFile)
   const instanceId = getInstanceId(stateFile, id)
   const inputs = prop('inputs', component)
@@ -31,6 +32,7 @@ const generateContext = (
     state: getState(stateFile, id),
     children: getChildrenPromises(component, components),
     rootPath,
+    projectPath,
     command,
     options,
     log,

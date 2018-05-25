@@ -1,4 +1,4 @@
-const { clone } = require('ramda')
+const { clone, isNil, isEmpty } = require('ramda')
 
 const utils = require('./utils')
 
@@ -20,6 +20,8 @@ const {
 } = utils
 
 const run = async (command, options) => {
+  options.projectPath = options.projectPath || process.cwd()
+  const { projectPath, serverlessFileObject } = options
   if (command === 'package') {
     return packageComponent(options)
   }
@@ -29,13 +31,22 @@ const run = async (command, options) => {
   let stateFile = {}
   let archive = {}
   try {
-    stateFile = await readStateFile()
+    stateFile = await readStateFile(projectPath)
     stateFile = setServiceId(stateFile)
     // TODO BRN: If we're using immutable data, we shouldn't need to clone here
     archive = clone(stateFile)
     let componentsToUse
     let orphanedComponents
-    const serverlessFileComponents = await getComponentsFromServerlessFile(stateFile)
+    let serverlessFileComponents
+    if (!isNil(serverlessFileObject) && !isEmpty(serverlessFileObject)) {
+      serverlessFileComponents = await getComponentsFromServerlessFile(
+        stateFile,
+        projectPath,
+        serverlessFileObject
+      )
+    } else {
+      serverlessFileComponents = await getComponentsFromServerlessFile(stateFile, projectPath)
+    }
     const stateFileComponents = getComponentsFromStateFile(stateFile)
     if (command === 'remove') {
       componentsToUse = stateFileComponents
@@ -78,7 +89,7 @@ const run = async (command, options) => {
 
     throw error
   } finally {
-    await writeStateFile(stateFile)
+    await writeStateFile(projectPath, stateFile)
   }
   return components
 }

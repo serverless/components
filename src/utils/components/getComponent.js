@@ -10,8 +10,10 @@ const setInputDefaults = require('./setInputDefaults')
 const validateCoreVersion = require('./validateCoreVersion')
 const validateTypes = require('./validateTypes')
 
-module.exports = async (componentRoot, componentId, inputs, stateFile) => {
-  let slsYml = await readFile(path.join(componentRoot, 'serverless.yml'))
+module.exports = async (componentRoot, componentId, inputs, stateFile, slsYml = null) => {
+  if (!slsYml) {
+    slsYml = await readFile(path.join(componentRoot, 'serverless.yml'))
+  }
 
   validateVarsUsage(slsYml)
   validateCoreVersion(slsYml.type, slsYml.core)

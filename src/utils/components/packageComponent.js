@@ -1,4 +1,5 @@
 const { fileExists, packDir, readFile } = require('@serverless/utils')
+const { isNil, isEmpty } = require('ramda')
 const path = require('path')
 const semver = require('semver')
 const log = require('../logging/log')
@@ -6,16 +7,23 @@ const validateCoreVersion = require('./validateCoreVersion')
 
 module.exports = async (options) => {
   const format = options.format || 'zip'
-  let componentPath = options.path || process.cwd()
+  let componentPath = options.path || options.projectPath
+  const { serverlessFileObject } = options
+
   if (!path.isAbsolute(componentPath)) {
     componentPath = path.resolve(process.cwd(), componentPath)
   }
-  const slsYmlFilePath = path.join(componentPath, 'serverless.yml')
-  if (!(await fileExists(slsYmlFilePath))) {
-    throw new Error(`Could not find a serverless.yml file in ${componentPath}`)
-  }
 
-  const slsYml = await readFile(slsYmlFilePath)
+  let slsYml
+  if (!isNil(serverlessFileObject) && !isEmpty(serverlessFileObject)) {
+    slsYml = serverlessFileObject
+  } else {
+    const slsYmlFilePath = path.join(componentPath, 'serverless.yml')
+    if (!(await fileExists(slsYmlFilePath))) {
+      throw new Error(`Could not find a serverless.yml file in ${componentPath}`)
+    }
+    slsYml = await readFile(slsYmlFilePath)
+  }
 
   validateCoreVersion(slsYml.type, slsYml.core)
 

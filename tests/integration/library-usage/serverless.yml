@@ -1,0 +1,9 @@
+type: library-usage
+version: 0.0.1
+
+components:
+  myRole:
+    type: tests-integration-iam-mock
+    inputs:
+      name: my-role
+      service: my.role.service

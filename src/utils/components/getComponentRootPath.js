@@ -1,5 +1,4 @@
 const path = require('path')
-const { isNil } = require('ramda')
 const urlRegex = require('url-regex')
 const getComponentFromUrl = require('./getComponentFromUrl')
 const getComponentsBucketRoot = require('./getComponentsBucketRoot')
@@ -11,9 +10,7 @@ const semVerDefinition =
 const registryRegex = new RegExp(`^${typeRegexDefinition}@${semVerDefinition}$`)
 
 async function getComponentRootPath(type = null) {
-  if (isNil(type)) {
-    return process.cwd()
-  } else if (urlRegex({ exact: true }).test(type)) {
+  if (urlRegex({ exact: true }).test(type)) {
     return getComponentFromUrl(type)
   } else if (type.match(registryRegex)) {
     const url = `${getComponentsBucketRoot()}/${type}.zip`

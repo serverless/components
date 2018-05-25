@@ -141,6 +141,10 @@ Also please do join the _Components_ channel on our public [Serverless-Contrib S
     * [deploy](#deploy)
     * [info](#info)
     * [remove](#remove)
+  * [Programmatic usage](#programmatic-usage)
+    * [deploy](#deploy)
+    * [package](#package)
+    * [remove](#remove)
   * [Component Docs](#component-docs)
     * [aws-apigateway](./registry/aws-apigateway)
     * [aws-cloudfront](./registry/aws-cloudfront)
@@ -432,10 +436,13 @@ The framework supports variables from the following sources:
 The framework supports two types of environment variables:
 
 * **.env File:** Create a .env file in the root directory of your project. Add environment-specific variables on new lines in the form of NAME=VALUE. For example:
+
 ```
 SOME_ENV=foo
 ```
+
 * **CLI** Running the command like this:
+
 ```
 SOME_ENV=foo components deploy
 ```
@@ -648,6 +655,95 @@ To remove your app, run
 ```sh
 components remove
 ```
+
+### Programmatic Usage
+
+Aside from using Serverless Components via the CLI you can also use the Framework programmatically.
+
+Different commands are available via an exposed API.
+
+You can use an existing Serverless Components project by providing the `projectPath` option or you can define the structure
+of your `serverless.yml` file on the fly using the `serverlessFileObject` option:
+
+```js
+const path = require('path')
+const { pkg, deploy, remove } = require('serverless-components')
+
+const projectPath = path.join('my', 'project')
+
+async function withProjectPath() {
+  console.log('Packaging service...')
+  await pkg({ projectPath, path: projectPath })
+  console.log('Deploying service...')
+  await deploy({ projectPath })
+  console.log('Re-deploying service...')
+  await deploy({ projectPath })
+  console.log('Removing service...')
+  await remove({ projectPath })
+}
+
+async function withServerlessFileObject() {
+  const serverlessFileObject = {
+    type: 'my-app',
+    version: '0.1.0',
+    components: {
+      myRole: {
+        type: 'tests-integration-iam-mock',
+        inputs: {
+          name: 'my-role-name',
+          service: 'my.function.service'
+        }
+      }
+    }
+  }
+
+  console.log('Deploying service...')
+  await deploy({ serverlessFileObject })
+  console.log('Re-deploying service...')
+  await deploy({ serverlessFileObject })
+  console.log('Removing service...')
+  await remove({ serverlessFileObject })
+}
+
+Promise.resolve()
+  .then(withProjectPath)
+  .then(withServerlessFileObject)
+```
+
+#### deploy
+
+The `deploy` API makes it possible to deploy a service.
+
+`await deploy(options)`
+
+Options:
+
+* `projectPath` - `string` - Path to the root of the project (defaults to `cwd`)
+* `serverlessFileObject` - `object` - The `serverless.yml` file representation as an object
+
+#### package
+
+The `pkg` API makes it possible to package a project which creates a deployment artifact.
+
+`await pkg(options)`
+
+Options:
+
+* `projectPath` - `string` - Path to the root of the project (defaults to `cwd`)
+* `serverlessFileObject` - `object` - The `serverless.yml` file representation as an object
+* `path` - `string` - Path to the project where the `serverless.yml` file can be found
+* `format` - `string` - The desired file format (`zip` or `tar`)
+
+#### remove
+
+The `remove` API makes it possible to remove a deployed service.
+
+`await remove(options)`
+
+Options:
+
+* `projectPath` - `string` - Path to the root of the project (defaults to `cwd`)
+* `serverlessFileObject` - `object` - The `serverless.yml` file representation as an object
 
 ### Component Docs
 
