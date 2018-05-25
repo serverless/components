@@ -1,4 +1,6 @@
 type: aws-sns-topic
+version: 0.2.0
+core: 0.2.x
 
 description: "Provision AWS SNS Topic with serverless components"
 license: Apache-2.0
