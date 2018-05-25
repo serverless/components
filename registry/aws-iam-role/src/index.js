@@ -155,17 +155,12 @@ const deploy = async (inputs, context) => {
   }
 
   context.saveState(state)
+  context.setOutputs(state)
   return state
 }
 
 const remove = async (inputs, context) => {
   if (!context.state.name) return {}
-
-  const outputs = {
-    policy: null,
-    service: null,
-    arn: null
-  }
   try {
     context.log(`Removing Role: ${context.state.name}`)
     await deleteRole(context.state)
@@ -174,14 +169,15 @@ const remove = async (inputs, context) => {
       throw new Error(e)
     }
   }
-  context.saveState({
+  const state = {
     name: null,
     arn: null,
     service: null,
     policy: null
-  })
-
-  return outputs
+  }
+  context.saveState(state)
+  context.setOutputs(state)
+  return state
 }
 
 module.exports = {

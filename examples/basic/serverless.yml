@@ -3,7 +3,7 @@ version: 0.0.1
 
 components:
   myFunction:
-    type: aws-lambda@0.2.0
+    type: aws-lambda
     inputs:
       memory: 512
       timeout: 10
@@ -11,6 +11,6 @@ components:
       role:
         arn: ${myRole.arn}
   myRole:
-    type: aws-iam-role@0.2.0
+    type: aws-iam-role
     inputs:
       service: lambda.amazonaws.com

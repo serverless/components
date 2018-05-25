@@ -119,6 +119,7 @@ async function deploy(inputs, context) {
   }
 
   context.saveState({ ...inputs, ...outputs, defaultRole })
+  context.setOutputs(outputs)
   return outputs
 }
 

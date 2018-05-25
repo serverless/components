@@ -24,8 +24,6 @@ const generateContext = (
   const serviceId = getServiceId(stateFile)
   const instanceId = getInstanceId(stateFile, id)
   const inputs = prop('inputs', component)
-  const originalState = getState(stateFile, id)
-  const originalOutputs = getOutputs(stateFile, id)
   const context = {
     id,
     serviceId,
@@ -102,7 +100,7 @@ const generateContext = (
       stateFile[this.id].rootPath = relativeRootPath
       stateFile[this.id].inputs = inputs
       stateFile[this.id].state = state
-      stateFile[this.id].outputs = originalOutputs
+      stateFile[this.id].outputs = this.outputs
       this.state = state
     },
     setOutputs(outputs) {
@@ -125,7 +123,7 @@ const generateContext = (
       stateFile[this.id].internallyManaged = internallyManaged
       stateFile[this.id].rootPath = relativeRootPath
       stateFile[this.id].inputs = inputs
-      stateFile[this.id].state = originalState
+      stateFile[this.id].state = this.state
       stateFile[this.id].outputs = outputs
       this.outputs = outputs
     }
