@@ -38,9 +38,9 @@ const executeComponent = async (
 
   /* Handle deploy command */
   const hasDeployFunction = fns.deploy && is(Function, fns.deploy)
-  const hasCreateFunction = fns.Create && is(Function, fns.Create)
-  const hasDeleteFunction = fns.Delete && is(Function, fns.Delete)
-  const hasUpdateFunction = fns.Update && is(Function, fns.Update)
+  const hasCreateFunction = fns.create && is(Function, fns.create)
+  const hasDeleteFunction = fns.delete && is(Function, fns.delete)
+  const hasUpdateFunction = fns.update && is(Function, fns.update)
   const hasRequiredMethods = hasDeployFunction || hasCreateFunction || hasDeleteFunction || hasUpdateFunction // eslint-disable-line
   if (command === 'deploy' && hasRequiredMethods) {
     const deployFunction = hasDeployFunction ? fns.deploy : defaultDeploy
@@ -90,14 +90,14 @@ const executeComponent = async (
 
 async function defaultRemove(inputs, context, component) {
   const fns = component.fns
-  const hasDeleteFunction = fns.Delete && is(Function, fns.Delete)
+  const hasDeleteFunction = fns.delete && is(Function, fns.delete)
 
   if (!hasDeleteFunction) {
     throw new Error(`${context.type} has no delete function exported from file`)
   }
 
   context.log(`${context.type}: ○ Removing resource "${context.type}"`)
-  const deleteOutputs = await fns.Delete(inputs, context)
+  const deleteOutputs = await fns.delete(inputs, context)
   context.log(`${context.type}: ✓ Finished Removing resource "${context.type}"`)
   // Then Save state
   context.saveState()
@@ -112,9 +112,9 @@ async function defaultDeploy(inputs, context, component) {
   const inputsChanged = !componentData.isEqual
   const defaultOutputs = { ...inputs, ...context.state }
 
-  const hasCreateFunction = fns.Create && is(Function, fns.Create)
-  const hasDeleteFunction = fns.Delete && is(Function, fns.Delete)
-  const hasUpdateFunction = fns.Update && is(Function, fns.Update)
+  const hasCreateFunction = fns.create && is(Function, fns.create)
+  const hasDeleteFunction = fns.delete && is(Function, fns.delete)
+  const hasUpdateFunction = fns.update && is(Function, fns.update)
 
   if (!hasCreateFunction) {
     throw new Error(`${context.type} has no create function exported from file`)
@@ -129,8 +129,8 @@ async function defaultDeploy(inputs, context, component) {
   /* No state found, run create flow */
   if (!componentData.hasState) {
     context.log(`${context.type}: ○ Creating resource "${context.type}"`)
-    const creationOutputs = await fns.Create(inputs, context)
-    context.log(`${context.type}: ✓ Finished Created resource "${context.type}"`)
+    const creationOutputs = await fns.create(inputs, context)
+    context.log(`${context.type}: ✓ Finished Creating resource "${context.type}"`)
     // Then Save state
     const createState = { ...inputs, ...creationOutputs }
     context.saveState(createState)
@@ -168,11 +168,11 @@ async function defaultDeploy(inputs, context, component) {
     if (criticalValueChanged) {
       context.log(`${context.type}: ○ Running Critical Update for "${context.type}"`)
       context.log(`${context.type}: ○ Removing old "${context.type}" resource`)
-      await fns.Delete(inputs, context)
+      await fns.delete(inputs, context)
       context.log(`${context.type}: ✓ Removed old "${context.type}" resource`)
       // Then create new webhook at new repo
       context.log(`${context.type}: ○ Creating new "${context.type}" resource`)
-      const creationOutputs = await fns.Create(inputs, context)
+      const creationOutputs = await fns.create(inputs, context)
       context.log(`${context.type}: ✓ Created new "${context.type}" resource`)
       // Save state
       const createState = { ...inputs, ...creationOutputs }
@@ -182,7 +182,7 @@ async function defaultDeploy(inputs, context, component) {
     }
     /* no critical value change. Run normal update */
     context.log(`${context.type}: ○ Running Update for "${context.type}"`)
-    const updateOutputs = await fns.Update(inputs, context)
+    const updateOutputs = await fns.update(inputs, context)
     // Save state
     const updateState = { ...inputs, ...updateOutputs }
     context.saveState(updateState)

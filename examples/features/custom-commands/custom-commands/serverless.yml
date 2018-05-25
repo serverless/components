@@ -1,0 +1,8 @@
+type: custom-commands
+version: 0.0.1
+
+components:
+  customCommandsChild:
+    type: ../custom-commands-child
+    inputs:
+      test: abc

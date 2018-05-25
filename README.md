@@ -433,7 +433,42 @@ The component author / user doesn't have to worry about dependencies at all. The
 
 ### Custom Commands
 
-Other than the built in `deploy` and `remove` commands, you can also include custom commands to add extra management capability for your component lifecycle. This is achieved by adding a corresponding function to the `index.js` file, just like the other functions in `index.js`.
+Other than the built in `deploy` and `remove` commands, you can also include custom commands to add extra management capability for your component lifecycle. You can do this in two ways, either by declaring your custom commands in your `index.js` file, or in `serverless.yml`
+
+#### Declaring custom commands in `index.js`
+
+To declare a custom commands in `index.js` file, just export a commands object that looks like this:
+
+
+```js
+
+const commands = {
+  custom: {
+    command: 'custom',
+    description: 'custom command description',
+    handler: async (inputs, state, options) => {
+      // your command logic goes here
+    },
+    options: {
+      test: {
+        description: 'Test option',
+        shortcut: 't'
+      }
+    }
+  }
+}
+
+module.exports = {
+  deploy,
+  commands
+}
+
+```
+
+
+
+
+This is achieved by adding a corresponding function to the `index.js` file, just like the other functions in `index.js`.
 
 As usual, the `test` function receives `inputs` and `context` as parameters:
 

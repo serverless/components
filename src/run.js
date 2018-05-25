@@ -316,7 +316,7 @@ function logCommandHelp(componentKey, commands) {
   Object.keys(commands).forEach((c) => {
     const cmd = `${componentKey} ${c}`
     const cmdInfo = commands[c]
-    console.log(` ${chalk.redBright(cmd)} - ${cmdInfo.description}`)
+    console.log(` ${chalk.whiteBright(cmd)} - ${cmdInfo.description}`)
     // Todo log out options
   })
 }
