@@ -38,7 +38,7 @@ async function deploy(inputs, context) {
     defaultRole
   }
   context.saveState(newState)
-
+  context.setOutputs(newState)
   return newState
 }
 
@@ -51,6 +51,7 @@ function invoke(inputs, context) {
     data
   }
   context.saveState(newState)
+  context.setOutputs(newState)
 
   return newState
 }

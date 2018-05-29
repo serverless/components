@@ -18,7 +18,7 @@ function deploy(inputs, context) {
     deploymentCounter
   }
   context.saveState(newState)
-
+  context.setOutputs(newState)
   return newState
 }
 

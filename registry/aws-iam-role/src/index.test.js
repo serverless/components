@@ -54,9 +54,11 @@ describe('aws-iam-role unit tests', () => {
   it('should deploy iam component with no errors', async () => {
     const iamContextMock = {
       state: {},
+      outputs: {},
       archive: {},
       log: () => {},
-      saveState: () => {}
+      saveState: () => {},
+      setOutputs: jest.fn()
     }
 
     const inputs = {
@@ -64,14 +66,19 @@ describe('aws-iam-role unit tests', () => {
       service: 'lambda.amazonaws.com'
     }
 
-    const outputs = await iamComponent.deploy(inputs, iamContextMock)
+    await iamComponent.deploy(inputs, iamContextMock)
 
     expect(AWS.IAM).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.createRoleMock).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.attachRolePolicyMock).toHaveBeenCalledTimes(1)
-    expect(outputs.name).toEqual(inputs.name)
-    expect(outputs.arn).toEqual('abc:xyz')
-    expect(outputs.service).toEqual(inputs.service)
+    expect(iamContextMock.setOutputs).toBeCalledWith({
+      name: inputs.name,
+      arn: 'abc:xyz',
+      service: inputs.service,
+      policy: {
+        arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
+      }
+    })
   })
 
   it('should deploy iam component a second time with no errors', async () => {
@@ -87,36 +94,44 @@ describe('aws-iam-role unit tests', () => {
           arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
         }
       },
+      outputs: {},
       archive: {},
       log: () => {},
-      saveState: () => {}
+      saveState: () => {},
+      setOutputs: jest.fn()
     }
-    const outputs = await iamComponent.deploy(inputs, iamContextMock)
+    await iamComponent.deploy(inputs, iamContextMock)
     expect(AWS.IAM).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.createRoleMock).not.toBeCalled()
     expect(AWS.mocks.attachRolePolicyMock).not.toBeCalled()
-    expect(outputs.name).toEqual(inputs.name)
-    expect(outputs.arn).toEqual('abc:xyz')
-    expect(outputs.service).toEqual(inputs.service)
+    expect(iamContextMock.setOutputs).toBeCalledWith({
+      name: inputs.name,
+      arn: 'abc:xyz',
+      service: inputs.service,
+      policy: {
+        arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
+      }
+    })
   })
 
   it('should remove a non-deployed iam component with no errors', async () => {
     const iamContextMock = {
       state: {},
+      outputs: {},
       archive: {},
       log: () => {},
-      saveState: () => {}
+      saveState: () => {},
+      setOutputs: jest.fn()
     }
     const inputs = {
       name: 'some-role',
       service: 'lambda.amazonaws.com'
     }
-    const outputs = await iamComponent.remove(inputs, iamContextMock)
+    await iamComponent.remove(inputs, iamContextMock)
 
     expect(AWS.IAM).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.deleteRoleMock).not.toBeCalled()
     expect(AWS.mocks.detachRolePolicyMock).not.toBeCalled()
-    expect(outputs).toEqual({})
   })
 
   it('should remove after a deployment with no errors', async () => {
@@ -132,19 +147,22 @@ describe('aws-iam-role unit tests', () => {
           arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
         }
       },
+      outputs: {},
       archive: {},
       log: () => {},
-      saveState: () => {}
+      saveState: () => {},
+      setOutputs: jest.fn()
     }
-    const outputs = await iamComponent.remove(inputs, iamContextMock)
+    await iamComponent.remove(inputs, iamContextMock)
 
     expect(AWS.IAM).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.deleteRoleMock).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.detachRolePolicyMock).toHaveBeenCalledTimes(1)
-    expect(outputs).toEqual({
+    expect(iamContextMock.setOutputs).toBeCalledWith({
+      name: null,
       arn: null,
-      policy: null,
-      service: null
+      service: null,
+      policy: null
     })
   })
 
@@ -161,12 +179,14 @@ describe('aws-iam-role unit tests', () => {
           arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
         }
       },
+      outputs: {},
       archive: {},
       log: () => {},
-      saveState: jest.fn()
+      saveState: jest.fn(),
+      setOutputs: jest.fn()
     }
 
-    const outputs = await iamComponent.remove(inputs, iamContextMock)
+    await iamComponent.remove(inputs, iamContextMock)
 
     expect(AWS.IAM).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.deleteRoleMock).toHaveBeenCalledTimes(1)
@@ -177,10 +197,11 @@ describe('aws-iam-role unit tests', () => {
       service: null,
       policy: null
     })
-    expect(outputs).toEqual({
+    expect(iamContextMock.setOutputs).toBeCalledWith({
+      name: null,
       arn: null,
-      policy: null,
-      service: null
+      service: null,
+      policy: null
     })
   })
 })

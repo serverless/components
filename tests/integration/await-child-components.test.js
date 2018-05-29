@@ -45,7 +45,7 @@ describe('Integration Test - Await child components', () => {
       expect(stateFileContent.$.serviceId).not.toBeFalsy()
       const awaitChildComponents = stateFileContent['await-child-components:awaitChildComponents']
       const awaitChildComponentsObjectKeys = Object.keys(awaitChildComponents)
-      expect(awaitChildComponentsObjectKeys.length).toEqual(6)
+      expect(awaitChildComponentsObjectKeys.length).toEqual(7)
       expect(awaitChildComponents).toHaveProperty('instanceId')
       expect(awaitChildComponents).toHaveProperty(
         'type',
