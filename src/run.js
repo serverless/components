@@ -147,7 +147,7 @@ async function doCommand(cmd, options, availableCommands, data) {
     if (!currentCommand || options.help || options.h) {
       console.log()
       const msg = `Here are the current available commands for ${componentKey}:`
-      console.log(`${chalk.whiteBright.bold(msg)}`)
+      console.log(`${chalk.yellow.bold(msg)}`)
       console.log()
       logCommandHelp(componentKey, commandData.commands)
     }
@@ -181,7 +181,7 @@ async function doCommand(cmd, options, availableCommands, data) {
     ) {
       console.log()
       const msg = `Here are the current available commands for ${componentKey}:`
-      console.log(`${chalk.whiteBright.bold(msg)}`)
+      console.log(`${chalk.yellow.bold(msg)}`)
       console.log()
       logCommandHelp(componentKey, commandData.commands)
       return false
@@ -271,7 +271,7 @@ function hasWhiteSpace(s) {
 }
 
 function logAllCommandsHelp(availableCommands) {
-  console.log(`${chalk.whiteBright.bold('Here are the current available commands:')}`)
+  console.log(`${chalk.yellow.bold('Here are the current available commands:')}`)
   console.log()
   const coreCommands = {
     deploy: {
@@ -300,14 +300,14 @@ function logAllCommandsHelp(availableCommands) {
     }
   })
   console.log()
-  console.log(`Run a command like this "${chalk.whiteBright('components deploy')}"`)
+  console.log(`Run a command like this "${chalk.yellow('components deploy')}"`)
 }
 
 function logCoreCommandHelp(commands) {
   Object.keys(commands).forEach((c) => {
     const cmd = `${c}`
     const cmdInfo = commands[c]
-    console.log(` ${chalk.whiteBright(cmd)} - ${cmdInfo.description}`)
+    console.log(` ${chalk.yellow(cmd)} - ${cmdInfo.description}`)
     // Todo log out options
   })
 }
@@ -316,7 +316,7 @@ function logCommandHelp(componentKey, commands) {
   Object.keys(commands).forEach((c) => {
     const cmd = `${componentKey} ${c}`
     const cmdInfo = commands[c]
-    console.log(` ${chalk.whiteBright(cmd)} - ${cmdInfo.description}`)
+    console.log(` ${chalk.yellow(cmd)} - ${cmdInfo.description}`)
     // Todo log out options
   })
 }
