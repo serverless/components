@@ -21,15 +21,7 @@ const deploy = async (inputs, context) => {
 const remove = async (inputs, context) => {
   const { state } = context
   // pass context to remove lambda subscription instead vars
-  await getProtocol(context.state.protocol).remove(
-    {
-      subscriptionArn: state.subscriptionArn,
-      functionName: state.statement ? state.statement.Resource : '',
-      statementId: state.statement ? state.statement.Sid : ''
-    },
-    context
-  )
-
+  await getProtocol(state.protocol).remove(context)
   context.saveState({})
   return {}
 }
