@@ -5,7 +5,7 @@ const AWS = require('aws-sdk')
 const mime = require('mime-types')
 const fs = require('fs')
 
-const S3 = new AWS.S3({ region: 'us-east-1' })
+const S3 = new AWS.S3({ region: process.env.AWS_DEFAULT_REGION || 'us-east-1' })
 
 const uploadFiles = async ({ contentPath, bucketName }) => {
   const filePaths = await walkDirSync(contentPath)

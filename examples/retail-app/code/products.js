@@ -2,7 +2,9 @@
 
 const AWS = require('aws-sdk')
 
-const dynamo = new AWS.DynamoDB.DocumentClient({ region: 'us-east-1' })
+const dynamo = new AWS.DynamoDB.DocumentClient({
+  region: process.env.AWS_DEFAULT_REGION || 'us-east-1'
+})
 
 const tableName = process.env.productTableName
 

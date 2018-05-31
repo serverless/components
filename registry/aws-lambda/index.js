@@ -1,7 +1,7 @@
 const AWS = require('aws-sdk')
 const pack = require('./pack')
 
-const lambda = new AWS.Lambda({ region: 'us-east-1' })
+const lambda = new AWS.Lambda({ region: process.env.AWS_DEFAULT_REGION || 'us-east-1' })
 
 async function createLambda(
   { name, handler, memory, timeout, runtime, env, description, root },
