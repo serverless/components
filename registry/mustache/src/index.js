@@ -37,7 +37,7 @@ const deploy = async (inputs, context) => {
     })
   })
 
-  return { renderedFilePath: tmpPath }
+  context.setOutputs({ renderedFilePath: tmpPath })
 }
 
 module.exports = { deploy }

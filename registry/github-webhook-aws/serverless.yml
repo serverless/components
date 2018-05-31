@@ -32,7 +32,7 @@ inputTypes:
 
 outputTypes:
   function:
-    type: string
+    type: object
     description: The function which is used for this WebHook
   githubApiToken:
     type: string

@@ -39,7 +39,6 @@ async function deploy(inputs, context) {
   }
   context.saveState(newState)
   context.setOutputs(newState)
-  return newState
 }
 
 function invoke(inputs, context) {
@@ -52,8 +51,6 @@ function invoke(inputs, context) {
   }
   context.saveState(newState)
   context.setOutputs(newState)
-
-  return newState
 }
 
 async function remove(inputs, context) {
@@ -68,6 +65,7 @@ async function remove(inputs, context) {
   }
 
   context.saveState()
+  context.setOutputs()
 }
 
 module.exports = {

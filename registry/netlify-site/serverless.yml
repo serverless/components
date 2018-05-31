@@ -37,7 +37,7 @@ inputTypes:
     example: dog-sweatpants.com
   siteForceSSL:
     type: boolean
-    required: true
+    required: false
     displayName: Force SSL
     description: Set to true if you want to force SSL connections
   siteRepo:

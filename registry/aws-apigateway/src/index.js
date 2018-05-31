@@ -92,7 +92,7 @@ const deploy = async (inputs, context) => {
     })
   }
   context.saveState({ ...inputs, ...outputs })
-  return outputs
+  context.setOutputs(outputs)
 }
 
 const remove = async (inputs, context) => {
@@ -112,7 +112,7 @@ const remove = async (inputs, context) => {
   }
 
   context.saveState()
-  return outputs
+  context.setOutputs(outputs)
 }
 
 module.exports = {

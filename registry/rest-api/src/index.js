@@ -181,7 +181,7 @@ async function deploy(inputs, context) {
       url: outputs.url
     })
   }
-  return outputs
+  context.setOutputs(outputs)
 }
 
 async function remove(inputs, context) {
@@ -192,7 +192,7 @@ async function remove(inputs, context) {
     await removeApiGateway(inputs, context)
   }
   context.saveState()
-  return {}
+  context.setOutputs({})
 }
 
 async function info(inputs, context) {

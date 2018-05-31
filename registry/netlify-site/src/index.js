@@ -151,8 +151,7 @@ const deploy = async (inputs, context) => {
   // Save state
   const updateState = { ...inputs, ...outputs }
   context.saveState(updateState)
-
-  return outputs
+  context.setOutputs(outputs)
 }
 
 const remove = async (inputs, context) => {
@@ -215,7 +214,7 @@ const remove = async (inputs, context) => {
 
   const outputs = {}
   context.saveState()
-  return outputs
+  context.setOutputs(outputs)
 }
 
 async function createNetlifyDeployKey(config, apiToken) {

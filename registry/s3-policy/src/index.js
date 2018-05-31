@@ -77,11 +77,11 @@ const deploy = async (inputs, context) => {
     await setPolicyAndCors(inputs)
   }
   context.saveState({ ...inputs })
-  return inputs
+  context.setOutputs({ ...inputs })
 }
 
 const remove = async (inputs, context) => {
-  if (!context.state.bucketName) return {}
+  if (!context.state.bucketName) return context.setOutputs({})
 
   try {
     context.log(`Removing policy for bucket: '${context.state.bucketName}'`)
@@ -93,8 +93,7 @@ const remove = async (inputs, context) => {
   }
 
   context.saveState({})
-
-  return {}
+  context.setOutputs({})
 }
 
 module.exports = {

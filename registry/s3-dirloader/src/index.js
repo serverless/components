@@ -45,16 +45,16 @@ const deploy = async (inputs, context) => {
     outputs = await uploadFiles(inputs)
   }
   context.saveState({ ...inputs, ...outputs })
-  return outputs
+  context.setOutputs(outputs)
 }
 
 const remove = async (inputs, context) => {
-  if (!context.state.contentPath) return {}
+  if (!context.state.contentPath) return context.setOutputs({})
 
   // context.log(`Removing files from Bucket: '${context.state.contentPath}'`)
   // outputs = await removeFiles(context.state.contentPath)
   context.saveState({})
-  return {}
+  context.setOutputs({})
 }
 
 module.exports = {

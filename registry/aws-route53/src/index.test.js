@@ -40,17 +40,20 @@ describe('Route53 Component Unit Tests', () => {
           id: 'doesNotExist'
         }
       },
+      outputs: {},
       archive: {},
       log: () => {},
-      saveState: () => {}
+      saveState: () => {},
+      setOutputs: jest.fn()
     }
 
     const inputs = {
       domainName: 'abc',
       dnsName: 'abc'
     }
+    await route53Component.remove(inputs, route53ContextMock)
 
-    await expect(route53Component.remove(inputs, route53ContextMock)).resolves.toEqual({})
+    expect(route53ContextMock.setOutputs).toBeCalledWith({})
     expect(AWS.Route53).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.changeResourceRecordSetsMock).toHaveBeenCalledTimes(1)
   })

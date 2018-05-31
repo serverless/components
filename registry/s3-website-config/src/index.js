@@ -77,18 +77,18 @@ const deploy = async (inputs, context) => {
     await setBucketForRedirection(inputs)
   }
   context.saveState({ ...inputs })
-  return inputs
+  context.setOutputs(inputs)
 }
 
 const remove = async (inputs, context) => {
-  if (!context.state.rootBucketName) return {}
+  if (!context.state.rootBucketName) return context.setOutputs({})
 
   // context.log(`Unsetting website configuration for Bucket: '${context.state.rootBucketName}'`)
   // await unsetBucketConfig(context.state.rootBucketName)
   // context.log(`Unsetting redirection for Bucket: '${context.state.redirectBucketName}'`)
   // await unsetBucketConfig(context.state.redirectBucketName)
   context.saveState({})
-  return {}
+  context.setOutputs({})
 }
 
 module.exports = {

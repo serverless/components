@@ -120,11 +120,10 @@ async function deploy(inputs, context) {
 
   context.saveState({ ...inputs, ...outputs, defaultRole })
   context.setOutputs(outputs)
-  return outputs
 }
 
 async function remove(inputs, context) {
-  if (!context.state.name) return { arn: null }
+  if (!context.state.name) return context.setOutputs({ arn: null })
 
   if (context.state.defaultRole) {
     const defaultRoleComponent = await context.load('aws-iam-role', 'defaultRole', {
@@ -147,7 +146,6 @@ async function remove(inputs, context) {
   }
   context.saveState(outputs)
   context.setOutputs(outputs)
-  return outputs
 }
 
 module.exports = {

@@ -244,11 +244,11 @@ const deploy = async (inputs, context) => {
     )
   }
   context.saveState({ ...inputs, ...outputs })
-  return outputs
+  context.setOutputs(outputs)
 }
 
 const remove = async (inputs, context) => {
-  if (!context.state.name) return {}
+  if (!context.state.name) return context.setOutputs({})
 
   try {
     context.log(
@@ -268,7 +268,7 @@ const remove = async (inputs, context) => {
       throw e
     }
   }
-  return {}
+  context.setOutputs({})
 }
 
 module.exports = {

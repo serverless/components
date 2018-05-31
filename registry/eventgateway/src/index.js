@@ -191,8 +191,7 @@ async function deploy(inputs, context) {
     ...outputs
   }
   context.saveState(updatedState)
-
-  return updatedState
+  context.setOutputs(updatedState)
 }
 
 async function remove(inputs, context) {

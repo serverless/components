@@ -90,7 +90,7 @@ const deploy = async (inputs, context) => {
     // Save state
     const createState = { ...inputs, ...creationOutputsData }
     context.saveState(createState)
-    return createState
+    return context.setOutputs(createState)
   }
 
   /* Has state, run update flow if inputsChanged */
@@ -112,7 +112,7 @@ const deploy = async (inputs, context) => {
     // Need to bail if state doesn't have what we need
     if (!webhookExists(context)) {
       // No webhook id found. Bail
-      return defaultOutputs
+      return context.setOutputs(defaultOutputs)
     }
 
     // If repo url has changed. Delete old webhook and make a new one in new repo
@@ -132,7 +132,7 @@ const deploy = async (inputs, context) => {
       // Save state
       const createState = { ...inputs, ...creationOutputsData }
       context.saveState(createState)
-      return createState
+      return context.setOutputs(createState)
     }
 
     // Same repo, update the existing hook
@@ -145,11 +145,11 @@ const deploy = async (inputs, context) => {
     // Save state
     const updateState = { ...inputs, ...updateOutputsData }
     context.saveState(updateState)
-    return updateState
+    return context.setOutputs(updateState)
   }
 
   // No Op. Return default
-  return defaultOutputs
+  context.setOutputs(defaultOutputs)
 }
 
 const remove = async (inputs, context) => {
@@ -158,12 +158,12 @@ const remove = async (inputs, context) => {
   context.log(`${context.type}: ◌ Removing Github Webhook from repo "${githubData.repo}"`)
   if (!webhookExists(context)) {
     // No webhook id found. Bail
-    return defaultOutputs
+    return context.setOutputs(defaultOutputs)
   }
   const outputs = await deleteWebhook(context.state, context.state.github.id)
   context.log(`${context.type}: ✓ Removed Github Webhook from repo "${githubData.repo}"`)
   context.saveState()
-  return outputs
+  context.setOutputs(outputs)
 }
 
 function webhookExists(context) {

@@ -48,7 +48,7 @@ const deploy = async (inputs, context) => {
   const outputs = {
     name: inputs.name
   }
-  return outputs
+  context.setOutputs(outputs)
 }
 
 const rollback = async (inputs, context) => {
@@ -65,11 +65,11 @@ const rollback = async (inputs, context) => {
     context.log(`Creating Bucket: ${archive.name}`)
     await createBucket(archive)
   }
-  return archive
+  context.setOutputs(archive)
 }
 
 const remove = async (inputs, context) => {
-  if (!context.state.name) return {}
+  if (!context.state.name) return context.setOutputs({})
 
   try {
     context.log(`Removing Bucket: '${context.state.name}'`)
@@ -81,9 +81,7 @@ const remove = async (inputs, context) => {
   }
 
   context.saveState({})
-  return {
-    name: null
-  }
+  context.setOutputs({ name: null })
 }
 
 module.exports = {

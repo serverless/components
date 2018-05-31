@@ -69,7 +69,8 @@ const generateContext = (
           // eslint-disable-next-line no-shadow
           accum[fnName] = async (fnInputs) => {
             inputs = fnInputs || prop('inputs', childComponent)
-            return childComponentFn(inputs, childComponentContext)
+            await childComponentFn(inputs, childComponentContext)
+            return childComponentContext.outputs
           }
           return accum
         },
@@ -103,7 +104,7 @@ const generateContext = (
       stateFile[this.id].outputs = this.outputs
       this.state = state
     },
-    setOutputs(outputs) {
+    setOutputs(outputs = {}) {
       const relativeRootPath = relative(process.cwd(), rootPath)
       // NOTE: set default values if information about component in stateFile is not yet present
       if (!stateFile[this.id]) {
