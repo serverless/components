@@ -134,7 +134,7 @@ Also please do join the _Components_ channel on our public [Serverless-Contrib S
 * [Creating Components](#creating-components)
   * [Basic setup](#basic-setup)
   * [`serverless.yml`](#serverless.yml)
-  * [`index.js`](#index.js)
+  * [`index.js`](#indexjs)
   * [Testing](#testing)
 * [Docs](#docs)
   * [CLI Usage](#cli-usage)
@@ -345,9 +345,9 @@ outputTypes:
 
 #### Outputs
 
-Your provisioning logic, or the `deploy` method of your `index.js` file, should return an `outputs` object that matches the outputTypes declared in your component's `serverless.yml` file. This output can be referenced in `serverless.yml` as inputs to other components.
+Your provisioning logic, or the `deploy` method of your `index.js` file, should use the `context.setOutputs()` method to set an outputs object that matches the outputTypes declared in your component's `serverless.yml` file. This output can be referenced in `serverless.yml` as inputs to other components.
 
-For example, the above `aws-lambda` component's `deploy` method returns outputs that look like this:
+For example, the above `aws-lambda` component's `deploy` method sets outputs that look like this:
 
 **index.js**
 
@@ -355,12 +355,11 @@ For example, the above `aws-lambda` component's `deploy` method returns outputs 
 const deploy = (inputs, context) => {
   // lambda provisioning logic
   const res = doLambdaDeploy()
-
-  // return outputs
-  return {
+  
+  context.setOutputs({
     arn: res.FunctionArn,
     name: res.FunctionName
-  }
+  })
 }
 
 module.exports = {
@@ -415,7 +414,7 @@ const deploy = async (inputs, context) => {
     console.log(`Updating Lambda: ${inputs.name}`)
     outputs = await update(inputs)
   }
-  return outputs
+  context.setOutputs(outputs)
 }
 
 module.exports = {
@@ -428,7 +427,7 @@ module.exports = {
 The framework supports variables from the following sources:
 
 * **Environment Variables:** for example, `${env.GITHUB_TOKEN}`
-* **Output:** for example: `${myEndpoint.url}`, where `myEndpoint` is the component alias as defined in `serverless.yml`, and `url` is a property in the outputs object that is returned from the `myEndpoint` provisioning function.
+* **Output:** for example: `${myEndpoint.url}`, where `myEndpoint` is the component alias as defined in `serverless.yml`, and `url` is a property in the outputs object that is set from the `myEndpoint` provisioning function using `context.setOutputs()`.
 * **Self:** for example, `${self.path}/frontend`, where `self.path` evaluates to the absolute path of the component's root folder.
 
 ### Setting Environment Variables
@@ -550,8 +549,7 @@ function deploy(inputs, context) {
     deployedAt
   }
   context.saveState(updatedState)
-
-  return updatedState
+  context.setOutputs(updatedState)
 }
 
 function greet(inputs, context) {
@@ -575,7 +573,7 @@ Let's take a closer look at the implementation.
 
 Right at the top we've defined a "helper" function we use to reduce code duplication (this function is not exported at the bottom and can therefore only be used internally). This `greetWithFullName` function gets `inputs` and `context`, and then logs a message which greets the user with his full name. Note that we're using the `log` function which is available at the `context` object instead of the native `console.log` function. The `context` object has other, very helpful functions and data attached to it.
 
-Next up, we've defined the `deploy` function. This function is executed every time the user runs a `deploy` command since we've exported it at the bottom of the file. At first, we re-use our `greetWithFullName` function to greet our user. Then we check the state to see if we've already deployed it. If this is the case we log out the timestamp of the last deployment. After that we get the current time and store it in an object which includes the `state`, the `inputs` and the new `deployedAt` timestamp. We store this object that reflects our current state. After that we return the object as `outputs`.
+Next up, we've defined the `deploy` function. This function is executed every time the user runs a `deploy` command since we've exported it at the bottom of the file. At first, we re-use our `greetWithFullName` function to greet our user. Then we check the state to see if we've already deployed it. If this is the case we log out the timestamp of the last deployment. After that we get the current time and store it in an object which includes the `state`, the `inputs` and the new `deployedAt` timestamp. We store this object that reflects our current state. After that we set the object as `outputs`.
 
 The `greet` function is a custom `command` we use to extend the CLI's capabilities. Since we've exported it at the bottom of the file it'll be executed every time someone runs the `greet` command. The functionality is pretty straightforward. We just log out a different greeting using the `context.log` method and the `inputs`.
 
