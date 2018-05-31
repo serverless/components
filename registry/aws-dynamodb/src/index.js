@@ -308,7 +308,6 @@ const insert = async (inputs, context) => {
       'Incorrect or insufficient parameters. \nUsage: insert --tablename <tablename> --itemdata <data in json format>'
     )
   }
-  console.log(context)
   context.setOutputs(outputs)
 }
 

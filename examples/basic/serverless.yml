@@ -8,9 +8,9 @@ components:
       memory: 512
       timeout: 10
       handler: handler.handler
-#      role:
-#        arn: ${myRole.arn}
-#  myRole:
-#    type: aws-iam-role
-#    inputs:
-#      service: lambda.amazonaws.com
+      role:
+        arn: ${myRole.arn}
+  myRole:
+    type: aws-iam-role
+    inputs:
+      service: lambda.amazonaws.com
