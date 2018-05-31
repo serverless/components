@@ -41,29 +41,31 @@ describe('aws-sns-topic tests', () => {
   it('should deploy sns topic component', async () => {
     const snsTopicContextMock = {
       state: {},
-      archive: {},
       log: () => {},
-      saveState: jest.fn()
+      saveState: jest.fn(),
+      setOutputs: jest.fn()
     }
 
     const inputs = {
       name: 'some-sns-topic-name'
     }
 
-    const outputs = await snsTopicComponent.deploy(inputs, snsTopicContextMock)
+    await snsTopicComponent.deploy(inputs, snsTopicContextMock)
 
     expect(AWS.SNS).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.createSNSTopicMock).toHaveBeenCalledTimes(1)
-    expect(outputs.arn).toEqual(`arn:aws:sns:us-east-1:000000000000:${inputs.name}`)
+    expect(snsTopicContextMock.setOutputs).toBeCalledWith({
+      arn: `arn:aws:sns:us-east-1:000000000000:${inputs.name}`
+    })
     expect(snsTopicContextMock.saveState).toHaveBeenCalledTimes(2)
   })
 
   it('should deploy sns topic component with topic attributes', async () => {
     const snsTopicContextMock = {
       state: {},
-      archive: {},
       log: () => {},
-      saveState: jest.fn()
+      saveState: jest.fn(),
+      setOutputs: jest.fn()
     }
 
     const inputs = {
@@ -115,7 +117,7 @@ describe('aws-sns-topic tests', () => {
       ]
     }
 
-    const outputs = await snsTopicComponent.deploy(inputs, snsTopicContextMock)
+    await snsTopicComponent.deploy(inputs, snsTopicContextMock)
 
     expect(AWS.SNS).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.createSNSTopicMock).toHaveBeenCalledTimes(1)
@@ -218,7 +220,9 @@ describe('aws-sns-topic tests', () => {
         TopicArn: 'arn:aws:sns:us-east-1:000000000000:some-sns-topic-name'
       })
     )
-    expect(outputs.arn).toEqual(`arn:aws:sns:us-east-1:000000000000:${inputs.name}`)
+    expect(snsTopicContextMock.setOutputs).toBeCalledWith({
+      arn: `arn:aws:sns:us-east-1:000000000000:${inputs.name}`
+    })
     expect(AWS.mocks.updateTopicAttributesMock).toHaveBeenCalledTimes(15)
     expect(snsTopicContextMock.saveState).toHaveBeenCalledTimes(2)
   })
@@ -230,9 +234,9 @@ describe('aws-sns-topic tests', () => {
         name: 'some-sns-topic-name',
         displayName: 'MySNSTopic'
       },
-      archive: {},
       log: () => {},
-      saveState: jest.fn()
+      saveState: jest.fn(),
+      setOutputs: jest.fn()
     }
 
     const inputs = {
@@ -284,7 +288,7 @@ describe('aws-sns-topic tests', () => {
       ]
     }
 
-    const outputs = await snsTopicComponent.deploy(inputs, snsTopicContextMock)
+    await snsTopicComponent.deploy(inputs, snsTopicContextMock)
 
     expect(AWS.SNS).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.removeSNSTopicMock).toHaveBeenCalledTimes(0)
@@ -388,7 +392,9 @@ describe('aws-sns-topic tests', () => {
         TopicArn: 'arn:aws:sns:us-east-1:000000000000:some-sns-topic-name'
       })
     )
-    expect(outputs.arn).toEqual(`arn:aws:sns:us-east-1:000000000000:${inputs.name}`)
+    expect(snsTopicContextMock.setOutputs).toBeCalledWith({
+      arn: `arn:aws:sns:us-east-1:000000000000:${inputs.name}`
+    })
     expect(snsTopicContextMock.saveState).toHaveBeenCalledTimes(1)
   })
 
@@ -404,9 +410,9 @@ describe('aws-sns-topic tests', () => {
           { ApplicationFailureFeedbackRoleArn: 'arn:aws:iam::536219383349:role/sns-role' }
         ]
       },
-      archive: {},
       log: () => {},
-      saveState: jest.fn()
+      saveState: jest.fn(),
+      setOutputs: jest.fn()
     }
 
     const inputs = {
@@ -433,7 +439,7 @@ describe('aws-sns-topic tests', () => {
       }
     }
 
-    const outputs = await snsTopicComponent.deploy(inputs, snsTopicContextMock)
+    await snsTopicComponent.deploy(inputs, snsTopicContextMock)
 
     expect(AWS.SNS).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.removeSNSTopicMock).toHaveBeenCalledTimes(0)
@@ -481,7 +487,9 @@ describe('aws-sns-topic tests', () => {
         TopicArn: 'arn:aws:sns:us-east-1:000000000000:some-sns-topic-name'
       })
     )
-    expect(outputs.arn).toEqual(`arn:aws:sns:us-east-1:000000000000:${inputs.name}`)
+    expect(snsTopicContextMock.setOutputs).toBeCalledWith({
+      arn: `arn:aws:sns:us-east-1:000000000000:${inputs.name}`
+    })
     expect(snsTopicContextMock.saveState).toHaveBeenCalledTimes(1)
   })
 
@@ -491,22 +499,24 @@ describe('aws-sns-topic tests', () => {
         topicArn: 'arn:aws:sns:us-east-1:000000000000:some-sns-topic-name',
         name: 'some-sns-topic-name'
       },
-      archive: {},
       log: () => {},
-      saveState: jest.fn()
+      saveState: jest.fn(),
+      setOutputs: jest.fn()
     }
 
     const inputs = {
       name: 'new-sns-topic-name'
     }
 
-    const outputs = await snsTopicComponent.deploy(inputs, snsTopicContextMock)
+    await snsTopicComponent.deploy(inputs, snsTopicContextMock)
 
     expect(AWS.SNS).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.removeSNSTopicMock).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.createSNSTopicMock).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.updateTopicAttributesMock).toHaveBeenCalledTimes(0)
-    expect(outputs.arn).toEqual(`arn:aws:sns:us-east-1:000000000000:${inputs.name}`)
+    expect(snsTopicContextMock.setOutputs).toBeCalledWith({
+      arn: `arn:aws:sns:us-east-1:000000000000:${inputs.name}`
+    })
     expect(snsTopicContextMock.saveState).toHaveBeenCalledTimes(3)
   })
 
@@ -516,7 +526,6 @@ describe('aws-sns-topic tests', () => {
         topicArn: 'arn:aws:sns:us-east-1:000000000000:some-sns-topic-name',
         name: 'some-sns-topic-name'
       },
-      archive: {},
       log: () => {},
       saveState: jest.fn()
     }
@@ -525,11 +534,10 @@ describe('aws-sns-topic tests', () => {
       name: 'some-sns-topic-name'
     }
 
-    const outputs = await snsTopicComponent.remove(inputs, snsTopicContextMock)
+    await snsTopicComponent.remove(inputs, snsTopicContextMock)
 
     expect(AWS.SNS).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.removeSNSTopicMock).toHaveBeenCalledTimes(1)
-    expect(outputs.arn).toEqual(null)
     expect(snsTopicContextMock.saveState).toHaveBeenCalledTimes(1)
   })
 })
