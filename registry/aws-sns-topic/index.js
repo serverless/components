@@ -174,6 +174,10 @@ const remove = async (inputs, context) => {
 const deploy = async (inputs, context) => {
   const { state } = context
   let newState
+  context.setOutputs({
+    arn: null
+  })
+
   if (!state.name && inputs.name) {
     // if no name stored to state, create a new topic
     newState = await createSNSTopic(inputs, context)
@@ -195,9 +199,9 @@ const deploy = async (inputs, context) => {
 
   context.saveState(newState)
 
-  return {
+  return context.setOutputs({
     arn: newState.topicArn
-  }
+  })
 }
 
 module.exports = {
