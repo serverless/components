@@ -16,11 +16,12 @@ const subscribe = async ({ topic, protocol, endpoint }, context) => {
     .promise()
 }
 
-const unsubscribe = async ({ subscriptionArn }, context) => {
-  context.log(`TBD removing ${subscriptionArn}`)
+const unsubscribe = async (context) => {
+  const { state } = context
+  context.log(`TBD removing ${state.subscriptionArn}`)
   return sns
     .unsubscribe({
-      SubscriptionArn: subscriptionArn
+      SubscriptionArn: state.subscriptionArn
     })
     .promise()
 }

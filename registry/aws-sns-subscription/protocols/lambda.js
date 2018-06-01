@@ -25,9 +25,9 @@ const deploy = async ({ topic, protocol, endpoint = '' }, context) => {
 }
 
 const remove = async (context) => {
-  const { subscriptionArn, statement } = context.state
+  const { statement } = context.state
   const response = Promise.all([
-    unsubscribe({ subscriptionArn }, context),
+    unsubscribe(context),
     lambda
       .removePermission({
         FunctionName: statement ? statement.Resource : '',

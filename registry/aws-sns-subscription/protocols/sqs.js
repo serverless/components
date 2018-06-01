@@ -91,11 +91,10 @@ const deploy = async ({ topic, protocol, endpoint = '' }, context) => {
 }
 
 const remove = async (context) => {
-  const { subscriptionArn, permission } = context.state
+  const { permission } = context.state
   const { QueueUrl } = permission
-
   const response = Promise.all([
-    unsubscribe({ subscriptionArn }, context),
+    unsubscribe(context),
     sqs
       .setQueueAttributes({
         QueueUrl,
