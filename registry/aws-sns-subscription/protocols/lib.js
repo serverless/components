@@ -76,10 +76,37 @@ const waitForConfirmation = async (
     }, interval)
   })
 
+function splitArn(arnToSplit) {
+  const [arn, partition, service, region, accountId, ...resources] = arnToSplit.split(':')
+  let resourceType
+  let resource
+
+  if (resources.length === 1 && resources[0].includes('/')) {
+    const split = resources[0].split('/')
+    resourceType = split[0]
+    resource = split[1]
+  } else if (resources.length === 1) {
+    resource = resources[0]
+  } else {
+    resourceType = resources[0]
+    resource = resources[1]
+  }
+  return {
+    arn,
+    partition,
+    service,
+    region,
+    accountId,
+    resourceType,
+    resource
+  }
+}
+
 module.exports = {
   subscribe,
   unsubscribe,
   setSubscriptionAttributes,
   deleteSubscriptionAttributes,
-  waitForConfirmation
+  waitForConfirmation,
+  splitArn
 }

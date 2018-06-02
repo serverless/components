@@ -1,44 +1,9 @@
 /* eslint-disable no-console */
 
 const AWS = require('aws-sdk')
-const { subscribe, unsubscribe } = require('./lib')
+const { subscribe, unsubscribe, splitArn } = require('./lib')
 
 const sqs = new AWS.SQS({ region: 'us-east-1' })
-
-function splitArn(a) {
-  const [arn, partition, service, region, accountId, resourceType, resource] = a.split(':')
-  if (!resource && !resourceType.includes('/')) {
-    return {
-      arn,
-      partition,
-      service,
-      region,
-      accountId,
-      resource: resourceType
-    }
-  } else if (resourceType.includes('/')) {
-    const f = resourceType.split('/')
-    return {
-      arn,
-      partition,
-      service,
-      region,
-      accountId,
-      resourceType: f[0],
-      resource: f[1]
-    }
-  }
-
-  return {
-    arn,
-    partition,
-    service,
-    region,
-    accountId,
-    resourceType,
-    resource
-  }
-}
 
 const deploy = async ({ topic, protocol, endpoint = '' }, context) => {
   const { region, accountId, resource } = splitArn(endpoint)

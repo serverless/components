@@ -5,7 +5,7 @@ const { subscribe, unsubscribe } = require('./lib')
 
 const lambda = new AWS.Lambda({ region: 'us-east-1' })
 
-const deploy = async ({ topic, protocol, endpoint = '' }, context) => {
+const deploy = async ({ topic, protocol, endpoint }, context) => {
   const response = Promise.all([
     subscribe({ topic, protocol, endpoint }, context),
     lambda
