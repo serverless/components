@@ -41,10 +41,10 @@ jest.mock('aws-sdk', () => {
 })
 
 afterEach(() => {
-  AWS.mocks.subscribeMock.mockClear(),
-    AWS.mocks.unsubscribeMock.mockClear(),
-    AWS.mocks.addPermissionMock.mockClear(),
-    AWS.mocks.removePermissionMock.mockClear()
+  AWS.mocks.subscribeMock.mockClear()
+  AWS.mocks.unsubscribeMock.mockClear()
+  AWS.mocks.addPermissionMock.mockClear()
+  AWS.mocks.removePermissionMock.mockClear()
 })
 
 afterAll(() => {

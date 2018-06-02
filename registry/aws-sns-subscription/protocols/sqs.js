@@ -5,29 +5,10 @@ const { subscribe, unsubscribe, splitArn } = require('./lib')
 
 const sqs = new AWS.SQS({ region: 'us-east-1' })
 
-const deploy = async ({ topic, protocol, endpoint = '' }, context) => {
+const deploy = async ({ topic, protocol, endpoint }, context) => {
   const { region, accountId, resource } = splitArn(endpoint)
   const queueUrl = `https://sqs.${region}.amazonaws.com/${accountId}/${resource}`
-  // const response = Promise.all([
-
-  // ]).then(([subscription, permission]) => ({
-  //   subscriptionArn: subscription.SubscriptionArn,
-  //   statement: JSON.parse(permission.Statement)
-  // }))
-
   const { SubscriptionArn } = await subscribe({ topic, protocol, endpoint }, context)
-  // const permission = {
-  //   AWSAccountIds: [accountId],
-  //   Actions: ['*'],
-  //   Label: `SQSStatement${Date.now()}`,
-  //   QueueUrl: queueUrl,
-  //   Condition:
-  //     {
-  //       ArnEquals: {
-  //         'aws:SourceArn': topic
-  //       }
-  //     }
-  // }
   const permission = {
     QueueUrl: queueUrl,
     Attributes: {
@@ -68,7 +49,6 @@ const remove = async (context) => {
         }
       })
       .promise()
-    // sqs.removePermission({ Label, QueueUrl }).promise()
   ])
   return response
 }
