@@ -5,6 +5,7 @@ const { merge } = require('ramda')
 
 const deploy = async (inputs, context) => {
   const { state } = context
+  context.setOutputs({})
   if (
     (state.topic && inputs.topic !== state.topic) ||
     (state.protocol && inputs.protocol !== state.protocol)
@@ -13,9 +14,9 @@ const deploy = async (inputs, context) => {
   }
   const newState = await getProtocol(inputs.protocol).deploy(inputs, context)
   context.saveState(merge(newState, inputs))
-  return {
+  return context.setOutputs({
     arn: newState.subscriptionArn
-  }
+  })
 }
 
 const remove = async (inputs, context) => {
@@ -23,7 +24,7 @@ const remove = async (inputs, context) => {
   // pass context to remove lambda subscription instead vars
   await getProtocol(state.protocol).remove(context)
   context.saveState({})
-  return {}
+  return context.setOutputs({})
 }
 
 module.exports = {

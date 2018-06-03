@@ -1,7 +1,7 @@
 <!-- AUTO-GENERATED-CONTENT:START (COMPONENT_HEADER) -->
 # AWS Sns Subscription
 
-Provision AWS SNS Subscription with serverless components
+Provision AWS SNS Subscription with Serverless Components
 <!-- AUTO-GENERATED-CONTENT:END -->
 
 <!-- AUTO-GENERATED-CONTENT:START (TOC) -->

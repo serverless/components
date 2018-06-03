@@ -45,8 +45,8 @@ describe('sms protocol tests', () => {
       log: () => {}
     }
     const inputs = { topic: 'topic-arn', protocol: 'sms', endpoint: '+1234567890' }
-    const { SubscriptionArn } = await protocol.deploy(inputs, contextMock)
-    expect(SubscriptionArn).toBe(
+    const { subscriptionArn } = await protocol.deploy(inputs, contextMock)
+    expect(subscriptionArn).toBe(
       `arn:aws:sns:us-east-1:000000000000:${inputs.topic}:00000000-0000-0000-0000-000000000000`
     )
     expect(AWS.mocks.subscribeMock).toHaveBeenCalledWith(
