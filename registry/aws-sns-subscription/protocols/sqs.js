@@ -3,7 +3,7 @@
 const AWS = require('aws-sdk')
 const { subscribe, unsubscribe, splitArn } = require('./lib')
 
-const sqs = new AWS.SQS({ region: 'us-east-1' })
+const sqs = new AWS.SQS({ region: process.env.AWS_DEFAULT_REGION || 'us-east-1' })
 
 const deploy = async ({ topic, protocol, endpoint }, context) => {
   const { region, accountId, resource } = splitArn(endpoint)

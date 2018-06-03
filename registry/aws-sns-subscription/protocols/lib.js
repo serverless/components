@@ -3,7 +3,7 @@
 const AWS = require('aws-sdk')
 const { find, isNil, whereEq } = require('ramda')
 
-const sns = new AWS.SNS({ region: 'us-east-1' })
+const sns = new AWS.SNS({ region: process.env.AWS_DEFAULT_REGION || 'us-east-1' })
 
 const subscribe = async ({ topic, protocol, endpoint }, context) => {
   context.log(`TBD ${protocol} ${endpoint} subscription -> ${topic}`)
