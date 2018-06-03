@@ -2,7 +2,7 @@ type: aws-sns-subscription
 version: 0.2.0
 core: 0.2.x
 
-description: "Provision AWS SNS Subscription with serverless components"
+description: "Provision AWS SNS Subscription with Serverless Components"
 license: Apache-2.0
 author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
 repository: "github:serverless/components"
@@ -13,7 +13,7 @@ inputTypes:
     required: true
     description: The ARN of your SNS topic to subscribe
     displayName: SNS Topic Arn
-    example: arn:aws:sns:*:123456789012:my_topic
+    example: arn:aws:sns:us-east-1:123456789012:my_topic
   protocol:
     type: string
     required: true
