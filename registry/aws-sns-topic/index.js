@@ -15,7 +15,7 @@ const {
   isNil
 } = require('ramda')
 
-const sns = new AWS.SNS({ region: 'us-east-1' })
+const sns = new AWS.SNS({ region: process.env.AWS_DEFAULT_REGION || 'us-east-1' })
 
 const capitalize = (string) => `${string.charAt(0).toUpperCase()}${string.slice(1)}`
 const first = (array) => (Array.isArray(array) ? array[0] : array)
