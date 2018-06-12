@@ -1,0 +1,34 @@
+type: aws-sns-platform-application
+version: 0.2.0
+core: 0.2.x
+
+description: "Provision AWS SNS Platform Application with Serverless Components"
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
+
+inputTypes:
+  name:
+    type: string
+    required: true
+    description: The name of your SNS platform application
+    displayName: SNS Platform Application Name
+    example: my_platform_application
+  platform:
+    type: string
+    required: true
+    default: https
+    displayName: SNS Platform Application Name
+    description: The platform application is using, possible values are ADM, APNS, APNS_SANDBOX, and GCM
+    example: https
+  attributes:
+    type: string
+    required: true
+    displayName: Platform attributes
+    description: Platform specific attributes, see https://docs.aws.amazon.com/sns/latest/api/API_SetPlatformApplicationAttributes.html
+    example: https://example.com/
+
+outputTypes:
+  arn:
+    type: string
+    description: Platform Application Arn
