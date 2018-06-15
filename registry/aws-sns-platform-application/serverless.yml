@@ -22,7 +22,7 @@ inputTypes:
     description: The platform application is using, possible values are ADM, APNS, APNS_SANDBOX, and GCM
     example: https
   attributes:
-    type: string
+    type: object
     required: true
     displayName: Platform attributes
     description: Platform specific attributes, see https://docs.aws.amazon.com/sns/latest/api/API_SetPlatformApplicationAttributes.html
