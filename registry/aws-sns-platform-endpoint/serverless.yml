@@ -1,0 +1,37 @@
+type: aws-sns-platform-endpoint
+version: 0.2.0
+core: 0.2.x
+
+description: "Provision AWS SNS Platform Endpoint with Serverless Components"
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
+
+inputTypes:
+  platformApplication:
+    type: string
+    required: true
+    description: The Arn of SNS platform application
+    displayName: SNS platform application Arn
+    example: arn:aws:sns:us-east-1:000000000000:app/GCM/some-application-name
+  token:
+    type: string
+    required: true
+    default: https
+    displayName: SNS Platform Application Name
+    description: The platform application is using, possible values are ADM, APNS, APNS_SANDBOX, and GCM
+    example: https
+  attributes:
+    type: object
+    displayName: Platform attributes
+    description: Platform specific attributes, see https://docs.aws.amazon.com/sns/latest/api/API_SetPlatformApplicationAttributes.html
+    example: https://example.com/
+  customUserData:
+    type: string
+    displayName: Custom User Data
+    description:
+    example: nnnnnnnn
+outputTypes:
+  arn:
+    type: string
+    description: Endpoint Arn

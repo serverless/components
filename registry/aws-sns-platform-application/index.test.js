@@ -6,14 +6,11 @@ const component = require('./index')
 
 jest.mock('aws-sdk', () => {
   const mocks = {
-    createPlatformApplicationMock: jest.fn((value) => {
-      console.log(value)
-      return {
-        PlatformApplicationArn: `arn:aws:sns:us-east-1:000000000000:app/${value.Platform}/${
-          value.Name
-        }`
-      }
-    }),
+    createPlatformApplicationMock: jest.fn((value) => ({
+      PlatformApplicationArn: `arn:aws:sns:us-east-1:000000000000:app/${value.Platform}/${
+        value.Name
+      }`
+    })),
     deletePlatformApplicationMock: jest.fn()
   }
 
@@ -167,7 +164,7 @@ describe('aws-sns-platform-application tests', () => {
     expect(contextMock.saveState).toHaveBeenCalledTimes(2)
   })
 
-  it('should not remove sns platform application component when name, platform, and attributes are same', async () => {
+  it('should not remove or create a new sns platform application when the name, platform, and attributes are same', async () => {
     const contextMock = {
       state: {
         platformApplicationArn: 'arn:aws:sns:us-east-1:000000000000:app/PLT/some-application-name',
@@ -192,12 +189,12 @@ describe('aws-sns-platform-application tests', () => {
     const outputs = await component.deploy(inputs, contextMock)
 
     expect(AWS.SNS).toHaveBeenCalledTimes(1)
-    expect(AWS.mocks.createPlatformApplicationMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.createPlatformApplicationMock).toHaveBeenCalledTimes(0)
     expect(AWS.mocks.deletePlatformApplicationMock).toHaveBeenCalledTimes(0)
     expect(outputs.arn).toEqual(
       `arn:aws:sns:us-east-1:000000000000:app/${inputs.platform}/${inputs.name}`
     )
-    expect(contextMock.saveState).toHaveBeenCalledTimes(1)
+    expect(contextMock.saveState).toHaveBeenCalledTimes(0)
   })
 
   it('should remove sns platform application component', async () => {

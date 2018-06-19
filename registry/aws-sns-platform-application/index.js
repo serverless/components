@@ -4,7 +4,7 @@ const AWS = require('aws-sdk')
 
 const sns = new AWS.SNS({ region: process.env.AWS_DEFAULT_REGION || 'us-east-1' })
 
-const { merge, equals } = require('ramda')
+const { merge, equals, filter } = require('ramda')
 
 const contextSetOutputs = (context) => {
   context.setOutputs = (output) => {
@@ -13,29 +13,38 @@ const contextSetOutputs = (context) => {
   }
 }
 
+const mapParams = (object) => {
+  return filter((item) => typeof item !== 'undefined')({
+    name: object.name,
+    platform: object.platform,
+    attributes: object.attributes
+  })
+}
+
 const deploy = async (inputs, context) => {
   contextSetOutputs(context) // REMOVE
   const { state } = context
-  if (
-    state.platformApplicationArn &&
-    (inputs.name !== state.name ||
-      inputs.platform !== state.platform ||
-      !equals(inputs.attributes, state.attributes))
-  ) {
+  let platformApplicationArn = state.platformApplicationArn
+  if (platformApplicationArn && !equals(mapParams(inputs), mapParams(state))) {
     context.log(`TBD to update ${inputs.name} old one needs to be removed first`)
     await remove(inputs, context)
   }
-  context.log(`TBD creating ${inputs.name}`)
-  const { PlatformApplicationArn } = await sns
-    .createPlatformApplication({
-      Name: inputs.name,
-      Platform: inputs.platform,
-      Attributes: inputs.attributes
-    })
-    .promise()
-  context.saveState(merge({ platformApplicationArn: PlatformApplicationArn }, inputs))
+  if (!equals(mapParams(inputs), mapParams(state))) {
+    context.log(`TBD creating ${inputs.name}`)
+    const { PlatformApplicationArn } = await sns
+      .createPlatformApplication({
+        Name: inputs.name,
+        Platform: inputs.platform,
+        Attributes: inputs.attributes
+      })
+      .promise()
+    platformApplicationArn = PlatformApplicationArn
+    context.saveState(merge({ platformApplicationArn }, inputs))
+  } else {
+    context.log(`TBD no changes to ${inputs.name}`)
+  }
   return context.setOutputs({
-    arn: PlatformApplicationArn
+    arn: platformApplicationArn
   })
 }
 
