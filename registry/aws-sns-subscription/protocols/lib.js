@@ -5,32 +5,54 @@ const { find, isNil, whereEq } = require('ramda')
 
 const sns = new AWS.SNS({ region: process.env.AWS_DEFAULT_REGION || 'us-east-1' })
 
+const contextSetOutputs = (context) => {
+  context.setOutputs = (output) => {
+    console.warn('*** temp setout', output)
+    return output // dummy output remove after PR #223
+  }
+}
+
 const subscribe = async ({ topic, protocol, endpoint }, context) => {
-  context.log(`TBD ${protocol} ${endpoint} subscription -> ${topic}`)
-  return sns
+  contextSetOutputs(context) // REMOVE
+  context.log(`Creating a SNS subcription to topic '${topic}'`)
+  const response = await sns
     .subscribe({
       TopicArn: topic,
       Protocol: protocol,
       Endpoint: endpoint
     })
     .promise()
+  context.log(`SNS subcription '${response.SubscriptionArn}' to topic '${topic}' created`)
+  return response
 }
 
 const unsubscribe = async (context) => {
+  contextSetOutputs(context) // REMOVE
   const { state } = context
-  context.log(`TBD removing ${state.subscriptionArn}`)
-  return sns
+  context.log(`Removing the SNS Subscription '${state.subscriptionArn}'`)
+  const response = await sns
     .unsubscribe({
       SubscriptionArn: state.subscriptionArn
     })
     .promise()
+  context.log(`SNS subcription '${state.subscriptionArn}' removed`)
+  return response
 }
 
 const setSubscriptionAttributes = async (
   { subscriptionArn, attributeName, attributeValue },
   context
 ) => {
-  context.log(`TBD setting ${attributeName} to ${subscriptionArn}`)
+  contextSetOutputs(context) // REMOVE
+  if (attributeValue === '') {
+    context.log(
+      `Removing SNS Subscription Attribute '${attributeName}' from subscription ${subscriptionArn}`
+    )
+  } else {
+    context.log(
+      `Setting SNS Subscription Attribute '${attributeName}' to subscription ${subscriptionArn}`
+    )
+  }
   return sns
     .setSubscriptionAttributes({
       AttributeName: attributeName,

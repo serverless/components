@@ -18,7 +18,7 @@ inputTypes:
     type: string
     required: true
     default: https
-    displayName: SNS Platform Application Name
+    displayName: Platform provider
     description: The platform application is using, possible values are ADM, APNS, APNS_SANDBOX, and GCM
     example: https
   attributes:

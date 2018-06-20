@@ -28,13 +28,17 @@ const deploy = async (inputs, context) => {
   let endpointArn = state.endpointArn
   // console.log('PARAMS', mapParams(inputs), mapParams(state))
   if (state.endpointArn && !equals(mapParams(inputs), mapParams(state))) {
-    context.log(`TBD to update ${inputs.name} old one needs to be removed first`)
+    context.log(
+      `To update the SNS Platform Endpoint with token '${
+        inputs.token
+      }', old version needs to be removed`
+    )
     await remove(inputs, context)
     endpointArn = ''
   }
 
   if (!equals(mapParams(inputs), mapParams(state))) {
-    context.log(`TBD creating ${inputs.token} endpoint to ${inputs.platformApplication}`)
+    context.log(`Creating a SNS Platform Endpoint with token '${inputs.token}'`)
     const { EndpointArn } = await sns
       .createPlatformEndpoint({
         PlatformApplicationArn: inputs.platformApplication,
@@ -43,10 +47,11 @@ const deploy = async (inputs, context) => {
         CustomUserData: inputs.customUserData
       })
       .promise()
+    context.log(`SNS Platform Endpoint with token '${inputs.token}' created`)
     endpointArn = EndpointArn
     context.saveState(merge({ endpointArn }, inputs))
   } else {
-    context.log(`TBD no changes to ${inputs.token} endpoint in ${inputs.platformApplication}`)
+    context.log(`No changes to the SNS Platform Endpoint with token '${inputs.token}'`)
   }
 
   return context.setOutputs({
@@ -57,13 +62,13 @@ const deploy = async (inputs, context) => {
 const remove = async (inputs, context) => {
   contextSetOutputs(context) // REMOVE
   const { state } = context
-  context.log(`TBD removing ${state.endpointArn}`)
+  context.log(`Removing the SNS Platform Endpoint with token '${state.token}'`)
   await sns
     .deleteEndpoint({
       EndpointArn: state.endpointArn
     })
     .promise()
-  context.log(`TBD removed ${state.endpointArn}`)
+  context.log(`SNS Platform Endpoint with token '${state.token}' removed`)
   await context.saveState({})
   return context.setOutputs({})
 }

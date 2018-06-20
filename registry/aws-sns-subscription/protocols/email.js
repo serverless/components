@@ -7,14 +7,18 @@ const deploy = async ({ topic, protocol, endpoint }, context) =>
     subscribe({ topic, protocol, endpoint }, context).then(async (response) => {
       if (response.SubscriptionArn === 'pending confirmation') {
         context.log(
-          `TBD ${topic} subscription is pending confirmation, check the ${endpoint} for confirmation instructions`
+          `SNS subscription to topic '${topic}' is pending confirmation, check the ${endpoint} for confirmation instructions`
         )
         const confirmationResponse = await waitForConfirmation(
           { topic, protocol, endpoint },
           2000,
           120000
         )
-        context.log(`TBD ${confirmationResponse.subscriptionArn} created`)
+        context.log(
+          `SNS subscription to the topic '${topic}' with '${
+            confirmationResponse.subscriptionArn
+          }' confirmed`
+        )
         resolve(confirmationResponse)
       } else {
         resolve({ subscriptionArn: response.SubscriptionArn })

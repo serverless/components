@@ -64,7 +64,7 @@ describe('protocol index tests', () => {
     await deploy(inputs, contextMock)
     expect(protocols.getProtocol).toHaveBeenCalledTimes(2)
     expect(contextMock.saveState).toHaveBeenCalledTimes(2)
-    expect(contextMock.setOutputs).toHaveBeenCalledTimes(3)
+    expect(contextMock.setOutputs).toHaveBeenCalledTimes(2)
     expect(contextMock.setOutputs.mock.calls[0][0]).toEqual({})
     expect(contextMock.setOutputs.mock.calls[1][0]).toEqual({})
     expect(contextMock.setOutputs.mock.calls[2][0]).toEqual(

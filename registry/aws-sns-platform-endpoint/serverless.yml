@@ -17,20 +17,20 @@ inputTypes:
   token:
     type: string
     required: true
-    default: https
-    displayName: SNS Platform Application Name
-    description: The platform application is using, possible values are ADM, APNS, APNS_SANDBOX, and GCM
-    example: https
+    displayName: The device token for push notification
+    description: Unique id that is generated for an app in the device by the notification service
+    example: APA91bGi7fFachkC1xjlqT66VYEucGHochmf1VQAr9kererjsM0PKPxKhddCzx6paEsyay9Zn3D4wNUJb8m6HZrBEXAMPLE
   attributes:
     type: object
-    displayName: Platform attributes
-    description: Platform specific attributes, see https://docs.aws.amazon.com/sns/latest/api/API_SetPlatformApplicationAttributes.html
-    example: https://example.com/
+    displayName: Endpoint attributes
+    description: Endpoint attributes, see https://docs.aws.amazon.com/sns/latest/api/API_SetEndpointAttributes.html
+    example:
+      Enabled: true
   customUserData:
     type: string
     displayName: Custom User Data
-    description:
-    example: nnnnnnnn
+    description: User data to associate with the endpoint
+    example: SomeUserData
 outputTypes:
   arn:
     type: string

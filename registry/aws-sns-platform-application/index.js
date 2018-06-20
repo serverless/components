@@ -26,11 +26,13 @@ const deploy = async (inputs, context) => {
   const { state } = context
   let platformApplicationArn = state.platformApplicationArn
   if (platformApplicationArn && !equals(mapParams(inputs), mapParams(state))) {
-    context.log(`TBD to update ${inputs.name} old one needs to be removed first`)
+    context.log(
+      `To update the SNS Platform Application'${inputs.name}', old version needs to be removed`
+    )
     await remove(inputs, context)
   }
   if (!equals(mapParams(inputs), mapParams(state))) {
-    context.log(`TBD creating ${inputs.name}`)
+    context.log(`Creating a SNS Platform Application '${inputs.name}'`)
     const { PlatformApplicationArn } = await sns
       .createPlatformApplication({
         Name: inputs.name,
@@ -38,10 +40,11 @@ const deploy = async (inputs, context) => {
         Attributes: inputs.attributes
       })
       .promise()
+    context.log(`SNS Platform application '${inputs.name}' created`)
     platformApplicationArn = PlatformApplicationArn
     context.saveState(merge({ platformApplicationArn }, inputs))
   } else {
-    context.log(`TBD no changes to ${inputs.name}`)
+    context.log(`No changes to the SNS Platform Application '${inputs.name}'`)
   }
   return context.setOutputs({
     arn: platformApplicationArn
@@ -51,13 +54,13 @@ const deploy = async (inputs, context) => {
 const remove = async (inputs, context) => {
   contextSetOutputs(context) // REMOVE
   const { state } = context
-  context.log(`TBD removing ${state.platformApplicationArn}`)
+  context.log(`Removing the SNS Platform Application '${state.name}'`)
   await sns
     .deletePlatformApplication({
       PlatformApplicationArn: state.platformApplicationArn
     })
     .promise()
-  context.log(`TBD removed ${state.platformApplicationArn}`)
+  context.log(`SNS Platform Application '${state.name}' removed`)
   context.saveState({})
   return context.setOutputs({})
 }

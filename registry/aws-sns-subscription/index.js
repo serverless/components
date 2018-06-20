@@ -3,9 +3,16 @@
 const { getProtocol } = require('./protocols')
 const { merge } = require('ramda')
 
+const contextSetOutputs = (context) => {
+  context.setOutputs = (output) => {
+    console.warn('*** temp setout', output)
+    return output // dummy output remove after PR #223
+  }
+}
+
 const deploy = async (inputs, context) => {
+  contextSetOutputs(context) // REMOVE
   const { state } = context
-  context.setOutputs({})
   if (
     (state.topic && inputs.topic !== state.topic) ||
     (state.protocol && inputs.protocol !== state.protocol)
