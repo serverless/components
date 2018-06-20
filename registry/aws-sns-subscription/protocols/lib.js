@@ -5,15 +5,7 @@ const { find, isNil, whereEq } = require('ramda')
 
 const sns = new AWS.SNS({ region: process.env.AWS_DEFAULT_REGION || 'us-east-1' })
 
-const contextSetOutputs = (context) => {
-  context.setOutputs = (output) => {
-    console.warn('*** temp setout', output)
-    return output // dummy output remove after PR #223
-  }
-}
-
 const subscribe = async ({ topic, protocol, endpoint }, context) => {
-  contextSetOutputs(context) // REMOVE
   context.log(`Creating a SNS subcription to topic '${topic}'`)
   const response = await sns
     .subscribe({
@@ -27,7 +19,6 @@ const subscribe = async ({ topic, protocol, endpoint }, context) => {
 }
 
 const unsubscribe = async (context) => {
-  contextSetOutputs(context) // REMOVE
   const { state } = context
   context.log(`Removing the SNS Subscription '${state.subscriptionArn}'`)
   const response = await sns
@@ -43,7 +34,6 @@ const setSubscriptionAttributes = async (
   { subscriptionArn, attributeName, attributeValue },
   context
 ) => {
-  contextSetOutputs(context) // REMOVE
   if (attributeValue === '') {
     context.log(
       `Removing SNS Subscription Attribute '${attributeName}' from subscription ${subscriptionArn}`

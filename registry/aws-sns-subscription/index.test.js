@@ -39,9 +39,8 @@ describe('protocol index tests', () => {
     await deploy(inputs, contextMock)
     expect(protocols.getProtocol).toHaveBeenCalledTimes(1)
     expect(contextMock.saveState).toHaveBeenCalledTimes(1)
-    expect(contextMock.setOutputs).toHaveBeenCalledTimes(2)
-    expect(contextMock.setOutputs.mock.calls[0][0]).toEqual({})
-    expect(contextMock.setOutputs.mock.calls[1][0]).toEqual(
+    expect(contextMock.setOutputs).toHaveBeenCalledTimes(1)
+    expect(contextMock.setOutputs.mock.calls[0][0]).toEqual(
       expect.objectContaining({ arn: 'subscriptionArn' })
     )
   })
@@ -66,8 +65,7 @@ describe('protocol index tests', () => {
     expect(contextMock.saveState).toHaveBeenCalledTimes(2)
     expect(contextMock.setOutputs).toHaveBeenCalledTimes(2)
     expect(contextMock.setOutputs.mock.calls[0][0]).toEqual({})
-    expect(contextMock.setOutputs.mock.calls[1][0]).toEqual({})
-    expect(contextMock.setOutputs.mock.calls[2][0]).toEqual(
+    expect(contextMock.setOutputs.mock.calls[1][0]).toEqual(
       expect.objectContaining({ arn: 'subscriptionArn' })
     )
   })

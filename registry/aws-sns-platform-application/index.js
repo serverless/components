@@ -6,13 +6,6 @@ const sns = new AWS.SNS({ region: process.env.AWS_DEFAULT_REGION || 'us-east-1' 
 
 const { merge, equals, filter } = require('ramda')
 
-const contextSetOutputs = (context) => {
-  context.setOutputs = (output) => {
-    console.warn('*** temp setout', output)
-    return output // dummy output remove after PR #223
-  }
-}
-
 const mapParams = (object) => {
   return filter((item) => typeof item !== 'undefined')({
     name: object.name,
@@ -22,7 +15,6 @@ const mapParams = (object) => {
 }
 
 const deploy = async (inputs, context) => {
-  contextSetOutputs(context) // REMOVE
   const { state } = context
   let platformApplicationArn = state.platformApplicationArn
   if (platformApplicationArn && !equals(mapParams(inputs), mapParams(state))) {
@@ -46,13 +38,15 @@ const deploy = async (inputs, context) => {
   } else {
     context.log(`No changes to the SNS Platform Application '${inputs.name}'`)
   }
-  return context.setOutputs({
+  context.setOutputs({
     arn: platformApplicationArn
   })
+  return {
+    arn: platformApplicationArn
+  }
 }
 
 const remove = async (inputs, context) => {
-  contextSetOutputs(context) // REMOVE
   const { state } = context
   context.log(`Removing the SNS Platform Application '${state.name}'`)
   await sns
@@ -62,7 +56,8 @@ const remove = async (inputs, context) => {
     .promise()
   context.log(`SNS Platform Application '${state.name}' removed`)
   context.saveState({})
-  return context.setOutputs({})
+  context.setOutputs({})
+  return {}
 }
 
 module.exports = {
