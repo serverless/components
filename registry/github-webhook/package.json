@@ -2,15 +2,15 @@
   "name": "github-webhook",
   "version": "0.2.0",
   "private": true,
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "@octokit/rest": "^15.2.6",
-    "parse-github-url": "^1.0.2",
-    "concordance": "^3.0.0",
     "chalk": "^2.3.2",
+    "concordance": "^3.0.0",
+    "parse-github-url": "^1.0.2",
     "ramda": "^0.25.0"
   }
 }

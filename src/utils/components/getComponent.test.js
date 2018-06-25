@@ -84,7 +84,7 @@ describe('#getComponent()', () => {
             }
           }
         )
-      ).rejects.toThrow('Type error(s) in component')
+      ).rejects.toHaveProperty('message')
     })
 
     it('Test invalid default for string type', async () => {
@@ -103,7 +103,7 @@ describe('#getComponent()', () => {
             }
           }
         )
-      ).rejects.toThrow('Type error(s) in component')
+      ).rejects.toHaveProperty('message')
     })
   })
 
@@ -128,7 +128,10 @@ describe('#getComponent()', () => {
           }
         }
       )
-    ).rejects.toThrow('variable syntax cannot be used')
+    ).rejects.toHaveProperty(
+      'message',
+      'The variable syntax cannot be used in "type" or "version" properties'
+    )
   })
 
   it('Test incompatible core version', async () => {
@@ -152,7 +155,10 @@ describe('#getComponent()', () => {
           }
         }
       )
-    ).rejects.toThrow('core is incompatible with component my-project')
+    ).rejects.toHaveProperty(
+      'message',
+      'The Serverless Components core is incompatible with component my-project'
+    )
   })
 
   it('Test passed-in serverless.yml component object', async () => {

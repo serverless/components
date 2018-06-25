@@ -3,7 +3,7 @@ const os = require('os')
 const crypto = require('crypto')
 const fse = require('fs-extra')
 const BbPromise = require('bluebird')
-const admZip = require('adm-zip')
+const decompress = require('decompress')
 const pack = require('./pack')
 
 const fsp = BbPromise.promisifyAll(fse)
@@ -25,10 +25,10 @@ describe('#pack()', () => {
 
   it('should zip the aws-lambda component and return the zip file content', async () => {
     const zipRes = await pack(packagePath, tempPath)
-    const zip = admZip(zipRes)
-    const files = zip.getEntries().map((entry) => ({
-      name: entry.entryName,
-      content: entry.getData()
+    const unzipRes = await decompress(zipRes)
+    const files = unzipRes.map((entry) => ({
+      name: entry.path.split(path.sep).pop(),
+      content: entry.data
     }))
     const jsonFile = files.filter((file) => file.name === 'foo.json').pop()
 

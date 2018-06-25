@@ -1,11 +1,15 @@
 async function deploy(inputs, context) {
   const myFunction = await context.children.myFunction
 
+  const functionToSave = {
+    ...myFunction
+  }
+
+  delete functionToSave.promise
+
   const newState = {
     ...context.state,
-    myFunction: {
-      ...myFunction
-    }
+    myFunction: functionToSave
   }
   context.saveState(newState)
 

@@ -63,7 +63,9 @@ describe('#handleSignalEvents()', () => {
 
     it('should support windows systems', (done) => {
       handleSignalEvents()
-      process.platform = 'win32'
+      Object.defineProperty(process, 'platform', {
+        value: 'win32'
+      })
       process.on(SIGNAL, (numEmitted) => {
         if (numEmitted === 2) {
           expect(logMock).toHaveBeenCalledTimes(1)
@@ -100,7 +102,9 @@ describe('#handleSignalEvents()', () => {
 
     it('should support windows systems', (done) => {
       handleSignalEvents()
-      process.platform = 'win32'
+      Object.defineProperty(process, 'platform', {
+        value: 'win32'
+      })
       process.on(SIGNAL, (numEmitted) => {
         if (numEmitted === 1) {
           expect(logMock).toHaveBeenCalledTimes(1)
@@ -135,7 +139,9 @@ describe('#handleSignalEvents()', () => {
 
     it('should support windows systems', (done) => {
       handleSignalEvents()
-      process.platform = 'win32'
+      Object.defineProperty(process, 'platform', {
+        value: 'win32'
+      })
       process.on(SIGNAL, (numEmitted) => {
         if (numEmitted === 1) {
           expect(logMock).toHaveBeenCalledTimes(1)

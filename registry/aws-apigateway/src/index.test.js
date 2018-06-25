@@ -87,7 +87,10 @@ describe('ApiGateway Component Unit Tests', () => {
       saveState: () => {}
     }
 
-    await expect(apigComponent.remove({}, apigContextMock)).rejects.toThrow('some random aws error')
+    await expect(apigComponent.remove({}, apigContextMock)).rejects.toHaveProperty(
+      'message',
+      'some random aws error'
+    )
     expect(AWS.APIGateway).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.deleteRestApiMock).toHaveBeenCalledTimes(1)
   })

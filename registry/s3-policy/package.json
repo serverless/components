@@ -1,0 +1,12 @@
+{
+  "name": "@serverless-components/s3-policy",
+  "version": "0.2.0",
+  "private": true,
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.201.0"
+  }
+}
