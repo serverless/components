@@ -7,9 +7,16 @@ const join = require('path').join
 const os = require('os')
 const cp = require('child_process')
 const BbPromise = require('bluebird')
+const contains = require('ramda').contains
 
 const rootPath = __dirname
-const componentDirs = fs.readdirSync(rootPath)
+const dirsFilter = process.argv.slice(2)
+const componentDirs = fs.readdirSync(rootPath).filter((componentDir) => {
+  if (dirsFilter.length === 0) {
+    return true
+  }
+  return contains(componentDir, dirsFilter)
+})
 
 function buildComponents(watch, concurrency) {
   return BbPromise.map(
@@ -31,9 +38,9 @@ function buildComponents(watch, concurrency) {
           '--source-maps',
           '--copy-files',
           '--ignore',
-          "'**/node_modules'",
+          '**/node_modules',
           '--ignore',
-          "'**/*.test.js'"
+          '**/*.test.js'
         ]
 
         if (watch === true) {
