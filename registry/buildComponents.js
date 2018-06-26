@@ -25,9 +25,9 @@ function buildComponents(watch, concurrency) {
         babel = os.platform().startsWith('win') ? join(babel, 'babel.cmd') : join(babel, 'babel')
 
         const params = [
-          'src',
+          join(componentDir, 'src'),
           '--out-dir',
-          'dist',
+          join(componentDir, 'dist'),
           '--source-maps',
           '--copy-files',
           '--ignore',
@@ -40,7 +40,7 @@ function buildComponents(watch, concurrency) {
           params.unshift('--watch')
         }
 
-        const command = cp.spawn(babel, params, { env: process.env, cwd: componentDirPath })
+        const command = cp.spawn(babel, params, { env: process.env, cwd: rootPath })
         command.stdout.on('data', (data) => {
           console.log(data.toString())
         })
