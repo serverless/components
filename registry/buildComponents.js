@@ -7,14 +7,11 @@ const join = require('path').join
 const os = require('os')
 const cp = require('child_process')
 const BbPromise = require('bluebird')
-const buildComponents = require('./buildComponents')
 
 const rootPath = __dirname
 const componentDirs = fs.readdirSync(rootPath)
-const npmCmd = os.platform().startsWith('win') ? 'npm.cmd' : 'npm'
-const concurrency = process.version.startsWith('v4') ? 8 : 0
 
-function installComponents() {
+function buildComponents(watch, concurrency) {
   return BbPromise.map(
     componentDirs,
     (componentDir) => {
@@ -24,7 +21,26 @@ function installComponents() {
       return new BbPromise((resolve, reject) => {
         if (!fs.existsSync(join(componentDirPath, 'package.json'))) return resolve()
 
-        const command = cp.spawn(npmCmd, ['install'], { env: process.env, cwd: componentDirPath })
+        let babel = join(componentDirPath, '..', 'node_modules', '.bin')
+        babel = os.platform().startsWith('win') ? join(babel, 'babel.cmd') : join(babel, 'babel')
+
+        const params = [
+          'src',
+          '--out-dir',
+          'dist',
+          '--source-maps',
+          '--copy-files',
+          '--ignore',
+          "'**/node_modules'",
+          '--ignore',
+          "'**/*.test.js'"
+        ]
+
+        if (watch === true) {
+          params.unshift('--watch')
+        }
+
+        const command = cp.spawn(babel, params, { env: process.env, cwd: componentDirPath })
         command.stdout.on('data', (data) => {
           console.log(data.toString())
         })
@@ -37,8 +53,4 @@ function installComponents() {
   )
 }
 
-;(() => {
-  return BbPromise.resolve()
-    .then(() => buildComponents(false, concurrency))
-    .then(installComponents)
-})()
+module.exports = buildComponents
