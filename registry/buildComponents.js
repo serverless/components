@@ -49,7 +49,7 @@ function buildComponents(watch, concurrency) {
 
         const command = cp.spawn(babel, params, { env: process.env, cwd: rootPath })
         command.stdout.on('data', (data) => {
-          console.log(data.toString())
+          console.log(data.toString().replace(/\n/, ''))
         })
         command.stdout.on('close', () => resolve())
         command.stdout.on('end', () => resolve())
