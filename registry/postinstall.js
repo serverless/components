@@ -7,51 +7,12 @@ const join = require('path').join
 const os = require('os')
 const cp = require('child_process')
 const BbPromise = require('bluebird')
+const buildComponents = require('./buildComponents')
 
 const rootPath = __dirname
 const componentDirs = fs.readdirSync(rootPath)
 const npmCmd = os.platform().startsWith('win') ? 'npm.cmd' : 'npm'
 const concurrency = process.version.startsWith('v4') ? 8 : 0
-
-function buildComponents() {
-  return BbPromise.map(
-    componentDirs,
-    (componentDir) => {
-      // eslint-disable-line consistent-return
-      const componentDirPath = join(rootPath, componentDir)
-
-      return new BbPromise((resolve, reject) => {
-        if (!fs.existsSync(join(componentDirPath, 'package.json'))) return resolve()
-
-        let babel = join(componentDirPath, '..', 'node_modules', '.bin')
-        babel = os.platform().startsWith('win') ? join(babel, 'babel.cmd') : join(babel, 'babel')
-
-        const command = cp.spawn(
-          babel,
-          [
-            'src',
-            '--out-dir',
-            'dist',
-            '--source-maps',
-            '--copy-files',
-            '--ignore',
-            "'**/node_modules'",
-            '--ignore',
-            "'**/*.test.js'"
-          ],
-          { env: process.env, cwd: componentDirPath }
-        )
-        command.stdout.on('data', (data) => {
-          console.log(data.toString())
-        })
-        command.stdout.on('close', () => resolve())
-        command.stdout.on('end', () => resolve())
-        command.stdout.on('error', (error) => reject(error))
-      })
-    },
-    { concurrency }
-  )
-}
 
 function installComponents() {
   return BbPromise.map(
@@ -78,6 +39,6 @@ function installComponents() {
 
 ;(() => {
   return BbPromise.resolve()
-    .then(buildComponents)
+    .then(() => buildComponents(false, concurrency))
     .then(installComponents)
 })()
