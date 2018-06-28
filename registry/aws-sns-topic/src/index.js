@@ -2,23 +2,23 @@
 
 const AWS = require('aws-sdk')
 const {
-  equals,
+  concat,
   contains,
+  equals,
+  filter,
+  find,
+  head,
+  isNil,
+  keys,
+  map,
   merge,
   reduce,
-  map,
-  concat,
-  keys,
-  values,
-  find,
-  filter,
-  isNil
+  values
 } = require('ramda')
 
 const sns = new AWS.SNS({ region: process.env.AWS_DEFAULT_REGION || 'us-east-1' })
 
 const capitalize = (string) => `${string.charAt(0).toUpperCase()}${string.slice(1)}`
-const first = (array) => (Array.isArray(array) ? array[0] : array)
 const resolveInSequence = async (functionsToExecute) =>
   reduce(
     (promise, functionToExecute) =>
@@ -49,13 +49,13 @@ const createSNSTopic = async (
 }
 
 const concatInputsAndState = (inputs = [], state = []) => {
-  const attributeKeys = map((item) => first(keys(item)), inputs)
+  const attributeKeys = map((item) => head(keys(item)), inputs)
   return filter((item) => isNil(find(equals(item))(state)))(
     concat(
       inputs,
       reduce(
         (attributes, attribute) => {
-          const key = first(keys(attribute))
+          const key = head(keys(attribute))
           if (!contains(key, attributeKeys)) {
             // return empty string to "unset" removed value
             return concat(attributes, [{ [key]: '' }])
@@ -75,14 +75,14 @@ const updateAttributes = async (
 ) => {
   const topicAttributes = reduce(
     (result, value) => {
-      if (first(values(value))) return concat(result, [value])
+      if (head(values(value))) return concat(result, [value])
       return result
     },
     [],
     [{ displayName }, { policy }, { deliveryPolicy }]
   )
 
-  const stateTopicAttributes = filter((item) => !isNil(first(values(item))))([
+  const stateTopicAttributes = filter((item) => !isNil(head(values(item))))([
     { displayName: state.displayName },
     { policy: state.policy },
     { deliveryPolicy: state.deliveryPolicy }
@@ -116,7 +116,7 @@ const updateAttributes = async (
 
   return merge(
     reduce(
-      (result, value) => merge({ [first(keys(value))]: first(values(value)) }, result),
+      (result, value) => merge({ [head(keys(value))]: head(values(value)) }, result),
       {},
       topicAttributes
     ),
@@ -127,10 +127,10 @@ const updateAttributes = async (
 const updateTopicAttributes = async ({ topicAttributes, topicArn }) =>
   Promise.all(
     map((topicAttribute) => {
-      const value = first(values(topicAttribute))
+      const value = head(values(topicAttribute))
       const params = {
         TopicArn: topicArn,
-        AttributeName: capitalize(first(keys(topicAttribute))),
+        AttributeName: capitalize(head(keys(topicAttribute))),
         AttributeValue: typeof value !== 'string' ? JSON.stringify(value) : value
       }
       return sns.setTopicAttributes(params).promise()
@@ -143,10 +143,10 @@ const updateDeliveryStatusAttributes = async ({ deliveryStatusAttributes, topicA
   resolveInSequence(
     map(
       (topicAttribute) => () => {
-        const value = first(values(topicAttribute))
+        const value = head(values(topicAttribute))
         const params = {
           TopicArn: topicArn,
-          AttributeName: capitalize(first(keys(topicAttribute))),
+          AttributeName: capitalize(head(keys(topicAttribute))),
           AttributeValue: typeof value !== 'string' ? JSON.stringify(value) : value
         }
         return sns.setTopicAttributes(params).promise()
