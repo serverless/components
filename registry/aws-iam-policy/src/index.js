@@ -21,6 +21,18 @@ const createPolicy = async ({ name, document }) => {
 }
 
 const deletePolicy = async (name, arn) => {
+  const { PolicyGroups, PolicyRoles, PolicyUsers } = await IAM.listEntitiesForPolicy({
+    PolicyArn: arn
+  }).promise()
+
+  await Promise.all([
+    Promise.all(
+      PolicyGroups.map((policyGroup) => IAM.detachGroupPolicy({ GroupName: policyGroup }))
+    ),
+    Promise.all(PolicyRoles.map((policyRole) => IAM.detachRolePolicy({ RoleName: policyRole }))),
+    Promise.all(PolicyUsers.map((policyUser) => IAM.detachUserPolicy({ UserName: policyUser })))
+  ])
+
   await IAM.deletePolicy({
     PolicyArn: arn
   }).promise()
@@ -45,6 +57,7 @@ const deploy = async (inputs, context) => {
     context.log(`Creating Policy: ${inputs.name}`)
     outputs = await createPolicy(inputs)
   }
+
   context.saveState({ ...inputs, ...outputs })
   return outputs
 }

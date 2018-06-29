@@ -50,10 +50,17 @@ const createRole = async ({ name, service, policy }) => {
 }
 
 const deleteRole = async ({ name, policy }) => {
-  await detachRolePolicy({
-    name,
-    policy
-  })
+  try {
+    await detachRolePolicy({
+      name,
+      policy
+    })
+  } catch (error) {
+    if (error.message !== `Policy ${policy.arn} was not found.`) {
+      throw error
+    }
+  }
+
   await IAM.deleteRole({
     RoleName: name
   }).promise()
@@ -166,6 +173,7 @@ const remove = async (inputs, context) => {
     service: null,
     arn: null
   }
+
   try {
     context.log(`Removing Role: ${context.state.name}`)
     await deleteRole(context.state)
