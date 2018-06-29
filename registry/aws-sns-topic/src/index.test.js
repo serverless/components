@@ -398,6 +398,54 @@ describe('aws-sns-topic tests', () => {
     expect(snsTopicContextMock.saveState).toHaveBeenCalledTimes(1)
   })
 
+  it('should remove sns topic policy', async () => {
+    const snsTopicContextMock = {
+      state: {
+        topicArn: 'arn:aws:sns:us-east-1:000000000000:some-sns-topic-name',
+        name: 'some-sns-topic-name',
+        displayName: 'MySNSTopic',
+        policy: {
+          Version: '2008-10-17',
+          Id: 'policy_id',
+          Statement: [
+            {
+              Effect: 'Allow',
+              Sid: 'statement_id',
+              Principal: { AWS: '*' },
+              Action: ['SNS:Publish'],
+              Resource: 'arn:aws:sns:us-east-1:000000000000:my-sns-topic'
+            }
+          ]
+        }
+      },
+      log: () => {},
+      saveState: jest.fn(),
+      setOutputs: jest.fn()
+    }
+
+    const inputs = {
+      name: 'some-sns-topic-name',
+      displayName: 'NewSNSTopic'
+    }
+
+    await snsTopicComponent.deploy(inputs, snsTopicContextMock)
+
+    expect(AWS.SNS).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.removeSNSTopicMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.updateTopicAttributesMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.updateTopicAttributesMock).toBeCalledWith(
+      expect.objectContaining({
+        AttributeName: 'DisplayName',
+        AttributeValue: 'NewSNSTopic',
+        TopicArn: 'arn:aws:sns:us-east-1:000000000000:some-sns-topic-name'
+      })
+    )
+    expect(snsTopicContextMock.setOutputs).toBeCalledWith({
+      arn: `arn:aws:sns:us-east-1:000000000000:${inputs.name}`
+    })
+    expect(snsTopicContextMock.saveState).toHaveBeenCalledTimes(3)
+  })
+
   it('should update sns topic component with empty topic attributes (reset to default)', async () => {
     const snsTopicContextMock = {
       state: {
@@ -487,6 +535,60 @@ describe('aws-sns-topic tests', () => {
         TopicArn: 'arn:aws:sns:us-east-1:000000000000:some-sns-topic-name'
       })
     )
+    expect(snsTopicContextMock.setOutputs).toBeCalledWith({
+      arn: `arn:aws:sns:us-east-1:000000000000:${inputs.name}`
+    })
+    expect(snsTopicContextMock.saveState).toHaveBeenCalledTimes(1)
+  })
+
+  it('should not try to update attributes if nothing is changed', async () => {
+    const snsTopicContextMock = {
+      state: {
+        topicArn: 'arn:aws:sns:us-east-1:000000000000:some-sns-topic-name',
+        name: 'some-sns-topic-name',
+        displayName: 'MySNSTopic',
+        policy: {
+          Version: '2008-10-17',
+          Id: 'policy_id',
+          Statement: [
+            {
+              Effect: 'Allow',
+              Sid: 'statement_id',
+              Principal: { AWS: '*' },
+              Action: ['SNS:Publish'],
+              Resource: 'arn:aws:sns:us-east-1:000000000000:my-sns-topic'
+            }
+          ]
+        }
+      },
+      log: () => {},
+      saveState: jest.fn(),
+      setOutputs: jest.fn()
+    }
+
+    const inputs = {
+      name: 'some-sns-topic-name',
+      displayName: 'MySNSTopic',
+      policy: {
+        Version: '2008-10-17',
+        Id: 'policy_id',
+        Statement: [
+          {
+            Effect: 'Allow',
+            Sid: 'statement_id',
+            Principal: { AWS: '*' },
+            Action: ['SNS:Publish'],
+            Resource: 'arn:aws:sns:us-east-1:000000000000:my-sns-topic'
+          }
+        ]
+      }
+    }
+
+    await snsTopicComponent.deploy(inputs, snsTopicContextMock)
+
+    expect(AWS.SNS).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.removeSNSTopicMock).toHaveBeenCalledTimes(0)
+    expect(AWS.mocks.updateTopicAttributesMock).toHaveBeenCalledTimes(0)
     expect(snsTopicContextMock.setOutputs).toBeCalledWith({
       arn: `arn:aws:sns:us-east-1:000000000000:${inputs.name}`
     })
