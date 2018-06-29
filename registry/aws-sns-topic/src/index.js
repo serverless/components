@@ -48,7 +48,7 @@ const createSNSTopic = async (
   return merge({ topicArn, name }, topicAttributes)
 }
 
-const concatInputsAndState = (inputs = [], state = []) => {
+const concatInputsAndState = (inputs, state = []) => {
   const attributeKeys = map((item) => head(keys(item)), inputs)
   return filter((item) => isNil(find(equals(item))(state)))(
     concat(
@@ -71,7 +71,7 @@ const concatInputsAndState = (inputs = [], state = []) => {
 
 const updateAttributes = async (
   { displayName, policy, deliveryPolicy, deliveryStatusAttributes = [], topicArn },
-  state = {}
+  state
 ) => {
   const topicAttributes = reduce(
     (result, value) => {
@@ -88,7 +88,6 @@ const updateAttributes = async (
     { deliveryPolicy: state.deliveryPolicy }
   ])
 
-  // @todo: alert that policy cannot be "unset"
   // combine inputs and check if something is removed
   const topicAttributesToUpdate = concatInputsAndState(topicAttributes, stateTopicAttributes)
 
@@ -165,6 +164,7 @@ const removeSNSTopic = async ({ topicArn }) =>
 const remove = async (inputs, context) => {
   context.log(`Removing SNS topic: '${context.state.name}'`)
   await removeSNSTopic(context.state)
+  context.log(`SNS topic '${context.state.name}' removed.`)
   context.saveState({})
   return {
     arn: null
@@ -184,11 +184,17 @@ const deploy = async (inputs, context) => {
     context.log(`SNS topic '${newState.name}' created with arn: '${newState.topicArn}'`)
   } else if (state.name && state.name === inputs.name) {
     // if input name and state name is same, update only topic attributes
-    context.log(`Updating SNS topic: '${inputs.name}'`)
-    newState = merge(await updateAttributes(merge({ topicArn: state.topicArn }, inputs), state), {
-      name: inputs.name,
-      topicArn: state.topicArn
-    })
+    if (state.policy && !inputs.policy) {
+      context.log(`To remove the SNS topic '${inputs.name}' policy, the topic has to be recreated`)
+      await remove(state, context)
+      newState = await createSNSTopic(inputs, context)
+    } else {
+      context.log(`Updating SNS topic: '${inputs.name}'`)
+      newState = merge(await updateAttributes(merge({ topicArn: state.topicArn }, inputs), state), {
+        name: inputs.name,
+        topicArn: state.topicArn
+      })
+    }
     context.log(`SNS topic '${newState.name}' updated`)
   } else {
     // topic name is changes, first remove the old topic then create a new one
