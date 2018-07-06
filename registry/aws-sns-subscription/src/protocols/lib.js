@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 
 const AWS = require('aws-sdk')
-const { find, isNil, whereEq } = require('ramda')
+const { find, isEmpty, isNil, whereEq } = require('ramda')
 
 const sns = new AWS.SNS({ region: process.env.AWS_DEFAULT_REGION || 'us-east-1' })
 
@@ -34,7 +34,7 @@ const setSubscriptionAttributes = async (
   { subscriptionArn, attributeName, attributeValue },
   context
 ) => {
-  if (attributeValue === '') {
+  if (isEmpty(attributeValue)) {
     context.log(
       `Removing SNS Subscription Attribute '${attributeName}' from subscription ${subscriptionArn}`
     )
@@ -43,17 +43,23 @@ const setSubscriptionAttributes = async (
       `Setting SNS Subscription Attribute '${attributeName}' to subscription ${subscriptionArn}`
     )
   }
-  return sns
-    .setSubscriptionAttributes({
-      AttributeName: attributeName,
-      SubscriptionArn: subscriptionArn,
-      AttributeValue: attributeValue
-    })
-    .promise()
-}
-
-const deleteSubscriptionAttributes = async ({ subscriptionArn, attributeName }, context) => {
-  return setSubscriptionAttributes({ subscriptionArn, attributeName, attributeValue: '' }, context)
+  try {
+    const response = await sns
+      .setSubscriptionAttributes({
+        AttributeName: attributeName,
+        SubscriptionArn: subscriptionArn,
+        AttributeValue:
+          typeof attributeValue === 'string' ? attributeValue : JSON.stringify(attributeValue)
+      })
+      .promise()
+    return response
+  } catch (error) {
+    if (!error.message.includes('does not support raw message delivery')) {
+      // raw message delivery is only supported in http/s and SQS protocols
+      // this will suppress the error if RawMessageDelivery is defined
+      throw error
+    }
+  }
 }
 
 const waitForConfirmation = async (
@@ -118,7 +124,6 @@ module.exports = {
   subscribe,
   unsubscribe,
   setSubscriptionAttributes,
-  deleteSubscriptionAttributes,
   waitForConfirmation,
   splitArn
 }

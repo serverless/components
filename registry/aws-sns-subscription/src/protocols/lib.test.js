@@ -10,7 +10,16 @@ jest.mock('aws-sdk', () => {
     })),
     unsubscribeMock: jest.fn(),
     listSubscriptionsByTopicMock: jest.fn(),
-    setSubscriptionAttributesMock: jest.fn()
+    setSubscriptionAttributesMock: jest.fn().mockImplementation((params) => {
+      if (params.AttributeValue === 'error-suppress') {
+        return Promise.reject(
+          new Error('Delivery protocol [lambda] does not support raw message delivery.')
+        )
+      } else if (params.AttributeValue === 'error') {
+        return Promise.reject(new Error('Error'))
+      }
+      return Promise.resolve()
+    })
   }
 
   const SNS = {
@@ -103,23 +112,53 @@ describe('protocol library tests', () => {
     expect(AWS.mocks.setSubscriptionAttributesMock).toHaveBeenCalledTimes(1)
   })
 
-  it('should unset subscription attributes', async () => {
+  it('should suppress error if setting raw message delivery fails if not supported', async () => {
     const contextMock = {
       log: () => {}
     }
     const inputs = {
       subscriptionArn:
-        'arn:aws:sns:us-east-1:000000000000:topic:00000000-0000-0000-0000-000000000000'
+        'arn:aws:sns:us-east-1:000000000000:topic:00000000-0000-0000-0000-000000000000',
+      attributeName: 'RawMessageDelivery',
+      attributeValue: 'error-suppress'
     }
-    await lib.deleteSubscriptionAttributes(inputs, contextMock)
+    await lib.setSubscriptionAttributes(inputs, contextMock)
     expect(AWS.mocks.setSubscriptionAttributesMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        AttributeName: undefined,
-        AttributeValue: '',
+        AttributeName: inputs.attributeName,
+        AttributeValue: inputs.attributeValue,
         SubscriptionArn: inputs.subscriptionArn
       })
     )
     expect(AWS.mocks.setSubscriptionAttributesMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('should throw error if setting subscription attribute fails', async () => {
+    const contextMock = {
+      log: () => {}
+    }
+    const inputs = {
+      subscriptionArn:
+        'arn:aws:sns:us-east-1:000000000000:topic:00000000-0000-0000-0000-000000000000',
+      attributeName: 'RawMessageDelivery',
+      attributeValue: 'error'
+    }
+    let response
+    try {
+      response = await lib.setSubscriptionAttributes(inputs, contextMock)
+    } catch (error) {
+      expect(error.message).toBe('Error')
+    }
+
+    expect(AWS.mocks.setSubscriptionAttributesMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        AttributeName: inputs.attributeName,
+        AttributeValue: inputs.attributeValue,
+        SubscriptionArn: inputs.subscriptionArn
+      })
+    )
+    expect(AWS.mocks.setSubscriptionAttributesMock).toHaveBeenCalledTimes(1)
+    expect(response).toBeUndefined()
   })
 
   it('should not wait for confirmation when SubscriptionArn is available', async () => {
