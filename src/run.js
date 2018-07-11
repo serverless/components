@@ -2,6 +2,8 @@ const { clone, isNil, isEmpty } = require('ramda')
 
 const utils = require('./utils')
 
+const { setupCredentials } = require('./utils/encryption/credentials')
+
 const {
   errorReporter,
   getComponentsFromStateFile,
@@ -15,13 +17,16 @@ const {
   writeStateFile,
   trackDeployment,
   handleSignalEvents,
-  packageComponent
-  // log
+  packageComponent,
+  log
 } = utils
 
 const run = async (command, options) => {
   options.projectPath = options.projectPath || process.cwd()
   const { projectPath, serverlessFileObject } = options
+
+  await setupCredentials(projectPath)
+
   if (command === 'package') {
     return packageComponent(options)
   }
@@ -66,6 +71,16 @@ const run = async (command, options) => {
       // eslint-disable-next-line no-shadow
       const graph = await buildGraph(componentsToUse, orphanedComponents, 'info')
       await executeGraph(graph, components, stateFile, archive, 'info', options, false)
+    }
+
+    if (command === 'encrypt') {
+      process.env.COMPONENTS_ENC_STATE = true
+      log('Encrypting state file...')
+    }
+
+    if (command === 'decrypt') {
+      process.env.COMPONENTS_ENC_STATE = false
+      log('Decrypting state file...')
     }
   } catch (error) {
     if (reporter) {
