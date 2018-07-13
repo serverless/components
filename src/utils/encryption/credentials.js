@@ -2,6 +2,9 @@ const path = require('path')
 const crypto = require('crypto')
 const fs = require('fs-extra')
 const { readFile, fileExists, writeFile } = require('@serverless/utils')
+const { EOL } = require('os')
+
+const { log } = require('../../utils/logging')
 
 const createCredentials = async (credentialsPath) => {
   await fs.ensureFile(credentialsPath)
@@ -11,13 +14,26 @@ const createCredentials = async (credentialsPath) => {
   return writeFile(credentialsPath, credentials)
 }
 
+const addCredentialsToGitignore = async (projectPath) => {
+  const gitignorePath = path.join(projectPath, '.gitignore')
+  if (await fileExists(gitignorePath)) {
+    let gitignore = await readFile(gitignorePath)
+    if (!/\.state\-credentials/g.test(gitignore)) {
+      gitignore = `${gitignore}${EOL}# Serverless Components state credentials file${EOL}.state-credentials${EOL}`
+      log('Added .state-credentials to .gitignore')
+      await writeFile(gitignorePath, gitignore)
+    }
+  }
+  return Promise.resolve()
+}
+
 const setupCredentials = async (projectPath) => {
   const credentialsPath = path.join(projectPath, '.state-credentials')
   if (!process.env.COMPONENTS_ENC_KEY || !process.env.COMPONENTS_ENC_IV) {
     if (!(await fileExists(credentialsPath))) {
       await createCredentials(credentialsPath)
+      await addCredentialsToGitignore(projectPath)
     }
-    // @todo add credentials to gitignore
     const credentials = await readFile(credentialsPath)
     const [key, iv] = Buffer.from(credentials, 'base64')
       .toString()
