@@ -1,0 +1,36 @@
+type: cloudflare-workers
+version: 0.1.0
+core: 0.2.x
+
+description: "Cloudflare Workers Serverless Component"
+license: Apache-2.0
+author: "Cloduflare, Inc. <spinkerton@cloudflare.com> (https://cloudflare.com)"
+repository: "github:serverless/components"
+
+inputTypes:
+  name:
+    type: string
+    default: func-${self.instanceId}
+    displayName: Workers function name
+    description: The Workers function name
+    example: myProject-functionName-${self.instanceId}
+  description:
+    type: string
+    displayName: Workers function description
+    description: |
+      A short, user-defined function description.
+      Cloudflare Workers does not use this value. Assign a meaningful description as you see fit
+    example: The function that does XYZ to ABC
+  handler:
+    type: string
+    required: true
+    displayName: Handler
+    description: The path to the exported handler function
+    example: products.create
+  root:
+    type: string
+    displayName: Path to source code
+    example: ${self.path}/code
+
+outputTypes:
+
