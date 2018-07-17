@@ -19,8 +19,7 @@ module.exports.handler = (event, context, callback) => {
     Key: key,
     ContentType: parts[0].type
   }
-  s3
-    .putObject(params)
+  s3.putObject(params)
     .promise()
     .then(() => {
       eventGateway.emit({

@@ -1,0 +1,12 @@
+type: cloudflare-workers
+version: 1.0.0
+description: 'Serverless components to deploy Cloudflare-Workers'
+
+inputTypes:
+        zone_id:
+                type: string
+                required: true
+        script_path:
+                type: string
+                required: true
+
