@@ -10,3 +10,17 @@ inputTypes:
                 type: string
                 required: true
 
+outputTypes:
+        success:
+                type: boolean
+                description: If worker script has been successfully deployed
+        result:
+                type: any
+                description: The resultant worker script uploaded
+        errors:
+                type: any
+                description: A list of error messages
+        messages:
+                type: any
+                description: Messages
+

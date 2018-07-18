@@ -4,7 +4,5 @@ components:
         myWorker:
                 type: cloudflare-workers
                 inputs:
-                        name: 'serverlessworker'
-                        description: 'Run-workers-on-cloudflare-instances'
                         zone_id: '66de06a610e659edd89a6de59df291d2'
-                        script_path: '<your_script_path>'
+                        script_path: '/Users/nirvikghosh/service_workers_playground/Serverless/crap.js'
