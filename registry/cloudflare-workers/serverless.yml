@@ -9,4 +9,3 @@ inputTypes:
         script_path:
                 type: string
                 required: true
-
