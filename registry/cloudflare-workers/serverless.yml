@@ -9,6 +9,15 @@ inputTypes:
         script_path:
                 type: string
                 required: true
+        account_id:
+                type: string
+                required: true
+        script_name:
+                type: string
+                required: true
+        routes:
+                type: string
+                required: true
 
 outputTypes:
         success:
@@ -23,4 +32,5 @@ outputTypes:
         messages:
                 type: any
                 description: Messages
+        
 
