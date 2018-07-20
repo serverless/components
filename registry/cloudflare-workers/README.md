@@ -11,7 +11,6 @@
 - [Example](#example)
 <!-- AUTO-GENERATED-CONTENT:END -->
 
-
 <!-- AUTO-GENERATED-CONTENT:START (COMPONENT_INPUT_TYPES) -->
 ## Input Types
 | Name | Type | Description |
