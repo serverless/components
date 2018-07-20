@@ -19,8 +19,8 @@ const addCredentialsToGitignore = async (projectPath) => {
   if (await fileExists(gitignorePath)) {
     let gitignore = await readFile(gitignorePath)
     if (!/\.state\-credentials/g.test(gitignore)) {
-      gitignore = `${gitignore}${EOL}# Serverless Components state credentials file${EOL}.state-credentials${EOL}`
-      log('Added .state-credentials to .gitignore')
+      gitignore = `${gitignore}${EOL}# Serverless Components state credentials file${EOL}.components-credentials${EOL}`
+      log('Added .components-credentials to .gitignore')
       await writeFile(gitignorePath, gitignore)
     }
   }
@@ -28,7 +28,7 @@ const addCredentialsToGitignore = async (projectPath) => {
 }
 
 const setupCredentials = async (projectPath) => {
-  const credentialsPath = path.join(projectPath, '.state-credentials')
+  const credentialsPath = path.join(projectPath, '.components-credentials')
   if (!process.env.COMPONENTS_ENC_KEY || !process.env.COMPONENTS_ENC_IV) {
     if (!(await fileExists(credentialsPath))) {
       await createCredentials(credentialsPath)
