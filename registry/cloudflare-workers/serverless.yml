@@ -20,17 +20,28 @@ inputTypes:
                 required: true
 
 outputTypes:
-        success:
+        successScript:
                 type: boolean
                 description: If worker script has been successfully deployed
-        result:
+        resultScript:
                 type: any
                 description: The resultant worker script uploaded
-        errors:
+        errorsScript:
                 type: any
                 description: A list of error messages
-        messages:
+        messagesScript:
                 type: any
                 description: Messages
-        
+        successRoute:
+                type: boolean
+                description: If worker script has been successfully deployed
+        resultRoute:
+                type: any
+                description: The resultant worker script uploaded
+        errorsRoute:
+                type: any
+                description: A list of error messages
+        messagesRoute:
+                type: any
+                description: Messages
 

@@ -1,0 +1,36 @@
+type: cloudflare-twilio
+version: 1.0.0
+description: 'Serverless components to deploy twilio workers'
+
+inputTypes:
+        serviceID:
+                type: string
+                required: true
+        preWebHookURL:
+                type: string
+                required: true
+        postWebHookURL:
+                type: string
+                required: true
+        accountID:
+                type: string
+                required: true
+        authID:
+                type: string
+                required: true
+
+outputTypes:
+        friendly_name:
+                type: string
+                description: If worker script has been successfully deployed
+        date_created:
+                type: any
+                description: The resultant worker script uploaded
+        date_updated:
+                type: any
+                description: A list of error messages
+        webhook_filters:
+                type: any
+                description: Messages
+        
+
