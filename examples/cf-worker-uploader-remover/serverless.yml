@@ -1,0 +1,9 @@
+type: cloudflare-worker-application
+
+components:
+  myWorker:
+    type: cloudflare-workers
+    inputs:
+      zoneId: 'c065856165e3fb015aa9bbc280663506'
+      scriptPath: './index.js.cf'
+      route: '*averyharnish.us/*'

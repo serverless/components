@@ -1,72 +1,110 @@
 const fetch = require('node-fetch')
 const fs = require('fs')
 
-const removeWorker = async ({ account_id, script_name }, context) => {
+const _cfApiCall = async ({ url, method, contentType = null, body = null }) => {
   const AUTH_KEY = process.env.CLOUDFLARE_AUTH_KEY
   const EMAIL = process.env.CLOUDFLARE_EMAIL
-
-  const url = `https://api.cloudflare.com/client/v4/accounts/${account_id}/workers/scripts/${script_name}`
-
-  const headers = {
-    'X-Auth-Email': `${EMAIL}`,
-    'X-Auth-Key': `${AUTH_KEY}`,
-    'Content-Type': 'application/javascript'
+  let options = {
+    headers: {
+      'X-Auth-Email': EMAIL,
+      'X-Auth-Key': AUTH_KEY
+    },
+    method: method
   }
+  if (contentType) {
+    options['headers']['Content-Type'] = contentType
+  }
+  if (body) {
+    options['body'] = body
+  }
+  const resp = await fetch(url, options)
+  return resp
+}
 
-  const response = await fetch(url, { headers, method: `DELETE` })
-  if (response.status == 200) {
-    context.log(`✅ Script Removed: ${response.url}`)
+// Cloudflare's script name for single script customers is their domain name
+const _getDefaultScriptName = async (zoneId) => {
+  const response = await _cfApiCall({
+    url: `https://api.cloudflare.com/client/v4/zones/${zoneId}`,
+    method: `GET`,
+    contentType: `application/json`
+  })
+  if (response.status === 200) {
+    const responseJson = await response.json()
+    return responseJson['result']['name'].replace('.', '-')
+  }
+  throw new Error(
+    'Something went wrong getting a default script name, try specifying scriptName in the serverless.yaml file'
+  )
+}
+
+const _getAccountId = async () => {
+  const response = await _cfApiCall({
+    url: `https://api.cloudflare.com/client/v4/accounts`,
+    method: `GET`
+  })
+  if (response.status === 200) {
+    const jsonResponse = await response.json()
+    return jsonResponse['result'][0]['id']
+  }
+  throw new Error(`Something went wrong getting your Cloudflare account ID`)
+}
+
+const removeWorker = async ({ accountId, scriptName }, context) => {
+  if (!context.state.routeId) {
+    context.log('You must deploy a script to a route before you can remove it')
+    return {}
+  }
+  const response = await _cfApiCall({
+    url: `https://api.cloudflare.com/client/v4/accounts/${accountId}/workers/scripts/${scriptName}`,
+    method: `DELETE`,
+    contentType: `application/javascript`
+  })
+  if (response.status === 200) {
+    context.log(`✅  Script Removed Successfully: ${scriptName}`)
   } else {
-    context.log(`❌ Script Remove Failed `)
+    context.log(`❌  Script Removal Failed`)
   }
   return response
 }
 
-const removeRoute = async ({ zone_id }, context) => {
-  const AUTH_KEY = process.env.CLOUDFLARE_AUTH_KEY
-  const EMAIL = process.env.CLOUDFLARE_EMAIL
-
-  if (!context.state.routeId) return {}
-  const url = `https://api.cloudflare.com/client/v4/zones/${zone_id}/workers/routes/${
-    context.state.routeId
-  }`
-  const headers = {
-    'X-Auth-Email': `${EMAIL}`,
-    'X-Auth-Key': `${AUTH_KEY}`
+const removeRoute = async ({ route, zoneId }, context) => {
+  if (!context.state.routeId) {
+    context.log('You must deploy a script to a route before you can remove it')
+    return {}
   }
-  const response = await fetch(url, { headers, method: `DELETE` })
 
-  if (response.status == 200) {
-    context.log(`✅ Route disbaled: ${response.statusText}`)
+  const response = await _cfApiCall({
+    url: `https://api.cloudflare.com/client/v4/zones/${zoneId}/workers/routes/${
+      context.state.routeId
+    }`,
+    method: `DELETE`
+  })
+
+  if (response.status === 200) {
+    context.log(`✅  Route Disabled Successfully: ${route}`)
   } else {
-    context.log(`❌ Script Remove Failed`)
+    context.log(`❌  Route Removal Failed`)
   }
   return response
 }
 
-const doRoutesDeploy = async ({ zone_id, script_name, routes }, context) => {
-  const AUTH_KEY = process.env.CLOUDFLARE_AUTH_KEY
-  const EMAIL = process.env.CLOUDFLARE_EMAIL
-  const url = `https://api.cloudflare.com/client/v4/zones/${zone_id}/workers/routes`
-  const headers = {
-    'X-Auth-Email': `${EMAIL}`,
-    'X-Auth-Key': `${AUTH_KEY}`,
-    'Content-Type': 'application/json'
-  }
-  const payload = { pattern: `${routes}`, script: `${script_name}` }
-
-  const response = await fetch(url, {
-    headers,
-    method: 'POST',
+const deployRoutes = async ({ route, scriptName, zoneId }, context) => {
+  context.log('Assigning Script to Routes')
+  const payload = { pattern: route, script: scriptName }
+  const response = await _cfApiCall({
+    url: `https://api.cloudflare.com/client/v4/zones/${zoneId}/workers/routes`,
+    method: `POST`,
+    contentType: `application/json`,
     body: JSON.stringify(payload)
-  }).then((body) => body.json())
+  })
+  const responseJson = await response.json()
 
-  let { success: routeSuccess, result: routeResult, errors: routeErrors } = response
+  let { success: routeSuccess, result: routeResult, errors: routeErrors } = responseJson
 
   if (routeSuccess || !routeContainsFatalErorrs(routeErrors)) {
-    context.log(' ✅ Route enabled ', routes)
+    context.log(`✅  Routes Deployed ${route}`)
   } else {
-    context.log(' ❌ Error, routes not deployed!')
+    context.log(`❌  Fatal Error, Routes Not Deployed!`)
     routeErrors.forEach((err) => {
       let { code, message } = err
       context.log(`--> Error Code:${code}\n--> Error Message: "${message}"`)
@@ -76,28 +114,22 @@ const doRoutesDeploy = async ({ zone_id, script_name, routes }, context) => {
   return { routeSuccess, routeResult, routeErrors }
 }
 
-const doWorkerDeploy = async ({ script_path, script_name, account_id }, context) => {
-  const AUTH_KEY = process.env.CLOUDFLARE_AUTH_KEY
-  const EMAIL = process.env.CLOUDFLARE_EMAIL
+const deployWorker = async ({ accountId, scriptName, scriptPath }, context) => {
+  const workerScript = fs.readFileSync(scriptPath).toString()
 
-  const url = `https://api.cloudflare.com/client/v4/accounts/${account_id}/workers/scripts/${script_name}`
+  const response = await _cfApiCall({
+    url: `https://api.cloudflare.com/client/v4/accounts/${accountId}/workers/scripts/${scriptName}`,
+    contentType: `application/javascript`,
+    body: workerScript,
+    method: `PUT`
+  }).then((body) => body.json())
 
-  const headers = {
-    'X-Auth-Email': `${EMAIL}`,
-    'X-Auth-Key': `${AUTH_KEY}`,
-    'Content-Type': 'application/javascript'
-  }
-  const workerScript = fs.readFileSync(script_path).toString()
-
-  const response = await fetch(url, { headers, body: workerScript, method: `PUT` }).then((body) =>
-    body.json()
-  )
   let { success: workerDeploySuccess, result: workerResult, errors: workerErrors } = response
 
   if (workerDeploySuccess) {
-    context.log(' ✅ Script deployed ', script_name)
+    context.log(`✅  Script Deployed ${scriptName}`)
   } else {
-    context.log(' ❌ Error, script not deployed!')
+    context.log(`❌  Fatal Error, Script Not Deployed!`)
     workerErrors.forEach((err) => {
       let { code, message } = err
       context.log(`--> Error Code:${code}\n--> Error Message: "${message}"`)
@@ -108,16 +140,22 @@ const doWorkerDeploy = async ({ script_path, script_name, account_id }, context)
 }
 
 const routeContainsFatalErorrs = (errors) => {
-  // print error if it is anything other than duplicate routes
-  return errors.some((e) => e.code != 10020)
-
-  //return errors.find(err => err.code != "10020")
+  // suppress 10020 duplicate routes error
+  // no need to show error when they are simply updating their script
+  return errors.some((e) => e.code !== 10020)
 }
 
 const deploy = async (input, context) => {
-  context.log('Deploying worker script')
-  const workerScriptResponse = await doWorkerDeploy(input, context)
-  const routeResponse = await doRoutesDeploy(input, context)
+  if (!input.scriptName) {
+    input.scriptName = await _getDefaultScriptName(input.zoneId)
+  }
+  if (!input.accountId) {
+    input.accountId = await _getAccountId()
+  }
+
+  context.log(`Deploying Worker Script`)
+  const workerScriptResponse = await deployWorker(input, context)
+  const routeResponse = await deployRoutes(input, context)
 
   const outputs = { ...workerScriptResponse, ...routeResponse }
 
@@ -134,11 +172,11 @@ const deploy = async (input, context) => {
 }
 
 const remove = async (input, context) => {
-  context.log('Removing script')
+  context.log(`Removing script`)
   const { state } = context
 
   if (!context || !Object.keys(state).length) {
-    throw new Error('No state data found')
+    throw new Error(`No state data found`)
   }
   if (state.workerDeploySuccess) {
     await removeWorker(input, context)
@@ -148,22 +186,10 @@ const remove = async (input, context) => {
     await removeRoute(input, context)
   }
   context.saveState()
-  return {}
-  /*
-  if (!context.state.workerDeploySuccess) return {}
-  const response = await removeWorker(input)
-  if (response.status != 200) {
-    context.save({ error: 'script not removed !' })
-  } else {
-    context.log(`removed:${response.url}`)
-    if (!context.state.routerSuccess) return {}
-    const routesRemovalResponse = await removeRoute(input, context)
-    context.log(`removed route: ${routesRemovalResponse.statusText}`)
-    context.saveState()
-  }
-  */
+
   return {}
 }
+
 module.exports = {
   deploy,
   remove
