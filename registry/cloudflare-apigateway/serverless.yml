@@ -1,0 +1,46 @@
+type: cloudflare-apigateway
+version: 1.0.0
+description: 'Serverless components to deploy Cloudflare Workers'
+
+inputTypes:
+  zoneId:
+    type: string
+    required: true
+  scriptPath:
+    type: string
+    required: true
+  accountId:
+    type: string
+    required: false
+  scriptName:
+    type: string
+    required: false
+  route:
+    type: string
+    required: true
+
+outputTypes:
+  successScript:
+    type: boolean
+    description: Success status returned by the Cloudflare Worker Script API endpoint
+  resultScript:
+    type: any
+    description: Contents of the script uploaded to the Cloudflare Worker Script API endpoint
+  errorsScript:
+    type: any
+    description: Errors returned by the Cloudflare Worker Script API endpoint
+  messagesScript:
+    type: any
+    description: Messages returned by the Cloudflare Worker Script API endpoint
+  successRoute:
+    type: boolean
+    description: Success status returned by the Cloudflare Worker Route API endpoint
+  resultRoute:
+    type: any
+    description: Routes that the script are deployed on
+  errorsRoute:
+    type: any
+    description: Errors returned by the Cloudflare Worker Route API endpoint
+  messagesRoute:
+    type: any
+    description: Messages returned by the Cloudflare Worker Route API endpoint

@@ -1,0 +1,9 @@
+type: cloudflare-worker-application
+
+components:
+  myWorker:
+    type: cloudflare-apigateway
+    inputs:
+      zoneId: '9a7806061c88ada191ed06f989cc3dac'
+      scriptPath: './index.js'
+      route: '*example.org/path/*'

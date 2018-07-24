@@ -1,6 +1,8 @@
 const fetch = require('node-fetch')
 const fs = require('fs')
 
+// API calls require environment variables CLOUDFLARE_AUTH_KEY and CLOUDFLARE_EMAIL
+// Your authentication key can be found on your Cloudflare dashboard
 const _cfApiCall = async ({ url, method, contentType = null, body = null }) => {
   const AUTH_KEY = process.env.CLOUDFLARE_AUTH_KEY
   const EMAIL = process.env.CLOUDFLARE_EMAIL
@@ -17,8 +19,7 @@ const _cfApiCall = async ({ url, method, contentType = null, body = null }) => {
   if (body) {
     options['body'] = body
   }
-  const resp = await fetch(url, options).then((responseBody) => responseBody.json())
-  return resp
+  return await fetch(url, options).then((responseBody) => responseBody.json())
 }
 
 // Cloudflare's script name for single script customers is their domain name
@@ -35,7 +36,6 @@ const _getDefaultScriptName = async (zoneId) => {
   }
 
   let errorMessage = errors.map((e) => e.message).join('\n')
-
   throw new Error(errorMessage)
 }
 
