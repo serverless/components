@@ -1,4 +1,4 @@
-type: cloudflare-apigateway
+type: cloudflare-workers
 version: 1.0.0
 core: 0.2.x
 
