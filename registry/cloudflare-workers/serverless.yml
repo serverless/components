@@ -1,6 +1,11 @@
 type: cloudflare-apigateway
 version: 1.0.0
+core: 0.2.x
+
 description: 'Serverless components to deploy Cloudflare Workers'
+license: BSD-3-Clause
+author: "Cloudflare, Inc. (https://cloudflare.com)"
+repository: "github:serverless/components"
 
 inputTypes:
   zoneId:
