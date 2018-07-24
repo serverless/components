@@ -17,7 +17,7 @@ const _cfApiCall = async ({ url, method, contentType = null, body = null }) => {
   if (body) {
     options['body'] = body
   }
-  const resp = await fetch(url, options)
+  const resp = await fetch(url, options).then((responseBody) => responseBody.json())
   return resp
 }
 
@@ -28,13 +28,15 @@ const _getDefaultScriptName = async (zoneId) => {
     method: `GET`,
     contentType: `application/json`
   })
-  if (response.status === 200) {
-    const responseJson = await response.json()
-    return responseJson['result']['name'].replace('.', '-')
+
+  let { success, errors, result } = response
+  if (success) {
+    return result.name.replace('.', '-')
   }
-  throw new Error(
-    'Something went wrong getting a default script name, try specifying scriptName in the serverless.yaml file'
-  )
+
+  let errorMessage = errors.map((e) => e.message).join('\n')
+
+  throw new Error(errorMessage)
 }
 
 const _getAccountId = async () => {
@@ -42,11 +44,13 @@ const _getAccountId = async () => {
     url: `https://api.cloudflare.com/client/v4/accounts`,
     method: `GET`
   })
-  if (response.status === 200) {
-    const jsonResponse = await response.json()
-    return jsonResponse['result'][0]['id']
+  let { success, result, errors } = response
+
+  if (success) {
+    return result[0]['id']
   }
-  throw new Error(`Something went wrong getting your Cloudflare account ID`)
+  let errorMessage = errors.map((e) => e.message).join('\n')
+  throw new Error(errorMessage)
 }
 
 const removeWorker = async ({ accountId, scriptName }, context) => {
@@ -59,12 +63,13 @@ const removeWorker = async ({ accountId, scriptName }, context) => {
     method: `DELETE`,
     contentType: `application/javascript`
   })
-  if (response.status === 200) {
+  let { success, errors } = response
+  if (success) {
     context.log(`✅  Script Removed Successfully: ${scriptName}`)
-  } else {
-    context.log(`❌  Script Removal Failed`)
+    return success
   }
-  return response
+  context.log(`❌  Script Removal Failed`)
+  throw new Error(errors.map((e) => e.message).join('\n'))
 }
 
 const removeRoute = async ({ route, zoneId }, context) => {
@@ -80,12 +85,14 @@ const removeRoute = async ({ route, zoneId }, context) => {
     method: `DELETE`
   })
 
-  if (response.status === 200) {
+  let { success, errors } = response
+  if (success) {
     context.log(`✅  Route Disabled Successfully: ${route}`)
+    return success
   } else {
     context.log(`❌  Route Removal Failed`)
   }
-  return response
+  throw new Error(errors.map((e) => e.message).join('\n'))
 }
 
 const deployRoutes = async ({ route, scriptName, zoneId }, context) => {
@@ -97,9 +104,8 @@ const deployRoutes = async ({ route, scriptName, zoneId }, context) => {
     contentType: `application/json`,
     body: JSON.stringify(payload)
   })
-  const responseJson = await response.json()
 
-  let { success: routeSuccess, result: routeResult, errors: routeErrors } = responseJson
+  let { success: routeSuccess, result: routeResult, errors: routeErrors } = response
 
   if (routeSuccess || !routeContainsFatalErorrs(routeErrors)) {
     context.log(`✅  Routes Deployed ${route}`)
@@ -122,7 +128,7 @@ const deployWorker = async ({ accountId, scriptName, scriptPath }, context) => {
     contentType: `application/javascript`,
     body: workerScript,
     method: `PUT`
-  }).then((body) => body.json())
+  })
 
   let { success: workerDeploySuccess, result: workerResult, errors: workerErrors } = response
 
