@@ -2,8 +2,8 @@ type: cloudflare-worker-application
 
 components:
   myWorker:
-    type: cloudflare-workers
+    type: cloudflare-apigateway
     inputs:
-      zoneId: '66de06a610e659edd89a6de59df291d2'
-      scriptPath: './index.js.cf'
-      route: '*nirvik.me/path/*'
+      zoneId: '9a7806061c88ada191ed06f989cc3dac'
+      scriptPath: './index.js'
+      route: '*example.org/path/*'
