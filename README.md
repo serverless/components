@@ -181,9 +181,11 @@ Also please do join the _Components_ channel on our public [Serverless-Contrib S
 **Note:** Make sure you have Node.js 8+ and npm installed on your machine.
 
 1.  `npm install --global serverless-components`
-1.  Setup the environment variables
+1.  Set up the environment variables depending on your cloud provider
     * `export AWS_ACCESS_KEY_ID=my_access_key_id`
     * `export AWS_SECRET_ACCESS_KEY=my_secret_access_key`
+    * `export CLOUDFLARE_AUTH_KEY=my_secret_auth_key`
+    * `export CLOUDFLARE_EMAIL=my_email@example.com`
 
 Run commands with:
 
@@ -204,7 +206,7 @@ The following is a list with some limitations one should be aware of when using 
 
 ### `us-east-1` only
 
-Right now the only supported region is `us-east-1`
+Right now the only supported region of AWS is `us-east-1`
 
 ### No rollback support
 
@@ -755,6 +757,7 @@ Options:
 * [aws-lambda](./registry/aws-lambda)
 * [aws-route53](./registry/aws-route53)
 * [aws-s3-bucket](./registry/aws-s3-bucket)
+* [cloudflare-workers](./registry/cloudflare-workers)
 * [eventgateway](./registry/eventgateway)
 * [github-webhook](./registry/github-webhook)
 * [github-webhook-aws](./registry/github-webhook-aws)
@@ -774,6 +777,7 @@ Options:
 
 * [Basic Lambda Example](./examples/basic)
 * [Blog Example](./examples/blog)
+* [Cloudflare Worekrs Example](./examples/cloudflare-workers-example)
 * [Github Webhook Example](./examples/github-webhook-example)
 * [Landing Page Example](./examples/landing-page)
 * [Netlify Site Example](./examples/netlify-site-example)
