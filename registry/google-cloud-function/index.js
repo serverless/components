@@ -1,37 +1,37 @@
-/* eslint-disable no-console */
-
-const { google } = require('googleapis')
 const googleStorage = require('@google-cloud/storage')
-const path = require('path')
 const fs = require('fs-extra')
+const { google } = require('googleapis')
 const os = require('os')
-const pack = require('./pack')
-const crypto = require('crypto')
+const path = require('path')
 const R = require('ramda')
+const pack = require('./pack')
 
 const cloudfunctions = google.cloudfunctions('v1')
 
 const getAuthClient = (keyFilename) => {
   const credParts = keyFilename.split(path.sep)
-
   if (credParts[0] === '~') {
     credParts[0] = os.homedir()
-    credentials = credParts.reduce((memo, part) => path.join(memo, part), '')
   }
-
+  const credentials = credParts.reduce((memo, part) => path.join(memo, part), '')
   const keyFileContent = fs.readFileSync(credentials).toString()
   const key = JSON.parse(keyFileContent)
 
-  return new google.auth
-    .JWT(key.client_email, null, key.private_key, ['https://www.googleapis.com/auth/cloud-platform'], null)
+  return new google.auth.JWT(
+    key.client_email,
+    null,
+    key.private_key,
+    ['https://www.googleapis.com/auth/cloud-platform'],
+    null
+  )
 }
 
 const getStorageClient = (keyFilename, projectId) => {
   const credParts = keyFilename.split(path.sep)
   if (credParts[0] === '~') {
     credParts[0] = os.homedir()
-    credentials = credParts.reduce((memo, part) => path.join(memo, part), '')
   }
+  const credentials = credParts.reduce((memo, part) => path.join(memo, part), '')
 
   const storage = new googleStorage({
     projectId: projectId,
@@ -94,60 +94,41 @@ const zipAndUploadSourceCode = async (
 ) => {
   // zip the source code and return archive zip file name and path as an array
   const packRes = await pack(sourceCodePath)
-  const hasSourceCodeChanged = (state && state.sourceArchiveHash !== packRes[2])
+  const hasSourceCodeChanged = state && state.sourceArchiveHash !== packRes[2]
   // compare with state if zip contents has changed
   if (!state || !state.sourceArchiveHash || hasSourceCodeChanged) {
     const storage = getStorageClient(keyFilename, projectId)
     if (hasSourceCodeChanged) {
-      console.log('Source code changes detected. Uploading source archive file.')
+      console.log('Source code changes detected. Uploading source archive file.') // eslint-disable-line no-console
     } else {
-      console.log('Uploading source archive file.')
+      console.log('Uploading source archive file.') // eslint-disable-line no-console
     }
     // create the bucket
-    await storage
-      .createBucket(deploymentBucket)
-      .then(() => {
-        // console.log(`Deployment bucket '${deploymentBucket}' created.`)
-      })
-      .catch(err => {
-        if (err.code != 409) {
-          console.error('Error in creating deployment bucket: ', err)
-        }
-      })
+    await storage.createBucket(deploymentBucket).catch((err) => {
+      if (err.code != 409) {
+        throw err
+      }
+    })
     // if source code changed, delete old archive object
     if (state && hasSourceCodeChanged) {
-      await storage
-        .bucket(deploymentBucket)
-        .file(state.sourceArchiveFilename)
-        .delete()
-        .then(() => {
-          // console.log(`Source zip file object '${state.sourceArchiveFilename}' deleted.`)
-        })
-        .catch(err => {
-          console.error('Error in deleting source code archive object file: ', err.message)
-        })
+      try {
+        await storage
+          .bucket(deploymentBucket)
+          .file(state.sourceArchiveFilename)
+          .delete()
+      } catch (err) {
+        console.error('Error in deleting source code archive object file: ', err.message) // eslint-disable-line no-console
+      }
     }
     // upload source code zip to bucket
-    await storage
-      .bucket(deploymentBucket)
-      .upload(packRes[1])
-      .then(() => {
-        // console.log(`Source zip file '${packRes[0]}' uploaded to '${deploymentBucket}'.`)
-      })
-      .catch(err => {
-        console.error('Error in uploading source code archive file: ', err)
-      })
+    await storage.bucket(deploymentBucket).upload(packRes[1])
+
     // get object
     await storage
       .bucket(deploymentBucket)
       .file(packRes[0])
       .makePublic()
-      .then(() => {
-        // console.log(`Public Url: 'gs://${deploymentBucket}/${packRes[0]}'`)
-      })
-      .catch(err => {
-        console.error('Error fetching archive file object url: ', err)
-      })
+
     return {
       sourceArchiveFilename: packRes[0],
       sourceArchiveUrl: `gs://${deploymentBucket}/${packRes[0]}`,
@@ -173,13 +154,13 @@ const createFunction = async ({
   sourceArchiveUrl,
   sourceRepository,
   sourceUploadUrl,
-  httpsTrigger,
-  eventTrigger,
-  runtime,
+  // httpsTrigger,
+  // eventTrigger,
+  // runtime,
   projectId,
   locationId,
   keyFilename,
-  env,
+  // env,
   deploymentBucket
 }) => {
   const location = `projects/${projectId}/locations/${locationId}`
@@ -188,7 +169,13 @@ const createFunction = async ({
     const resAuth = await authClient.authorize()
     if (resAuth) {
       // upload the source code to google storage
-      const zipRes = await zipAndUploadSourceCode(projectId, keyFilename, sourceCodePath, deploymentBucket, null)
+      const zipRes = await zipAndUploadSourceCode(
+        projectId,
+        keyFilename,
+        sourceCodePath,
+        deploymentBucket,
+        null
+      )
       // Only one of sourceArchiveUrl, sourceRepository or sourceUploadUrl is allowed
       if (!sourceUploadUrl && !sourceRepository) {
         sourceArchiveUrl = zipRes.sourceArchiveUrl
@@ -257,26 +244,20 @@ const deleteFunction = async (state) => {
   const location = `projects/${state.projectId}/locations/${state.locationId}`
   const storage = getStorageClient(state.keyFilename, state.projectId)
   // delete source code archive object from deployment bucket
-  await storage
-    .bucket(state.deploymentBucket)
-    .file(state.sourceArchiveFilename)
-    .delete()
-    .then(() => {
-      // console.log(`Source zip file object '${state.sourceArchiveFilename}' deleted.`)
-    })
-    .catch(err => {
-      console.error('Error in deleting source code archive object file: ', err.message)
-    })
+  try {
+    await storage
+      .bucket(state.deploymentBucket)
+      .file(state.sourceArchiveFilename)
+      .delete()
+  } catch (err) {
+    console.error('Error in deleting source code archive object file: ', err.message) // eslint-disable-line no-console
+  }
   // delete deployment bucket
-  await storage
-    .bucket(state.deploymentBucket)
-    .delete()
-    .then(() => {
-      // console.log(`Deployment bucket '${state.deploymentBucket}' deleted.`)
-    })
-    .catch(err => {
-      console.error('Error in deleting deployment bucket: ', err.message)
-    })
+  try {
+    await storage.bucket(state.deploymentBucket).delete()
+  } catch (err) {
+    console.error('Error in deleting deployment bucket: ', err.message) // eslint-disable-line no-console
+  }
 
   // delete function
   const authClient = getAuthClient(state.keyFilename)
@@ -287,33 +268,37 @@ const deleteFunction = async (state) => {
         name: `${location}/functions/${state.name}`
       }
       const requestDelParams = { auth: authClient, ...delParams }
-      const res = await cloudfunctions.projects.locations.functions.delete(requestDelParams)
-
+      await cloudfunctions.projects.locations.functions.delete(requestDelParams)
       return {}
     }
   }
 }
 
-const patchFunction = async ({
-  name,
-  description,
-  entryPoint,
-  sourceCodePath,
-  timeout,
-  availableMemoryMb,
-  labels,
-  sourceArchiveUrl,
-  sourceRepository,
-  sourceUploadUrl,
-  httpsTrigger,
-  eventTrigger,
-  runtime,
-  projectId,
-  locationId,
-  keyFilename,
-  env,
-  deploymentBucket
-}, state, archiveRes, updateMask) => {
+const patchFunction = async (
+  {
+    name,
+    description,
+    entryPoint,
+    // sourceCodePath,
+    timeout,
+    availableMemoryMb,
+    labels,
+    sourceArchiveUrl,
+    sourceRepository,
+    sourceUploadUrl,
+    // httpsTrigger,
+    // eventTrigger,
+    // runtime,
+    projectId,
+    locationId,
+    keyFilename
+    // env,
+    // deploymentBucket
+  },
+  state,
+  archiveRes,
+  updateMask
+) => {
   const location = `projects/${projectId}/locations/${locationId}`
   const authClient = getAuthClient(keyFilename)
   if (authClient) {
@@ -392,11 +377,18 @@ const deploy = async (inputs, context) => {
     outputs = await deployFunction(inputs)
   } else {
     // zip & upload the source code to google storage
-    const zipRes = await zipAndUploadSourceCode(inputs.projectId, inputs.keyFilename, inputs.sourceCodePath, inputs.deploymentBucket, context.state)
+    const zipRes = await zipAndUploadSourceCode(
+      inputs.projectId,
+      inputs.keyFilename,
+      inputs.sourceCodePath,
+      inputs.deploymentBucket,
+      context.state
+    )
 
-    if (componentData.hasState &&
-        zipRes.sourceArchiveHash !== context.state.sourceArchiveHash ||
-        hasInputsChanged(componentData, inputsToUpdate)) {
+    if (
+      (componentData.hasState && zipRes.sourceArchiveHash !== context.state.sourceArchiveHash) ||
+      hasInputsChanged(componentData, inputsToUpdate)
+    ) {
       context.log(`Updating Google Cloud Function: ${inputs.name}`)
       let updateMask = componentData.keys || []
       if (zipRes.sourceArchiveHash !== context.state.sourceArchiveHash) {
@@ -435,7 +427,7 @@ const info = async (inputs, context) => {
   try {
     resGet = await getFunction(inputs)
   } catch (e) {
-    console.log('Error in fetching function: ', e)
+    context.log('Error in fetching function: ', e)
   }
 
   context.saveState({ ...inputs, ...outputs, ...resGet })
