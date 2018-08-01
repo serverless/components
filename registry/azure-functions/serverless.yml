@@ -1,0 +1,57 @@
+type: azure-functions
+version: 0.0.1
+core: 0.2.x
+
+description: "Azure Functions Serverless Component"
+license: MIT
+author: "Jeff Hollan <jehollan@microsoft.com> (https://azure.com/serverless)"
+repository: "github:serverless/components"
+
+inputTypes:
+  name:
+    type: string
+    default: func-${self.instanceId}
+    displayName: Azure function name
+    description: The Azure function name
+    example: myProject-functionName-${self.instanceId}
+  resourceGroup:
+    type: string
+    required: true
+    default: serverless-rg
+    displayName: Resource group name
+    description: The functions resource group
+    example: serverless-rg
+  runtime:
+    type: string
+    required: true
+    default: nodejs8
+    displayName: Function runtime
+    description: |
+      Runtime for the function.
+      Possible values are java8, nodejs8, nodejs10, and dotnetcore2
+    example: nodejs8
+  description:
+    type: string
+    displayName: Lambda function description
+    description: |
+      A short, user-defined function description.
+      Lambda does not use this value. Assign a meaningful description as you see fit
+    example: The function that does XYZ to ABC
+  root:
+    type: string
+    displayName: Path to source code
+    example: ${self.path}/code
+  env:
+    type: object
+    displayName: Application settings
+    description: Azure functions environment's configuration settings
+    example:
+      CosmosDbConnectionString: <my-connection-string>
+
+outputTypes:
+  arn:
+    type: string
+    description: The Lambda functions arn
+  roleArn:
+    type: string
+    description: The arn of the created / managed role the Lambda function uses
