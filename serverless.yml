@@ -6,5 +6,5 @@ components:
     inputs:
       name: jehollan-testserverless
       subscriptionId: ${env.subscriptionId}
-      resourceGroup: serverless-rg
+      resourceGroup: serverless-framework-rg
       runtime: nodejs8

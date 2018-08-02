@@ -1,14 +1,13 @@
 const msRestAzure = require('ms-rest-azure')
-const ResourceManagementClient = require('azure-arm-resource').ResourceManagementClient
-const StorageManagementClient = require('azure-arm-storage').StorageManagementClient
-const Promise = require('bluebird')
+const { ResourceManagementClient } = require('azure-arm-resource')
+const StorageManagementClient = require('azure-arm-storage')
 
 async function createFunction(
   { name, subscriptionId, resourceGroup /*, runtime, description, env, root */ },
   context,
   role
 ) {
-  context.log('starting create function...')
+  context.log('Authenticating and creating clients...')
   // const path = root || context.projectPath
   // TODO: const pkg = await pack(path);
   const credentials = new msRestAzure.ApplicationTokenCredentials(
@@ -20,58 +19,60 @@ async function createFunction(
   const storageClient = new StorageManagementClient(credentials, subscriptionId)
 
   const storageAccountName = 'serverlessstorage1221'
+  const appServicePlanName = 'serverless-westus'
+  const functionLocation = 'westus'
 
-  let createResourceGroupAsync = Promise.promisify(resourceClient.resourceGroups.createOrUpdate)
-  let createResourceAsync = Promise.promisify(resourceClient.resources.createOrUpdate)
-  let listKeysAsync = Promise.promisify(storageClient.storageAccounts.listKeys)
+  var groupParameters = { location: functionLocation, tags: { source: 'serverless-framework' } }
 
-  context.log('authenticated clients...')
-  var groupParameters = { location: 'westus', tags: { source: 'serverless-framework' } }
+  context.log('Creating resource group: ' + resourceGroup)
 
-  context.log('\nCreating resource group: ' + resourceGroup)
+  await resourceClient.resourceGroups.createOrUpdate(resourceGroup, groupParameters)
 
-  await createResourceGroupAsync(resourceGroup, groupParameters)
+  context.log('Resource group created')
 
   var planParameters = {
     properties: {
       sku: 'Dynamic',
       computeMode: 'Dynamic',
-      name: 'serverless-westus'
+      name: appServicePlanName
     },
-    location: 'westus'
+    location: functionLocation
   }
 
-  context.log('\nCreating hosting plan: serverless-westus')
-  await createResourceAsync(
+  context.log(`Creating hosting plan: ${appServicePlanName}`)
+  await resourceClient.resources.createOrUpdate(
     resourceGroup,
     'Microsoft.Web',
     '',
     'serverFarms',
-    'serverless-westus',
+    appServicePlanName,
     '2015-04-01',
     planParameters
   )
 
-  context.log(`\nCreating storage account: storageAccountName`)
+  context.log(`Creating storage account: ${storageAccountName}`)
   var storageParameters = {
-    location: 'westus',
+    location: functionLocation,
     kind: 'Storage',
     sku: {
       name: 'Standard_LRS'
     }
   }
 
-  await createResourceAsync(
+  await resourceClient.resources.createOrUpdate(
     resourceGroup,
     'Microsoft.Storage',
     '',
     'storageAccounts',
-    'storageAccountName',
+    storageAccountName,
     '2018-02-01',
     storageParameters
   )
 
-  let storageKeyResult = await listKeysAsync(resourceGroup, 'storageAccountName')
+  let storageKeyResult = await storageClient.storageAccounts.listKeys(
+    resourceGroup,
+    storageAccountName
+  )
   let storageKey = storageKeyResult.keys[0]
 
   var functionAppSettings = [
@@ -85,13 +86,13 @@ async function createFunction(
     },
     {
       name: 'WEBSITE_NODE_DEFAULT_VERSION',
-      value: '8.11.0'
+      value: '8.11.0' /* this would correspond to node runtime specified */
     }
   ]
   var functionAppParameters = {
-    location: 'westus',
+    location: functionLocation,
     properties: {
-      serverFarmId: 'serverless-westus',
+      serverFarmId: appServicePlanName,
       siteConfig: { appSettings: functionAppSettings }
     },
     Name: name
@@ -99,7 +100,7 @@ async function createFunction(
 
   context.log(`\nCreating function app: ${name}`)
 
-  let functionAppResult = await createResourceAsync(
+  let functionAppResult = await resourceClient.resources.createOrUpdate(
     resourceGroup,
     'Microsoft.Web',
     '',
@@ -129,6 +130,7 @@ async function deploy(inputs, context) {
 
   // TODO: do the decision tree on create or update (if necessary)
 
+  context.log('about to call createFunction')
   await createFunction(inputs, context, role)
 
   context.log('about to save state')
