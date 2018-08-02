@@ -1,5 +1,6 @@
 const msRestAzure = require('ms-rest-azure')
 const ResourceManagementClient = require('azure-arm-resource').ResourceManagementClient
+const StorageManagementClient = require('azure-arm-storage').StorageManagementClient
 const Promise = require('bluebird')
 
 async function createFunction(
@@ -16,9 +17,13 @@ async function createFunction(
     role.secret
   )
   const resourceClient = new ResourceManagementClient(credentials, subscriptionId)
+  const storageClient = new StorageManagementClient(credentials, subscriptionId)
+
+  const storageAccountName = 'serverlessstorage1221'
 
   let createResourceGroupAsync = Promise.promisify(resourceClient.resourceGroups.createOrUpdate)
   let createResourceAsync = Promise.promisify(resourceClient.resources.createOrUpdate)
+  let listKeysAsync = Promise.promisify(storageClient.storageAccounts.listKeys)
 
   context.log('authenticated clients...')
   var groupParameters = { location: 'westus', tags: { source: 'serverless-framework' } }
@@ -47,25 +52,64 @@ async function createFunction(
     planParameters
   )
 
-  var params = {
+  context.log(`\nCreating storage account: storageAccountName`)
+  var storageParameters = {
     location: 'westus',
-    properties: { serverFarmId: 'serverless-westus', siteConfig: { appSettings: [] } },
+    kind: 'Storage',
+    sku: {
+      name: 'Standard_LRS'
+    }
+  }
+
+  await createResourceAsync(
+    resourceGroup,
+    'Microsoft.Storage',
+    '',
+    'storageAccounts',
+    'storageAccountName',
+    '2018-02-01',
+    storageParameters
+  )
+
+  let storageKeyResult = await listKeysAsync(resourceGroup, 'storageAccountName')
+  let storageKey = storageKeyResult.keys[0]
+
+  var functionAppSettings = [
+    {
+      name: 'AzureWebJobsStorage',
+      value: `DefaultEndpointsProtocol=https;AccountName=${storageAccountName};AccountKey=${storageKey}`
+    },
+    {
+      name: 'FUNCTIONS_EXTENSION_VERSION',
+      value: 'beta'
+    },
+    {
+      name: 'WEBSITE_NODE_DEFAULT_VERSION',
+      value: '8.11.0'
+    }
+  ]
+  var functionAppParameters = {
+    location: 'westus',
+    properties: {
+      serverFarmId: 'serverless-westus',
+      siteConfig: { appSettings: functionAppSettings }
+    },
     Name: name
   }
 
   context.log(`\nCreating function app: ${name}`)
 
-  var response = await createResourceAsync(
+  let functionAppResult = await createResourceAsync(
     resourceGroup,
     'Microsoft.Web',
     '',
     'sites',
     name,
     '2015-08-01',
-    params
+    functionAppParameters
   )
 
-  return response
+  return functionAppResult
 }
 
 async function deploy(inputs, context) {

@@ -1,0 +1,21 @@
+{
+    "name": "@serverless-components/azure-functions",
+    "version": "0.0.1",
+    "private": true,
+    "main": "dist/index.js",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "dependencies": {
+      "archiver": "^2.1.1",
+      "azure-arm-resource": "^1.0.0-preview",
+      "azure-arm-storage": "^0.12.2-preview",
+      "ms-rest-azure": "^1.9.0",
+      "bluebird": "^3.5.1"
+    },
+    "devDependencies": {
+      "decompress": "^4.2.0",
+      "fs-extra": "^5.0.0"
+    }
+  }
+  
