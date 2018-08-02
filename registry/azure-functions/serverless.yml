@@ -53,3 +53,8 @@ inputTypes:
     description: Azure functions environment's configuration settings
     example:
       CosmosDbConnectionString: <my-connection-string>
+
+outputTypes:
+  functionUrl:
+    type: string
+    description: The URL of the Azure Function
