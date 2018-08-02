@@ -1,0 +1,10 @@
+type: my-application
+
+components:
+  myAzureFunction:
+    type: azure-functions
+    inputs:
+      name: jehollan-testserverless
+      subscriptionId: ${env.subscriptionId}
+      resourceGroup: serverless-rg
+      runtime: nodejs8

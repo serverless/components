@@ -14,6 +14,12 @@ inputTypes:
     displayName: Azure function name
     description: The Azure function name
     example: myProject-functionName-${self.instanceId}
+  subscriptionId:
+    type: string
+    required: true
+    displayName: Subscription ID
+    description: The Azure subscription ID
+    example: serverless-rg
   resourceGroup:
     type: string
     required: true
@@ -47,11 +53,3 @@ inputTypes:
     description: Azure functions environment's configuration settings
     example:
       CosmosDbConnectionString: <my-connection-string>
-
-outputTypes:
-  arn:
-    type: string
-    description: The Lambda functions arn
-  roleArn:
-    type: string
-    description: The arn of the created / managed role the Lambda function uses
