@@ -1,0 +1,13 @@
+type: azure-web-app
+version: 0.0.1
+
+components:
+  saveUser:
+    type: azure-functions
+    inputs:
+      runtime: nodejs8
+      subscriptionId: hello
+      resourceGroup: hello
+      tenant: ${env.AZURE_TENANT}
+      clientId: ${env.AZURE_CLIENT_SECRET}
+      clientSecret: ${env.AZURE_CLIENT_ID}

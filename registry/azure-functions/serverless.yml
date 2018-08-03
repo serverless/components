@@ -10,7 +10,6 @@ repository: "github:serverless/components"
 inputTypes:
   name:
     type: string
-    default: func-${self.instanceId}
     displayName: Azure function name
     description: The Azure function name
     example: myProject-functionName-${self.instanceId}
@@ -53,6 +52,18 @@ inputTypes:
     description: Azure functions environment's configuration settings
     example:
       CosmosDbConnectionString: <my-connection-string>
+  clientId:
+    type: string
+    displayName: Azure Client ID
+    description: The Azure Client ID
+  clientSecret:
+    type: string
+    displayName: Azure Client Secret
+    description: The Azure Client Secret
+  tenant:
+    type: string
+    displayName: Azure Tenant
+    description: The Azure Tenant
 
 outputTypes:
   functionUrl:

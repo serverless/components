@@ -3,18 +3,20 @@ const { ResourceManagementClient } = require('azure-arm-resource')
 const StorageManagementClient = require('azure-arm-storage')
 
 async function createFunction(
-  { name, subscriptionId, resourceGroup /*, runtime, description, env, root */ },
-  context,
-  role
+  {
+    name,
+    subscriptionId,
+    resourceGroup,
+    tenant,
+    clientId,
+    clientSecret /*, runtime, description, env, root */
+  },
+  context
 ) {
   context.log('Authenticating and creating clients...')
   // const path = root || context.projectPath
   // TODO: const pkg = await pack(path);
-  const credentials = new msRestAzure.ApplicationTokenCredentials(
-    role.clientId,
-    role.tenant,
-    role.secret
-  )
+  const credentials = new msRestAzure.ApplicationTokenCredentials(clientId, tenant, clientSecret)
   const resourceClient = new ResourceManagementClient(credentials, subscriptionId)
   const storageClient = new StorageManagementClient(credentials, subscriptionId)
 
@@ -114,13 +116,11 @@ async function createFunction(
 }
 
 async function deploy(inputs, context) {
+  // If name is not included, add it from config key
+  if (!inputs.name) inputs.name = context.id.split(':')[1]
+
   let outputs = {
     functionUrl: 'https://jeff.azurewebsites.net'
-  }
-  const role = {
-    clientId: process.env.clientId,
-    secret: process.env.clientSecret,
-    tenant: process.env.tenant
   }
 
   // az ad sp create-for-rbac -n "jehollan-serverlessframework" --role contributor  \
@@ -131,7 +131,7 @@ async function deploy(inputs, context) {
   // TODO: do the decision tree on create or update (if necessary)
 
   context.log('about to call createFunction')
-  await createFunction(inputs, context, role)
+  await createFunction(inputs, context)
 
   context.log('about to save state')
   context.saveState({ ...inputs, ...outputs })
