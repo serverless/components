@@ -2,7 +2,7 @@ const { clone, isNil, isEmpty } = require('ramda')
 
 const utils = require('./utils')
 
-const { setupCredentials } = require('./utils/encryption/credentials')
+const { credentials } = require('./utils/encryption')
 
 const {
   errorReporter,
@@ -25,7 +25,7 @@ const run = async (command, options) => {
   options.projectPath = options.projectPath || process.cwd()
   const { projectPath, serverlessFileObject } = options
 
-  await setupCredentials(projectPath)
+  await credentials({ projectPath })
 
   if (command === 'package') {
     return packageComponent(options)

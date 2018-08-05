@@ -27,7 +27,7 @@ const addCredentialsToGitignore = async (projectPath) => {
   return Promise.resolve()
 }
 
-const setupCredentials = async (projectPath) => {
+const setupCredentials = async ({ projectPath }) => {
   const credentialsPath = path.join(projectPath, '.components-credentials')
   if (!process.env.COMPONENTS_ENC_KEY || !process.env.COMPONENTS_ENC_IV) {
     if (!(await fileExists(credentialsPath))) {
@@ -43,6 +43,4 @@ const setupCredentials = async (projectPath) => {
   }
 }
 
-module.exports = {
-  setupCredentials
-}
+module.exports = setupCredentials
