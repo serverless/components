@@ -9,10 +9,11 @@ const getInstanceId = require('./getInstanceId')
 const setInputDefaults = require('./setInputDefaults')
 const validateCoreVersion = require('./validateCoreVersion')
 const validateTypes = require('./validateTypes')
+const { schema } = require('./encryptComponent')
 
 module.exports = async (componentRoot, componentId, inputs, stateFile, slsYml = null) => {
   if (!slsYml) {
-    slsYml = await readFile(path.join(componentRoot, 'serverless.yml'))
+    slsYml = await readFile(path.join(componentRoot, 'serverless.yml'), { schema })
   }
 
   validateVarsUsage(slsYml)

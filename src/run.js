@@ -2,7 +2,7 @@ const { clone, isNil, isEmpty } = require('ramda')
 
 const utils = require('./utils')
 
-const { credentials } = require('./utils/encryption')
+const { credentials, decryptString, encryptString } = require('./utils/encryption')
 
 const {
   errorReporter,
@@ -74,13 +74,21 @@ const run = async (command, options) => {
     }
 
     if (command === 'encrypt') {
-      process.env.COMPONENTS_ENC_STATE = true
-      log('Encrypting state file...')
+      if (options.variable) {
+        log(encryptString(options.variable))
+      } else {
+        process.env.COMPONENTS_ENC_STATE = true
+        log('Encrypting state file...')
+      }
     }
 
     if (command === 'decrypt') {
-      process.env.COMPONENTS_ENC_STATE = false
-      log('Decrypting state file...')
+      if (options.variable) {
+        log(decryptString(options.variable))
+      } else {
+        process.env.COMPONENTS_ENC_STATE = false
+        log('Decrypting state file...')
+      }
     }
   } catch (error) {
     if (reporter) {

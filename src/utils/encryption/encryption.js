@@ -16,7 +16,27 @@ const decrypt = (cipher_alg, key, iv, text, encoding = 'binary') => {
   return result
 }
 
+const encryptString = (content) =>
+  encrypt(
+    'aes-256-cbc',
+    process.env.COMPONENTS_ENC_KEY,
+    process.env.COMPONENTS_ENC_IV,
+    JSON.stringify(content),
+    'base64'
+  )
+
+const decryptString = (content) =>
+  decrypt(
+    'aes-256-cbc',
+    process.env.COMPONENTS_ENC_KEY,
+    process.env.COMPONENTS_ENC_IV,
+    content,
+    'base64'
+  ).replace(/^"(.+(?="$))"$/, '$1')
+
 module.exports = {
   encrypt,
-  decrypt
+  decrypt,
+  encryptString,
+  decryptString
 }
