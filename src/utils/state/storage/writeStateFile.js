@@ -10,7 +10,7 @@ module.exports = async (projectPath, content) => {
   switch (type) {
     case 'aws-s3':
       return awsS3.write(config, content)
-    case 'aws-dynamo':
+    case 'aws-dynamodb':
       return awsDynamo.write(config, content)
     default:
       return local.write(config, content)

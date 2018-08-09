@@ -10,7 +10,7 @@ module.exports = async (projectPath) => {
   switch (type) {
     case 'aws-s3':
       return awsS3.read(config)
-    case 'aws-dynamo':
+    case 'aws-dynamodb':
       return awsDynamo.read(config)
     default:
       return local.read(config)

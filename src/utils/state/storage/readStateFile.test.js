@@ -1,55 +1,80 @@
-const { getTmpDir, writeFile } = require('@serverless/utils')
-const path = require('path')
+const getConfig = require('../../misc/getConfig')
+const local = require('./local')
+const awsS3 = require('./aws-s3')
+const awsDynamo = require('./aws-dynamo')
 const readStateFile = require('./readStateFile')
 
-describe('#readStateFile()', () => {
-  let oldCwd
-  let tmpDirPath
-  let stateFilePath
-  let projectPath
+jest.mock('../../misc/getConfig', () => jest.fn())
 
-  const fileContent = {
-    $: { serviceId: 'AsH3gefdfDSY' },
-    'myApp:myFunction': {
-      type: 'aws-iam-function',
-      internallyManaged: false,
-      state: {
-        name: 'my-function',
-        memorySize: 512,
-        timeout: 60
-      }
-    },
-    'myApp:myRole': {
-      type: 'aws-iam-role',
-      internallyManaged: false,
-      state: {
-        name: 'my-role',
-        service: 'some.serverless.service'
-      }
-    }
+jest.mock('./local', () => {
+  const mocks = {
+    readMock: jest.fn().mockReturnValue('local')
   }
+  return {
+    mocks,
+    read: (obj) => mocks.readMock(obj)
+  }
+})
 
-  beforeEach(async () => {
-    tmpDirPath = await getTmpDir()
-    stateFilePath = path.join(tmpDirPath, 'state.json')
-    await writeFile(stateFilePath, fileContent)
-    projectPath = tmpDirPath
-    oldCwd = process.cwd()
-    process.chdir(tmpDirPath)
+jest.mock('./aws-s3', () => {
+  const mocks = {
+    readMock: jest.fn().mockReturnValue('aws-s3')
+  }
+  return {
+    mocks,
+    read: (obj) => mocks.readMock(obj)
+  }
+})
+
+jest.mock('./aws-dynamo', () => {
+  const mocks = {
+    readMock: jest.fn().mockReturnValue('aws-dynamodb')
+  }
+  return {
+    mocks,
+    read: (obj) => mocks.readMock(obj)
+  }
+})
+
+afterEach(() => {
+  jest.clearAllMocks()
+})
+
+afterAll(() => {
+  jest.restoreAllMocks()
+})
+
+describe('#readStateFile()', () => {
+  it('should read local file', async () => {
+    getConfig.mockResolvedValue({ state: { type: 'local' } })
+    const res = await readStateFile('local')
+    expect(local.mocks.readMock).toHaveBeenCalledTimes(1)
+    expect(awsS3.mocks.readMock).toHaveBeenCalledTimes(0)
+    expect(awsDynamo.mocks.readMock).toHaveBeenCalledTimes(0)
+    expect(res).toEqual('local')
   })
 
-  afterEach(() => {
-    process.chdir(oldCwd)
+  it('should read s3 object', async () => {
+    getConfig.mockResolvedValue({ state: { type: 'aws-s3' } })
+    const res = await readStateFile('aws-s3')
+    expect(local.mocks.readMock).toHaveBeenCalledTimes(0)
+    expect(awsS3.mocks.readMock).toHaveBeenCalledTimes(1)
+    expect(awsDynamo.mocks.readMock).toHaveBeenCalledTimes(0)
+    expect(res).toEqual('aws-s3')
   })
 
-  it('should read the projects state file if present', async () => {
-    const res = await readStateFile(projectPath)
-    expect(res).toEqual(fileContent)
+  it('should read dynamodb row', async () => {
+    getConfig.mockResolvedValue({ state: { type: 'aws-dynamodb' } })
+    const res = await readStateFile('aws-dynamodb')
+    expect(local.mocks.readMock).toHaveBeenCalledTimes(0)
+    expect(awsS3.mocks.readMock).toHaveBeenCalledTimes(0)
+    expect(awsDynamo.mocks.readMock).toHaveBeenCalledTimes(1)
+    expect(res).toEqual('aws-dynamodb')
   })
 
-  it('should return an empty object if the project does not contain a state file', async () => {
-    projectPath = await getTmpDir()
-    const res = await readStateFile(projectPath)
-    expect(res).toEqual({})
+  it('should read local file when nothing is defined', async () => {
+    getConfig.mockResolvedValue({})
+    const res = await readStateFile('local')
+    expect(res).toEqual('local')
   })
 })
