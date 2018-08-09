@@ -3,9 +3,9 @@ const getInputs = require('./getInputs')
 const getRootPath = require('./getRootPath')
 const getServiceId = require('./getServiceId')
 const getState = require('./getState')
-const readStateFile = require('./readStateFile')
+const readStateFile = require('./storage/readStateFile')
 const setServiceId = require('./setServiceId')
-const writeStateFile = require('./writeStateFile')
+const writeStateFile = require('./storage/writeStateFile')
 
 module.exports = {
   generateServiceId,
