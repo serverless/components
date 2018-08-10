@@ -43,7 +43,13 @@ describe('#writeStateFile()', () => {
   })
 
   it('should write the content to disk', async () => {
-    await writeStateFile(projectPath, fileContent)
+    await writeStateFile({ projectPath }, fileContent)
+    const stateFileContent = await readJson(stateFilePath)
+    expect(stateFileContent).toEqual(fileContent)
+  })
+
+  it('should write the content to disk when state file is defined in config', async () => {
+    await writeStateFile({ projectPath, state: { file: 'state.json' } }, fileContent)
     const stateFileContent = await readJson(stateFilePath)
     expect(stateFileContent).toEqual(fileContent)
   })
