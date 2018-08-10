@@ -2,7 +2,7 @@ const getConfig = require('../../misc/getConfig')
 
 const local = require('./local')
 const awsS3 = require('./aws-s3')
-const awsDynamo = require('./aws-dynamo')
+const awsDynamoDB = require('./aws-dynamodb')
 
 module.exports = async (projectPath, content) => {
   const config = await getConfig(projectPath)
@@ -11,7 +11,7 @@ module.exports = async (projectPath, content) => {
     case 'aws-s3':
       return awsS3.write(config, content)
     case 'aws-dynamodb':
-      return awsDynamo.write(config, content)
+      return awsDynamoDB.write(config, content)
     default:
       return local.write(config, content)
   }

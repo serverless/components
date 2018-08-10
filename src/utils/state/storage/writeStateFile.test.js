@@ -1,7 +1,7 @@
 const getConfig = require('../../misc/getConfig')
 const local = require('./local')
 const awsS3 = require('./aws-s3')
-const awsDynamo = require('./aws-dynamo')
+const awsDynamoDB = require('./aws-dynamodb')
 const writeStateFile = require('./writeStateFile')
 
 jest.mock('../../misc/getConfig', () => jest.fn())
@@ -26,7 +26,7 @@ jest.mock('./aws-s3', () => {
   }
 })
 
-jest.mock('./aws-dynamo', () => {
+jest.mock('./aws-dynamodb', () => {
   const mocks = {
     writeMock: jest.fn().mockReturnValue('aws-dynamodb')
   }
@@ -50,7 +50,7 @@ describe('#writeStateFile()', () => {
     const res = await writeStateFile('local')
     expect(local.mocks.writeMock).toHaveBeenCalledTimes(1)
     expect(awsS3.mocks.writeMock).toHaveBeenCalledTimes(0)
-    expect(awsDynamo.mocks.writeMock).toHaveBeenCalledTimes(0)
+    expect(awsDynamoDB.mocks.writeMock).toHaveBeenCalledTimes(0)
     expect(res).toEqual('local')
   })
 
@@ -59,7 +59,7 @@ describe('#writeStateFile()', () => {
     const res = await writeStateFile('aws-s3')
     expect(local.mocks.writeMock).toHaveBeenCalledTimes(0)
     expect(awsS3.mocks.writeMock).toHaveBeenCalledTimes(1)
-    expect(awsDynamo.mocks.writeMock).toHaveBeenCalledTimes(0)
+    expect(awsDynamoDB.mocks.writeMock).toHaveBeenCalledTimes(0)
     expect(res).toEqual('aws-s3')
   })
 
@@ -68,7 +68,7 @@ describe('#writeStateFile()', () => {
     const res = await writeStateFile('aws-dynamodb')
     expect(local.mocks.writeMock).toHaveBeenCalledTimes(0)
     expect(awsS3.mocks.writeMock).toHaveBeenCalledTimes(0)
-    expect(awsDynamo.mocks.writeMock).toHaveBeenCalledTimes(1)
+    expect(awsDynamoDB.mocks.writeMock).toHaveBeenCalledTimes(1)
     expect(res).toEqual('aws-dynamodb')
   })
 
