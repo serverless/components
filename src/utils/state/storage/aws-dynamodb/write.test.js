@@ -5,7 +5,7 @@ jest.mock('../../../../utils/logging')
 
 jest.mock('aws-sdk', () => {
   const mocks = {
-    updateMock: jest.fn().mockResolvedValue({ Item: 'ok' })
+    updateMock: jest.fn().mockReturnValue(Promise.resolve({ Item: 'ok' }))
   }
 
   const DocumentClient = {

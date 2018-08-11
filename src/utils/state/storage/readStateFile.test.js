@@ -46,7 +46,7 @@ afterAll(() => {
 
 describe('#readStateFile()', () => {
   it('should read local file', async () => {
-    getRootInputs.mockResolvedValue({ state: { type: 'local' } })
+    getRootInputs.mockReturnValue(Promise.resolve({ state: { type: 'local' } }))
     const res = await readStateFile('local')
     expect(local.mocks.readMock).toHaveBeenCalledTimes(1)
     expect(awsS3.mocks.readMock).toHaveBeenCalledTimes(0)
@@ -55,7 +55,7 @@ describe('#readStateFile()', () => {
   })
 
   it('should read s3 object', async () => {
-    getRootInputs.mockResolvedValue({ state: { type: 'aws-s3' } })
+    getRootInputs.mockReturnValue(Promise.resolve({ state: { type: 'aws-s3' } }))
     const res = await readStateFile('aws-s3')
     expect(local.mocks.readMock).toHaveBeenCalledTimes(0)
     expect(awsS3.mocks.readMock).toHaveBeenCalledTimes(1)
@@ -64,7 +64,7 @@ describe('#readStateFile()', () => {
   })
 
   it('should read dynamodb row', async () => {
-    getRootInputs.mockResolvedValue({ state: { type: 'aws-dynamodb' } })
+    getRootInputs.mockReturnValue(Promise.resolve({ state: { type: 'aws-dynamodb' } }))
     const res = await readStateFile('aws-dynamodb')
     expect(local.mocks.readMock).toHaveBeenCalledTimes(0)
     expect(awsS3.mocks.readMock).toHaveBeenCalledTimes(0)
@@ -73,7 +73,7 @@ describe('#readStateFile()', () => {
   })
 
   it('should read local file when nothing is defined', async () => {
-    getRootInputs.mockResolvedValue({})
+    getRootInputs.mockReturnValue(Promise.resolve({}))
     const res = await readStateFile('local')
     expect(res).toEqual('local')
   })

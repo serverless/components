@@ -46,7 +46,7 @@ afterAll(() => {
 
 describe('#writeStateFile()', () => {
   it('should write local file', async () => {
-    getRootInputs.mockResolvedValue({ state: { type: 'local' } })
+    getRootInputs.mockReturnValue(Promise.resolve({ state: { type: 'local' } }))
     const res = await writeStateFile('local')
     expect(local.mocks.writeMock).toHaveBeenCalledTimes(1)
     expect(awsS3.mocks.writeMock).toHaveBeenCalledTimes(0)
@@ -55,7 +55,7 @@ describe('#writeStateFile()', () => {
   })
 
   it('should write s3 object', async () => {
-    getRootInputs.mockResolvedValue({ state: { type: 'aws-s3' } })
+    getRootInputs.mockReturnValue(Promise.resolve({ state: { type: 'aws-s3' } }))
     const res = await writeStateFile('aws-s3')
     expect(local.mocks.writeMock).toHaveBeenCalledTimes(0)
     expect(awsS3.mocks.writeMock).toHaveBeenCalledTimes(1)
@@ -64,7 +64,7 @@ describe('#writeStateFile()', () => {
   })
 
   it('should write dynamodb row', async () => {
-    getRootInputs.mockResolvedValue({ state: { type: 'aws-dynamodb' } })
+    getRootInputs.mockReturnValue(Promise.resolve({ state: { type: 'aws-dynamodb' } }))
     const res = await writeStateFile('aws-dynamodb')
     expect(local.mocks.writeMock).toHaveBeenCalledTimes(0)
     expect(awsS3.mocks.writeMock).toHaveBeenCalledTimes(0)
@@ -73,7 +73,7 @@ describe('#writeStateFile()', () => {
   })
 
   it('should write local file when nothing is defined', async () => {
-    getRootInputs.mockResolvedValue({})
+    getRootInputs.mockReturnValue(Promise.resolve({}))
     const res = await writeStateFile('local')
     expect(res).toEqual('local')
   })
