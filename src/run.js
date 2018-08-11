@@ -31,7 +31,7 @@ const run = async (command, options) => {
   let stateFile = {}
   let archive = {}
   try {
-    stateFile = await readStateFile(projectPath)
+    stateFile = await readStateFile(projectPath, serverlessFileObject)
     stateFile = setServiceId(stateFile)
     // TODO BRN: If we're using immutable data, we shouldn't need to clone here
     archive = clone(stateFile)
@@ -89,7 +89,7 @@ const run = async (command, options) => {
 
     throw error
   } finally {
-    await writeStateFile(projectPath, stateFile)
+    await writeStateFile(projectPath, stateFile, serverlessFileObject)
   }
   return components
 }

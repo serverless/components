@@ -94,7 +94,7 @@ describe('Integration Test - Library Usage', () => {
       })
 
       it('should package the "iam" component', async () => {
-        await pkg({ path: testServiceDir, projectPath: testServiceDir })
+        await pkg({ path: testServiceDir, projectPath: testServiceDir, serverlessFileObject: {} })
         const testServiceHasZipFile = await fileExists(testServiceZipFile)
         expect(testServiceHasZipFile).toEqual(true)
         // the state should not change
