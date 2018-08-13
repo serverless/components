@@ -83,15 +83,15 @@ async function deleteLambda(name) {
 
 async function deploy(inputs, context) {
   let outputs = {}
+  let defaultRoleComponent = null
   const configuredRole = inputs.role
   let { defaultRole } = context.state
 
-  const defaultRoleComponent = await context.load('aws-iam-role', 'defaultRole', {
-    name: `${inputs.name}-execution-role`,
-    service: 'lambda.amazonaws.com'
-  })
-
   if (!configuredRole && !defaultRole) {
+    defaultRoleComponent = await context.load('aws-iam-role', 'defaultRole', {
+      name: `${inputs.name}-execution-role`,
+      service: 'lambda.amazonaws.com'
+    })
     defaultRole = await defaultRoleComponent.deploy()
   }
 

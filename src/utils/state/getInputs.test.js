@@ -1,6 +1,6 @@
-const getInputs = require('./getInputs')
+const getPreviousInputs = require('./getPreviousInputs')
 
-describe('#getInputs()', () => {
+describe('#getPreviousInputs()', () => {
   const stateFile = {
     'function-mock': {
       type: 'function-mock',
@@ -22,12 +22,12 @@ describe('#getInputs()', () => {
       memorySize: 512,
       timeout: 60
     }
-    const res = getInputs(stateFile, 'function-mock')
+    const res = getPreviousInputs(stateFile, 'function-mock')
     expect(res).toEqual(expected)
   })
 
   it('should return an empty object if no inputs are present', () => {
-    const res = getInputs(stateFile, 'non-present-mock')
+    const res = getPreviousInputs(stateFile, 'non-present-mock')
     expect(res).toEqual({})
   })
 })

@@ -1,8 +1,20 @@
 /*
 * Generate Component Diffs
 * - Uses a modified version of https://github.com/flitbit/diff
-* - Not leveraging the pure OS library because need to own the diff'ing experience.  It's an API component authors will rely on heavily.
-* - Changes thus far involve using relevant terms in the API.
+* - Not leveraging the pure OS library because we need to own the diff'ing experience.  It's an API component authors will rely on heavily.
+* - API must stay consistent.
+* - Adds "inputs" as first path item for future-proofing.
+*  API:
+*    change: 'create', 'update', 'delete', 'update_array'
+*    path: [ (changed value path as an array of strings) ]
+*    previous: (the previous value)
+*    current: (the new value)
+*    index: (if change: 'update_array', the index of the array item modified)
+*    item: (if change: 'update_array', the diff of the modified array item)
+*/
+
+/*
+* Diff Functionality
 */
 
 function inherits(ctor, superCtor) {
@@ -140,7 +152,7 @@ function getOrderIndependentHash(object) {
     return accum
   }
 
-  // Non object, non array...should be good?
+  // Non object, non array
   var stringToHash = '[ type: ' + type + ' ; value: ' + object + ']'
   return accum + hashThisString(stringToHash)
 }
@@ -320,6 +332,24 @@ function diffInputs(previous, current, prefilter, accum) {
       }
     : undefined
   var changes = observableDiff(previous, current, observer, prefilter)
+
+  // Convert Diff classes to objects
+  const flatten = (item) => {
+    let object = {}
+    object.change = item.change || null
+    object.path = item.path || null
+    object.previous = item.previous || null
+    object.current = item.current || null
+    if (item.index) {
+      object.index = item.index
+    }
+    if (item.item) {
+      object.item = flatten(item.item)
+    }
+    return object
+  }
+
+  changes = changes.map(flatten)
   return accum ? accum : changes.length ? changes : undefined
 }
 
@@ -327,9 +357,11 @@ function diffInputs(previous, current, prefilter, accum) {
 * Generate Component Diff
 */
 
-const generateComponentDiffs = (id, newInputs, previousInputs) => {
-  const changes = diffInputs(previousInputs, newInputs)
-  return changes || null
+const generateComponentDiffs = (newInputs, previousInputs) => {
+  const inputDiffs = diffInputs(previousInputs, newInputs)
+  return {
+    inputs: inputDiffs || null
+  }
 }
 
 module.exports = generateComponentDiffs

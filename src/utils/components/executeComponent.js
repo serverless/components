@@ -2,7 +2,7 @@ const { is, isEmpty } = require('ramda')
 const generateContext = require('./generateContext')
 const validateTypes = require('./validateTypes')
 const resolvePostExecutionVars = require('../variables/resolvePostExecutionVars')
-const { getInputs, getState } = require('../state')
+const { getPreviousInputs, getState } = require('../state')
 
 const executeComponent = async (
   componentId,
@@ -20,7 +20,7 @@ const executeComponent = async (
     command = 'rollback'
     stateFile[componentId] = archive[componentId]
   } else if (command === 'remove') {
-    component.inputs = getInputs(stateFile, componentId)
+    component.inputs = getPreviousInputs(stateFile, componentId)
   }
 
   const context = generateContext(components, component, stateFile, archive, options, command)

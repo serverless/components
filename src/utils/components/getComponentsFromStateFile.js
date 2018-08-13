@@ -3,7 +3,7 @@ const { keys, reduce, not, isEmpty, append, pickBy, prop } = require('ramda')
 const getComponentFunctions = require('./getComponentFunctions')
 const getChildrenIds = require('./getChildrenIds')
 const getState = require('../state/getState')
-const getInputs = require('../state/getInputs')
+const getPreviousInputs = require('../state/getPreviousInputs')
 const getRootPath = require('../state/getRootPath')
 
 function getComponentsFromStateFile(stateFile) {
@@ -28,7 +28,7 @@ function getComponentsFromStateFile(stateFile) {
         [id]: {
           id,
           type,
-          inputs: getInputs(stateFile, id),
+          inputs: getPreviousInputs(stateFile, id),
           outputs: {},
           rootPath,
           state: getState(stateFile, id),

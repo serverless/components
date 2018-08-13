@@ -1,5 +1,5 @@
 const generateServiceId = require('./generateServiceId')
-const getInputs = require('./getInputs')
+const getPreviousInputs = require('./getPreviousInputs')
 const getRootPath = require('./getRootPath')
 const getServiceId = require('./getServiceId')
 const getState = require('./getState')
@@ -9,7 +9,7 @@ const writeStateFile = require('./writeStateFile')
 
 module.exports = {
   generateServiceId,
-  getInputs,
+  getPreviousInputs,
   getRootPath,
   getServiceId,
   getState,

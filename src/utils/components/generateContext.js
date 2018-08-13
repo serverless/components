@@ -5,8 +5,10 @@ const getInstanceId = require('./getInstanceId')
 const getChildrenPromises = require('./getChildrenPromises')
 const getComponentFunctions = require('./getComponentFunctions')
 const getComponentRootPath = require('./getComponentRootPath')
+const generateComponentDiffs = require('./generateComponentDiffs')
 const log = require('../logging/log')
 const getServiceId = require('../state/getServiceId')
+const getPreviousInputs = require('../state/getPreviousInputs')
 const getState = require('../state/getState')
 
 const generateContext = (
@@ -22,18 +24,20 @@ const generateContext = (
   const { projectPath } = options
   const serviceId = getServiceId(stateFile)
   const instanceId = getInstanceId(stateFile, id)
+  const previousInputs = getPreviousInputs(stateFile, id)
   const inputs = prop('inputs', component)
   const context = {
     id,
     serviceId,
     instanceId,
     type,
-    archive: getState(archive, id),
+    command,
+    updates: generateComponentDiffs(inputs, previousInputs),
     state: getState(stateFile, id),
+    archive: getState(archive, id),
     children: getChildrenPromises(component, components),
     rootPath,
     projectPath,
-    command,
     options,
     log,
     // eslint-disable-next-line no-shadow
