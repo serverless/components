@@ -310,6 +310,35 @@ components:
       name: Jane  # This overrides the default of "John" from the inputType
 ```
 
+#### Accessing Input Variables
+You can use the child component's inputs as variables in the component's `serverless.yml` file.  For example if the child component had a another child component, you could pass the input as a parameter:
+
+```yaml
+type: child-component
+
+inputTypes:
+  name:
+    type: string
+    required: true
+    default: John
+
+components:
+  function1:
+      type: aws-lambda
+      inputs:
+        name: f1
+        description: Example lambda component.
+        memory: 512
+        timeout: 10
+        handler: handler.handler
+        runtime: nodejs8.10
+        root: '${self.path}'
+        role:
+          arn: ${myRole.arn}
+        env:
+          name: ${input.name}
+```
+
 #### Inputs
 
 Inputs are the configuration that are supplied to your component's logic by the user. You define these inputs in the `serverless.yml` file where the component is being used:
