@@ -1,7 +1,7 @@
 ![serverless components logo](https://s3.amazonaws.com/assets.github.serverless/serverless-components-readme-2.gif)
 
-[We're Hiring!](https://serverless.com/company/jobs/) • 
-[Newsletter](http://eepurl.com/b8dv4P) • [Forum](http://forum.serverless.com) • [Meetups](https://github.com/serverless/meetups) • [Twitter](https://twitter.com/goserverless) 
+[We're Hiring!](https://serverless.com/company/jobs/) •
+[Newsletter](http://eepurl.com/b8dv4P) • [Forum](http://forum.serverless.com) • [Meetups](https://github.com/serverless/meetups) • [Twitter](https://twitter.com/goserverless)
 
 ## Overview
 
@@ -109,6 +109,7 @@ components:
 [![Build Status](https://travis-ci.org/serverless/components.svg?branch=master)](https://travis-ci.org/serverless/components)
 [![npm version](https://badge.fury.io/js/serverless-components.svg)](https://badge.fury.io/js/serverless-components)
 [![dependencies](https://img.shields.io/david/serverless/serverless-components.svg)](https://www.npmjs.com/package/serverless-components)
+[![Known Vulnerabilities](https://snyk.io/test/github/serverless/components/badge.svg)](https://snyk.io/test/github/serverless/components)
 [![license](https://img.shields.io/npm/l/serverless-components.svg)](https://www.npmjs.com/package/serverless-components)
 
 [Website](http://www.serverless.com) • [Slack](https://join.slack.com/t/serverless-contrib/shared_invite/enQtMzgxMTkxMzIzNTU3LTY0OGZlYWI2OTI4YTliMWQ0YWNlZGZjMDhkNDAyZGQyZDYwMzYwMTlmNmVmMzMzNmI4YzAyNjg0ZjZkYTdmMzU) • [Newsletter](http://eepurl.com/b8dv4P) • [Forum](http://forum.serverless.com) • [Meetups](http://serverlessmeetups.com) • [Twitter](https://twitter.com/goserverless) • [We're Hiring](https://serverless.com/company/jobs/)
