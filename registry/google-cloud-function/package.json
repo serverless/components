@@ -1,0 +1,21 @@
+{
+  "name": "google-cloud-function",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@google-cloud/storage": "^1.7.0",
+    "@serverless/utils": "0.0.2",
+    "archiver": "^2.1.1",
+    "crypto": "^1.0.1",
+    "fs-extra": "^6.0.1",
+    "googleapis": "^32.0.0",
+    "ramda": "^0.25.0"
+  }
+}
