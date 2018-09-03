@@ -18,7 +18,6 @@ const mapParams = (object) => {
 const deploy = async (inputs, context) => {
   const { state } = context
   let endpointArn = state.endpointArn
-  // console.log('PARAMS', mapParams(inputs), mapParams(state))
   if (state.endpointArn && !equals(mapParams(inputs), mapParams(state))) {
     context.log(
       `To update the SNS Platform Endpoint with token '${

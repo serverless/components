@@ -36,7 +36,7 @@ afterAll(() => {
   jest.restoreAllMocks()
 })
 
-describe('SNS Subscription - Http protocol tests', () => {
+describe('SNS Subscription - HTTP(S) protocol tests', () => {
   it('should return correct types', () => {
     expect(protocol.types).toEqual(['http', 'https'])
   })
