@@ -1,0 +1,74 @@
+type: azure-storage-blob
+version: 0.0.1
+core: 0.2.x
+
+description: "Azure Storage Blob Serverless Component"
+license: MIT
+author: "Jeff Hollan <jehollan@microsoft.com> (https://azure.com/serverless)"
+repository: "github:serverless/components"
+
+inputTypes:
+  name:
+    type: string
+    displayName: Azure storage account name
+    required: true
+    description: The Azure storage account name
+    example: stor${self.serviceId}
+    default: stor${self.serviceId}
+  description:
+    type: string
+    displayName: Azure storage blob description
+    description: |
+      A short, user-defined storage blob description.
+      Azure does not use this value. Assign a meaningful description as you see fit
+    example: The blob is for web contents
+  blobContainer:
+    type: string
+    displayName: Azure storage container name
+    required: true
+    description: The Azure storage container name
+    example: contents
+    default: contents
+  resourceGroup:
+    type: string
+    required: true
+    default: serverless-rg
+    displayName: Resource group name
+    description: The functions resource group
+    example: serverless-rg
+  subscriptionId:
+    type: string
+    required: true
+    displayName: Subscription ID
+    description: The Azure subscription ID
+    example: 38ee4b45-d54e-451e-bdff-d08b951f32ae
+  directoryId:
+    type: string
+    required: true
+    displayName: Azure Directory/Tenant
+    description: The Azure Directory/Tenant
+    example: qwertyuiop.onmicrosoft.com
+  appId:
+    type: string
+    displayName: Azure App Client ID
+    description: The Azure App Client ID
+  appSecret:
+    type: string
+    displayName: Azure App Client Secret
+    description: The Azure App Client Secret
+  location:
+    type: string
+    displayName: Azure storage location
+    description: The region to deploy the storage account
+    default: westus
+
+outputTypes:
+  name:
+    type: string
+    description: The name of the storage account
+  blobContainer:
+    type: string
+    description: The blob container name
+  connectionString:
+    type: string
+    description: Connection string for the storage account
