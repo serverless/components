@@ -25,13 +25,11 @@ const deletePolicy = async (name, arn) => {
     PolicyArn: arn
   }).promise()
 
-  await Promise.all([
-    Promise.all(
-      PolicyGroups.map((policyGroup) => IAM.detachGroupPolicy({ GroupName: policyGroup }))
-    ),
-    Promise.all(PolicyRoles.map((policyRole) => IAM.detachRolePolicy({ RoleName: policyRole }))),
-    Promise.all(PolicyUsers.map((policyUser) => IAM.detachUserPolicy({ UserName: policyUser })))
-  ])
+  await Promise.all(
+    PolicyGroups.map((group) => IAM.detachGroupPolicy({ GroupName: group })),
+    PolicyRoles.map((role) => IAM.detachRolePolicy({ RoleName: role })),
+    PolicyUsers.map((user) => IAM.detachUserPolicy({ UserName: user }))
+  )
 
   await IAM.deletePolicy({
     PolicyArn: arn
