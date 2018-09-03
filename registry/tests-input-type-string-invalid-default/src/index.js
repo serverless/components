@@ -1,10 +1,11 @@
 const deploy = (inputs, context) => {
   context.saveState({ inputs })
-  return {}
+  context.setOutputs({})
 }
 
 const remove = (inputs, context) => {
   context.saveState({})
+  context.setOutputs({})
 }
 
 module.exports = {

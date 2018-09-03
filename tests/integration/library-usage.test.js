@@ -55,7 +55,7 @@ describe('Integration Test - Library Usage', () => {
         expect(stateFileContent.$.serviceId).not.toBeFalsy()
         const myRole = stateFileContent['library-usage:myRole']
         const myRoleObjectKeys = Object.keys(myRole)
-        expect(myRoleObjectKeys.length).toEqual(6)
+        expect(myRoleObjectKeys.length).toEqual(7)
         expect(myRole).toHaveProperty('instanceId')
         expect(myRole).toHaveProperty('type', 'tests-integration-iam-mock')
         expect(myRole).toHaveProperty('internallyManaged', false)
@@ -79,7 +79,7 @@ describe('Integration Test - Library Usage', () => {
         expect(stateFileContent.$.serviceId).not.toBeFalsy()
         const myRole = stateFileContent['library-usage:myRole']
         const myRoleObjectKeys = Object.keys(myRole)
-        expect(myRoleObjectKeys.length).toEqual(6)
+        expect(myRoleObjectKeys.length).toEqual(7)
         expect(myRole).toHaveProperty('instanceId')
         expect(myRole).toHaveProperty('type', 'tests-integration-iam-mock')
         expect(myRole).toHaveProperty('internallyManaged', false)
@@ -106,7 +106,7 @@ describe('Integration Test - Library Usage', () => {
         expect(stateFileContent.$.serviceId).not.toBeFalsy()
         const myRole = stateFileContent['library-usage:myRole']
         const myRoleObjectKeys = Object.keys(myRole)
-        expect(myRoleObjectKeys.length).toEqual(6)
+        expect(myRoleObjectKeys.length).toEqual(7)
         expect(myRole).toHaveProperty('instanceId')
         expect(myRole).toHaveProperty('type', 'tests-integration-iam-mock')
         expect(myRole).toHaveProperty('internallyManaged', false)
@@ -184,7 +184,7 @@ describe('Integration Test - Library Usage', () => {
         expect(stateFileContent.$.serviceId).not.toBeFalsy()
         const myRole = stateFileContent['library-usage:myRole']
         const myRoleObjectKeys = Object.keys(myRole)
-        expect(myRoleObjectKeys.length).toEqual(6)
+        expect(myRoleObjectKeys.length).toEqual(7)
         expect(myRole).toHaveProperty('instanceId')
         expect(myRole).toHaveProperty('type', 'tests-integration-iam-mock')
         expect(myRole).toHaveProperty('internallyManaged', false)
@@ -208,7 +208,7 @@ describe('Integration Test - Library Usage', () => {
         expect(stateFileContent.$.serviceId).not.toBeFalsy()
         const myRole = stateFileContent['library-usage:myRole']
         const myRoleObjectKeys = Object.keys(myRole)
-        expect(myRoleObjectKeys.length).toEqual(6)
+        expect(myRoleObjectKeys.length).toEqual(7)
         expect(myRole).toHaveProperty('instanceId')
         expect(myRole).toHaveProperty('type', 'tests-integration-iam-mock')
         expect(myRole).toHaveProperty('internallyManaged', false)
@@ -235,7 +235,7 @@ describe('Integration Test - Library Usage', () => {
         expect(stateFileContent.$.serviceId).not.toBeFalsy()
         const myRole = stateFileContent['library-usage:myRole']
         const myRoleObjectKeys = Object.keys(myRole)
-        expect(myRoleObjectKeys.length).toEqual(6)
+        expect(myRoleObjectKeys.length).toEqual(7)
         expect(myRole).toHaveProperty('instanceId')
         expect(myRole).toHaveProperty('type', 'tests-integration-iam-mock')
         expect(myRole).toHaveProperty('internallyManaged', false)

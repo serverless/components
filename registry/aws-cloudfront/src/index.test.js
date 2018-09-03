@@ -68,14 +68,16 @@ describe('CloudFront Component Unit Tests', () => {
           eTag: 'abc'
         }
       },
+      outputs: {},
       archive: {},
       log: () => {},
-      saveState: () => {}
+      saveState: () => {},
+      setOutputs: jest.fn()
     }
 
     const inputs = {}
-
-    await expect(cloudFrontComponent.remove(inputs, cloudFrontContextMock)).resolves.toEqual({})
+    await cloudFrontComponent.remove(inputs, cloudFrontContextMock)
+    expect(cloudFrontContextMock.setOutputs).toBeCalledWith({})
     expect(AWS.CloudFront).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.getDistributionMock).toHaveBeenCalledTimes(1)
   })

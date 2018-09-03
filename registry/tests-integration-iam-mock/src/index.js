@@ -18,13 +18,13 @@ function deploy(inputs, context) {
     deploymentCounter
   }
   context.saveState(newState)
-
-  return newState
+  context.setOutputs(newState)
 }
 
 function remove(inputs, context) {
   context.log(`Removing role "${context.state.name}"`)
   context.saveState()
+  context.setOutputs()
 }
 
 module.exports = {

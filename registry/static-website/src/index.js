@@ -26,15 +26,15 @@ const deploy = async (inputs, context) => {
   context.saveState({ ...inputs, ...outputs })
   // TODO uncomment and log out real URL when
   // we get it context.log(`Created Site with url: '${s3url}'`)
-  return outputs
+  context.setOutputs(outputs)
 }
 
 const remove = async (inputs, context) => {
-  if (!context.state.name) return {}
+  if (!context.state.name) return context.setOutputs({})
 
   context.log(`Removing Site: '${context.state.name}'`)
   context.saveState({})
-  return {}
+  context.setOutputs({})
 }
 
 const info = (inputs, context) => {

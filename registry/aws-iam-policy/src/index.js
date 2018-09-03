@@ -46,11 +46,11 @@ const deploy = async (inputs, context) => {
     outputs = await createPolicy(inputs)
   }
   context.saveState({ ...inputs, ...outputs })
-  return outputs
+  context.setOutputs(outputs)
 }
 
 const remove = async (inputs, context) => {
-  if (!context.state.name) return {}
+  if (!context.state.name) return context.setOutputs({})
 
   try {
     context.log(`Removing Policy: ${context.state.name}`)
@@ -62,7 +62,7 @@ const remove = async (inputs, context) => {
   }
 
   context.saveState({})
-  return {}
+  context.setOutputs({})
 }
 
 module.exports = {

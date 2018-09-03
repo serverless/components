@@ -249,7 +249,7 @@ const deploy = async (inputs, context) => {
       context.log(
         'Cannot deploy multiple tables at this time. Please update your inputs and try again...'
       )
-      return {}
+      return context.setOutputs({})
     }
     try {
       outputs = await createTables(inputs, context)
@@ -257,11 +257,12 @@ const deploy = async (inputs, context) => {
       console.log('Error in creating table(s)', err.message)
     }
   }
-  return outputs
+  context.setOutputs(outputs)
 }
 
 const remove = async (inputs, context) => {
-  if (!context.state.ddbtables || context.state.ddbtables.length === 0) return {}
+  if (!context.state.ddbtables || context.state.ddbtables.length === 0)
+    return context.setOutputs({})
 
   let tableName
   if (context.options && context.options.tablename) {
@@ -286,13 +287,14 @@ const remove = async (inputs, context) => {
     }
   }
 
-  return ddbTables
+  context.setOutputs(ddbTables)
 }
 
 const insert = async (inputs, context) => {
   let outputs = context.state
 
-  if (!context.state.ddbtables || context.state.ddbtables.length === 0) return {}
+  if (!context.state.ddbtables || context.state.ddbtables.length === 0)
+    return context.setOutputs({})
 
   if (context.options && context.options.tablename && context.options.itemdata) {
     outputs = await insertItem(
@@ -306,13 +308,14 @@ const insert = async (inputs, context) => {
       'Incorrect or insufficient parameters. \nUsage: insert --tablename <tablename> --itemdata <data in json format>'
     )
   }
-  return outputs
+  context.setOutputs(outputs)
 }
 
 const destroy = async (inputs, context) => {
   let outputs = context.state
 
-  if (!context.state.ddbtables || context.state.ddbtables.length === 0) return {}
+  if (!context.state.ddbtables || context.state.ddbtables.length === 0)
+    return context.setOutputs({})
 
   if (context.options && context.options.tablename && context.options.keydata) {
     outputs = await deleteItem(
@@ -326,13 +329,14 @@ const destroy = async (inputs, context) => {
       'Incorrect or insufficient parameters. \nUsage: destroy --tablename <tablename> --keydata <hashkey and rangekey key/value pairs in json format>'
     )
   }
-  return outputs
+  context.setOutputs(outputs)
 }
 
 const get = async (inputs, context) => {
   let outputs = context.state
 
-  if (!context.state.ddbtables || context.state.ddbtables.length === 0) return {}
+  if (!context.state.ddbtables || context.state.ddbtables.length === 0)
+    return context.setOutputs({})
 
   if (context.options && context.options.tablename && context.options.keydata) {
     outputs = await getItem(
@@ -346,7 +350,7 @@ const get = async (inputs, context) => {
       'Incorrect or insufficient parameters. \nUsage: get --tablename <tablename> --keydata <hashkey and rangekey key/value pairs in json format>'
     )
   }
-  return outputs
+  context.setOutputs(outputs)
 }
 
 module.exports = {

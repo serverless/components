@@ -39,9 +39,11 @@ describe('ApiGateway Component Unit Tests', () => {
         name: 'abc',
         id: 'exists'
       },
+      outputs: {},
       archive: {},
       log: () => {},
-      saveState: () => {}
+      saveState: () => {},
+      setOutputs: jest.fn()
     }
 
     const expectedOutputs = {
@@ -50,7 +52,9 @@ describe('ApiGateway Component Unit Tests', () => {
       urls: null
     }
 
-    await expect(apigComponent.remove({}, apigContextMock)).resolves.toEqual(expectedOutputs)
+    await apigComponent.remove({}, apigContextMock)
+
+    expect(apigContextMock.setOutputs).toBeCalledWith(expectedOutputs)
     expect(AWS.APIGateway).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.deleteRestApiMock).toHaveBeenCalledTimes(1)
   })
@@ -60,9 +64,11 @@ describe('ApiGateway Component Unit Tests', () => {
         name: 'abc',
         id: 'doesNotExist'
       },
+      outputs: {},
       archive: {},
       log: () => {},
-      saveState: () => {}
+      saveState: () => {},
+      setOutputs: jest.fn()
     }
 
     const expectedOutputs = {
@@ -70,8 +76,9 @@ describe('ApiGateway Component Unit Tests', () => {
       url: null,
       urls: null
     }
+    await apigComponent.remove({}, apigContextMock)
 
-    await expect(apigComponent.remove({}, apigContextMock)).resolves.toEqual(expectedOutputs)
+    expect(apigContextMock.setOutputs).toBeCalledWith(expectedOutputs)
     expect(AWS.APIGateway).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.deleteRestApiMock).toHaveBeenCalledTimes(1)
   })
@@ -82,9 +89,11 @@ describe('ApiGateway Component Unit Tests', () => {
         name: 'abc',
         id: 'throwError'
       },
+      outputs: {},
       archive: {},
       log: () => {},
-      saveState: () => {}
+      saveState: () => {},
+      setOutputs: () => {}
     }
 
     await expect(apigComponent.remove({}, apigContextMock)).rejects.toHaveProperty(

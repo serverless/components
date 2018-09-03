@@ -104,7 +104,7 @@ const rollback = async (inputs, context) => {
       await attachRolePolicy(archive)
     }
   }
-  return archive
+  context.setOutputs(archive)
 }
 
 const deploy = async (inputs, context) => {
@@ -155,17 +155,11 @@ const deploy = async (inputs, context) => {
   }
 
   context.saveState(state)
-  return state
+  context.setOutputs(state)
 }
 
 const remove = async (inputs, context) => {
-  if (!context.state.name) return {}
-
-  const outputs = {
-    policy: null,
-    service: null,
-    arn: null
-  }
+  if (!context.state.name) return context.setOutputs({})
   try {
     context.log(`Removing Role: ${context.state.name}`)
     await deleteRole(context.state)
@@ -174,14 +168,14 @@ const remove = async (inputs, context) => {
       throw new Error(e)
     }
   }
-  context.saveState({
+  const state = {
     name: null,
     arn: null,
     service: null,
     policy: null
-  })
-
-  return outputs
+  }
+  context.saveState(state)
+  context.setOutputs(state)
 }
 
 module.exports = {

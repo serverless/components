@@ -1,9 +1,9 @@
 async function deploy(inputs, context) {
-  return { ...inputs, ...context }
+  context.setOutputs({ ...inputs, ...context })
 }
 
-async function remove() {
-  return {}
+async function remove(inputs, context) {
+  context.setOutputs({})
 }
 
 module.exports = {

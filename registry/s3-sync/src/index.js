@@ -48,14 +48,14 @@ const deploy = async (inputs, context) => {
     bucketName: inputs.bucketName
   }
   context.saveState({ ...inputs, ...outputs })
-  return outputs
+  context.setOutputs(outputs)
 }
 
 const remove = async (inputs, context) => {
-  if (!context.state.contentPath) return {}
+  if (!context.state.contentPath) return context.setOutputs({})
 
   context.saveState({})
-  return {}
+  context.setOutputs({})
 }
 
 module.exports = {
