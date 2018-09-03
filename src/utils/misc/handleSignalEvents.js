@@ -8,7 +8,7 @@ function handleSignalEvents() {
     shouldExitGracefully: false
   }
 
-  let msg = 'Waiting for current operation to gracefully finish (this might some seconds)...'
+  let msg = 'Waiting for current operation to gracefully finish (this might take some seconds)...'
 
   if (process.platform === 'win32') {
     const rl = readline.createInterface({
