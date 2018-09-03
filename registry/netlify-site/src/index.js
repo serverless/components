@@ -155,16 +155,37 @@ const deploy = async (inputs, context) => {
   return outputs
 }
 
+const objectAnyKeyExists = (object, keys) => Object.keys(object).some((key) => keys.includes(key))
+
 const remove = async (inputs, context) => {
   context.log('Removing netlify site:')
   const { netlifyApiToken, githubApiToken, siteRepo } = inputs
-  const githubData = parseGithubUrl(siteRepo)
-
   const { state } = context
 
-  if (!context || !Object.keys(state).length) {
-    throw new Error('No state data found')
+  if (
+    objectAnyKeyExists(state, [
+      'netlifyDeployCreatedWebhook',
+      'netlifyDeployFailedWebhook',
+      'netlifyDeployBuildingWebhook',
+      'netlifySiteData',
+      'netlifyDeployKeyData'
+    ]) &&
+    !netlifyApiToken
+  ) {
+    context.log(
+      'Failed to remove netlify site, "netlifyApiToken" is not defined. Add "netlifyApiToken" and try again.'
+    )
+    return {}
   }
+
+  if (objectAnyKeyExists(state, ['githubWebhookData', 'githubDeployKeyData']) && !githubApiToken) {
+    context.log(
+      'Failed to remove netlify site, "githubApiToken" is not defined. Add "githubApiToken" and try again.'
+    )
+    return {}
+  }
+
+  const githubData = parseGithubUrl(siteRepo)
 
   /* Clean up netlify DeployCreated webhook */
   if (state.netlifyDeployCreatedWebhook.id) {
