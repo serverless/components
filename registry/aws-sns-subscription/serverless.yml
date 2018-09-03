@@ -1,0 +1,34 @@
+type: aws-sns-subscription
+version: 0.2.0
+core: 0.2.x
+
+description: "Provision AWS SNS Subscription with Serverless Components"
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
+
+inputTypes:
+  topic:
+    type: string
+    required: true
+    description: The ARN of your SNS topic to subscribe
+    displayName: SNS Topic Arn
+    example: arn:aws:sns:us-east-1:123456789012:my_topic
+  protocol:
+    type: string
+    required: true
+    default: https
+    displayName: SNS Topic Display Name
+    description: The protocol of the subscription, possible values are http, https, email, email-json, sms, sqs, application, and lambda
+    example: https
+  endpoint:
+    type: string
+    required: false
+    displayName: SNS Topic Display Name
+    description: The endpoint that you want to receive notifications
+    example: https://example.com/
+
+outputTypes:
+  arn:
+    type: string
+    description: The subscription arn
