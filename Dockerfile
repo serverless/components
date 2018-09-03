@@ -2,7 +2,7 @@ FROM ubuntu:latest
 
 RUN apt-get update -y \
   && apt-get upgrade -y \
-  && apt-get install -y screen rsync curl git
+  && apt-get install -y screen rsync curl git gnupg2
 
 # install Node.js and update npm
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -

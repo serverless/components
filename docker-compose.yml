@@ -4,6 +4,10 @@ services:
     build:
       context: ./
     working_dir: /app
+    container_name: serverless-components
+    command: bash
+    stdin_open: true
+    tty: true
     volumes:
       - .:/app
       - ~/.aws/:/root/.aws
