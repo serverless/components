@@ -1,0 +1,57 @@
+type: azure-rg
+version: 0.0.1
+core: 0.2.x
+
+description: "Azure Resource Group Serverless Component"
+license: MIT
+author: "Jeff Hollan <jehollan@microsoft.com> (https://azure.com/serverless)"
+repository: "github:serverless/components"
+
+inputTypes:
+  name:
+    type: string
+    displayName: Azure resource group name
+    required: true
+    description: The Azure resource group name
+    example: serverless-rg
+    default: serverless-rg
+  description:
+    type: string
+    displayName: Azure resource group description
+    description: |
+      A short, user-defined resource group description.
+      Azure does not use this value. Assign a meaningful description as you see fit
+    example: The resource group for serverless
+  subscriptionId:
+    type: string
+    required: true
+    displayName: Subscription ID
+    description: The Azure subscription ID
+    example: 38ee4b45-d54e-451e-bdff-d08b951f32ae
+  directoryId:
+    type: string
+    required: true
+    displayName: Azure Directory/Tenant
+    description: The Azure Directory/Tenant
+    example: qwertyuiop.onmicrosoft.com
+  appId:
+    type: string
+    required: true
+    displayName: Azure Client ID
+    description: The Azure Client ID
+  appSecret:
+    type: string
+    required: true
+    displayName: Azure App Client Secret
+    description: The Azure App Client Secret
+  location:
+    type: string
+    displayName: Azure resource group location
+    description: The region to deploy the resource group
+    default: westus
+
+
+outputTypes:
+  name:
+    type: string
+    description: The name of the resource group

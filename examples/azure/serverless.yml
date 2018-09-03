@@ -1,0 +1,12 @@
+type: my-azure-project
+version: 0.0.1
+
+components:
+  azureResourceGroup:
+    type: ../../registry/azure-rg
+    inputs:
+      name: components-rg
+      subscriptionId: xxx-xxx-xxx-xxx-xxx
+      directoryId: xxx.xxx.xxx
+      appId: xxx-xxx-xxx-xxx-xxx
+      appSecret: xxx
