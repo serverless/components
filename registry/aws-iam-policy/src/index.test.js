@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk') // eslint-disable-line
-const BbPromise = require('bluebird')
+const BbPromise = require('bluebird') // eslint-disable-line
 const iamComponent = require('./index')
 
 jest.mock('bluebird', () => ({
@@ -76,10 +76,10 @@ afterEach(() => {
 })
 
 afterAll(() => {
-  BbPromise.delay.mockRestore()
+  jest.restoreAllMocks()
 })
 
-describe('aws-iam-policy unit tests', () => {
+describe('IAM Policy Unit Tests', () => {
   it('should deploy iam policy', async () => {
     const iamContextMock = {
       state: {},
