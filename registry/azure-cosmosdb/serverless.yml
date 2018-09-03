@@ -1,0 +1,80 @@
+type: azure-cosmosdb
+version: 0.0.1
+core: 0.2.x
+
+description: "Azure CosmosDB Serverless Component"
+license: MIT
+author: "Jeff Hollan <jehollan@microsoft.com> (https://azure.com/serverless)"
+repository: "github:serverless/components"
+
+inputTypes:
+  name:
+    type: string
+    displayName: Azure CosmosDB name
+    required: true
+    description: The Azure CosmosDB name
+    example: cosmos${self.instanceId}
+    default: cosmos${self.instanceId}
+  description:
+    type: string
+    displayName: Azure CosmosDB description
+    description: |
+      A short, user-defined CosmosDB description.
+      Azure does not use this value. Assign a meaningful description as you see fit
+    example: The CosmosDB for serverless
+  apiType:
+    type: string
+    displayName: CosmosDB API Type
+    description: API type to interact with CosmosDB
+    example: SQL
+    default: SQL
+  resourceGroup:
+    type: string
+    required: true
+    default: serverless-rg
+    displayName: Resource group name
+    description: The functions resource group
+    example: serverless-rg
+  subscriptionId:
+    type: string
+    required: true
+    displayName: Subscription ID
+    description: The Azure subscription ID
+    example: 38ee4b45-d54e-451e-bdff-d08b951f32ae
+  directoryId:
+    type: string
+    required: true
+    displayName: Azure Directory/Tenant
+    description: The Azure Directory/Tenant
+    example: qwertyuiop.onmicrosoft.com
+  appId:
+    type: string
+    displayName: Azure App Client ID
+    description: The Azure App Client ID
+  appSecret:
+    type: string
+    displayName: Azure App Client Secret
+    description: The Azure App Client Secret
+  location:
+    type: string
+    required: true
+    displayName: Azure CosmosDB location
+    description: The region to deploy the CosmosDB
+    default: westus
+
+outputTypes:
+  name:
+    type: string
+    description: The name of the CosmosDB
+  primaryMasterKey:
+    type: string
+    description: Primary master key
+  secondaryMasterKey:
+    type: string
+    description: Secondary master key
+  primaryReadonlyMasterKey:
+    type: string
+    description: Primary read only master key
+  secondaryReadonlyMasterKey:
+    type: string
+    description: Secondary read only master key
