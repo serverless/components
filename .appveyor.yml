@@ -1,6 +1,5 @@
 environment:
   matrix:
-    - NODEJS_VERSION: '4'
     - NODEJS_VERSION: '6'
     - NODEJS_VERSION: '8'
     - NODEJS_VERSION: '10'
