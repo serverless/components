@@ -35,7 +35,7 @@ afterAll(() => {
   jest.restoreAllMocks()
 })
 
-describe('application protocol tests', () => {
+describe('SNS Subscription - Application protocol tests', () => {
   it('should return correct types', () => {
     expect(protocol.types).toEqual(['application'])
   })

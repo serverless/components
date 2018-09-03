@@ -38,14 +38,13 @@ afterAll(() => {
   jest.restoreAllMocks()
 })
 
-describe('aws-sns-platform-application tests', () => {
+describe('SNS Platform Application Unit Tests', () => {
   it('should deploy sns platform application component', async () => {
     const contextMock = {
       state: {},
       archive: {},
       log: () => {},
-      saveState: jest.fn(),
-      setOutputs: jest.fn()
+      saveState: jest.fn()
     }
 
     const inputs = {
@@ -77,8 +76,7 @@ describe('aws-sns-platform-application tests', () => {
       },
       archive: {},
       log: () => {},
-      saveState: jest.fn(),
-      setOutputs: jest.fn()
+      saveState: jest.fn()
     }
 
     const inputs = {
@@ -110,8 +108,7 @@ describe('aws-sns-platform-application tests', () => {
       },
       archive: {},
       log: () => {},
-      saveState: jest.fn(),
-      setOutputs: jest.fn()
+      saveState: jest.fn()
     }
 
     const inputs = {
@@ -143,8 +140,7 @@ describe('aws-sns-platform-application tests', () => {
       },
       archive: {},
       log: () => {},
-      saveState: jest.fn(),
-      setOutputs: jest.fn()
+      saveState: jest.fn()
     }
 
     const inputs = {
@@ -176,8 +172,7 @@ describe('aws-sns-platform-application tests', () => {
       },
       archive: {},
       log: () => {},
-      saveState: jest.fn(),
-      setOutputs: jest.fn()
+      saveState: jest.fn()
     }
 
     const inputs = {
@@ -209,8 +204,7 @@ describe('aws-sns-platform-application tests', () => {
       },
       archive: {},
       log: () => {},
-      saveState: jest.fn(),
-      setOutputs: jest.fn()
+      saveState: jest.fn()
     }
 
     const inputs = {

@@ -44,7 +44,7 @@ afterAll(() => {
   jest.restoreAllMocks()
 })
 
-describe('sqs protocol tests', () => {
+describe('SNS Subscription - SQS protocol tests', () => {
   it('should return correct types', () => {
     expect(protocol.types).toEqual(['sqs'])
   })

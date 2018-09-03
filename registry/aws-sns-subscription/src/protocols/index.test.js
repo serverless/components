@@ -1,6 +1,6 @@
 const { types, getProtocol } = require('./index')
 
-describe('protocol index tests', () => {
+describe('SNS Subscription - Protocol index tests', () => {
   it('should return correct types', () => {
     expect(types).toEqual([
       'application',

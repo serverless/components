@@ -46,10 +46,6 @@ const deploy = async (inputs, context) => {
     context.log(`No changes to the SNS Platform Endpoint with token '${inputs.token}'`)
   }
 
-  context.setOutputs({
-    arn: endpointArn
-  })
-
   return {
     arn: endpointArn
   }
@@ -65,7 +61,7 @@ const remove = async (inputs, context) => {
     .promise()
   context.log(`SNS Platform Endpoint with token '${state.token}' removed`)
   await context.saveState({})
-  context.setOutputs({})
+
   return {}
 }
 

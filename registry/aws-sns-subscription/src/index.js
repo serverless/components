@@ -73,9 +73,6 @@ const deploy = async (inputs, context) => {
 
   context.saveState(merge(newState, inputs))
 
-  context.setOutputs({
-    arn: newState.subscriptionArn
-  })
   return {
     arn: newState.subscriptionArn
   }
@@ -85,7 +82,7 @@ const remove = async (inputs, context) => {
   const { state } = context
   await getProtocol(state.protocol).remove(context)
   context.saveState({})
-  context.setOutputs({})
+
   return {}
 }
 

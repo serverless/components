@@ -54,7 +54,7 @@ afterAll(() => {
   jest.restoreAllMocks()
 })
 
-describe('protocol library tests', () => {
+describe('SNS Subscription - Protocol library tests', () => {
   it('should subscribe to SNS topic and return Subscription Arn', async () => {
     const contextMock = {
       log: () => {}

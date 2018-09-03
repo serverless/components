@@ -39,7 +39,7 @@ afterAll(() => {
   jest.restoreAllMocks()
 })
 
-describe('protocol index tests', () => {
+describe('SNS Subscription Unit Tests', () => {
   it('should deploy subscription', async () => {
     const inputs = {
       topic: 'topic-arn',
@@ -67,16 +67,12 @@ describe('protocol index tests', () => {
     const contextMock = {
       log: () => {},
       saveState: jest.fn(),
-      setOutputs: jest.fn(),
       state: {}
     }
-    await deploy(inputs, contextMock)
+    const outputs = await deploy(inputs, contextMock)
     expect(protocols.getProtocol).toHaveBeenCalledTimes(1)
     expect(contextMock.saveState).toHaveBeenCalledTimes(1)
-    expect(contextMock.setOutputs).toHaveBeenCalledTimes(1)
-    expect(contextMock.setOutputs.mock.calls[0][0]).toEqual(
-      expect.objectContaining({ arn: 'subscriptionArn' })
-    )
+    expect(outputs.arn).toEqual('subscriptionArn')
   })
 
   it('should not deploy subscription', async () => {
@@ -84,7 +80,6 @@ describe('protocol index tests', () => {
     const contextMock = {
       log: () => {},
       saveState: jest.fn(),
-      setOutputs: jest.fn(),
       state: {
         topic: 'topic-arn',
         protocol: 'lambda',
@@ -92,15 +87,10 @@ describe('protocol index tests', () => {
         subscriptionArn: 'subscriptionArn'
       }
     }
-    await deploy(inputs, contextMock)
+    const outputs = await deploy(inputs, contextMock)
     expect(protocols.getProtocol).toHaveBeenCalledTimes(0)
     expect(contextMock.saveState).toHaveBeenCalledTimes(1)
-    expect(contextMock.setOutputs).toHaveBeenCalledTimes(1)
-    expect(contextMock.setOutputs.mock.calls[0][0]).toEqual(
-      expect.objectContaining({
-        arn: 'subscriptionArn'
-      })
-    )
+    expect(outputs.arn).toEqual('subscriptionArn')
   })
 
   it('should remove subscription attribute', async () => {
@@ -119,7 +109,6 @@ describe('protocol index tests', () => {
     const contextMock = {
       log: () => {},
       saveState: jest.fn(),
-      setOutputs: jest.fn(),
       state: {
         topic: 'topic-arn',
         protocol: 'lambda',
@@ -145,13 +134,10 @@ describe('protocol index tests', () => {
         }
       }
     }
-    await deploy(inputs, contextMock)
+    const outputs = await deploy(inputs, contextMock)
     expect(protocols.getProtocol).toHaveBeenCalledTimes(0)
     expect(contextMock.saveState).toHaveBeenCalledTimes(1)
-    expect(contextMock.setOutputs).toHaveBeenCalledTimes(1)
-    expect(contextMock.setOutputs.mock.calls[0][0]).toEqual(
-      expect.objectContaining({ arn: 'subscriptionArn' })
-    )
+    expect(outputs.arn).toEqual('subscriptionArn')
   })
 
   it('should remove subscription when protocol changes and then deploy new', async () => {
@@ -159,7 +145,6 @@ describe('protocol index tests', () => {
     const contextMock = {
       log: () => {},
       saveState: jest.fn(),
-      setOutputs: jest.fn(),
       state: {
         topic: 'topic-arn',
         protocol: 'lambda',
@@ -167,14 +152,10 @@ describe('protocol index tests', () => {
         subscriptionArn: 'subscriptionArn'
       }
     }
-    await deploy(inputs, contextMock)
+    const outputs = await deploy(inputs, contextMock)
     expect(protocols.getProtocol).toHaveBeenCalledTimes(2)
     expect(contextMock.saveState).toHaveBeenCalledTimes(2)
-    expect(contextMock.setOutputs).toHaveBeenCalledTimes(2)
-    expect(contextMock.setOutputs.mock.calls[0][0]).toEqual({})
-    expect(contextMock.setOutputs.mock.calls[1][0]).toEqual(
-      expect.objectContaining({ arn: 'subscriptionArn' })
-    )
+    expect(outputs.arn).toEqual('subscriptionArn')
   })
 
   it('should remove subscription', async () => {
@@ -182,7 +163,6 @@ describe('protocol index tests', () => {
     const contextMock = {
       log: () => {},
       saveState: jest.fn(),
-      setOutputs: jest.fn(),
       state: {
         topic: 'topic-arn',
         protocol: 'lambda',
@@ -190,10 +170,9 @@ describe('protocol index tests', () => {
         subscriptionArn: 'subscriptionArn'
       }
     }
-    await remove(inputs, contextMock)
+    const outputs = await remove(inputs, contextMock)
     expect(protocols.getProtocol).toHaveBeenCalledTimes(1)
     expect(contextMock.saveState).toHaveBeenCalledTimes(1)
-    expect(contextMock.setOutputs).toHaveBeenCalledTimes(1)
-    expect(contextMock.setOutputs.mock.calls[0][0]).toEqual({})
+    expect(outputs).toEqual({})
   })
 })

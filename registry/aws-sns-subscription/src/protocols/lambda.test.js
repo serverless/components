@@ -51,7 +51,7 @@ afterAll(() => {
   jest.restoreAllMocks()
 })
 
-describe('lambda protocol tests', () => {
+describe('SNS Subscription - Lambda protocol tests', () => {
   it('should return correct types', () => {
     expect(protocol.types).toEqual(['lambda'])
   })

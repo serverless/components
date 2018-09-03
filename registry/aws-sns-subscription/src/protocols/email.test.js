@@ -36,7 +36,7 @@ afterAll(() => {
   jest.restoreAllMocks()
 })
 
-describe('email protocol tests', () => {
+describe('SNS Subscription - Email protocol tests', () => {
   it('should return correct types', () => {
     expect(protocol.types).toEqual(['email', 'email-json'])
   })

@@ -38,9 +38,6 @@ const deploy = async (inputs, context) => {
   } else {
     context.log(`No changes to the SNS Platform Application '${inputs.name}'`)
   }
-  context.setOutputs({
-    arn: platformApplicationArn
-  })
   return {
     arn: platformApplicationArn
   }
@@ -56,7 +53,6 @@ const remove = async (inputs, context) => {
     .promise()
   context.log(`SNS Platform Application '${state.name}' removed`)
   context.saveState({})
-  context.setOutputs({})
   return {}
 }
 
