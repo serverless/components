@@ -11,4 +11,5 @@ services:
     volumes:
       - .:/app
       - ~/.aws/:/root/.aws
+      - ~/.gcloud/:/root/.gcloud
       - ~/.gitconfig:/root/.gitconfig
