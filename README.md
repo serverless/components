@@ -158,6 +158,7 @@ Also please do join the _Components_ channel on our public [Serverless-Contrib S
     * [aws-sns-platform-endpoint](./registry/aws-sns-platform-endpoint)
     * [aws-sns-subscription](./registry/aws-sns-subscription)
     * [aws-sns-topic](./registry/aws-sns-topic)
+    * [docker-image](./registry/docker-image)
     * [eventgateway](./registry/eventgateway)
     * [github-webhook](./registry/github-webhook)
     * [github-webhook-aws](./registry/github-webhook-aws)

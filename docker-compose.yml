@@ -12,3 +12,5 @@ services:
       - .:/app
       - ~/.aws/:/root/.aws
       - ~/.gitconfig:/root/.gitconfig
+      # run Docker in Docker...
+      - /var/run/docker.sock:/var/run/docker.sock
