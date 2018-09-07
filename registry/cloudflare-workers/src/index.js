@@ -49,12 +49,12 @@ const _getDefaultScriptName = async (zoneId) => {
     contentType: `application/json`
   })
 
-  let { success, errors, result } = response
+  const { success, errors, result } = response
   if (success) {
     return result.name.replace('.', '-')
   }
 
-  let errorMessage = errors.map((e) => e.message).join('\n')
+  const errorMessage = errors.map((e) => e.message).join('\n')
   throw new Error(errorMessage)
 }
 
@@ -63,12 +63,12 @@ const _getAccountId = async () => {
     url: `https://api.cloudflare.com/client/v4/accounts`,
     method: `GET`
   })
-  let { success, result, errors } = response
+  const { success, result, errors } = response
 
   if (success) {
     return result[0]['id']
   }
-  let errorMessage = errors.map((e) => e.message).join('\n')
+  const errorMessage = errors.map((e) => e.message).join('\n')
   throw new Error(errorMessage)
 }
 
@@ -82,7 +82,7 @@ const removeWorker = async ({ accountId, scriptName }, context) => {
     method: `DELETE`,
     contentType: `application/javascript`
   })
-  let { success, errors } = response
+  const { success, errors } = response
   if (success) {
     context.log(`✅  Script Removed Successfully: ${scriptName}`)
     return success
@@ -104,7 +104,7 @@ const removeRoute = async ({ route, zoneId }, context) => {
     method: `DELETE`
   })
 
-  let { success, errors } = response
+  const { success, errors } = response
   if (success) {
     context.log(`✅  Route Disabled Successfully: ${route}`)
     return success
@@ -124,14 +124,14 @@ const deployRoutes = async ({ route, scriptName, zoneId }, context) => {
     body: JSON.stringify(payload)
   })
 
-  let { success: routeSuccess, result: routeResult, errors: routeErrors } = response
+  const { success: routeSuccess, result: routeResult, errors: routeErrors } = response
 
   if (routeSuccess || !routeContainsFatalErorrs(routeErrors)) {
     context.log(`✅  Routes Deployed ${route}`)
   } else {
     context.log(`❌  Fatal Error, Routes Not Deployed!`)
     routeErrors.forEach((err) => {
-      let { code, message } = err
+      const { code, message } = err
       context.log(`--> Error Code:${code}\n--> Error Message: "${message}"`)
     })
   }
@@ -149,14 +149,14 @@ const deployWorker = async ({ accountId, scriptName, scriptPath }, context) => {
     method: `PUT`
   })
 
-  let { success: workerDeploySuccess, result: workerResult, errors: workerErrors } = response
+  const { success: workerDeploySuccess, result: workerResult, errors: workerErrors } = response
 
   if (workerDeploySuccess) {
     context.log(`✅  Script Deployed ${scriptName}`)
   } else {
     context.log(`❌  Fatal Error, Script Not Deployed!`)
     workerErrors.forEach((err) => {
-      let { code, message } = err
+      const { code, message } = err
       context.log(`--> Error Code:${code}\n--> Error Message: "${message}"`)
     })
   }
@@ -184,9 +184,9 @@ const deploy = async (input, context) => {
 
   const outputs = { ...workerScriptResponse, ...routeResponse }
 
-  let { routeResult, routeErrors, routeSuccess } = outputs
+  const { routeResult, routeErrors, routeSuccess } = outputs
 
-  let updatedState = {
+  const updatedState = {
     ...outputs,
     routeSuccess: routeSuccess || !routeContainsFatalErorrs(routeErrors),
     routeId: routeResult ? routeResult.id : context.state.routeId
