@@ -25,6 +25,11 @@ const fs = require('fs')
 const _cfApiCall = async ({ url, method, contentType = null, body = null }) => {
   const AUTH_KEY = process.env.CLOUDFLARE_AUTH_KEY
   const EMAIL = process.env.CLOUDFLARE_EMAIL
+  if (!AUTH_KEY || !EMAIL)
+    return Promise.reject(
+      'Please make sure env variables "CLOUDFLARE_EMAIL" and ' +
+        '"CLOUDFLARE_AUTH_KEY" are set before trying to deploy.'
+    )
   let options = {
     headers: {
       'X-Auth-Email': EMAIL,
