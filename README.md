@@ -777,7 +777,7 @@ Options:
 
 * [Basic Lambda Example](./examples/basic)
 * [Blog Example](./examples/blog)
-* [Cloudflare Worekrs Example](./examples/cloudflare-workers-example)
+* [Cloudflare Workers Example](./examples/cloudflare-workers-example)
 * [Github Webhook Example](./examples/github-webhook-example)
 * [Landing Page Example](./examples/landing-page)
 * [Netlify Site Example](./examples/netlify-site-example)
