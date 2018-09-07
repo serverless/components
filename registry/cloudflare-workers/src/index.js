@@ -108,9 +108,8 @@ const removeRoute = async ({ route, zoneId }, context) => {
   if (success) {
     context.log(`✅  Route Disabled Successfully: ${route}`)
     return success
-  } else {
-    context.log(`❌  Route Removal Failed`)
   }
+  context.log(`❌  Route Removal Failed`)
   throw new Error(errors.map((e) => e.message).join('\n'))
 }
 
