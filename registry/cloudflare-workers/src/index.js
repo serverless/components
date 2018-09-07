@@ -125,7 +125,7 @@ const deployRoutes = async ({ route, scriptName, zoneId }, context) => {
 
   const { success: routeSuccess, result: routeResult, errors: routeErrors } = response
 
-  if (routeSuccess || !routeContainsFatalErorrs(routeErrors)) {
+  if (routeSuccess || !routeContainsFatalErrors(routeErrors)) {
     context.log(`✅  Routes Deployed ${route}`)
   } else {
     context.log(`❌  Fatal Error, Routes Not Deployed!`)
@@ -163,7 +163,7 @@ const deployWorker = async ({ accountId, scriptName, scriptPath }, context) => {
   return { workerDeploySuccess, workerResult, workerErrors }
 }
 
-const routeContainsFatalErorrs = (errors) => {
+const routeContainsFatalErrors = (errors) => {
   // suppress 10020 duplicate routes error
   // no need to show error when they are simply updating their script
   return errors.some((e) => e.code !== 10020)
@@ -187,7 +187,7 @@ const deploy = async (input, context) => {
 
   const updatedState = {
     ...outputs,
-    routeSuccess: routeSuccess || !routeContainsFatalErorrs(routeErrors),
+    routeSuccess: routeSuccess || !routeContainsFatalErrors(routeErrors),
     routeId: routeResult ? routeResult.id : context.state.routeId
   }
 
