@@ -12,7 +12,7 @@ const buildComponents = require('./buildComponents')
 const rootPath = __dirname
 const componentDirs = fs.readdirSync(rootPath)
 const npmCmd = os.platform().startsWith('win') ? 'npm.cmd' : 'npm'
-const concurrency = process.version.startsWith('v4') ? 8 : 0
+const concurrency = 0
 
 function installComponents() {
   return BbPromise.map(

@@ -1,0 +1,37 @@
+type: aws-sns-platform-endpoint
+version: 0.2.0
+core: 0.2.x
+
+description: "Provision AWS SNS Platform Endpoint with Serverless Components"
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
+
+inputTypes:
+  platformApplication:
+    type: string
+    required: true
+    description: The Arn of SNS platform application
+    displayName: SNS platform application Arn
+    example: arn:aws:sns:us-east-1:000000000000:app/GCM/some-application-name
+  token:
+    type: string
+    required: true
+    displayName: The device token for push notification
+    description: Unique id that is generated for an app in the device by the notification service
+    example: APA91bGi7fFachkC1xjlqT66VYEucGHochmf1VQAr9kererjsM0PKPxKhddCzx6paEsyay9Zn3D4wNUJb8m6HZrBEXAMPLE
+  attributes:
+    type: object
+    displayName: Endpoint attributes
+    description: Endpoint attributes, see https://docs.aws.amazon.com/sns/latest/api/API_SetEndpointAttributes.html
+    example:
+      Enabled: true
+  customUserData:
+    type: string
+    displayName: Custom User Data
+    description: User data to associate with the endpoint
+    example: SomeUserData
+outputTypes:
+  arn:
+    type: string
+    description: Endpoint Arn

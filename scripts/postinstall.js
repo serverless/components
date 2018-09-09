@@ -34,29 +34,6 @@ function trackInstall() {
   })
 }
 
-function installNode4Support() {
-  if (process.version.startsWith('v4')) {
-    console.log('Installing older Jest version to support tests for Node 4...')
-
-    return new BbPromise((resolve, reject) => {
-      const command = cp.spawn(
-        npmCmd,
-        ['install', '--save-dev', 'jest@21', 'babel-jest@21', 'jest-environment-node@21'],
-        {
-          env: process.env,
-          cwd: rootPath
-        }
-      )
-      command.stdout.on('data', (data) => {
-        console.log(data.toString())
-      })
-      command.stdout.on('close', () => resolve())
-      command.stdout.on('end', () => resolve())
-      command.stdout.on('error', (error) => reject(error))
-    })
-  }
-}
-
 function installRegistryDependencies() {
   return new BbPromise((resolve, reject) => {
     const command = cp.spawn(npmCmd, ['install'], {
@@ -76,6 +53,5 @@ function installRegistryDependencies() {
   return BbPromise.resolve()
     .then(build)
     .then(trackInstall)
-    .then(installNode4Support)
     .then(installRegistryDependencies)
 })()
