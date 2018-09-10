@@ -43,7 +43,7 @@ const _cfApiCall = async ({ url, method, contentType = null, body = null }) => {
   if (body) {
     options['body'] = body
   }
-  return await fetch(url, options).then((responseBody) => responseBody.json())
+  return fetch(url, options).then((responseBody) => responseBody.json())
 }
 
 // Cloudflare's script name for single script customers is their domain name
