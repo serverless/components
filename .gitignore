@@ -33,6 +33,7 @@ dist
 .eslintcache
 yarn.lock
 default.etcd
+workspace
 
 .serverlessrc
 .serverless

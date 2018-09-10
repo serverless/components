@@ -32,7 +32,7 @@ const generateContext = (
     instanceId,
     type,
     command,
-    updates: generateComponentDiffs(inputs, previousInputs),
+    changes: generateComponentDiffs(previousInputs, inputs),
     state: getState(stateFile, id),
     archive: getState(archive, id),
     children: getChildrenPromises(component, components),

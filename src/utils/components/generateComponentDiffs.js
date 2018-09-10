@@ -1,7 +1,7 @@
 /*
 * Generate Component Diffs
 * - Uses a modified version of https://github.com/flitbit/diff
-* - Not leveraging the pure OS library because we need to own the diff'ing experience.  It's an API component authors will rely on heavily.
+* - Not leveraging the pure OS library because we need to own the diff'ing experience.  It's an API which component authors may rely on greatly.
 * - API must stay consistent.
 * - Adds "inputs" as first path item for future-proofing.
 *  API:
@@ -357,11 +357,9 @@ function diffInputs(previous, current, prefilter, accum) {
 * Generate Component Diff
 */
 
-const generateComponentDiffs = (newInputs, previousInputs) => {
+const generateComponentDiffs = (previousInputs, newInputs) => {
   const inputDiffs = diffInputs(previousInputs, newInputs)
-  return {
-    inputs: inputDiffs || null
-  }
+  return inputDiffs || null
 }
 
 module.exports = generateComponentDiffs
