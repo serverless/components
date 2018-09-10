@@ -8,7 +8,8 @@
   },
   "dependencies": {
     "archiver": "^2.1.1",
-    "bluebird": "^3.5.1"
+    "bluebird": "^3.5.1",
+    "node-fetch": "^2.2.0"
   },
   "devDependencies": {
     "decompress": "^4.2.0",
