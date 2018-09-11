@@ -15,7 +15,7 @@ Find your auth key in the [Cloudflare Dashboard](https://dash.cloudflare.com/164
 
 ```
 export CLOUDFLARE_AUTH_KEY=YOUR_AUTH_KEY
-export CLOUDFLARE_EMAIL=you@example.com
+export CLOUDFLARE_AUTH_EMAIL=you@example.com
 ```
 
 <!-- AUTO-GENERATED-CONTENT:START (COMPONENT_INPUT_TYPES) -->

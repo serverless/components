@@ -20,14 +20,14 @@
 const fetch = require('node-fetch')
 const fs = require('fs')
 
-// API calls require environment variables CLOUDFLARE_AUTH_KEY and CLOUDFLARE_EMAIL
+// API calls require environment variables CLOUDFLARE_AUTH_KEY and CLOUDFLARE_AUTH_EMAIL
 // Your authentication key can be found on your Cloudflare dashboard
 const _cfApiCall = async ({ url, method, contentType = null, body = null }) => {
   const AUTH_KEY = process.env.CLOUDFLARE_AUTH_KEY
-  const EMAIL = process.env.CLOUDFLARE_EMAIL
+  const EMAIL = process.env.CLOUDFLARE_AUTH_EMAIL
   if (!AUTH_KEY || !EMAIL)
     return Promise.reject(
-      'Please make sure env variables "CLOUDFLARE_EMAIL" and ' +
+      'Please make sure env variables "CLOUDFLARE_AUTH_EMAIL" and ' +
         '"CLOUDFLARE_AUTH_KEY" are set before trying to deploy.'
     )
   let options = {

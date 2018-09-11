@@ -185,7 +185,7 @@ Also please do join the _Components_ channel on our public [Serverless-Contrib S
     * `export AWS_ACCESS_KEY_ID=my_access_key_id`
     * `export AWS_SECRET_ACCESS_KEY=my_secret_access_key`
     * `export CLOUDFLARE_AUTH_KEY=my_secret_auth_key`
-    * `export CLOUDFLARE_EMAIL=my_email@example.com`
+    * `export CLOUDFLARE_AUTH_EMAIL=my_email@example.com`
 
 Run commands with:
 
