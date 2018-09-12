@@ -1,0 +1,18 @@
+type: component
+name: landing-page
+version: 0.0.1
+
+dependencies:
+  dynamic-html: ./service
+
+components:
+  landingPageService:
+    type: dynamic-html
+    inputs:
+      memory: 512
+      timeout: 10
+      handler: code/handler.landingPageFunction
+      env:
+        MAILCHIMP_API_KEY: my-mailchimp-api-key
+        MAILCHIMP_LIST_ID: my-mailchimp-list-id
+        MAILCHIMP_REGION: us11

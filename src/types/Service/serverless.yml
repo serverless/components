@@ -1,0 +1,11 @@
+type: Component
+name: Service
+version: 1.0.0
+main: ./index.js
+
+providers: ${input.providers}
+
+inputTypes:
+  providers:
+    type: Object<string, Provider>
+    default: ${context.providers}

@@ -1,0 +1,16 @@
+name: Deploy
+type: Plugin
+version: 1.0.0
+main: ./index.js
+
+description: Plugin that provides the deploy command
+
+command: "deploy"
+options:
+  path:
+    option: "-p, --path [path]"
+    description: "The path to the target directory"
+  stage:
+    option: "-s, --stage [stage]"
+    description: "Set the stage"
+    default: "prod"

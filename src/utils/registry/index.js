@@ -1,7 +1,5 @@
-const getRegistryComponentsRoots = require('./getRegistryComponentsRoots')
-const getRegistryRoot = require('./getRegistryRoot')
-
-module.exports = {
-  getRegistryComponentsRoots,
-  getRegistryRoot
-}
+export { default as getRegistryComponentsRoots } from './getRegistryComponentsRoots'
+export { default as getRegistryRoot } from './getRegistryRoot'
+export { default as getRegistryUrl } from './getRegistryUrl'
+export { default as isSemver } from './isSemver'
+export { default as isSemverRange } from './isSemverRange'

@@ -1,0 +1,46 @@
+# you can directly use serverless v1 services and
+# components will deploy the service as part of the
+# components deployment
+
+type: service@1.29 # set the exact version of the framework you want to use based on component version
+service: dynamic-html
+
+app: myapp-dev
+tenant: my-tenant
+
+inputTypes:
+  memory:
+    type: number
+    required: true
+    displayName: Memory size
+    description: The functions memory size in Megabyte
+    example: 512
+  timeout:
+    type: number
+    required: true
+    displayName: Function timeout
+    description: The function execution time at which Lambda should terminate the function
+    example: 3
+
+outputTypes:
+  arn:
+    type: string
+    description: The Lambda functions arn
+    value: ${self.functions.landingPage.arn}
+
+# outputs:
+#   arn: ${self.functions.landingPage.arn}
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+
+functions:
+  landingPage:
+    handler: handler.landingPage
+    memory: ${inputs.memory}
+    timeout: ${inputs.timeout}
+    events:
+      - http:
+          method: get
+          path: /{proxy+}

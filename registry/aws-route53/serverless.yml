@@ -1,4 +1,5 @@
-type: aws-route53
+type: Component
+name: AwsRoute53
 version: 0.2.0
 core: 0.2.x
 

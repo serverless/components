@@ -1,8 +1,5 @@
-const { clone, isNil, isEmpty } = require('ramda')
-
-const utils = require('./utils')
-
-const {
+import { clone, isNil, isEmpty } from 'ramda'
+import {
   errorReporter,
   getComponentsFromStateFile,
   getComponentsFromServerlessFile,
@@ -17,7 +14,7 @@ const {
   handleSignalEvents,
   packageComponent
   // log
-} = utils
+} from './utils'
 
 const run = async (command, options) => {
   options.projectPath = options.projectPath || process.cwd()
@@ -94,4 +91,4 @@ const run = async (command, options) => {
   return components
 }
 
-module.exports = run
+export default run
