@@ -35,8 +35,8 @@ afterAll(() => {
   jest.restoreAllMocks()
 })
 
-describe('#${name}', () => {
-  it('should create a vpc', async () => {
+describe('AWS VPC Unit Tests', () => {
+  it('should create a new VPC', async () => {
     const contextMock = {
       state: {},
       log: () => {},
@@ -53,7 +53,7 @@ describe('#${name}', () => {
     expect(contextMock.saveState).toHaveBeenCalledTimes(1)
   })
 
-  it('should remove vpc', async () => {
+  it('should remove an existing VPC', async () => {
     const contextMock = {
       state: {
         vpcId: 'vpc-abbaabba'
@@ -71,7 +71,7 @@ describe('#${name}', () => {
     expect(contextMock.saveState).toHaveBeenCalledTimes(1)
   })
 
-  it('should update a vpc with new cidr', async () => {
+  it('should update the VPC with a new CIDR', async () => {
     const contextMock = {
       state: {
         vpcId: 'vpc-abbaabba',
