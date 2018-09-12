@@ -1,5 +1,3 @@
-const loadTypeMetaFromRegistry = async (registryQuery, context) => {
-
-}
+const loadTypeMetaFromRegistry = async (registryQuery, context) => {}
 
 export default loadTypeMetaFromRegistry

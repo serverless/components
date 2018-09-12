@@ -1,5 +1,3 @@
-const construct = (type, inputs, context) => {
-
-}
+const construct = (type, inputs, context) => {}
 
 export default construct

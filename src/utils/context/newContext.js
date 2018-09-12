@@ -13,10 +13,11 @@ const newContext = (props) => {
         ...context,
         ...value
       }),
-    set: (selector, value) => newContext({
-      ...context,
-      data: set(selector, value, context.data)
-    })
+    set: (selector, value) =>
+      newContext({
+        ...context,
+        data: set(selector, value, context.data)
+      })
   }
   return finalContext
 }

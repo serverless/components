@@ -3,13 +3,14 @@ import errorTypeMainNotFound from './errorTypeMainNotFound'
 import resolveTypeMain from './resolveTypeMain'
 import requireTypeMain from './requireTypeMain'
 
-
 const defType = async ({ root, type }, context) => {
   if (!isObject(type)) {
     throw new Error('defType expects an object witha type property that is an object')
   }
   if (!isString(type.name)) {
-    throw new Error(`Type declarations are expected to have a name. The type located at ${root} did not have one.`)
+    throw new Error(
+      `Type declarations are expected to have a name. The type located at ${root} did not have one.`
+    )
   }
 
   // check for type definition in cache
@@ -49,7 +50,6 @@ const defType = async ({ root, type }, context) => {
     throw errorTypeMainNotFound(name, typeRoot)
   }
 
-
   console.log('parentType:', parentType)
   console.log('finalType:', finalType)
   console.log('typeMain:', typeMain)
@@ -57,11 +57,7 @@ const defType = async ({ root, type }, context) => {
   console.log(`loaded type ${type.name} from ${root}`)
 
   // store type meta data in cache
-  context.cache = set(
-    'types.loaded',
-    assocProp(absoluteTypePath, typeMeta, cache),
-    context.cache
-  )
+  context.cache = set('types.loaded', assocProp(absoluteTypePath, typeMeta, cache), context.cache)
 
   return finalType
 }
