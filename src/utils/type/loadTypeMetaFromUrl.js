@@ -1,7 +1,6 @@
 import crypto from 'crypto'
 import path from 'path'
 import fse from 'fs-extra'
-// import download from 'download'
 
 import downloadType from './downloadType'
 import anyTypeFileExistsAtPath from './anyTypeFileExistsAtPath'
@@ -20,7 +19,6 @@ const loadTypeMetaFromUrl = async (url, context) => {
 
   if (!isDownloaded) {
     await fse.ensureDirAsync(downloadedTypePath)
-    // await download(url, downloadedTypePath, { extract: true })
     await downloadType(url, downloadedTypePath)
   }
 
