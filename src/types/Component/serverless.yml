@@ -1,0 +1,10 @@
+type: Object
+name: Component
+version: 1.0.0
+
+components: ${inputs.components}
+
+inputTypes:
+  components:
+    type: Object<string, Component>
+    default: {}

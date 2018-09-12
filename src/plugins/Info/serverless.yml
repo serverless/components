@@ -1,0 +1,16 @@
+name: Info
+type: Plugin
+version: 1.0.0
+main: ./index.js
+
+description: Plugin that provides the info command
+
+command: "info"
+options:
+  path:
+    option: "-p, --path [path]"
+    description: "The path to the target directory"
+  stage:
+    option: "-s, --stage [stage]"
+    description: "Set the stage"
+    default: "prod"

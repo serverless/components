@@ -4,10 +4,15 @@ if (!global._babelPolyfill) {
   require('babel-polyfill')
 }
 
-const run = require('./run')
+// eslint-disable-next-line global-require
+require('source-map-support/register')
+
+const run = require('./run').default
+const start = require('./start').default
 const commands = require('./commands')
 
 module.exports = {
   run,
+  start,
   ...commands
 }

@@ -1,0 +1,16 @@
+name: Remove
+type: Plugin
+version: 1.0.0
+main: ./index.js
+
+description: Plugin that provides the remove command
+
+command: "remove"
+options:
+  path:
+    option: "-p, --path [path]"
+    description: "The path to the target directory"
+  stage:
+    option: "-s, --stage [stage]"
+    description: "Set the stage"
+    default: "prod"

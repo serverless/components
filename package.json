@@ -28,19 +28,16 @@
     "test:appveyor": "jest --testPathPattern=\"bin|examples|registry|src\" --colors --forceExit",
     "docs": "node ./scripts/doc-gen.js",
     "postinstall": "node ./scripts/postinstall.js",
+    "prepare": "node ./scripts/prepare.js",
     "prepublishOnly": "node ./scripts/prepublish.js"
   },
   "dependencies": {
     "@octokit/rest": "^14.0.5",
-    "@serverless/utils": "0.0.2",
+    "@serverless/utils": "../utils",
     "analytics-node": "^3.2.0",
     "aws-sdk": "^2.214.1",
     "axios": "^0.17.1",
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.3",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-polyfill": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
     "bluebird": "^3.5.1",
     "chalk": "^2.3.2",
     "concordance": "^3.0.0",
@@ -57,12 +54,19 @@
     "ramda": "^0.25.0",
     "raml-validate": "^1.1.2",
     "raven": "^2.4.2",
+    "resolve": "^1.8.1",
     "s3-client": "^4.4.1",
     "semver": "^5.5.0",
+    "source-map-support": "^0.5.6",
     "url-regex": "^4.1.1"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
     "babel-jest": "^22.4.1",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-register": "^6.26.0",
     "eslint": "^4.18.1",
     "eslint-config-prettier": "^2.9.0",
     "eslint-plugin-import": "^2.9.0",
@@ -72,20 +76,6 @@
     "markdown-magic": "^0.1.21",
     "pre-commit": "^1.2.2",
     "prettier": "^1.12.1"
-  },
-  "jest": {
-    "coverageDirectory": "./coverage/",
-    "collectCoverage": true,
-    "testEnvironment": "node",
-    "setupFiles": [
-      "<rootDir>/.jest.init.js"
-    ]
-  },
-  "lint-staged": {
-    "*.js": [
-      "eslint --fix .",
-      "git add -A"
-    ]
   },
   "pre-commit": [
     "lint:staged"
