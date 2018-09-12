@@ -15,7 +15,7 @@ const defType = async ({ root, props }, context) => {
 
   // check for type definition in cache
   const cache = get('types.defs', context.cache)
-  let typeDef = get([ root ], cache)
+  let typeDef = get([root], cache)
   if (typeDef) {
     return typeDef
   }

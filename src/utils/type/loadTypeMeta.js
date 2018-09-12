@@ -1,10 +1,7 @@
 import { isUrl } from '@serverless/utils'
-import { memoizeWith } from 'ramda'
 import errorBadTypeQuery from './errorBadTypeQuery'
-import isGitUrl from './isGitUrl'
 import isTypeName from './isTypeName'
 import isTypeRegistryQuery from './isTypeRegistryQuery'
-import loadTypeMetaFromGitUrl from './loadTypeMetaFromGitUrl'
 import loadTypeMetaFromName from './loadTypeMetaFromName'
 import loadTypeMetaFromPath from './loadTypeMetaFromPath'
 import loadTypeMetaFromRegistry from './loadTypeMetaFromRegistry'
@@ -19,9 +16,7 @@ import loadTypeMetaFromUrl from './loadTypeMetaFromUrl'
  * }}
  */
 const loadTypeMeta = async (query, context) => {
-  if (isGitUrl(query)) {
-    return loadTypeMetaFromGitUrl(query, context)
-  } else if (isUrl(query)) {
+  if (isUrl(query)) {
     return loadTypeMetaFromUrl(query, context)
   } else if (isTypeRegistryQuery(query)) {
     return loadTypeMetaFromRegistry(query, context)
