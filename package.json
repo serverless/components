@@ -28,7 +28,8 @@
     "test:appveyor": "jest --testPathPattern=\"bin|examples|registry|src\" --colors --forceExit",
     "docs": "node ./scripts/doc-gen.js",
     "postinstall": "node ./scripts/postinstall.js",
-    "prepublishOnly": "node ./scripts/prepublish.js"
+    "prepublishOnly": "node ./scripts/prepublish.js",
+    "create:component": "node ./scripts/create-component.js"
   },
   "dependencies": {
     "@octokit/rest": "^14.0.5",
