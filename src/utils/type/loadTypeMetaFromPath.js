@@ -1,4 +1,4 @@
-import { assocProp, get, getProp, has, readFile, set } from '@serverless/utils'
+import { get, has, readFile, set } from '@serverless/utils'
 import { dirname, isAbsolute, resolve } from 'path'
 import errorTypeFileNotFound from './errorTypeFileNotFound'
 import findTypeFileAtPath from './findTypeFileAtPath'
@@ -8,7 +8,7 @@ import findTypeFileAtPath from './findTypeFileAtPath'
  * @param {*} context
  * @returns {{
  *   root: string,
- *   type: string
+ *   props: string
  * }}
  */
 const loadTypeMetaFromPath = async (typePath, context) => {
@@ -19,7 +19,7 @@ const loadTypeMetaFromPath = async (typePath, context) => {
 
   // check for type meta in cache
   const cache = get('types.meta', context.cache)
-  let typeMeta = getProp(absoluteTypePath, cache)
+  let typeMeta = get([ absoluteTypePath ], cache)
   if (typeMeta) {
     return typeMeta
   }
@@ -31,11 +31,11 @@ const loadTypeMetaFromPath = async (typePath, context) => {
   }
   typeMeta = {
     root: dirname(typeFilePath),
-    type: await readFile(typeFilePath)
+    props: await readFile(typeFilePath)
   }
 
   // store type meta data in cache
-  context.cache = set('types.meta', assocProp(absoluteTypePath, typeMeta, cache), context.cache)
+  context.cache = set('types.meta', set([ absoluteTypePath ], typeMeta, cache), context.cache)
   return typeMeta
 }
 
