@@ -35,6 +35,7 @@ module.exports = {
     'no-unused-vars': 'error',
     semi: ['error', 'never'],
     'object-shorthand': 'off',
-    'prettier/prettier': 'error'
+    'prettier/prettier': 'error',
+    'prefer-const': 'error'
   }
 }

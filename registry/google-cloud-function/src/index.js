@@ -390,7 +390,7 @@ const deploy = async (inputs, context) => {
       hasInputsChanged(componentData, inputsToUpdate)
     ) {
       context.log(`Updating Google Cloud Function: ${inputs.name}`)
-      let updateMask = componentData.keys || []
+      const updateMask = componentData.keys || []
       if (zipRes.sourceArchiveHash !== context.state.sourceArchiveHash) {
         updateMask.push('sourceArchiveUrl')
       }
@@ -421,7 +421,7 @@ const remove = async (inputs, context) => {
 const info = async (inputs, context) => {
   if (!context.state.name) return {}
 
-  let outputs = context.state
+  const outputs = context.state
   let resGet = {}
 
   try {

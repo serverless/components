@@ -29,7 +29,8 @@
     "docs": "node ./scripts/doc-gen.js",
     "postinstall": "node ./scripts/postinstall.js",
     "prepare": "node ./scripts/prepare.js",
-    "prepublishOnly": "node ./scripts/prepublish.js"
+    "prepublishOnly": "node ./scripts/prepublish.js",
+    "create:component": "node ./scripts/create-component.js"
   },
   "dependencies": {
     "@octokit/rest": "^14.0.5",

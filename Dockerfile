@@ -10,3 +10,7 @@ RUN apt-get update -y \
   && apt-get upgrade -y \
   && apt-get install -y nodejs build-essential \
   && npm install npm@latest -g
+
+# install Docker
+RUN curl -fsSL get.docker.com -o get-docker.sh
+RUN sh get-docker.sh

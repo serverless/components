@@ -1,7 +1,7 @@
 ![serverless components logo](https://s3.amazonaws.com/assets.github.serverless/serverless-components-readme-2.gif)
 
-[We're Hiring!](https://serverless.com/company/jobs/) • 
-[Newsletter](http://eepurl.com/b8dv4P) • [Forum](http://forum.serverless.com) • [Meetups](https://github.com/serverless/meetups) • [Twitter](https://twitter.com/goserverless) 
+[We're Hiring!](https://serverless.com/company/jobs/) •
+[Newsletter](http://eepurl.com/b8dv4P) • [Forum](http://forum.serverless.com) • [Meetups](https://github.com/serverless/meetups) • [Twitter](https://twitter.com/goserverless)
 
 ## Overview
 
@@ -154,7 +154,11 @@ Also please do join the _Components_ channel on our public [Serverless-Contrib S
     * [aws-lambda](./registry/aws-lambda)
     * [aws-route53](./registry/aws-route53)
     * [aws-s3-bucket](./registry/aws-s3-bucket)
+    * [aws-sns-platform-application](./registry/aws-sns-platform-application)
+    * [aws-sns-platform-endpoint](./registry/aws-sns-platform-endpoint)
+    * [aws-sns-subscription](./registry/aws-sns-subscription)
     * [aws-sns-topic](./registry/aws-sns-topic)
+    * [docker-image](./registry/docker-image)
     * [eventgateway](./registry/eventgateway)
     * [github-webhook](./registry/github-webhook)
     * [github-webhook-aws](./registry/github-webhook-aws)
