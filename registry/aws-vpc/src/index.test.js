@@ -10,7 +10,14 @@ jest.mock('aws-sdk', () => {
         instanceTenancy: 'default'
       }
     })),
-    deleteVpcMock: jest.fn()
+    deleteVpcMock: jest.fn(({ VpcId }) => {
+      if (VpcId === 'vpc-not-abba') {
+        throw new Error(`The vpc ID 'vpc-not-abba' does not exist`)
+      } else if (VpcId === 'vpc-error') {
+        throw new Error('Something went wrong')
+      }
+      return {}
+    })
   }
 
   const EC2 = {
@@ -69,6 +76,47 @@ describe('AWS VPC Unit Tests', () => {
     expect(AWS.mocks.createVpcMock).toHaveBeenCalledTimes(0)
     expect(AWS.mocks.deleteVpcMock).toHaveBeenCalledTimes(1)
     expect(contextMock.saveState).toHaveBeenCalledTimes(1)
+  })
+
+  it("should not error if vpc doesn't exists when removing", async () => {
+    const contextMock = {
+      state: {
+        vpcId: 'vpc-not-abba'
+      },
+      log: () => {},
+      saveState: jest.fn()
+    }
+
+    const inputs = {}
+
+    await awsVpcComponent.remove(inputs, contextMock)
+
+    expect(AWS.mocks.createVpcMock).toHaveBeenCalledTimes(0)
+    expect(AWS.mocks.deleteVpcMock).toHaveBeenCalledTimes(1)
+    expect(contextMock.saveState).toHaveBeenCalledTimes(1)
+  })
+
+  it("should not error if vpc doesn't exists when removing", async () => {
+    const contextMock = {
+      state: {
+        vpcId: 'vpc-error'
+      },
+      log: () => {},
+      saveState: jest.fn()
+    }
+
+    const inputs = {}
+
+    let response
+    try {
+      response = await awsVpcComponent.remove(inputs, contextMock)
+    } catch (exception) {
+      expect(exception.message).toBe('Something went wrong')
+    }
+    expect(response).toBeUndefined()
+    expect(AWS.mocks.createVpcMock).toHaveBeenCalledTimes(0)
+    expect(AWS.mocks.deleteVpcMock).toHaveBeenCalledTimes(1)
+    expect(contextMock.saveState).toHaveBeenCalledTimes(0)
   })
 
   it('should update the VPC with a new CIDR', async () => {

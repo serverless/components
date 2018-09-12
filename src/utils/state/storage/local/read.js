@@ -8,6 +8,6 @@ module.exports = async (config) => {
   if (!(await fileExists(stateFilePath))) {
     return {}
   }
-  let content = await readFile(stateFilePath)
+  const content = await readFile(stateFilePath)
   return content
 }

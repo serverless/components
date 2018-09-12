@@ -45,13 +45,19 @@ const deploy = async (inputs, context) => {
 const remove = async (inputs, context) => {
   const { state } = context
   context.log(`Removing VPC: "${state.vpcId}"`)
-  await ec2
-    .deleteVpc({
-      VpcId: state.vpcId
-    })
-    .promise()
-  context.saveState({})
+  try {
+    await ec2
+      .deleteVpc({
+        VpcId: state.vpcId
+      })
+      .promise()
+  } catch (exception) {
+    if (exception.message !== `The vpc ID '${state.vpcId}' does not exist`) {
+      throw exception
+    }
+  }
   context.log(`VPC removed`)
+  context.saveState({})
   return {}
 }
 module.exports = {
