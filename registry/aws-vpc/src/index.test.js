@@ -3,17 +3,19 @@ const awsVpcComponent = require('./index')
 
 jest.mock('aws-sdk', () => {
   const mocks = {
-    createVpcMock: jest.fn(),
-    createDefaultVpcMock: jest.fn(),
+    createVpcMock: jest.fn(() => ({
+      Vpc: {
+        VpcId: 'vpc-abbaabba',
+        CidrBlock: '10.0.0.0/16',
+        instanceTenancy: 'default'
+      }
+    })),
     deleteVpcMock: jest.fn()
   }
 
   const EC2 = {
     createVpc: (obj) => ({
       promise: () => mocks.createVpcMock(obj)
-    }),
-    createDefaultVpc: (obj) => ({
-      promise: () => mocks.createDefaultVpcMock(obj)
     }),
     deleteVpc: (obj) => ({
       promise: () => mocks.deleteVpcMock(obj)
@@ -34,8 +36,84 @@ afterAll(() => {
 })
 
 describe('#${name}', () => {
-  it('should have tests', async () => {
-    const { vpcId } = await awsVpcComponent.deploy()
-    expect(vpcId).toBe(undefined)
+  it('should create a vpc', async () => {
+    const contextMock = {
+      state: {},
+      log: () => {},
+      saveState: jest.fn()
+    }
+
+    const inputs = {}
+
+    const { vpcId } = await awsVpcComponent.deploy(inputs, contextMock)
+
+    expect(vpcId).toBe('vpc-abbaabba')
+    expect(AWS.mocks.createVpcMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.deleteVpcMock).toHaveBeenCalledTimes(0)
+    expect(contextMock.saveState).toHaveBeenCalledTimes(1)
+  })
+
+  it('should remove vpc', async () => {
+    const contextMock = {
+      state: {
+        vpcId: 'vpc-abbaabba'
+      },
+      log: () => {},
+      saveState: jest.fn()
+    }
+
+    const inputs = {}
+
+    await awsVpcComponent.remove(inputs, contextMock)
+
+    expect(AWS.mocks.createVpcMock).toHaveBeenCalledTimes(0)
+    expect(AWS.mocks.deleteVpcMock).toHaveBeenCalledTimes(1)
+    expect(contextMock.saveState).toHaveBeenCalledTimes(1)
+  })
+
+  it('should update a vpc with new cidr', async () => {
+    const contextMock = {
+      state: {
+        vpcId: 'vpc-abbaabba',
+        cidrBlock: '10.0.0.0/20'
+      },
+      log: () => {},
+      saveState: jest.fn()
+    }
+
+    const inputs = {}
+
+    const { vpcId } = await awsVpcComponent.deploy(inputs, contextMock)
+
+    expect(vpcId).toBe('vpc-abbaabba')
+    expect(contextMock.state.cidrBlock).toBe('10.0.0.0/20')
+    expect(AWS.mocks.createVpcMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.deleteVpcMock).toHaveBeenCalledTimes(1)
+    expect(contextMock.saveState).toHaveBeenCalledTimes(2)
+  })
+
+  it('should ignore when nothing is changed', async () => {
+    const contextMock = {
+      state: {
+        vpcId: 'vpc-abbaabba',
+        cidrBlock: '10.0.0.0/20',
+        amazonProvidedIpv6CidrBlock: true,
+        instanceTenancy: 'default'
+      },
+      log: () => {},
+      saveState: jest.fn()
+    }
+
+    const inputs = {
+      cidrBlock: '10.0.0.0/20',
+      amazonProvidedIpv6CidrBlock: true,
+      instanceTenancy: 'default'
+    }
+
+    const { vpcId } = await awsVpcComponent.deploy(inputs, contextMock)
+    expect(vpcId).toBe('vpc-abbaabba')
+    expect(AWS.mocks.createVpcMock).toHaveBeenCalledTimes(0)
+    expect(AWS.mocks.deleteVpcMock).toHaveBeenCalledTimes(0)
+    expect(contextMock.saveState).toHaveBeenCalledTimes(0)
   })
 })
