@@ -3,7 +3,7 @@
  * @param {*} context
  * @returns {{
  *   root: string,
- *   type: string
+ *   props: string
  * }}
  */
 const loadTypeMetaFromRegistry = async (registryQuery, context) => {}

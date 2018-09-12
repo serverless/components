@@ -18,7 +18,7 @@ const NATIVE_NAMES = {
  * @param {*} context
  * @returns {{
  *   root: string,
- *   type: string
+ *   props: string
  * }}
  */
 const loadTypeMetaFromName = async (typeName, context) => {
