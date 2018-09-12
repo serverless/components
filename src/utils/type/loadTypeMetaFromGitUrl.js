@@ -1,5 +1,5 @@
 /**
- * @param {string} gitUrl the file path to look for a serverless config file
+ * @param {string} gitUrl the git url to download the type from
  * @param {*} context
  * @returns {{
  *   root: string,
