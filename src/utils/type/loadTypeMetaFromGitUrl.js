@@ -6,8 +6,6 @@
  *   type: string
  * }}
  */
-const loadTypeMetaFromGitUrl = async (gitUrl, context) => {
-
-}
+const loadTypeMetaFromGitUrl = async (gitUrl, context) => {}
 
 export default loadTypeMetaFromGitUrl

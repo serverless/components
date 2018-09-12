@@ -9,7 +9,7 @@ const start = async () => {
 
   try {
     await run(command, options)
-  } catch(error) {
+  } catch (error) {
     console.error(error)
     process.exit(1)
   }

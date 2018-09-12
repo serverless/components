@@ -35,11 +35,7 @@ const loadTypeMetaFromPath = async (typePath, context) => {
   }
 
   // store type meta data in cache
-  context.cache = set(
-    'types.meta',
-    assocProp(absoluteTypePath, typeMeta, cache),
-    context.cache
-  )
+  context.cache = set('types.meta', assocProp(absoluteTypePath, typeMeta, cache), context.cache)
   return typeMeta
 }
 

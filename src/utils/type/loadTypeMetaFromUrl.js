@@ -1,5 +1,3 @@
-const loadTypeMetaFromUrl = async (url, context) => {
-
-}
+const loadTypeMetaFromUrl = async (url, context) => {}
 
 export default loadTypeMetaFromUrl

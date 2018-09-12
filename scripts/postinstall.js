@@ -19,6 +19,5 @@ function trackInstall() {
 }
 
 ;(() => {
-  return BbPromise.resolve()
-    .then(trackInstall)
+  return BbPromise.resolve().then(trackInstall)
 })()
