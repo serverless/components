@@ -54,21 +54,55 @@ const readMeTemplate = `<!-- AUTO-GENERATED-CONTENT:START (COMPONENT_HEADER) -->
 <!-- AUTO-GENERATED-CONTENT:END -->
 `
 
+const indexTemplate = `// ${name}
+
+const deploy = async () => {
+  return {}
+}
+
+const remove = async () => {
+  return {}
+}
+
+module.exports = {
+  deploy,
+  remove
+}
+`
+
+const indexTestTemplate = `// ${name}
+
+describe('#${name}', () => {
+  it('should have tests', async () => {
+    expect(false).toBe(true)
+  })
+})
+`
+
 const run = async () => {
   if (await fs.exists(directory)) {
     throw new Error(`Component "${name}" already exists.`)
   }
   await fs.ensureDir(directory)
-  await fs.writeJson(path.join(directory, 'package.json'), packageJsonTemplate, {
-    encoding: 'utf8',
-    spaces: 2
-  })
-  await fs.writeFile(path.join(directory, 'serverless.yml'), serverlessYmlTemplate, {
-    encoding: 'utf8'
-  })
-  await fs.writeFile(path.join(directory, 'README.md'), readMeTemplate, {
-    encoding: 'utf8'
-  })
+  await fs.ensureDir(path.join(directory, 'src'))
+  await Promise.all([
+    fs.writeJson(path.join(directory, 'package.json'), packageJsonTemplate, {
+      encoding: 'utf8',
+      spaces: 2
+    }),
+    fs.writeFile(path.join(directory, 'serverless.yml'), serverlessYmlTemplate, {
+      encoding: 'utf8'
+    }),
+    fs.writeFile(path.join(directory, 'README.md'), readMeTemplate, {
+      encoding: 'utf8'
+    }),
+    fs.writeFile(path.join(directory, 'src', 'index.js'), indexTemplate, {
+      encoding: 'utf8'
+    }),
+    fs.writeFile(path.join(directory, 'src', 'index.test.js'), indexTestTemplate, {
+      encoding: 'utf8'
+    })
+  ])
 }
 
 run().catch((error) => {
