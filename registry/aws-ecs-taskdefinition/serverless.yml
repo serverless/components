@@ -1,0 +1,68 @@
+type: aws-ecs-taskdefinition
+version: 0.2.0
+core: 0.2.x
+
+description: "Provision AWS ECS TaskDefinition with Serverless Components"
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
+
+inputTypes:
+  family:
+    type: string
+    required: true
+  cpu:
+    type: integer
+    required: false
+  memory:
+    type: integer
+    required: false
+  networkMode:
+    type: string
+    required: false
+    enum: [none, bridge, awsvpc, host]
+  requiresCompatibilities:
+    type: array
+    required: false
+  executionRoleArn:
+    type: string
+    required: false
+  taskRoleArn:
+    type: string
+    required: false
+  containerDefinitions:
+    type: object
+    required: false
+
+outputTypes:
+  taskDefinitionArn:
+    type: string
+  containerDescriptions:
+    type: array
+  family:
+    type: string
+  taskRoleArn:
+    type: string
+  executionRoleArn:
+    type: string
+  networkMode:
+    type: string
+  revisions:
+    type: integer
+  volumes:
+    type: array
+  status:
+    type: string
+  requiresAttributes:
+    type: string
+  placementConstraints:
+    type: string
+  compatibilities:
+    type: string
+  requiresCompatibilities:
+    type: string
+  cpu:
+    type: string
+  memory:
+    type: string
+
