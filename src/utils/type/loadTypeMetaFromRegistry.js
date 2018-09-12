@@ -1,11 +1,9 @@
-/**
- * @param {string} registryQuery the registry query to search for a type (foo@1.2.3)
- * @param {*} context
- * @returns {{
- *   root: string,
- *   props: string
- * }}
- */
-const loadTypeMetaFromRegistry = async (registryQuery, context) => {}
+import getRegistryBucketRoot from './getRegistryBucketRoot'
+import loadTypeMetaFromUrl from './loadTypeMetaFromUrl'
+
+const loadTypeMetaFromRegistry = async (registryQuery, context) => {
+  const url = `${getRegistryBucketRoot()}/${registryQuery}.zip`
+  return loadTypeMetaFromUrl(url, context)
+}
 
 export default loadTypeMetaFromRegistry

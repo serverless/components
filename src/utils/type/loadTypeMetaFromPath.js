@@ -1,4 +1,4 @@
-import { get, has, readFile, set } from '@serverless/utils'
+import { get, readFile, set } from '@serverless/utils'
 import { dirname, isAbsolute, resolve } from 'path'
 import errorTypeFileNotFound from './errorTypeFileNotFound'
 import findTypeFileAtPath from './findTypeFileAtPath'
@@ -19,7 +19,7 @@ const loadTypeMetaFromPath = async (typePath, context) => {
 
   // check for type meta in cache
   const cache = get('types.meta', context.cache)
-  let typeMeta = get([ absoluteTypePath ], cache)
+  let typeMeta = get([absoluteTypePath], cache)
   if (typeMeta) {
     return typeMeta
   }
@@ -35,7 +35,7 @@ const loadTypeMetaFromPath = async (typePath, context) => {
   }
 
   // store type meta data in cache
-  context.cache = set('types.meta', set([ absoluteTypePath ], typeMeta, cache), context.cache)
+  context.cache = set('types.meta', set([absoluteTypePath], typeMeta, cache), context.cache)
   return typeMeta
 }
 
