@@ -1,0 +1,34 @@
+---
+type: aws-vpc
+version: 0.2.0
+core: 0.2.x
+
+description: "Provision AWS VPC with serverless components"
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
+
+inputTypes:
+  cidrBlock:
+    type: string
+    displayName: CIDR Block
+    description: CIDR Block for the VPC
+    example: "10.0.0.0/16"
+    default: "10.0.0.0/16"
+  amazonProvidedIpv6CidrBlock:
+    type: boolean
+    displayName: Amazon Provided Ipv6 CIDR Block
+    description: CIDR Block for the VPC
+    example: true
+    default: false
+  instanceTenancy:
+    type: string
+    displayName: Instance Tenancy
+    description: Instance Tenancy, possible values default, dedicated or host.
+    example: default
+    default: default
+
+outputTypes:
+  vpcId:
+    type: string
+    description: VPC id
