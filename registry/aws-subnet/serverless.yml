@@ -1,0 +1,37 @@
+---
+type: aws-subnet
+version: 0.2.0
+core: 0.2.x
+
+description: "My component description"
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
+
+inputTypes:
+  vpcId:
+    type: string
+    displayName: The id of the VPC
+    description: The id of the VPC
+    example: us-east-1a
+  availabilityZone:
+    type: string
+    displayName: Availability Zone
+    description: Availability Zone for the Subnet
+    example: us-east-1a
+  cidrBlock:
+    type: string
+    displayName: IPv6CIDR Block
+    description: CIDR Block for the Subnet
+    example: "10.0.0.0/24"
+    default: "10.0.0.0/24"
+  ipv6CidrBlock:
+    type: string
+    displayName: IPv6 CIDR Block
+    description: IPv6 CIDR Block for the Subnet
+    example: "2600:1f18:24c2:b200::/64"
+
+outputTypes:
+  subnetId:
+    type: string
+    description: Subnet id
