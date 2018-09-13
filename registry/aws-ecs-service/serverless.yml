@@ -1,0 +1,80 @@
+type: aws-ecs-service
+version: 0.2.0
+core: 0.2.x
+
+description: "Provision AWS ECS Service with Serverless Components"
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
+
+inputTypes:
+  serviceName:
+    type: string
+    required: true
+  cluster:
+    type: integer
+    required: false
+  launchType:
+    type: string
+    required: false
+    enum: [EC2, FARGATE]
+  deploymentConfiguration:
+    type: object
+    required: false
+  desiredCount:
+    type: integer
+    required: false
+  networkConfiguration:
+    type: object
+    required: false
+  taskDefinitions:
+    type: aws-ecs-taskdefinition | object
+    required: false
+  loadBalancers:
+    type: array
+    required: false
+
+outputTypes:
+  servicearn:
+    type: string
+  serviceName:
+    type: array
+  clusterArn:
+    type: string
+  loadBalancers:
+    type: array
+  serviceRegisteries:
+    type: string
+  status:
+    type: string
+  desiredCount:
+    type: integer
+  runningCount:
+    type: integer
+  pendingCount:
+    type: integer
+  launchType:
+    type: string
+  platformVersion:
+    type: string
+  taskDefinition:
+    type: string
+  deploymentConfiguration:
+    type: object
+  deployments:
+    type: array
+  roleArn:
+    type: string
+  createdAt:
+    type: integer
+  placementConstraints:
+    type: array
+  placementStrategy:
+    type: array
+  networkConfiguration:
+    type: object
+  healthCheckGracePeriodSeconds:
+    type: integers
+  schedulingStrategy:
+    type: string
+
