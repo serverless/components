@@ -3,7 +3,7 @@ type: aws-subnet
 version: 0.2.0
 core: 0.2.x
 
-description: "My component description"
+description: "Provision AWS Subnet with Serverless Components"
 license: Apache-2.0
 author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
 repository: "github:serverless/components"
@@ -13,12 +13,14 @@ inputTypes:
     type: string
     displayName: The id of the VPC
     description: The id of the VPC
-    example: us-east-1a
+    example: vpc-abbaabba
+    required: true
   availabilityZone:
     type: string
     displayName: Availability Zone
     description: Availability Zone for the Subnet
     example: us-east-1a
+    required: true
   cidrBlock:
     type: string
     displayName: IPv6CIDR Block
