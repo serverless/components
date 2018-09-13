@@ -40,7 +40,7 @@ const get = async (inputs, context) => {
 
   const outputs = await new Promise((resolve, reject) =>
     ecs.describeServices({ services: [state.serviceName] }, (err, data) => {
-      err ? reject(err) : resolve(data.services && data.services.shift())
+      err ? reject(err) : resolve(Array.isArray(data.services) && data.services.shift())
     })
   )
     .catch(context.log)
