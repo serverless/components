@@ -162,6 +162,7 @@ Also please do join the _Components_ channel on our public [Serverless-Contrib S
     * [eventgateway](./registry/eventgateway)
     * [github-webhook](./registry/github-webhook)
     * [github-webhook-aws](./registry/github-webhook-aws)
+    * [google-cloud-function](./registry/google-cloud-function)
     * [mustache](./registry/mustache)
     * [netlify-site](./registry/netlify-site)
     * [rest-api](./registry/rest-api)

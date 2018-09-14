@@ -1,10 +1,13 @@
+const fs = require('fs')
 const path = require('path')
 const crypto = require('crypto')
-const fs = require('fs-extra')
 const os = require('os')
+const BbPromise = require('bluebird')
 const archiver = require('archiver')
 
-const pack = async (packagePath, tempPath) => {
+const fsp = BbPromise.promisifyAll(fs)
+
+async function pack(packagePath, tempPath) {
   // Set defaults
   tempPath = tempPath || os.tmpdir()
 
@@ -30,14 +33,18 @@ const pack = async (packagePath, tempPath) => {
       archive.finalize()
     })
     archive.on('error', (err) => reject(err))
-    output.on('close', () => {
+    output.on('close', async () => {
       try {
-        const zipContents = fs.readFileSync(outputFilePath)
+        const zipContents = await fsp.readFileAsync(outputFilePath)
         const outputFileHash = crypto
           .createHash('sha256')
           .update(zipContents)
           .digest('base64')
-        resolve([outputFileName, outputFilePath, outputFileHash])
+        resolve({
+          fileName: outputFileName,
+          filePath: outputFilePath,
+          hash: outputFileHash
+        })
       } catch (e) {
         reject(e)
       }

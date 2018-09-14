@@ -11,6 +11,7 @@ services:
     volumes:
       - .:/app
       - ~/.aws/:/root/.aws
+      - ~/.gcloud/:/root/.gcloud
       - ~/.gitconfig:/root/.gitconfig
       # run Docker in Docker...
       - /var/run/docker.sock:/var/run/docker.sock
