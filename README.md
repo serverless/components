@@ -167,6 +167,8 @@ Also please do join the _Components_ channel on our public [Serverless-Contrib S
     * [s3-uploader](./registry/s3-uploader)
     * [s3-website-config](./registry/s3-website-config)
     * [static-website](./registry/static-website)
+    * [twilio-application](./registry/twilio-application)
+    * [twilio-phone-number](./registry/twilio-phone-number)
 * [Examples](#examples)
   * [Basic Lambda Example](./examples/basic)
   * [Blog Example](./examples/blog)
