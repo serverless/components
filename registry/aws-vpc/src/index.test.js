@@ -133,7 +133,7 @@ describe('AWS VPC Unit Tests', () => {
     expect(contextMock.saveState).toHaveBeenCalledTimes(1)
   })
 
-  it("should not error if vpc doesn't exists when removing", async () => {
+  it('should throw an error', async () => {
     const contextMock = {
       state: {
         vpcId: 'vpc-error'
