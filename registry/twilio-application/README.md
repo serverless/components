@@ -1,11 +1,12 @@
 <!-- AUTO-GENERATED-CONTENT:START (COMPONENT_HEADER) -->
 # Twilio Application
+
+Provision Twilio Applications with Serverless Components
 <!-- AUTO-GENERATED-CONTENT:END -->
 
 <!-- AUTO-GENERATED-CONTENT:START (TOC) -->
 - [Input Types](#input-types)
 - [Output Types](#output-types)
-- [Example](#example)
 <!-- AUTO-GENERATED-CONTENT:END -->
 
 <!-- AUTO-GENERATED-CONTENT:START (COMPONENT_INPUT_TYPES) -->
@@ -59,20 +60,3 @@
 
 <!-- AUTO-GENERATED-CONTENT:END -->
 
-<!-- AUTO-GENERATED-CONTENT:START (COMPONENT_EXAMPLES) -->
-## Example
-```yml
-type: my-application
-components:
-  myAzureStorageBlob:
-    type: azure-storage-blob
-    inputs:
-      description: The blob is for web contents
-      name: 'stor${self.serviceId}'
-      blobContainer: contents
-      resourceGroup: serverless-rg
-      subscriptionId: 38ee4b45-d54e-451e-bdff-d08b951f32ae
-      directoryId: qwertyuiop.onmicrosoft.com
-
-```
-<!-- AUTO-GENERATED-CONTENT:END -->
