@@ -5,6 +5,7 @@ jest.mock('twilio')
 
 const expectedOutputs = {
   accountSid: 'accountSid',
+  authToken: 'authToken',
   addressRequirements: 'addressRequirements',
   addressSid: 'addressSid',
   apiVersion: 'apiVersion',
@@ -96,22 +97,22 @@ describe('twilio-phone-number unit tests', () => {
     }
 
     const expectedParams = {
-      friendlyName: 'friendlyName',
-      phoneNumber: 'phoneNumber',
-      areaCode: 'areaCode',
-      trunkSid: 'trunkSid',
       addressSid: 'addressSid',
+      areaCode: 'areaCode',
+      friendlyName: 'friendlyName',
       messageStatusCallback: 'messageStatusCallback',
+      phoneNumber: 'phoneNumber',
+      smsApplicationSid: 'smsApplicationSid',
       smsFallbackMethod: 'smsFallbackMethod',
       smsFallbackUrl: 'smsFallbackUrl',
       smsMethod: 'smsMethod',
       smsStatusCallback: 'smsStatusCallback',
       smsUrl: 'smsUrl',
-      smsApplicationSid: 'smsApplicationSid',
       statusCallback: 'statusCallback',
       statusCallbackMethod: 'statusCallbackMethod',
-      voiceCallerIdLookup: 'voiceCallerIdLookup',
+      trunkSid: 'trunkSid',
       voiceApplicationSid: 'voiceApplicationSid',
+      voiceCallerIdLookup: 'voiceCallerIdLookup',
       voiceFallbackMethod: 'voiceFallbackMethod',
       voiceFallbackUrl: 'voiceFallbackUrl',
       voiceMethod: 'voiceMethod',

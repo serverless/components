@@ -88,6 +88,7 @@ const deploy = async (inputs, context) => {
       sid
     })
   }
+  outputs.authToken = inputs.authToken
   context.saveState({ ...outputs })
   return outputs
 }
