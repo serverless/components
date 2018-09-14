@@ -19,7 +19,7 @@ const deploy = async (inputs, context) => {
   // any changes to vpc requires replacement
   if (!isEmpty(state) && !compareStateAndInputs(state, inputs)) {
     context.log(`Changes to existing VPC requires replacement`)
-    remove(state, context) // because of the dependecies, vpc must be removed asynchronously
+    remove(state, context) // because of the dependencies, VPC must be removed asynchronously
   }
   context.log(`Creating a VPC`)
   const { Vpc } = await ec2

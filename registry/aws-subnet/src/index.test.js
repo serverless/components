@@ -3,16 +3,14 @@ const awsSubnetComponent = require('./index')
 
 jest.mock('aws-sdk', () => {
   const mocks = {
-    createVpcMock: jest.fn(() => ({
-      Vpc: {
-        VpcId: 'vpc-abbaabba',
-        CidrBlock: '10.0.0.0/16',
-        instanceTenancy: 'default'
+    createSubnetMock: jest.fn(() => ({
+      Subnet: {
+        SubnetId: 'subnet-abbaabba'
       }
     })),
-    deleteVpcMock: jest.fn(({ VpcId }) => {
+    deleteSubnetMock: jest.fn(({ VpcId }) => {
       if (VpcId === 'vpc-not-abba') {
-        throw new Error(`The vpc ID 'vpc-not-abba' does not exist`)
+        throw new Error(`The subnet ID 'subnet-not-abba' does not exist`)
       } else if (VpcId === 'vpc-error') {
         throw new Error('Something went wrong')
       }
@@ -21,11 +19,11 @@ jest.mock('aws-sdk', () => {
   }
 
   const EC2 = {
-    createVpc: (obj) => ({
-      promise: () => mocks.createVpcMock(obj)
+    createSubnet: (obj) => ({
+      promise: () => mocks.createSubnetMock(obj)
     }),
-    deleteVpc: (obj) => ({
-      promise: () => mocks.deleteVpcMock(obj)
+    deleteSubnet: (obj) => ({
+      promise: () => mocks.deleteSubnetMock(obj)
     })
   }
   return {
@@ -42,8 +40,64 @@ afterAll(() => {
   jest.restoreAllMocks()
 })
 
-describe('#aws-subnet', () => {
-  it('should have tests', async () => {
-    expect(await awsSubnetComponent.deploy()).toEqual({})
+describe('AWS Subnet Unit Tests', () => {
+  it('should create a new subnet', async () => {
+    const contextMock = {
+      state: {},
+      log: () => {},
+      saveState: jest.fn()
+    }
+
+    const inputs = {
+      vpcId: 'vpc-abbaabba',
+      availabilityZone: 'us-east-1a'
+    }
+
+    const { subnetId } = await awsSubnetComponent.deploy(inputs, contextMock)
+    expect(subnetId).toBe('subnet-abbaabba')
+    expect(AWS.mocks.createSubnetMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.deleteSubnetMock).toHaveBeenCalledTimes(0)
+    expect(contextMock.saveState).toHaveBeenCalledTimes(1)
+  })
+
+  it('should remove the subnet', async () => {
+    const contextMock = {
+      state: { subnetId: 'subnet-abbaabba' },
+      log: () => {},
+      saveState: jest.fn()
+    }
+
+    const inputs = {
+      vpcId: 'vpc-abbaabba',
+      availabilityZone: 'us-east-1a'
+    }
+
+    await awsSubnetComponent.remove(inputs, contextMock)
+    expect(AWS.mocks.createSubnetMock).toHaveBeenCalledTimes(0)
+    expect(AWS.mocks.deleteSubnetMock).toHaveBeenCalledTimes(1)
+    expect(contextMock.saveState).toHaveBeenCalledTimes(1)
+  })
+
+  it('should update an existing ubnet', async () => {
+    const contextMock = {
+      state: {
+        subnetId: 'subnet-abbaabba',
+        vpcId: 'vpc-abbaabba',
+        availabilityZone: 'us-east-1a'
+      },
+      log: () => {},
+      saveState: jest.fn()
+    }
+
+    const inputs = {
+      vpcId: 'vpc-abbaabba',
+      availabilityZone: 'us-east-1b'
+    }
+
+    const { subnetId } = await awsSubnetComponent.deploy(inputs, contextMock)
+    expect(subnetId).toBe('subnet-abbaabba')
+    expect(AWS.mocks.createSubnetMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.deleteSubnetMock).toHaveBeenCalledTimes(1)
+    expect(contextMock.saveState).toHaveBeenCalledTimes(2)
   })
 })
