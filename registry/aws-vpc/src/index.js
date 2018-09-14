@@ -1,6 +1,8 @@
 const AWS = require('aws-sdk')
 const { equals, isEmpty, omit } = require('ramda')
 
+const sleep = require('./sleep')
+
 const ec2 = new AWS.EC2({
   region: process.env.AWS_DEFAULT_REGION || 'us-east-1'
 })
@@ -11,7 +13,7 @@ const compareStateAndInputs = (state, inputs) => {
 
 const deploy = async (inputs, context) => {
   const { state } = context
-  if (compareStateAndInputs(state, inputs)) {
+  if (!isEmpty(state) && compareStateAndInputs(state, inputs)) {
     return { vpcId: state.vpcId }
   }
   // any changes to vpc requires replacement
@@ -44,10 +46,16 @@ const deploy = async (inputs, context) => {
 
 const describeSubnets = (vpcId, context) =>
   ec2
-    .describeSubnets()
+    .describeSubnets({
+      Filters: [
+        {
+          Name: 'vpc-id',
+          Values: [vpcId]
+        }
+      ]
+    })
     .promise()
-    .then(({ Subnets }) => Subnets.filter(({ VpcId }) => VpcId === vpcId))
-    .then((subnets) => {
+    .then(({ Subnets: subnets }) => {
       const ready = subnets.length === 0
       if (!ready) {
         context.log(
@@ -56,8 +64,6 @@ const describeSubnets = (vpcId, context) =>
       }
       return ready
     })
-
-const sleep = (time) => new Promise((resolve) => setTimeout(() => resolve(), time))
 
 const waitFor = async (service) =>
   new Promise(async (resolve) => {
@@ -103,6 +109,7 @@ const remove = async (inputs, context) => {
   context.saveState({})
   return {}
 }
+
 module.exports = {
   deploy,
   remove
