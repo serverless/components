@@ -17,7 +17,7 @@ const deploy = async (inputs, context) => {
     await remove(inputs, context)
   }
 
-  context.log('creating subnet...')
+  context.log('Creating a Subnet')
   const { Subnet } = await ec2
     .createSubnet({
       VpcId: inputs.vpcId,
@@ -35,13 +35,13 @@ const deploy = async (inputs, context) => {
     ipv6CidrBlock: inputs.ipv6CidrBlock
   })
 
-  context.log('subnet created')
+  context.log(`Subnet created: "${Subnet.SubnetId}"`)
   return { subnetId: Subnet.SubnetId }
 }
 
 const remove = async (inputs, context) => {
-  context.log('removing subnet...')
   const { state } = context
+  context.log(`Removing subnet: "${state.subnetId}"`)
   try {
     await ec2
       .deleteSubnet({
@@ -54,7 +54,7 @@ const remove = async (inputs, context) => {
     }
   }
   context.saveState({})
-  context.log('subnet removed...')
+  context.log(`Subnet "${state.subnetId}" removed`)
   return {}
 }
 
