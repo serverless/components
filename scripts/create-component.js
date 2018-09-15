@@ -56,11 +56,11 @@ const readMeTemplate = `<!-- AUTO-GENERATED-CONTENT:START (COMPONENT_HEADER) -->
 
 const indexTemplate = `// ${name}
 
-const deploy = async () => {
+const deploy = async (inputs, context) => {
   return {}
 }
 
-const remove = async () => {
+const remove = async (inputs, context) => {
   return {}
 }
 
