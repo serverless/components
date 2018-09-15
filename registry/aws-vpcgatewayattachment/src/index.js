@@ -5,7 +5,7 @@ const ec2 = new AWS.EC2({
   region: process.env.AWS_DEFAULT_REGION || 'us-east-1'
 })
 
-const compareStateAndInputs = (state, inputs, keys = []) => {
+const compareStateAndInputs = (state, inputs, keys) => {
   const inputsPick = pick(keys, inputs)
   const statePick = pick(keys, state)
   return equals(statePick, inputsPick)
