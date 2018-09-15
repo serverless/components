@@ -71,9 +71,16 @@ module.exports = {
 `
 
 const indexTestTemplate = `// ${name}
+const myComponent = require('./index')
 
-describe('#${name}', () => {
+describe('${name} Unit Tests', () => {
   it('should have tests', async () => {
+    const contextMock = {
+      state: {},
+      log: () => {},
+      saveState: jest.fn()
+    }
+    await myComponent.deploy({}, contextMock)
     expect(false).toBe(true)
   })
 })
