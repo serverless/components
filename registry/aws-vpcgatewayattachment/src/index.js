@@ -1,17 +1,22 @@
 const AWS = require('aws-sdk')
-// const { equals, omit, isEmpty } = require('ramda')
+const { equals, pick } = require('ramda')
 
 const ec2 = new AWS.EC2({
   region: process.env.AWS_DEFAULT_REGION || 'us-east-1'
 })
 
-const deploy = async (inputs, context) => {
-  context.log('Creating Internet Gateway Attachment')
-  // const { state } = context
-  // if (state.internetGatewayId) {
-  //   return { internetGatewayId: state.internetGatewayId }
-  // }
+const compareStateAndInputs = (state, inputs, keys = []) => {
+  const inputsPick = pick(keys, inputs)
+  const statePick = pick(keys, state)
+  return equals(statePick, inputsPick)
+}
 
+const deploy = async (inputs, context) => {
+  const { state } = context
+  if (compareStateAndInputs(state, inputs, ['internetGatewayId', 'vpcId'])) {
+    return { internetGatewayId: state.internetGatewayId }
+  }
+  context.log('Creating Internet Gateway Attachment')
   await ec2
     .attachInternetGateway({
       InternetGatewayId: inputs.internetGatewayId,

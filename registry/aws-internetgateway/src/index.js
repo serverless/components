@@ -7,34 +7,51 @@ const ec2 = new AWS.EC2({
 
 const deploy = async (inputs, context) => {
   const { state } = context
-  if (state.internetGatewayId) {
+  if (state.internetGatewayId && inputs.vpcId === state.vpcId) {
     return { internetGatewayId: state.internetGatewayId }
   }
 
-  context.log('Creating Internet Gateway')
-  const { InternetGateway } = await ec2.createInternetGateway().promise()
-  context.log(`Internet Gateway created: "${InternetGateway.InternetGatewayId}"`)
+  let internetGatewayId = state.internetGatewayId
+
+  if (!state.internetGatewayId) {
+    context.log('Creating Internet Gateway')
+    const { InternetGateway } = await ec2.createInternetGateway().promise()
+    internetGatewayId = InternetGateway.InternetGatewayId
+    context.log(`Internet Gateway created: "${InternetGateway.InternetGatewayId}"`)
+  }
+
   let awsVpcgatewayattachment = {}
   if (inputs.vpcId) {
-    const awsVpcgatewayattachmentComponent = await context.load(
+    // create gateway attachment if vpcId is defined
+    const attachmentDeloyComponent = await context.load(
       'aws-vpcgatewayattachment',
-      'defaultAWSVpcgatewayattachment',
+      `defaultAWSVpcgatewayattachment${internetGatewayId}`,
       {
         vpcId: inputs.vpcId,
-        internetGatewayId: InternetGateway.InternetGatewayId
+        internetGatewayId
       }
     )
-    awsVpcgatewayattachment = await awsVpcgatewayattachmentComponent.deploy()
+    awsVpcgatewayattachment = await attachmentDeloyComponent.deploy()
+  } else if (state.vpcId && !inputs.vpcId) {
+    const attachmentRemoveComponent = await context.load(
+      'aws-vpcgatewayattachment',
+      `defaultAWSVpcgatewayattachment${state.internetGatewayId}`,
+      {
+        vpcId: state.vpcId,
+        internetGatewayId: state.internetGatewayId
+      }
+    )
+    await attachmentRemoveComponent.remove()
   }
 
   context.saveState({
-    internetGatewayId: InternetGateway.InternetGatewayId,
+    internetGatewayId,
     vpcId: inputs.vpcId,
     awsVpcgatewayattachment
   })
 
   return {
-    internetGatewayId: InternetGateway.InternetGatewayId
+    internetGatewayId
   }
 }
 
@@ -43,7 +60,7 @@ const remove = async (inputs, context) => {
   if (!isEmpty(state.awsVpcgatewayattachment)) {
     const awsVpcgatewayattachmentComponent = await context.load(
       'aws-vpcgatewayattachment',
-      'defaultAWSVpcgatewayattachment',
+      `defaultAWSVpcgatewayattachment${state.internetGatewayId}`,
       {
         vpcId: state.vpcId,
         internetGatewayId: state.internetGatewayId
