@@ -65,6 +65,29 @@ const describeSubnets = (vpcId, context) =>
       return ready
     })
 
+const describeInternetGateways = (vpcId, context) =>
+  ec2
+    .describeInternetGateways({
+      Filters: [
+        {
+          Name: 'vpc-id',
+          Values: [vpcId]
+        }
+      ]
+    })
+    .promise()
+    .then(({ InternetGateways: internetGateways }) => {
+      const ready = internetGateways.length === 0
+      if (!ready) {
+        context.log(
+          `Waiting for ${internetGateways
+            .map(({ InternetGatewayId }) => InternetGatewayId)
+            .join(', ')} to be removed`
+        )
+      }
+      return ready
+    })
+
 const waitFor = async (service) =>
   new Promise(async (resolve) => {
     let ready = false
@@ -87,7 +110,10 @@ const waitForDependenciesToBeRemoved = async (vpcId, context) =>
   // Route Tables
   // Network Interfaces
   // VPC Peering Connections
-  Promise.all([waitFor(() => describeSubnets(vpcId, context))])
+  Promise.all([
+    waitFor(() => describeSubnets(vpcId, context)),
+    waitFor(() => describeInternetGateways(vpcId, context))
+  ])
 
 const remove = async (inputs, context) => {
   const { state } = context

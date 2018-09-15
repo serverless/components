@@ -1,19 +1,25 @@
 ---
-type: aws-internetgateway
+type: aws-vpcgatewayattachment
 version: 0.2.0
 core: 0.2.x
 
-description: "Provision AWS Internet Gateway with Serverless Components"
+description: "Provision AWS VPC Gateway Attachment with Serverless Components"
 license: Apache-2.0
 author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
 repository: "github:serverless/components"
 
 inputTypes:
+  internetGatewayId:
+    type: string
+    description: Intenet Gateway Id
+    example: igw-abbaabba
+    required: true
   vpcId:
     type: string
     displayName: The id of the VPC
-    description: The id of the VPC, if set the Internet Gateway is attached to the VPC, otherwise it is created detatched
+    description: The id of the VPC
     example: vpc-abbaabba
+    required: true
 
 outputTypes:
   internetGatewayId:

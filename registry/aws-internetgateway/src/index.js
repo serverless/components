@@ -6,7 +6,7 @@ const ec2 = new AWS.EC2({
 })
 
 const deploy = async (inputs, context) => {
-  context.log('Creating InternetGateway')
+  context.log('Creating Internet Gateway')
   const { state } = context
   if (state.internetGatewayId) {
     return { internetGatewayId: state.internetGatewayId }
@@ -17,7 +17,7 @@ const deploy = async (inputs, context) => {
     internetGatewayId: InternetGateway.InternetGatewayId
   })
 
-  context.log(`InternetGateway created: "${InternetGateway.InternetGatewayId}"`)
+  context.log(`Internet Gateway created: "${InternetGateway.InternetGatewayId}"`)
 
   return {
     internetGatewayId: InternetGateway.InternetGatewayId
@@ -26,10 +26,10 @@ const deploy = async (inputs, context) => {
 
 const remove = async (inputs, context) => {
   const { state } = context
-  context.log(`Removing InternetGateway: "${state.internetGatewayId}"`)
+  context.log(`Removing Internet Gateway: "${state.internetGatewayId}"`)
   await ec2.deleteInternetGateway({ InternetGatewayId: state.internetGatewayId }).promise()
   context.saveState({})
-  context.log(`InternetGateway "${state.internetGatewayId}" removed`)
+  context.log(`Internet Gateway "${state.internetGatewayId}" removed`)
   return {}
 }
 

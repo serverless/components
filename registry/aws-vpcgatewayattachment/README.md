@@ -1,7 +1,7 @@
 <!-- AUTO-GENERATED-CONTENT:START (COMPONENT_HEADER) -->
-# AWS Internetgateway
+# AWS Vpcgatewayattachment
 
-Provision AWS Internet Gateway with Serverless Components
+Provision AWS VPC Gateway Attachment with Serverless Components
 <!-- AUTO-GENERATED-CONTENT:END -->
 <!-- AUTO-GENERATED-CONTENT:START (TOC) -->
 - [Input Types](#input-types)
@@ -12,7 +12,8 @@ Provision AWS Internet Gateway with Serverless Components
 ## Input Types
 | Name | Type | Description |
 |:------ |:-----|:-----------------|
-| **vpcId**| `string` | The id of the VPC, if set the Internet Gateway is attached to the VPC, otherwise it is created detatched
+| **internetGatewayId**| `string`<br/>*required* | Intenet Gateway Id
+| **vpcId**| `string`<br/>*required* | The id of the VPC
 
 <!-- AUTO-GENERATED-CONTENT:END -->
 <!-- AUTO-GENERATED-CONTENT:START (COMPONENT_OUTPUT_TYPES) -->
@@ -27,9 +28,10 @@ Provision AWS Internet Gateway with Serverless Components
 ```yml
 type: my-application
 components:
-  myAwsInternetgateway:
-    type: aws-internetgateway
+  myAwsVpcgatewayattachment:
+    type: aws-vpcgatewayattachment
     inputs:
+      internetGatewayId: igw-abbaabba
       vpcId: vpc-abbaabba
 
 ```
