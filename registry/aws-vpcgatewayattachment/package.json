@@ -1,5 +1,5 @@
 {
-  "name": "@serverless-components/aws-internetgateway",
+  "name": "@serverless-components/aws-vpcgatewayattachment",
   "version": "0.2.0",
   "private": true,
   "main": "src/index.js",
