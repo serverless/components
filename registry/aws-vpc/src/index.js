@@ -7,7 +7,7 @@ const ec2 = new AWS.EC2({
   region: process.env.AWS_DEFAULT_REGION || 'us-east-1'
 })
 
-const compareStateAndInputs = (state, inputs, keys = []) => {
+const compareStateAndInputs = (state, inputs, keys) => {
   const inputsPick = pick(keys, inputs)
   const statePick = pick(keys, state)
   return equals(statePick, inputsPick)
@@ -16,7 +16,6 @@ const compareStateAndInputs = (state, inputs, keys = []) => {
 const deploy = async (inputs, context) => {
   const { state } = context
   let newState = {}
-  context.log(`Creating a VPC`)
   if (
     !compareStateAndInputs(state, inputs, [
       'cidrBlock',
@@ -24,6 +23,7 @@ const deploy = async (inputs, context) => {
       'instanceTenancy'
     ])
   ) {
+    context.log(`Creating a VPC`)
     if (!isEmpty(state)) {
       context.log(`Changes to existing VPC requires replacement`)
       remove(state, context) // because of the dependencies, VPC must be removed asynchronously
@@ -43,36 +43,12 @@ const deploy = async (inputs, context) => {
     })
     context.log(`VPC created: "${newState.vpcId}"`)
   } else {
-    newState = merge(newState, { vpcId: state.vpcId })
     newState = merge(newState, {
       vpcId: state.vpcId,
       cidrBlock: state.cidrBlock,
       instanceTenancy: state.instanceTenancy,
       amazonProvidedIpv6CidrBlock: state.amazonProvidedIpv6CidrBlock
     })
-  }
-
-  let internetgatewayComponent
-  if (inputs.internetGateway === true) {
-    internetgatewayComponent = await context.load(
-      'aws-internetgateway',
-      `defaultAWSInternetgateway${newState.vpcId}`,
-      {
-        vpcId: newState.vpcId
-      }
-    )
-    const { internetGatewayId } = await internetgatewayComponent.deploy()
-    newState = merge(newState, { internetGatewayId })
-  } else if (inputs.internetGateway !== true && state.internetGatewayId) {
-    internetgatewayComponent = await context.load(
-      'aws-internetgateway',
-      `defaultAWSInternetgateway${state.vpcId}`,
-      {
-        vpcId: state.vpcId,
-        internetGatewayId: state.internetGatewayId
-      }
-    )
-    await internetgatewayComponent.remove()
   }
 
   context.saveState(newState)
@@ -165,18 +141,6 @@ const remove = async (inputs, context) => {
   const { state } = context
   context.log(`Removing VPC: "${state.vpcId}"`)
   context.log('Waiting for VPC dependencies to be removed')
-  if (state.internetGatewayId) {
-    const internetgatewayComponent = await context.load(
-      'aws-internetgateway',
-      `defaultAWSInternetgateway${state.vpcId}`,
-      {
-        vpcId: state.vpcId,
-        internetGatewayId: state.internetGatewayId
-      }
-    )
-
-    await internetgatewayComponent.remove()
-  }
   await waitForDependenciesToBeRemoved(state.vpcId, context)
   try {
     await ec2
