@@ -34,12 +34,22 @@ const deploy = async (inputs, context) => {
 const remove = async (inputs, context) => {
   const { state } = context
   context.log('Removing Internet Gateway Attachment')
-  await ec2
-    .detachInternetGateway({
-      VpcId: state.vpcId,
-      InternetGatewayId: state.internetGatewayId
-    })
-    .promise()
+  if (state.vpcId && state.internetGatewayId) {
+    try {
+      await ec2
+        .detachInternetGateway({
+          VpcId: state.vpcId,
+          InternetGatewayId: state.internetGatewayId
+        })
+        .promise()
+    } catch (exception) {
+      if (
+        exception.message !== `The internetGateway ID '${state.internetGatewayId}' does not exist`
+      ) {
+        throw exception
+      }
+    }
+  }
   context.saveState({})
   context.log(`Internet Gateway Attachment removed`)
   return {}
