@@ -17,7 +17,7 @@ inputTypes:
   elbtype:
     type: string
     required: false
-    description: The type of load balancer. The default is application. network
+    description: The type of load balancer. The default is application. network is another option.
   subnets:
     type: array
     required: false
@@ -33,11 +33,11 @@ inputTypes:
   ipAddressType:
     type: string
     required: false
-    description: The type of IP addresses used by the subnets for load balancer. Valid values are ipv4 and dualstack. Internal load balancers                   must use ipv4.
+    description: The type of IP addresses used by the subnets for load balancer. Valid values are ipv4 and dualstack. Internal load balancers must use ipv4.
   subnetMappings:
     type: array
     required: false
-    description: The IDs of the public subnets. You can specify only one subnet per Availability Zone. Either subnets or subnet mappings must                  be specified .
+    description: The IDs of the public subnets. You can specify only one subnet per Availability Zone. Either subnets or subnet mappings must be specified.
   tags:
     type: array
     required: false
