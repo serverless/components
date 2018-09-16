@@ -1,0 +1,49 @@
+type: aws-elb
+version: 0.2.0
+core: 0.2.x
+
+description: "Provision AWS ELB with serverless components"
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
+
+inputTypes:
+  name:
+    type: string
+    required: true
+    displayName: ELB Name
+    description: The name of the ELB. Name must be in AWS region.
+    example: myelb
+  elbtype:
+    type: string
+    required: false
+    description: The type of load balancer. The default is application. network
+  subnets:
+    type: array
+    required: false
+    description: List of subnets for the ELB
+  securityGroups:
+    type: array
+    required: false
+    description: List of security groups to attach with the ELB.
+  scheme:
+    type: string
+    required: false
+    description: Type of loanbalancer. Valid values are internet-facing and internal.
+  ipAddressType:
+    type: string
+    required: false
+    description: The type of IP addresses used by the subnets for load balancer. Valid values are ipv4 and dualstack. Internal load balancers                   must use ipv4.
+  subnetMappings:
+    type: array
+    required: false
+    description: The IDs of the public subnets. You can specify only one subnet per Availability Zone. Either subnets or subnet mappings must                  be specified .
+  tags:
+    type: array
+    required: false
+    description: One or more tags to assign to the load balancer.
+
+outputTypes:
+  loadBalancerArn:
+    type: string
+    description: ARN of the ELB created
