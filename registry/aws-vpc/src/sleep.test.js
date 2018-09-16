@@ -6,6 +6,5 @@ describe('AWS VPC Unit Tests', () => {
     await sleep(100)
     const runtime = Date.now() - start
     expect(runtime).toBeGreaterThanOrEqual(100)
-    expect(runtime).toBeLessThan(110)
   })
 })
