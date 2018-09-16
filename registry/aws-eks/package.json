@@ -1,0 +1,15 @@
+{
+  "name": "@serverless-components/aws-eks",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.315.0"
+  },
+  "devDependencies": {
+    "jest": "^23.6.0"
+  }
+}

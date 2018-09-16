@@ -1,0 +1,36 @@
+type: aws-eks
+version: 0.1.0
+
+description: "Provision an AWS EKS cluster with serverless components"
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
+
+inputTypes:
+  name:
+    type: string
+    required: true
+    default: serverless-component-cluster
+  subnetIds:
+    type: array
+    required: true
+  securityGroupIds:
+    type: array
+    required: true
+  roleArn:
+    type: string
+    required: true
+
+outputTypes:
+  name:
+    type: string
+    description: Cluster name
+  arn:
+    type: string
+    description: Cluster ARN
+  status:
+    type: string
+    description: The status of the cluster
+  endpoint:
+    type: string
+    description: The HTTPS endpoint the cluster is available on
