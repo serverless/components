@@ -32,6 +32,6 @@ components:
   myELB:
     type: aws-elb
     inputs:
-      name: my-project-elb1
+      name: my-project-elb
       subnets: ["subnet-0b8da2094908e1b23","subnet-02579e43d5262dfeb"]
       securityGroups: ["sg-06f16046d66441c1c"]
