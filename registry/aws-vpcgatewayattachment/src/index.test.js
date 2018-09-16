@@ -47,9 +47,11 @@ describe('#aws-vpcgatewayattachment', () => {
       vpcId: 'vpc-abbaabba'
     }
     const { internetGatewayId } = await awsVpcgatewayattachmentComponent.deploy(inputs, contextMock)
+
     expect(internetGatewayId).toBe('igw-abbaabba')
     expect(AWS.mocks.attachInternetGatewayMock).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.detachInternetGatewayMock).toHaveBeenCalledTimes(0)
+    expect(contextMock.saveState).toHaveBeenCalledTimes(1)
   })
 
   it('should remove the VPC gateway attachment', async () => {
@@ -67,6 +69,7 @@ describe('#aws-vpcgatewayattachment', () => {
 
     expect(AWS.mocks.attachInternetGatewayMock).toHaveBeenCalledTimes(0)
     expect(AWS.mocks.detachInternetGatewayMock).toHaveBeenCalledTimes(1)
+    expect(contextMock.saveState).toHaveBeenCalledTimes(1)
   })
 
   it('should ignore if nothing is changes', async () => {
@@ -83,9 +86,11 @@ describe('#aws-vpcgatewayattachment', () => {
       vpcId: 'vpc-abbaabba'
     }
     const { internetGatewayId } = await awsVpcgatewayattachmentComponent.deploy(inputs, contextMock)
+
     expect(internetGatewayId).toBe('igw-abbaabba')
     expect(AWS.mocks.attachInternetGatewayMock).toHaveBeenCalledTimes(0)
     expect(AWS.mocks.detachInternetGatewayMock).toHaveBeenCalledTimes(0)
+    expect(contextMock.saveState).toHaveBeenCalledTimes(0)
   })
 
   it('should not try to detach if parameters are not set', async () => {
@@ -100,6 +105,7 @@ describe('#aws-vpcgatewayattachment', () => {
 
     expect(AWS.mocks.attachInternetGatewayMock).toHaveBeenCalledTimes(0)
     expect(AWS.mocks.detachInternetGatewayMock).toHaveBeenCalledTimes(0)
+    expect(contextMock.saveState).toHaveBeenCalledTimes(1)
   })
 
   it('should handle error if attachment is removed manually', async () => {
@@ -117,6 +123,7 @@ describe('#aws-vpcgatewayattachment', () => {
 
     expect(AWS.mocks.attachInternetGatewayMock).toHaveBeenCalledTimes(0)
     expect(AWS.mocks.detachInternetGatewayMock).toHaveBeenCalledTimes(1)
+    expect(contextMock.saveState).toHaveBeenCalledTimes(1)
   })
 
   it('should throw error while removing', async () => {
@@ -140,5 +147,6 @@ describe('#aws-vpcgatewayattachment', () => {
     expect(response).toBeUndefined()
     expect(AWS.mocks.attachInternetGatewayMock).toHaveBeenCalledTimes(0)
     expect(AWS.mocks.detachInternetGatewayMock).toHaveBeenCalledTimes(1)
+    expect(contextMock.saveState).toHaveBeenCalledTimes(0)
   })
 })
