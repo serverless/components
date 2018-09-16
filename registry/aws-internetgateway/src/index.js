@@ -21,7 +21,7 @@ const deploy = async (inputs, context) => {
   }
 
   let awsVpcgatewayattachment = {}
-  if (inputs.vpcId) {
+  if (inputs.vpcId && (!state.vpcId || state.vpcId !== inputs.vpcId)) {
     // create gateway attachment if vpcId is defined
     const attachmentDeloyComponent = await context.load(
       'aws-vpcgatewayattachment',
@@ -32,7 +32,9 @@ const deploy = async (inputs, context) => {
       }
     )
     awsVpcgatewayattachment = await attachmentDeloyComponent.deploy()
-  } else if (state.vpcId && !inputs.vpcId) {
+  }
+
+  if ((state.vpcId && !inputs.vpcId) || (state.vpcId && state.vpcId !== inputs.vpcId)) {
     const attachmentRemoveComponent = await context.load(
       'aws-vpcgatewayattachment',
       `defaultAWSVpcgatewayattachment${state.internetGatewayId}`,
@@ -57,7 +59,7 @@ const deploy = async (inputs, context) => {
 
 const remove = async (inputs, context) => {
   const { state } = context
-  if (!isEmpty(state.awsVpcgatewayattachment)) {
+  if (!isEmpty(state.awsVpcgatewayattachment || {})) {
     const awsVpcgatewayattachmentComponent = await context.load(
       'aws-vpcgatewayattachment',
       `defaultAWSVpcgatewayattachment${state.internetGatewayId}`,
