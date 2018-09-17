@@ -3,21 +3,31 @@ const awsEcsClusterComponent = require('./index')
 
 jest.mock('aws-sdk', () => {
   const mocks = {
-    createEcsClusterMock: jest.fn(({ clusterName }) => ({
+    createClusterMock: jest.fn(({ clusterName }) => ({
       cluster: {
         clusterArn: `arn:aws:ecs:us-east-1:123456789012:cluster/${clusterName}`,
         clusterName
       }
     })),
-    deleteEcsClusterMock: jest.fn().mockResolvedValue({})
+    deleteClusterMock: jest.fn().mockResolvedValue({}),
+    listTasksMock: jest.fn().mockResolvedValue({
+      taskArns: ['arn:aws:ecs:us-east-1:123456789012:task/92ef2e8e-62ae-411f-8f76-cedccaea4fa1']
+    }),
+    stopTaskMock: jest.fn().mockResolvedValue({})
   }
 
   const ECS = {
     createCluster: (obj) => ({
-      promise: () => mocks.createEcsClusterMock(obj)
+      promise: () => mocks.createClusterMock(obj)
     }),
     deleteCluster: (obj) => ({
-      promise: () => mocks.deleteEcsClusterMock(obj)
+      promise: () => mocks.deleteClusterMock(obj)
+    }),
+    listTasks: (obj) => ({
+      promise: () => mocks.listTasksMock(obj)
+    }),
+    stopTask: (obj) => ({
+      promise: () => mocks.stopTaskMock(obj)
     })
   }
   return {
@@ -49,8 +59,8 @@ describe('AWS ECS Cluster Unit Tests', () => {
     const { clusterArn } = await awsEcsClusterComponent.deploy(inputs, contextMock)
 
     expect(clusterArn).toBe('arn:aws:ecs:us-east-1:123456789012:cluster/default')
-    expect(AWS.mocks.createEcsClusterMock).toHaveBeenCalledTimes(1)
-    expect(AWS.mocks.deleteEcsClusterMock).toHaveBeenCalledTimes(0)
+    expect(AWS.mocks.createClusterMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.deleteClusterMock).toHaveBeenCalledTimes(0)
     expect(contextMock.saveState).toHaveBeenCalledTimes(1)
   })
 
@@ -71,8 +81,8 @@ describe('AWS ECS Cluster Unit Tests', () => {
     const { clusterArn } = await awsEcsClusterComponent.deploy(inputs, contextMock)
 
     expect(clusterArn).toBe('arn:aws:ecs:us-east-1:123456789012:cluster/my-cluster')
-    expect(AWS.mocks.createEcsClusterMock).toHaveBeenCalledTimes(1)
-    expect(AWS.mocks.deleteEcsClusterMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.createClusterMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.deleteClusterMock).toHaveBeenCalledTimes(1)
     expect(contextMock.saveState).toHaveBeenCalledTimes(2)
   })
 
@@ -93,12 +103,37 @@ describe('AWS ECS Cluster Unit Tests', () => {
     const { clusterArn } = await awsEcsClusterComponent.deploy(inputs, contextMock)
 
     expect(clusterArn).toBe('arn:aws:ecs:us-east-1:123456789012:cluster/default')
-    expect(AWS.mocks.createEcsClusterMock).toHaveBeenCalledTimes(0)
-    expect(AWS.mocks.deleteEcsClusterMock).toHaveBeenCalledTimes(0)
+    expect(AWS.mocks.createClusterMock).toHaveBeenCalledTimes(0)
+    expect(AWS.mocks.deleteClusterMock).toHaveBeenCalledTimes(0)
     expect(contextMock.saveState).toHaveBeenCalledTimes(0)
   })
 
   it('should remove the cluster', async () => {
+    const contextMock = {
+      state: {
+        clusterName: 'default',
+        clusterArn: 'arn:aws:ecs:us-east-1:123456789012:cluster/default'
+      },
+      log: () => {},
+      saveState: jest.fn()
+    }
+
+    AWS.mocks.listTasksMock.mockImplementationOnce().mockResolvedValueOnce({})
+
+    const inputs = {
+      clusterName: 'default'
+    }
+
+    await awsEcsClusterComponent.remove(inputs, contextMock)
+
+    expect(AWS.mocks.createClusterMock).toHaveBeenCalledTimes(0)
+    expect(AWS.mocks.deleteClusterMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.listTasksMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.stopTaskMock).toHaveBeenCalledTimes(0)
+    expect(contextMock.saveState).toHaveBeenCalledTimes(1)
+  })
+
+  it('should remove the cluster with tasks running', async () => {
     const contextMock = {
       state: {
         clusterName: 'default',
@@ -114,8 +149,10 @@ describe('AWS ECS Cluster Unit Tests', () => {
 
     await awsEcsClusterComponent.remove(inputs, contextMock)
 
-    expect(AWS.mocks.createEcsClusterMock).toHaveBeenCalledTimes(0)
-    expect(AWS.mocks.deleteEcsClusterMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.createClusterMock).toHaveBeenCalledTimes(0)
+    expect(AWS.mocks.deleteClusterMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.listTasksMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.stopTaskMock).toHaveBeenCalledTimes(1)
     expect(contextMock.saveState).toHaveBeenCalledTimes(1)
   })
 })

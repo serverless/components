@@ -39,8 +39,27 @@ const remove = async (inputs, context) => {
   const { state } = context
   context.log(`Removing ECS cluster: "${state.clusterName}"`)
 
+  const tasks = await ecs
+    .listTasks({
+      cluster: state.clusterArn
+    })
+    .promise()
+
+  await Promise.all(
+    (tasks.taskArns || []).map((task) => {
+      context.log(`Stopping task: "${task}"`)
+      return ecs
+        .stopTask({
+          task,
+          cluster: state.clusterArn,
+          reason: 'Removing cluster'
+        })
+        .promise()
+    })
+  )
+
   await ecs
-    // delete cluster doesn't throw error if it deleted manually
+    // delete cluster doesn't throw error even if it is deleted manually
     .deleteCluster({
       cluster: state.clusterArn
     })
