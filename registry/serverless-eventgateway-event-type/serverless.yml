@@ -1,0 +1,44 @@
+type: serverless-eventgateway-event-type
+version: 0.2.0
+core: 0.2.x
+
+description: "Manages Event Gateway Event Types"
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
+
+inputTypes:
+  url:
+    type: string
+    required: true
+    displayName: URL
+    description: The Event Gateway URL
+    example: http://localhost
+  space:
+    type: string
+    default: default
+    displayName: Space
+    description: The Event Gateway space which should be used
+    example: acme-marketing-space
+  accessKey:
+    type: string
+    required: true
+    displayName: Access Key
+    description: The access key used to authenticate with the hosted Event Gateway
+    example: s0m34c355k3y
+  name:
+    type: string
+    required: true
+    displayName: Type
+    description: The event type name
+    example: user.created
+  authorizerId:
+    type: string
+    displayName: Authorizer ID
+    description: The authorizer function id
+    example: authorizerFunction
+
+outputTypes:
+  name:
+    type: string
+    description: The event type name
