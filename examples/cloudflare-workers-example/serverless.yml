@@ -4,6 +4,6 @@ components:
   myWorker:
     type: cloudflare-workers
     inputs:
-      zoneId: '9a7806061c88ada191ed06f989cc3dac'
+      zoneId: 'INSERT_YOUR_ZONE_ID_HERE'
       scriptPath: './index.js'
-      route: '*example.org/path/*'
+      route: '*example.com/path/*'
