@@ -1,0 +1,9 @@
+type: cloudflare-worker-application
+
+components:
+  myWorker:
+    type: cloudflare-workers
+    inputs:
+      zoneId: 'INSERT_YOUR_ZONE_ID_HERE'
+      scriptPath: './index.js'
+      route: '*example.com/path/*'
