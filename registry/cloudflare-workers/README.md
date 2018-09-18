@@ -22,11 +22,11 @@ export CLOUDFLARE_AUTH_EMAIL=you@example.com
 ## Input Types
 | Name | Type | Description |
 |:------ |:-----|:-----------------|
-| **accountId**| `string`<br/>*optional* | Defaults to the account associated with your exported email address, but can be overwritten
-| **scriptName**| `string`<br/>*optional* | 💼 Enterprise only. Name of the *deployed* script as shown on the Workers editor (*Not* the name of the local script) 
-| **zoneId**| `string`<br/>*required* | Found on your Cloudflare dashboard or with the [API](https://api.cloudflare.com/#getting-started-resource-ids)
-| **scriptPath**| `string`<br/>*required* | Path to the script to be deployed (script must be <= 1 MB)
-| **route**| `string`<br/>*required* | The route that will trigger your script, e.g. `*.example.com/*`
+| **accountId**| `string` | accountId
+| **scriptName**| `string` | scriptName
+| **zoneId**| `string`<br/>*required* | zoneId
+| **scriptPath**| `string`<br/>*required* | scriptPath
+| **route**| `string`<br/>*required* | route
 
 <!-- AUTO-GENERATED-CONTENT:END -->
 
