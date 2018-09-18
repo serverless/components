@@ -127,7 +127,7 @@ describe('twilio-phone-number unit tests', () => {
     expect(outputs).toEqual(expectedOutputs)
   })
 
-  it('should update application if changes detected', async () => {
+  it('should update phone number if changes detected', async () => {
     const inputs = {
       accountSid: 'accountSid',
       friendlyName: 'friendlyName',
@@ -181,7 +181,7 @@ describe('twilio-phone-number unit tests', () => {
     expect(outputs).toEqual(expectedOutputs)
   })
 
-  it('should not update application if no changes detected', async () => {
+  it('should not update phone number if no changes detected', async () => {
     const inputs = {
       accountSid: 'accountSid',
       authToken: 'authToken'
@@ -202,7 +202,7 @@ describe('twilio-phone-number unit tests', () => {
     expect(outputs).toEqual(context.state)
   })
 
-  it('should remove application', async () => {
+  it('should remove phone number', async () => {
     const inputs = {
       accountSid: 'accountSid',
       authToken: 'authToken'

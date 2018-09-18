@@ -130,77 +130,58 @@ outputTypes:
     description: "The sid of your emergency address"
   accountSid:
     type: string
-    required: true
     description: "The unique id of the Account responsible for this application."
   phoneNumber:
     type: string
-    required: false
     description: "The phone number you want to purchase. The number should be formatted starting with a '+' followed by the country code and the number in E.164 format e.g., '+15105555555'. You must include either this or an AreaCode parameter to have your POST succeed."
   friendlyName:
     type: string
-    required: false
     description: "A human readable description of the new incoming phone number. Maximum 64 characters. Defaults to a formatted version of the number."
   apiVersion:
     type: string
-    required: false
     description: "The Twilio REST API version to use for incoming calls made to this number. If omitted, uses 2010-04-01."
   voiceUrl:
     type: string
-    required: false
     description: "The URL that Twilio should request when somebody dials the new phone number. The VoiceURL will no longer be used if a VoiceApplicationSid or a TrunkSid is set."
   voiceMethod:
     type: string
-    required: false
     description: "The HTTP method that should be used to request the VoiceUrl. Must be either GET or POST. Defaults to POST."
   voiceFallbackUrl:
     type: string
-    required: false
     description: "A URL that Twilio will request if an error occurs requesting or executing the TwiML at Url."
   voiceFallbackMethod:
     type: string
-    required: false
     description: "The HTTP method that should be used to request the VoiceFallbackUrl. Either GET or POST. Defaults to POST."
   statusCallback:
     type: string
-    required: false
     description: "The URL that Twilio will request to pass status parameters (such as call ended) to your application."
   statusCallbackMethod:
     type: string
-    required: false
     description: "The HTTP method Twilio will use to make requests to the StatusCallback URL. Either GET or POST. Defaults to POST."
   voiceCallerIdLookup:
     type: string
-    required: false
     description: "Do a lookup of a caller's name from the CNAM database and post it to your app. Either true or false. Defaults to false."
   voiceApplicationSid:
     type: string
-    required: false
     description: "The 34 character sid of the application Twilio should use to handle phone calls to the new number. If a VoiceApplicationSid is present, Twilio will ignore all of the voice urls above and use those set on the application. Setting a VoiceApplicationSid will automatically delete your TrunkSid and vice versa."
   trunkSid:
     type: string
-    required: false
     description: "The 34 character sid of the Trunk Twilio should use to handle phone calls to this number. If a TrunkSid is present, Twilio will ignore all of the voice urls and voice applications above and use those set on the Trunk. Setting a TrunkSid will automatically delete your VoiceApplicationSid and vice versa."
   smsUrl:
     type: string
-    required: false
     description: "The URL that Twilio should request when somebody sends an SMS to the phone number."
   smsMethod:
     type: string
-    required: false
     description: "The HTTP method that should be used to request the SmsUrl. Must be either GET or POST. Defaults to POST."
   smsFallbackUrl:
     type: string
-    required: false
     description: "A URL that Twilio will request if an error occurs requesting or executing the TwiML defined by SmsUrl."
   smsFallbackMethod:
     type: string
-    required: false
     description: "The HTTP method that should be used to request the SmsFallbackUrl. Must be either GET or POST. Defaults to POST."
   smsApplicationSid:
     type: string
-    required: false
     description: "The 34 character sid of the application Twilio should use to handle SMSs sent to the new number. If a SmsApplicationSid is present, Twilio will ignore all of the SMS urls above and use those set on the application."
   addressSid:
     type: string
-    required: false
     description: "The 34 character sid of the address Twilio should associate with the number."
