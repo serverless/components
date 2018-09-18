@@ -1,24 +1,14 @@
 import path from 'path'
 import { tmpdir } from 'os'
 import archiver from 'archiver'
-import { createWriteStream, createReadStream, readFileSync } from 'fs'
+import { createWriteStream, readFileSync } from 'fs'
 
-const AwsLambda = {
+const AwsLambdaFunction = {
   pack: async (instance, context) => {
-    const { name, memory, timeout, runtime, handler, env, code } = context.inputs
+    const { code, shimStream } = context.inputs
 
     const outputFileName = `${String(Date.now())}.zip`
     const outputFilePath = path.join(tmpdir(), outputFileName)
-    const pkg = {
-      name,
-      memory,
-      timeout,
-      runtime,
-      handler,
-      env
-    }
-
-    pkg.env.SERVERLESS_HANDLER = handler
 
     return new Promise((resolve, reject) => {
       const output = createWriteStream(outputFilePath)
@@ -28,22 +18,13 @@ const AwsLambda = {
 
       archive.on('error', (err) => reject(err))
       output.on('close', () => {
-        pkg.code = readFileSync(outputFilePath)
-        return resolve(pkg)
+        return resolve(readFileSync(outputFilePath))
       })
 
       archive.pipe(output)
 
-      let shimFile
-      let handlerFile
+      if (shimStream) archive.append(shimStream)
 
-      if (runtime === 'nodejs8.10') {
-        shimFile = 'shim.js'
-        handlerFile = 'handler.js'
-      } // todo other runtimes
-
-      const handlerTemplateFilePath = path.join(__dirname, 'shims', shimFile)
-      archive.append(createReadStream(handlerTemplateFilePath), { name: handlerFile })
       archive.glob(
         '**/*',
         {
@@ -57,10 +38,12 @@ const AwsLambda = {
   },
   deploy: async (instance, context) => {
     // todo
+    // if code is path call pack above
+    // otherwise if binary pass it directly to aws
   },
   remove: (instance, context) => {
     // todo
   }
 }
 
-export default AwsLambda
+export default AwsLambdaFunction
