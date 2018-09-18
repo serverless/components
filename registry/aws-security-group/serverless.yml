@@ -1,0 +1,32 @@
+---
+type: aws-security-group
+version: 0.2.0
+core: 0.2.x
+
+description: "My component description"
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
+
+inputTypes:
+  groupName:
+    type: string
+    displayName: Security Group Name
+    description: Security Group Name
+    example: my-security-group
+  description:
+    type: string
+    displayName: Security group description
+    description: Security group description
+    example: Security group for enabling access to ephemeral port range
+  vpcId:
+    type: string
+    displayName: The id of the VPC
+    description: The id of the VPC
+    example: vpc-abbaabba
+    required: true
+
+outputTypes:
+  groupId:
+    type: string
+    description: The Group id of the security group
