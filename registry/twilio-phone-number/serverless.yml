@@ -93,7 +93,6 @@ inputTypes:
     required: false
     description: "The 34 character sid of the address Twilio should associate with the number."
 
-
 outputTypes:
   sid:
     type: string
