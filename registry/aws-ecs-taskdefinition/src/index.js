@@ -10,6 +10,7 @@ const deploy = async (inputs, context) => {
   }
 
   const { taskDefinition } = await ecs.registerTaskDefinition(inputs).promise()
+  context.log(`ECS TaskDefinition registered: "${inputs.family}"`)
 
   context.saveState(taskDefinition || {})
   return taskDefinition
@@ -22,6 +23,7 @@ const remove = async (inputs, context) => {
   await ecs
     .deregisterTaskDefinition({ taskDefinition: `${state.family}:${state.revision}` })
     .promise()
+  context.log(`ECS TaskDefinition deregistered: "${inputs.family}"`)
 
   context.saveState({})
   return {}
