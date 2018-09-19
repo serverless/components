@@ -1,7 +1,11 @@
 import { get, isObject, isString, set } from '@serverless/utils'
+import buildTypeClass from './buildTypeClass'
+import buildTypeConstructor from './buildTypeConstructor'
 import errorTypeMainNotFound from './errorTypeMainNotFound'
 import resolveTypeMain from './resolveTypeMain'
 import requireTypeMain from './requireTypeMain'
+
+const DEFAULT_MAIN = (SuperClass) => class extends SuperClass {}
 
 const defType = async ({ root, props }, context) => {
   if (!isObject(props)) {
@@ -26,42 +30,31 @@ const defType = async ({ root, props }, context) => {
   }
 
   if (!isString(typeDef.props.type) && typeDef.props.name !== 'Object') {
-    typeDef = {
-      ...typeDef,
-      props: {
-        ...typeDef.props,
-        type: 'Object'
-      }
-    }
+    typeDef = set('props.type', 'Object', typeDef)
   }
 
   let parentTypeDef
   if (typeDef.props.type) {
+    // Add the root to context so that files loaded by path are done so from
+    // this component's root
+    context = context.merge({ root })
     parentTypeDef = await context.loadType(typeDef.props.type)
   }
-
-  // If parent type exists, then we need to extend the previous type
-  // Else, define a new base level type
-
-  // TODO BRN: Need to load type data from all layers of the type inheritance
-  // Once each layer is loaded, when then need to merged the type data to form the new type
+  typeDef = set('parent', parentTypeDef, typeDef)
 
   let typeMain = resolveTypeMain(typeDef.props, typeDef.root)
   if (typeMain) {
     typeMain = requireTypeMain(typeMain)
   } else if (isString(typeDef.props.main)) {
-    throw errorTypeMainNotFound(name, typeRoot)
+    throw errorTypeMainNotFound(typeDef.props.name, typeDef.root, typeDef.props.main)
+  } else {
+    typeMain = DEFAULT_MAIN
   }
+  typeDef = set('main', typeMain, typeDef)
+  typeDef = set('class', await buildTypeClass(typeDef, context), typeDef)
+  typeDef = set('constructor', buildTypeConstructor(typeDef), typeDef)
 
-  // TODO BRN: Assemble the type class based on the main, meta and parent values
-
-  console.log('parentTypeDef:', parentTypeDef)
-  console.log('typeDef:', typeDef)
-  console.log('typeMain:', typeMain)
-
-  console.log(`loaded type ${typeDef.props.name} from ${typeDef.root}`)
-
-  // store type meta data in cache
+  // store type def in cache
   context.cache = set('types.defs', set([typeDef.root], typeDef, cache), context.cache)
 
   return typeDef

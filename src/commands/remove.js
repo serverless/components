@@ -1,7 +1,5 @@
-const run = require('../run')
+import run from '../run'
 
-async function remove(options) {
-  return run('remove', options)
-}
+const remove = (options) => run('remove', options)
 
-module.exports = remove
+export default remove

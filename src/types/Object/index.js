@@ -1,6 +1,5 @@
 const _Object = {
-  constructor(instance, inputs) {
-    console.log('Object - instance:', instance, ' inputs:', inputs)
+  construct(instance) {
     return instance
   }
 }

@@ -1,7 +1,5 @@
-const run = require('../run')
+import run from '../run'
 
-async function pkg(options) {
-  return run('package', options)
-}
+const pkg = async (options) => run('package', options)
 
-module.exports = pkg
+export default pkg

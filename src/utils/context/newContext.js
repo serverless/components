@@ -1,11 +1,13 @@
 import { get, pick, set } from '@serverless/utils'
+import construct from '../type/construct'
 import loadType from '../type/loadType'
 
 const newContext = (props) => {
-  const context = pick(['cache', 'cwd', 'data', 'registry'], props)
+  const context = pick(['cache', 'cwd', 'data', 'registry', 'root'], props)
 
   const finalContext = {
     ...context,
+    construct: (type, inputs) => construct(type, inputs, context),
     get: (selector) => get(selector, context.data),
     loadType: (...args) => loadType(...args, finalContext),
     merge: (value) =>

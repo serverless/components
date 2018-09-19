@@ -1,9 +1,3 @@
-const pkg = require('./pkg')
-const deploy = require('./deploy')
-const remove = require('./remove')
-
-module.exports = {
-  pkg,
-  deploy,
-  remove
-}
+export { default as deploy } from './deploy'
+export { default as pkg } from './pkg'
+export { default as remove } from './remove'

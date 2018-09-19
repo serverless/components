@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "@google-cloud/storage": "^1.7.0",
-    "@serverless/utils": "0.0.2",
+    "@serverless/utils": "0.0.3",
     "archiver": "^2.1.1",
     "bluebird": "^3.5.2",
     "crypto": "^1.0.1",

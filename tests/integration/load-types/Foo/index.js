@@ -1,5 +1,5 @@
 const Foo = {
-  bar: (instance) => instance
+  foofn: (instance) => instance
 }
 
 export default Foo
