@@ -4,6 +4,21 @@ const AWS = require('aws-sdk')
 
 const ELBv2 = new AWS.ELBv2({ region: process.env.AWS_DEFAULT_REGION || 'us-east-1' })
 
+function compareArrays(array1, array2)  {
+
+    array1 = array1.slice();
+    array2 = array2.slice();
+  if (array1.length === array2.length) {
+      array1.sort();
+      array2.sort();                         
+      return array1.every(function(item, index) {
+          return item === array2[index];       
+      });                                      
+  }
+  return false;
+
+}
+
 const setSecurityGroup = async (inputs,arn) => {
       var params = {
            LoadBalancerArn: arn,
@@ -32,7 +47,7 @@ const setIpAddressType = async (inputs,arn) => {
          else     console.log(data);
       });
 }
-const createELB = async (inputs) => {
+const createELB = async (inputs,context) => {
 
     var params = {
      Name: inputs.name,
@@ -48,48 +63,40 @@ const createELB = async (inputs) => {
     if (err)  console.log(err, err.stack);
      else     return data;
     }).promise();
-    return elb
+    context.saveState({ name: inputs.name,
+        subnets: inputs.subnets,
+        securityGroups: inputs.securityGroups,
+        ipAddressType: elb.LoadBalancers[0]["IpAddressType"],
+        scheme: elb.LoadBalancers[0]["Scheme"],
+        elbtype: elb.LoadBalancers[0]["Type"],
+        subnetMappings: inputs.subnetMappings,
+        arn: elb.LoadBalancers[0]["LoadBalancerArn"]
+        })
+
+    return context.state.arn
 }
 const deploy = async (inputs, context) => {
 
     const { state } = context
     if (!state.name && inputs.name) {
     context.log(`Creating ELb: '${inputs.name}'`)
-    const elb = await createELB(inputs)
-    context.saveState({ name: inputs.name,
-                    subnets: inputs.subnets,
-                    securityGroups: inputs.securityGroups,
-                    ipAddressType: elb.LoadBalancers[0]["IpAddressType"],
-                    scheme: elb.LoadBalancers[0]["Scheme"],
-                    elbtype: elb.LoadBalancers[0]["Type"],
-                    subnetMappings: inputs.subnetMappings,
-                    arn: elb.LoadBalancers[0]["LoadBalancerArn"]
-                    })
-     return { arn: state.arn }
+    const arn = await createELB(inputs,context)
+     return { arn: arn }
   }
     if (state.name !== inputs.name || state.elbtype !== inputs.elbtype && inputs.elbtype || state.scheme !== inputs.scheme && inputs.scheme)
    {
       context.log("changing name or elbtype or scheme forces new resource")
       await remove(inputs,context)
       context.log(`Creating ELb: '${inputs.name}'`)
-      const elb = await createELB(inputs)
-      context.saveState({ name: inputs.name,
-                    subnets: inputs.subnets,
-                    securityGroups: inputs.securityGroups,
-                    ipAddressType: elb.LoadBalancers[0]["IpAddressType"],
-                    scheme: elb.LoadBalancers[0]["Scheme"],
-                    elbtype: elb.LoadBalancers[0]["Type"],
-                    subnetMappings: inputs.subnetMappings,
-                    arn: elb.LoadBalancers[0]["LoadBalancerArn"]
-                    })
-       return { arn: state.arn }
+      const arn = await createELB(inputs,context)
+       return { arn: arn }
    }
-   if (state.securityGroups !== inputs.securityGroups) {
+   if (!compareArrays(state.securityGroups,inputs.securityGroups)) {
     await setSecurityGroup(inputs, state.arn)
     context.log(`security group updated ELB: '${state.name}'`)
     state.securityGroups = inputs.securityGroups
    }
- if (state.subnets !== inputs.subnets || state.subnetMappings !== inputs.subnetMappings) {
+   if (!compareArrays(state.subnets,inputs.subnets) || inputs.subnetMappings && !compareArrays(state.subnetMappings,inputs.subnetMappings)) {
     await setSubnets(inputs, state.arn)
     state.subnets = inputs.subnets
     context.log(`subnets updated ELB: '${state.name}'`)
