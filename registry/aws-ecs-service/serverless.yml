@@ -4,38 +4,51 @@ core: 0.2.x
 
 description: "Provision AWS ECS Service with Serverless Components"
 license: Apache-2.0
-author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+author: "Serverless Inc. <hello@serverless.com> (https://serverless.com)"
 repository: "github:serverless/components"
 
 inputTypes:
   serviceName:
     type: string
     required: true
+    example: myAwsEcsService
   cluster:
-    type: integer
-    required: false
+    type: string
   launchType:
     type: string
-    required: false
     enum: [EC2, FARGATE]
+    example: FARGATE
   deploymentConfiguration:
     type: object
-    required: false
   desiredCount:
     type: integer
-    required: false
+    example: 10
+  healthCheckGracePeriodSeconds:
+    type: integer
   networkConfiguration:
     type: object
-    required: false
-  taskDefinitions:
-    type: aws-ecs-taskdefinition | object
-    required: false
+  placementConstraints:
+    type: array
+  placementStrategy:
+    type: array
+  platformVersion:
+    type: string
+  role:
+    type: string
+  schedulingStrategy:
+    type: string
+    enum: [REPLICA, DAEMON]
+  serviceRegistries:
+    type: array
+  taskDefinition:
+    type: string
+    required: true
+    example: sleep360:1
   loadBalancers:
     type: array
-    required: false
 
 outputTypes:
-  servicearn:
+  serviceArn:
     type: string
   serviceName:
     type: array

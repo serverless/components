@@ -19,7 +19,7 @@ Provision AWS ECS Service with Serverless Components
 | **deploymentConfiguration**| `object` | deploymentConfiguration
 | **desiredCount**| `integer` | desiredCount
 | **networkConfiguration**| `object` | networkConfiguration
-| **taskDefinitions**| `aws-ecs-taskdefinition | object` | taskDefinitions
+| **taskDefinition**| `aws-ecs-taskdefinition | object` | taskDefinition
 | **loadBalancers**| `array` | loadBalancers
 | **serviceName**| `string`<br/>*required* | serviceName
 
@@ -29,7 +29,7 @@ Provision AWS ECS Service with Serverless Components
 ## Output Types
 | Name | Type | Description |
 |:------ |:-----|:-----------------|
-| **servicearn**| `string` | servicearn
+| **serviceArn**| `string` | serviceArn
 | **runningCount**| `integer` | runningCount
 | **pendingCount**| `integer` | pendingCount
 | **launchType**| `string` | launchType
@@ -61,8 +61,10 @@ components:
   myAwsEcsService:
     type: aws-ecs-service
     inputs:
+      launchType: FARGATE
       desiredCount: 10
+      taskDefinition: sleep360
       serviceName: myAwsEcsService
-      taskDefinition: helloWorld
+
 ```
 <!-- AUTO-GENERATED-CONTENT:END -->

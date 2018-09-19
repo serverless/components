@@ -1,52 +1,66 @@
-/* eslint-disable no-console */
 const aws = require('aws-sdk')
 const ecs = new aws.ECS({ region: process.env.AWS_DEFAULT_REGION || 'us-east-1' })
 
 const deploy = async (inputs, context) => {
-  const newState = await new Promise((resolve, reject) =>
-    ecs.createService(inputs, (err, data) => {
-      err ? reject(err) : resolve(data.service)
-    })
-  )
-    .catch(context.log)
-    .then((outputs) => outputs || {})
+  const { state } = context
 
-  context.saveState(newState || {})
+  if (state.serviceName && inputs.serviceName !== state.serviceName) {
+    context.log('Change to ECS service name requires replacement. Making one now...')
+    await remove({}, context)
+  }
 
-  return newState
+  context.log(`Creating ECS service: "${inputs.serviceName}"`)
+  const { service } = await ecs.createService(inputs).promise()
+
+  context.log(`ECS service "${inputs.serviceName}" created`)
+
+  context.saveState(service || {})
+
+  return service
 }
 
 const remove = async (inputs, context) => {
   const { state } = context
   if (!state.hasOwnProperty('serviceName')) return {}
 
-  const newState = await new Promise((resolve, reject) =>
-    ecs.deleteService({ service: state.serviceName }, (err, data) => {
-      err ? reject(err) : resolve(data.service)
+  const tasks = await ecs
+    .listTasks({
+      serviceName: state.serviceName
+    })
+    .promise()
+
+  await Promise.all(
+    (tasks.taskArns || []).map((task) => {
+      context.log(`Stopping task: "${task}"`)
+      return ecs
+        .stopTask({
+          task,
+          cluster: state.clusterArn,
+          reason: 'Removing service'
+        })
+        .promise()
     })
   )
-    .catch(context.log)
-    .then((outputs) => outputs || {})
 
-  context.saveState(newState)
+  await ecs.deleteService({ service: state.serviceName }).promise()
+  context.log(`ECS service "${state.serviceName}" removed`)
 
-  return newState
+  context.saveState({})
+
+  return {}
 }
 
 const get = async (inputs, context) => {
   const { state } = context
-
   if (!state.hasOwnProperty('serviceName')) return {}
 
-  const outputs = await new Promise((resolve, reject) =>
-    ecs.describeServices({ services: [state.serviceName] }, (err, data) => {
-      err ? reject(err) : resolve(Array.isArray(data.services) && data.services.shift())
-    })
-  )
-    .catch(context.log)
-    .then((res) => res || {})
+  const { services } = await ecs.describeServices({ services: [state.serviceName] }).promise()
 
-  return outputs
+  const service = Array.isArray(services) ? services.shift() : {}
+
+  context.saveState(service || {})
+
+  return service
 }
 
 module.exports = {
