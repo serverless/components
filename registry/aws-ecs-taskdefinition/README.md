@@ -14,13 +14,15 @@ Provision AWS ECS TaskDefinition with Serverless Components
 ## Input Types
 | Name | Type | Description |
 |:------ |:-----|:-----------------|
+| **placementConstraints**| `object` | placementConstraints
+| **volumes**| `array` | volumes
 | **cpu**| `integer` | cpu
 | **memory**| `integer` | memory
 | **networkMode**| `string` | networkMode
 | **requiresCompatibilities**| `array` | requiresCompatibilities
 | **executionRoleArn**| `string` | executionRoleArn
 | **taskRoleArn**| `string` | taskRoleArn
-| **containerDefinitions**| `object` | containerDefinitions
+| **containerDefinitions**| `array` | containerDefinitions
 | **family**| `string`<br/>*required* | family
 
 <!-- AUTO-GENERATED-CONTENT:END -->
@@ -36,8 +38,8 @@ Provision AWS ECS TaskDefinition with Serverless Components
 | **taskRoleArn**| `string` | taskRoleArn
 | **status**| `string` | status
 | **requiresAttributes**| `string` | requiresAttributes
-| **placementConstraints**| `string` | placementConstraints
-| **compatibilities**| `string` | compatibilities
+| **placementConstraints**| `array` | placementConstraints
+| **compatibilities**| `array` | compatibilities
 | **requiresCompatibilities**| `string` | requiresCompatibilities
 | **family**| `string` | family
 | **cpu**| `string` | cpu
@@ -52,10 +54,20 @@ Provision AWS ECS TaskDefinition with Serverless Components
 ```yml
 type: my-application
 components:
-  myAwsEcsTaskDefinition:
+  myAwsEcsTaskdefinition:
     type: aws-ecs-taskdefinition
     inputs:
-      family: "sleep360", 
-      taskRoleArn: ""
+      volumes: []
+      containerDefinitions:
+        - name: sleep
+          command:
+            - sleep
+            - '360'
+          cpu: 10
+          essential: true
+          image: busybox
+          memory: 10
+      family: sleep360
+
 ```
 <!-- AUTO-GENERATED-CONTENT:END -->

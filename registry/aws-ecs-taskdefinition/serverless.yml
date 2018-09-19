@@ -4,13 +4,14 @@ core: 0.2.x
 
 description: "Provision AWS ECS TaskDefinition with Serverless Components"
 license: Apache-2.0
-author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+author: "Serverless Inc. <hello@serverless.com> (https://serverless.com)"
 repository: "github:serverless/components"
 
 inputTypes:
   family:
     type: string
     required: true
+    example: "sleep360"
   cpu:
     type: integer
     required: false
@@ -21,6 +22,8 @@ inputTypes:
     type: string
     required: false
     enum: [none, bridge, awsvpc, host]
+  placementConstraints:
+    type: object
   requiresCompatibilities:
     type: array
     required: false
@@ -30,9 +33,20 @@ inputTypes:
   taskRoleArn:
     type: string
     required: false
+    example: ""
   containerDefinitions:
-    type: object
+    type: array
     required: false
+    example:
+      - name: "sleep"
+        command: ["sleep", "360"]
+        cpu: 10
+        essential: true
+        image: "busybox"
+        memory: 10
+  volumes:
+    type: array
+    example: []
 
 outputTypes:
   taskDefinitionArn:
@@ -56,9 +70,9 @@ outputTypes:
   requiresAttributes:
     type: string
   placementConstraints:
-    type: string
+    type: array
   compatibilities:
-    type: string
+    type: array
   requiresCompatibilities:
     type: string
   cpu:
