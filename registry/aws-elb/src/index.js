@@ -6,16 +6,16 @@ const ELBv2 = new AWS.ELBv2({ region: process.env.AWS_DEFAULT_REGION || 'us-east
 
 function compareArrays(array1, array2)  {
 
-    array1 = array1.slice();
-    array2 = array2.slice();
-  if (array1.length === array2.length) {
-      array1.sort();
-      array2.sort();                         
-      return array1.every(function(item, index) {
-          return item === array2[index];       
-      });                                      
-  }
-  return false;
+      array1 = array1.slice();
+      array2 = array2.slice();
+    if (array1.length === array2.length) {
+        array1.sort();
+        array2.sort();                         
+        return array1.every(function(item, index) {
+            return item === array2[index];       
+        });                                      
+    }
+    return false;
 
 }
 
@@ -23,28 +23,25 @@ const setSecurityGroup = async (inputs,arn) => {
       var params = {
            LoadBalancerArn: arn,
            SecurityGroups: inputs.securityGroups };
-      ELBv2.setSecurityGroups(params, function(err, data) {
+      ELBv2.setSecurityGroups(params, function(err) {
          if (err) console.log(err, err.stack);
-         else     console.log(data);
       });
 }
 const setSubnets = async (inputs,arn) => {
       var params = {
            LoadBalancerArn: arn,
            Subnets: inputs.subnets };
-      ELBv2.setSubnets(params, function(err, data) {
+      ELBv2.setSubnets(params, function(err) {
          if (err) console.log(err, err.stack);
-         else     console.log(data);
       });
 }
 
-const setIpAddressType = async (inputs,arn) => {
+const setIpAddressType = async (inputs, arn) => {
       var params = {
            LoadBalancerArn: arn,
            IpAddressType: inputs.ipAddressType};
-      ELBv2.setIpAddressType(params, function(err, data) {
+      ELBv2.setIpAddressType(params, function(err) {
          if (err) console.log(err, err.stack);
-         else     console.log(data);
       });
 }
 const createELB = async (inputs,context) => {
@@ -64,20 +61,20 @@ const createELB = async (inputs,context) => {
      else     return data;
     }).promise();
     context.saveState({ name: inputs.name,
-        subnets: inputs.subnets,
-        securityGroups: inputs.securityGroups,
-        ipAddressType: elb.LoadBalancers[0]["IpAddressType"],
-        scheme: elb.LoadBalancers[0]["Scheme"],
-        elbtype: elb.LoadBalancers[0]["Type"],
-        subnetMappings: inputs.subnetMappings,
-        arn: elb.LoadBalancers[0]["LoadBalancerArn"]
-        })
+                    subnets: inputs.subnets,
+                    securityGroups: inputs.securityGroups,
+                    ipAddressType: elb.LoadBalancers[0]["IpAddressType"],
+                    scheme: elb.LoadBalancers[0]["Scheme"],
+                    elbtype: elb.LoadBalancers[0]["Type"],
+                    subnetMappings: inputs.subnetMappings,
+                    arn: elb.LoadBalancers[0]["LoadBalancerArn"]
+                    })
 
     return context.state.arn
 }
 const deploy = async (inputs, context) => {
 
-    const { state } = context
+    const state  = context.state
     if (!state.name && inputs.name) {
     context.log(`Creating ELb: '${inputs.name}'`)
     const arn = await createELB(inputs,context)
@@ -91,12 +88,12 @@ const deploy = async (inputs, context) => {
       const arn = await createELB(inputs,context)
        return { arn: arn }
    }
-   if (!compareArrays(state.securityGroups,inputs.securityGroups)) {
+ if (!compareArrays(state.securityGroups,inputs.securityGroups)) {
     await setSecurityGroup(inputs, state.arn)
     context.log(`security group updated ELB: '${state.name}'`)
     state.securityGroups = inputs.securityGroups
    }
-   if (!compareArrays(state.subnets,inputs.subnets) || inputs.subnetMappings && !compareArrays(state.subnetMappings,inputs.subnetMappings)) {
+ if (inputs.subnets && !compareArrays(state.subnets,inputs.subnets) || inputs.subnetMappings && !compareArrays(state.subnetMappings,inputs.subnetMappings)) {
     await setSubnets(inputs, state.arn)
     state.subnets = inputs.subnets
     context.log(`subnets updated ELB: '${state.name}'`)
@@ -113,9 +110,8 @@ const deploy = async (inputs, context) => {
 const deleteELB = async (arn) => {
 
   var params = { LoadBalancerArn: arn };
-  ELBv2.deleteLoadBalancer(params, function(err, data) {
+  ELBv2.deleteLoadBalancer(params, function(err) {
      if (err) console.log(err, err.stack);
-    else      console.log(data);
  });
 }
 
