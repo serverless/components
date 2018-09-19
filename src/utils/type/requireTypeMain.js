@@ -9,7 +9,8 @@ const requireTypeMain = (name) => {
 
   try {
     LOADING_TYPE_MAINS.add(name)
-    return require(name)
+    const required = require(name)
+    return required.default || required
   } finally {
     LOADING_TYPE_MAINS.delete(name)
   }

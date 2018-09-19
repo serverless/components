@@ -1,7 +1,5 @@
-const run = require('../run')
+import run from '../run'
 
-async function deploy(options) {
-  return run('deploy', options)
-}
+const deploy = async (options) => run('deploy', options)
 
-module.exports = deploy
+export default deploy

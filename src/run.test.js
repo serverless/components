@@ -1,6 +1,6 @@
-const { difference } = require('ramda')
-const run = require('./run')
-const utils = require('./utils')
+import { difference } from 'ramda'
+import run from './run'
+import * as utils from './utils'
 
 jest.mock('./utils')
 

@@ -1,0 +1,6 @@
+type: ../Foo
+name: Bar
+main: ./index.js
+
+bar: 'def'
+baz: 'def'

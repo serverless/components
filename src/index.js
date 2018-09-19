@@ -5,7 +5,7 @@ if (!global._babelPolyfill) {
 }
 
 // eslint-disable-next-line global-require
-require('source-map-support/register')
+//require('source-map-support/register')
 
 const run = require('./run').default
 const start = require('./start').default

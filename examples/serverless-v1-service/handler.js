@@ -18,6 +18,7 @@ module.exports.landingPage = (event, context, callback) => {
         </body>
       </html>`
 
+  // eslint-disable-next-line no-console
   console.log('http event received - event:', JSON.stringify(event, null, 2))
 
   const response = {

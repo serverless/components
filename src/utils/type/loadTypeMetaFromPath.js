@@ -1,4 +1,4 @@
-import { get, readFile, set } from '@serverless/utils'
+import { findPath, get, readFile, set } from '@serverless/utils'
 import { dirname, isAbsolute, resolve } from 'path'
 import errorTypeFileNotFound from './errorTypeFileNotFound'
 import findTypeFileAtPath from './findTypeFileAtPath'
@@ -14,7 +14,8 @@ import findTypeFileAtPath from './findTypeFileAtPath'
 const loadTypeMetaFromPath = async (typePath, context) => {
   let absoluteTypePath = typePath
   if (!isAbsolute(typePath)) {
-    absoluteTypePath = resolve(context.cwd, typePath)
+    const basePath = findPath(context.root, context.cwd, process.cwd())
+    absoluteTypePath = resolve(basePath, typePath)
   }
 
   // check for type meta in cache
@@ -27,7 +28,7 @@ const loadTypeMetaFromPath = async (typePath, context) => {
   // no type meta found, load file
   const typeFilePath = await findTypeFileAtPath(absoluteTypePath)
   if (!typeFilePath) {
-    throw errorTypeFileNotFound(dirname(typeFilePath))
+    throw errorTypeFileNotFound(dirname(absoluteTypePath))
   }
   typeMeta = {
     root: dirname(typeFilePath),
