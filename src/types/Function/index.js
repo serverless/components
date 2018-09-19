@@ -1,4 +1,4 @@
-import { forEach } from '@serverless/utils'
+import { forEach } from 'ramda'
 
 const Function = {
   deploy: async (instance, context) => {

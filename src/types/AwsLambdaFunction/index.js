@@ -2,10 +2,19 @@ import path from 'path'
 import { tmpdir } from 'os'
 import archiver from 'archiver'
 import { createWriteStream, readFileSync } from 'fs'
+import { forEach } from 'ramda'
 
+/*
+ * Code:
+ *   - String - path to src dir or package file binarys
+ *   - Array of Strings - first item is path to src dir, rest are paths to shim files
+ *   - Buffer - package file binary
+ */
 const AwsLambdaFunction = {
-  pack: async (instance, context) => {
-    const { code, shimStream } = context.inputs
+  pack: async (instance) => {
+    let inputDirPath = instance.Code
+
+    if (typeof instance.Code === Array) inputDirPath = instance.Code[0]
 
     const outputFileName = `${String(Date.now())}.zip`
     const outputFilePath = path.join(tmpdir(), outputFileName)
@@ -23,12 +32,16 @@ const AwsLambdaFunction = {
 
       archive.pipe(output)
 
-      if (shimStream) archive.append(shimStream)
+      if (typeof instance.Code === Array) {
+        forEach((shim) => {
+          if (typeof shim !== String) archive.append(shim)
+        }, instance.Code)
+      }
 
       archive.glob(
         '**/*',
         {
-          cwd: path.resolve(code),
+          cwd: path.resolve(inputDirPath),
           ignore: 'node_modules/aws-sdk/**'
         },
         {}
@@ -38,8 +51,7 @@ const AwsLambdaFunction = {
   },
   deploy: async (instance, context) => {
     // todo
-    // if code is path call pack above
-    // otherwise if binary pass it directly to aws
+    // if code is buffer dont call pack above
   },
   remove: (instance, context) => {
     // todo
