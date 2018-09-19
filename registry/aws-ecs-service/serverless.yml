@@ -51,7 +51,7 @@ outputTypes:
   serviceArn:
     type: string
   serviceName:
-    type: array
+    type: string
   clusterArn:
     type: string
   loadBalancers:
@@ -79,7 +79,7 @@ outputTypes:
   roleArn:
     type: string
   createdAt:
-    type: integer
+    type: datetime
   placementConstraints:
     type: array
   placementStrategy:
