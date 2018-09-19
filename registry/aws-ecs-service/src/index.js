@@ -9,8 +9,14 @@ const deploy = async (inputs, context) => {
     await remove({}, context)
   }
 
+  const { services } = await ecs.describeServices({ services: [inputs.serviceName] }).promise()
+  const existingService = Array.isArray(services) && services.shift()
+
   context.log(`Creating ECS service: "${inputs.serviceName}"`)
-  const { service } = await ecs.createService(inputs).promise()
+  const { serviceName, ...params } = inputs
+  const { service } = await (existingService && existingService.status === 'ACTIVE'
+    ? ecs.updateService(Object.assign(params, { service: serviceName })).promise()
+    : ecs.createService(inputs).promise())
 
   context.log(`ECS service "${inputs.serviceName}" created`)
 
@@ -29,6 +35,7 @@ const remove = async (inputs, context) => {
     })
     .promise()
 
+  await ecs.updateService({ service: state.serviceName, desiredCount: 0 }).promise()
   await Promise.all(
     (tasks.taskArns || []).map((task) => {
       context.log(`Stopping task: "${task}"`)
