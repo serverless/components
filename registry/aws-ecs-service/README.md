@@ -14,13 +14,20 @@ Provision AWS ECS Service with Serverless Components
 ## Input Types
 | Name | Type | Description |
 |:------ |:-----|:-----------------|
-| **cluster**| `integer` | cluster
-| **launchType**| `string` | launchType
+| **loadBalancers**| `array` | loadBalancers
 | **deploymentConfiguration**| `object` | deploymentConfiguration
 | **desiredCount**| `integer` | desiredCount
+| **healthCheckGracePeriodSeconds**| `integer` | healthCheckGracePeriodSeconds
 | **networkConfiguration**| `object` | networkConfiguration
-| **taskDefinition**| `aws-ecs-taskdefinition | object` | taskDefinition
-| **loadBalancers**| `array` | loadBalancers
+| **launchType**| `string` | launchType
+| **placementStrategy**| `array` | placementStrategy
+| **platformVersion**| `string` | platformVersion
+| **role**| `string` | role
+| **schedulingStrategy**| `string` | schedulingStrategy
+| **serviceRegistries**| `array` | serviceRegistries
+| **cluster**| `string` | cluster
+| **placementConstraints**| `array` | placementConstraints
+| **taskDefinition**| `string`<br/>*required* | taskDefinition
 | **serviceName**| `string`<br/>*required* | serviceName
 
 <!-- AUTO-GENERATED-CONTENT:END -->
@@ -38,7 +45,7 @@ Provision AWS ECS Service with Serverless Components
 | **deploymentConfiguration**| `object` | deploymentConfiguration
 | **deployments**| `array` | deployments
 | **roleArn**| `string` | roleArn
-| **createdAt**| `integer` | createdAt
+| **createdAt**| `any` | createdAt
 | **status**| `string` | status
 | **placementConstraints**| `array` | placementConstraints
 | **serviceRegisteries**| `string` | serviceRegisteries
@@ -47,7 +54,7 @@ Provision AWS ECS Service with Serverless Components
 | **networkConfiguration**| `object` | networkConfiguration
 | **clusterArn**| `string` | clusterArn
 | **healthCheckGracePeriodSeconds**| `integers` | healthCheckGracePeriodSeconds
-| **serviceName**| `array` | serviceName
+| **serviceName**| `string` | serviceName
 | **schedulingStrategy**| `string` | schedulingStrategy
 | **platformVersion**| `string` | platformVersion
 
@@ -61,9 +68,9 @@ components:
   myAwsEcsService:
     type: aws-ecs-service
     inputs:
-      launchType: FARGATE
       desiredCount: 10
-      taskDefinition: sleep360
+      launchType: FARGATE
+      taskDefinition: '${myECSTaskDefinition}'
       serviceName: myAwsEcsService
 
 ```
