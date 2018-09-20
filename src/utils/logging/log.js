@@ -1,7 +1,7 @@
-module.exports = (message) => {
+module.exports = (...params) => {
   if (!process.env.CI) {
     try {
-      process.stdout.write(`${message}\n`)
+      console.log(...params) //eslint-disable-line no-console
     } catch (error) {} // eslint-disable-line no-empty
   }
 }
