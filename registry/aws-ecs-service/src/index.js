@@ -13,10 +13,16 @@ const deploy = async (inputs, context) => {
   const existingService = Array.isArray(services) && services.shift()
 
   context.log(`Creating ECS service: "${inputs.serviceName}"`)
-  const { serviceName, ...params } = inputs
+  const { serviceName, taskDefinition: taskDefinitionOriginal, ...params } = inputs
+
+  const taskDefinition =
+    typeof taskDefinitionOriginal === 'object'
+      ? `${taskDefinitionOriginal.family}:${taskDefinitionOriginal.revision}`
+      : taskDefinitionOriginal
+
   const { service } = await (existingService && existingService.status === 'ACTIVE'
-    ? ecs.updateService(Object.assign(params, { service: serviceName })).promise()
-    : ecs.createService(inputs).promise())
+    ? ecs.updateService({ ...params, service: serviceName, taskDefinition }).promise()
+    : ecs.createService({ ...inputs, taskDefinition }).promise())
 
   context.log(`ECS service "${inputs.serviceName}" created`)
 

@@ -43,7 +43,7 @@ inputTypes:
   taskDefinition:
     type: string
     required: true
-    example: sleep360:1
+    example: ${myECSTaskDefinition}
   loadBalancers:
     type: array
 
@@ -79,7 +79,7 @@ outputTypes:
   roleArn:
     type: string
   createdAt:
-    type: datetime
+    type: any
   placementConstraints:
     type: array
   placementStrategy:
