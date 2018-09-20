@@ -14,10 +14,10 @@ inputTypes:
     description: You must specify a family for a task definition, which allows you to track multiple versions of the same task definition. The family is used as a name for your task definition. Up to 255 letters (uppercase and lowercase), numbers, hyphens, and underscores are allowed.
     example: "sleep360"
   cpu:
-    type: integer
+    type: string
     description: The number of CPU units used by the task. It can be expressed as an integer using CPU units, for example 1024, or as a string using vCPUs, for example 1 vCPU or 1 vcpu, in a task definition.
   memory:
-    type: integer
+    type: string
     description: The amount of memory (in MiB) used by the task. It can be expressed as an integer using MiB, for example 1024, or as a string using GB, for example 1GB or 1 GB, in a task definition.
   networkMode:
     type: string
@@ -89,7 +89,7 @@ outputTypes:
     enum: [ACTIVE, INACTIVE]
     description: The status of the task definition.
   requiresAttributes:
-    type: string
+    type: array
     description: The container instance attributes required by your task. This field is not valid if using the Fargate launch type for your task.
   placementConstraints:
     type: array
@@ -98,7 +98,7 @@ outputTypes:
     type: array
     description: The launch type to use with your task.
   requiresCompatibilities:
-    type: string
+    type: array
     description: The launch type the task is using.
   cpu:
     type: string
