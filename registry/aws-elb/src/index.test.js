@@ -145,7 +145,7 @@ describe('aws-elb tests', () => {
     expect(arn).toEqual('arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/my-project-elb/b8aeaf4b672f5107')
     expect(contextMock.state.subnets).toEqual(inputs.subnets)
   })
-  it('should update  of an existing ELB', async () => {
+  it('should update ipAddressType of an existing ELB', async () => {
     const contextMock = {
       state: {
         name: 'my-project-elb',
