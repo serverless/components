@@ -44,7 +44,7 @@ const setIpAddressType = async (inputs, arn) => {
          if (err) console.log(err, err.stack);
       });
 }
-const createELB = async (inputs,context) => {
+const createELB = async (inputs,state) => {
 
     var params = {
      Name: inputs.name,
@@ -60,33 +60,33 @@ const createELB = async (inputs,context) => {
     if (err)  console.log(err, err.stack);
      else     return data;
     }).promise();
-    context.saveState({ name: inputs.name,
-                    subnets: inputs.subnets,
-                    securityGroups: inputs.securityGroups,
-                    ipAddressType: elb.LoadBalancers[0]["IpAddressType"],
-                    scheme: elb.LoadBalancers[0]["Scheme"],
-                    elbtype: elb.LoadBalancers[0]["Type"],
-                    subnetMappings: inputs.subnetMappings,
-                    arn: elb.LoadBalancers[0]["LoadBalancerArn"]
-                    })
+    state.name = inputs.name,
+    state.subnets = inputs.subnets,
+    state.securityGroups = inputs.securityGroups,
+    state.ipAddressType = elb.LoadBalancers[0]["IpAddressType"],
+    state.scheme = elb.LoadBalancers[0]["Scheme"],
+    state.elbtype = elb.LoadBalancers[0]["Type"],
+    state.subnetMappings = inputs.subnetMappings,
+    state.arn = elb.LoadBalancers[0]["LoadBalancerArn"]
 
-    return context.state.arn
 }
 const deploy = async (inputs, context) => {
 
     const state  = context.state
     if (!state.name && inputs.name) {
     context.log(`Creating ELb: '${inputs.name}'`)
-    const arn = await createELB(inputs,context)
-     return { arn: arn }
+    await createELB(inputs,state)
+    context.saveState(state)
+    return { arn: state.arn }
   }
     if (state.name !== inputs.name || state.elbtype !== inputs.elbtype && inputs.elbtype || state.scheme !== inputs.scheme && inputs.scheme)
    {
       context.log("changing name or elbtype or scheme forces new resource")
       await remove(inputs,context)
       context.log(`Creating ELb: '${inputs.name}'`)
-      const arn = await createELB(inputs,context)
-       return { arn: arn }
+      await createELB(inputs,state)
+      context.saveState(state)
+      return { arn: state.arn }
    }
  if (!compareArrays(state.securityGroups,inputs.securityGroups)) {
     await setSecurityGroup(inputs, state.arn)
