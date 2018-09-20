@@ -1,23 +1,33 @@
 type: Component
-name: AwsLambda
+name: AwsLambdaFunction
+
 version: 1.0.0
 main: ./index.js
 
-memory: ${input.memory || 1028}
-timeout: ${input.timeout || 10}
-runtime:
-code: string
-handler: string
-role: string
-environment: Object<string, string>
-tags: Object<string, string> (explore the feasibility of this)
+Provider: ${input.Provider}
+FunctionName: ${input.FunctionName}
+Handler: ${input.Handler}
+Runtime: ${input.Runtime}
+Code: ${input.Code}
+MemorySize: ${input.MemorySize}
+Timeout: ${input.Timeout}
+Environment: ${input.Environment}
 
 inputTypes:
-  name: string
-  memory: integer
-  timeout: integer
-  runtime: string
-  code: string
-  handler: string
-  role: string
-  environment: Object<string, string>
+  Provider:
+    type: Provider
+    default: ${context.Provider}
+  FunctionName:
+    type: string
+  Handler:
+    type: string
+  Code:
+    type: string || array || buffer
+  Runtime:
+    type: string
+  MemorySize:
+    type: integer
+  Timeout:
+    type: integer
+  Environment:
+    type: object

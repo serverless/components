@@ -1,2 +1,21 @@
 type: Compute
 name: AwsLambdaCompute
+
+provider: ${input.provider}
+runtime: ${input.runtime}
+memory: ${input.memory}
+timeout: ${input.timeout}
+
+inputTypes:
+  provider:
+    type: Object<string, Provider>
+    default: ${context.providers}
+  runtime:
+    type: string
+    default: ${context.runtime}
+  memory:
+    type: string
+    default: ${context.memory}
+  timeout:
+    type: string
+    default: ${context.timeout}

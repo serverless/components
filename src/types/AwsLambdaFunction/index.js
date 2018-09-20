@@ -80,8 +80,10 @@ const deleteLambda = async (Lambda, FunctionName) => {
   }
 }
 
-export const pack = async (instance, context) => {
-  let inputDirPath = instance.Code
+export const pack = async (instance) => {
+  const { FunctionName, Handler, Code, Runtime, MemorySize, Timeout } = instance
+  const outputs = { FunctionName, Handler, Code, Runtime, MemorySize, Timeout }
+  let inputDirPath = outputs.Code
 
   if (typeof instance.Code === Array) inputDirPath = instance.Code[0]
 
@@ -96,15 +98,16 @@ export const pack = async (instance, context) => {
 
     archive.on('error', (err) => reject(err))
     output.on('close', () => {
-      return resolve(readFileSync(outputFilePath))
+      outputs.Code = readFileSync(outputFilePath)
+      return resolve(outputs)
     })
 
     archive.pipe(output)
 
-    if (typeof instance.Code === Array) {
+    if (typeof outputs.Code === Array) {
       forEach((shim) => {
         if (typeof shim !== String) archive.append(shim)
-      }, instance.Code)
+      }, outputs.Code)
     }
 
     archive.glob(
@@ -120,7 +123,7 @@ export const pack = async (instance, context) => {
 }
 
 export const deploy = async (instance, context) => {
-  const Lambda = new instance.provider.getSdk().Lambda
+  const Lambda = new instance.Provider.getSdk().Lambda
   let outputs = {}
   const configuredRoleArn = instance.Role
   let { defaultRoleArn } = context.state
@@ -153,10 +156,10 @@ export const deploy = async (instance, context) => {
   } else if (instance.FunctionName !== context.state.FunctionName) {
     context.log(`Removing Lambda: ${context.state.FunctionName}`)
     await deleteLambda(Lambda, context.state.FunctionName)
-    context.log(`Creating Lambda: ${inputs.FunctionName}`)
+    context.log(`Creating Lambda: ${instance.FunctionName}`)
     outputs = await createLambda(Lambda, instance)
   } else {
-    context.log(`Updating Lambda: ${inputs.FunctionName}`)
+    context.log(`Updating Lambda: ${instance.FunctionName}`)
     outputs = await updateLambda(Lambda, instance)
   }
 

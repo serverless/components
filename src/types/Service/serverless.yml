@@ -4,8 +4,16 @@ version: 1.0.0
 main: ./index.js
 
 providers: ${input.providers}
+compute: ${input.compute}
+functions: ${input.functions}
 
 inputTypes:
   providers:
     type: Object<string, Provider>
     default: ${context.providers}
+  compute:
+    type: Object<string, Compute>
+    default: ${context.compute}
+  functions:
+    type: Object
+    default: ${context.functions}

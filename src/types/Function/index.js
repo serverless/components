@@ -1,11 +1,13 @@
-import { forEach } from 'ramda'
+import { forEachObjIndexed } from 'ramda'
 
 const Function = {
   deploy: async (instance, context) => {
-    forEach((c) => c.deploy(context), instance.compute)
+    const { name, handler, code, runtime, memory, timeout } = instance
+    const functionInputs = { name, handler, code, runtime, memory, timeout }
+    forEachObjIndexed((c) => c.deploy(context, functionInputs), instance.compute)
   },
   remove: (instance, context) => {
-    forEach((c) => c.remove(context), instance.compute)
+    forEachObjIndexed((c) => c.remove(context), instance.compute)
   }
 }
 
