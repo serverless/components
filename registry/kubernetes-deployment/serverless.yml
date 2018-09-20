@@ -1,0 +1,69 @@
+type: kubernetes-deployment
+version: 0.2.0
+core: 0.2.x
+
+description: "Create a Kubernetes Deployment"
+license: Apache-2.0
+author: "Serverless Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
+
+inputTypes:
+  name:
+    type: string
+    required: true
+    example: mykubedeployment
+  metadata:
+    type: object
+  namespace:
+    type: string
+    required: true
+    example: default
+  minReadySeconds:
+    type: integer
+  paused:
+    type: boolean
+  progressDeadlineSeconds:
+    type: integer
+  replicas:
+    type: integer
+    example: 1
+  revisionHistoryLimit:
+    type: integer
+  selector:
+    type: object
+    example:
+      matchLabels:
+        app: nginx
+  strategy:
+    type: object
+  template:
+    type: object
+    required: true
+    example:
+      metadata:
+        labels:
+          app: nginx
+      spec:
+        containers:
+        - name: nginx
+          image: nginx:1.7.9
+          ports:
+          - containerPort: 80
+
+outputTypes:
+  availableReplicas:
+    type: integer
+  collisionCount:
+    type: integer
+  conditions:
+    type: array
+  observedGeneration:
+    type: integer
+  readyReplicas:
+    type: integer
+  replicas:
+    type: integer
+  unavailableReplicas:
+    type: integer
+  updatedReplicas:
+    type: integer
