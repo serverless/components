@@ -3,17 +3,18 @@ const ELBComponent = require('./index')
 
 jest.mock('aws-sdk', () => {
   const mocks = {
-    createLoadBalancerMock: jest.fn().mockImplementation(() => {
+    createLoadBalancerMock: jest.fn().mockImplementation((params) => {
       return Promise.resolve({ LoadBalancers:
                                [ { LoadBalancerArn: 'arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/my-project-elb/b8aeaf4b672f5107',
-                                   LoadBalancerName: 'my-project-elb',
+                                   LoadBalancerName: params.name,
                                    Scheme: 'internet-facing',
                                    Type: 'application',
                                    IpAddressType: 'ipv4'} ] }
                                )}),
     deleteLoadBalancerMock: jest.fn().mockReturnValue({}),
     setSecurityGroupsMock: jest.fn().mockReturnValue({}),
-    setSubnetsMock: jest.fn().mockReturnValue({})
+    setSubnetsMock: jest.fn().mockReturnValue({}),
+    setIpAddressTypeMock: jest.fn().mockReturnValue({})
 }
 
   const ELBv2 = {
@@ -28,6 +29,9 @@ jest.mock('aws-sdk', () => {
     ),
     setSubnets: (obj) => (
       mocks.setSubnetsMock(obj)
+    ),
+    setIpAddressType: (obj) => (
+      mocks.setIpAddressTypeMock(obj)
     )
 }
 
@@ -42,6 +46,7 @@ afterEach(() => {
   AWS.mocks.deleteLoadBalancerMock.mockClear()
   AWS.mocks.setSecurityGroupsMock.mockClear()
   AWS.mocks.setSubnetsMock.mockClear()
+  AWS.mocks.setIpAddressTypeMock.mockClear()
 })
 
 afterAll(() => {
@@ -114,7 +119,7 @@ describe('aws-elb tests', () => {
     expect(arn).toEqual('arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/my-project-elb/b8aeaf4b672f5107')
     expect(contextMock.state.securityGroups).toEqual(inputs.securityGroups)
   })
-  it('should update subnets of an existing ELB', async () => {
+  it('should update IpAddressType of an existing ELB', async () => {
     const contextMock = {
       state: {
         name: 'my-project-elb',
@@ -139,5 +144,54 @@ describe('aws-elb tests', () => {
     expect(contextMock.saveState).toHaveBeenCalledTimes(0)
     expect(arn).toEqual('arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/my-project-elb/b8aeaf4b672f5107')
     expect(contextMock.state.subnets).toEqual(inputs.subnets)
+  })
+  it('should update  of an existing ELB', async () => {
+    const contextMock = {
+      state: {
+        name: 'my-project-elb',
+         arn: 'arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/my-project-elb/b8aeaf4b672f5107',
+        subnets: ["subnet-0b8da2094908e1b23","subnet-01a46af43b2c5e16c"],
+        securityGroups: ["sg-03fa0c02886c183d4"],
+        ipAddressType: 'ipv4'
+      },
+      log: () => {},
+      saveState: jest.fn()
+    }
+    const inputs = {
+      name: 'my-project-elb',
+      arn: 'arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/my-project-elb/b8aeaf4b672f5107',
+     subnets: ["subnet-0b8da2094908e1b23","subnet-02579e43d5262dfeb"],
+     securityGroups: ["sg-03fa0c02886c183d4"],
+     ipAddressType: 'dualstack'
+    }
+    const {arn} = await ELBComponent.deploy(inputs, contextMock)
+    expect(AWS.ELBv2).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.createLoadBalancerMock).toHaveBeenCalledTimes(0)
+    expect(AWS.mocks.deleteLoadBalancerMock).toHaveBeenCalledTimes(0)
+    expect(AWS.mocks.setIpAddressTypeMock).toHaveBeenCalledTimes(1)
+    expect(contextMock.saveState).toHaveBeenCalledTimes(0)
+    expect(arn).toEqual('arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/my-project-elb/b8aeaf4b672f5107')
+    expect(contextMock.state.ipAddressType).toEqual(inputs.ipAddressType)
+  })
+  it('changing ELB name it should delete the existing ELB and create new one', async () => {
+    const contextMock = {
+      state: {
+        name: 'my-project-elb',
+         arn: 'arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/my-project-elb/b8aeaf4b672f5107'
+      },
+      log: () => {},
+      saveState: jest.fn()
+    }
+    const inputs = {
+      name: 'my-project-elb1',
+      subnets: ["subnet-0b8da2094908e1b23","subnet-02579e43d5262dfeb"],
+    }
+    const {arn} = await ELBComponent.deploy(inputs, contextMock)
+    expect(AWS.ELBv2).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.createLoadBalancerMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.deleteLoadBalancerMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.setSubnetsMock).toHaveBeenCalledTimes(0)
+    expect(contextMock.saveState).toHaveBeenCalledTimes(2)
+    expect(contextMock.state.name).toEqual(inputs.name)
   })
 })
