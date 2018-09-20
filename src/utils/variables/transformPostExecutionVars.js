@@ -13,17 +13,19 @@ module.exports = (slsYml) => {
         const referencedVariable = replace(/[${}]/g, '', reference).split('.')
         const referencedComponentAlias = referencedVariable[0]
         if (!reservedNames.includes(referencedComponentAlias)) {
-          if (!slsYml.components[referencedComponentAlias]) {
-            /* eslint-disable */
-            console.log(`Error: Unable to find "${referencedComponentAlias}" variable reference in ${
-              slsYml.type
-            } component.
+          if (slsYml.components) {
+            if (!slsYml.components[referencedComponentAlias]) {
+              /* eslint-disable */
+              console.log(`Error: Unable to find "${referencedComponentAlias}" variable reference in ${
+                slsYml.type
+                } component.
 Please double check spelling of reference in ${slsYml.type} component.`)
-            /* eslint-enable */
+              /* eslint-enable */
+            }
+            const componentId = slsYml.components[referencedComponentAlias].id
+            referencedVariable[0] = componentId
+            return `\${${referencedVariable.join('.')}}`
           }
-          const componentId = slsYml.components[referencedComponentAlias].id
-          referencedVariable[0] = componentId
-          return `\${${referencedVariable.join('.')}}`
         }
         return reference
       })
