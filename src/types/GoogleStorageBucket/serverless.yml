@@ -1,0 +1,9 @@
+name: GoogleStorageBucket
+extends: Component
+implements:
+  - ISource
+
+version: 1.0.0
+main: ./index.js
+
+bucketName: String

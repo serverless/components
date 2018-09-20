@@ -1,0 +1,21 @@
+extends: Service
+name: example-service
+
+description: Connects a Google Cloud Storage bucket to a Google Cloud Function using a subscription
+
+components:
+  myStorageBucket:
+    type: GoogleCloudStorageBucket
+    inputs:
+      name: ${inputs.name}-bucket
+  myCloudFunction:
+    type: GoogleCloudFunction
+    # inputs:
+    #   ...
+  mySubscription:
+    type: Subscription
+    inputs:
+      source: ${myStorageBucket}
+      sink: ${myCloudFunction}
+      config:
+        event: google.storage.object.finalize

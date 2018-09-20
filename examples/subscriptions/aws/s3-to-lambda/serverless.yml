@@ -1,0 +1,24 @@
+extends: Service
+name: example-service
+
+description: Connects a S3 bucket to a Lambda function using a subscription
+
+components:
+  myS3Bucket:
+    type: AwsS3Bucket
+    inputs:
+      name: ${inputs.name}-bucket
+  myLambdaFunction:
+    type: AwsLambdaFunction
+    # inputs:
+    #   ...
+  mySubscription:
+    type: Subscription
+    inputs:
+      source: ${myS3Bucket}
+      sink: ${myLambdaFunction}
+      config:
+        event: s3:ObjectCreated:*
+        filter:
+          - prefix: uploads/
+          - suffix: .jpg

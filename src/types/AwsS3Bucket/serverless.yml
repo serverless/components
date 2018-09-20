@@ -1,0 +1,9 @@
+name: AwsS3Bucket
+extends: Component
+implements:
+  - ISource
+
+version: 1.0.0
+main: ./index.js
+
+arn: String

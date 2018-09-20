@@ -1,0 +1,9 @@
+extends: Component
+name: Subscription
+version: 1.0.0
+main: ./index.js
+
+config: Object
+source: ISource
+sink: ISink
+gateway: IGateway
