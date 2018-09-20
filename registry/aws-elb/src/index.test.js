@@ -3,7 +3,7 @@ const ELBComponent = require('./index')
 
 jest.mock('aws-sdk', () => {
   const mocks = {
-    createLoadBalancerMock: jest.fn().mockImplementation((params) => {
+    createLoadBalancerMock: jest.fn().mockImplementation(() => {
       return Promise.resolve({ LoadBalancers:
                                [ { LoadBalancerArn: 'arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/my-project-elb/b8aeaf4b672f5107',
                                    LoadBalancerName: 'my-project-elb',
