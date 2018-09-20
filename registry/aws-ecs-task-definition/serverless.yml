@@ -14,29 +14,22 @@ inputTypes:
     example: "sleep360"
   cpu:
     type: integer
-    required: false
   memory:
     type: integer
-    required: false
   networkMode:
     type: string
-    required: false
     enum: [none, bridge, awsvpc, host]
   placementConstraints:
     type: object
   requiresCompatibilities:
     type: array
-    required: false
   executionRoleArn:
     type: string
-    required: false
   taskRoleArn:
     type: string
-    required: false
     example: ""
   containerDefinitions:
     type: array
-    required: false
     example:
       - name: "sleep"
         command: ["sleep", "360"]
