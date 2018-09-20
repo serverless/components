@@ -1,0 +1,109 @@
+type: aws-ecs-fargate-service
+version: 0.2.0
+core: 0.2.x
+
+description: "Provision AWS ECS Fargate Service with Serverless Components"
+license: Apache-2.0
+author: "Serverless Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
+
+inputTypes:
+  serviceName:
+    type: string
+    required: true
+    example: myAwsEcsFargateService
+  cpu:
+    type: string
+    enum: [256, 512, 1024, 2048, 4096]
+    example: "256"
+  memory:
+    type: string
+    enum: [512, 1024, 2014, 4096, 5120, 6144, 7168, 8192, 9216, 10240, 11264, 12288, 13312, 14336, 15360, 16384, 17408, 18432, 19456, 20480, 21504, 22528, 23552, 24576, 25600, 26624, 27648, 28672, 29696, 30720]
+    example: "512"
+  containerDefinitions:
+    type: array
+    description: A list of container definitions in JSON format that describe the different containers that make up your task.
+    required: true
+    example:
+    - name: "sleep"
+      command: ["sleep", "360"]
+      essential: true
+      image: "busybox"
+  desiredCount:
+    type: integer
+    example: 10
+    required: true
+  awsVpcConfiguration:
+    type: object
+    required: true
+    example:
+      assignPublicIp: DISABLED
+      securityGroups: []
+      subnets: [SUBNET_ID_HERE]
+
+
+outputTypes:
+  serviceArn:
+    type: string
+  serviceName:
+    type: string
+  clusterArn:
+    type: string
+  loadBalancers:
+    type: array
+  serviceRegisteries:
+    type: string
+  status:
+    type: string
+  desiredCount:
+    type: integer
+  runningCount:
+    type: integer
+  pendingCount:
+    type: integer
+  launchType:
+    type: string
+  platformVersion:
+    type: string
+  taskDefinition:
+    type: string
+  deploymentConfiguration:
+    type: object
+  deployments:
+    type: array
+  roleArn:
+    type: string
+  createdAt:
+    type: datetime
+  placementConstraints:
+    type: array
+  placementStrategy:
+    type: array
+  networkConfiguration:
+    type: object
+  healthCheckGracePeriodSeconds:
+    type: integers
+  schedulingStrategy:
+    type: string
+
+components:
+  awsEcsTaskdefinition:
+    type: aws-ecs-task-definition
+    inputs:
+      family: ${input.serviceName}-family
+      volumes: []
+      containerDefinitions: ${input.containerDefinitions}
+      networkMode: awsvpc
+      requiresCompatibilities: [FARGATE]
+      cpu: ${input.cpu}
+      memory: ${input.memory}
+
+  awsEcsService:
+    type: aws-ecs-service
+    inputs:
+      launchType: FARGATE
+      desiredCount: ${input.desiredCount}
+      taskDefinition: ${awsEcsTaskdefinition.family}:${awsEcsTaskdefinition.revision}
+      serviceName: ${input.serviceName}
+      networkConfiguration:
+        awsvpcConfiguration: ${input.awsVpcConfiguration}
