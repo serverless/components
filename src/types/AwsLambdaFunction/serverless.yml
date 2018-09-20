@@ -1,8 +1,12 @@
 name: AwsLambdaFunction
 extends: Component
+implements:
+  - ISink
 
 version: 1.0.0
 main: ./index.js
+
+arn: String
 
 inputTypes:
   Provider:

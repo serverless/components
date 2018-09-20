@@ -220,6 +220,7 @@ const AwsLambdaFunction = {
     context.saveState({ ...outputs, defaultRoleArn, defaultRoleName })
     return outputs
   },
+
   async remove(context) {
     const outputs = {
       name: null,
@@ -257,6 +258,15 @@ const AwsLambdaFunction = {
     }
     context.saveState(outputs)
     return outputs
+  },
+
+  // NOTE: this is the implementation for the ISink interface
+  getSinkConfig() {
+    return {
+      uri: this.arn,
+      protocol: 'AwsLambdaFunction'
+    }
   }
 }
+
 export default AwsLambdaFunction

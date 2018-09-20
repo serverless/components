@@ -1,0 +1,29 @@
+extends: Service
+name: example-service
+
+description: Connects a S3 bucket to a Google Cloud Function function using a subscription and a gateway
+
+components:
+  myS3Bucket:
+    type: AwsS3Bucket
+    # inputs:
+    #   ...
+  myCloudFunction:
+    type: GoogleCloudFunction
+    # inputs:
+    #   ...
+  myEventGateway:
+    type: ServerlessEventGateway
+    # inputs:
+    #   ...
+  mySubscription:
+    type: Subscription
+    inputs:
+      source: ${myS3Bucket}
+      sink: ${myCloudFunction}
+      gateway: ${myEventGateway}
+      config:
+        event: s3:ObjectCreated:*
+        filter:
+          - prefix: uploads/
+          - suffix: .jpg
