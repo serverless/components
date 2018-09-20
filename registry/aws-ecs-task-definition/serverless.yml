@@ -1,4 +1,4 @@
-type: aws-ecs-taskdefinition
+type: aws-ecs-task-definition
 version: 0.2.0
 core: 0.2.x
 

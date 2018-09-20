@@ -1,5 +1,5 @@
 {
-  "name": "@serverless-components/aws-ecs-taskdefinition",
+  "name": "@serverless-components/aws-ecs-task-definition",
   "version": "0.2.0",
   "private": true,
   "main": "dist/index.js",

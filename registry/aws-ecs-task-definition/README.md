@@ -1,5 +1,5 @@
 <!-- AUTO-GENERATED-CONTENT:START (COMPONENT_HEADER) -->
-# AWS Ecs Taskdefinition
+# AWS Ecs Task Definition
 
 Provision AWS ECS TaskDefinition with Serverless Components
 <!-- AUTO-GENERATED-CONTENT:END -->
@@ -54,8 +54,8 @@ Provision AWS ECS TaskDefinition with Serverless Components
 ```yml
 type: my-application
 components:
-  myAwsEcsTaskdefinition:
-    type: aws-ecs-taskdefinition
+  myAwsEcsTaskDefinition:
+    type: aws-ecs-task-definition
     inputs:
       volumes: []
       containerDefinitions:
