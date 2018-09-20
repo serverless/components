@@ -186,7 +186,7 @@ describe('aws-elb tests', () => {
       name: 'my-project-elb1',
       subnets: ["subnet-0b8da2094908e1b23","subnet-02579e43d5262dfeb"],
     }
-    const {arn} = await ELBComponent.deploy(inputs, contextMock)
+    await ELBComponent.deploy(inputs, contextMock)
     expect(AWS.ELBv2).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.createLoadBalancerMock).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.deleteLoadBalancerMock).toHaveBeenCalledTimes(1)
