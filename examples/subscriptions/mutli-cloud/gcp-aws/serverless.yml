@@ -1,0 +1,26 @@
+extends: service
+name: example-service
+
+description: Connects an Storage bucket to a Lambda function using a subscription and a gateway
+
+components:
+  myStorageBucket:
+    type: GoogleCloudStorageBucket
+    # inputs:
+    #   ...
+  myLambdaFunction:
+    type: AwsLambdaFunction
+    # inputs:
+    #   ...
+  myEventGateway:
+    type: ServerlessEventGateway
+    # inputs:
+    #   ...
+  mySubscription:
+    type: Subscription
+    inputs:
+      source: ${myStorageBucket}
+      sink: ${myLambdaFunction}
+      gateway: ${myEventGateway}
+      config:
+        event: google.storage.object.finalize
