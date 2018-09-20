@@ -1,0 +1,48 @@
+type: Service
+name: SimpleService
+
+provider:
+  aws:
+    type: AwsProvider
+    inputs:
+      accessKey: 1234567890
+      secretKey: 1234567890
+      region: us-east-1
+  azure:
+    type: AzureProvider
+    inputs:
+      subscriptionId: 1234567890
+      directoryId: 1234567890
+      appId: 1234567890
+      subscriptionId: 1234567890
+      location: us-east-1
+
+compute:
+  awsLambda:
+    type: AwsLambdaCompute
+    inputs:
+      provider: ${inputs.provider.aws}
+      runtime: nodejs
+      memory: 512
+      timeout: 10
+  awsLambda:
+    type: AzureFunctionsCompute
+    inputs:
+      provider: ${inputs.provider.azure}
+      runtime: nodejs
+      memory: 512
+      timeout: 10
+
+functions:
+  hello:
+    compute:
+      aws: ${inputs.compute.awsLambda}
+    handler: index.hello
+    code: ./code
+    memory: 1024
+  world:
+    compute:
+      aws: ${inputs.compute.awsLambda}
+      azure: ${inputs.compute.azureFunctions}
+    handler: index.world
+    code: ./code

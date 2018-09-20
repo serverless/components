@@ -3,11 +3,12 @@ import { createReadStream } from 'fs'
 
 const pack = async (instance, context) => {
   const AwsLambdaFunctionInputs = {
+    Provider: instance.provider,
     FunctionName: instance.name,
-    MemorySize: instance.memory, // todo validate
+    MemorySize: instance.memory,
     Timeout: instance.timeout,
     Handler: 'shim.handler',
-    Description: 'Serverless Function'
+    Code: instance.code
   }
 
   // env
@@ -20,26 +21,25 @@ const pack = async (instance, context) => {
     AwsLambdaFunctionInputs.Runtime = 'nodejs8.10'
   } // todo other runtimes
 
-  if (typeof instance.code === String) {
+  if (typeof AwsLambdaFunctionInputs.Code === String) {
     let shimFile
     if (AwsLambdaFunctionInputs.Runtime === 'nodejs8.10') {
       shimFile = 'shim.js'
     } // todo other runtimes
     const shimFilePath = path.join(__dirname, 'shims', shimFile)
     const shimStream = createReadStream(shimFilePath, { name: shimFile })
-    AwsLambdaFunctionInputs.Code = [instance.code, shimStream]
-  } else {
-    AwsLambdaFunctionInputs.Code = instance.code
+    AwsLambdaFunctionInputs.Code = [AwsLambdaFunctionInputs.Code, shimStream]
   }
 
-  const AwsLambdaFunction = context.loadType('AwsLambdaFunction')
+  const AwsLambdaFunction = await context.loadType('AwsLambdaFunction')
   const awsLambdaFunction = context.construct(AwsLambdaFunction, AwsLambdaFunctionInputs)
   return awsLambdaFunction.pack(context)
 }
 
-const deploy = async (instance, context) => {
-  const AwsLambdaFunctionInputs = await instance.pack(instance, context)
-  const AwsLambdaFunction = context.loadType('AwsLambdaFunction')
+const deploy = async (instance, context, functionInputs) => {
+  instance = { ...instance, ...functionInputs }
+  const AwsLambdaFunctionInputs = await instance.pack(context)
+  const AwsLambdaFunction = await context.loadType('AwsLambdaFunction')
   const awsLambdaFunction = context.construct(AwsLambdaFunction, AwsLambdaFunctionInputs)
   return awsLambdaFunction.deploy(context)
 }

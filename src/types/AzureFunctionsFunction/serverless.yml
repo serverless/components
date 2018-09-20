@@ -7,20 +7,22 @@ memory: ${input.memory || 1028}
 timeout: ${input.timeout || 10}
 runtime:
 code: string (path to folder for code)
-handler: string
+handler: string (property path for function)
+provider: string (name of provider to use for this) | Provider (a provider type that knows the function)
 compute: Compute?
 environment: Object<string, string>
-tags: Object<string, string>
+tags: Object<string, string> (explore the feasibility of this)
 
 inputTypes:
-  compute:
-    type: Object<string, Compute>
-    default: ${context.compute}
-  name: string
+  providers:
+    type: Object<string, Provider>
+    default: ${context.providers}
   memory: integer
   timeout: integer
   runtime: string (common format across providers that is converted by provider code)
   code: string (path to folder for code)
   handler: string (property path for function)
+  provider: string (name of provider to use for this) | Provider (a provider type that knows the function)
+  compute: Compute?
   environment: Object<string, string>
-  tags: Object<string, string>
+  tags: Object<string, string> (explore the feasibility of this)
