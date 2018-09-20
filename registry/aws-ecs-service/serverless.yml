@@ -41,7 +41,7 @@ inputTypes:
   serviceRegistries:
     type: array
   taskDefinition:
-    type: string
+    type: any
     required: true
     example: ${myECSTaskDefinition}
   loadBalancers:

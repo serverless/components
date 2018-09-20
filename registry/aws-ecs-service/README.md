@@ -27,7 +27,7 @@ Provision AWS ECS Service with Serverless Components
 | **serviceRegistries**| `array` | serviceRegistries
 | **cluster**| `string` | cluster
 | **placementConstraints**| `array` | placementConstraints
-| **taskDefinition**| `string`<br/>*required* | taskDefinition
+| **taskDefinition**| `any`<br/>*required* | taskDefinition
 | **serviceName**| `string`<br/>*required* | serviceName
 
 <!-- AUTO-GENERATED-CONTENT:END -->
