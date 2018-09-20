@@ -1,0 +1,21 @@
+type: Component
+name: AwsIamRole
+version: 1.0.0
+main: ./index.js
+
+inputTypes:
+  name:
+    type: string
+    default: role-${self.instanceId}
+    displayName: IAM role name
+    description: The name of the role to create
+  service:
+    type: string
+    required: true
+    displayName: Principle AWS service
+    description: The name of the AWS service to create role for
+    example: lambda.amazonaws.com
+  policy:
+    type: object
+    displayName: IAM Role Policy
+    description: The policy that grants an entity permission to assume the role
