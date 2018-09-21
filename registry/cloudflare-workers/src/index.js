@@ -30,7 +30,7 @@ const _cfApiCall = async ({ url, method, contentType = null, body = null }) => {
       'Please make sure env variables "CLOUDFLARE_AUTH_EMAIL" and ' +
         '"CLOUDFLARE_AUTH_KEY" are set before trying to deploy.'
     )
-  let options = {
+  const options = {
     headers: {
       'X-Auth-Email': EMAIL,
       'X-Auth-Key': AUTH_KEY
