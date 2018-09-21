@@ -21,12 +21,7 @@ const fetch = require('node-fetch')
 const fs = require('fs')
 
 class CloudflareWorkers {
-  constructor(
-    credentials = {
-      authKey: process.env.CLOUDFLARE_AUTH_KEY,
-      authEmail: process.env.CLOUDFLARE_AUTH_EMAIL
-    }
-  ) {
+  constructor(credentials) {
     if (!credentials.authKey || !credentials.authEmail) {
       throw new Error(
         'Please make sure that you have "authKey" and "authEmail" set under "credentials" input property in your serverless.yml'
