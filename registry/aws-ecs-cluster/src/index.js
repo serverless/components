@@ -18,6 +18,7 @@ const deploy = async (inputs, context) => {
   }
 
   context.log(`Creating ECS cluster: "${inputs.clusterName}"`)
+
   const { cluster } = await ecs
     .createCluster({
       clusterName: inputs.clusterName

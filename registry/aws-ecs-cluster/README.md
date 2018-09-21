@@ -20,6 +20,7 @@ Provision AWS ECS Cluster with Serverless Components
 | Name | Type | Description |
 |:------ |:-----|:-----------------|
 | **clusterArn**| `string` | The ARN that identifies the cluster
+| **clusterName**| `string` | The name of the cluster
 
 <!-- AUTO-GENERATED-CONTENT:END -->
 <!-- AUTO-GENERATED-CONTENT:START (COMPONENT_EXAMPLES) -->
