@@ -34,7 +34,7 @@ components:
     inputs:
       vpcId: vpc-abbaabba
       groupName: my-security-group
-      description: Security group for enabling access to ephemeral port range
+      description: Security group for my Fargate container
 
 ```
 <!-- AUTO-GENERATED-CONTENT:END -->

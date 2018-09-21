@@ -1,0 +1,99 @@
+---
+type: aws-security-group-ingress
+version: 0.2.0
+core: 0.2.x
+
+description: "My component description"
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
+
+inputTypes:
+  # cidrIp:
+  #   type: string
+  #   displayName: IPv4 CIDR range
+  #   description: IPv4 CIDR range
+  #   example: 10.0.0.0/16
+  # cidrIpv6:
+  #   type: string
+  #   displayName: IPv6 CIDR range
+  #   description: IPv6 CIDR range
+  #   example: 2600:1f18:24c2:b200::/56
+  description:
+    type: string
+    displayName: Ingress rule desription
+    description: Ingress rule desription
+    example: Ingress rule for accessing ephemeral port range
+  rules:
+    type: array
+    displayName: Ingress rules
+    description: Ingress rules
+    example:
+    - cidrIp: 10.0.0.0/16
+      cidrIpv6: 2600:1f18:24c2:b200::/56
+      fromPort: 1024
+      groupId: sg-abbaabbba
+      groupName: my-group
+      ipProtocol: tcp
+      sourceSecurityGroupName: security-group-name
+      sourceSecurityGroupOwnerId: "123456789012"
+      toPort: 65535
+    - cidrIp: 172.16.0.0/16
+      fromPort: 1024
+      groupId: sg-abbaabbba
+      groupName: my-group
+      ipProtocol: tcp
+      sourceSecurityGroupName: security-group-name
+      sourceSecurityGroupOwnerId: "123456789012"
+      toPort: 65535
+
+      #   - cidrIp:
+      #   type: string
+      #   displayName: IPv4 CIDR range
+      #   description: IPv4 CIDR range
+      #   example: 10.0.0.0/16
+      # cidrIpv6:
+      #   type: string
+      #   displayName: IPv6 CIDR range
+      #   description: IPv6 CIDR range
+      #   example: 2600:1f18:24c2:b200::/56
+      # fromPort:
+      #   type: number
+      #   displayName: Start of port range
+      #   description: Start of port range for the TCP and UDP protocols
+      #   example: 1024
+      # groupId:
+      #   type: string
+      #   displayName: Group Id
+      #   description: Amazon EC2 or VPC security group Id
+      #   example: sg-abbaabbba
+      # groupName:
+      #   type: string
+      #   displayName: Group Name
+      #   description: Amazon EC2 security group name
+      #   example: my-group
+      # ipProtocol:
+      #   type: string
+      #   displayName: My input
+      #   description: The IP protocol name (tcp, udp, icmp ICMPv6) or number ("6", "17", "1", "58"). If you specify "-1", or a protocol number other than previously mentioned traffic on all ports is allowed.
+      #   required: true
+      # sourceSecurityGroupName:
+      #   type: string
+      #   displayName: Source Security Group Name
+      #   description: The name of the source non-VPC security group
+      #   example: security-group-name
+      # sourceSecurityGroupOwnerId:
+      #   type: string
+      #   displayName: My input
+      #   description: AWS Account ID of the owner of the Amazon EC2 security group
+      #   example: "123456789012"
+      # toPort:
+      #   type: number
+      #   displayName: End of port range
+      #   description: End of port range for the TCP and UDP protocols
+      #   example: 65535
+
+outputTypes:
+  myOutput:
+    type: string
+    description: my output string

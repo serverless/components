@@ -18,7 +18,7 @@ inputTypes:
     type: string
     displayName: Security group description
     description: Security group description
-    example: Security group for enabling access to ephemeral port range
+    example: Security group for my Fargate container
   vpcId:
     type: string
     displayName: The id of the VPC
