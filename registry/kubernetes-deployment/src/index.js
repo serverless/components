@@ -23,8 +23,7 @@ const deploy = async (inputs, context) => {
     throw new Error(JSON.stringify(resp.body))
   })
   context.saveState(body || {})
-  await get(inputs, { ...context, state: body })
-  return {}
+  return await get(inputs, { ...context, state: body })
 }
 
 const remove = async (inputs, context) => {
