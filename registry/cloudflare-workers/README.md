@@ -3,20 +3,15 @@
 Cloudflare Workers serverless component
 
 <!-- AUTO-GENERATED-CONTENT:START (TOC) -->
-- [Environment Variables](#environment-variables)
+- [Credentials](#credentials)
 - [Input Types](#input-types)
 - [Output Types](#output-types)
 - [Example](#example)
 <!-- AUTO-GENERATED-CONTENT:END -->
 
-## Environment Variables
+## Credentials
 
 Find your auth key in the [Cloudflare Dashboard](https://dash.cloudflare.com/164e11ba607e82f8b25f9b1ad43685a9) ➡️ click user icon in top right ➡️ My Profile ➡️ API Keys ➡️ Global API Key
-
-```
-export CLOUDFLARE_AUTH_KEY=YOUR_AUTH_KEY
-export CLOUDFLARE_AUTH_EMAIL=you@example.com
-```
 
 <!-- AUTO-GENERATED-CONTENT:START (COMPONENT_INPUT_TYPES) -->
 ## Input Types
@@ -24,6 +19,7 @@ export CLOUDFLARE_AUTH_EMAIL=you@example.com
 |:------ |:-----|:-----------------|
 | **accountId**| `string` | accountId
 | **scriptName**| `string` | scriptName
+| **credentials**| `object`<br/>*required* | credentials
 | **zoneId**| `string`<br/>*required* | zoneId
 | **scriptPath**| `string`<br/>*required* | scriptPath
 | **route**| `string`<br/>*required* | route
@@ -46,16 +42,21 @@ export CLOUDFLARE_AUTH_EMAIL=you@example.com
 
 <!-- AUTO-GENERATED-CONTENT:END -->
 
+<!-- AUTO-GENERATED-CONTENT:START (COMPONENT_EXAMPLES) -->
 ## Example
-
-```
-type: cloudflare-worker-application
-
+```yml
+type: my-application
 components:
-  myWorker:
-    type: cloudflare-apigateway
+  myCloudflareWorkers:
+    type: cloudflare-workers
     inputs:
-      zoneId: '9a7806061c88ada191ed06f989cc3dac'
-      scriptPath: './index.js'
-      route: '*example.org/path/*'
+      accountId: ACCOUNT_ID_HERE
+      credentials:
+        authKey: CLOUDFLARE_AUTH_KEY_HERE
+        authEmail: CLOUDFLARE_AUTH_EMAIL_HERE
+      zoneId: ZONE_ID_HERE
+      scriptPath: ./index.js
+      route: example.com/path/*
+
 ```
+<!-- AUTO-GENERATED-CONTENT:END -->

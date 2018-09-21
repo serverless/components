@@ -1,5 +1,5 @@
 type: cloudflare-workers
-version: 1.0.0
+version: 1.1.0
 core: 0.2.x
 
 description: 'Serverless components to deploy Cloudflare Workers'
@@ -8,21 +8,31 @@ author: "Cloudflare, Inc. (https://cloudflare.com)"
 repository: "github:serverless/components"
 
 inputTypes:
+  credentials:
+    type: object
+    required: true
+    example:
+      authKey: CLOUDFLARE_AUTH_KEY_HERE
+      authEmail: CLOUDFLARE_AUTH_EMAIL_HERE
   zoneId:
     type: string
     required: true
+    example: ZONE_ID_HERE
   scriptPath:
     type: string
     required: true
+    example: ./index.js
   accountId:
     type: string
     required: false
+    example: ACCOUNT_ID_HERE
   scriptName:
     type: string
     required: false
   route:
     type: string
     required: true
+    example: example.com/path/*
 
 outputTypes:
   successScript:
