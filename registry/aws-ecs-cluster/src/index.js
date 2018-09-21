@@ -7,7 +7,8 @@ const deploy = async (inputs, context) => {
 
   if (inputs.clusterName === state.clusterName) {
     return {
-      clusterArn: state.clusterArn
+      clusterArn: state.clusterArn,
+      clusterName: state.clusterName
     }
   }
 
@@ -31,6 +32,7 @@ const deploy = async (inputs, context) => {
   })
 
   return {
+    clusterName: cluster.clusterName,
     clusterArn: cluster.clusterArn
   }
 }
