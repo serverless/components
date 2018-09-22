@@ -3,18 +3,31 @@ const AWS = require('aws-sdk')
 const ec2 = new AWS.EC2({ region: process.env.AWS_DEFAULT_REGION || 'us-east-1' })
 
 const deploy = async (inputs, context) => {
-  // const { state } = context
+  const { state } = context
+
+  let groupName = inputs.groupName
+  if (!groupName) {
+    groupName = `default-${inputs.vpcId}`
+  }
+
+  // temp
+  if (state.groupName === groupName) {
+    return { groupId: state.groupId }
+  }
+
+  context.log(`Creating security group "${groupName}"`)
   const { GroupId: groupId } = await ec2
     .createSecurityGroup({
       Description: inputs.description,
-      GroupName: inputs.groupName,
+      GroupName: groupName,
       VpcId: inputs.vpcId
     })
     .promise()
-
+  context.log(`Security group "${groupName}" created with id "${groupId}"`)
   context.saveState({
     groupId,
-    ...inputs
+    ...inputs,
+    groupName
   })
 
   return { groupId }
@@ -22,11 +35,19 @@ const deploy = async (inputs, context) => {
 
 const remove = async (inputs, context) => {
   const { state } = context
-  await ec2
-    .deleteSecurityGroup({
-      GroupId: state.groupId
-    })
-    .promise()
+  context.log(`Removing security group "${state.groupName}"`)
+  try {
+    await ec2
+      .deleteSecurityGroup({
+        GroupId: state.groupId
+      })
+      .promise()
+  } catch (exception) {
+    if (exception.code !== 'InvalidGroup.NotFound') {
+      throw exception
+    }
+  }
+  context.log(`Security group "${state.groupName}" removed`)
   context.saveState({})
   return {}
 }
@@ -35,82 +56,3 @@ module.exports = {
   deploy,
   remove
 }
-
-// const AWS = require('aws-sdk')
-
-// const ecs = new AWS.ECS({ region: process.env.AWS_DEFAULT_REGION || 'us-east-1' })
-
-// const deploy = async (inputs, context) => {
-//   const { state } = context
-
-//   if (inputs.clusterName === state.clusterName) {
-//     return {
-//       clusterArn: state.clusterArn
-//     }
-//   }
-
-//   if (state.clusterName && inputs.clusterName !== state.clusterName) {
-//     context.log('Change to ECS cluster name requires replacement')
-//     await remove({}, context)
-//   }
-
-//   context.log(`Creating ECS cluster: "${inputs.clusterName}"`)
-//   const { cluster } = await ecs
-//     .createCluster({
-//       clusterName: inputs.clusterName
-//     })
-//     .promise()
-
-//   context.log(`ECS cluster "${inputs.clusterName}" created`)
-
-//   context.saveState({
-//     clusterName: cluster.clusterName,
-//     clusterArn: cluster.clusterArn
-//   })
-
-//   return {
-//     clusterArn: cluster.clusterArn
-//   }
-// }
-
-// const remove = async (inputs, context) => {
-//   const { state } = context
-//   context.log(`Removing ECS cluster: "${state.clusterName}"`)
-
-//   const tasks = await ecs
-//     .listTasks({
-//       cluster: state.clusterArn
-//     })
-//     .promise()
-
-//   await Promise.all(
-//     (tasks.taskArns || []).map((task) => {
-//       context.log(`Stopping task: "${task}"`)
-//       return ecs
-//         .stopTask({
-//           task,
-//           cluster: state.clusterArn,
-//           reason: 'Removing cluster'
-//         })
-//         .promise()
-//     })
-//   )
-
-//   await ecs
-//     // delete cluster doesn't throw error even if it is deleted manually
-//     .deleteCluster({
-//       cluster: state.clusterArn
-//     })
-//     .promise()
-
-//   context.log(`ECS cluster "${state.clusterName}" removed`)
-
-//   context.saveState({})
-
-//   return {}
-// }
-
-// module.exports = {
-//   deploy,
-//   remove
-// }
