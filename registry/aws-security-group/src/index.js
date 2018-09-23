@@ -1,4 +1,5 @@
 const AWS = require('aws-sdk')
+const { equals, pick, merge } = require('ramda')
 
 const ec2 = new AWS.EC2({ region: process.env.AWS_DEFAULT_REGION || 'us-east-1' })
 
@@ -13,16 +14,21 @@ const deploy = async (inputs, context) => {
     groupName = `default-${context.instanceId}`
   }
 
-  // temp
-  if (state.groupName === groupName) {
+  const params = merge(inputs, { groupName })
+  if (
+    equals(
+      pick(['vpcId', 'groupName', 'description'], state),
+      pick(['vpcId', 'groupName', 'description'], params)
+    )
+  ) {
     return { groupId: state.groupId, groupName: state.groupName }
   }
 
-  if (state.groupName && state.groupName !== groupName) {
+  if (state.groupName && state.groupName !== params.groupName) {
     deleteSecurityGroupWithRetry(state.groupId, 20)
   }
 
-  context.log(`Creating security group "${groupName}"`)
+  context.log(`Creating security group "${params.groupName}"`)
   const { GroupId: groupId } = await ec2
     .createSecurityGroup({
       Description: inputs.description,
@@ -30,14 +36,13 @@ const deploy = async (inputs, context) => {
       VpcId: inputs.vpcId
     })
     .promise()
-  context.log(`Security group "${groupName}" created with id "${groupId}"`)
+  context.log(`Security group "${params.groupName}" created with id "${groupId}"`)
   context.saveState({
     groupId,
-    ...inputs,
-    groupName
+    ...params
   })
 
-  return { groupId, groupName }
+  return { groupId, groupName: params.groupName }
 }
 
 const deleteSecurityGroupWithRetry = async (groupId, retryCount) =>

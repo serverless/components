@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "aws-sdk": "^2.224.1"
+    "aws-sdk": "^2.224.1",
+    "ramda": "^0.25.0"
   }
 }
