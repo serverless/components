@@ -7,12 +7,16 @@ const deploy = async (inputs, context) => {
 
   let groupName = inputs.groupName
   if (!groupName) {
-    groupName = `default-${inputs.vpcId}`
+    groupName = `default-${context.instanceId}`
   }
 
   // temp
   if (state.groupName === groupName) {
-    return { groupId: state.groupId }
+    return { groupId: state.groupId, groupName: state.groupName }
+  }
+
+  if (state.groupName !== groupName) {
+    await remove(inputs, context)
   }
 
   context.log(`Creating security group "${groupName}"`)
@@ -30,7 +34,7 @@ const deploy = async (inputs, context) => {
     groupName
   })
 
-  return { groupId }
+  return { groupId, groupName }
 }
 
 const remove = async (inputs, context) => {
