@@ -10,8 +10,11 @@ const {
   equals,
   omit,
   reduce,
-  isEmpty
+  isEmpty,
+  type
 } = require('ramda')
+
+const portsMap = require('./ports.json')
 
 const ec2 = new AWS.EC2({ region: process.env.AWS_DEFAULT_REGION || 'us-east-1' })
 
@@ -27,23 +30,45 @@ const capitalizeObjectKeys = (object) =>
     keys(object)
   )
 
+const getPortMapping = (port, range) => {
+  let mappedPort = port
+  if (type(mappedPort) === 'String') {
+    mappedPort = parseInt(
+      portsMap[mappedPort] && !isEmpty(portsMap[mappedPort][range])
+        ? portsMap[mappedPort][range]
+        : mappedPort,
+      10
+    )
+    if (isNaN(mappedPort)) {
+      throw new Error(`Invalid port mapping "${port}"`)
+    }
+  }
+  return mappedPort
+}
+
+const getPortRange = (portRange) => {
+  const ports = portRange.split('-')
+  return {
+    from: getPortMapping(head(ports), 'from'),
+    to: getPortMapping(last(ports), 'to')
+  }
+}
+
 const formatIpPermissions = (ipPermissions) => {
   const capitalized = map((item) => {
     let capitalizedItem = capitalizeObjectKeys(item)
-    // parse port range
+    // port mappings
+    if (capitalizedItem.FromPort) {
+      capitalizedItem.FromPort = getPortMapping(capitalizedItem.FromPort, 'from')
+    }
+    if (capitalizedItem.ToPort) {
+      capitalizedItem.ToPort = getPortMapping(capitalizedItem.ToPort, 'to')
+    }
     if (capitalizedItem.PortRange) {
-      const ports = capitalizedItem.PortRange.split('-')
-      let fromPort = head(ports)
-      let toPort = last(ports)
-      if (fromPort.toUpperCase() === 'ALL') {
-        fromPort = 0
-      }
-      if (toPort.toUpperCase() === 'ALL') {
-        toPort = 65535
-      }
+      const { from, to } = getPortRange(capitalizedItem.PortRange)
       capitalizedItem = merge(capitalizedItem, {
-        FromPort: parseInt(fromPort, 10),
-        ToPort: parseInt(toPort, 10)
+        FromPort: from,
+        ToPort: to
       })
       capitalizedItem = omit(['PortRange'], capitalizedItem)
     }
