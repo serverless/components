@@ -1,13 +1,20 @@
-import { forEachObjIndexed } from 'ramda'
+import { is, map } from '@serverless/utils'
 
-const Function = {
-  deploy: async (instance, context) => {
-    const { name, handler, code, runtime, memory, timeout } = instance
-    const functionInputs = { name, handler, code, runtime, memory, timeout }
-    forEachObjIndexed((c) => c.deploy(context, functionInputs), instance.compute)
-  },
-  remove: (instance, context) => {
-    forEachObjIndexed((c) => c.remove(context), instance.compute)
+const Function = async (SuperClass, context) => {
+  const ICompute = await context.loadType('ICompute')
+
+  return {
+    define(context) {
+      let children = {}
+      if (is(ICompute, this.compute)) {
+        children = {
+          [this.compute.name]: this.compute.defineFunction(this, context)
+        }
+      } else {
+        children = map((compute) => compute.defineFunction(this, context), this.compute)
+      }
+      return children
+    }
   }
 }
 

@@ -1,5 +1,5 @@
-type: Compute
 name: AwsLambdaCompute
+extends: Compute
 
 provider: ${input.provider}
 runtime: ${input.runtime}
@@ -8,14 +8,11 @@ timeout: ${input.timeout}
 
 inputTypes:
   provider:
-    type: Object<string, Provider>
-    default: ${context.providers}
+    type: Provider
+    default: ${context.providers.aws}
   runtime:
     type: string
-    default: ${context.runtime}
   memory:
     type: string
-    default: ${context.memory}
   timeout:
     type: string
-    default: ${context.timeout}

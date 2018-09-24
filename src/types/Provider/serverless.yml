@@ -1,0 +1,9 @@
+name: Provider
+extends: Object
+main: './index.js'
+
+credentials: ${input.credentials}
+
+inputTypes:
+  credentials:
+    type: Object

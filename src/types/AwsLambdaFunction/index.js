@@ -130,7 +130,7 @@ export const deploy = async (instance, context) => {
 
   const DefaultRole = await context.loadType('AwsIamRole')
 
-  const defaultRole = context.construct(
+  const defaultRole = await context.construct(
     DefaultRole,
     {
       name: `${instance.FunctionName}-execution-role`,
