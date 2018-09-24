@@ -7,10 +7,10 @@ const Service = async (SuperClass, context) => {
     async define(context) {
       return Promise.all(
         map(async (func, name) => {
-          const fn = await context.construct(
+          return await context.construct(
             Fn,
             {
-              ...functionObj,
+              ...func,
               name
             },
             context
@@ -18,6 +18,11 @@ const Service = async (SuperClass, context) => {
         }, this.functions)
       )
     }
+    // => {
+    //  someFunction: new Function({ ...inputs }),
+    //  myDatabase: new DyanamoDb({ ...inputs })
+    // }
+
   }
 }
 

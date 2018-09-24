@@ -55,6 +55,10 @@ functions:
     handler: index.helloLambda
     code: ./code
     memory: 1024
+    environment:
+      foo: bar
+    tags:
+      bar: baz
 
   # deploy function to azure
   helloAzure:
