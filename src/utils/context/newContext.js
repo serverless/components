@@ -7,7 +7,7 @@ const newContext = (props) => {
 
   const finalContext = {
     ...context,
-    construct: (type, inputs) => construct(type, inputs, context),
+    construct: (type, inputs) => construct(type, inputs, finalContext),
     get: (selector) => get(selector, context.data),
     loadType: (...args) => loadType(...args, finalContext),
     merge: (value) =>

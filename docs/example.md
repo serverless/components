@@ -309,3 +309,15 @@ components:
   fileUploader:
     type: FileUploader
 ```
+
+
+
+
+
+
+
+```yaml
+name: MyService
+extends: Service
+
+provider

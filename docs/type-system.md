@@ -9,11 +9,12 @@ The type system can be thought of as equivalent to a class system in object orie
     1. [Type Concept](#type-concept)
     2. [Interface Concept](#interface-concept)
 2. [Basic type operations](#basic-type-operations)
-    1. Declaring a type (severless.yml/programmatically) and the code (index.js, etc)  
-    2. Loading a type
-    3. [Instantiating types](#instantiating-types)
-    4. Extending a type
-3. [Types]()
+    1. [Declaring a type](#declaring-a-type)
+    2. [Loading a type](#loading-a-type)
+    3. [Declaring the type's main file](#declaring-the-types-main-file)
+    4. [Instantiating types](#instantiating-types)
+    5. [Extending a type](#extending-api)
+3. [Types](#types)
     1. [Object type](#object-type)
     2. Component type
     3. Service type
@@ -128,7 +129,7 @@ foo: 'bar'
 
 *Example main file ./myType.js*
 ```js
-module.exports = {
+const MyType = {
   bim(...args) {  
     console.log(this)
     //=> {
@@ -143,27 +144,32 @@ module.exports = {
 
   }
 }
+
+export default MyType
 ```
 
+*Example: code that loads a type and constructs an instance of that type*
 ```js
 const myFunction = async (instance, context) => {
-  const MyType = await loadType('MyType')
+  const MyType = await context.loadType('MyType')
   console.log(MyType)
   // => {
   //  constructor: Function,
   //  class: class,
   //  main: Object<Function>,
-  //  props: Object<*>
+  //  props: Object<*>,
+  //  parent: ObjectType,
+  //  root: '/absolute/path/to/type/folder'
   //}
 
   const myInstance = await context.construct(MyType, {})
   console.log(myInstance)
   //=> {
-  //  name: MyType,
+  //  name: 'MyType',
   //  main: './myType.js',
   //  foo: 'bar',
-  //  bim: function,
-  //  bop: function
+  //  bim: Function,
+  //  bop: Function
   //}
 }
 ```
@@ -188,42 +194,178 @@ class MyType {
 }
 ```
 
+### Declaring the type's main file
+
+The main file declares the methods for a type. There are three different ways of declaring the methods.
+
+
+#### Defining a type's main using an object
+
+You can declare an object that has the types methods.
+
+```yaml
+# ./serverless.yml
+name: MyType
+main: ./index.js
+```
+
+```js
+// ./index.js
+const MyType = {
+  foo(arg1, arg2) {
+    ...
+  }
+}
+
+export default MyType
+```
+
+```js
+const MyType = await context.loadType('./MyType')
+const instance = await context.construct(MyType, inputs)
+
+console.log(instance)
+// {
+//   name: MyType,
+//   main: './index.js',
+//   extends: 'Object',
+//   foo: Function,
+//   
+//   // inherited from Object
+//   construct: Function,
+//   getType: Function
+// }
+```
+
+
+#### Defining a type's main using a function that returns an object
+
+You can use a function that returns an object similar to the above object approach. This is useful if you want to use context to load types or encapsulate other values in closure. The method also exposes the SuperClass if you want to use it to make prototype super calls.
+
+
+```yaml
+#serverless.yml
+name: MyParentType
+# extends: Object
+main: ./index.js
+```
+
+```js
+const MyParentType = {
+  foo(arg1, arg2, context) {
+    ...
+  }
+}
+```
+
+```yaml
+#serverless.yml
+name: MyChildType
+extends: MyParentType
+main: ./index.js
+```
+
+```js
+// index.js
+const MyChildType = (SuperClass, context) => {
+  const AWSLambdaFunction = await context.loadType('AWSLambdaFunction')
+  ...
+
+  return {
+    construct(inputs, context) {
+      ...
+    },
+    foo(arg1, arg2, context) {
+      // prototype super call
+      SuperClass.prototype.foo.call(this, arg1, arg2, context)
+      const instance = await context.construct(AWSLambdaFunction, {})
+    },
+    bar(arg2, arg3, context) {
+      const instance = await context.construct(AWSLambdaFunction, {})
+    }
+  }
+}
+
+export default MyChildType
+```
+
+
+
+#### Defining a type's methods using a class
+
+You can also return a class from the function instead of an object. This makes super calls a bit cleaner.
+
+```yaml
+#serverless.yml
+name: MyChildType
+extends: MyParentType
+main: ./index.js
+```
+
+```js
+// index.js
+const MyChildType = (SuperClass, context) => {
+  const AWSLambdaFunction = await context.loadType('AWSLambdaFunction')
+
+  return class extends SuperClass {
+    foo(arg1, arg2, context) {
+      // super call
+      super.foo(arg1, arg2, context)
+      const instance = await context.construct(AWSLambdaFunction, {})
+    }
+
+    bar(arg2, arg3, context) {
+      const instance = await context.construct(AWSLambdaFunction, {})
+    }
+  }
+}
+
+export default MyChildType
+```
 
 ### Instantiating types
 
 To convert a type to a component instance, simply use the `context.construct` method and supply the method with the type and inputs.
 
+NOTE: Construction is an async process since we have to load type during the construction.
+
 ```js
 const MyType = await context.loadType('./MyType')
-const instance = context.construct(MyType, inputs)
+const instance = await context.construct(MyType, inputs)
 ```
 
-Input variables are resolved a the
+Variables are replace with dynamic getters that resolve the variable when the value is accessed. They resolve the value every time the property is accessed so you can get different values at different times depending upon when the value was accessed.
 
 
 ### Extending a type
 
 Types can be extended which allows for types to inherit the functionality of other types.
 
-To extend another type, we simply use the type property.
+To extend another type, we simply use the `extends` property.
 
 ```yaml
 name: MyComponent
 extends: Component
 ```
-The default type if none is provided is `Object`
+The default extended type if none is provided is `Object`
 
 
 
 ## Context
 
+TODO BRN: Outline the Context API
+
 index.js file
 ```js
-module.exports = {
-  deploy(instance) {
-    context.inputs
+const MyType = {
+  deploy() {
+    context.loadType()
+    context.construct()
+    context.cwd
   }
 }
+
+export default MyType
 ```
 
 
@@ -245,11 +387,6 @@ name: AwsLambdaCompute
 implements:
   - ICompute
 ```
-
-
-
-
-
 
 
 
