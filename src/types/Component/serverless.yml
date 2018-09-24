@@ -1,10 +1,11 @@
-type: Object
 name: Component
+extends: Object
 version: 1.0.0
+main: ./index.js
 
-components: ${inputs.components}
+components: ${input.components}
 
 inputTypes:
   components:
-    type: Object<string, Component>
+    type: Object
     default: {}

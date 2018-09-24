@@ -13,7 +13,7 @@ describe('#buildTypeClass()', () => {
         name: 'Test'
       }
     }
-    const TypeClass = buildTypeClass(def, context)
+    const TypeClass = await buildTypeClass(def, context)
     expect(TypeClass.name).toBe('Test')
     expect(TypeClass.prototype).toEqual({
       foo: expect.any(Function)

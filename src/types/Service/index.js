@@ -1,17 +1,24 @@
-import { forEachObjIndexed } from 'ramda'
+import { map } from '@serverless/utils'
 
-const Function = {
-  deploy: async (instance, context) => {
-    forEachObjIndexed((functionObj, functionName) => {
-      functionObj.name = functionName
-      const Fn = context.loadType('Function')
-      const fn = context.construct(Fn, functionObj, context)
-      fn.deploy(context)
-    }, instance.functions)
-  },
-  remove: (instance, context) => {
-    forEachObjIndexed((c) => c.remove(context), instance.compute)
+const Service = async (SuperClass, context) => {
+  const Fn = await context.loadType('Function')
+
+  return {
+    async define(context) {
+      return Promise.all(
+        map(async (func, name) => {
+          const fn = await context.construct(
+            Fn,
+            {
+              ...functionObj,
+              name
+            },
+            context
+          )
+        }, this.functions)
+      )
+    }
   }
 }
 
-export default Function
+export default Service

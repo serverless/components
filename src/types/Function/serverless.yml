@@ -1,26 +1,36 @@
-type: Component
 name: Function
+extends: Component
 version: 1.0.0
 main: ./index.js
 
-memory: ${input.memory || 1028}
-timeout: ${input.timeout || 10}
-runtime:
-code: string (path to folder for code)
-handler: string
-compute: Compute?
-environment: Object<string, string>
-tags: Object<string, string>
+memory: ${input.memory}
+timeout: ${input.timeout}
+runtime: ${input.runtime}
+code: ${input.code}
+handler: ${input.handler}
+compute: ${input.compute}
+environment: ${input.environment}
+tags: ${input.tags}
 
+# TODO BRN: Add opt out for universal function signature
 inputTypes:
   compute:
-    type: Object<string, Compute>
+    type: Compute
     default: ${context.compute}
-  name: string
-  memory: integer
-  timeout: integer
-  runtime: string (common format across providers that is converted by provider code)
-  code: string (path to folder for code)
-  handler: string (property path for function)
-  environment: Object<string, string>
-  tags: Object<string, string>
+  memory:
+    type: integer
+  timeout:
+    type: integer
+  runtime:
+    type: string
+    description: common format across providers that is converted by provider code
+  code:
+    type: string
+    description: path to folder for code
+  handler:
+    type: string
+    description: property path for function
+  environment:
+    type: Object
+  tags:
+    type: Object

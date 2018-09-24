@@ -1,5 +1,7 @@
 const Bar = {
-  barfn: (instance) => instance
+  barfn() {
+    return this
+  }
 }
 
 export default Bar

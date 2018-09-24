@@ -11,6 +11,12 @@ describe('#createContext()', () => {
       cwd: '/test/dir'
     })
     expect(context).toEqual({
+      cache: {
+        types: {
+          defs: {},
+          meta: {}
+        }
+      },
       construct: expect.any(Function),
       cwd: '/test/dir',
       get: expect.any(Function),

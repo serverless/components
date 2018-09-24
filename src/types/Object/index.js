@@ -1,6 +1,11 @@
+import { SYMBOL_TYPE } from '../../utils'
+
 const _Object = {
-  construct(instance) {
-    return instance
+  construct() {
+    return this
+  },
+  getType() {
+    return this[SYMBOL_TYPE]
   }
 }
 

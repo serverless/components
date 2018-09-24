@@ -1,17 +1,8 @@
-type: Component
 name: AwsLambdaFunction
+extends: Component
 
 version: 1.0.0
 main: ./index.js
-
-Provider: ${input.Provider}
-FunctionName: ${input.FunctionName}
-Handler: ${input.Handler}
-Runtime: ${input.Runtime}
-Code: ${input.Code}
-MemorySize: ${input.MemorySize}
-Timeout: ${input.Timeout}
-Environment: ${input.Environment}
 
 inputTypes:
   Provider:

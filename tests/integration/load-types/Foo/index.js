@@ -1,5 +1,7 @@
 const Foo = {
-  foofn: (instance) => instance
+  foofn() {
+    return this
+  }
 }
 
 export default Foo

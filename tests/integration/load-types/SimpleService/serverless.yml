@@ -1,7 +1,7 @@
-type: Service
 name: SimpleService
+extends: Service
 
-provider:
+providers:
   aws:
     type: AwsProvider
     inputs:
@@ -21,14 +21,14 @@ compute:
   awsLambda:
     type: AwsLambdaCompute
     inputs:
-      provider: ${inputs.provider.aws}
+      provider: ${input.providers.aws}
       runtime: nodejs
       memory: 512
       timeout: 10
-  awsLambda:
+  azureFunctions:
     type: AzureFunctionsCompute
     inputs:
-      provider: ${inputs.provider.azure}
+      provider: ${input.providers.azure}
       runtime: nodejs
       memory: 512
       timeout: 10

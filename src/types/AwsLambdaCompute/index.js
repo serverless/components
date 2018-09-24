@@ -1,7 +1,7 @@
 import path from 'path'
 import { createReadStream } from 'fs'
 
-const pack = async (instance, context) => {
+const packFunction = async (instance, context) => {
   const AwsLambdaFunctionInputs = {
     Provider: instance.provider,
     FunctionName: instance.name,
@@ -32,19 +32,18 @@ const pack = async (instance, context) => {
   }
 
   const AwsLambdaFunction = await context.loadType('AwsLambdaFunction')
-  const awsLambdaFunction = context.construct(AwsLambdaFunction, AwsLambdaFunctionInputs)
+  const awsLambdaFunction = await context.construct(AwsLambdaFunction, AwsLambdaFunctionInputs)
   return awsLambdaFunction.pack(context)
 }
 
-const deploy = async (instance, context, functionInputs) => {
-  instance = { ...instance, ...functionInputs }
-  const AwsLambdaFunctionInputs = await instance.pack(context)
+const deployFunction = async (instance, functionInstance, context) => {
+  const awsLambdaFunctionInputs = await instance.packFunction(context)
   const AwsLambdaFunction = await context.loadType('AwsLambdaFunction')
-  const awsLambdaFunction = context.construct(AwsLambdaFunction, AwsLambdaFunctionInputs)
+  const awsLambdaFunction = await context.construct(AwsLambdaFunction, awsLambdaFunctionInputs)
   return awsLambdaFunction.deploy(context)
 }
 
 module.exports = {
-  pack,
-  deploy
+  packFunction,
+  deployFunction
 }

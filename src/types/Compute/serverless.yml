@@ -1,10 +1,9 @@
-type: Component
 name: Compute
+extends: Component
 version: 1.0.0
 
-components: ${inputs.components}
+provider: ${input.provider}
 
 inputTypes:
-  components:
-    type: Object<string, Component>
-    default: {}
+  provider:
+    type: Provider

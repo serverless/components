@@ -5,15 +5,15 @@ The type system can be thought of as equivalent to a class system in object orie
 
 ## Table of contents
 
-1. Concepts
-    1. Types
-    2. Interfaces
+1. [Concepts](#concepts)
+    1. [Type Concept](#type-concept)
+    2. [Interface Concept](#interface-concept)
 2. [Basic type operations](#basic-type-operations)
-    1. declaring a type (severless.yml/programmatically) and the code (index.js, etc)  
-    2. Extending a type
-    3. instantiating types to instances
-    4. loading instances from the component tree
-3. Types
+    1. Declaring a type (severless.yml/programmatically) and the code (index.js, etc)  
+    2. Loading a type
+    3. [Instantiating types](#instantiating-types)
+    4. Extending a type
+3. [Types]()
     1. [Object type](#object-type)
     2. Component type
     3. Service type
@@ -32,6 +32,7 @@ The type system can be thought of as equivalent to a class system in object orie
 
 The type system is built on two basic concepts, types and interfaces.
 
+### Type Concept
 Types are used to declare what can be thought of as classes in object oriented programming.
 
 Types are built on a collection of name/value pairs. Each name represents the name of a property for that type and the values represent default values that will be resolved during instantiation of that type.
@@ -39,6 +40,12 @@ Types are built on a collection of name/value pairs. Each name represents the na
 In javascript, a type is realized as a class. The type's properties are applied during instantiation by the constructor and the type's methods are added as methods on the class's prototype chain.
 
 Types can be extended using a single inheritance model. All super type methods are available using the es6 `super` method.
+
+### Interface Concept
+
+Interfaces provide a mechanism for performing declaring a collection of named of methods that provide an "abstraction" for a given set of functionality.
+
+Interfaces in this case are runtime concepts that can be used to perform checks on types during runtime assembly to ensure that they implement the required method to adhere to the type. Further, a set of utility methods allow runtime checks to determine in code whether a given instance reference has implemented a specific type. This can be used to branch the logic based upon whether an interface has been implemented or not.
 
 
 ## Basic type operations
@@ -80,44 +87,36 @@ module.exports = {
 }
 ```
 
-
-### Extending a type
-
-Types can be extended which allows for types to inherit the functionality of other types.
-
-To extend another type, we simply use the type property.
-
-```yaml
-type: Component
-name: MyComponent
-```
-The default type if none is provided is `component`
-
-
 ### Loading a type
 
 Types by themselves are not instances, they are more like a reference to a class that has not been instantiated.
 
-To load a type, use the `loadType` method . Types are loadable by...
+To load a type, use the `context.loadType` method . Types are loadable by...
 
 - Name/version from registry
 ```js
-const MyType = loadType('MyType@1.0.0')
+const MyType = await context.loadType('MyType@1.0.0')
 ```
 - File path
 ```js
-const MyType = loadType('./MyType')
+const MyType = await context.loadType('./MyType')
 ```
 - Url
 ```js
-const MyType = loadType('https://examples.com/some/path/my-type.zip')
+const MyType = await context.loadType('https://examples.com/some/path/my-type.zip')
 ```
 - Github org/repo#branch
 ```js
-const MyType = loadType('github:serverless/my-type#branch')
+const MyType = await context.loadType('github:serverless/my-type#branch')
 ```
 
-When a type is loaded, a JS class is created that can be used to instantiate the type. The methods are applied to the class's prototype and the properties are stored on a static property of the class called `props`
+When a type is loaded, an object is created that holds the meta data for the type and a JS class is created and available on the type object. The methods declared in the main are applied to the class's prototype.
+
+The type object contains the following properties.
+
+
+
+*Example of declaring a type, loading it and outputting the type object*
 
 *Example serverless.yml with main entry*
 ```yaml
@@ -130,25 +129,60 @@ foo: 'bar'
 *Example main file ./myType.js*
 ```js
 module.exports = {
-  bim() {
-
+  bim(...args) {  
+    console.log(this)
+    //=> {
+    //  name: MyType,
+    //  main: './myType.js',
+    //  foo: 'bar',
+    //  bim: function,
+    //  bop: function
+    //}
   },
-  bop() {
+  bop(...args) {
 
   }
 }
 ```
 
+```js
+const myFunction = async (instance, context) => {
+  const MyType = await loadType('MyType')
+  console.log(MyType)
+  // => {
+  //  constructor: Function,
+  //  class: class,
+  //  main: Object<Function>,
+  //  props: Object<*>
+  //}
+
+  const myInstance = await context.construct(MyType, {})
+  console.log(myInstance)
+  //=> {
+  //  name: MyType,
+  //  main: './myType.js',
+  //  foo: 'bar',
+  //  bim: function,
+  //  bop: function
+  //}
+}
+```
+
+
 *Example class assembled for MyType*
 ```js
 class MyType {
-  static props = ...serverless.yml
 
   constructor() {
     this = {
       ...this,
-      ...resolve(MyType.props)
+      ...resolve(serverless.yml)
     }
+    this.construct(this)
+  }
+
+  construct(instance) {
+    //  assign props to instance here
   }
   ...myType.js
 }
@@ -157,12 +191,27 @@ class MyType {
 
 ### Instantiating types
 
-To convert a type to a component instance, simply instantiate the class with inputs.
+To convert a type to a component instance, simply use the `context.construct` method and supply the method with the type and inputs.
 
 ```js
-const MyType = loadType('./MyType')
-const instance = new MyType(inputs)
+const MyType = await context.loadType('./MyType')
+const instance = context.construct(MyType, inputs)
 ```
+
+Input variables are resolved a the
+
+
+### Extending a type
+
+Types can be extended which allows for types to inherit the functionality of other types.
+
+To extend another type, we simply use the type property.
+
+```yaml
+name: MyComponent
+extends: Component
+```
+The default type if none is provided is `Object`
 
 
 
@@ -176,6 +225,34 @@ module.exports = {
   }
 }
 ```
+
+
+### Defining an Interface
+
+Defining interfaces gives us a mechanism for ensuring types implement specific functions
+
+```yaml
+interface: ICompute
+
+packFunction: function
+deployFunction: function
+```
+
+### Implementing an interface
+
+```yaml
+name: AwsLambdaCompute
+implements:
+  - ICompute
+```
+
+
+
+
+
+
+
+
 
 
 

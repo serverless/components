@@ -18,8 +18,8 @@ const defType = async ({ root, props }, context) => {
   }
 
   // check for type definition in cache
-  const cache = get('types.defs', context.cache)
-  let typeDef = get([root], cache)
+  const defsCache = get('types.defs', context.cache)
+  let typeDef = get([root], defsCache)
   if (typeDef) {
     return typeDef
   }
@@ -29,16 +29,16 @@ const defType = async ({ root, props }, context) => {
     props
   }
 
-  if (!isString(typeDef.props.type) && typeDef.props.name !== 'Object') {
-    typeDef = set('props.type', 'Object', typeDef)
+  if (!isString(typeDef.props.extends) && typeDef.props.name !== 'Object') {
+    typeDef = set('props.extends', 'Object', typeDef)
   }
 
   let parentTypeDef
-  if (typeDef.props.type) {
+  if (typeDef.props.extends) {
     // Add the root to context so that files loaded by path are done so from
     // this component's root
     context = context.merge({ root })
-    parentTypeDef = await context.loadType(typeDef.props.type)
+    parentTypeDef = await context.loadType(typeDef.props.extends)
   }
   typeDef = set('parent', parentTypeDef, typeDef)
 
@@ -55,7 +55,7 @@ const defType = async ({ root, props }, context) => {
   typeDef = set('constructor', buildTypeConstructor(typeDef), typeDef)
 
   // store type def in cache
-  context.cache = set('types.defs', set([typeDef.root], typeDef, cache), context.cache)
+  context.cache.types.defs = set([typeDef.root], typeDef, defsCache)
 
   return typeDef
 }

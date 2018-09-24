@@ -1,4 +1,4 @@
-type: ../Foo
+extends: ../Foo
 name: Bar
 main: ./index.js
 
