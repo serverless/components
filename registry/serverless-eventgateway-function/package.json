@@ -1,0 +1,12 @@
+{
+  "name": "@serverless-components/serverless-eventgateway-function",
+  "version": "0.2.0",
+  "private": true,
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@serverless/event-gateway-sdk": "^0.10.2"
+  }
+}
