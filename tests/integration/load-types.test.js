@@ -1,6 +1,6 @@
 import { createContext, SYMBOL_TYPE } from '../../src/utils'
 
-describe('Integration Test - load types', () => {
+describe('load-types: Integration Test - load types', () => {
   it('should load the Object type by name', async () => {
     const context = await createContext({
       cwd: __dirname
@@ -57,8 +57,10 @@ describe('Integration Test - load types', () => {
       version: '1.0.0',
       [SYMBOL_TYPE]: FooType
     })
+    expect(instance).toBeInstanceOf(FooType.constructor)
     expect(instance).toBeInstanceOf(FooType.class)
-    expect(instance).toBeInstanceOf(FooType.parent.class)
+    expect(instance).toBeInstanceOf(ObjectType.constructor)
+    expect(instance).toBeInstanceOf(ObjectType.class)
     expect(instance.foofn()).toBe(instance)
   })
   //
@@ -93,10 +95,11 @@ describe('Integration Test - load types', () => {
   //   expect(type.props).toEqual({ main: './index.js', name: 'Foo', type: 'Object' })
   // })
 
-  it('should load a type that depends on another type by file path', async () => {
+  it('should load a type that extends another type by file path', async () => {
     const context = await createContext({
       cwd: __dirname
     })
+    const ObjectType = await context.loadType('Object')
     const FooType = await context.loadType('./load-types/Foo')
     const BarType = await context.loadType('./load-types/Bar')
     expect(BarType).toEqual({
@@ -128,8 +131,55 @@ describe('Integration Test - load types', () => {
       version: '1.0.0',
       [SYMBOL_TYPE]: BarType
     })
+    expect(instance).toBeInstanceOf(BarType.constructor)
     expect(instance).toBeInstanceOf(BarType.class)
-    expect(instance).toBeInstanceOf(BarType.parent.class)
+    expect(instance).toBeInstanceOf(FooType.constructor)
+    expect(instance).toBeInstanceOf(FooType.class)
+    expect(instance).toBeInstanceOf(ObjectType.constructor)
+    expect(instance).toBeInstanceOf(ObjectType.class)
+    expect(instance.foofn()).toBe(instance)
+  })
+
+  it('should load a type that extends another type using class extension', async () => {
+    const context = await createContext({
+      cwd: __dirname
+    })
+    const ObjectType = await context.loadType('Object')
+    const FooType = await context.loadType('./load-types/FooClass')
+    const BarType = await context.loadType('./load-types/BarClass')
+    expect(BarType).toEqual({
+      class: expect.any(Function),
+      constructor: expect.any(Function),
+      main: expect.any(Function),
+      parent: FooType,
+      props: {
+        main: './index.js',
+        name: 'BarClass',
+        extends: '../FooClass',
+        bar: 'def',
+        baz: 'def'
+      },
+      root: expect.stringMatching(/^.*BarClass$/)
+    })
+
+    const inputs = {}
+    const instance = await context.construct(BarType, inputs)
+    expect(instance).toEqual({
+      bar: 'def',
+      baz: 'def',
+      extends: '../FooClass',
+      foo: 'abc',
+      main: './index.js',
+      name: 'BarClass',
+      version: '1.0.0',
+      [SYMBOL_TYPE]: BarType
+    })
+    expect(instance).toBeInstanceOf(BarType.constructor)
+    expect(instance).toBeInstanceOf(BarType.class)
+    expect(instance).toBeInstanceOf(FooType.constructor)
+    expect(instance).toBeInstanceOf(FooType.class)
+    expect(instance).toBeInstanceOf(ObjectType.constructor)
+    expect(instance).toBeInstanceOf(ObjectType.class)
     expect(instance.foofn()).toBe(instance)
   })
 })

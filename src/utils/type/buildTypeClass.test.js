@@ -20,5 +20,6 @@ describe('#buildTypeClass()', () => {
     })
     const instance = new TypeClass()
     expect(instance).toBeInstanceOf(Base)
+    expect(instance).toBeInstanceOf(TypeClass)
   })
 })

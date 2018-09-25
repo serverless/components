@@ -22,7 +22,6 @@ const Service = async (SuperClass, context) => {
     //  someFunction: new Function({ ...inputs }),
     //  myDatabase: new DyanamoDb({ ...inputs })
     // }
-
   }
 }
 

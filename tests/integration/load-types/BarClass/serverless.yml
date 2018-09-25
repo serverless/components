@@ -1,0 +1,7 @@
+extends: ../FooClass
+name: BarClass
+main: ./index.js
+
+bar: 'def'
+
+baz: 'def'

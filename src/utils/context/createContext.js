@@ -4,6 +4,7 @@ import newContext from './newContext'
 
 const createContext = async (options) => {
   const cwd = resolve(findPath(prop('cwd', options), process.cwd()))
+  const overrides = options.overrides
   return newContext({
     cache: {
       types: {
@@ -11,7 +12,8 @@ const createContext = async (options) => {
         meta: {}
       }
     },
-    cwd
+    cwd,
+    overrides
   })
 }
 

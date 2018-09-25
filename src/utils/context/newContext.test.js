@@ -7,7 +7,8 @@ describe('#newContext()', () => {
       cwd: '/test/dir',
       data: {},
       registry: 'https://registry.com',
-      root: '/test/root'
+      root: '/test/root',
+      Type: { foo: 'bar' }
     })
     expect(context).toEqual({
       cache: {},
@@ -19,7 +20,8 @@ describe('#newContext()', () => {
       merge: expect.any(Function),
       registry: 'https://registry.com',
       root: '/test/root',
-      set: expect.any(Function)
+      set: expect.any(Function),
+      Type: { foo: 'bar' }
     })
   })
 })
