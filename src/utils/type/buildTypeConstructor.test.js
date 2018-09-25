@@ -116,6 +116,29 @@ describe('#buildTypeConstructor()', () => {
     })
   })
 
+  it('supports resolving input variables', async () => {
+    const Class = class {}
+    let context = await createContext({})
+    const inputs = { foo: 'bar' }
+    const Type = {
+      main: {},
+      props: {
+        name: 'Test',
+        foo: '${inputs.foo}'
+      },
+      class: Class
+    }
+    Type.constructor = buildTypeConstructor(Type, context)
+    context = context.merge({ Type })
+    const instance = await new Type.constructor(inputs, context)
+
+    expect(instance).toEqual({
+      name: 'Test',
+      foo: 'bar',
+      [SYMBOL_TYPE]: Type
+    })
+  })
+
   it('instantiates type constructions in props', async () => {
     const Test1Type = {
       main: {
