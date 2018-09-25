@@ -31,7 +31,7 @@ inputTypes:
       image: "busybox"
   desiredCount:
     type: integer
-    example: 10
+    example: 1
     required: true
   awsVpcConfiguration:
     type: object
