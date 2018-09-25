@@ -1,5 +1,5 @@
 <!-- AUTO-GENERATED-CONTENT:START (COMPONENT_HEADER) -->
-# AWS Ecs Fargate Service
+# AWS Fargate
 
 Provision AWS ECS Fargate Service with Serverless Components
 <!-- AUTO-GENERATED-CONTENT:END -->
@@ -56,8 +56,8 @@ Provision AWS ECS Fargate Service with Serverless Components
 ```yml
 type: my-application
 components:
-  myAwsEcsFargateService:
-    type: aws-ecs-fargate-service
+  myAwsFargate:
+    type: aws-fargate
     inputs:
       cpu: '256'
       memory: '512'
@@ -69,7 +69,7 @@ components:
             - '360'
           essential: true
           image: busybox
-      desiredCount: 10
+      desiredCount: 1
       awsVpcConfiguration:
         assignPublicIp: DISABLED
         securityGroups: []
