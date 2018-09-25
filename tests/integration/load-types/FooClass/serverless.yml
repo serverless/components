@@ -1,0 +1,5 @@
+name: FooClass
+main: ./index.js
+
+foo: 'abc'
+baz: 'abc'

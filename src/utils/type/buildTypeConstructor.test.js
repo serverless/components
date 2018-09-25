@@ -4,8 +4,8 @@ import buildTypeConstructor from './buildTypeConstructor'
 
 describe('#buildTypeConstructor()', () => {
   it('constructor should set @@type when constructing an instance', async () => {
-    const context = await createContext({})
-    const type = {
+    let context = await createContext({})
+    const Type = {
       main: {
         foo() {}
       },
@@ -14,27 +14,88 @@ describe('#buildTypeConstructor()', () => {
       },
       class: class {}
     }
-    const constructor = buildTypeConstructor(type, context)
-    expect(constructor).toBeInstanceOf(Function)
+    Type.constructor = buildTypeConstructor(Type, context)
+    expect(Type.constructor).toBeInstanceOf(Function)
 
     const inputs = {}
-    const instance = await new constructor(inputs, context, type)
+    context = context.merge({ Type })
+    const instance = await new Type.constructor(inputs, context)
 
-    expect(instance[SYMBOL_TYPE]).toBe(type)
+    expect(instance[SYMBOL_TYPE]).toBe(Type)
+  })
+
+  it('constructor instance is instanceof both constructor and class', async () => {
+    let context = await createContext({})
+    const Type = {
+      main: {
+        foo() {}
+      },
+      props: {
+        name: 'Test'
+      },
+      class: class {}
+    }
+    Type.constructor = buildTypeConstructor(Type, context)
+    expect(Type.constructor).toBeInstanceOf(Function)
+
+    const inputs = {}
+    context = context.merge({ Type })
+    const instance = await new Type.constructor(inputs, context)
+
+    expect(instance).toBeInstanceOf(Type.constructor)
+    expect(instance).toBeInstanceOf(Type.class)
+  })
+
+  it('constructor calls class constructor', async () => {
+    let context = await createContext({})
+    const inputs = { foo: 'bar' }
+    const Class = class {
+      constructor(inpt, ctx) {
+        expect(inpt).toBe(inputs)
+        expect(ctx).toEqual({
+          Type: undefined,
+          cache: context.cache,
+          construct: expect.any(Function),
+          cwd: context.cwd,
+          get: expect.any(Function),
+          loadType: expect.any(Function),
+          merge: expect.any(Function),
+          overrides: context.overrides,
+          set: expect.any(Function)
+        })
+        this.ran = true
+      }
+    }
+    const Type = {
+      main: {},
+      props: {
+        name: 'Test'
+      },
+      class: Class
+    }
+    Type.constructor = buildTypeConstructor(Type, context)
+    context = context.merge({ Type })
+    const instance = await new Type.constructor(inputs, context)
+
+    expect(instance).toEqual({
+      name: 'Test',
+      ran: true,
+      [SYMBOL_TYPE]: Type
+    })
   })
 
   it('constructor supports construct method', async () => {
     const Class = class {}
-    const context = await createContext({})
+    let context = await createContext({})
     const inputs = { foo: 'bar' }
-    const type = {
+    const Type = {
       main: {
-        construct(inputs, context) {
-          expect(inputs).toBe(inputs)
-          expect(context).toBe(context)
+        construct(inpt, ctx) {
+          expect(inpt).toBe(inputs)
+          expect(ctx).toBe(context)
           expect(this).toEqual({
             name: 'Test',
-            [SYMBOL_TYPE]: type
+            [SYMBOL_TYPE]: Type
           })
           this.ran = true
         }
@@ -44,16 +105,21 @@ describe('#buildTypeConstructor()', () => {
       },
       class: Class
     }
-    const constructor = buildTypeConstructor(type, context)
-    const instance = await new constructor(inputs, context, type)
+    Type.constructor = buildTypeConstructor(Type, context)
+    context = context.merge({ Type })
+    const instance = await new Type.constructor(inputs, context)
 
-    expect(instance.ran).toBe(true)
+    expect(instance).toEqual({
+      name: 'Test',
+      ran: true,
+      [SYMBOL_TYPE]: Type
+    })
   })
 
   it('instantiates type constructions in props', async () => {
     const Test1Type = {
       main: {
-        construct(inputs, context) {
+        construct(inputs) {
           expect(inputs).toEqual({
             foo1: 'bar1'
           })
@@ -69,7 +135,7 @@ describe('#buildTypeConstructor()', () => {
 
     const Test2Type = {
       main: {
-        construct(inputs, context) {
+        construct(inputs) {
           expect(inputs).toEqual({
             foo2: 'bar2'
           })
@@ -83,15 +149,18 @@ describe('#buildTypeConstructor()', () => {
     }
     Test2Type.constructor = buildTypeConstructor(Test2Type)
 
-    const context = await createContext({})
-    context.loadType = async (query, context) => {
-      if (query === 'Test1') {
-        return Test1Type
-      } else if (query === 'Test2') {
-        return Test2Type
+    let context = await createContext({
+      overrides: {
+        loadType: async (query) => {
+          if (query === 'Test1') {
+            return Test1Type
+          } else if (query === 'Test2') {
+            return Test2Type
+          }
+          throw new Error(`unknown query ${query}`)
+        }
       }
-      throw new Error(`unknown query ${query}`)
-    }
+    })
 
     const MainType = {
       props: {
@@ -112,8 +181,9 @@ describe('#buildTypeConstructor()', () => {
       },
       class: class {}
     }
-    const constructor = buildTypeConstructor(MainType, context)
-    const instance = await new constructor({}, context, MainType)
+    MainType.constructor = buildTypeConstructor(MainType, context)
+    context = context.merge({ Type: MainType })
+    const instance = await new MainType.constructor({}, context)
 
     expect(instance).toEqual({
       testArray: [

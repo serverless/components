@@ -3,8 +3,8 @@ import construct from '../type/construct'
 import loadType from '../type/loadType'
 
 const newContext = (props) => {
-  const context = pick(['cache', 'cwd', 'data', 'registry', 'root'], props)
-
+  const context = pick(['cache', 'cwd', 'data', 'overrides', 'registry', 'root', 'Type'], props)
+  const overrides = context.overrides || {}
   const finalContext = {
     ...context,
     construct: (type, inputs) => construct(type, inputs, finalContext),
@@ -19,7 +19,8 @@ const newContext = (props) => {
       newContext({
         ...context,
         data: set(selector, value, context.data)
-      })
+      }),
+    ...overrides
   }
   return finalContext
 }
