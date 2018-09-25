@@ -4,6 +4,10 @@ components:
   myWorker:
     type: cloudflare-workers
     inputs:
-      zoneId: 'INSERT_YOUR_ZONE_ID_HERE'
+      accountId: ACCOUNT_ID_HERE
+      credentials:
+        authKey: CLOUDFLARE_AUTH_KEY_HERE
+        authEmail: CLOUDFLARE_AUTH_EMAIL_HERE
+      zoneId: ZONE_ID_HERE
       scriptPath: './index.js'
       route: '*example.com/path/*'
