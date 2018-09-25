@@ -12,6 +12,11 @@ const deploy = async (inputs, context) => {
   const { taskDefinition } = await ecs.registerTaskDefinition(inputs).promise()
   context.log(`ECS TaskDefinition registered: "${inputs.family}"`)
 
+  // Remove previous revision
+  if (state.hasOwnProperty('family') && state.hasOwnProperty('revision')) {
+    await remove({}, context)
+  }
+
   context.saveState(taskDefinition || {})
   return taskDefinition
 }
@@ -23,7 +28,7 @@ const remove = async (inputs, context) => {
   await ecs
     .deregisterTaskDefinition({ taskDefinition: `${state.family}:${state.revision}` })
     .promise()
-  context.log(`ECS TaskDefinition deregistered: "${inputs.family}"`)
+  context.log(`ECS TaskDefinition revision deregistered: "${state.family}:${state.revision}"`)
 
   context.saveState({})
   return {}
