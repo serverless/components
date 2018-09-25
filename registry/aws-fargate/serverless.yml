@@ -85,25 +85,3 @@ outputTypes:
     type: integers
   schedulingStrategy:
     type: string
-
-components:
-  awsEcsTaskdefinition:
-    type: aws-ecs-task-definition
-    inputs:
-      family: ${input.serviceName}-family
-      volumes: []
-      containerDefinitions: ${input.containerDefinitions}
-      networkMode: awsvpc
-      requiresCompatibilities: [FARGATE]
-      cpu: ${input.cpu}
-      memory: ${input.memory}
-
-  awsEcsService:
-    type: aws-ecs-service
-    inputs:
-      launchType: FARGATE
-      desiredCount: ${input.desiredCount}
-      taskDefinition: ${awsEcsTaskdefinition.family}:${awsEcsTaskdefinition.revision}
-      serviceName: ${input.serviceName}
-      networkConfiguration:
-        awsvpcConfiguration: ${input.awsVpcConfiguration}
