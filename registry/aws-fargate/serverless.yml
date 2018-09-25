@@ -33,12 +33,14 @@ inputTypes:
     type: integer
     example: 1
     required: true
+  exposePublically:
+    type: boolean
+    required: false
+    example: true
   awsVpcConfiguration:
     type: object
-    required: true
     example:
-      assignPublicIp: DISABLED
-      securityGroups: []
+      securityGroups: [SECURITYGROUP_ID_HERE]
       subnets: [SUBNET_ID_HERE]
 
 
