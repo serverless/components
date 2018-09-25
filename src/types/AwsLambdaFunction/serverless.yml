@@ -6,7 +6,7 @@ main: ./index.js
 
 inputTypes:
   Provider:
-    type: Provider
+    type: AwsProvider
     default: ${context.Provider}
   FunctionName:
     type: string

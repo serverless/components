@@ -1,6 +1,8 @@
 import { createContext, SYMBOL_TYPE } from '../../src/utils'
 
-describe('load-types: Integration Test - load types', () => {
+jest.setTimeout(50000)
+
+describe('Integration Test - load types', () => {
   it('should load the Object type by name', async () => {
     const context = await createContext({
       cwd: __dirname
@@ -181,5 +183,83 @@ describe('load-types: Integration Test - load types', () => {
     expect(instance).toBeInstanceOf(ObjectType.constructor)
     expect(instance).toBeInstanceOf(ObjectType.class)
     expect(instance.foofn()).toBe(instance)
+  })
+
+  it('should load AwsLambdaFunction', async () => {
+    const context = await createContext({
+      cwd: __dirname
+    })
+    const AwsProvider = await context.loadType('AwsProvider')
+    const AwsProviderInputs = {
+      region: 'us-east-1',
+      credentials: {
+        accessKeyId: 'AKIAIJKIIU5OJU37BTCQ',
+        secretAccessKey: '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'
+      }
+    }
+    const awsProvider = await context.construct(AwsProvider, AwsProviderInputs, context)
+
+    const AwsLambdaFunction = await context.loadType('AwsLambdaFunction')
+    const AwsLambdaFunctionInputs = {
+      provider: awsProvider,
+      name: 'type-system-demo-11',
+      memory: 512,
+      timeout: 10,
+      runtime: 'nodejs8.10',
+      code: './load-types/SimpleLambda',
+      handler: 'index.handler'
+    }
+    const awsLambdaFunction = await context.construct(
+      AwsLambdaFunction,
+      AwsLambdaFunctionInputs,
+      context
+    )
+
+    const outputs = await awsLambdaFunction.deploy(context)
+
+    console.log(outputs)
+  })
+
+  it.only('should load Function', async () => {
+    const context = await createContext({
+      cwd: __dirname
+    })
+    const AwsProvider = await context.loadType('AwsProvider')
+    const AwsProviderInputs = {
+      region: 'us-east-1',
+      credentials: {
+        accessKeyId: 'AKIAIJKIIU5OJU37BTCQ',
+        secretAccessKey: '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'
+      }
+    }
+    const awsProvider = await context.construct(AwsProvider, AwsProviderInputs, context)
+
+    const AwsLambdaCompute = await context.loadType('AwsLambdaCompute')
+    const AwsLambdaComputeInputs = {
+      provider: awsProvider,
+      memory: 512,
+      runtime: 'nodejs'
+    }
+    const awsLambdaCompute = await context.construct(
+      AwsLambdaCompute,
+      AwsLambdaComputeInputs,
+      context
+    )
+
+    const Function = await context.loadType('Function')
+    const FunctionInputs = {
+      compute: {
+        aws: awsLambdaCompute
+      },
+      name: 'type-system-demo-11',
+      memory: 512,
+      timeout: 10,
+      runtime: 'nodejs',
+      code: './load-types/SimpleFunction',
+      handler: 'index.hello'
+    }
+    const fn = await context.construct(Function, FunctionInputs, context)
+
+    await fn.deploy(context)
   })
 })

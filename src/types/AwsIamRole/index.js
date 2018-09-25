@@ -34,7 +34,7 @@ const createRole = async (IAM, { name, service, policy }) => {
     AssumeRolePolicyDocument: JSON.stringify(assumeRolePolicyDocument)
   }).promise()
 
-  await attachRolePolicy({
+  await attachRolePolicy(IAM, {
     name,
     policy
   })
@@ -48,7 +48,7 @@ const createRole = async (IAM, { name, service, policy }) => {
 
 const deleteRole = async (IAM, { name, policy }) => {
   try {
-    await detachRolePolicy({
+    await detachRolePolicy(IAM, {
       name,
       policy
     })
@@ -86,87 +86,97 @@ const updateAssumeRolePolicy = async (IAM, { name, service }) => {
   }).promise()
 }
 
-export const deploy = async (instance, context) => {
-  const IAM = new instance.provider.getSdk().IAM
-  let props = {
-    name: instance.name,
-    service: instance.service,
-    policy: instance.policy
-  }
-  let { state } = context
+const AwsIamRole = {
+  construct({ provider, name, service, policy }) {
+    this.provider = provider
+    this.name = name
+    this.service = service
+    this.policy = policy
+  },
+  async deploy(context) {
+    const IAM = new this.provider.sdk.IAM()
+    let props = {
+      name: this.name,
+      service: this.service,
+      policy: this.policy
+    }
+    let { state } = context
 
-  if (!props.policy) {
-    props = {
-      ...props,
-      policy: {
-        arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
+    if (!props.policy) {
+      props = {
+        ...props,
+        policy: {
+          arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
+        }
       }
     }
-  }
 
-  if (!state.name && props.name) {
-    context.log(`Creating Role: ${props.name}`)
-    const role = await createRole(IAM, props)
-    state = {
-      ...state,
-      ...role,
-      name: props.name
+    if (!state.name && props.name) {
+      context.log(`Creating Role: ${props.name}`)
+      const role = await createRole(IAM, props)
+      state = {
+        ...state,
+        ...role,
+        name: props.name
+      }
+    } else if (!props.name && state.name) {
+      context.log(`Removing Role: ${state.name}`)
+      await deleteRole(IAM, state)
+      state = {
+        ...state,
+        name: null
+      }
+    } else if (state.name !== props.name) {
+      context.log(`Removing Role: ${state.name}`)
+      await deleteRole(IAM, state)
+      context.log(`Creating Role: ${props.name}`)
+      const role = await createRole(IAM, props)
+      state = {
+        ...state,
+        ...role,
+        name: props.name
+      }
+    } else {
+      if (state.service !== props.service) {
+        await updateAssumeRolePolicy(IAM, props)
+      }
+      if (!equals(state.policy, props.policy)) {
+        await detachRolePolicy(IAM, props)
+        await attachRolePolicy(IAM, props)
+      }
     }
-  } else if (!props.name && state.name) {
-    context.log(`Removing Role: ${state.name}`)
-    await deleteRole(IAM, state)
-    state = {
-      ...state,
-      name: null
-    }
-  } else if (state.name !== props.name) {
-    context.log(`Removing Role: ${state.name}`)
-    await deleteRole(IAM, state)
-    context.log(`Creating Role: ${props.name}`)
-    const role = await createRole(IAM, props)
-    state = {
-      ...state,
-      ...role,
-      name: props.name
-    }
-  } else {
-    if (state.service !== props.service) {
-      await updateAssumeRolePolicy(IAM, props)
-    }
-    if (!equals(state.policy, props.policy)) {
-      await detachRolePolicy(IAM, props)
-      await attachRolePolicy(IAM, props)
-    }
-  }
 
-  context.saveState(state)
-  return state
+    context.saveState(state)
+    return state
+  },
+
+  async remove(context) {
+    const IAM = new this.provider.sdk.IAM()
+    if (!context.state.name) return {}
+
+    const outputs = {
+      policy: null,
+      service: null,
+      arn: null
+    }
+
+    try {
+      context.log(`Removing Role: ${context.state.name}`)
+      await deleteRole(IAM, context.state)
+    } catch (e) {
+      if (!e.message.includes('Role not found')) {
+        throw new Error(e)
+      }
+    }
+    context.saveState({
+      name: null,
+      arn: null,
+      service: null,
+      policy: null
+    })
+
+    return outputs
+  }
 }
 
-export const remove = async (instance, context) => {
-  const IAM = new instance.provider.getSdk().IAM
-  if (!context.state.name) return {}
-
-  const outputs = {
-    policy: null,
-    service: null,
-    arn: null
-  }
-
-  try {
-    context.log(`Removing Role: ${context.state.name}`)
-    await deleteRole(IAM, context.state)
-  } catch (e) {
-    if (!e.message.includes('Role not found')) {
-      throw new Error(e)
-    }
-  }
-  context.saveState({
-    name: null,
-    arn: null,
-    service: null,
-    policy: null
-  })
-
-  return outputs
-}
+export default AwsIamRole

@@ -1,9 +1,12 @@
-type: Component
+extends: Component
 name: AwsIamRole
 version: 1.0.0
 main: ./index.js
 
 inputTypes:
+  provider:
+    type: AwsProvider
+    default: ${context.provider}
   name:
     type: string
     default: role-${self.instanceId}
