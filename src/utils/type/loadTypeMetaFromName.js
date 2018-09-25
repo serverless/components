@@ -7,10 +7,15 @@ import loadTypeMetaFromPath from './loadTypeMetaFromPath'
 const NATIVE_NAMES = {
   Component: resolve(__dirname, '..', '..', 'types', 'Component'),
   Function: resolve(__dirname, '..', '..', 'types', 'Function'),
+  Compute: resolve(__dirname, '..', '..', 'types', 'Compute'),
   Object: resolve(__dirname, '..', '..', 'types', 'Object'),
   Plugin: resolve(__dirname, '..', '..', 'types', 'Plugin'),
   Provider: resolve(__dirname, '..', '..', 'types', 'Provider'),
-  Service: resolve(__dirname, '..', '..', 'types', 'Service')
+  Service: resolve(__dirname, '..', '..', 'types', 'Service'),
+  AwsProvider: resolve(__dirname, '..', '..', 'types', 'AwsProvider'),
+  AwsLambdaFunction: resolve(__dirname, '..', '..', 'types', 'AwsLambdaFunction'),
+  AwsIamRole: resolve(__dirname, '..', '..', 'types', 'AwsIamRole'),
+  AwsLambdaCompute: resolve(__dirname, '..', '..', 'types', 'AwsLambdaCompute')
 }
 
 /**

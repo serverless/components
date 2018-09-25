@@ -8,6 +8,11 @@ const newContext = (props) => {
   const finalContext = {
     ...context,
     construct: (type, inputs) => construct(type, inputs, finalContext),
+    state: {}, // todo
+    saveState: () => {}, // todo
+    log: (msg) => {
+      console.log(msg)
+    }, // todo
     get: (selector) => get(selector, context.data),
     loadType: (...args) => loadType(...args, finalContext),
     merge: (value) =>
