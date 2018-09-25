@@ -1,4 +1,4 @@
-type: aws-ecs-fargate-service
+type: aws-fargate
 version: 0.2.0
 core: 0.2.x
 
