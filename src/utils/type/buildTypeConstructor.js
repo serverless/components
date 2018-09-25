@@ -1,12 +1,64 @@
-import { forEachObjIndexed, isFunction, set, walkReduceDepthFirst } from '@serverless/utils'
+import {
+  forEach,
+  get,
+  isFunction,
+  init,
+  isString,
+  keys,
+  last,
+  set,
+  walkReduceDepthFirst
+} from '@serverless/utils'
 import { SYMBOL_TYPE } from '../constants'
+import isVariable from '../variables/isVariable'
+import { regex } from '../variables/regexVariable'
 import isTypeConstruct from './isTypeConstruct'
 
 // eslint-disable-next-line no-unused-vars
-const resolveProps = (props, { self, inputs, context }) => {
-  // TODO BRN
-  return props
+
+const assign = (target, source) => {
+  forEach((key) => {
+    const descriptor = Object.getOwnPropertyDescriptor(source, key)
+    Object.defineProperty(target, key, descriptor)
+  }, keys(source))
+  return target
 }
+
+const clone = (source) => {
+  let copy = {}
+  forEach((key) => {
+    const descriptor = Object.getOwnPropertyDescriptor(source, key)
+    Object.defineProperty(copy, key, descriptor)
+  }, keys(source))
+  return copy
+}
+
+const resolveProps = (props, data) =>
+  walkReduceDepthFirst(
+    (accum, value, keys) => {
+      if (isString(value) && isVariable(value)) {
+        const parentKeys = init(keys)
+        const key = last(keys)
+        const parent = get(parentKeys, accum)
+        const parentCopy = clone(parent)
+        Object.defineProperty(parentCopy, key, {
+          configurable: true,
+          enumerable: true,
+          get() {
+            const propPath = value.match(regex)[1]
+            return value.replace(regex, get(propPath, data))
+          },
+          set(value) {
+            this[key] = value
+          }
+        })
+        return set(parentKeys, parentCopy, accum)
+      }
+      return accum
+    },
+    props,
+    props
+  )
 
 const constructTypes = async (props, ctx) => {
   const context = ctx.merge({ root: ctx.Type.root })
@@ -38,10 +90,10 @@ const buildTypeConstructor = (type) => {
       const { Type } = context
       const { main, props, parent } = Type
 
-      // NOTE BRN: We have to do the instantiation async since we need to load and convert { type, inputs } combos to instances. The types have to be loaded first in order to do that. Any js constructor and divert the constructor to return any instance it want by simply returning a value from the constructor. Here we return a promise instead of the instance and then have the promise return the instance after the async construction.
+      // NOTE BRN: We have to do the instantiation async since we need to load and convert { type, inputs } combos to instances. The types have to be loaded first in order to do that. Any js constructor can divert the constructor to return any instance it wants by simply returning a value from the constructor. Here we return a promise instead of the instance and then have the promise return the instance after the async construction.
       return (async () => {
         // NOTE BRN: call super constructors first so that we dive to the bottom of the class constructor heirarchy and build our instance from the bottom up, first resolving props on the base classes and layering the higher level class's props on top of the lower level ones. This allows for overriding the lower level props.
-        const self = await super(inputs, context.merge({ Type: parent }))
+        let self = await super(inputs, context.merge({ Type: parent }))
 
         // NOTE BRN: set the type onto the instance so that we can use it in cases of reflection.
         self[SYMBOL_TYPE] = Type
@@ -59,17 +111,15 @@ const buildTypeConstructor = (type) => {
         // NOTE BRN: This step walks depth first through the properties and creates instances for any property that has both a 'type' and 'inputs' combo. Lower level instances are created first so in case we have nested constructions the higher construction will receive an instance as an input instead of the { type, inputs }
         resolvedProps = await constructTypes(resolvedProps, context)
 
-        // NOTE BRN: We set all props onto the instance after they have been resolved.
-        // QUESTION: Will this work if variables are referencing self?
-        forEachObjIndexed((value, key) => {
-          self[key] = value
-        }, resolvedProps)
+        // NOTE BRN: We set all props onto the instance after they have been resolved. We use the getOwnPropertyDescriptor and defineProperty so that we properly pass getters that may exist in the properties from the property resolution step
+        self = assign(self, resolvedProps)
 
+        // NOTE BRN: If a construct method exists, call it now. This gives types one last chance to set values.
         if (main && isFunction(main.construct)) {
           main.construct.call(self, inputs, context)
         }
 
-        // NOTE BRN: We return this because the constructor is overridden to return a Promise. Therefore the promise must return the reference to the instance.
+        // NOTE BRN: We return self (this) because the constructor is overridden to return a Promise. Therefore the promise must return the reference to the instance.
         return self
       })()
     }

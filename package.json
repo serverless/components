@@ -35,7 +35,7 @@
   "dependencies": {
     "@babel/polyfill": "^7.0.0",
     "@octokit/rest": "^14.0.5",
-    "@serverless/utils": "0.0.4",
+    "@serverless/utils": "0.0.5",
     "analytics-node": "^3.2.0",
     "aws-sdk": "^2.214.1",
     "axios": "^0.17.1",
