@@ -160,7 +160,8 @@ const deploy = async (input, context) => {
   })
 
   const serviceComponentOutputs = await serviceComponent.deploy()
-  context.saveState({ ...state, service: serviceComponentOutputs })
+  state = { ...state, service: serviceComponentOutputs }
+  context.saveState(state)
 
   context.log('Tasks: waiting for provisioning to finish')
   await new Promise((resolve) => setTimeout(() => resolve(), 20000))
@@ -170,17 +171,21 @@ const deploy = async (input, context) => {
   const tasks = await waitUntilTaskChangeFinishes(taskArns, 0, 10).catch((res) => res)
   context.log('Tasks: provision complete')
   let containers = []
+  let attachments = []
   if (Array.isArray(tasks) && tasks.length) {
     containers = tasks.reduce((prev, current) => prev.concat(current.containers), containers)
+    attachments = tasks.reduce((prev, current) => prev.concat(current.attachments), attachments)
   }
 
-  const tr = {
+  state = { ...state, containers, attachments }
+  context.saveState(state)
+
+  return {
     serviceArn: serviceComponentOutputs.serviceArn,
     serviceName: serviceComponentOutputs.serviceName,
-    containers: containers
+    containers,
+    attachments
   }
-  context.saveState({ ...state, ...tr })
-  return tr
 }
 
 async function waitUntilTaskChangeFinishes(taskArns, currentTry, limit) {

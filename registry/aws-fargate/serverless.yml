@@ -53,4 +53,7 @@ outputTypes:
     description: The name of your service.
   containers:
     type: array
-    description: "The containers associated with the task. Container definition: https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_Container.html"
+    description: "The containers associated with the tasks. Container definition: https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_Container.html"
+  attachments:
+    type: array
+    description: "The attachments associated with the tasks. Attachment definition: https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_Attachment.html"
