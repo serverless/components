@@ -177,6 +177,7 @@ Also please do join the _Components_ channel on our public [Serverless-Contrib S
     * [s3-website-config](./registry/s3-website-config)
     * [serverless-eventgateway-event-type](./registry/serverless-eventgateway-event-type)
     * [serverless-eventgateway-function](./registry/serverless-eventgateway-function)
+    * [serverless-eventgateway-subscription](./registry/serverless-eventgateway-subscription)
     * [static-website](./registry/static-website)
     * [twilio-application](./registry/twilio-application)
     * [twilio-phone-number](./registry/twilio-phone-number)
