@@ -57,3 +57,6 @@ outputTypes:
   attachments:
     type: array
     description: "The attachments associated with the tasks. Attachment definition: https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_Attachment.html"
+  networkInterfaces:
+    type: array
+    description: "Information about one or more network interfaces attached to the Tasks. Network Interface definition: https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_NetworkInterface.html"

@@ -172,19 +172,37 @@ const deploy = async (input, context) => {
   context.log('Tasks: provision complete')
   let containers = []
   let attachments = []
+  let networkInterfaces = []
   if (Array.isArray(tasks) && tasks.length) {
     containers = tasks.reduce((prev, current) => prev.concat(current.containers), containers)
     attachments = tasks.reduce((prev, current) => prev.concat(current.attachments), attachments)
+    const interfaceIds = attachments.reduce(
+      (prev, current) =>
+        prev.concat(
+          (Array.isArray(current.details) ? current.details : [])
+            .filter((d) => d.name === 'networkInterfaceId')
+            .map((d) => d.value)
+        ),
+      []
+    )
+
+    if (Array.isArray(interfaceIds) && interfaceIds.length) {
+      const niData = await ec2
+        .describeNetworkInterfaces({ NetworkInterfaceIds: interfaceIds })
+        .promise()
+      networkInterfaces = niData.NetworkInterfaces || []
+    }
   }
 
-  state = { ...state, containers, attachments }
+  state = { ...state, containers, attachments, networkInterfaces }
   context.saveState(state)
 
   return {
     serviceArn: serviceComponentOutputs.serviceArn,
     serviceName: serviceComponentOutputs.serviceName,
     containers,
-    attachments
+    attachments,
+    networkInterfaces
   }
 }
 
@@ -344,12 +362,44 @@ const remove = async (input, context) => {
 }
 
 const get = async (input, context) => {
-  const { state } = context
+  let { state } = context
+  context.log('Tasks: waiting for provisioning to finish')
+  await new Promise((resolve) => setTimeout(() => resolve(), 40000))
+  const { taskArns } = await ecs.listTasks({ serviceName: input.serviceName }).promise()
+  const tasks = await waitUntilTaskChangeFinishes(taskArns, 0, 10).catch((res) => res)
+  context.log('Tasks: provision complete')
+  let containers = []
+  let attachments = []
+  let networkInterfaces = []
+  if (Array.isArray(tasks) && tasks.length) {
+    containers = tasks.reduce((prev, current) => prev.concat(current.containers), containers)
+    attachments = tasks.reduce((prev, current) => prev.concat(current.attachments), attachments)
+    const interfaceIds = attachments.reduce(
+      (prev, current) =>
+        prev.concat(
+          (Array.isArray(current.details) ? current.details : [])
+            .filter((d) => d.name === 'networkInterfaceId')
+            .map((d) => d.value)
+        ),
+      []
+    )
+
+    if (Array.isArray(interfaceIds) && interfaceIds.length) {
+      const niData = await ec2
+        .describeNetworkInterfaces({ NetworkInterfaceIds: interfaceIds })
+        .promise()
+      networkInterfaces = niData.NetworkInterfaces || []
+    }
+  }
+
+  state = { ...state, containers, attachments, networkInterfaces }
+  context.saveState(state)
   return {
     serviceArn: (state.service || {}).serviceArn,
     serviceName: (state.service || {}).serviceName,
     containers: state.containers,
-    attachments: state.attachments
+    attachments: state.attachments,
+    networkInterfaces: state.networkInterfaces
   }
 }
 
