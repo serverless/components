@@ -85,8 +85,8 @@ describe('AWS ECS TaskDefinition Unit Tests', () => {
 
     expect(family).toBe(inputs.family)
     expect(AWS.mocks.registerTaskDefinitionMock).toHaveBeenCalledTimes(1)
-    expect(AWS.mocks.deregisterTaskDefinitionMock).toHaveBeenCalledTimes(1)
-    expect(contextMock.saveState).toHaveBeenCalledTimes(2)
+    expect(AWS.mocks.deregisterTaskDefinitionMock).toHaveBeenCalledTimes(2)
+    expect(contextMock.saveState).toHaveBeenCalledTimes(3)
   })
 
   it('should deregister the task definition', async () => {
