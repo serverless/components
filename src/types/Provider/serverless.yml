@@ -1,0 +1,20 @@
+type: Component
+name: Provider
+version: 1.0.0
+
+provider: Provider
+credentials: Object<string, string>
+sdk: Object<any, any>
+
+inputTypes:
+  provider:
+    type: Provider
+    required: true
+    example: AWS
+  credentials:
+    type: Object
+    required: true
+    example: { apiKey: my4p1k3y }
+  sdk:
+    type: Object
+    example: { faas: class Faas() {} }
