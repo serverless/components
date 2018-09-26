@@ -164,7 +164,7 @@ const deploy = async (input, context) => {
   context.saveState(state)
 
   context.log('Tasks: waiting for provisioning to finish')
-  await new Promise((resolve) => setTimeout(() => resolve(), 20000))
+  await new Promise((resolve) => setTimeout(() => resolve(), 15000))
   const { taskArns } = await ecs
     .listTasks({ serviceName: serviceComponentOutputs.serviceName })
     .promise()
