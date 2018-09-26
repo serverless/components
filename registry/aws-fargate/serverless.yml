@@ -10,38 +10,43 @@ repository: "github:serverless/components"
 inputTypes:
   serviceName:
     type: string
+    description: The name of your service. Up to 255 letters (uppercase and lowercase), numbers, hyphens, and underscores are allowed. Service names must be unique within a cluster, but you can have similarly named services in multiple clusters within a Region or across multiple Regions.
     required: true
     example: myAwsEcsFargateService
   cpu:
     type: string
     enum: [256, 512, 1024, 2048, 4096]
+    description: The number of CPU units used by the task.
     example: "256"
   memory:
     type: string
     enum: [512, 1024, 2014, 4096, 5120, 6144, 7168, 8192, 9216, 10240, 11264, 12288, 13312, 14336, 15360, 16384, 17408, 18432, 19456, 20480, 21504, 22528, 23552, 24576, 25600, 26624, 27648, 28672, 29696, 30720]
+    description: The amount of memory (in MiB) used by the task.
     example: "512"
   containerDefinitions:
     type: array
-    description: A list of container definitions in JSON format that describe the different containers that make up your task.
+    description: "A list of container definitions that describe the different containers that make up your task. ContainerDefinition definition: https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_ContainerDefinition.html"
     required: true
     example:
-    - name: "sleep"
-      command: ["sleep", "360"]
+    - name: "nginx"
       essential: true
-      image: "busybox"
+      image: nginx:1.7.9
+      portMappings:
+        - containerPort: 80
+          hostPort: 80
+          protocol: tcp
   desiredCount:
     type: integer
-    example: 1
+    description: The number of instantiations of the specified task definition to place and keep running on your cluster.
     required: true
+    example: 1
   exposePublically:
     type: boolean
-    required: false
+    description: Whether to assign a public IP address to container instances or not.
     example: true
   awsVpcConfiguration:
     type: object
-    example:
-      securityGroups: [SECURITYGROUP_ID_HERE]
-      subnets: [SUBNET_ID_HERE]
+    description: "The VPC subnets and security groups associated with a task. AwsVpcConfiguration definition: https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_AwsVpcConfiguration.html"
 
 
 outputTypes:
