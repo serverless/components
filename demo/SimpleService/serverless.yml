@@ -1,0 +1,26 @@
+name: SimpleService
+extends: Service
+
+providers:
+  aws:
+    type: AwsProvider
+    inputs:
+      credentials:
+        accessKeyId: xxx
+        secretAccessKey: xxx
+      region: us-east-1
+
+compute:
+  awsLambda:
+    type: AwsLambdaCompute
+    inputs:
+      provider: ${self.providers.aws}
+      runtime: nodejs
+
+functions:
+  hello:
+    compute:
+      aws: ${self.compute.awsLambda}
+    handler: index.hello
+    code: ./code
+    memory: 1024
