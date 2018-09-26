@@ -127,16 +127,16 @@ const AwsLambdaFunction = {
 
       archive.on('error', (err) => reject(err))
       output.on('close', () => {
-        console.log('hi')
-        console.log(outputFilePath)
         this.code = readFileSync(outputFilePath)
         return resolve({
+          provider: this.provider,
           name: this.name,
           handler: this.handler,
           code: this.code,
           memory: this.memory,
           timeout: this.timeout,
           description: this.description,
+          environment: this.environment,
           runtime: this.runtime,
           arn: this.arn,
           roleArn: this.roleArn
@@ -149,11 +149,10 @@ const AwsLambdaFunction = {
         const shims = this.code
         shims.shift() // remove first item since it's the path to code dir
         forEach((shimFilePath) => {
-          const shimStream = createReadStream(shimFilePath, { name: path.basename(shimFilePath) })
-          archive.append(shimStream)
+          const shimStream = createReadStream(shimFilePath)
+          archive.append(shimStream, { name: path.basename(shimFilePath) })
         }, shims)
       }
-
       archive.glob(
         '**/*',
         {
