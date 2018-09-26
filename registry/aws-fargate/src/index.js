@@ -248,13 +248,17 @@ const remove = async (input, context) => {
   }
 
   if (state.service) {
-    const serviceComponent = await context.load('aws-ecs-service', 'service', {
+    let serviceParams = {
       launchType: 'FARGATE',
       desiredCount: input.desiredCount,
       taskDefinition: '',
       serviceName: input.serviceName,
       networkConfiguration: {}
-    })
+    }
+    if (typeof input.cluster === 'string' && input.cluster.length) {
+      serviceParams = Object.assign(serviceParams, { cluster: input.cluster })
+    }
+    const serviceComponent = await context.load('aws-ecs-service', 'service', serviceParams)
     await serviceComponent.remove({}, state.service)
 
     state = { ...state, service: null }
