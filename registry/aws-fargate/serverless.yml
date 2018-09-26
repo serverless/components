@@ -47,43 +47,10 @@ inputTypes:
 outputTypes:
   serviceArn:
     type: string
+    description: The ARN that identifies the service.
   serviceName:
     type: string
-  clusterArn:
-    type: string
-  loadBalancers:
+    description: The name of your service.
+  containers:
     type: array
-  serviceRegisteries:
-    type: string
-  status:
-    type: string
-  desiredCount:
-    type: integer
-  runningCount:
-    type: integer
-  pendingCount:
-    type: integer
-  launchType:
-    type: string
-  platformVersion:
-    type: string
-  taskDefinition:
-    type: string
-  deploymentConfiguration:
-    type: object
-  deployments:
-    type: array
-  roleArn:
-    type: string
-  createdAt:
-    type: datetime
-  placementConstraints:
-    type: array
-  placementStrategy:
-    type: array
-  networkConfiguration:
-    type: object
-  healthCheckGracePeriodSeconds:
-    type: integers
-  schedulingStrategy:
-    type: string
+    description: "The containers associated with the task. Container definition: https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_Container.html"

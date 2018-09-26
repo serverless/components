@@ -158,19 +158,39 @@ const deploy = async (input, context) => {
       }
     }
   })
+
   const serviceComponentOutputs = await serviceComponent.deploy()
   context.saveState({ ...state, service: serviceComponentOutputs })
+
+  context.log('Tasks: waiting for provisioning to finish')
+  await new Promise((resolve) => setTimeout(() => resolve(), 20000))
+  const { taskArns } = await ecs
+    .listTasks({ serviceName: serviceComponentOutputs.serviceName })
+    .promise()
+  const tasks = await waitUntilTaskChangeFinishes(taskArns, 0, 10).catch((res) => res)
+  context.log('Tasks: provision complete')
+  let containers = []
+  if (Array.isArray(tasks) && tasks.length) {
+    containers = tasks.reduce((prev, current) => prev.concat(current.containers), containers)
+  }
+
+  const tr = {
+    serviceArn: serviceComponentOutputs.serviceArn,
+    serviceName: serviceComponentOutputs.serviceName,
+    containers: containers
+  }
+  context.saveState({ ...state, ...tr })
+  return tr
 }
 
 async function waitUntilTaskChangeFinishes(taskArns, currentTry, limit) {
-  if (currentTry > limit) return Promise.reject([])
-
-  // Wait 10 seconds because it times some times for tasks to change
-  await new Promise((resolve) => setTimeout(() => resolve(), 10000))
-
   const { tasks } = await ecs.describeTasks({ tasks: taskArns }).promise()
+  if (currentTry > limit || !Array.isArray(tasks)) return Promise.reject(tasks)
+
   const unfinishedTasks = tasks.filter((t) => t.desiredStatus !== t.lastStatus)
-  if (Array.isArray(unfinishedTasks) && unfinishedTasks.length) {
+  if (unfinishedTasks.length) {
+    // Wait 10 seconds because it times some times for tasks to change
+    await new Promise((resolve) => setTimeout(() => resolve(), 10000))
     return waitUntilTaskChangeFinishes(unfinishedTasks.map((t) => t.taskArn), currentTry++, limit)
   }
 
@@ -217,26 +237,26 @@ const remove = async (input, context) => {
   }
 
   if (Array.isArray(taskArns) && taskArns.length) {
-    context.log('Task removal: waiting for removal to finish')
+    context.log('Task: waiting for removal to finish')
     await waitUntilTaskChangeFinishes(taskArns, 0, 5)
-    context.log('Task removal: finished')
+    context.log('Task: finished')
   }
 
   if (state.RouteTableAssociationId) {
     await ec2.disassociateRouteTable({ AssociationId: state.RouteTableAssociationId }).promise()
-    context.log('RouteTable: successfully disassociate')
+    context.log('RouteTable: disassociated')
     state = { ...state, RouteTableAssociationId: null }
     context.saveState(state)
   }
   if (state.SubnetId) {
     await ec2.deleteSubnet({ SubnetId: state.SubnetId }).promise()
     state = { ...state, SubnetId: null }
-    context.log('Subnet: successfully deleted')
+    context.log('Subnet: deleted')
     context.saveState(state)
   }
   if (state.SecurityGroupId) {
     await ec2.deleteSecurityGroup({ GroupId: state.SecurityGroupId }).promise()
-    context.log('SecurityGroup: successfully deleted')
+    context.log('SecurityGroup: deleted')
     state = { ...state, SecurityGroupId: null }
     context.saveState(state)
   }
@@ -245,10 +265,10 @@ const remove = async (input, context) => {
       await ec2
         .detachInternetGateway({ InternetGatewayId: state.InternetGatewayId, VpcId: state.VpcId })
         .promise()
-      context.log('InternetGateway: successfully detached')
+      context.log('InternetGateway: detached')
     }
     await ec2.deleteInternetGateway({ InternetGatewayId: state.InternetGatewayId }).promise()
-    context.log('InternetGateway: successfully deleted')
+    context.log('InternetGateway: deleted')
     state = { ...state, InternetGatewayId: null }
     context.saveState(state)
   }
@@ -275,7 +295,7 @@ const remove = async (input, context) => {
       }
     }
     await ec2.deleteRouteTable({ RouteTableId: state.RouteTableId }).promise()
-    context.log('RouteTable: successfully deleted')
+    context.log('RouteTable: deleted')
   }
   if (state.NetworkAclId) {
     const { NetworkAcls } = await ec2
@@ -302,18 +322,20 @@ const remove = async (input, context) => {
       }
     }
     await ec2.deleteNetworkAcl({ NetworkAclId: state.NetworkAclId }).promise()
-    context.log('NetworkAcl: successfully deleted')
+    context.log('NetworkAcl: deleted')
     state = { ...state, NetworkAclId: null }
     context.saveState(state)
   }
   if (state.VpcId) {
     await ec2.deleteVpc({ VpcId: state.VpcId }).promise()
-    context.log('VPC: successfully deleted')
+    context.log('VPC: deleted')
     state = { ...state, VpcId: null }
     context.saveState(state)
   }
 
+  context.log('Fargate service: removal complete')
   context.saveState({})
+  return {}
 }
 
 const get = async (input, context) => {
