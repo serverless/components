@@ -197,6 +197,8 @@ const deploy = async (input, context) => {
   state = { ...state, containers, attachments, networkInterfaces }
   context.saveState(state)
 
+  context.log('AWS Fargate: deployment complete')
+
   return {
     serviceArn: serviceComponentOutputs.serviceArn,
     serviceName: serviceComponentOutputs.serviceName,
