@@ -345,7 +345,12 @@ const remove = async (input, context) => {
 
 const get = async (input, context) => {
   const { state } = context
-  return state || {}
+  return {
+    serviceArn: (state.service || {}).serviceArn,
+    serviceName: (state.service || {}).serviceName,
+    containers: state.containers,
+    attachments: state.attachments
+  }
 }
 
 module.exports = {
