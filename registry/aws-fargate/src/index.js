@@ -24,125 +24,139 @@ const deploy = async (input, context) => {
     securityGroups = input.awsVpcConfiguration.securityGroups
     subnets = input.awsVpcConfiguration.subnets
   } else {
-    const {
-      Vpc: { VpcId }
-    } = await ec2.createVpc({ CidrBlock: '10.0.0.0/16' }).promise()
-    if (!VpcId) throw new Error('Could not get VPC ID')
-    context.log('VPC: created')
+    if (!state.VpcId) {
+      const {
+        Vpc: { VpcId }
+      } = await ec2.createVpc({ CidrBlock: '10.0.0.0/16' }).promise()
+      if (!VpcId) throw new Error('Could not create VPC ID')
+      context.log('VPC: created')
 
-    state = { ...state, VpcId }
-    context.saveState(state)
+      state = { ...state, VpcId }
+      context.saveState(state)
+    }
 
-    const {
-      InternetGateway: { InternetGatewayId }
-    } = await ec2.createInternetGateway({}).promise()
-    if (!InternetGatewayId) throw new Error('Could not attach Internet Gateway')
-    context.log('Internet Gateway: created')
+    if (!state.InternetGatewayId) {
+      const {
+        InternetGateway: { InternetGatewayId }
+      } = await ec2.createInternetGateway({}).promise()
+      if (!InternetGatewayId) throw new Error('Could not create Internet Gateway')
+      context.log('Internet Gateway: created')
 
-    state = { ...state, InternetGatewayId }
-    context.saveState(state)
+      state = { ...state, InternetGatewayId }
+      context.saveState(state)
 
-    await ec2.attachInternetGateway({ InternetGatewayId, VpcId }).promise()
-    context.log('Internet Gateway: attached to VPC')
+      await ec2.attachInternetGateway({ InternetGatewayId, VpcId: state.VpcId }).promise()
+      context.log('Internet Gateway: attached to VPC')
+    }
 
-    const { GroupId } = await ec2
-      .createSecurityGroup({
-        Description: `${input.serviceName} security group`,
-        GroupName: `${input.serviceName}-security-group`,
-        VpcId
-      })
-      .promise()
-    if (!GroupId) throw new Error('Could not get Security group')
-    context.log('Security Group: created')
+    if (!state.SecurityGroupId) {
+      const { GroupId: SecurityGroupId } = await ec2
+        .createSecurityGroup({
+          Description: `${input.serviceName} security group`,
+          GroupName: `${input.serviceName}-security-group`,
+          VpcId: state.VpcId
+        })
+        .promise()
+      if (!SecurityGroupId) throw new Error('Could not get Security group')
+      context.log('Security Group: created')
 
-    state = { ...state, SecurityGroupId: GroupId }
-    context.saveState(state)
+      state = { ...state, SecurityGroupId }
+      context.saveState(state)
 
-    const {
-      NetworkAcl: { NetworkAclId }
-    } = await ec2.createNetworkAcl({ VpcId }).promise()
-    if (!NetworkAclId) throw new Error('Could not create Network ACL')
-    context.log('NetworkAcl: created')
+      await ec2
+        .authorizeSecurityGroupIngress({
+          GroupId: state.SecurityGroupId,
+          IpPermissions: [
+            {
+              FromPort: -1,
+              IpProtocol: '-1',
+              IpRanges: [{ CidrIp: '0.0.0.0/0' }],
+              Ipv6Ranges: [{ CidrIpv6: '::/0' }],
+              ToPort: -1
+            }
+          ]
+        })
+        .promise()
+      context.log('SecurityGroupIngress: rule created')
 
-    state = { ...state, NetworkAclId }
-    context.saveState(state)
+      await ec2
+        .authorizeSecurityGroupEgress({
+          GroupId: state.SecurityGroupId,
+          IpPermissions: [
+            {
+              FromPort: -1,
+              IpProtocol: '-1',
+              Ipv6Ranges: [{ CidrIpv6: '::/0' }],
+              ToPort: -1
+            }
+          ]
+        })
+        .promise()
+      context.log('SecurityGroupEgress: rule created')
+    }
 
-    const {
-      RouteTable: { RouteTableId }
-    } = await ec2.createRouteTable({ VpcId }).promise()
-    if (!RouteTableId) throw new Error('Could not create Route Table for VPC')
-    context.log('RouteTable: created')
+    if (!state.NetworkAclId) {
+      const {
+        NetworkAcl: { NetworkAclId }
+      } = await ec2.createNetworkAcl({ VpcId: state.VpcId }).promise()
+      if (!NetworkAclId) throw new Error('Could not create Network ACL')
+      context.log('NetworkAcl: created')
 
-    state = { ...state, RouteTableId }
-    context.saveState(state)
+      state = { ...state, NetworkAclId }
+      context.saveState(state)
+    }
 
-    await ec2
-      .createRoute({
-        DestinationCidrBlock: '0.0.0.0/0',
-        GatewayId: InternetGatewayId,
-        RouteTableId: RouteTableId
-      })
-      .promise()
-    await ec2
-      .createRoute({
-        DestinationIpv6CidrBlock: '::/0',
-        GatewayId: InternetGatewayId,
-        RouteTableId: RouteTableId
-      })
-      .promise()
-    context.log('RouteTable: routes created')
+    if (!state.RouteTableId) {
+      const {
+        RouteTable: { RouteTableId }
+      } = await ec2.createRouteTable({ VpcId: state.VpcId }).promise()
+      if (!RouteTableId) throw new Error('Could not create Route Table for VPC')
+      context.log('RouteTable: created')
 
-    await ec2
-      .authorizeSecurityGroupIngress({
-        GroupId: GroupId,
-        IpPermissions: [
-          {
-            FromPort: -1,
-            IpProtocol: '-1',
-            IpRanges: [{ CidrIp: '0.0.0.0/0' }],
-            Ipv6Ranges: [{ CidrIpv6: '::/0' }],
-            ToPort: -1
-          }
-        ]
-      })
-      .promise()
-    context.log('SecurityGroupIngress: rule created')
+      state = { ...state, RouteTableId }
+      context.saveState(state)
 
-    await ec2
-      .authorizeSecurityGroupEgress({
-        GroupId: GroupId,
-        IpPermissions: [
-          {
-            FromPort: -1,
-            IpProtocol: '-1',
-            Ipv6Ranges: [{ CidrIpv6: '::/0' }],
-            ToPort: -1
-          }
-        ]
-      })
-      .promise()
-    context.log('SecurityGroupEgress: rule created')
+      await ec2
+        .createRoute({
+          DestinationCidrBlock: '0.0.0.0/0',
+          GatewayId: state.InternetGatewayId,
+          RouteTableId: RouteTableId
+        })
+        .promise()
+      await ec2
+        .createRoute({
+          DestinationIpv6CidrBlock: '::/0',
+          GatewayId: state.InternetGatewayId,
+          RouteTableId: RouteTableId
+        })
+        .promise()
+      context.log('RouteTable: routes created')
+    }
 
-    const {
-      Subnet: { SubnetId }
-    } = await ec2.createSubnet({ CidrBlock: '10.0.0.0/16', VpcId }).promise()
-    if (!SubnetId) throw new Error('Could not get Subnet')
-    context.log('Subnet: created')
+    if (!state.SubnetId) {
+      const {
+        Subnet: { SubnetId }
+      } = await ec2.createSubnet({ CidrBlock: '10.0.0.0/16', VpcId: state.VpcId }).promise()
+      if (!SubnetId) throw new Error('Could not get Subnet')
+      context.log('Subnet: created')
 
-    state = { ...state, SubnetId }
-    context.saveState(state)
+      state = { ...state, SubnetId }
+      context.saveState(state)
+    }
 
-    const { AssociationId: RouteTableAssociationId } = await ec2
-      .associateRouteTable({ RouteTableId, SubnetId })
-      .promise()
-    if (!RouteTableAssociationId) throw new Error('Could not associate RouteTable with Subnet')
-    context.log('Subnet: route table associated')
+    if (!state.RouteTableAssociationId) {
+      const { AssociationId: RouteTableAssociationId } = await ec2
+        .associateRouteTable({ RouteTableId: state.RouteTableId, SubnetId: state.SubnetId })
+        .promise()
+      if (!RouteTableAssociationId) throw new Error('Could not associate RouteTable with Subnet')
+      context.log('Subnet: route table associated')
 
-    state = { ...state, RouteTableAssociationId }
-    context.saveState(state)
+      state = { ...state, RouteTableAssociationId }
+      context.saveState(state)
+    }
 
-    securityGroups = [GroupId]
-    subnets = [SubnetId]
+    securityGroups = [state.SecurityGroupId]
+    subnets = [state.SubnetId]
   }
 
   const serviceComponent = await context.load('aws-ecs-service', 'service', {
