@@ -1,0 +1,71 @@
+type: serverless-eventgateway-cors
+version: 0.2.0
+core: 0.2.x
+
+description: "Manages Event Gateway CORS configurations"
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
+
+inputTypes:
+  url:
+    type: string
+    required: true
+    displayName: URL
+    description: The Event Gateway URL
+    example: http://localhost
+  space:
+    type: string
+    default: default
+    displayName: Space
+    description: The Event Gateway space which should be used
+    example: acme-marketing-space
+  accessKey:
+    type: string
+    required: true
+    displayName: Access Key
+    description: The access key used to authenticate with the hosted Event Gateway
+    example: s0m34c355k3y
+  method:
+    type: string
+    required: true
+    displayName: Method
+    description: The method CORS configuration should be applied to
+    example: POST
+  path:
+    type: string
+    required: true
+    displayName: Path
+    description: The path CORS configuration should be applied to
+    example: /acme
+  allowedOrigins:
+    type: array
+    displayName: Allowed Origins
+    description: The allowed origins for the CORS configuration
+    example: ['http://*.domain.com']
+  allowedMethods:
+    type: array
+    displayName: Allowed Methods
+    description: The allowed methods for the CORS connfiguration
+    example: ['POST', 'GET']
+  allowedHeaders:
+    type: array
+    displayName: Allowed Headers
+    description: The allowed headers for the CORS configuration
+    example: ['Origin', 'Accept']
+  allowCredentials:
+    type: boolean
+    displayName: Allowed Credentials
+    description: Whether credentials are allowed for the CORS configuration
+    example: false
+
+outputTypes:
+  corsId:
+    type: string
+    description: The CORS configuration id
+  method:
+    type: string
+    description: The method CORS configuration is applied to
+  path:
+    type: string
+    description: The path CORS configuration is applied to
