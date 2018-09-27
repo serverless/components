@@ -1,8 +1,8 @@
 const AWS = require('aws-sdk')
 const awsVpcComponent = require('./index')
-const sleep = require('./sleep')
+const { sleep } = require('@serverless/utils')
 
-jest.mock('./sleep')
+jest.mock('@serverless/utils')
 
 jest.mock('aws-sdk', () => {
   const mocks = {

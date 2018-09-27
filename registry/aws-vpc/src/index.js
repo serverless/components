@@ -1,7 +1,6 @@
 const AWS = require('aws-sdk')
 const { equals, isEmpty, merge, pick } = require('ramda')
-
-const sleep = require('./sleep')
+const { sleep } = require('@serverless/utils')
 
 const ec2 = new AWS.EC2({
   region: process.env.AWS_DEFAULT_REGION || 'us-east-1'
