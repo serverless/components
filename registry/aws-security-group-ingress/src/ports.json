@@ -18,5 +18,89 @@
   "HTTPS*": {
     "from": 8443,
     "to": 8443
+  },
+  "SSH": {
+    "from": 22,
+    "to": 22
+  },
+  "telnet": {
+    "from": 23,
+    "to": 23
+  },
+  "SMTP": {
+    "from": 25,
+    "to": 25
+  },
+  "nameserver": {
+    "from": 42,
+    "to": 42
+  },
+  "DNS": {
+    "from": 53,
+    "to": 53
+  },
+  "POP3": {
+    "from": 110,
+    "to": 110
+  },
+  "IMAP": {
+    "from": 143,
+    "to": 143
+  },
+  "LDAP": {
+    "from": 389,
+    "to": 389
+  },
+  "SMB": {
+    "from": 445,
+    "to": 445
+  },
+  "SMTPS": {
+    "from": 465,
+    "to": 465
+  },
+  "IMAPS": {
+    "from": 993,
+    "to": 993
+  },
+  "POP3S": {
+    "from": 995,
+    "to": 995
+  },
+  "MSSQL": {
+    "from": 1433,
+    "to": 1433
+  },
+  "Oracle": {
+    "from": 1521,
+    "to": 1521
+  },
+  "MySQL": {
+    "from": 3306,
+    "to": 3306
+  },
+  "NFS": {
+    "from": 2049,
+    "to": 2049
+  },
+  "RDP": {
+    "from": 3389,
+    "to": 3389
+  },
+  "PostgreSQL": {
+    "from": 5432,
+    "to": 5432
+  },
+  "Redshift": {
+    "from": 5439,
+    "to": 5439
+  },
+  "WinRM-HTTP": {
+    "from": 5985,
+    "to": 5985
+  },
+  "WinRM-HTTPS": {
+    "from": 5986,
+    "to": 5986
   }
 }
