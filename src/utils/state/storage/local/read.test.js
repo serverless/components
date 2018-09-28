@@ -1,6 +1,6 @@
 const { getTmpDir, writeFile } = require('@serverless/utils')
 const path = require('path')
-const readStateFile = require('./readStateFile')
+const readStateFile = require('./read')
 
 describe('#readStateFile()', () => {
   let oldCwd
@@ -43,13 +43,18 @@ describe('#readStateFile()', () => {
   })
 
   it('should read the projects state file if present', async () => {
-    const res = await readStateFile(projectPath)
+    const res = await readStateFile({ projectPath })
+    expect(res).toEqual(fileContent)
+  })
+
+  it('should read the projects state file if present and defined in config', async () => {
+    const res = await readStateFile({ projectPath, state: { file: 'state.json' } })
     expect(res).toEqual(fileContent)
   })
 
   it('should return an empty object if the project does not contain a state file', async () => {
     projectPath = await getTmpDir()
-    const res = await readStateFile(projectPath)
+    const res = await readStateFile({ projectPath })
     expect(res).toEqual({})
   })
 })

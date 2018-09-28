@@ -1,0 +1,61 @@
+type: cloudflare-workers
+version: 1.1.0
+core: 0.2.x
+
+description: 'Serverless components to deploy Cloudflare Workers'
+license: BSD-3-Clause
+author: "Cloudflare, Inc. (https://cloudflare.com)"
+repository: "github:serverless/components"
+
+inputTypes:
+  credentials:
+    type: object
+    required: true
+    example:
+      authKey: CLOUDFLARE_AUTH_KEY_HERE
+      authEmail: CLOUDFLARE_AUTH_EMAIL_HERE
+  zoneId:
+    type: string
+    required: true
+    example: ZONE_ID_HERE
+  scriptPath:
+    type: string
+    required: true
+    example: ./index.js
+  accountId:
+    type: string
+    required: false
+    example: ACCOUNT_ID_HERE
+  scriptName:
+    type: string
+    required: false
+  route:
+    type: string
+    required: true
+    example: example.com/path/*
+
+outputTypes:
+  successScript:
+    type: boolean
+    description: Success status returned by the Cloudflare Worker Script API endpoint
+  resultScript:
+    type: any
+    description: Contents of the script uploaded to the Cloudflare Worker Script API endpoint
+  errorsScript:
+    type: any
+    description: Errors returned by the Cloudflare Worker Script API endpoint
+  messagesScript:
+    type: any
+    description: Messages returned by the Cloudflare Worker Script API endpoint
+  successRoute:
+    type: boolean
+    description: Success status returned by the Cloudflare Worker Route API endpoint
+  resultRoute:
+    type: any
+    description: Routes that the script are deployed on
+  errorsRoute:
+    type: any
+    description: Errors returned by the Cloudflare Worker Route API endpoint
+  messagesRoute:
+    type: any
+    description: Messages returned by the Cloudflare Worker Route API endpoint

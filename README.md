@@ -111,7 +111,7 @@ components:
 [![dependencies](https://img.shields.io/david/serverless/serverless-components.svg)](https://www.npmjs.com/package/serverless-components)
 [![license](https://img.shields.io/npm/l/serverless-components.svg)](https://www.npmjs.com/package/serverless-components)
 
-[Website](http://www.serverless.com) • [Slack](https://join.slack.com/t/serverless-contrib/shared_invite/enQtNDI4MjM3MTIwMTgzLTE3Y2RkOTY1YTY1MTE0ZjA0YTBhYjA2NzNiMGUwODNlYWFjNjE3YTE1OGFjZjFiNmE1NTgzM2NjYzc5ZTNhM2Q) • [Newsletter](http://eepurl.com/b8dv4P) • [Forum](http://forum.serverless.com) • [Meetups](http://serverlessmeetups.com) • [Twitter](https://twitter.com/goserverless) • [We're Hiring](https://serverless.com/company/jobs/)
+[Website](http://www.serverless.com) • [Slack](https://serverless.com/slack) • [Newsletter](http://eepurl.com/b8dv4P) • [Forum](http://forum.serverless.com) • [Meetups](http://serverlessmeetups.com) • [Twitter](https://twitter.com/goserverless) • [We're Hiring](https://serverless.com/company/jobs/)
 
 Also please do join the _Components_ channel on our public [Serverless-Contrib Slack](https://serverless-contrib.slack.com/messages/C9U3RA55M) to continue the conversation.
 
@@ -152,15 +152,20 @@ Also please do join the _Components_ channel on our public [Serverless-Contrib S
     * [aws-iam-policy](./registry/aws-iam-policy)
     * [aws-iam-role](./registry/aws-iam-role)
     * [aws-lambda](./registry/aws-lambda)
+    * [aws-lambda-secure](./registry/aws-lambda-secure)
     * [aws-route53](./registry/aws-route53)
     * [aws-s3-bucket](./registry/aws-s3-bucket)
     * [aws-sns-platform-application](./registry/aws-sns-platform-application)
     * [aws-sns-platform-endpoint](./registry/aws-sns-platform-endpoint)
     * [aws-sns-subscription](./registry/aws-sns-subscription)
     * [aws-sns-topic](./registry/aws-sns-topic)
+    * [aws-vpc](./registry/aws-vpc)
+    * [cloudflare-workers](./registry/cloudflare-workers)
+    * [docker-image](./registry/docker-image)
     * [eventgateway](./registry/eventgateway)
     * [github-webhook](./registry/github-webhook)
     * [github-webhook-aws](./registry/github-webhook-aws)
+    * [google-cloud-function](./registry/google-cloud-function)
     * [mustache](./registry/mustache)
     * [netlify-site](./registry/netlify-site)
     * [rest-api](./registry/rest-api)
@@ -170,7 +175,13 @@ Also please do join the _Components_ channel on our public [Serverless-Contrib S
     * [s3-sync](./registry/s3-sync)
     * [s3-uploader](./registry/s3-uploader)
     * [s3-website-config](./registry/s3-website-config)
+    * [serverless-eventgateway-cors](./registry/serverless-eventgateway-cors)
+    * [serverless-eventgateway-event-type](./registry/serverless-eventgateway-event-type)
+    * [serverless-eventgateway-function](./registry/serverless-eventgateway-function)
+    * [serverless-eventgateway-subscription](./registry/serverless-eventgateway-subscription)
     * [static-website](./registry/static-website)
+    * [twilio-application](./registry/twilio-application)
+    * [twilio-phone-number](./registry/twilio-phone-number)
 * [Examples](#examples)
   * [Basic Lambda Example](./examples/basic)
   * [Blog Example](./examples/blog)
@@ -185,9 +196,11 @@ Also please do join the _Components_ channel on our public [Serverless-Contrib S
 **Note:** Make sure you have Node.js 8+ and npm installed on your machine.
 
 1.  `npm install --global serverless-components`
-1.  Setup the environment variables
+1.  Set up the environment variables depending on your cloud provider
     * `export AWS_ACCESS_KEY_ID=my_access_key_id`
     * `export AWS_SECRET_ACCESS_KEY=my_secret_access_key`
+    * `export CLOUDFLARE_AUTH_KEY=my_secret_auth_key`
+    * `export CLOUDFLARE_AUTH_EMAIL=my_email@example.com`
 
 Run commands with:
 
@@ -208,7 +221,7 @@ The following is a list with some limitations one should be aware of when using 
 
 ### `us-east-1` only
 
-Right now the only supported region is `us-east-1`
+Right now the only supported region of AWS is `us-east-1`
 
 ### No rollback support
 
@@ -788,6 +801,7 @@ Options:
 * [aws-lambda](./registry/aws-lambda)
 * [aws-route53](./registry/aws-route53)
 * [aws-s3-bucket](./registry/aws-s3-bucket)
+* [cloudflare-workers](./registry/cloudflare-workers)
 * [eventgateway](./registry/eventgateway)
 * [github-webhook](./registry/github-webhook)
 * [github-webhook-aws](./registry/github-webhook-aws)
@@ -807,6 +821,7 @@ Options:
 
 * [Basic Lambda Example](./examples/basic)
 * [Blog Example](./examples/blog)
+* [Cloudflare Workers Example](./examples/cloudflare-workers-example)
 * [Github Webhook Example](./examples/github-webhook-example)
 * [Landing Page Example](./examples/landing-page)
 * [Netlify Site Example](./examples/netlify-site-example)

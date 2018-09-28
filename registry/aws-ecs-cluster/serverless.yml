@@ -1,0 +1,25 @@
+---
+type: aws-ecs-cluster
+version: 0.2.0
+core: 0.2.x
+
+description: "Provision AWS ECS Cluster with Serverless Components"
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
+
+inputTypes:
+  clusterName:
+    type: string
+    displayName: The name of the cluster
+    description: The name of the cluster
+    example: my-cluster
+    default: default
+
+outputTypes:
+  clusterArn:
+    type: string
+    description: The ARN that identifies the cluster
+  clusterName:
+    type: string
+    description: The name of the cluster
