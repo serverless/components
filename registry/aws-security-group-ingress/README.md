@@ -12,8 +12,8 @@ My component description
 ## Input Types
 | Name | Type | Description |
 |:------ |:-----|:-----------------|
-| **description**| `string` | Ingress rule desription
-| **rules**| `array` | Ingress rules
+| **groupId**| `string`<br/>*required* | Security Group Id
+| **ipPermissions**| `array`<br/>*required* | Ingress rules
 
 <!-- AUTO-GENERATED-CONTENT:END -->
 <!-- AUTO-GENERATED-CONTENT:START (COMPONENT_OUTPUT_TYPES) -->
@@ -31,25 +31,26 @@ components:
   myAwsSecurityGroupIngress:
     type: aws-security-group-ingress
     inputs:
-      description: Ingress rule for accessing ephemeral port range
-      rules:
-        - cidrIp: 10.0.0.0/16
-          cidrIpv6: '2600:1f18:24c2:b200::/56'
-          fromPort: 1024
-          groupId: sg-abbaabbba
-          groupName: my-group
+      groupId: sg-abbaabba
+      ipPermissions:
+        - fromPort: 80
+          toPort: 81
           ipProtocol: tcp
-          sourceSecurityGroupName: security-group-name
-          sourceSecurityGroupOwnerId: '123456789012'
-          toPort: 65535
-        - cidrIp: 172.16.0.0/16
-          fromPort: 1024
-          groupId: sg-abbaabbba
-          groupName: my-group
+          ipRanges:
+            - cidrIp: 10.0.0.0/16
+              description: VPC CIDR 1
+            - cidrIp: 10.1.0.0/16
+              description: VPC CIDR 2
+        - portRange: ALL
           ipProtocol: tcp
-          sourceSecurityGroupName: security-group-name
-          sourceSecurityGroupOwnerId: '123456789012'
-          toPort: 65535
+          ipRanges:
+            - cidrIp: 10.0.0.0/16
+              description: VPC CIDR 1
+        - portRange: HTTPS*
+          ipProtocol: tcp
+          userIdGroupPairs:
+            - groupId: '$\{myOtherAwsSecurityGroup.groupId\}'
+              description: 'Allow 2 $\{myOtherAwsSecurityGroup.groupName\}'
 
 ```
 <!-- AUTO-GENERATED-CONTENT:END -->

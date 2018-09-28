@@ -142,7 +142,7 @@ const remove = async (inputs, context) => {
     await ec2.revokeSecurityGroupIngress(state).promise()
   } catch (exception) {
     if (!['InvalidPermission.NotFound', 'InvalidGroup.NotFound'].includes(exception.code)) {
-      throw exception
+      return Promise.reject(exception)
     }
   }
   context.log(`Security group ingress removed from security group "${state.GroupId}"`)

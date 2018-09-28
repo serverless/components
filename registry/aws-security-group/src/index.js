@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk')
-const { equals, pick, merge } = require('ramda')
+const { equals, isEmpty, merge, pick } = require('ramda')
 const { sleep } = require('@serverless/utils')
 
 const ec2 = new AWS.EC2({ region: process.env.AWS_DEFAULT_REGION || 'us-east-1' })
@@ -23,7 +23,12 @@ const deploy = async (inputs, context) => {
     return { groupId: state.groupId, groupName: state.groupName }
   }
 
-  if (state.groupName && state.groupName !== params.groupName) {
+  if (
+    !isEmpty(state) &&
+    (state.vpcId !== inputs.vpcId ||
+      state.groupName !== inputs.groupName ||
+      state.description !== inputs.description)
+  ) {
     deleteSecurityGroupWithRetry(state.groupId, 20)
   }
 
@@ -45,7 +50,7 @@ const deploy = async (inputs, context) => {
 }
 
 const deleteSecurityGroupWithRetry = async (groupId, retryCount) =>
-  new Promise(async (resolve) => {
+  new Promise(async (resolve, reject) => {
     let counter = 0
     while (counter <= retryCount) {
       try {
@@ -56,13 +61,12 @@ const deleteSecurityGroupWithRetry = async (groupId, retryCount) =>
           return resolve()
         }
         if (counter === retryCount) {
-          throw exception
+          return reject(exception)
         }
       }
       await sleep(3000)
       counter++
     }
-    return resolve()
   })
 
 const deleteSecurityGroup = async (GroupId) =>
@@ -75,13 +79,8 @@ const deleteSecurityGroup = async (GroupId) =>
 const remove = async (inputs, context) => {
   const { state } = context
   context.log(`Removing security group "${state.groupName}"`)
-  try {
-    await deleteSecurityGroup(state.groupId)
-  } catch (exception) {
-    if (exception.code !== 'InvalidGroup.NotFound') {
-      throw exception
-    }
-  }
+  // errors are handler in the deleteSecurityGroupWithRetry
+  await deleteSecurityGroupWithRetry(state.groupId, 20)
   context.log(`Security group "${state.groupName}" removed`)
   context.saveState({})
   return {}

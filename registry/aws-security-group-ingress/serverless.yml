@@ -9,30 +9,36 @@ author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
 repository: "github:serverless/components"
 
 inputTypes:
-  description:
+  groupId:
     type: string
-    displayName: Ingress rule desription
-    description: Ingress rule desription
-    example: Ingress rule for accessing ephemeral port range
+    displayName: Security Group Id
+    description: Security Group Id
+    example: sg-abbaabba
+    required: true
   ipPermissions:
     type: array
     displayName: Ingress rules
     description: Ingress rules
     required: true
     example:
-      - fromPort: 8080
+      - fromPort: 80
+        toPort: 81
         ipProtocol: tcp
         ipRanges:
           - cidrIp: 10.0.0.0/16
-            description: ipv4 description
-        ipv6Ranges:
-          - cidrIpv6: '2600:1f18:24c2:b200::/56'
-            description: ipv6cidr description'
-        prefixListIds:
-          - description: 'STRING_VALUE'
-            prefixListId: 'STRING_VALUE'
-        toPort: 8080
-
+            description: VPC CIDR 1
+          - cidrIp: 10.1.0.0/16
+            description: VPC CIDR 2
+      - portRange: ALL
+        ipProtocol: tcp
+        ipRanges:
+          - cidrIp: 10.0.0.0/16
+            description: VPC CIDR 1
+      - portRange: HTTPS*
+        ipProtocol: tcp
+        userIdGroupPairs:
+          - groupId: $\{myOtherAwsSecurityGroup.groupId\}
+            description: Allow 2 $\{myOtherAwsSecurityGroup.groupName\}
 outputTypes:
   myOutput:
     type: string
