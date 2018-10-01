@@ -1,0 +1,40 @@
+name: GoogleCloudFunctionCompute
+extends: Compute
+version: 1.0.0
+main: ./index.js
+
+inputTypes:
+  provider:
+    type: Provider
+    default: ${context.provider}
+    displayName: Provider
+    description: The reference to the Cloud provider type
+    example: ${context.provider}
+  runtime:
+    type: String
+    default: nodejs
+    displayName: Runtime
+    description: The functions runtime
+    example: nodejs
+  memory:
+    type: String
+    default: 1024
+    displayName: Memory
+    description: The functions memory
+    example: 512
+  timeout:
+    type: String
+    default: 60
+    displayName: Timeout
+    description: The functions timeout
+    example: 10
+  environment:
+    type: Object
+    displayName: Environment
+    description: The functions environment variables
+    example: { stage: 'production', region: 'us-east1' }
+  tags:
+    type: Object
+    displayName: Tags
+    description: The functions tags
+    example: { runtime: 'node' }

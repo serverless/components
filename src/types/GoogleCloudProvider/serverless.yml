@@ -1,0 +1,35 @@
+name: GoogleCloudProvider
+extends: Provider
+version: 1.0.0
+main: ./index.js
+
+clientEmail: ${inputs.clientEmail}
+privateKey: ${inputs.privateKey}
+projectId: ${inputs.projectId}
+locationId: ${inputs.locationId}
+
+inputTypes:
+  clientEmail:
+    type: String
+    required: true
+    displayName: Client E-Mail
+    description: The client E-Mail which can be found in the keyfile.json
+    example: acme@example-project.iam.gserviceaccount.com
+  privateKey:
+    type: String
+    required: true
+    displayName: Private Key
+    description: The private key which can be found in the keyfile.json
+    example: -----BEGIN PRIVATE KEY-----\nPR1V4T3K3Y\n-----END PRIVATE KEY-----\n
+  projectId:
+    type: String
+    required: true
+    displayName: Project ID
+    description: The project ID which can be found in the keyfile.json
+    example: example-project-1234
+  locationId:
+    type: String
+    default: us-east1
+    displayName: Location ID
+    description: The location in which the Google Cloud SDK should operate
+    example: europe-west1

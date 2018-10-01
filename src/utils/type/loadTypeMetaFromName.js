@@ -13,13 +13,18 @@ const NATIVE_NAMES = {
   Plugin: resolve(__dirname, '..', '..', 'types', 'Plugin'),
   Provider: resolve(__dirname, '..', '..', 'types', 'Provider'),
   Service: resolve(__dirname, '..', '..', 'types', 'Service'),
+  // TODO: remove this entries once they are moved to the registry
+  Cron: resolve(__dirname, '..', '..', 'types', 'Cron'),
   AwsProvider: resolve(__dirname, '..', '..', 'types', 'AwsProvider'),
   AwsLambdaFunction: resolve(__dirname, '..', '..', 'types', 'AwsLambdaFunction'),
   AwsIamRole: resolve(__dirname, '..', '..', 'types', 'AwsIamRole'),
   AwsLambdaCompute: resolve(__dirname, '..', '..', 'types', 'AwsLambdaCompute'),
   AwsEventsRule: resolve(__dirname, '..', '..', 'types', 'AwsEventsRule'),
-  Cron: resolve(__dirname, '..', '..', 'types', 'Cron'),
-  AwsS3Bucket: resolve(__dirname, '..', '..', 'types', 'AwsS3Bucket')
+  AwsS3Bucket: resolve(__dirname, '..', '..', 'types', 'AwsS3Bucket'),
+  AwsS3Bucket: resolve(__dirname, '..', '..', 'types', 'AwsS3Bucket'),
+  GoogleCloudProvider: resolve(__dirname, '..', '..', 'types', 'GoogleCloudProvider'),
+  GoogleCloudFunctionCompute: resolve(__dirname, '..', '..', 'types', 'GoogleCloudFunctionCompute'),
+  GoogleCloudFunction: resolve(__dirname, '..', '..', 'types', 'GoogleCloudFunction')
 }
 
 /**

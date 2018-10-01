@@ -1,0 +1,20 @@
+{
+  "name": "@serverless/GoogleCloudFunction",
+  "version": "1.0.0",
+  "description": "Serverless Google Cloud Function type",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@serverless/utils": "0.0.5",
+    "archiver": "^3.0.0",
+    "fs-extra": "^7.0.0",
+    "node-fetch": "^2.2.0"
+  },
+  "devDependencies": {
+    "decompress": "^4.2.0"
+  }
+}

@@ -6,4 +6,119 @@ implements:
 version: 1.0.0
 main: ./index.js
 
-functionName: String
+provider: ${inputs.provider}
+code: ${inputs.code}
+# "official" Google Cloud Functions parameters
+functionName: ${inputs.name} # NOTE: this property differs from the input name
+description: ${inputs.description}
+runtime: ${inputs.runtime}
+availableMemoryMb: ${inputs.availableMemoryMb}
+timeout: ${inputs.timeout}
+entryPoint: ${inputs.entryPoint}
+environmentVariables: ${inputs.environmentVariables}
+labels: ${inputs.labels}
+maxInstances: ${inputs.maxInstances}
+network: ${inputs.network}
+sourceArchiveUrl: ${inputs.sourceArchiveUrl}
+sourceRepository: ${inputs.sourceRepository}
+sourceUploadUrl: ${inputs.sourceUploadUrl}
+eventTrigger: ${inputs.eventTrigger}
+httpsTrigger: ${inputs.httpsTrigger}
+
+inputTypes:
+  provider:
+    type: GoogleCloudProvider
+    required: true
+    displayName: Provider
+    description: The provider which is used to setup the function
+    example: ${context.provider}
+  code:
+    type: String
+    default: ./code
+    displayName: Code path
+    description: The path to the functions source code
+    example: ./my-function/code
+  # "official" Google Cloud Functions parameters
+  name:
+    type: String
+    default: func-${this.instanceId}
+    displayName: Name
+    description: The function name
+    example: my-function
+  description:
+    type: String
+    displayName: Description
+    description: The functions description
+    example: The Google Cloud Function "my-function"
+  runtime:
+    type: String
+    default: nodejs6
+    displayName: Runtime
+    description: The functions runtime
+    example: nodejs6
+  availableMemoryMb:
+    type: String
+    default: 512
+    displayName: Memory
+    description: The functions memory allocation
+    example: 1024
+  timeout:
+    type: String
+    default: '60s'
+    displayName: Timeout
+    description: The function timeout
+    example: '120s'
+  entryPoint:
+    type: String
+    default: handler
+    displayName: Entry point
+    description: The exported function which should be executed
+    example: myFunction
+  environmentVariables:
+    type: Object
+    displayName: Environment Variables
+    description: Environment variables which should be accessible within your function
+    example: { stage: 'production', region: 'us-east1' }
+  labels:
+    type: Object
+    displayName: Labels
+    description: Labels to tag your function
+    example: { runtime: 'node' }
+  maxInstances:
+    type: Number
+    displayName: Max. instances
+    description: Maximum number of function instances that should coexist
+    example: 5
+  network:
+    type: String
+    displayName: VPC network
+    description: The VPC network this function can connect to
+    example: projects/my-project/global/networks/my-network
+  sourceArchiveUrl:
+    type: String
+    displayName: Source archive URL
+    description: The Google Cloud Storage URL pointing to a zip file containing the function
+    example: gs://my-bucket/my-function.zip
+  sourceRepository:
+    type: String
+    displayName: Source repository
+    description: The source repository where a function is hosted
+    example: https://github.com/jdoe/gcf-example
+  sourceUploadUrl:
+    type: String
+    displayName: Source upload URL
+    description: The Google Cloud Storage signed URL used for source uploading
+  eventTrigger:
+    type: Object
+    displayName: Event trigger
+    description: A source that fires events in response to a condition in another service
+    example:
+      {
+        eventType: 'providers/cloud.pubsub/eventTypes/topic.publish',
+        resource: 'projects/my-project/topics/my-topic',
+      }
+  httpsTrigger:
+    type: Object
+    displayName: Https trigger
+    description: HTTPS endpoint type of source that can be triggered via a URL
+    example: { url: 'my-url' }
