@@ -3,17 +3,18 @@ const ecs = new aws.ECS({ region: process.env.AWS_DEFAULT_REGION || 'us-east-1' 
 
 const deploy = async (inputs, context) => {
   const { state } = context
+  const serviceName = inputs.serviceName || `${context.instanceId}-service`
 
-  if (state.serviceName && inputs.serviceName !== state.serviceName) {
+  if (state.serviceName && serviceName !== state.serviceName) {
     context.log('Change to ECS service name requires replacement. Making one now...')
     await remove({}, context)
   }
 
-  const { services } = await ecs.describeServices({ services: [inputs.serviceName] }).promise()
+  const { services } = await ecs.describeServices({ services: [serviceName] }).promise()
   const existingService = Array.isArray(services) && services.shift()
 
-  context.log(`Creating ECS service: "${inputs.serviceName}"`)
-  const { serviceName, taskDefinition: taskDefinitionOriginal, launchType, ...params } = inputs
+  context.log(`Creating ECS service: "${serviceName}"`)
+  const { taskDefinition: taskDefinitionOriginal, launchType, ...params } = inputs
 
   const taskDefinition =
     typeof taskDefinitionOriginal === 'object'
@@ -24,7 +25,7 @@ const deploy = async (inputs, context) => {
     ? ecs.updateService({ ...params, service: serviceName, taskDefinition }).promise()
     : ecs.createService({ ...inputs, taskDefinition, launchType }).promise())
 
-  context.log(`ECS service "${inputs.serviceName}" created`)
+  context.log(`ECS service "${serviceName}" created`)
 
   context.saveState(service || {})
 
