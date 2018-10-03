@@ -1,5 +1,4 @@
-name: github-webhook-aws
-extends: Component
+type: github-webhook-aws
 version: 0.2.0
 core: 0.2.x
 

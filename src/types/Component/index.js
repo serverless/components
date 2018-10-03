@@ -1,5 +1,5 @@
 const Component = {
-  define(context) {
+  define() {
     return {
       ...this.components
     }

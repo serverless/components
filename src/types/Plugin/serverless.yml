@@ -1,2 +1,2 @@
-extends: Plugin
-type: Object
+name: Plugin
+extends: Object

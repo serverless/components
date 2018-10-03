@@ -1,8 +1,8 @@
-const semver = require('semver')
-const coreVersion = require('../../../package.json').version
+import semver from 'semver'
+import packageData from '../../../package.json'
 
 const validateCoreVersion = (componentType, componentCoreVersion) => {
-  if (componentCoreVersion && !semver.satisfies(coreVersion, componentCoreVersion)) {
+  if (componentCoreVersion && !semver.satisfies(packageData.version, componentCoreVersion)) {
     throw new Error(
       `The Serverless Components core is incompatible with component ${componentType}`
     )
@@ -10,4 +10,4 @@ const validateCoreVersion = (componentType, componentCoreVersion) => {
   return true
 }
 
-module.exports = validateCoreVersion
+export default validateCoreVersion

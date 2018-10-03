@@ -1,7 +1,13 @@
 const BarClass = (SuperClass) =>
   class extends SuperClass {
     constructor(inputs, context) {
-      super({ ...inputs, rad: true }, context)
+      super(
+        {
+          ...inputs,
+          foo: 'constructor override'
+        },
+        context
+      )
     }
     barfn() {
       return this

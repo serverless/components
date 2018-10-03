@@ -1,0 +1,11 @@
+name: Bim
+main: ./index.js
+
+inputTypes:
+  bim:
+    type: array
+
+bim:
+  type: ../BarClass
+  inputs:
+    bar: ${inputs.bim[0]}

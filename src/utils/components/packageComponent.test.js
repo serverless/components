@@ -1,8 +1,9 @@
-const utils = require('@serverless/utils')
-const path = require('path')
+import utils from '@serverless/utils'
+import path from 'path'
 const packageComponent = require('./packageComponent')
 
 jest.mock('@serverless/utils', () => ({
+  ...require.requireActual('@serverless/utils'),
   fileExists: jest.fn(),
   packDir: jest.fn(),
   readFile: jest.fn()

@@ -111,8 +111,12 @@ const config = {
         })
 
       yml.components[logicalName].inputs = values
-
-      const contents = yaml.safeDump(yml)
+      let contents
+      try {
+        contents = yaml.safeDump(yml)
+      } catch(error) {
+        throw new Error(`error in example generation for ${JSON.stringify(json, null, 2)}`)
+      }
       const header = '## Example\n'
       let ymlOutput = content
       if (contents && Object.keys(values).length) {

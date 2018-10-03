@@ -1,8 +1,9 @@
-const AWS = require('aws-sdk')
-const { isNil } = require('ramda')
+import { isNil } from '@serverless/utils'
+import AWS from 'aws-sdk'
+import log from '../../../logging/log'
+
 const dynamo = new AWS.DynamoDB.DocumentClient({ region: 'us-east-1' })
 
-const { log } = require('../../../../utils/logging')
 const createLockAndFetch = async (config) => {
   log('Checking if state is locked')
   let locked = false

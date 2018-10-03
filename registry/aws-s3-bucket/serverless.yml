@@ -8,7 +8,7 @@ author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
 repository: "github:serverless/components"
 
 inputTypes:
-  name:
+  bucket:
     type: string
     required: false
     default: bucket-${self.instanceId}

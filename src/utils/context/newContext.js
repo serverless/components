@@ -1,4 +1,5 @@
 import { get, pick, set } from '@serverless/utils'
+import log from '../logging/log'
 import construct from '../type/construct'
 import loadType from '../type/loadType'
 
@@ -8,11 +9,9 @@ const newContext = (props) => {
   const finalContext = {
     ...context,
     construct: (type, inputs) => construct(type, inputs, finalContext),
-    state: {}, // todo
-    saveState: () => {}, // todo
-    log: (msg) => {
-      console.log(msg)
-    }, // todo
+    // state: {}, // todo
+    // saveState: () => {}, // todo
+    log, // todo
     get: (selector) => get(selector, context.data),
     loadType: (...args) => loadType(...args, finalContext),
     merge: (value) =>

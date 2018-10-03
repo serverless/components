@@ -1,19 +1,27 @@
 name: Function
 extends: Component
-version: 1.0.0
 main: ./index.js
 
-memory: ${input.memory}
-timeout: ${input.timeout}
-runtime: ${input.runtime}
-code: ${input.code}
-handler: ${input.handler}
-compute: ${input.compute}
-environment: ${input.environment}
-tags: ${input.tags}
+version: 0.3.0
+description: "A cloud agnostic Severless function"
+
+functionName: ${inputs.functionName}
+functionDescription: ${inputs.functionDescription}
+memory: ${inputs.memory}
+timeout: ${inputs.timeout}
+runtime: ${inputs.runtime}
+code: ${inputs.code}
+handler: ${inputs.handler}
+compute: ${inputs.compute}
+environment: ${inputs.environment}
+tags: ${inputs.tags}
 
 # TODO BRN: Add opt out for universal function signature
 inputTypes:
+  functionName:
+    type: string
+  description:
+    type: string
   compute:
     type: Compute
     default: ${context.compute}

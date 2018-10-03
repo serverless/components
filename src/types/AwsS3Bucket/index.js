@@ -1,8 +1,33 @@
+import { createBucket, deleteBucket } from './utils'
+
+const DEPLOY = 'deploy'
+const REPLACE = 'replace'
+
 const AwsS3Bucket = {
-  async deploy() {
-    const provider = this.provider
-    // TODO: add deployment logic here
-    this.arn = await deploy()
+  construct(inputs, context) {
+    const state = context.getState(this)
+    this.bucketName = state.bucketName || inputs.bucketName
+    this.provider = inputs.provider || context.get('provider')
+  },
+
+  shouldDeploy(prevInstance) {
+    if (!prevInstance) {
+      return DEPLOY
+    }
+    if (prevInstance.bucketName !== this.bucketName) {
+      return REPLACE
+    }
+  },
+
+  async deploy(prevInstance, context) {
+    context.log(`Creating Bucket: '${this.bucketName}'`)
+    await createBucket(this)
+    context.saveState(this, { bucketName: this.bucketName }) // provider?
+  },
+
+  async remove(context) {
+    context.log(`Removing Bucket: '${this.bucketName}'`)
+    await deleteBucket(this)
   },
 
   async updateS3Config({ event, filter, function: func }) {

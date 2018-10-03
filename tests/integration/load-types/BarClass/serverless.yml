@@ -2,6 +2,9 @@ extends: ../FooClass
 name: BarClass
 main: ./index.js
 
-bar: 'def'
 
-baz: 'def'
+inputTypes:
+  bar:
+    type: string
+
+bar: ${inputs.bar}

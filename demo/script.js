@@ -1,6 +1,6 @@
-const { createContext } = require('../dist/utils')
+import { createContext } from '../src'
 
-const SimpleFunctionScript = async () => {
+const simpleFunctionScript = async () => {
   const context = await createContext({
     cwd: __dirname
   })
@@ -43,15 +43,16 @@ const SimpleFunctionScript = async () => {
   await fn.deploy(context)
 }
 
-const SimpleServiceScript = async () => {
-  const context = await createContext({
-    cwd: __dirname
-  })
+// const SimpleServiceScript = async () => {
+//   const context = await createContext({
+//     cwd: __dirname
+// })
+//
+//   const SimpleService = await context.loadType('./SimpleService')
+//   const simpleService = await context.construct(SimpleService, {}, context)
+//
+//   simpleService.deploy(context)
+// }
 
-  const SimpleService = await context.loadType('./SimpleService')
-  const simpleService = await context.construct(SimpleService, {}, context)
-
-  simpleService.deploy(context)
-}
-
-SimpleFunctionScript().catch((e) => console.log(e))
+// eslint-disable-next-line no-console
+simpleFunctionScript().catch((e) => console.log(e))

@@ -1,8 +1,7 @@
-const AWS = require('aws-sdk')
+import AWS from 'aws-sdk'
+import log from '../../../logging/log'
 
 const s3 = new AWS.S3({ region: 'us-east-1' })
-
-const { log } = require('../../../../utils/logging')
 
 const createLock = async (config) => {
   const lockFile = `${config.state.file}.lock`

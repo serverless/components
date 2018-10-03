@@ -1,10 +1,10 @@
 # Compute
 
-The compute abstractions offers a mechanism for specifying which compute functions will run on separately from the declaration of the function itself.
+The compute abstraction offers a mechanism for specifying which compute functions will run on separately from the declaration of the function itself.
 
 From this, we gain a method for abstracting compute from the function enabling functions to be written in such a way where the function deployment target can be configured later.
 
-*Examle: A service the deploys functions to multiple providers*
+**Example: A service the deploys functions to multiple providers**
 ```yaml
 name: MultiProviderService
 extends: Service
@@ -90,9 +90,10 @@ providers:
       secretKey: 1234567890
       region: us-east-1
 
+compute:
   type: AwsLambdaCompute
   inputs:
-    # provider: ${self.providers.aws}
+    # provider: ${self.providers.aws} // This value is set by context
     runtime: nodejs
     memory: 512  # default memory
     timeout: 10  # default timeout
@@ -122,6 +123,24 @@ components:
     inputs: ...
 ```
 
+**Example: A compute agnostic component that accepts the compute as an input so it can be configured by the end user of this component**
+```yaml
+name: FindFaces
+extends: Component
+
+inputTypes:
+  compute:
+    type: Compute
+
+components:
+  findFacesInImage:
+    type: Function
+    inputs:
+      compute: ${inputs.compute}
+      handler: index.findFacesInImage
+      code: ./code
+      memory: 2048
+```
 
 
 # Concepts
@@ -130,23 +149,7 @@ components:
 
 A cloud agnostic function definition in a component that allows for compute to be configured through an input.
 
-```yaml
-name: FindFaces
-extends: Component
 
-inputTypes:
-  compute:
-    type: ICompute
-
-components:
-  findFacesInImage:
-    type: Function
-    inputs:
-      compute: ${input.compute}
-      handler: index.findFacesInImage
-      code: ./code
-      memory: 2048
-```
 
 The general function instance hands off to the compute instance to perform the deployment
 
@@ -155,7 +158,7 @@ const Function = {
   deploy: async (instance, context) => {
     // const { name, handler, code, runtime, memory, timeout } = instance
 
-    if (satisfies(ICompute, instance.compute)) {
+    if (is(Compute, instance.compute)) {
       instance.compute.deployFunction(instance, context)
     } else {
       forEachObjIndexed((c) => c.deployFunction(instance, context), instance.compute)
@@ -166,13 +169,13 @@ const Function = {
 ```
 
 
-## ICompute
+## Compute
 
 A general interface for provider specific compute abstractions
 
 ```js
 const AwsLambdaCompute = {
-  async deployFunction(instance, functionInstance, context) {
+  async defineFunction(instance, functionInstance, context) {
     const provider = instance.provider
 
     const inputs = {
