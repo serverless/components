@@ -39,11 +39,7 @@ const createRole = async (IAM, { name, service, policy }) => {
     policy
   })
 
-  return {
-    arn: roleRes.Role.Arn,
-    service,
-    policy
-  }
+  return roleRes.Role.Arn
 }
 
 const deleteRole = async (IAM, { name, policy }) => {
@@ -62,11 +58,7 @@ const deleteRole = async (IAM, { name, policy }) => {
     RoleName: name
   }).promise()
 
-  return {
-    policy: null,
-    service: null,
-    arn: null
-  }
+  return null
 }
 
 const updateAssumeRolePolicy = async (IAM, { name, service }) => {
@@ -93,89 +85,51 @@ const AwsIamRole = {
     this.service = service
     this.policy = policy
   },
-  async deploy(context) {
+  async deploy(prevInstance, context) {
     const IAM = new this.provider.sdk.IAM()
-    let props = {
-      name: this.name,
-      service: this.service,
-      policy: this.policy
-    }
-    let { state } = context
 
-    if (!props.policy) {
-      props = {
-        ...props,
-        policy: {
-          arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
-        }
+    if (!this.policy) {
+      this.policy = {
+        arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
       }
     }
 
-    if (!state.name && props.name) {
-      context.log(`Creating Role: ${props.name}`)
-      const role = await createRole(IAM, props)
-      state = {
-        ...state,
-        ...role,
-        name: props.name
-      }
-    } else if (!props.name && state.name) {
-      context.log(`Removing Role: ${state.name}`)
-      await deleteRole(IAM, state)
-      state = {
-        ...state,
-        name: null
-      }
-    } else if (state.name !== props.name) {
-      context.log(`Removing Role: ${state.name}`)
-      await deleteRole(IAM, state)
-      context.log(`Creating Role: ${props.name}`)
-      const role = await createRole(IAM, props)
-      state = {
-        ...state,
-        ...role,
-        name: props.name
-      }
+    if (!prevInstance.name && this.name) {
+      context.log(`Creating Role: ${prevInstance.name}`)
+      this.arn = await createRole(IAM, this)
+    } else if (!this.name && prevInstance.name) {
+      context.log(`Removing Role: ${prevInstance.name}`)
+      this.arn = await deleteRole(IAM, prevInstance)
+    } else if (prevInstance.name !== this.name) {
+      context.log(`Removing Role: ${prevInstance.name}`)
+      await deleteRole(IAM, prevInstance)
+      context.log(`Creating Role: ${this.name}`)
+      this.arn = await createRole(IAM, this)
     } else {
-      if (state.service !== props.service) {
-        await updateAssumeRolePolicy(IAM, props)
+      if (prevInstance.service !== this.service) {
+        await updateAssumeRolePolicy(IAM, this)
       }
-      if (!equals(state.policy, props.policy)) {
-        await detachRolePolicy(IAM, props)
-        await attachRolePolicy(IAM, props)
+      if (!equals(prevInstance.policy, this.policy)) {
+        await detachRolePolicy(IAM, this)
+        await attachRolePolicy(IAM, this)
       }
     }
 
-    context.saveState(state)
-    return state
+    return this
   },
 
-  async remove(context) {
+  async remove(prevInstance, context) {
     const IAM = new this.provider.sdk.IAM()
-    if (!context.state.name) return {}
-
-    const outputs = {
-      policy: null,
-      service: null,
-      arn: null
-    }
+    if (!prevInstance.name) return this
 
     try {
-      context.log(`Removing Role: ${context.state.name}`)
-      await deleteRole(IAM, context.state)
+      context.log(`Removing Role: ${prevInstance.name}`)
+      this.arn = await deleteRole(IAM, prevInstance)
     } catch (e) {
       if (!e.message.includes('Role not found')) {
         throw new Error(e)
       }
     }
-    context.saveState({
-      name: null,
-      arn: null,
-      service: null,
-      policy: null
-    })
-
-    return outputs
   }
 }
 

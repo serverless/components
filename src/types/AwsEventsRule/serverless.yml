@@ -1,0 +1,12 @@
+name: AwsEventsRule
+extends: Component
+main: ./index.js
+version: 1.0.0
+
+inputTypes:
+  lambdaArn:
+    type: string
+  schedule:
+    type: string
+  enabled:
+    type: boolean

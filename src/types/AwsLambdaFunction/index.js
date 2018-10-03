@@ -3,13 +3,7 @@ import { tmpdir } from 'os'
 import archiver from 'archiver'
 import { createWriteStream, createReadStream, readFileSync } from 'fs'
 import { forEach, is } from 'ramda'
-
-/*
- * Code:
- *   - String - path to src dir or package file binaries
- *   - Array of Strings - first item is path to src dir, rest are paths to shim files
- *   - Buffer - package file binary
- */
+import {map} from "@serverless/utils/dist/index";
 
 const createLambda = async (
   Lambda,
@@ -100,17 +94,6 @@ const deleteLambda = async (Lambda, name) => {
 }
 
 const AwsLambdaFunction = {
-  construct(inputs) {
-    this.provider = inputs.provider
-    this.functionName = inputs.functionName
-    this.description = inputs.description
-    this.handler = inputs.handler
-    this.code = inputs.code
-    this.runtime = inputs.runtime
-    this.memorySize = inputs.memorySize
-    this.timeout = inputs.timeout
-    this.environment = inputs.environment
-  },
   async pack() {
     let inputDirPath = this.code // string path to code dir
 
@@ -128,19 +111,7 @@ const AwsLambdaFunction = {
       archive.on('error', (err) => reject(err))
       output.on('close', () => {
         this.code = readFileSync(outputFilePath)
-        return resolve({
-          provider: this.provider,
-          name: this.name,
-          handler: this.handler,
-          code: this.code,
-          memory: this.memory,
-          timeout: this.timeout,
-          description: this.description,
-          environment: this.environment,
-          runtime: this.runtime,
-          arn: this.arn,
-          roleArn: this.roleArn
-        })
+        return resolve(this)
       })
 
       archive.pipe(output)
@@ -164,103 +135,69 @@ const AwsLambdaFunction = {
       archive.finalize()
     })
   },
-
-  async deploy(context) {
-    let defaultRoleName
-    const Lambda = new this.provider.sdk.Lambda()
-    let outputs = {}
-    const configuredRoleArn = this.role
-    let { defaultRoleArn } = context.state
-
-    const DefaultRole = await context.loadType('AwsIamRole')
-
-    const defaultRole = await context.construct(
-      DefaultRole,
-      {
-        name: `${this.name}-execution-role`,
-        service: 'lambda.amazonaws.com',
-        provider: this.provider
-      },
-      context
-    )
-
-    if (!configuredRoleArn && !defaultRoleArn) {
-      const defaultRoleOutputs = await defaultRole.deploy(context)
-      defaultRoleArn = defaultRoleOutputs.arn
-      defaultRoleName = defaultRoleOutputs.name
-    }
-
-    this.role = configuredRoleArn || defaultRoleArn
-
-    if (is(String, this.code)) {
-      await this.pack()
-    }
-
-    if (this.name && !context.state.name) {
-      context.log(`Creating Lambda: ${this.name}`)
-      outputs = await createLambda(Lambda, this)
-    } else if (context.state.name && !this.name) {
-      context.log(`Removing Lambda: ${context.state.name}`)
-      outputs = await deleteLambda(Lambda, context.state.name)
-    } else if (this.name !== context.state.name) {
-      context.log(`Removing Lambda: ${context.state.name}`)
-      await deleteLambda(Lambda, context.state.name)
-      context.log(`Creating Lambda: ${this.name}`)
-      outputs = await createLambda(Lambda, this)
-    } else {
-      context.log(`Updating Lambda: ${this.name}`)
-      outputs = await updateLambda(Lambda, this)
-    }
-
-    if (configuredRoleArn && defaultRoleArn) {
-      await defaultRole.remove(context)
-      defaultRoleName = null
-    }
-
-    context.saveState({ ...outputs, defaultRoleArn, defaultRoleName })
-    return outputs
-  },
-
-  async remove(context) {
-    const outputs = {
-      name: null,
-      handler: null,
-      memory: null,
-      timeout: null,
-      description: null,
-      runtime: null,
-      arn: null,
-      roleArn: null
-    }
-    if (!context.state.name) return outputs
-
-    if (context.state.defaultRoleName) {
+  async define(context) {
+    let role
+    if (!this.role) {
       const DefaultRole = await context.loadType('AwsIamRole')
-      const defaultRole = await context.construct(
+
+      role = await context.construct(
         DefaultRole,
         {
-          name: context.state.defaultRoleName,
+          name: `${this.name}-execution-role`,
+          service: 'lambda.amazonaws.com',
           provider: this.provider
         },
         context
       )
-      await defaultRole.remove(context)
     }
+    return { role } // arn:
+  },
+  async deploy(prevInstance, context) {
+    const Lambda = new this.provider.sdk.Lambda()
 
-    context.log(`Removing Lambda: ${context.state.name}`)
+    await this.pack(context)
+
+    if (this.name && !prevInstance.name) {
+      context.log(`Creating Lambda: ${this.name}`)
+      this.arn = await createLambda(Lambda, this)
+    } else if (prevInstance.name && !this.name) {
+      context.log(`Removing Lambda: ${prevInstance.name}`)
+      this.arn = await deleteLambda(Lambda, prevInstance.name)
+    } else if (this.name !== prevInstance.name) {
+      context.log(`Removing Lambda: ${prevInstance.name}`)
+      await deleteLambda(Lambda, prevInstance.name)
+      context.log(`Creating Lambda: ${this.name}`)
+      this.arn = await createLambda(Lambda, this)
+    } else {
+      context.log(`Updating Lambda: ${this.name}`)
+      this.arn = await updateLambda(Lambda, this)
+    }
+    return this
+  },
+  async remove(prevInstance, context) {
+    if (!prevInstance.name) return this
+
+    context.log(`Removing Lambda: ${prevInstance.name}`)
 
     try {
-      await deleteLambda(context.state.name)
+      await deleteLambda(prevInstance.name)
     } catch (error) {
       if (!error.message.includes('Function not found')) {
         throw new Error(error)
       }
     }
-    context.saveState(outputs)
-    return outputs
+    return this
   },
-
-  // NOTE: this is the implementation for the ISink interface
+  async defineSchedule(schedule, context) {
+    const AwsEventsRule = await context.loadType('../AwsEventsRule')
+    const awsEventsRuleInputs = {
+      provider: this.provider,
+      lambdaArn: this.arn,
+      schedule,
+      enabled: true
+    }
+    return context.construct(AwsEventsRule, awsEventsRuleInputs)
+  },
   getSinkConfig() {
     return {
       uri: this.arn,
