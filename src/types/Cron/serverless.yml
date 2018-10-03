@@ -1,0 +1,10 @@
+name: AwsEventsRule
+extends: Component
+main: ./index.js
+version: 1.0.0
+
+inputTypes:
+  function:
+    type: Function
+  schedule:
+    type: string
