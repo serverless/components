@@ -54,6 +54,48 @@ describe('#aws-vpcgatewayattachment', () => {
     expect(contextMock.saveState).toHaveBeenCalledTimes(1)
   })
 
+  it('should update the VPC gateway attachment when IGW id changes', async () => {
+    const contextMock = {
+      state: {
+        internetGatewayId: 'igw-abbaabba',
+        vpcId: 'vpc-abbaabba'
+      },
+      log: () => {},
+      saveState: jest.fn()
+    }
+    const inputs = {
+      internetGatewayId: 'igw-abbabaab',
+      vpcId: 'vpc-abbaabba'
+    }
+    const { internetGatewayId } = await awsVpcgatewayattachmentComponent.deploy(inputs, contextMock)
+
+    expect(internetGatewayId).toBe('igw-abbabaab')
+    expect(AWS.mocks.attachInternetGatewayMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.detachInternetGatewayMock).toHaveBeenCalledTimes(1)
+    expect(contextMock.saveState).toHaveBeenCalledTimes(2)
+  })
+
+  it('should update the VPC gateway attachment when VPC id changes', async () => {
+    const contextMock = {
+      state: {
+        internetGatewayId: 'igw-abbaabba',
+        vpcId: 'vpc-abbaabba'
+      },
+      log: () => {},
+      saveState: jest.fn()
+    }
+    const inputs = {
+      internetGatewayId: 'igw-abbaabba',
+      vpcId: 'vpc-abbabaab'
+    }
+    const { internetGatewayId } = await awsVpcgatewayattachmentComponent.deploy(inputs, contextMock)
+
+    expect(internetGatewayId).toBe('igw-abbaabba')
+    expect(AWS.mocks.attachInternetGatewayMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.detachInternetGatewayMock).toHaveBeenCalledTimes(1)
+    expect(contextMock.saveState).toHaveBeenCalledTimes(2)
+  })
+
   it('should remove the VPC gateway attachment', async () => {
     const contextMock = {
       state: {

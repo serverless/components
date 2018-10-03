@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk')
-const { equals, pick } = require('ramda')
+const { equals, isEmpty, pick } = require('ramda')
 
 const ec2 = new AWS.EC2({
   region: process.env.AWS_DEFAULT_REGION || 'us-east-1'
@@ -16,6 +16,12 @@ const deploy = async (inputs, context) => {
   if (compareStateAndInputs(state, inputs, ['internetGatewayId', 'vpcId'])) {
     return { internetGatewayId: state.internetGatewayId }
   }
+
+  // when vpcId or internetGatewayId changes gateway attachment need to be replaced
+  if (!isEmpty(state) && !compareStateAndInputs(state, inputs, ['internetGatewayId', 'vpcId'])) {
+    await remove(inputs, context)
+  }
+
   context.log('Creating Internet Gateway Attachment')
   await ec2
     .attachInternetGateway({
