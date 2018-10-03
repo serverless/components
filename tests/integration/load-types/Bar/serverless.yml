@@ -2,6 +2,10 @@ extends: ../Foo
 name: Bar
 main: ./index.js
 
-bar: 'def'
+inputTypes:
+  bar:
+    type: string
 
-baz: 'def'
+bar: ${inputs.bar}
+
+foo: hello override

@@ -1,3 +1,5 @@
+import log from '../logging/log'
+
 const { relative } = require('path')
 const { prop, keys, reduce } = require('ramda')
 const getComponent = require('./getComponent')
@@ -5,7 +7,6 @@ const getInstanceId = require('./getInstanceId')
 const getChildrenPromises = require('./getChildrenPromises')
 const getComponentFunctions = require('./getComponentFunctions')
 const getComponentRootPath = require('./getComponentRootPath')
-const log = require('../logging/log')
 const getServiceId = require('../state/getServiceId')
 const getState = require('../state/getState')
 

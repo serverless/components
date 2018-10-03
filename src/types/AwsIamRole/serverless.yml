@@ -1,7 +1,8 @@
-extends: Component
 name: AwsIamRole
-version: 1.0.0
+extends: Component
 main: ./index.js
+
+version: 1.0.0
 
 inputTypes:
   provider:

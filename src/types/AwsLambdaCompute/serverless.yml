@@ -1,18 +1,3 @@
 name: AwsLambdaCompute
 extends: Compute
-
-provider: ${input.provider}
-runtime: ${input.runtime}
-memory: ${input.memory}
-timeout: ${input.timeout}
-
-inputTypes:
-  provider:
-    type: Provider
-    default: ${context.providers.aws}
-  runtime:
-    type: string
-  memory:
-    type: string
-  timeout:
-    type: string
+main: ./index.js

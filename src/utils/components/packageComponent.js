@@ -1,9 +1,8 @@
-const { fileExists, packDir, readFile } = require('@serverless/utils')
-const { isNil, isEmpty } = require('ramda')
-const path = require('path')
-const semver = require('semver')
-const log = require('../logging/log')
-const validateCoreVersion = require('./validateCoreVersion')
+import { fileExists, isEmpty, isNil, packDir, readFile } from '@serverless/utils'
+import path from 'path'
+import semver from 'semver'
+import log from '../logging/log'
+import validateCoreVersion from './validateCoreVersion'
 
 module.exports = async (options) => {
   const format = options.format || 'zip'

@@ -215,9 +215,7 @@ describe('Integration Test - load types', () => {
       context
     )
 
-    const outputs = await awsLambdaFunction.deploy(context)
-
-    console.log(outputs)
+    await awsLambdaFunction.deploy(context)
   })
 
   it.only('should load Function', async () => {

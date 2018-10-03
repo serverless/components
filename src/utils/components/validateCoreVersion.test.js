@@ -1,5 +1,5 @@
-const validateCoreVersion = require('./validateCoreVersion')
-const coreVersion = require('../../../package.json').version
+import validateCoreVersion from './validateCoreVersion'
+import packageData from '../../../package.json'
 
 describe('#validateCoreVersion', () => {
   const componentType = 'my-component'
@@ -9,7 +9,7 @@ describe('#validateCoreVersion', () => {
   })
 
   it('should return true if compatible with core version', () => {
-    const isValid = validateCoreVersion(componentType, coreVersion)
+    const isValid = validateCoreVersion(componentType, packageData.version)
     expect(isValid).toEqual(true)
   })
 

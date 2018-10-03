@@ -1,9 +1,33 @@
 name: Compute
-extends: Component
+extends: Object
 version: 1.0.0
+main: ./index.js
 
-provider: ${input.provider}
+provider: ${inputs.provider}
+runtime: ${inputs.runtime}
+memory: ${inputs.memory}
+timeout: ${inputs.timeout}
+environment: ${inputs.environment}
+tags: ${inputs.tags}
 
 inputTypes:
   provider:
     type: Provider
+    default: ${context.provider}
+  runtime:
+    type: string
+    required: false
+  memory:
+    type: string
+    default: 1024
+    required: false
+  timeout:
+    type: string
+    default: 10
+    required: false
+  environment:
+    type: object
+    required: false
+  tags:
+    type: object
+    required: false

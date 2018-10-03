@@ -59,6 +59,7 @@ describe('#buildTypeConstructor()', () => {
           cwd: context.cwd,
           get: expect.any(Function),
           loadType: expect.any(Function),
+          log: expect.any(Function),
           merge: expect.any(Function),
           overrides: context.overrides,
           set: expect.any(Function)

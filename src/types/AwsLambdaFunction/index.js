@@ -102,12 +102,12 @@ const deleteLambda = async (Lambda, name) => {
 const AwsLambdaFunction = {
   construct(inputs) {
     this.provider = inputs.provider
-    this.name = inputs.name
+    this.functionName = inputs.functionName
+    this.description = inputs.description
     this.handler = inputs.handler
     this.code = inputs.code
     this.runtime = inputs.runtime
-    this.description = inputs.description
-    this.memory = inputs.memory
+    this.memorySize = inputs.memorySize
     this.timeout = inputs.timeout
     this.environment = inputs.environment
   },

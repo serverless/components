@@ -1,5 +1,9 @@
 name: Foo
 main: ./index.js
 
-foo: 'abc'
+inputTypes:
+  foo:
+    type: string
+
+foo: ${inputs.foo}
 baz: 'abc'

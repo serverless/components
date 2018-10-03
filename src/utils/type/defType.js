@@ -26,6 +26,7 @@ const defType = async ({ root, props }, context) => {
     return typeDef
   }
 
+  // NOTE BRN: When loading a type. If a re-entrant call (circular reference) is made when loading a type, we throw an error. We could work on allowing the circular reference to be resolved by stopping the def process here and returning early, but for now it's not supported.
   if (LOADING_TYPES.has(root)) {
     throw errorReentrantTypeLoad(props.name)
   }
@@ -54,7 +55,6 @@ const defType = async ({ root, props }, context) => {
   // NOTE BRN: try to load the type main. This will default to './index.js'. When using the default, if we can't find the default then we ignore it. If the type was explicitly set in the serverless.yml file then we consider it an error when we can't find the main file.
   let typeMain = resolveTypeMain(typeDef.props, typeDef.root)
   if (typeMain) {
-    // NOTE BRN: When loading a type main. If a re-entrant call (circular reference) is made when
     typeMain = requireTypeMain(typeMain)
   } else if (isString(typeDef.props.main)) {
     throw errorTypeMainNotFound(typeDef.props.name, typeDef.root, typeDef.props.main)

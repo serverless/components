@@ -2,8 +2,30 @@ name: AwsS3Bucket
 extends: Component
 implements:
   - ISource
-
-version: 1.0.0
 main: ./index.js
 
-arn: String
+version: 0.3.0
+core: 0.3.x
+description: "Provision AWS s3 buckets with serverless components"
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
+
+inputTypes:
+  bucketName:
+    type: string
+    required: false
+    default: bucket-${this.instanceId}
+    displayName: S3 Bucket Name
+    description: The name of your S3 bucket. Name must be globally unique in AWS
+    example: my-project-bucket-${this.instanceId}
+  provider:
+    type: AwsProvider
+    default: ${context.provider}
+    displayName: AWS Provider
+    description: The AWSProvider instance that contains the credentials for AWS
+
+bucketName:
+  type: string
+  # value: ${state.bucketName || inputs.bucketName}
+  description: the S3 bucket name

@@ -3,7 +3,7 @@ extends: Object
 version: 1.0.0
 main: ./index.js
 
-components: ${input.components}
+components: ${inputs.components}
 
 inputTypes:
   components:

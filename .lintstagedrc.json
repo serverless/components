@@ -1,7 +1,8 @@
 {
   "linters": {
     "*.js": [
-      "eslint --fix .",
+      "npm run lint",
+      "npm run docs",
       "git add -A"
     ]
   }

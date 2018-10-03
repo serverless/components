@@ -14,8 +14,6 @@ import isVariable from '../variables/isVariable'
 import { regex } from '../variables/regexVariable'
 import isTypeConstruct from './isTypeConstruct'
 
-// eslint-disable-next-line no-unused-vars
-
 const assign = (target, source) => {
   forEach((key) => {
     const descriptor = Object.getOwnPropertyDescriptor(source, key)
@@ -25,7 +23,7 @@ const assign = (target, source) => {
 }
 
 const clone = (source) => {
-  let copy = {}
+  const copy = {}
   forEach((key) => {
     const descriptor = Object.getOwnPropertyDescriptor(source, key)
     Object.defineProperty(copy, key, descriptor)
@@ -35,24 +33,25 @@ const clone = (source) => {
 
 const resolveProps = (props, data) =>
   walkReduceDepthFirst(
-    (accum, value, keys) => {
+    (accum, value, pathParts) => {
       if (isString(value) && isVariable(value)) {
-        const parentKeys = init(keys)
-        const key = last(keys)
-        const parent = get(parentKeys, accum)
+        const parentPathParts = init(pathParts)
+        const pathPart = last(pathParts)
+        const parent = get(parentPathParts, accum)
         const parentCopy = clone(parent)
-        Object.defineProperty(parentCopy, key, {
+        Object.defineProperty(parentCopy, pathPart, {
           configurable: true,
           enumerable: true,
           get() {
             const propPath = value.match(regex)[1]
             return value.replace(regex, get(propPath, data))
           },
-          set(value) {
-            this[key] = value
+          set(val) {
+            // this[key] = value
+            value = val
           }
         })
-        return set(parentKeys, parentCopy, accum)
+        return set(parentPathParts, parentCopy, accum)
       }
       return accum
     },
@@ -63,13 +62,13 @@ const resolveProps = (props, data) =>
 const constructTypes = async (props, ctx) => {
   const context = ctx.merge({ root: ctx.Type.root })
   return walkReduceDepthFirst(
-    async (accum, value, keys) => {
+    async (accum, value, pathParts) => {
       let constructedProps = await accum
       if (isTypeConstruct(value)) {
         const { type, inputs } = value
         const Type = await context.loadType(type)
         const instance = await context.construct(Type, inputs)
-        constructedProps = set(keys, instance, constructedProps)
+        constructedProps = set(pathParts, instance, constructedProps)
       }
       return constructedProps
     },
@@ -116,7 +115,7 @@ const buildTypeConstructor = (type) => {
 
         // NOTE BRN: If a construct method exists, call it now. This gives types one last chance to set values.
         if (main && isFunction(main.construct)) {
-          main.construct.call(self, inputs, context)
+          await main.construct.call(self, inputs, context)
         }
 
         // NOTE BRN: We return self (this) because the constructor is overridden to return a Promise. Therefore the promise must return the reference to the instance.

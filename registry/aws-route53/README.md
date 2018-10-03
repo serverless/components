@@ -36,8 +36,8 @@ Provision AWS route53 definitions with serverless components
 ```yml
 type: my-application
 components:
-  myAwsRoute53:
-    type: aws-route53
+  myComponent:
+    type: Component
     inputs:
       domainName: www.defaultdomain.com
       dnsName: d111111abcdef8.cloudfront.net

@@ -21,6 +21,7 @@ describe('#createContext()', () => {
       cwd: '/test/dir',
       get: expect.any(Function),
       loadType: expect.any(Function),
+      log: expect.any(Function),
       merge: expect.any(Function),
       set: expect.any(Function)
     })

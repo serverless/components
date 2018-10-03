@@ -3,26 +3,87 @@ extends: Component
 implements:
   - ISink
 
-version: 1.0.0
+version: 0.3.0
+core: 0.3.x
 main: ./index.js
 
-arn: String
+description: "AWS Lambda Serverless Component"
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
+
+arn:
+  type: string
+  description: The Lambda function's ARN
+role:
+  type: AwsIamRole
+  description: The AwsIamRole that is attached to this fucntion
 
 inputTypes:
-  Provider:
+  provider:
     type: AwsProvider
-    default: ${context.Provider}
-  FunctionName:
+    default: ${context.provider}
+    displayName: AWS Provider
+    description: The AWSProvider instance that contains the credentials for AWS
+  functionName:
     type: string
-  Handler:
+    default: func-${this.instanceId}
+    displayName: Lambda function name
+    description: The Lambda function name
+    example: myProject-functionName-${self.instanceId}
+  description:
     type: string
-  Code:
+    displayName: Lambda function description
+    description: |
+      A short, user-defined function description.
+      Lambda does not use this value. Assign a meaningful description as you see fit
+    example: The function that does XYZ to ABC
+  handler:
+    type: string
+    required: true
+    displayName: Handler
+    description: The path to the exported handler function
+    example: products.create
+  code:
     type: string || array || buffer
-  Runtime:
+    required: true
+    displayName: Path source code
+    description: Path to the folder that contains the source code for the function
+    example: ${this.path}/code
+  runtime:
     type: string
-  MemorySize:
+    required: true
+    default: nodejs8.10
+    displayName: Function runtime
+    description: Runtime for the function. Possible values are java8, nodejs6.10, nodejs8.10, python2.7, python3.6 and dotnetcore1.0
+    example: nodejs8.10
+  memorySize:
     type: integer
-  Timeout:
+    default: 1024
+    displayName: Memory size
+    description: The functions memory size in Megabyte
+    example: 512
+  timeout:
     type: integer
-  Environment:
+    default: 10
+    displayName: Function timeout
+    description: The function execution time at which Lambda should terminate the function
+    example: 3
+  environment:
     type: object
+    displayName: Environment variables
+    description: Lambda functions environment's configuration settings
+    example:
+      foo: true
+      tableName: products-${this.serviceId}
+  tags:
+    type: object
+    displayName: Tags
+    description: AWS tags to apply to the function
+    example:
+      bar: foo
+      service: some-service
+  role:
+    type: AwsIamRole | string
+    displayName: Lambda IAM role
+    description: The Amazon Resource Name (ARN) of the IAM role that Lambda assumes when it executes your function to access any other Amazon Web Services (AWS) resources

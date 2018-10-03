@@ -14,7 +14,7 @@ Provision AWS s3 buckets with serverless components
 ## Input Types
 | Name | Type | Description |
 |:------ |:-----|:-----------------|
-| **name**| `string` | The name of your S3 bucket. Name must be globally unique in AWS
+| **bucket**| `string` | The name of your S3 bucket. Name must be globally unique in AWS
 
 <!-- AUTO-GENERATED-CONTENT:END -->
 
@@ -34,7 +34,7 @@ components:
   myAwsS3Bucket:
     type: aws-s3-bucket
     inputs:
-      name: 'my-project-bucket-${self.instanceId}'
+      bucket: 'my-project-bucket-${self.instanceId}'
 
 ```
 <!-- AUTO-GENERATED-CONTENT:END -->
