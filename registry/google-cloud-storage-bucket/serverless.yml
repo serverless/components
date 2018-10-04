@@ -1,0 +1,59 @@
+type: google-cloud-storage-bucket
+version: 0.2.0
+core: 0.2.x
+
+description: "Provision a Google Cloud Storage bucket"
+license: Apache-2.0
+author: "Google, Inc.(https://cloud.google.com)"
+repository: "github:serverless/components"
+
+inputTypes:
+  name:
+    type: string
+    default: bucket-${self.instanceId}
+    displayName: Cloud Storage Bucket Name
+    description: The name of the bucket.
+    example: hello-world
+  location:
+    type: string
+    required: false
+    description: The location of the bucket. Object data for objects in the bucket resides in physical storage within this region. Defaults to US. See the developer's guide for the authoritative list.
+    displayName: Location
+  project:
+    type: string
+    required: true
+    description: A valid API project identifier.
+    displayName: Project
+  storageClass:
+    type: string
+    required: false
+    description: The bucket's default storage class, used whenever no storageClass is specified for a newly-created object. This defines how objects in the bucket are stored and determines the SLA and the cost of storage. Values include MULTI_REGIONAL, REGIONAL, STANDARD, NEARLINE, COLDLINE, and DURABLE_REDUCED_AVAILABILITY. If this value is not specified when the bucket is created, it will default to STANDARD. For more information, see storage classes.
+    displayName: Storage Class
+
+outputTypes:
+  name:
+    type: string
+    description: The Cloud Storage bucket name
+  location:
+    type: string
+    description: The location of the bucket. Object data for objects in the bucket resides in physical storage within this region. Defaults to US. See the developer's guide for the authoritative list.
+  project:
+    type: string
+    required: true
+    description: A valid API project identifier.
+    displayName: Project
+  selfLink:
+    type: string
+    description: The URI of this bucket.
+    displayName: Self Link
+  storageClass:
+    type: string
+    description: The bucket's default storage class, used whenever no storageClass is specified for a newly-created object. This defines how objects in the bucket are stored and determines the SLA and the cost of storage. Values include MULTI_REGIONAL, REGIONAL, STANDARD, NEARLINE, COLDLINE, and DURABLE_REDUCED_AVAILABILITY. If this value is not specified when the bucket is created, it will default to STANDARD. For more information, see storage classes.
+  timeCreated:
+    type: string
+    description: The creation time of the bucket in RFC 3339 format.
+    displayName: Time Created
+  updated:
+    type: string
+    description: The modification time of the bucket in RFC 3339 format.
+    displayName: Updated
