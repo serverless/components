@@ -1,7 +1,7 @@
 <!-- AUTO-GENERATED-CONTENT:START (COMPONENT_HEADER) -->
-# AWS Vpc
+# AWS Internetgateway
 
-Provision AWS VPC with Serverless Components
+Provision AWS Internet Gateway with Serverless Components
 <!-- AUTO-GENERATED-CONTENT:END -->
 <!-- AUTO-GENERATED-CONTENT:START (TOC) -->
 - [Input Types](#input-types)
@@ -12,16 +12,14 @@ Provision AWS VPC with Serverless Components
 ## Input Types
 | Name | Type | Description |
 |:------ |:-----|:-----------------|
-| **cidrBlock**| `string` | CIDR Block for the VPC
-| **amazonProvidedIpv6CidrBlock**| `boolean` | CIDR Block for the VPC
-| **instanceTenancy**| `string` | Instance Tenancy, possible values default, dedicated or host.
+| **vpcId**| `string` | The id of the VPC, if set the Internet Gateway is attached to the VPC, otherwise it is created detatched
 
 <!-- AUTO-GENERATED-CONTENT:END -->
 <!-- AUTO-GENERATED-CONTENT:START (COMPONENT_OUTPUT_TYPES) -->
 ## Output Types
 | Name | Type | Description |
 |:------ |:-----|:-----------------|
-| **vpcId**| `string` | VPC id
+| **internetGatewayId**| `string` | Intenet Gateway Id
 
 <!-- AUTO-GENERATED-CONTENT:END -->
 <!-- AUTO-GENERATED-CONTENT:START (COMPONENT_EXAMPLES) -->
@@ -29,12 +27,10 @@ Provision AWS VPC with Serverless Components
 ```yml
 type: my-application
 components:
-  myAwsVpc:
-    type: aws-vpc
+  myAwsInternetgateway:
+    type: aws-internetgateway
     inputs:
-      cidrBlock: 10.0.0.0/16
-      amazonProvidedIpv6CidrBlock: true
-      instanceTenancy: default
+      vpcId: vpc-abbaabba
 
 ```
 <!-- AUTO-GENERATED-CONTENT:END -->

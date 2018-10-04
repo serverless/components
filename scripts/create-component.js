@@ -56,11 +56,11 @@ const readMeTemplate = `<!-- AUTO-GENERATED-CONTENT:START (COMPONENT_HEADER) -->
 
 const indexTemplate = `// ${name}
 
-const deploy = async () => {
+const deploy = async (inputs, context) => {
   return {}
 }
 
-const remove = async () => {
+const remove = async (inputs, context) => {
   return {}
 }
 
@@ -71,9 +71,16 @@ module.exports = {
 `
 
 const indexTestTemplate = `// ${name}
+const myComponent = require('./index')
 
-describe('#${name}', () => {
+describe('${name} Unit Tests', () => {
   it('should have tests', async () => {
+    const contextMock = {
+      state: {},
+      log: () => {},
+      saveState: jest.fn()
+    }
+    await myComponent.deploy({}, contextMock)
     expect(false).toBe(true)
   })
 })

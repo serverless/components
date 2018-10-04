@@ -1,50 +1,146 @@
 const AWS = require('aws-sdk')
-const { equals, isEmpty } = require('ramda')
+const { equals, isEmpty, merge, pick } = require('ramda')
+const { sleep } = require('@serverless/utils')
 
 const ec2 = new AWS.EC2({
   region: process.env.AWS_DEFAULT_REGION || 'us-east-1'
 })
 
-const compareStateAndInputs = (state, inputs) => {
-  const { cidrBlock, instanceTenancy, amazonProvidedIpv6CidrBlock } = state
-  return equals({ cidrBlock, instanceTenancy, amazonProvidedIpv6CidrBlock }, inputs)
+const compareStateAndInputs = (state, inputs, keys) => {
+  const inputsPick = pick(keys, inputs)
+  const statePick = pick(keys, state)
+  return equals(statePick, inputsPick)
 }
 
 const deploy = async (inputs, context) => {
   const { state } = context
-  if (compareStateAndInputs(state, inputs)) {
-    return { vpcId: state.vpcId }
-  }
-  // any changes to vpc requires replacement
-  if (!isEmpty(state) && !compareStateAndInputs(state, inputs)) {
-    context.log(`Changes to existing VPC requires replacement`)
-    await remove(state, context)
-  }
-  context.log(`Creating a VPC`)
-  const { Vpc } = await ec2
-    .createVpc({
-      CidrBlock: inputs.cidrBlock,
-      InstanceTenancy: inputs.instanceTenancy,
-      AmazonProvidedIpv6CidrBlock: inputs.amazonProvidedIpv6CidrBlock
+  let newState = {}
+  if (
+    !compareStateAndInputs(state, inputs, [
+      'cidrBlock',
+      'amazonProvidedIpv6CidrBlock',
+      'instanceTenancy'
+    ])
+  ) {
+    context.log(`Creating a VPC`)
+    if (!isEmpty(state)) {
+      context.log(`Changes to existing VPC requires replacement`)
+      remove(state, context) // because of the dependencies, VPC must be removed asynchronously
+    }
+    const { Vpc } = await ec2
+      .createVpc({
+        CidrBlock: inputs.cidrBlock,
+        InstanceTenancy: inputs.instanceTenancy,
+        AmazonProvidedIpv6CidrBlock: inputs.amazonProvidedIpv6CidrBlock
+      })
+      .promise()
+    newState = merge(newState, {
+      vpcId: Vpc.VpcId,
+      cidrBlock: Vpc.CidrBlock,
+      instanceTenancy: Vpc.InstanceTenancy,
+      amazonProvidedIpv6CidrBlock: inputs.amazonProvidedIpv6CidrBlock
     })
-    .promise()
+    context.log(`VPC created: "${newState.vpcId}"`)
+  } else {
+    newState = merge(newState, {
+      vpcId: state.vpcId,
+      cidrBlock: state.cidrBlock,
+      instanceTenancy: state.instanceTenancy,
+      amazonProvidedIpv6CidrBlock: state.amazonProvidedIpv6CidrBlock
+    })
+  }
 
-  context.saveState({
-    vpcId: Vpc.VpcId,
-    amazonProvidedIpv6CidrBlock: inputs.amazonProvidedIpv6CidrBlock,
-    cidrBlock: Vpc.CidrBlock,
-    instanceTenancy: Vpc.InstanceTenancy
-  })
-
-  context.log(`VPC created: "${Vpc.VpcId}"`)
+  context.saveState(newState)
 
   return {
-    vpcId: Vpc.VpcId
+    vpcId: newState.vpcId
   }
 }
+
+const describeSubnets = (vpcId, context) =>
+  ec2
+    .describeSubnets({
+      Filters: [
+        {
+          Name: 'vpc-id',
+          Values: [vpcId]
+        }
+      ]
+    })
+    .promise()
+    .then(({ Subnets: subnets }) => {
+      const ready = subnets.length === 0
+      if (!ready) {
+        context.log(
+          `Waiting for ${subnets.map(({ SubnetId }) => SubnetId).join(', ')} to be removed`
+        )
+      }
+      return ready
+    })
+    .catch((error) => {
+      context.log('ERROR: describeSubnets', vpcId, error.message)
+      return true
+    })
+
+const describeInternetGateways = (vpcId, context) =>
+  ec2
+    .describeInternetGateways({
+      Filters: [
+        {
+          Name: 'attachment.vpc-id',
+          Values: [vpcId]
+        }
+      ]
+    })
+    .promise()
+    .then(({ InternetGateways: internetGateways }) => {
+      const ready = internetGateways.length === 0
+      if (!ready) {
+        context.log(
+          `Waiting for ${internetGateways
+            .map(({ InternetGatewayId }) => InternetGatewayId)
+            .join(', ')} to be removed`
+        )
+      }
+      return ready
+    })
+    .catch((error) => {
+      context.log('ERROR: describeInternetGateways', vpcId, error.message)
+      return true
+    })
+
+const waitFor = async (service) =>
+  new Promise(async (resolve) => {
+    let ready = false
+    while (!ready) {
+      ready = await service()
+      if (ready) {
+        return resolve()
+      }
+      await sleep(2000)
+    }
+  })
+
+const waitForDependenciesToBeRemoved = async (vpcId, context) =>
+  // check for following component states
+  // Subnets
+  // Security Groups
+  // Network ACLs
+  // VPN Attachments
+  // Internet Gateways
+  // Route Tables
+  // Network Interfaces
+  // VPC Peering Connections
+  Promise.all([
+    waitFor(() => describeSubnets(vpcId, context)),
+    waitFor(() => describeInternetGateways(vpcId, context))
+  ])
+
 const remove = async (inputs, context) => {
   const { state } = context
   context.log(`Removing VPC: "${state.vpcId}"`)
+  context.log('Waiting for VPC dependencies to be removed')
+  await waitForDependenciesToBeRemoved(state.vpcId, context)
   try {
     await ec2
       .deleteVpc({
@@ -56,10 +152,11 @@ const remove = async (inputs, context) => {
       throw exception
     }
   }
-  context.log(`VPC removed`)
+  context.log(`VPC "${state.vpcId}" removed`)
   context.saveState({})
   return {}
 }
+
 module.exports = {
   deploy,
   remove
