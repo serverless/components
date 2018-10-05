@@ -1,0 +1,9 @@
+name: AwsDynamoDB
+extends: Component
+main: ./index.js
+version: 1.0.0
+
+description: "Provision AWS DynamoDB tables with the Serverless Framework"
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
