@@ -1,0 +1,26 @@
+name: aws-iam-policy
+extends: Component
+
+description: "Provision AWS IAM Policies with the Serverless Framework"
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
+
+provider: ${inputs.provider}
+name: ${inputs.name}
+document: ${inputs.document}
+
+inputTypes:
+  provider:
+    type: AwsProvider
+    required: true
+  name:
+    type: string
+    default: policy-${self.instanceId}
+    displayName: IAM Policy Name
+    description: The friendly name of the policy
+  document:
+    type: object
+    required: true
+    displayName: IAM Policy Document
+    description: The JSON policy document that you want to use as the content for the new policy
