@@ -1,0 +1,25 @@
+name: EventgatewayProvider
+extends: Component
+main: ./index.js
+version: 0.2.0
+
+description: "Event Gateway Provider Serverless Component."
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
+
+inputTypes:
+  space:
+    type: string
+    required: true
+  apiKey:
+    type: string
+    displayName: Event gateway API Access Key
+    description: API key of your event gateway space
+    required: false
+  apiUrl:
+    type: string
+    default: https://eventgateway-dev.io
+  configurationUrl:
+    type: string
+    default: https://config.eventgateway-dev.io
