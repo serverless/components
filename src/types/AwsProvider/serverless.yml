@@ -3,6 +3,9 @@ extends: Provider
 version: 1.0.0
 main: ./index.js
 
+credentials: ${inputs.credentials}
+region: ${inputs.region}
+
 inputTypes:
   credentials:
     type: object
