@@ -1,19 +1,15 @@
-name: Service
+name: Apps
 extends: Component
 version: 1.0.0
 main: ./index.js
 
 providers: ${inputs.providers}
-compute: ${inputs.compute}
 functions: ${inputs.functions}
 
 inputTypes:
   providers:
     type: Object
     default: ${context.providers}
-  compute:
+  services:
     type: Object
-    default: ${context.compute}
-  functions:
-    type: Object
-    default: ${context.functions}
+    default: ${context.services}
