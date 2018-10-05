@@ -77,23 +77,24 @@ export default {
       region: process.env.AWS_DEFAULT_REGION || 'us-east-1'
     })
     const inputs = pick(inputsProps, this)
+    const state = context.getState()
     const noChanges =
-      inputs.name === context.state.name &&
-      inputs.roleArn === context.state.roleArn &&
-      equals(inputs.routes, context.state.routes)
+      inputs.name === state.name &&
+      inputs.roleArn === state.roleArn &&
+      equals(inputs.routes, state.routes)
 
     let outputs
     if (noChanges) {
-      outputs = context.state
-    } else if (inputs.name && !context.state.name) {
+      outputs = state
+    } else if (inputs.name && !state.name) {
       context.log(`Creating API Gateway: "${inputs.name}"`)
       outputs = await createApi(inputs)
     } else {
       context.log(`Updating API Gateway: "${inputs.name}"`)
       outputs = await updateApi(APIGateway, {
         ...inputs,
-        id: context.state.id,
-        url: context.state.url
+        id: state.id,
+        url: state.url
       })
     }
     context.saveState(this, { ...inputs, ...outputs })
@@ -106,10 +107,11 @@ export default {
       url: null,
       urls: null
     }
+    const state = context.getState()
 
     try {
-      context.log(`Removing API Gateway: "${context.state.name}"`)
-      await deleteApi({ name: context.state.name, id: context.state.id })
+      context.log(`Removing API Gateway: "${state.name}"`)
+      await deleteApi({ name: state.name, id: state.id })
     } catch (e) {
       if (!e.message.includes('Invalid REST API identifier specified')) {
         throw e
