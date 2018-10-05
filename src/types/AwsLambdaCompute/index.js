@@ -11,7 +11,7 @@ const parseRate = (rate) => {
     if (unit === 'h') awsUnit = 'hours'
     return `rate(${period} ${awsUnit})`
   } else {
-    return = `cron(${rate})`
+    return `cron(${rate})`
   }
 }
 const convertRuntime = (runtime) => {
