@@ -1,0 +1,46 @@
+name: DockerImage
+extends: Component
+version: 0.2.0
+core: 0.2.x
+
+description: "Create and publish Docker images"
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
+
+inputTypes:
+  dockerfilePath:
+    type: string
+    required: true
+    displayName: Dockerfile
+    description: The Dockerfile which should be used to assemble the image
+    example: ./Dockerfile
+  contextPath:
+    type: string
+    required: true
+    displayName: Build context
+    description: The build context path which is used when building the Docker image
+    example: .
+  tag:
+    type: string
+    required: true
+    displayName: Tag
+    description: The tag which should be used to tag the Docker image
+    example: jdoe/my-image:latest
+  registryUrl:
+    type: string
+    required: true
+    default: https://hub.docker.com
+    displayName: Registry URL
+    description: The Docker registry URL which should be used to push the image
+    example: https://my-registry.com:8080
+  username:
+    type: string
+    displayName: Username
+    description: The username used when logging in to the Docker registry
+    example: jdoe
+  password:
+    type: string
+    displayName: Password
+    description: The password used when logging in to the Docker registry
+    example: s0m3p455w0rd
