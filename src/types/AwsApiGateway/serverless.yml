@@ -1,4 +1,4 @@
-name: AWsApigateway
+name: AwsApiGateway
 extends: Component
 main: ./index.js
 version: 0.2.0

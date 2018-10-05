@@ -1,4 +1,4 @@
-name: EventgatewayProvider
+name: EventGatewayProvider
 extends: Component
 main: ./index.js
 version: 0.2.0
