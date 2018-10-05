@@ -77,7 +77,7 @@ export default {
       region: process.env.AWS_DEFAULT_REGION || 'us-east-1'
     })
     const inputs = pick(inputsProps, this)
-    const state = context.getState()
+    const state = context.getState(this)
     const noChanges =
       inputs.name === state.name &&
       inputs.roleArn === state.roleArn &&
@@ -107,7 +107,7 @@ export default {
       url: null,
       urls: null
     }
-    const state = context.getState()
+    const state = context.getState(this)
 
     try {
       context.log(`Removing API Gateway: "${state.name}"`)
