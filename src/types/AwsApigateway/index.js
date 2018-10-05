@@ -96,7 +96,7 @@ export default {
         url: context.state.url
       })
     }
-    context.saveState({ ...inputs, ...outputs })
+    context.saveState(this, { ...inputs, ...outputs })
     return outputs
   },
 
@@ -116,7 +116,7 @@ export default {
       }
     }
 
-    context.saveState()
+    context.saveState(this, {})
     return outputs
   }
 }
