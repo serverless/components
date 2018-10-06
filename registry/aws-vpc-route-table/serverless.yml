@@ -1,0 +1,22 @@
+---
+type: aws-vpc-route-table
+version: 0.2.0
+core: 0.2.x
+
+description: "Provision AWS VPC Route Table with Serverless Components"
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
+
+inputTypes:
+  vpcId:
+    type: string
+    displayName: The id of the VPC
+    description: The id of the VPC
+    example: vpc-abbaabba
+    required: true
+
+outputTypes:
+  routeTableId:
+    type: string
+    description: The route table id

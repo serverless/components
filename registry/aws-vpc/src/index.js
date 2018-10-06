@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk')
-const { equals, isEmpty, merge, pick } = require('ramda')
+const { concat, equals, filter, head, isEmpty, merge, pick } = require('ramda')
 const { sleep } = require('@serverless/utils')
 
 const ec2 = new AWS.EC2({
@@ -34,7 +34,27 @@ const deploy = async (inputs, context) => {
         AmazonProvidedIpv6CidrBlock: inputs.amazonProvidedIpv6CidrBlock
       })
       .promise()
+
+    const { RouteTables } = await ec2
+      .describeRouteTables({
+        Filters: [
+          {
+            Name: 'vpc-id',
+            Values: [Vpc.VpcId]
+          }
+        ]
+      })
+      .promise()
+
+    const defaultRouteTableId = RouteTables.length > 0 ? head(RouteTables).RouteTableId : undefined
+    const defaultRouteTableIds = pick(
+      concat([Vpc.VpcId], [state.vpcId]),
+      merge(state.defaultRouteTableIds, {
+        [Vpc.VpcId]: defaultRouteTableId
+      })
+    )
     newState = merge(newState, {
+      defaultRouteTableIds,
       vpcId: Vpc.VpcId,
       cidrBlock: Vpc.CidrBlock,
       instanceTenancy: Vpc.InstanceTenancy,
@@ -43,6 +63,7 @@ const deploy = async (inputs, context) => {
     context.log(`VPC created: "${newState.vpcId}"`)
   } else {
     newState = merge(newState, {
+      defaultRouteTableIds: state.defaultRouteTableIds,
       vpcId: state.vpcId,
       cidrBlock: state.cidrBlock,
       instanceTenancy: state.instanceTenancy,
@@ -109,6 +130,38 @@ const describeInternetGateways = (vpcId, context) =>
       return true
     })
 
+const describeRouteTables = async (vpcId, context) => {
+  let ready
+  try {
+    const { RouteTables: routeTables } = await ec2
+      .describeRouteTables({
+        Filters: [
+          {
+            Name: 'vpc-id',
+            Values: [vpcId]
+          }
+        ]
+      })
+      .promise()
+    const filteredRouteTables = filter(
+      ({ RouteTableId }) => RouteTableId !== context.state.defaultRouteTableIds[vpcId],
+      routeTables
+    )
+    ready = filteredRouteTables.length === 0
+    if (!ready) {
+      context.log(
+        `Waiting for ${filteredRouteTables
+          .map(({ RouteTableId }) => RouteTableId)
+          .join(', ')} to be removed`
+      )
+    }
+  } catch (exception) {
+    context.log('ERROR: describeRouteTables', vpcId, exception.message)
+    ready = true
+  }
+  return ready
+}
+
 const waitFor = async (service) =>
   new Promise(async (resolve) => {
     let ready = false
@@ -133,7 +186,8 @@ const waitForDependenciesToBeRemoved = async (vpcId, context) =>
   // VPC Peering Connections
   Promise.all([
     waitFor(() => describeSubnets(vpcId, context)),
-    waitFor(() => describeInternetGateways(vpcId, context))
+    waitFor(() => describeInternetGateways(vpcId, context)),
+    waitFor(() => describeRouteTables(vpcId, context))
   ])
 
 const remove = async (inputs, context) => {
