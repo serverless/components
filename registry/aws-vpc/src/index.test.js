@@ -32,6 +32,14 @@ jest.mock('aws-sdk', () => {
         return Promise.reject('Something went wrong')
       }
       return Promise.resolve({ InternetGateways: [] })
+    }),
+    describeSecurityGroupsMock: jest.fn().mockImplementation((value) => {
+      if (value.Filters[0].Values[0] === 'vpc-error-describe') {
+        return Promise.reject('Something went wrong')
+      }
+      return Promise.resolve({
+        SecurityGroups: []
+      })
     })
   }
 
@@ -47,6 +55,9 @@ jest.mock('aws-sdk', () => {
     }),
     describeInternetGateways: (obj) => ({
       promise: () => mocks.describeInternetGatewaysMock(obj)
+    }),
+    describeSecurityGroups: (obj) => ({
+      promise: () => mocks.describeSecurityGroupsMock(obj)
     })
   }
   return {
@@ -79,6 +90,10 @@ describe('AWS VPC Unit Tests', () => {
       instanceTenancy: 'default'
     }
 
+    AWS.mocks.describeSecurityGroupsMock.mockImplementationOnce().mockResolvedValueOnce({
+      SecurityGroups: [{ GroupId: 'sg-default', VpcId: 'vpc-subnets' }]
+    })
+
     const { vpcId } = await awsVpcComponent.deploy(inputs, contextMock)
 
     expect(vpcId).toBe('vpc-abbaabba')
@@ -90,7 +105,8 @@ describe('AWS VPC Unit Tests', () => {
   it('should remove an existing VPC', async () => {
     const contextMock = {
       state: {
-        vpcId: 'vpc-subnets'
+        vpcId: 'vpc-subnets',
+        defaultSecurityGroupId: 'sg-default'
       },
       log: () => {},
       saveState: jest.fn()
@@ -109,6 +125,13 @@ describe('AWS VPC Unit Tests', () => {
         {
           InternetGatewayId: 'igw-123'
         }
+      ]
+    })
+
+    AWS.mocks.describeSecurityGroupsMock.mockImplementationOnce().mockResolvedValueOnce({
+      SecurityGroups: [
+        { GroupId: 'sg-default', VpcId: 'vpc-subnets' },
+        { GroupId: 'sg-abbaabba', VpcId: 'vpc-subnets' }
       ]
     })
 

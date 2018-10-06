@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk')
-const { equals, isEmpty, merge, pick } = require('ramda')
+const { equals, filter, head, isEmpty, merge, pick } = require('ramda')
 const { sleep } = require('@serverless/utils')
 
 const ec2 = new AWS.EC2({
@@ -34,7 +34,23 @@ const deploy = async (inputs, context) => {
         AmazonProvidedIpv6CidrBlock: inputs.amazonProvidedIpv6CidrBlock
       })
       .promise()
+
+    const { SecurityGroups } = await ec2
+      .describeSecurityGroups({
+        Filters: [
+          {
+            Name: 'vpc-id',
+            Values: [Vpc.VpcId]
+          }
+        ]
+      })
+      .promise()
+
+    const defaultSecurityGroupId =
+      SecurityGroups.length > 0 ? head(SecurityGroups).GroupId : undefined
+
     newState = merge(newState, {
+      defaultSecurityGroupId,
       vpcId: Vpc.VpcId,
       cidrBlock: Vpc.CidrBlock,
       instanceTenancy: Vpc.InstanceTenancy,
@@ -43,6 +59,7 @@ const deploy = async (inputs, context) => {
     context.log(`VPC created: "${newState.vpcId}"`)
   } else {
     newState = merge(newState, {
+      defaultSecurityGroupId: state.defaultSecurityGroupId,
       vpcId: state.vpcId,
       cidrBlock: state.cidrBlock,
       instanceTenancy: state.instanceTenancy,
@@ -57,57 +74,88 @@ const deploy = async (inputs, context) => {
   }
 }
 
-const describeSubnets = (vpcId, context) =>
-  ec2
-    .describeSubnets({
-      Filters: [
-        {
-          Name: 'vpc-id',
-          Values: [vpcId]
-        }
-      ]
-    })
-    .promise()
-    .then(({ Subnets: subnets }) => {
-      const ready = subnets.length === 0
-      if (!ready) {
-        context.log(
-          `Waiting for ${subnets.map(({ SubnetId }) => SubnetId).join(', ')} to be removed`
-        )
-      }
-      return ready
-    })
-    .catch((error) => {
-      context.log('ERROR: describeSubnets', vpcId, error.message)
-      return true
-    })
+const describeSubnets = async (vpcId, context) => {
+  let ready
+  try {
+    const { Subnets: subnets } = await ec2
+      .describeSubnets({
+        Filters: [
+          {
+            Name: 'vpc-id',
+            Values: [vpcId]
+          }
+        ]
+      })
+      .promise()
+    ready = subnets.length === 0
+    if (!ready) {
+      context.log(`Waiting for ${subnets.map(({ SubnetId }) => SubnetId).join(', ')} to be removed`)
+    }
+  } catch (exception) {
+    context.log('ERROR: describeSubnets', vpcId, exception.message)
+    ready = true
+  }
+  return ready
+}
 
-const describeInternetGateways = (vpcId, context) =>
-  ec2
-    .describeInternetGateways({
-      Filters: [
-        {
-          Name: 'attachment.vpc-id',
-          Values: [vpcId]
-        }
-      ]
-    })
-    .promise()
-    .then(({ InternetGateways: internetGateways }) => {
-      const ready = internetGateways.length === 0
-      if (!ready) {
-        context.log(
-          `Waiting for ${internetGateways
-            .map(({ InternetGatewayId }) => InternetGatewayId)
-            .join(', ')} to be removed`
-        )
-      }
-      return ready
-    })
-    .catch((error) => {
-      context.log('ERROR: describeInternetGateways', vpcId, error.message)
-      return true
-    })
+const describeInternetGateways = async (vpcId, context) => {
+  let ready
+  try {
+    const { InternetGateways: internetGateways } = await ec2
+      .describeInternetGateways({
+        Filters: [
+          {
+            Name: 'attachment.vpc-id',
+            Values: [vpcId]
+          }
+        ]
+      })
+      .promise()
+    ready = internetGateways.length === 0
+    if (!ready) {
+      context.log(
+        `Waiting for ${internetGateways
+          .map(({ InternetGatewayId }) => InternetGatewayId)
+          .join(', ')} to be removed`
+      )
+    }
+  } catch (exception) {
+    context.log('ERROR: describeInternetGateways', vpcId, exception.message)
+    ready = true
+  }
+  return ready
+}
+
+const describeSecurityGroups = async (vpcId, context) => {
+  let ready
+  try {
+    const { SecurityGroups: securityGroups } = await ec2
+      .describeSecurityGroups({
+        Filters: [
+          {
+            Name: 'vpc-id',
+            Values: [vpcId]
+          }
+        ]
+      })
+      .promise()
+    // VPC removal will delete the default security group automatically
+    const filteredSecurityGroups = filter(
+      ({ GroupId }) => GroupId !== context.state.defaultSecurityGroupId,
+      securityGroups
+    )
+    ready = filteredSecurityGroups.length === 0
+    if (!ready) {
+      context.log(
+        `Waiting for ${securityGroups.map(({ GroupId }) => GroupId).join(', ')} to be removed`
+      )
+    }
+  } catch (exception) {
+    context.log('ERROR: describeSecurityGroups', vpcId, exception.message)
+    ready = true
+  }
+  return ready
+}
 
 const waitFor = async (service) =>
   new Promise(async (resolve) => {
@@ -133,7 +181,8 @@ const waitForDependenciesToBeRemoved = async (vpcId, context) =>
   // VPC Peering Connections
   Promise.all([
     waitFor(() => describeSubnets(vpcId, context)),
-    waitFor(() => describeInternetGateways(vpcId, context))
+    waitFor(() => describeInternetGateways(vpcId, context)),
+    waitFor(() => describeSecurityGroups(vpcId, context))
   ])
 
 const remove = async (inputs, context) => {
