@@ -106,7 +106,7 @@ describe('AWS VPC Unit Tests', () => {
     const contextMock = {
       state: {
         vpcId: 'vpc-subnets',
-        defaultSecurityGroupId: 'sg-default'
+        defaultSecurityGroupIds: { 'vpc-subnets': 'sg-default' }
       },
       log: () => {},
       saveState: jest.fn()

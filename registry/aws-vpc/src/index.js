@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk')
-const { equals, filter, head, isEmpty, merge, pick } = require('ramda')
+const { concat, equals, filter, head, isEmpty, merge, pick } = require('ramda')
 const { sleep } = require('@serverless/utils')
 
 const ec2 = new AWS.EC2({
@@ -48,9 +48,15 @@ const deploy = async (inputs, context) => {
 
     const defaultSecurityGroupId =
       SecurityGroups.length > 0 ? head(SecurityGroups).GroupId : undefined
+    const defaultSecurityGroupIds = pick(
+      concat([Vpc.VpcId], [state.vpcId]),
+      merge(state.defaultSecurityGroupIds, {
+        [Vpc.VpcId]: defaultSecurityGroupId
+      })
+    )
 
     newState = merge(newState, {
-      defaultSecurityGroupId,
+      defaultSecurityGroupIds,
       vpcId: Vpc.VpcId,
       cidrBlock: Vpc.CidrBlock,
       instanceTenancy: Vpc.InstanceTenancy,
@@ -59,7 +65,7 @@ const deploy = async (inputs, context) => {
     context.log(`VPC created: "${newState.vpcId}"`)
   } else {
     newState = merge(newState, {
-      defaultSecurityGroupId: state.defaultSecurityGroupId,
+      defaultSecurityGroupIds: state.defaultSecurityGroupIds,
       vpcId: state.vpcId,
       cidrBlock: state.cidrBlock,
       instanceTenancy: state.instanceTenancy,
@@ -141,13 +147,15 @@ const describeSecurityGroups = async (vpcId, context) => {
       .promise()
     // VPC removal will delete the default security group automatically
     const filteredSecurityGroups = filter(
-      ({ GroupId }) => GroupId !== context.state.defaultSecurityGroupId,
+      ({ GroupId }) => GroupId !== context.state.defaultSecurityGroupIds[vpcId],
       securityGroups
     )
     ready = filteredSecurityGroups.length === 0
     if (!ready) {
       context.log(
-        `Waiting for ${securityGroups.map(({ GroupId }) => GroupId).join(', ')} to be removed`
+        `Waiting for ${filteredSecurityGroups
+          .map(({ GroupId }) => GroupId)
+          .join(', ')} to be removed`
       )
     }
   } catch (exception) {
