@@ -1,4 +1,4 @@
-import { forEachObjIndexed, map } from 'ramda'
+import { forEachObjIndexed } from '@serverless/utils'
 
 const Function = {
   async define(context) {

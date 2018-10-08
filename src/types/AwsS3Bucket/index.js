@@ -9,7 +9,8 @@ const AwsS3Bucket = {
     this.provider = inputs.provider || context.get('provider')
   },
 
-  hydrate(state) {
+  hydrate(state, context) {
+    super.hydrate(state, context)
     this.bucketName = state.bucketName || this.bucketName
   },
 

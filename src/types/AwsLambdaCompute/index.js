@@ -3,12 +3,14 @@ import path from 'path'
 
 const parseRate = (rate) => {
   const unit = rate.substr(rate.length - 1)
-  if (['s', 'm', 'h'].includes(unit)) {
+  if (['s', 'm', 'h', 'd', 'week'].includes(unit)) {
     let awsUnit
     const period = rate.substr(0, rate.length - 1)
     if (unit === 's') awsUnit = 'seconds'
     if (unit === 'm') awsUnit = 'minutes'
     if (unit === 'h') awsUnit = 'hours'
+    if (unit === 'd') awsUnit = 'days'
+    if (unit === 'w') awsUnit = 'weeks'
     return `rate(${period} ${awsUnit})`
   } else {
     return `cron(${rate})`
@@ -65,18 +67,6 @@ const AwsLambdaCompute = async (SuperClass, superContext) => {
       return context.construct(AwsLambdaFunction, inputs)
     },
     async defineSchedule(functionInstance, rate, context) {
-      let awsEventsSchedule
-      const unit = rate.substr(rate.length - 1)
-      if (['s', 'm', 'h'].includes(unit)) {
-        let awsUnit
-        const period = rate.substr(0, rate.length - 1)
-        if (unit === 's') awsUnit = 'seconds'
-        if (unit === 'm') awsUnit = 'minutes'
-        if (unit === 'h') awsUnit = 'hours'
-        awsEventsSchedule = `rate(${period} ${awsUnit})`
-      } else {
-        awsEventsSchedule = `cron(${rate})`
-      }
       return functionInstance.defineSchedule(parseRate(rate), context)
     }
   }
