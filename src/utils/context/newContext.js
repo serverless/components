@@ -40,7 +40,21 @@ const newContext = (props) => {
   const finalContext = {
     ...context,
     construct: (type, inputs) => construct(type, inputs, finalContext),
-    createDeployment: async (previousDeployment) => createDeployment(previousDeployment, context),
+    createDeployment: async (previousDeployment) => {
+      const { app } = finalContext
+      if (!app) {
+        throw new Error(
+          'createDeployment method expects context to have an app loaded. You must first call loadApp on context before calling createDeployment'
+        )
+      }
+      const deployment = await createDeployment(previousDeployment, app)
+
+      const nextContext = newContext({
+        ...context,
+        deployment
+      })
+      return nextContext.loadState()
+    },
     defineComponent: (component) => defineComponent(component, finalContext),
     defineComponentFromState: (component) => defineComponentFromState(component, finalContext),
     generateInstanceId: () => {
@@ -83,7 +97,9 @@ const newContext = (props) => {
         )
       }
       const deployment = await loadDeployment(deploymentId, app)
-
+      if (!deployment) {
+        return finalContext
+      }
       const nextContext = newContext({
         ...context,
         deployment
@@ -106,7 +122,9 @@ const newContext = (props) => {
         )
       }
       const deployment = await loadPreviousDeployment(app)
-
+      if (!deployment) {
+        return finalContext
+      }
       const nextContext = newContext({
         ...context,
         deployment
