@@ -12,7 +12,7 @@ import loadTypeMeta from './loadTypeMeta'
  * @func
  * @param {string} query The query string to identify the type to load
  * @param {Context} context The context object
- * @return {Promise<Type>} The type object that was loaded
+ * @returns {Promise<Type>} The type object that was loaded
  * @example
  *
  *  const Component = await loadType('Component')

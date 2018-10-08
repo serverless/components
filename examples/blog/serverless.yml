@@ -11,5 +11,5 @@ components:
       contentIndex: index.html
       contentError: error.html
       hostingRegion: us-east-1
-      hostingDomain: sls-blog-${self.serviceId}.example.com
-      aliasDomain: www.sls-blog-${self.serviceId}.example.com
+      hostingDomain: sls-blog-${self.appId}.example.com
+      aliasDomain: www.sls-blog-${self.appId}.example.com

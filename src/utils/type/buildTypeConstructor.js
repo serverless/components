@@ -1,4 +1,6 @@
 import {
+  clone,
+  defineProperty,
   forEach,
   get,
   isFunction,
@@ -10,48 +12,36 @@ import {
   walkReduceDepthFirst
 } from '@serverless/utils'
 import { SYMBOL_TYPE } from '../constants'
-import isVariable from '../variables/isVariable'
-import { regex } from '../variables/regexVariable'
+import hasVariableString from '../variable/hasVariableString'
+import newVariable from '../variable/newVariable'
 import isTypeConstruct from './isTypeConstruct'
 
-const assign = (target, source) => {
-  forEach((key) => {
-    const descriptor = Object.getOwnPropertyDescriptor(source, key)
-    Object.defineProperty(target, key, descriptor)
-  }, keys(source))
-  return target
-}
-
-const clone = (source) => {
-  const copy = {}
-  forEach((key) => {
-    const descriptor = Object.getOwnPropertyDescriptor(source, key)
-    Object.defineProperty(copy, key, descriptor)
-  }, keys(source))
-  return copy
-}
 
 const resolveProps = (props, data) =>
   walkReduceDepthFirst(
     (accum, value, pathParts) => {
-      if (isString(value) && isVariable(value)) {
+      if (isString(value) && hasVariableString(value)) {
         const parentPathParts = init(pathParts)
-        const pathPart = last(pathParts)
+        const lastPathPart = last(pathParts)
         const parent = get(parentPathParts, accum)
-        const parentCopy = clone(parent)
-        Object.defineProperty(parentCopy, pathPart, {
-          configurable: true,
-          enumerable: true,
-          get() {
-            const propPath = value.match(regex)[1]
-            return value.replace(regex, get(propPath, data))
-          },
-          set(val) {
-            // this[key] = value
-            value = val
-          }
-        })
-        return set(parentPathParts, parentCopy, accum)
+        // const parentCopy = clone(parent)
+        // defineProperty(parent, pathPart, {
+        //   configurable: true,
+        //   enumerable: true,
+        //   get() {
+        //     const propPath = value.match(regex)[1]
+        //     return value.replace(regex, get(propPath, data))
+        //   },
+        //   set(val) {
+        //
+        //     //TODO defineProperty
+        //   }
+        // })
+
+        parent[lastPathPart] = newVariable(value, data)
+
+        // return set(parentPathParts, parent, accum)
+        return accum
       }
       return accum
     },
@@ -97,10 +87,11 @@ const buildTypeConstructor = (type) => {
         // NOTE BRN: set the type onto the instance so that we can use it in cases of reflection.
         self[SYMBOL_TYPE] = Type
 
+
         // NOTE BRN: variables in inputs should already be resolved outside of the call to this constructor method. There should be no need to resolve them again here.
 
-        // NOTE BRN: properties are first resolved since all the values in props are references to the execution context of the current type
-        let resolvedProps = resolveProps(props, {
+        // NOTE BRN: properties are first resolved since all the values in props are references to the execution context of the current type. We clone the properties here so that we don't change the base property descriptions from the Type.
+        let resolvedProps = resolveProps(clone(props), {
           this: self,
           self,
           inputs,

@@ -1,4 +1,4 @@
-const getInputs = require('./getInputs')
+import getInputs from './getInputs'
 
 describe('#getInputs()', () => {
   const stateFile = {

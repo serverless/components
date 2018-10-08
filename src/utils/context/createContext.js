@@ -1,10 +1,21 @@
-import { findPath, prop } from '@serverless/utils'
+import { findPath, prop, propOr } from '@serverless/utils'
 import { resolve } from 'path'
+import getStateStore from '../state/getStateStore'
 import newContext from './newContext'
 
-const createContext = async (options) => {
+/**
+ * @param {{
+ *   cwd: ?string,
+ *   projectPath: ?string,
+ *
+ * }} options
+ * @returns Context
+ */
+const createContext = async (options = {}, context = {}) => {
   const cwd = resolve(findPath(prop('cwd', options), process.cwd()))
-  const overrides = options.overrides
+  const state = getStateStore(propOr('local', 'stateStore', options))
+  const { overrides } = options
+
   return newContext({
     cache: {
       types: {
@@ -12,8 +23,11 @@ const createContext = async (options) => {
         meta: {}
       }
     },
+    ...context,
     cwd,
-    overrides
+    options,
+    overrides,
+    state
   })
 }
 

@@ -1,8 +1,8 @@
-function getInputs(stateFile, componentId) {
+const getInputs = (stateFile, componentId) => {
   if (stateFile[componentId] && stateFile[componentId].inputs) {
     return stateFile[componentId].inputs
   }
   return {}
 }
 
-module.exports = getInputs
+export default getInputs

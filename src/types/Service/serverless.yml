@@ -1,6 +1,5 @@
 name: Service
 extends: Component
-version: 1.0.0
 main: ./index.js
 
 providers: ${inputs.providers}

@@ -40,9 +40,9 @@ describe('Integration Test - Await child components', () => {
       const stateFileContent = await fsp.readJsonAsync(testServiceStateFile)
       const stateFileKeys = Object.keys(stateFileContent)
       expect(stateFileKeys.length).toEqual(5)
-      expect(stateFileContent).toHaveProperty('$.serviceId')
+      expect(stateFileContent).toHaveProperty('$.appId')
       expect(stateFileContent).toHaveProperty('await-child-components:awaitChildComponents')
-      expect(stateFileContent.$.serviceId).not.toBeFalsy()
+      expect(stateFileContent.$.appId).not.toBeFalsy()
       const awaitChildComponents = stateFileContent['await-child-components:awaitChildComponents']
       const awaitChildComponentsObjectKeys = Object.keys(awaitChildComponents)
       expect(awaitChildComponentsObjectKeys.length).toEqual(6)
@@ -88,9 +88,9 @@ describe('Integration Test - Await child components', () => {
       const stateFileContent = await fsp.readJsonAsync(testServiceStateFile)
       const stateFileKeys = Object.keys(stateFileContent)
       expect(stateFileKeys.length).toEqual(5)
-      expect(stateFileContent).toHaveProperty('$.serviceId')
+      expect(stateFileContent).toHaveProperty('$.appId')
       expect(stateFileContent).toHaveProperty('await-child-components:awaitChildComponents')
-      expect(stateFileContent.$.serviceId).not.toBeFalsy()
+      expect(stateFileContent.$.appId).not.toBeFalsy()
       const awaitChildComponents = stateFileContent['await-child-components:awaitChildComponents']
       const awaitChildComponentsObjectKeys = Object.keys(awaitChildComponents)
       expect(awaitChildComponentsObjectKeys.length).toEqual(2)

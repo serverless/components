@@ -75,7 +75,7 @@ inputTypes:
     description: Lambda functions environment's configuration settings
     example:
       foo: true
-      tableName: products-${this.serviceId}
+      tableName: products-${this.appId}
   tags:
     type: object
     displayName: Tags

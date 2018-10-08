@@ -1,4 +1,4 @@
-const handleSignalEvents = require('./handleSignalEvents')
+import handleSignalEvents from './handleSignalEvents'
 
 afterAll(() => {
   jest.restoreAllMocks()
@@ -6,25 +6,18 @@ afterAll(() => {
 
 describe('#handleSignalEvents()', () => {
   let oldProcess
-  let oldConsole
   let exitMock
-  let logMock
 
   beforeEach(() => {
     oldProcess = process
-    oldConsole = console
     exitMock = jest.fn()
-    logMock = jest.fn()
     global.process = oldProcess
-    global.console = oldConsole
     global.process.exit = exitMock
-    global.console.log = logMock
   })
 
   afterEach(() => {
     jest.resetAllMocks()
     global.process = oldProcess
-    global.console = oldConsole
   })
 
   describe('when dealing with a SIGINT signal', () => {
@@ -35,9 +28,12 @@ describe('#handleSignalEvents()', () => {
     })
 
     it('should ask for a confirmation (emitting signal a second time) before exiting', (done) => {
-      handleSignalEvents()
+      const context = {
+        log: jest.fn()
+      }
+      handleSignalEvents(context)
       process.on(SIGNAL, () => {
-        expect(logMock).toHaveBeenCalledTimes(1)
+        expect(context.log).toHaveBeenCalledTimes(1)
         expect(exitMock).not.toHaveBeenCalled()
         expect(global.signalEventHandling.SIGINTCount).toEqual(1)
         expect(global.signalEventHandling.shouldExitGracefully).toEqual(true)
@@ -47,10 +43,13 @@ describe('#handleSignalEvents()', () => {
     })
 
     it('should exit the process after receiving the second signal', (done) => {
-      handleSignalEvents()
+      const context = {
+        log: jest.fn()
+      }
+      handleSignalEvents(context)
       process.on(SIGNAL, (numEmitted) => {
         if (numEmitted === 2) {
-          expect(logMock).toHaveBeenCalledTimes(1)
+          expect(context.log).toHaveBeenCalledTimes(1)
           expect(exitMock).toHaveBeenCalled()
           expect(global.signalEventHandling.SIGINTCount).toEqual(2)
           expect(global.signalEventHandling.shouldExitGracefully).toEqual(true)
@@ -62,13 +61,16 @@ describe('#handleSignalEvents()', () => {
     })
 
     it('should support windows systems', (done) => {
-      handleSignalEvents()
+      const context = {
+        log: jest.fn()
+      }
+      handleSignalEvents(context)
       Object.defineProperty(process, 'platform', {
         value: 'win32'
       })
       process.on(SIGNAL, (numEmitted) => {
         if (numEmitted === 2) {
-          expect(logMock).toHaveBeenCalledTimes(1)
+          expect(context.log).toHaveBeenCalledTimes(1)
           expect(exitMock).toHaveBeenCalled()
           expect(global.signalEventHandling.SIGINTCount).toEqual(2)
           expect(global.signalEventHandling.shouldExitGracefully).toEqual(true)
@@ -88,10 +90,13 @@ describe('#handleSignalEvents()', () => {
     })
 
     it('should exit the process after receiving the signal', (done) => {
-      handleSignalEvents()
+      const context = {
+        log: jest.fn()
+      }
+      handleSignalEvents(context)
       process.on(SIGNAL, (numEmitted) => {
         if (numEmitted === 1) {
-          expect(logMock).toHaveBeenCalledTimes(1)
+          expect(context.log).toHaveBeenCalledTimes(1)
           expect(exitMock).not.toHaveBeenCalled()
           expect(global.signalEventHandling.shouldExitGracefully).toEqual(true)
           done()
@@ -101,13 +106,16 @@ describe('#handleSignalEvents()', () => {
     })
 
     it('should support windows systems', (done) => {
-      handleSignalEvents()
+      const context = {
+        log: jest.fn()
+      }
+      handleSignalEvents(context)
       Object.defineProperty(process, 'platform', {
         value: 'win32'
       })
       process.on(SIGNAL, (numEmitted) => {
         if (numEmitted === 1) {
-          expect(logMock).toHaveBeenCalledTimes(1)
+          expect(context.log).toHaveBeenCalledTimes(1)
           expect(exitMock).not.toHaveBeenCalled()
           expect(global.signalEventHandling.shouldExitGracefully).toEqual(true)
           done()
@@ -125,10 +133,13 @@ describe('#handleSignalEvents()', () => {
     })
 
     it('should exit the process after receiving the signal', (done) => {
-      handleSignalEvents()
+      const context = {
+        log: jest.fn()
+      }
+      handleSignalEvents(context)
       process.on(SIGNAL, (numEmitted) => {
         if (numEmitted === 1) {
-          expect(logMock).toHaveBeenCalledTimes(1)
+          expect(context.log).toHaveBeenCalledTimes(1)
           expect(exitMock).not.toHaveBeenCalled()
           expect(global.signalEventHandling.shouldExitGracefully).toEqual(true)
           done()
@@ -138,13 +149,16 @@ describe('#handleSignalEvents()', () => {
     })
 
     it('should support windows systems', (done) => {
-      handleSignalEvents()
+      const context = {
+        log: jest.fn()
+      }
+      handleSignalEvents(context)
       Object.defineProperty(process, 'platform', {
         value: 'win32'
       })
       process.on(SIGNAL, (numEmitted) => {
         if (numEmitted === 1) {
-          expect(logMock).toHaveBeenCalledTimes(1)
+          expect(context.log).toHaveBeenCalledTimes(1)
           expect(exitMock).not.toHaveBeenCalled()
           expect(global.signalEventHandling.shouldExitGracefully).toEqual(true)
           done()

@@ -16,7 +16,7 @@ module.exports = {
     )
 
     if (products.length > 0) {
-      const tablename = `products-${context.serviceId}`
+      const tablename = `products-${context.appId}`
       context.log(`Seeding ${products.length} items into table ${tablename}.`)
 
       const insertItem = (triesLeft, wait) => (product) =>

@@ -1,10 +1,9 @@
-const BbPromise = require('bluebird')
-const publicIp = require('public-ip')
-const whereIs = BbPromise.promisify(require('node-where').is)
+import { lookupIp } from '@serverless/utils'
+import publicIp from 'public-ip'
 
-module.exports = async () => {
+const getLocation = async () => {
   const ip = await publicIp.v4()
-  const location = await whereIs(ip)
-  location.attributes.ip = ip
-  return location.attributes
+  return lookupIp(ip)
 }
+
+export default getLocation

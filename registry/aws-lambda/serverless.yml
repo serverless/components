@@ -64,7 +64,7 @@ inputTypes:
     description: Lambda functions environment's configuration settings
     example:
       foo: true
-      tableName: products-${self.serviceId}
+      tableName: products-${self.appId}
 
 outputTypes:
   arn:

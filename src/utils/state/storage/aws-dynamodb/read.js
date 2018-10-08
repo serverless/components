@@ -40,7 +40,9 @@ const createLockAndFetch = async (config) => {
   return Item && Item.state ? Item.state : {}
 }
 
-module.exports = async (config) => {
+const read = async (config) => {
   const content = await createLockAndFetch(config)
   return content
 }
+
+export default read

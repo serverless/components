@@ -1,17 +1,14 @@
-import dotenv from 'dotenv'
-import minimist from 'minimist'
-import run from './run'
+import { createCli } from './utils'
+import createContext from './createContext'
 
 const start = async () => {
-  dotenv.config()
-  const command = process.argv[2]
-  const options = minimist(process.argv.slice(2))
-
+  const context = await createContext()
+  const cli = await createCli(context)
   try {
-    await run(command, options)
+    await cli.start(process.argv)
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(error)
+    context.log('An unexpected error occurred.')
+    context.log(error)
     process.exit(1)
   }
 }

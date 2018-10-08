@@ -1,5 +1,1 @@
-const handleSignalEvents = require('./handleSignalEvents')
-
-module.exports = {
-  handleSignalEvents
-}
+export { default as handleSignalEvents } from './handleSignalEvents'

@@ -1,7 +1,2 @@
-const read = require('./read')
-const write = require('./write')
-
-module.exports = {
-  read,
-  write
-}
+export { default as read } from './read'
+export { default as write } from './write'

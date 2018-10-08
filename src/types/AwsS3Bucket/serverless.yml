@@ -11,6 +11,7 @@ license: Apache-2.0
 author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
 repository: "github:serverless/components"
 
+
 inputTypes:
   bucketName:
     type: string
@@ -27,5 +28,5 @@ inputTypes:
 
 bucketName:
   type: string
-  # value: ${state.bucketName || inputs.bucketName}
+  value: ${state.bucketName || inputs.bucketName}
   description: the S3 bucket name

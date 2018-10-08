@@ -1,19 +1,8 @@
-const generateServiceId = require('./generateServiceId')
-const getInputs = require('./getInputs')
-const getRootPath = require('./getRootPath')
-const getServiceId = require('./getServiceId')
-const getState = require('./getState')
-const readStateFile = require('./storage/readStateFile')
-const setServiceId = require('./setServiceId')
-const writeStateFile = require('./storage/writeStateFile')
-
-module.exports = {
-  generateServiceId,
-  getInputs,
-  getRootPath,
-  getServiceId,
-  getState,
-  readStateFile,
-  setServiceId,
-  writeStateFile
-}
+export { default as getInputs } from './getInputs'
+export { default as getRootPath } from './getRootPath'
+export { default as getAppId } from './getAppId'
+export { default as getState } from './getState'
+export { default as readStateFile } from './readStateFile'
+export { default as saveState } from './saveState'
+export { default as setAppId } from './setAppId'
+export { default as writeStateFile } from './writeStateFile'

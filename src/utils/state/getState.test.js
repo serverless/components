@@ -1,4 +1,4 @@
-const getState = require('./getState')
+import getState from './getState'
 
 describe('#getState()', () => {
   const stateFile = {
