@@ -8,9 +8,7 @@ const defineComponentFromState = async (component, context) => {
   // TODO BRN (priority high): Need to save children by instanceId in state
   // TODO BRN: load component state by instance
   // TODO BRN: define each child by state value
-
   // TODO BRN: Figure out how the hell we deal with changes in code from one version to another
-
   // if (isFunction(component.define)) {
   //   const children = await component.define(context)
   //   forEach((child) => child.parent = component, children)

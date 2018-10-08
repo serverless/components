@@ -3,13 +3,15 @@ import isType from './isType'
 
 describe('#isType()', () => {
   test('returns true for a Type object', () => {
-    expect(isType({
-      class: class {},
-      constructor: class {},
-      main: {},
-      props: {},
-      root: '/foo'
-    })).toBe(true)
+    expect(
+      isType({
+        class: class {},
+        constructor: class {},
+        main: {},
+        props: {},
+        root: '/foo'
+      })
+    ).toBe(true)
   })
 
   test('returns false for all other values', () => {

@@ -25,7 +25,7 @@ const run = async (command, context) => {
   }
   try {
     return plugin.run(context)
-  } catch(error) {
+  } catch (error) {
     if (reporter) {
       // TODO BRN: Only report unexpected exceptions
       reporter.captureException(error)

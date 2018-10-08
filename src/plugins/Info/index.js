@@ -6,9 +6,9 @@ const Info = {
     // merge and then sort based on category names
 
     // context.log
-      // [category name]
-        // [item 1]
-        // [item 2]
+    // [category name]
+    // [item 1]
+    // [item 2]
 
     context.log('TODO: implement info command')
 

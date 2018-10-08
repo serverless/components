@@ -5,7 +5,6 @@ const DEPLOY = 'deploy'
 const Component = {
   async construct(context) {
     const state = context.getState(this)
-
   },
 
   hydrate(state, context) {
