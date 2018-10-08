@@ -2,6 +2,7 @@ import dotenv from 'dotenv'
 import run from '../../run'
 import createContext from '../context/createContext'
 import parseOptions from './parseOptions'
+import parseCommand from './parseCommand'
 
 /**
  * Starts a command fed by the command line aruments

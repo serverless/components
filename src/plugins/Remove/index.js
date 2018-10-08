@@ -1,9 +1,8 @@
 const Remove = {
   async run(context) {
-
     context = await context.loadProject()
     context = await context.loadApp()
-    const { app, project } = context
+    const { app } = context
     const lastDeployment = await app.loadLastDeployment()
     const lastContext = await context.loadState(lastDeployment)
 

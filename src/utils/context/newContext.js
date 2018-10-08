@@ -1,4 +1,5 @@
 import { get, pick, set } from '@serverless/utils'
+import { propOr } from 'ramda' // Eslam todo: move to @serverless/utils
 import loadApp from '../app/loadApp'
 import defineComponent from '../component/defineComponent'
 import defineComponentFromState from '../component/defineComponentFromState'
@@ -12,6 +13,7 @@ import loadPlugins from '../plugin/loadPlugins'
 import loadProject from '../project/loadProject'
 import getState from '../state/getState'
 import saveState from '../state/saveState'
+import loadState from '../state/loadState'
 import construct from '../type/construct'
 import loadType from '../type/loadType'
 
@@ -112,7 +114,7 @@ const newContext = (props) => {
       return nextContext.loadState()
     },
     loadProject: async () => {
-      const projectPath = propOr(finalContext.cwd, 'project', options)
+      const projectPath = propOr(finalContext.cwd, 'project', finalContext.options)
       const project = await loadProject(projectPath, finalContext)
       return newContext({
         ...context,

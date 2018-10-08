@@ -1,9 +1,9 @@
 import { merge } from '@serverless/utils'
 import getRootInputs from '../components/getRootInputs'
 
-const local = require('./local')
-const awsS3 = require('./aws-s3')
-const awsDynamoDB = require('./aws-dynamodb')
+const local = require('./storage/local')
+const awsS3 = require('./storage/aws-s3')
+const awsDynamoDB = require('./storage/aws-dynamodb')
 
 module.exports = async (projectPath, content, serverlessFileObject) => {
   const rootInputs = await getRootInputs(projectPath, serverlessFileObject)

@@ -1,1 +1,1 @@
-const hydrateComponent = (component, state) =
+const hydrateComponent = (component, state) => {}

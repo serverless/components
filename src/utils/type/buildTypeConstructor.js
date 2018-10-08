@@ -9,6 +9,7 @@ import {
   keys,
   last,
   set,
+  assign,
   walkReduceDepthFirst
 } from '@serverless/utils'
 import { SYMBOL_TYPE } from '../constants'
@@ -100,7 +101,7 @@ const buildTypeConstructor = (type) => {
         resolvedProps = await constructTypes(resolvedProps, context)
 
         // NOTE BRN: We set all props onto the instance after they have been resolved. We use the getOwnPropertyDescriptor and defineProperty so that we properly pass getters that may exist in the properties from the property resolution step
-        self = assign(self, resolvedProps)
+        self = Object.assign(self, resolvedProps)
 
         // NOTE BRN: If a construct method exists, call it now. This gives types one last chance to set values.
         if (main && isFunction(main.construct)) {

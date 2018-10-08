@@ -18,7 +18,7 @@ const run = async (command, context) => {
     }
     return context
   }
-  const reporter = errorReporter()
+  const reporter = await errorReporter()
   const plugin = findPluginForCommand(command, context)
   if (!plugin) {
     throw new Error(`No plugin found that handles the command '${command}'`)
