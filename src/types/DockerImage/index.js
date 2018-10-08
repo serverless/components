@@ -112,10 +112,10 @@ const DockerImage = {
     await logout(registryUrl)
 
     const outputs = { tag }
-    const state = { ...this }
-    delete state.username
-    delete state.password
-    context.saveState(this, state)
+    const newState = { ...this }
+    delete newState.username
+    delete newState.password
+    context.saveState(this, newState)
 
     context.log(`Image successfully pushed to registry "${registryUrl}"`)
 

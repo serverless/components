@@ -1,9 +1,3 @@
-const buildGraph = require('./buildGraph')
-const detectCircularDeps = require('./detectCircularDeps')
-const executeGraph = require('./executeGraph')
-
-module.exports = {
-  buildGraph,
-  detectCircularDeps,
-  executeGraph
-}
+export { default as buildGraph } from './buildGraph'
+export { default as deployGraph } from './deployGraph'
+export { default as removeGraph } from './removeGraph'

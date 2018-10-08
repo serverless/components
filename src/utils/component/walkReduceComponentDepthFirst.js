@@ -1,9 +1,11 @@
-import concat from './concat'
-import forEachIndexed from './forEachIndexed'
-import forEachObjIndexed from './forEachObjIndexed'
-import isArray from './isArray'
-import isObject from './isObject'
-import walk from './walk'
+import {
+  concat,
+  forEachIndexed,
+  forEachObjIndexed,
+  isArray,
+  isObject,
+  walk
+} from '@serverless/utils'
 
 const walkee = (accum, component, keys, iteratee, recur) => {
   let result = accum
