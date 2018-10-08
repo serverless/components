@@ -1,6 +1,6 @@
-const readline = require('readline')
+import readline from 'readline'
 
-function handleSignalEvents() {
+const handleSignalEvents = (context) => {
   // NOTE: instantiating this global variable here to keep track of the state
   // usually global variables should be "considered harmful" but are a good fit in this case
   global.signalEventHandling = {
@@ -8,7 +8,7 @@ function handleSignalEvents() {
     shouldExitGracefully: false
   }
 
-  let msg = 'Waiting for current operation to gracefully finish (this might take some seconds)...'
+  let msg = 'Waiting for current operation to gracefully finish (this might take some time)...'
 
   if (process.platform === 'win32') {
     const rl = readline.createInterface({
@@ -32,7 +32,7 @@ function handleSignalEvents() {
     global.signalEventHandling.shouldExitGracefully = true
     if (global.signalEventHandling.SIGINTCount < 2) {
       msg = `${msg} Press CTRL + C again to force an exit\nNOTE: Doing so might corrupt the applications state information!`
-      console.log(msg) // eslint-disable-line no-console
+      context.log(msg)
     } else {
       process.exit(1)
     }
@@ -40,13 +40,13 @@ function handleSignalEvents() {
 
   process.on('SIGTERM', () => {
     global.signalEventHandling.shouldExitGracefully = true
-    console.log(msg) // eslint-disable-line no-console
+    context.log(msg)
   })
 
   process.on('SIGBREAK', () => {
     global.signalEventHandling.shouldExitGracefully = true
-    console.log(msg) // eslint-disable-line no-console
+    context.log(msg)
   })
 }
 
-module.exports = handleSignalEvents
+export default handleSignalEvents

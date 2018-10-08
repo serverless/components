@@ -1,94 +1,37 @@
-import { clone, isNil, isEmpty } from 'ramda'
-import {
-  errorReporter,
-  getComponentsFromStateFile,
-  getComponentsFromServerlessFile,
-  getOrphanedComponents,
-  // getExecutedComponents,
-  buildGraph,
-  executeGraph,
-  setServiceId,
-  readStateFile,
-  writeStateFile,
-  trackDeployment,
-  handleSignalEvents,
-  packageComponent
-  // log
-} from './utils'
+import { clone, isNil, isEmpty } from '@serverless/utils'
+import { version } from '../package.json'
+import { errorReporter, findPluginForCommand } from './utils'
 
-const run = async (command, options) => {
-  options.projectPath = options.projectPath || process.cwd()
-  const { projectPath, serverlessFileObject } = options
-  if (command === 'package') {
-    return packageComponent(options)
+/**
+ * Runs a command against the given context
+ *
+ * @param {string} command
+ * @param {Context} context
+ * @returns {Promise}
+ */
+const run = async (command, context) => {
+  if (!command) {
+    if (context.options.version) {
+      context.log(`v${version}`)
+    } else {
+      context.log('TODO: output help')
+    }
+    return context
   }
-  handleSignalEvents()
-  const reporter = await errorReporter()
-  let components = {}
-  let stateFile = {}
-  let archive = {}
+  const reporter = errorReporter()
+  const plugin = findPluginForCommand(command, context)
+  if (!plugin) {
+    throw new Error(`No plugin found that handles the command '${command}'`)
+  }
   try {
-    stateFile = await readStateFile(projectPath, serverlessFileObject)
-    stateFile = setServiceId(stateFile)
-    // TODO BRN: If we're using immutable data, we shouldn't need to clone here
-    archive = clone(stateFile)
-    let componentsToUse
-    let orphanedComponents
-    let serverlessFileComponents
-    if (!isNil(serverlessFileObject) && !isEmpty(serverlessFileObject)) {
-      serverlessFileComponents = await getComponentsFromServerlessFile(
-        stateFile,
-        projectPath,
-        serverlessFileObject
-      )
-    } else {
-      serverlessFileComponents = await getComponentsFromServerlessFile(stateFile, projectPath)
-    }
-    const stateFileComponents = getComponentsFromStateFile(stateFile)
-    if (command === 'remove') {
-      componentsToUse = stateFileComponents
-      orphanedComponents = {}
-    } else {
-      componentsToUse = serverlessFileComponents
-      orphanedComponents = getOrphanedComponents(serverlessFileComponents, stateFileComponents)
-    }
-    components = { ...componentsToUse, ...orphanedComponents }
-    if (command === 'deploy') trackDeployment(componentsToUse)
-    const graph = await buildGraph(componentsToUse, orphanedComponents, command)
-    await executeGraph(graph, components, stateFile, archive, command, options, false)
-    // run the "info" command on every component after a successful deployment
-    if (command === 'deploy') {
-      // NOTE: need to re-build the graph here since we're mutating it in "executeGraph"
-      // TODO: we should refactor this code later on
-      // eslint-disable-next-line no-shadow
-      const graph = await buildGraph(componentsToUse, orphanedComponents, 'info')
-      await executeGraph(graph, components, stateFile, archive, 'info', options, false)
-    }
-  } catch (error) {
+    return plugin.run(context)
+  } catch(error) {
     if (reporter) {
+      // TODO BRN: Only report unexpected exceptions
       reporter.captureException(error)
     }
-
-    // DISABLING rollback for the launch.
-
-    // log(chalk.red(`Error: ${error.message}. Rolling back...`))
-    // const executedComponents = getExecutedComponents(components)
-    // const executedComponentsGraph = await buildGraph(executedComponents, {}, command)
-    // await executeGraph(
-    //   executedComponentsGraph,
-    //   executedComponents,
-    //   stateFile,
-    //   archive,
-    //   command,
-    //   options,
-    //   true
-    // )
-
     throw error
-  } finally {
-    await writeStateFile(projectPath, stateFile, serverlessFileObject)
   }
-  return components
 }
 
 export default run

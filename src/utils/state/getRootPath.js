@@ -1,10 +1,10 @@
-const { resolve } = require('path')
+import { resolve } from 'path'
 
-function getRootPath(stateFile, componentId) {
+const getRootPath = (stateFile, componentId) => {
   if (stateFile[componentId] && stateFile[componentId].rootPath) {
     return resolve(stateFile[componentId].rootPath)
   }
   return null
 }
 
-module.exports = getRootPath
+export default getRootPath

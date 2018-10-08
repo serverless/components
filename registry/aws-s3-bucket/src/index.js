@@ -51,23 +51,6 @@ const deploy = async (inputs, context) => {
   return outputs
 }
 
-const rollback = async (inputs, context) => {
-  const { archive, state } = context
-  if (!archive.name && state.name) {
-    context.log(`Removing Bucket: ${state.name}`)
-    await deleteBucket(state)
-  } else if (archive.name && !state.name) {
-    context.log(`Creating Bucket: ${archive.name}`)
-    await createBucket(archive)
-  } else if (archive.name !== state.name) {
-    context.log(`Removing Bucket: ${state.name}`)
-    await deleteBucket(state)
-    context.log(`Creating Bucket: ${archive.name}`)
-    await createBucket(archive)
-  }
-  return archive
-}
-
 const remove = async (inputs, context) => {
   if (!context.state.name) return {}
 
@@ -88,6 +71,5 @@ const remove = async (inputs, context) => {
 
 module.exports = {
   deploy,
-  remove,
-  rollback
+  remove
 }

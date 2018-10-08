@@ -32,7 +32,7 @@ afterAll(() => {
 
 describe('#readStateFile()', () => {
   const fileContent = {
-    $: { serviceId: 'AsH3gefdfDSY' },
+    $: { appId: 'AsH3gefdfDSY' },
     'myApp:myFunction': {
       type: 'aws-iam-function',
       internallyManaged: false,

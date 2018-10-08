@@ -1,9 +1,9 @@
-const { fileExists, readFile } = require('@serverless/utils')
-const path = require('path')
-const raven = require('raven')
-const pkg = require('../../../package.json')
+import { fileExists, readFile } from '@serverless/utils'
+import path from 'path'
+import raven from 'raven'
+import { version } from '../../../package.json'
 
-async function errorReporter() {
+const errorReporter = async () => {
   const trackingConfigFilePath = path.join('..', '..', 'tracking-config.json')
 
   if (await fileExists(trackingConfigFilePath)) {
@@ -25,4 +25,4 @@ async function errorReporter() {
   return null
 }
 
-module.exports = errorReporter
+export default errorReporter

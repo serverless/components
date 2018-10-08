@@ -8,7 +8,7 @@ module.exports = async (componentsToUse, orphanedComponents, command) => {
   // the orphaned components which should be auto-removed
   forEach((componentId) => {
     // NOTE: here we're hard-coding the association of removal with the remove command
-    graph.setNode(componentId, { type: 'orphan', command: 'remove' })
+    graph.setNode(componentId, { type: 'orphan', command: 'remove', instance })
   }, keys(orphanedComponents))
 
   // the used components

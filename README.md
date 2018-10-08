@@ -69,28 +69,28 @@ components:
       handler: products.create
       root: ${self.path}/code
       env:
-        productTableName: products-${self.serviceId}
+        productTableName: products-${self.appId}
   getProduct:
     type: aws-lambda
     inputs:
       handler: products.get
       root: ${self.path}/code
       env:
-        productTableName: products-${self.serviceId}
+        productTableName: products-${self.appId}
   listProducts:
     type: aws-lambda
     inputs:
       handler: products.list
       root: ${self.path}/code
       env:
-        productTableName: products-${self.serviceId}
+        productTableName: products-${self.appId}
 
   productsDb:
     type: aws-dynamodb
     inputs:
       region: us-east-1
       tables:
-        - name: products-${self.serviceId}
+        - name: products-${self.appId}
           hashKey: id
           indexes:
             - name: ProductIdIndex

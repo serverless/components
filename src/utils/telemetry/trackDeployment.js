@@ -1,7 +1,7 @@
-const { keys, reduce } = require('ramda')
-const track = require('./track')
+import { keys, reduce } from '@serverless/utils'
+import track from './track'
 
-module.exports = async (components) => {
+const trackDeployment = async (components) => {
   const types = reduce(
     (accum, componentId) => {
       const { type } = components[componentId]
@@ -12,12 +12,13 @@ module.exports = async (components) => {
     keys(components)
   )
 
-  const trackingData = {
+  return track('Deployment', {
     components: {
       total: keys(components).length,
       types,
       ids: keys(components)
     }
-  }
-  return track('Deployment', trackingData)
+  })
 }
+
+export default trackDeployment

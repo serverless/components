@@ -1,5 +1,6 @@
-const AWS = require('aws-sdk')
+import AWS from 'aws-sdk'
 
+// TODO BRN: Add configuration of AWS creds (perhaps StateStorage should be a type?)
 const dynamo = new AWS.DynamoDB.DocumentClient({ region: 'us-east-1' })
 
 const writeObject = async (config, content) =>
@@ -18,6 +19,6 @@ const writeObject = async (config, content) =>
     })
     .promise()
 
-module.exports = async (config, content) => {
-  return writeObject(config, content)
-}
+const write = async (config, content) => writeObject(config, content)
+
+export default write

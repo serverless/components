@@ -1,4 +1,4 @@
-import getRegistryBucketRoot from './getRegistryBucketRoot'
+import getRegistryBucketRoot from '../registry/getRegistryBucketRoot'
 import loadTypeMetaFromUrl from './loadTypeMetaFromUrl'
 
 const loadTypeMetaFromRegistry = async (registryQuery, context) => {

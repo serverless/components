@@ -1,9 +1,9 @@
-const { fileExists, getConfig, readFile } = require('@serverless/utils')
-const path = require('path')
-const Analytics = require('analytics-node')
-const getLocation = require('./getLocation')
+import { fileExists, getConfig, readFile } from '@serverless/utils'
+import path from 'path'
+import Analytics from 'analytics-node'
+import getLocation from './getLocation'
 
-module.exports = async (eventName, data = {}) => {
+const track = async (eventName, data = {}) => {
   const trackingFilePath = path.resolve(__dirname, '..', '..', '..', 'tracking-config.json')
   const { trackingDisabled, frameworkId, userId } = await getConfig()
 
@@ -19,7 +19,9 @@ module.exports = async (eventName, data = {}) => {
 
   const { segmentWriteKey } = await readFile(trackingFilePath) // eslint-disable-line
 
-  if (!segmentWriteKey) return
+  if (!segmentWriteKey) {
+    return
+  }
 
   const analytics = new Analytics(segmentWriteKey)
 
@@ -32,9 +34,11 @@ module.exports = async (eventName, data = {}) => {
   const payload = {
     event: eventName,
     userId: userId || frameworkId,
-    location: await getLocation(),
+    location,
     properties: { frameworkId, location, ...data }
   }
 
   return analytics.track(payload) // eslint-disable-line
 }
+
+export default track

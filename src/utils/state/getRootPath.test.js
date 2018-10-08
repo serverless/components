@@ -1,6 +1,6 @@
-const { getTmpDir } = require('@serverless/utils')
-const { join } = require('path')
-const getRootPath = require('./getRootPath')
+import { getTmpDir } from '@serverless/utils'
+import { join } from 'path'
+import getRootPath from './getRootPath'
 
 describe('#getRootPath()', () => {
   let oldCwd

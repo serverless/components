@@ -1,6 +1,7 @@
 export { default as anyTypeFileExistsAtPath } from './anyTypeFileExistsAtPath'
 export { default as construct } from './construct'
 export { default as defType } from './defType'
+export { default as isType } from './isType'
 export { default as isTypeName } from './isTypeName'
 export { default as loadType } from './loadType'
 export { default as loadTypes } from './loadTypes'

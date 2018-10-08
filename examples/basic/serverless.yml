@@ -14,3 +14,6 @@ components:
     type: aws-iam-role@0.2.0
     inputs:
       service: lambda.amazonaws.com
+  myBucket:
+    type: AwsS3Bucket
+    inputs: ...

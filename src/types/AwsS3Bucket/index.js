@@ -5,9 +5,12 @@ const REPLACE = 'replace'
 
 const AwsS3Bucket = {
   construct(inputs, context) {
-    const state = context.getState(this)
-    this.bucketName = state.bucketName || inputs.bucketName
+    this.bucketName = inputs.bucketName
     this.provider = inputs.provider || context.get('provider')
+  },
+
+  hydrate(state) {
+    this.bucketName = state.bucketName || this.bucketName
   },
 
   shouldDeploy(prevInstance) {
@@ -20,7 +23,7 @@ const AwsS3Bucket = {
   },
 
   async deploy(prevInstance, context) {
-    context.log(`Creating Bucket: '${this.bucketName}'`)
+    context.log(`Creating Bucket: '${get('bucketName', this)}'`)
     await createBucket(this)
     context.saveState(this, { bucketName: this.bucketName }) // provider?
   },

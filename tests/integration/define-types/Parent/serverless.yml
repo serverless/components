@@ -1,0 +1,19 @@
+extends: Component
+name: Parent
+main: ./index.js
+
+inputTypes:
+  bar:
+    type: string
+
+bar: ${inputs.bar}
+
+components:
+  childA:
+    type: ./Child
+    inputs:
+      foo: abc
+  childB:
+    type: ./Child
+    inputs:
+      foo: def

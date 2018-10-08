@@ -9,6 +9,13 @@ import requireTypeMain from './requireTypeMain'
 const DEFAULT_MAIN = (SuperClass) => class extends SuperClass {}
 const LOADING_TYPES = new Set()
 
+/**
+ * Define a type using the given root path and property declarations
+ *
+ * @param {{ root: string, props: Object }} def The type definition
+ * @param {Context} context The context object
+ * @returns {Type}
+ */
 const defType = async ({ root, props }, context) => {
   if (!isObject(props)) {
     throw new Error('defType expects an object witha props property that is an object')

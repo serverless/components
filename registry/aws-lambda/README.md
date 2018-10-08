@@ -52,7 +52,7 @@ components:
       root: '${self.path}/code'
       env:
         foo: true
-        tableName: 'products-${self.serviceId}'
+        tableName: 'products-${self.appId}'
 
 ```
 <!-- AUTO-GENERATED-CONTENT:END -->
