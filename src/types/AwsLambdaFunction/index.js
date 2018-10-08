@@ -2,8 +2,7 @@ import path from 'path'
 import { tmpdir } from 'os'
 import archiver from 'archiver'
 import { createWriteStream, createReadStream, readFileSync } from 'fs'
-import { forEach, is } from 'ramda'
-import { map } from '@serverless/utils/dist/index'
+import { forEach, is } from '@serverless/utils'
 
 const createLambda = async (
   Lambda,

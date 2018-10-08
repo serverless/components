@@ -10,9 +10,12 @@ inputTypes:
   providers:
     type: Object
     default: ${context.providers}
+    required: false
   compute:
     type: Object
     default: ${context.compute}
+    required: false
   functions:
     type: Object
     default: ${context.functions}
+    required: false

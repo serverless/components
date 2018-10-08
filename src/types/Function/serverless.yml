@@ -3,7 +3,7 @@ extends: Component
 main: ./index.js
 
 version: 0.3.0
-description: "A cloud agnostic Severless function"
+description: "A cloud agnostic Severless Function"
 
 functionName: ${inputs.functionName}
 functionDescription: ${inputs.functionDescription}
