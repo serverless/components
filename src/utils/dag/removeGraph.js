@@ -1,5 +1,5 @@
 import { Graph } from 'graphlib'
-import { forEach } from '@serverless/utils'
+import { all, map } from '@serverless/utils'
 
 const removeGraph = (graph, startingInstanceId, context) => {
   // get ordered list of nodes that "depend on" others using preorder traversal
@@ -7,11 +7,14 @@ const removeGraph = (graph, startingInstanceId, context) => {
   //  the "sinks & leaves" strategy in the previous implementation
   const instancesToRemove = Graph.alg.preorder(graph, startingInstanceId)
 
-  forEach(async (node) => {
-    if (['remove', 'replace'].includes(node.operation)) {
-      await node.prevInstance.deploy(node.prevInstance, context) // do we pass prevInstance in that case?! or the one prev to that?
-    }
-  }, instancesToRemove)
+  // todo use map series
+  return all(
+    map(async (node) => {
+      if (['remove', 'replace'].includes(node.operation)) {
+        await node.prevInstance.remove(context)
+      }
+    }, instancesToRemove)
+  )
 }
 
 export default removeGraph

@@ -18,20 +18,19 @@ const Deploy = {
     // TODO BRN (low priority): inputs to the top level might be a way to inject project/deployment config
 
     // WARNING BRN: this is the newer type. It is possible that this code has changed so much from the prev deployment that it's not possible to build an accurate represention of what was deployed. Could cause issues. Need a way to reconcile this eventually. Perhaps packaging up the project on each deployment and storing it away for use in this scenario (along with the config that was used to perform the deployment).
-    let prevInstance = await prevContext.construct(context.project.Type, {})
+    let prevInstance = await prevContext.construct(prevContext.project.Type, {})
     prevInstance = setKey('$', prevInstance)
     // NOTE BRN: prevInstance gets defined based on what was stored into state
     prevInstance = await prevContext.defineComponentFromState(prevInstance)
 
-    let nextInstance = await nextContext.construct(project.Type)
+    let nextInstance = await nextContext.construct(nextContext.project.Type)
     nextInstance = setKey('$', nextInstance)
     // NOTE BRN: nextInstance gets defined based on serverless.yml and type code
     nextInstance = await nextContext.defineComponent(nextInstance)
 
-    const graph = buildGraph(nextInstance, prevInstance)
-
-    await deployGraph(graph, nextInstance.instanceId, context)
-    await removeGraph(graph, nextInstance.instanceId, context) // nextInstance is the starting point, right?!
+    let graph = buildGraph(nextInstance, prevInstance)
+    graph = await deployGraph(graph, nextInstance.instanceId, nextInstance)
+    graph = await removeGraph(graph, prevContext.instanceId, prevContext)
 
     // TODO BRN (high priority): build a deployment graph based upon the prevInstance and the nextInstance. Please note that all of the code in the "utils/dag" will need to be refactored based upon the following instructions. Please also update it to use imports/exports as we do in the rest of the utils folders.
     //

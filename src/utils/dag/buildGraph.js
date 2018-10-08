@@ -14,16 +14,7 @@ const buildGraph = (nextInstance, prevInstance) => {
         nextInstance: currentInstance
       }
       accum.setNode(currentInstance.instanceId, node)
-      return accum
-    },
-    graph,
-    nextInstance
-  )
-
-  // edges
-  graph = walkReduceComponentDepthFirst(
-    (accum, currentInstance) => {
-      const childrenIds = currentInstance.getChildrenIds()
+      const childrenIds = getChildrendIds(currentInstance)
       forEach((childId) => {
         accum.setEdge(currentInstance.instanceId, childId)
       }, childrenIds)
@@ -43,10 +34,11 @@ const buildGraph = (nextInstance, prevInstance) => {
         node = {
           instanceId: currentInstance.instanceId,
           operation: 'remove',
-          nextInstance: {} // what should be nextInstance in that case?
+          nextInstance: null
         }
         accum.setNode(currentInstance.instanceId, node)
-        accum.setEdge(currentInstance.parent, currentInstance.instanceId) // edge from parent to child
+        // todo validate parent
+        accum.setEdge(currentInstance.parent.instanceId, currentInstance.instanceId) // edge from parent to child
       }
       node.prevInstance = currentInstance
       accum.setNode(currentInstance.instanceId, node)
