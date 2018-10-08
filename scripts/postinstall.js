@@ -15,4 +15,6 @@ function trackInstall() {
   })
 }
 
-trackInstall().catch((error) => {/*do noting*/})
+trackInstall().catch((error) => {
+  /*do noting*/
+})

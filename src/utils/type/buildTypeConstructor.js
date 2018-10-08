@@ -16,7 +16,6 @@ import hasVariableString from '../variable/hasVariableString'
 import newVariable from '../variable/newVariable'
 import isTypeConstruct from './isTypeConstruct'
 
-
 const resolveProps = (props, data) =>
   walkReduceDepthFirst(
     (accum, value, pathParts) => {
@@ -86,7 +85,6 @@ const buildTypeConstructor = (type) => {
 
         // NOTE BRN: set the type onto the instance so that we can use it in cases of reflection.
         self[SYMBOL_TYPE] = Type
-
 
         // NOTE BRN: variables in inputs should already be resolved outside of the call to this constructor method. There should be no need to resolve them again here.
 

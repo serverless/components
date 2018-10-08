@@ -12,11 +12,8 @@ const Deploy = {
     const prevContext = await context.loadPreviousDeployment()
     const nextContext = await context.createDeployment(prevContext.deployment)
 
-
     // TODO BRN (low priority): Upgrade this signal handling so that we can tie in a handler that knows what to do when a SIGINT is received. In the case of deploy we may want to ignore the first one and log out the message, then if we receive anther one we stop the current deployment and start a rollback
     handleSignalEvents(context)
-
-
 
     // TODO BRN (low priority): inputs to the top level might be a way to inject project/deployment config
 
@@ -26,12 +23,10 @@ const Deploy = {
     // NOTE BRN: prevInstance gets defined based on what was stored into state
     prevInstance = await prevContext.defineComponentFromState(prevInstance)
 
-
     let nextInstance = await nextContext.construct(project.Type)
     nextInstance = setKey('$', nextInstance)
     // NOTE BRN: nextInstance gets defined based on serverless.yml and type code
     nextInstance = await nextContext.defineComponent(nextInstance)
-
 
     // TODO BRN (high priority): build a deployment graph based upon the prevInstance and the nextInstance. Please note that all of the code in the "utils/dag" will need to be refactored based upon the following instructions. Please also update it to use imports/exports as we do in the rest of the utils folders.
     //
@@ -59,7 +54,6 @@ const Deploy = {
     //    - as you walk through each instance on the tree, load the corresponding node from the graph and set the prevInstance property on the node.
     //    - If the node does not exist on the graph, it means the node needs to be removed. Add the node to the graph. Set the prevInstance property, the instanceId and the operation to "remove". Also add an edge from the instances parent to the child that will be removed. You can access a child's parent using the `instance.parent` property
 
-
     // Deploying the Graph
     // We should execute the deployment of the graph in a few phases
     //  1. First execute all deploy operations.
@@ -72,7 +66,6 @@ const Deploy = {
     //    - note the reverse order from deploy. This requires traversing the graph backward.
     //    - remove should be called against the "prevInstance" value of the graph node
     //    - If a "replace" is encountered, call remove() on the prevInstance value in the graph node.
-
 
     // Deployment complete!
 

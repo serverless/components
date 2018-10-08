@@ -16,21 +16,24 @@ import construct from '../type/construct'
 import loadType from '../type/loadType'
 
 const newContext = (props) => {
-  const context = pick([
-    'app',
-    'cache',
-    'cwd',
-    'data',
-    'deployment',
-    'options',
-    'overrides',
-    'plugins',
-    'project',
-    'registry',
-    'root',
-    'state',
-    'Type'
-  ], props)
+  const context = pick(
+    [
+      'app',
+      'cache',
+      'cwd',
+      'data',
+      'deployment',
+      'options',
+      'overrides',
+      'plugins',
+      'project',
+      'registry',
+      'root',
+      'state',
+      'Type'
+    ],
+    props
+  )
   const overrides = context.overrides || {}
   const finalContext = {
     ...context,
@@ -41,7 +44,9 @@ const newContext = (props) => {
     generateInstanceId: () => {
       const { app } = finalContext
       if (!app) {
-        throw new Error('generateInstanceId method expects context to have an app loaded. You must first call loadApp on context before calling generateInstanceId')
+        throw new Error(
+          'generateInstanceId method expects context to have an app loaded. You must first call loadApp on context before calling generateInstanceId'
+        )
       }
       return generateInstanceId(app.id)
     },
@@ -56,7 +61,9 @@ const newContext = (props) => {
       }
       const { project } = finalContext
       if (!project) {
-        throw new Error('loadApp method expects context to have a project loaded. You must first call loadProject on context before calling loadApp')
+        throw new Error(
+          'loadApp method expects context to have a project loaded. You must first call loadProject on context before calling loadApp'
+        )
       }
 
       const appId = `${project.name}-${stage}`
@@ -69,7 +76,9 @@ const newContext = (props) => {
     loadDeployment: async (deploymentId) => {
       const { app } = finalContext
       if (!app) {
-        throw new Error('loadDeployment method expects context to have an app loaded. You must first call loadApp on context before calling loadDeployment')
+        throw new Error(
+          'loadDeployment method expects context to have an app loaded. You must first call loadApp on context before calling loadDeployment'
+        )
       }
       const deployment = await loadDeployment(deploymentId, app)
 
@@ -90,7 +99,9 @@ const newContext = (props) => {
     loadPreviousDeployment: async () => {
       const { app } = finalContext
       if (!app) {
-        throw new Error('loadPreviousDeployment method expects context to have an app loaded. You must first call loadApp on context before calling loadPreviousDeployment')
+        throw new Error(
+          'loadPreviousDeployment method expects context to have an app loaded. You must first call loadApp on context before calling loadPreviousDeployment'
+        )
       }
       const deployment = await loadPreviousDeployment(app)
 
@@ -111,7 +122,9 @@ const newContext = (props) => {
     loadState: async () => {
       const { deployment } = finalContext
       if (!deployment) {
-        throw new Error('loadState method expects context to have a deployment loaded. You must first call loadDeployment, loadPreviousDeployment or createDeployment on context before calling loadState')
+        throw new Error(
+          'loadState method expects context to have a deployment loaded. You must first call loadDeployment, loadPreviousDeployment or createDeployment on context before calling loadState'
+        )
       }
       const state = await loadState(deployment)
       return newContext({
