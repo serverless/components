@@ -8,7 +8,10 @@ const getState = (query, state) => {
       return stateObject.state || {}
     }
   } else if (getKey(query)) {
-    return find((stateObject) => stateObject.key === getKey(query), state)
+    const stateObject = find((fState) => fState.key === getKey(query), state)
+    if (stateObject && stateObject.state) {
+      return stateObject.state || {}
+    }
   }
   return {}
 }

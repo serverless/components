@@ -3,10 +3,6 @@ import { shallowEquals } from '@serverless/utils'
 const DEPLOY = 'deploy'
 
 const Component = {
-  async construct(context) {
-    const state = context.getState(this)
-  },
-
   hydrate(state, context) {
     this.instanceId = state.instanceId || context.generateInstanceId()
   },

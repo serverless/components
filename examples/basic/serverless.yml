@@ -1,9 +1,9 @@
-type: my-project
-version: 0.0.1
+name: MyProject
+extends: Component
 
 components:
   myFunction:
-    type: aws-lambda@0.2.0
+    type: AwsLambdaFunction
     inputs:
       memory: 512
       timeout: 10
@@ -11,9 +11,6 @@ components:
       role:
         arn: ${myRole.arn}
   myRole:
-    type: aws-iam-role@0.2.0
+    type: AwsIamRole
     inputs:
       service: lambda.amazonaws.com
-  myBucket:
-    type: AwsS3Bucket
-    inputs: ...

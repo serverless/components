@@ -1,3 +1,3 @@
-const SYMBOL_KEY = typeof Symbol !== 'undefined' ? Symbol('@@key') : '@@key'
+const SYMBOL_KEY = '@@key'
 
 export default SYMBOL_KEY
