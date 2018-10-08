@@ -98,7 +98,8 @@ export default {
       })
     }
     context.saveState(this, { ...inputs, ...outputs })
-    return outputs
+    Object.assign(this, outputs)
+    return this
   },
 
   async remove(prevInstance, context) {
@@ -119,6 +120,7 @@ export default {
     }
 
     context.saveState(this, {})
-    return outputs
+    Object.assign(this, outputs)
+    return this
   }
 }
