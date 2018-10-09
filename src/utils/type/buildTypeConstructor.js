@@ -21,7 +21,7 @@ const interpretProps = async (props, data, ctx) => {
   const context = ctx.merge({ root: ctx.Type.root })
   return walkReduceDepthFirst(
     async (accum, value, pathParts) => {
-      let interpretedProps = await accum
+      const interpretedProps = await accum
       if (isString(value) && hasVariableString(value)) {
         const parentPathParts = init(pathParts)
         const lastPathPart = last(pathParts)
@@ -43,11 +43,8 @@ const interpretProps = async (props, data, ctx) => {
 }
 
 const constructTypes = async (props, ctx) => {
-
   return walkReduceDepthFirst(
     async (accum, value, pathParts) => {
-
-
       return constructedProps
     },
     props,
@@ -78,12 +75,16 @@ const buildTypeConstructor = (type) => {
         // NOTE BRN: variables in inputs should already be resolved outside of the call to this constructor method. There should be no need to resolve them again here.
 
         // NOTE BRN: properties are first resolved since all the values in props are references to the execution context of the current type. We clone the properties here so that we don't change the base property descriptions from the Type.
-        const selfProps = await interpretProps(clone(props), {
-          this: self,
-          self,
-          inputs,
+        const selfProps = await interpretProps(
+          clone(props),
+          {
+            this: self,
+            self,
+            inputs,
+            context
+          },
           context
-        }, context)
+        )
 
         // NOTE BRN: This step walks depth first through the properties and creates instances for any property that has both a 'type' and 'inputs' combo. Lower level instances are created first so in case we have nested constructions the higher construction will receive an instance as an input instead of the { type, inputs }
         // selfProps = await constructTypes(selfProps, context)

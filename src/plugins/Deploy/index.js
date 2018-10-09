@@ -1,7 +1,6 @@
 import { isEmpty } from '@serverless/utils'
 import { handleSignalEvents, setKey, buildGraph, deployGraph, removeGraph } from '../../utils'
 
-
 const createInstance = async (context) => {
   let instance = await context.construct(context.project.Type)
   instance = setKey('$', instance)
@@ -41,9 +40,8 @@ const Deploy = {
 
     // TODO BRN (low priority): inputs to the top level might be a way to inject project/deployment config
 
-
-    let prevInstance = await loadInstanceFromState(prevContext)
-    let nextInstance = await createInstance(nextContext)
+    const prevInstance = await loadInstanceFromState(prevContext)
+    const nextInstance = await createInstance(nextContext)
 
     const graph = buildGraph(nextInstance, prevInstance)
 

@@ -10,7 +10,9 @@ const buildGraph = (nextInstance, prevInstance) => {
   graph = walkReduceComponentDepthFirst(
     (accum, currentInstance) => {
       if (!currentInstance.instanceId) {
-        throw new Error(`While building the dependency graph we detected a component instance doesn't have an instanceId. This shouldn't happen. Something has gone wrong. ${currentInstance}`)
+        throw new Error(
+          `While building the dependency graph we detected a component instance doesn't have an instanceId. This shouldn't happen. Something has gone wrong. ${currentInstance}`
+        )
       }
       const node = {
         instanceId: currentInstance.instanceId,
@@ -43,7 +45,9 @@ const buildGraph = (nextInstance, prevInstance) => {
       (accum, currentInstance) => {
         console.log('prevInstance nodes currentInstance:', currentInstance)
         if (!currentInstance.instanceId) {
-          throw new Error(`While building the dependency graph we detected a component instance doesn't have an instanceId. This shouldn't happen. Something has gone wrong. ${currentInstance}`)
+          throw new Error(
+            `While building the dependency graph we detected a component instance doesn't have an instanceId. This shouldn't happen. Something has gone wrong. ${currentInstance}`
+          )
         }
         let node = accum.node(currentInstance.instanceId)
 

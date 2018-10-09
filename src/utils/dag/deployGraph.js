@@ -3,7 +3,6 @@ import { Graph } from 'graphlib'
 import resolveVariables from '../variable/resolveVariables'
 import cloneGraph from './cloneGraph'
 
-
 const deployNode = async (node, context) => {
   const nextInstance = resolveVariables(node.nextInstance)
   const prevInstance = resolveVariables(node.prevInstance)
@@ -12,17 +11,14 @@ const deployNode = async (node, context) => {
   }
 }
 
-const deployNodeIds = async (nodeIds, graph, context) => all(
-  map(
-    async (nodeId) => {
+const deployNodeIds = async (nodeIds, graph, context) =>
+  all(
+    map(async (nodeId) => {
       const node = graph.node(nodeId)
       await deployNode(node, context)
       graph.removeNode(nodeId)
-    },
-    nodeIds
+    }, nodeIds)
   )
-)
-
 
 const deployLeaves = async (graph, context) => {
   const leaves = graph.sinks()
@@ -43,7 +39,6 @@ const deployLeaves = async (graph, context) => {
   //
   // return execute(graph, components, stateFile, archive, command, options, rollback)
 }
-
 
 const deployGraph = async (graph, context) => deployLeaves(cloneGraph(graph), context)
 
