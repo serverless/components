@@ -36,7 +36,6 @@ const AwsLambdaCompute = async (SuperClass, superContext) => {
   const AwsLambdaFunction = await superContext.loadType('AwsLambdaFunction')
   return {
     async defineFunction(functionInstance, context) {
-      // console.log(functionInstance.runtime)
       const runtime = convertRuntime(this.runtime.get())
       let code = functionInstance.code.get()
       if (isString(code)) {
@@ -72,7 +71,7 @@ const AwsLambdaCompute = async (SuperClass, superContext) => {
       const AwsEventsRule = await context.loadType('AwsEventsRule')
       const inputs = {
         provider: this.provider.get(),
-        lambdaArn: functionInstance.arn,
+        function: functionInstance,
         schedule: parseRate(rate),
         enabled: true
       }

@@ -4,7 +4,7 @@ const AwsEventsRule = {
   construct(inputs) {
     this.provider = inputs.provider
     // this.lambdaArn = inputs.lambdaArn
-    this.functionObj = inputs.functionObj
+    this.function = inputs.function
     this.schedule = inputs.schedule
     this.enabled = inputs.enabled
     // this.name = inputs.lambdaArn.split(':')[inputs.lambdaArn.split(':').length - 1]
@@ -12,13 +12,8 @@ const AwsEventsRule = {
   },
 
   async define(context) {
-    const AwsLambdaCompute = await context.loadType('AwsLambdaCompute')
-    const inputs = {
-      provider: this.provider,
-      ...this.functionObj
-    }
-    const awsEventsRule = context.construct(AwsEventsRule, inputs)
-    this.lambda = awsEventsRule.defineFunction()
+    const compute = this.function.compute.get()
+    this.lambda = await compute.defineFunction(this.function, context)
     return { lambda: this.lambda }
   },
 
