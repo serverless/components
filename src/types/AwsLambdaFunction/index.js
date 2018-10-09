@@ -145,11 +145,10 @@ const AwsLambdaFunction = {
     })
   },
   async define(context) {
-    let role
     if (!this.role) {
       const DefaultRole = await context.loadType('AwsIamRole')
 
-      role = await context.construct(
+      this.role = await context.construct(
         DefaultRole,
         {
           name: `${this.name}-execution-role`,
@@ -159,7 +158,7 @@ const AwsLambdaFunction = {
         context
       )
     }
-    return { role } // arn:
+    return { role: this.role } // arn:
   },
   async deploy(prevInstance, context) {
     const AWS = this.provider.getSdk()
