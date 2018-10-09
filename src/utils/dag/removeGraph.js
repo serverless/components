@@ -3,7 +3,6 @@ import { Graph } from 'graphlib'
 import resolveVariables from '../variable/resolveVariables'
 import cloneGraph from './cloneGraph'
 
-
 const removeNode = async (node, context) => {
   const prevInstance = resolveVariables(node.prevInstance)
   if (['remove', 'replace'].includes(node.operation)) {
@@ -11,17 +10,14 @@ const removeNode = async (node, context) => {
   }
 }
 
-const removeNodeIds = async (nodeIds, graph, context) => all(
-  map(
-    async (nodeId) => {
+const removeNodeIds = async (nodeIds, graph, context) =>
+  all(
+    map(async (nodeId) => {
       const node = graph.node(nodeId)
       await removeNode(node, context)
       graph.removeNode(nodeId)
-    },
-    nodeIds
+    }, nodeIds)
   )
-)
-
 
 const removeLeaves = async (graph, context) => {
   const leaves = graph.sources()
@@ -42,7 +38,6 @@ const removeLeaves = async (graph, context) => {
   //
   // return execute(graph, components, stateFile, archive, command, options, rollback)
 }
-
 
 const removeGraph = async (graph, context) => removeLeaves(cloneGraph(graph), context)
 

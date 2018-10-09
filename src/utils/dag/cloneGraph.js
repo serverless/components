@@ -1,7 +1,6 @@
 import { clone, forEach, isUndefined, map } from '@serverless/utils'
 import { Graph } from 'graphlib'
 
-
 const cloneNodes = (graph) =>
   map((v) => {
     const nodeValue = graph.node(v)
@@ -16,7 +15,6 @@ const cloneNodes = (graph) =>
     return node
   }, graph.nodes())
 
-
 const cloneEdges = (graph) =>
   map((edge) => {
     const edgeValue = graph.edge(edge)
@@ -30,7 +28,6 @@ const cloneEdges = (graph) =>
     return edgeObject
   }, graph.edges())
 
-
 const graphToObject = (graph) => {
   const object = {
     options: {
@@ -40,7 +37,7 @@ const graphToObject = (graph) => {
     },
     nodes: cloneNodes(graph),
     edges: cloneEdges(graph)
-  };
+  }
   if (!isUndefined(graph.graph())) {
     object.value = clone(graph.graph())
   }
@@ -62,7 +59,6 @@ const objectToGraph = (object) => {
 
   return graph
 }
-
 
 const cloneGraph = (graph) => objectToGraph(graphToObject(graph))
 
