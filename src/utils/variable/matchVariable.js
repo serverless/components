@@ -11,12 +11,18 @@ import { regex } from './regexVariable'
  */
 const matchVariable = (string) => {
   const result = string.match(regex)
-  if (!result) {
-    return result
+  let expression
+  let match
+  let exact
+  if (result) {
+    expression = result[1]
+    match = result[0]
+    exact = result.input === result[0]
   }
   return {
-    expression: result[1],
-    exact: result.input === result[0]
+    expression,
+    match,
+    exact
   }
 }
 

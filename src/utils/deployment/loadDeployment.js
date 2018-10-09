@@ -1,6 +1,7 @@
 import { dirExists, toInteger } from '@serverless/utils'
 import { join } from 'path'
 import newDeployment from './newDeployment'
+import parseDeploymentNumber from './parseDeploymentNumber'
 
 const loadDeployment = async (id, app) => {
   const { project } = app
@@ -10,7 +11,7 @@ const loadDeployment = async (id, app) => {
       `Cannot load deployment directory. Deployment directory '${path}' does not exist.`
     )
   }
-  const number = toInteger(id.replace(`${app.id}-`, ''))
+  const number = parseDeploymentNumber(id)
   return newDeployment({
     app,
     id,

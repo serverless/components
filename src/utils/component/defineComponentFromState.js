@@ -14,7 +14,7 @@ const defineComponentFromState = async (component, context) => {
   //   forEach((child) => child.parent = component, children)
   //   component.children = await all(map((child) => define(child, context), children))
   // }
-  // return component
+  return component
 }
 
 export default defineComponentFromState

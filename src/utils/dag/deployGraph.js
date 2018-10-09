@@ -1,20 +1,50 @@
+import { all, isEmpty, map } from '@serverless/utils'
 import { Graph } from 'graphlib'
-import { all, map } from '@serverless/utils'
+import resolveVariables from '../variable/resolveVariables'
+import cloneGraph from './cloneGraph'
 
-const deployGraph = async (graph, startingInstanceId, context) => {
-  // get ordered list of nodes that are "dependend upon" by others using postorder traversal
-  // hmm that wouldn't execute in parallel though, which is why I reverted to
-  //  the "sinks & leaves" strategy in the previous implementation
-  const instancesToDeploy = Graph.alg.postorder(graph, startingInstanceId)
 
-  // todo use map series
-  return all(
-    map(async (node) => {
-      if (['deploy', 'replace'].includes(node.operation)) {
-        await node.nextInstance.deploy(node.prevInstance, context)
-      }
-    }, instancesToDeploy)
-  )
+const deployNode = async (node, context) => {
+  const nextInstance = resolveVariables(node.nextInstance)
+  const prevInstance = resolveVariables(node.prevInstance)
+  if (['deploy', 'replace'].includes(node.operation)) {
+    await nextInstance.deploy(prevInstance, context)
+  }
 }
+
+const deployNodeIds = async (nodeIds, graph, context) => all(
+  map(
+    async (nodeId) => {
+      const node = graph.node(nodeId)
+      await deployNode(node, context)
+      graph.removeNode(nodeId)
+    },
+    nodeIds
+  )
+)
+
+
+const deployLeaves = async (graph, context) => {
+  const leaves = graph.sinks()
+
+  if (isEmpty(leaves)) {
+    return graph
+  }
+
+  await deployNodeIds(leaves, graph, context)
+  return deployLeaves(graph, context)
+  //
+  // // allow all executions to complete without terminating
+  // const suppressErrors = (p) => p.catch(() => {})
+  // await Promise.all(map(suppressErrors, executions))
+  //
+  // // if any executions failed, throw the error
+  // await Promise.all(executions)
+  //
+  // return execute(graph, components, stateFile, archive, command, options, rollback)
+}
+
+
+const deployGraph = async (graph, context) => deployLeaves(cloneGraph(graph), context)
 
 export default deployGraph
