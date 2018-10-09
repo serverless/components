@@ -16,6 +16,8 @@ const NATIVE_NAMES = {
   AwsLambdaFunction: resolve(__dirname, '..', '..', 'types', 'AwsLambdaFunction'),
   AwsIamRole: resolve(__dirname, '..', '..', 'types', 'AwsIamRole'),
   AwsLambdaCompute: resolve(__dirname, '..', '..', 'types', 'AwsLambdaCompute'),
+  AwsEventsRule: resolve(__dirname, '..', '..', 'types', 'AwsEventsRule'),
+  Cron: resolve(__dirname, '..', '..', 'types', 'Cron'),
   AwsS3Bucket: resolve(__dirname, '..', '..', 'types', 'AwsS3Bucket')
 }
 

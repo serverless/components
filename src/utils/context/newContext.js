@@ -159,7 +159,15 @@ const newContext = (props) => {
         ...context,
         ...value
       }),
-    saveState: (query, state) => saveState(query, state, finalContext),
+    saveState: (query, state) => {
+      const { deployment } = finalContext
+      if (!deployment) {
+        throw new Error(
+          'saveState method expects context to have a deployment loaded. You must first call loadDeployment, loadPreviousDeployment or createDeployment on context before calling saveState'
+        )
+      }
+      return saveState(deployment, state)
+    },
     set: (selector, value) =>
       newContext({
         ...context,

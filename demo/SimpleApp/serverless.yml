@@ -1,0 +1,6 @@
+name: SimpleApp
+extends: App
+
+services:
+  simpleService:
+    type: ./SimpleService

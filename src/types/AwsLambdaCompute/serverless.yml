@@ -1,3 +1,33 @@
 name: AwsLambdaCompute
 extends: Compute
 main: ./index.js
+version: 0.3.0
+core: 0.3.x
+
+description: "AWS Lambda Compute"
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
+
+inputTypes:
+  provider:
+    type: Provider
+    default: ${context.provider}
+  runtime:
+    type: string
+    required: false
+  memory:
+    type: string
+    default: 1024
+    required: false
+  timeout:
+    type: string
+    default: 10
+    required: false
+  environment:
+    type: object
+    required: false
+  tags:
+    type: object
+    required: false
+

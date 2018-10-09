@@ -93,6 +93,16 @@ const deleteLambda = async (Lambda, name) => {
 }
 
 const AwsLambdaFunction = {
+  construct(inputs) {
+    this.provider = inputs.provider
+    this.functionName = inputs.functionName
+    this.memorySize = inputs.memorySize
+    this.timeout = inputs.timeout
+    this.runtime = inputs.runtime
+    this.handler = inputs.handler
+    this.environment = inputs.environment
+    this.code = inputs.code
+  },
   async pack() {
     let inputDirPath = this.code // string path to code dir
 
@@ -152,26 +162,28 @@ const AwsLambdaFunction = {
     return { role } // arn:
   },
   async deploy(prevInstance, context) {
-    const Lambda = new this.provider.sdk.Lambda()
+    const AWS = this.provider.getSdk()
+    const Lambda = new AWS.Lambda()
+    console.log('lambda')
 
-    await this.pack(context)
-
-    if (this.name && !prevInstance.name) {
-      context.log(`Creating Lambda: ${this.name}`)
-      this.arn = await createLambda(Lambda, this)
-    } else if (prevInstance.name && !this.name) {
-      context.log(`Removing Lambda: ${prevInstance.name}`)
-      this.arn = await deleteLambda(Lambda, prevInstance.name)
-    } else if (this.name !== prevInstance.name) {
-      context.log(`Removing Lambda: ${prevInstance.name}`)
-      await deleteLambda(Lambda, prevInstance.name)
-      context.log(`Creating Lambda: ${this.name}`)
-      this.arn = await createLambda(Lambda, this)
-    } else {
-      context.log(`Updating Lambda: ${this.name}`)
-      this.arn = await updateLambda(Lambda, this)
-    }
-    return this
+    // await this.pack(context)
+    //
+    // if (!prevInstance) {
+    //   context.log(`Creating Lambda: ${this.name}`)
+    //   this.arn = await createLambda(Lambda, this)
+    // } else if (prevInstance.name && !this.name) {
+    //   context.log(`Removing Lambda: ${prevInstance.name}`)
+    //   this.arn = await deleteLambda(Lambda, prevInstance.name)
+    // } else if (this.name !== prevInstance.name) {
+    //   context.log(`Removing Lambda: ${prevInstance.name}`)
+    //   await deleteLambda(Lambda, prevInstance.name)
+    //   context.log(`Creating Lambda: ${this.name}`)
+    //   this.arn = await createLambda(Lambda, this)
+    // } else {
+    //   context.log(`Updating Lambda: ${this.name}`)
+    //   this.arn = await updateLambda(Lambda, this)
+    // }
+    // await context.saveState({ arn: this.arn })
   },
   async remove(prevInstance, context) {
     if (!prevInstance.name) return this

@@ -81,12 +81,14 @@ const updateAssumeRolePolicy = async (IAM, { name, service }) => {
 const AwsIamRole = {
   construct({ provider, name, service, policy }) {
     this.provider = provider
-    this.name = name
+    this.roleName = name
     this.service = service
     this.policy = policy
   },
   async deploy(prevInstance, context) {
-    const IAM = new this.provider.sdk.IAM()
+    console.log('iam')
+    const AWS = this.provider.getSdk()
+    const IAM = new AWS.IAM()
 
     if (!this.policy) {
       this.policy = {
@@ -94,28 +96,30 @@ const AwsIamRole = {
       }
     }
 
-    if (!prevInstance.name && this.name) {
-      context.log(`Creating Role: ${prevInstance.name}`)
-      this.arn = await createRole(IAM, this)
-    } else if (!this.name && prevInstance.name) {
-      context.log(`Removing Role: ${prevInstance.name}`)
-      this.arn = await deleteRole(IAM, prevInstance)
-    } else if (prevInstance.name !== this.name) {
-      context.log(`Removing Role: ${prevInstance.name}`)
-      await deleteRole(IAM, prevInstance)
-      context.log(`Creating Role: ${this.name}`)
-      this.arn = await createRole(IAM, this)
-    } else {
-      if (prevInstance.service !== this.service) {
-        await updateAssumeRolePolicy(IAM, this)
-      }
-      if (!equals(prevInstance.policy, this.policy)) {
-        await detachRolePolicy(IAM, this)
-        await attachRolePolicy(IAM, this)
-      }
-    }
+    // this.arn = 'abc'
 
-    return this
+    // if (!prevInstance) {
+    //   context.log(`Creating Role: ${this.name}`)
+    //   this.arn = await createRole(IAM, this)
+    // } else if (!this.name && prevInstance.name) {
+    //   context.log(`Removing Role: ${prevInstance.name}`)
+    //   this.arn = await deleteRole(IAM, prevInstance)
+    // } else if (prevInstance.name !== this.name) {
+    //   context.log(`Removing Role: ${prevInstance.name}`)
+    //   await deleteRole(IAM, prevInstance)
+    //   context.log(`Creating Role: ${this.name}`)
+    //   this.arn = await createRole(IAM, this)
+    // } else {
+    //   if (prevInstance.service !== this.service) {
+    //     await updateAssumeRolePolicy(IAM, this)
+    //   }
+    //   if (!equals(prevInstance.policy, this.policy)) {
+    //     await detachRolePolicy(IAM, this)
+    //     await attachRolePolicy(IAM, this)
+    //   }
+    // }
+
+    // await context.saveState(this, { arn: this.arn })
   },
 
   async remove(prevInstance, context) {
