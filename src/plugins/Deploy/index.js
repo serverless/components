@@ -1,4 +1,28 @@
+import { isEmpty } from '@serverless/utils'
 import { handleSignalEvents, setKey, buildGraph, deployGraph, removeGraph } from '../../utils'
+
+
+const createInstance = async (context) => {
+  let instance = await context.construct(context.project.Type)
+  instance = setKey('$', instance)
+
+  // NOTE BRN: instance gets defined based on serverless.yml and type code
+  instance = context.defineComponent(instance)
+
+  return instance
+}
+
+const loadInstanceFromState = async (context) => {
+  // WARNING BRN: this is the newer type. It is possible that this code has changed so much from the prev deployment that it's not possible to build an accurate represention of what was deployed. Could cause issues. Need a way to reconcile this eventually. Perhaps packaging up the project on each deployment and storing it away for use in this scenario (along with the config that was used to perform the deployment).
+  let instance
+  if (!isEmpty(context.state)) {
+    instance = await context.construct(context.project.Type, {})
+    instance = setKey('$', instance)
+    // NOTE BRN: instance gets defined based on what was stored into state
+    instance = await context.defineComponentFromState(instance)
+  }
+  return instance
+}
 
 const Deploy = {
   async run(context) {
@@ -17,20 +41,14 @@ const Deploy = {
 
     // TODO BRN (low priority): inputs to the top level might be a way to inject project/deployment config
 
-    // WARNING BRN: this is the newer type. It is possible that this code has changed so much from the prev deployment that it's not possible to build an accurate represention of what was deployed. Could cause issues. Need a way to reconcile this eventually. Perhaps packaging up the project on each deployment and storing it away for use in this scenario (along with the config that was used to perform the deployment).
-    let prevInstance = await prevContext.construct(prevContext.project.Type, {})
-    prevInstance = setKey('$', prevInstance)
-    // NOTE BRN: prevInstance gets defined based on what was stored into state
-    prevInstance = await prevContext.defineComponentFromState(prevInstance)
 
-    let nextInstance = await nextContext.construct(nextContext.project.Type)
-    nextInstance = setKey('$', nextInstance)
-    // NOTE BRN: nextInstance gets defined based on serverless.yml and type code
-    nextInstance = await nextContext.defineComponent(nextInstance)
+    let prevInstance = await loadInstanceFromState(prevContext)
+    let nextInstance = await createInstance(nextContext)
 
-    let graph = buildGraph(nextInstance, prevInstance)
-    graph = await deployGraph(graph, nextInstance.instanceId, nextInstance)
-    graph = await removeGraph(graph, prevContext.instanceId, prevContext)
+    const graph = buildGraph(nextInstance, prevInstance)
+
+    await deployGraph(graph, nextContext)
+    await removeGraph(graph, prevContext) // nextInstance is the starting point, right?!
 
     // TODO BRN (high priority): build a deployment graph based upon the prevInstance and the nextInstance. Please note that all of the code in the "utils/dag" will need to be refactored based upon the following instructions. Please also update it to use imports/exports as we do in the rest of the utils folders.
     //

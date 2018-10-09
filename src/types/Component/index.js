@@ -21,7 +21,11 @@ const Component = {
 
   async deploy() {},
 
-  async remove() {}
+  async remove() {},
+
+  toString() {
+    return `${this['@@key']} ${this.name} {  }`
+  }
 }
 
 export default Component

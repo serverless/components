@@ -17,49 +17,37 @@ import hasVariableString from '../variable/hasVariableString'
 import newVariable from '../variable/newVariable'
 import isTypeConstruct from './isTypeConstruct'
 
-const resolveProps = (props, data) =>
-  walkReduceDepthFirst(
-    (accum, value, pathParts) => {
+const interpretProps = async (props, data, ctx) => {
+  const context = ctx.merge({ root: ctx.Type.root })
+  return walkReduceDepthFirst(
+    async (accum, value, pathParts) => {
+      let interpretedProps = await accum
       if (isString(value) && hasVariableString(value)) {
         const parentPathParts = init(pathParts)
         const lastPathPart = last(pathParts)
-        const parent = get(parentPathParts, accum)
-        // const parentCopy = clone(parent)
-        // defineProperty(parent, pathPart, {
-        //   configurable: true,
-        //   enumerable: true,
-        //   get() {
-        //     const propPath = value.match(regex)[1]
-        //     return value.replace(regex, get(propPath, data))
-        //   },
-        //   set(val) {
-        //
-        //     //TODO defineProperty
-        //   }
-        // })
-
+        const parent = get(parentPathParts, interpretedProps)
         parent[lastPathPart] = newVariable(value, data)
-
-        // return set(parentPathParts, parent, accum)
-        return accum
+      } else if (isTypeConstruct(value)) {
+        const parentPathParts = init(pathParts)
+        const lastPathPart = last(pathParts)
+        const parent = get(parentPathParts, interpretedProps)
+        const { type, inputs } = value
+        const Type = await context.loadType(type)
+        parent[lastPathPart] = await context.construct(Type, inputs)
       }
-      return accum
+      return interpretedProps
     },
     props,
     props
   )
+}
 
 const constructTypes = async (props, ctx) => {
-  const context = ctx.merge({ root: ctx.Type.root })
+
   return walkReduceDepthFirst(
     async (accum, value, pathParts) => {
-      let constructedProps = await accum
-      if (isTypeConstruct(value)) {
-        const { type, inputs } = value
-        const Type = await context.loadType(type)
-        const instance = await context.construct(Type, inputs)
-        constructedProps = set(pathParts, instance, constructedProps)
-      }
+
+
       return constructedProps
     },
     props,
@@ -90,22 +78,22 @@ const buildTypeConstructor = (type) => {
         // NOTE BRN: variables in inputs should already be resolved outside of the call to this constructor method. There should be no need to resolve them again here.
 
         // NOTE BRN: properties are first resolved since all the values in props are references to the execution context of the current type. We clone the properties here so that we don't change the base property descriptions from the Type.
-        let resolvedProps = resolveProps(clone(props), {
+        const selfProps = await interpretProps(clone(props), {
           this: self,
           self,
           inputs,
           context
-        })
+        }, context)
 
         // NOTE BRN: This step walks depth first through the properties and creates instances for any property that has both a 'type' and 'inputs' combo. Lower level instances are created first so in case we have nested constructions the higher construction will receive an instance as an input instead of the { type, inputs }
-        resolvedProps = await constructTypes(resolvedProps, context)
+        // selfProps = await constructTypes(selfProps, context)
 
         // NOTE BRN: We set all props onto the instance after they have been resolved. We use the getOwnPropertyDescriptor and defineProperty so that we properly pass getters that may exist in the properties from the property resolution step
-        self = Object.assign(self, resolvedProps)
+        self = Object.assign(self, selfProps)
 
         // NOTE BRN: If a construct method exists, call it now. This gives types one last chance to set values.
-        if (main && isFunction(main.construct)) {
-          await main.construct.call(self, inputs, context)
+        if (isFunction(Type.class.prototype.construct)) {
+          await Type.class.prototype.construct.call(self, inputs, context)
         }
 
         // NOTE BRN: We return self (this) because the constructor is overridden to return a Promise. Therefore the promise must return the reference to the instance.

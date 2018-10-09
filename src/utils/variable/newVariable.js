@@ -1,7 +1,7 @@
 import { append, castPath, get, has, toString, walkReducePath } from '@serverless/utils'
 import { SYMBOL_VARIABLE } from '../constants'
 import matchVariable from './matchVariable'
-import resolveVariable from './resolveVariable'
+import resolveVariableString from './resolveVariableString'
 
 const newVariable = (variableString, data) => ({
   [SYMBOL_VARIABLE]: true,
@@ -20,10 +20,16 @@ const newVariable = (variableString, data) => ({
     )
   },
   get(path) {
-    return get(path, resolveVariable(variableString, data))
+    return get(path, resolveVariableString(variableString, data))
   },
   valueOf() {
-    return resolveVariable(variableString, data)
+    return resolveVariableString(variableString, data)
+  },
+  toString() {
+    return resolveVariableString(variableString, data)
+  },
+  toVariableString() {
+    return variableString
   }
 })
 

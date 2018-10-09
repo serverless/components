@@ -22,7 +22,7 @@ import loadTypeMeta from './loadTypeMeta'
  *  const OtherComponent = await loadType('https://example.com/OtherComponent.zip')
  */
 const loadType = async (query, context) => {
-  const typeMeta = await loadTypeMeta(query, context)
+  const typeMeta = await loadTypeMeta(query.trim(), context)
   return defType(typeMeta, context)
 }
 

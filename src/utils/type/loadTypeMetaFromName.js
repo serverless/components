@@ -15,7 +15,8 @@ const NATIVE_NAMES = {
   AwsProvider: resolve(__dirname, '..', '..', 'types', 'AwsProvider'),
   AwsLambdaFunction: resolve(__dirname, '..', '..', 'types', 'AwsLambdaFunction'),
   AwsIamRole: resolve(__dirname, '..', '..', 'types', 'AwsIamRole'),
-  AwsLambdaCompute: resolve(__dirname, '..', '..', 'types', 'AwsLambdaCompute')
+  AwsLambdaCompute: resolve(__dirname, '..', '..', 'types', 'AwsLambdaCompute'),
+  AwsS3Bucket: resolve(__dirname, '..', '..', 'types', 'AwsS3Bucket')
 }
 
 /**
@@ -27,6 +28,7 @@ const NATIVE_NAMES = {
  * }}
  */
 const loadTypeMetaFromName = async (typeName, context) => {
+  console.log('loadTypeMetaFromName - typeName:', typeName)
   const absoluteTypePath = getProp(typeName, NATIVE_NAMES)
   if (!absoluteTypePath) {
     throw errorUnknownTypeName(typeName)

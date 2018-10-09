@@ -6,19 +6,20 @@ import {
   isObject,
   walk
 } from '@serverless/utils'
+import resolve from '../variable/resolve'
 
 const reduceWalkee = (accum, component, keys, iteratee, recur) => {
   let result = iteratee(accum, component, keys)
-  const { children } = component
+  const children = resolve(component.children)
   if (isArray(children)) {
     forEachIndexed((child, childIndex) => {
       const newKeys = concat(keys, [childIndex])
-      result = recur(result, child, newKeys, iteratee)
+      result = recur(result, resolve(child), newKeys, iteratee)
     }, children)
   } else if (isObject(children)) {
     forEachObjIndexed((child, childKey) => {
       const newKeys = concat(keys, [childKey])
-      result = recur(result, child, newKeys, iteratee)
+      result = recur(result, resolve(child), newKeys, iteratee)
     }, children)
   }
   return result

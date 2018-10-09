@@ -1,9 +1,9 @@
-import { concat, prop } from '@serverless/utils'
+import { get, concat } from '@serverless/utils'
 
 const getParentIds = (component) => {
-  const parent = prop('parent', component)
+  const parent = get('parent', component)
   if (parent) {
-    return concat([parent.id], getParentIds(parent))
+    return concat([get('id', parent)], getParentIds(parent))
   }
   return []
 }

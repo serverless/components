@@ -12,6 +12,7 @@ import findTypeFileAtPath from './findTypeFileAtPath'
  * }}
  */
 const loadTypeMetaFromPath = async (typePath, context) => {
+  console.log('typePath:', typePath)
   let absoluteTypePath = typePath
   if (!isAbsolute(typePath)) {
     const basePath = findPath(context.root, context.cwd, process.cwd())
@@ -28,7 +29,7 @@ const loadTypeMetaFromPath = async (typePath, context) => {
   // no type meta found, load file
   const typeFilePath = await findTypeFileAtPath(absoluteTypePath)
   if (!typeFilePath) {
-    throw errorTypeFileNotFound(dirname(absoluteTypePath))
+    throw errorTypeFileNotFound(absoluteTypePath)
   }
   typeMeta = {
     root: dirname(typeFilePath),

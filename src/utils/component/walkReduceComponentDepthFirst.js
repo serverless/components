@@ -6,19 +6,20 @@ import {
   isObject,
   walk
 } from '@serverless/utils'
+import resolve from '../variable/resolve'
 
 const walkee = (accum, component, keys, iteratee, recur) => {
   let result = accum
-  const { children } = component
+  const children = resolve(component.children)
   if (isArray(children)) {
     forEachIndexed((child, childIndex) => {
       const newKeys = concat(keys, [childIndex])
-      result = recur(result, child, newKeys, iteratee)
+      result = recur(result, resolve(child), newKeys, iteratee)
     }, children)
   } else if (isObject(children)) {
     forEachObjIndexed((child, childKey) => {
       const newKeys = concat(keys, [childKey])
-      result = recur(result, child, newKeys, iteratee)
+      result = recur(result, resolve(child), newKeys, iteratee)
     }, children)
   }
   return iteratee(result, component, keys)
@@ -33,7 +34,7 @@ const walkee = (accum, component, keys, iteratee, recur) => {
  * @param {Component} component The component to walk.
  * @returns {*} The final, accumulated value.
  */
-const walkReduceDepthFirst = (iteratee, accum, component) =>
+const walkReduceComponentDepthFirst = (iteratee, accum, component) =>
   walk(walkee, iteratee, accum, component, [])
 
-export default walkReduceDepthFirst
+export default walkReduceComponentDepthFirst

@@ -1,6 +1,7 @@
 import { dirExists, last, readdirDirectoryNames, sort } from '@serverless/utils'
 import { join } from 'path'
 import loadDeployment from './loadDeployment'
+import parseDeploymentNumber from './parseDeploymentNumber'
 
 const loadPreviousDeployment = async (app) => {
   const { project } = app
@@ -9,10 +10,12 @@ const loadPreviousDeployment = async (app) => {
   if (await dirExists(deploymentsDir)) {
     let deploymentIds = await readdirDirectoryNames(deploymentsDir)
     deploymentIds = sort((idA, idB) => {
-      if (idA < idB) {
+      const numberA = parseDeploymentNumber(idA)
+      const numberB = parseDeploymentNumber(idB)
+      if (numberA < numberB) {
         return -1
       }
-      if (idA > idB) {
+      if (numberA > numberB) {
         return 1
       }
       return 0
