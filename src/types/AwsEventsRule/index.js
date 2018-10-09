@@ -2,11 +2,24 @@ import { isEmpty, not, equals, pick } from 'ramda'
 
 const AwsEventsRule = {
   construct(inputs) {
-    this.lambdaArn = inputs.lambdaArn
+    this.provider = inputs.provider
+    // this.lambdaArn = inputs.lambdaArn
+    this.functionObj = inputs.functionObj
     this.schedule = inputs.schedule
     this.enabled = inputs.enabled
     // this.name = inputs.lambdaArn.split(':')[inputs.lambdaArn.split(':').length - 1]
     this.ruleName = 'abc'
+  },
+
+  async define(context) {
+    const AwsLambdaCompute = await context.loadType('AwsLambdaCompute')
+    const inputs = {
+      provider: this.provider,
+      ...this.functionObj
+    }
+    const awsEventsRule = context.construct(AwsEventsRule, inputs)
+    this.lambda = awsEventsRule.defineFunction()
+    return { lambda: this.lambda }
   },
 
   async deploy(prevInstance, context) {

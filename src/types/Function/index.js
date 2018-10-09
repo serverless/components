@@ -16,11 +16,6 @@ const Function = {
   async define(context) {
     const compute = this.compute.get()
     return { fn: await compute.defineFunction(this, context) }
-  },
-  async defineSchedule(rate, context) {
-    console.log("hoooo")
-    const compute = this.compute.get()
-    return compute.defineSchedule(this, rate, context)
   }
 }
 

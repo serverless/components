@@ -4,9 +4,10 @@ const Cron = {
     this.rate = inputs.rate
   },
   async define(context) {
-    console.log('dude')
-    const fn = this.function.get()
-    const compute = fn.compute.get()
+    const Function = await context.loadType('Function')
+    const fnInputs = this.function.get()
+    const compute = fnInputs.compute.get()
+    const fn = await context.construct(Function, fnInputs)
     return {
       schedule: await compute.defineSchedule(fn, this.rate, context)
     }

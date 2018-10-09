@@ -20,7 +20,7 @@ const Service = async (SuperClass, superContext) => {
       )
 
       return {
-        ...fns,
+        // ...fns,
         ...this.components // this define overwrites Component.define!
       }
     }
