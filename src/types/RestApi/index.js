@@ -53,8 +53,9 @@ function getAwsApiGatewayInputs(inputs) {
 async function deployApiGateway(inputs, context) {
   const apiInputs = getAwsApiGatewayInputs(inputs)
 
-  const apiGatewayComponent = await context.load('aws-apigateway', 'apig', apiInputs)
-  const outputs = await apiGatewayComponent.deploy()
+  const apiGatewayComponent = await context.loadType('AwsApiGateway')
+  const apiGateway = context.construct(apiGatewayComponent, apiInputs)
+  const outputs = await apiGateway.deploy()
   outputs.name = inputs.name
   return outputs
 }
@@ -112,8 +113,9 @@ async function removeApiGateway(inputs, context, state) {
     roleArn: state.roleArn,
     routes: {}
   })
-  const apiGatewayComponent = await context.load('aws-apigateway', 'apig', apiInputs)
-  return apiGatewayComponent.remove()
+  const apiGatewayComponent = await context.loadType('AwsApiGateway')
+  const apiGateway = context.construct(apiGatewayComponent, apiInputs)
+  return apiGateway.remove()
 }
 
 async function removeEventGateway(inputs, context) {
@@ -161,40 +163,56 @@ export default {
   async deploy(prevInstance, context) {
     const inputs = pick(inputsProps, this)
     const flatRoutes = flattenRoutes(inputs.routes)
-    const flatInputs = { ...inputs, routes: flatRoutes }
 
     const outputs = {}
-    if (inputs.gateway === 'eventgateway') {
-      outputs.eventgateway = await deployEventGateway(flatInputs, context)
-      outputs.url = outputs.eventgateway.url
-      context.saveState(this, { url: outputs.url })
-    } else if (inputs.gateway === 'aws-apigateway') {
-      outputs.iam = await deployIamRole(inputs, context)
-      outputs.apigateway = await deployApiGateway(
-        {
-          ...flatInputs,
-          roleArn: outputs.iam.arn // TODO: add functionality to read from state so that update works
-        },
-        context
-      )
-      outputs.url = outputs.apigateway.url
-      context.saveState(this, {
-        roleArn: outputs.iam.arn,
-        apigArn: outputs.apigateway.arn,
-        url: outputs.url
-      })
-    }
+    const state = context.getState(this)
+    forEachObjIndexed(async (fields, key) => {
+      if (fields.gateway === 'EventGateway') {
+        // TODO: implement SLS EG support
+        outputs.eventgateway = await deployEventGateway(
+          { ...fields, routes: { [key]: fields } },
+          context
+        )
+        outputs.url = outputs.eventgateway.url
+        context.saveState(this, { url: outputs.url })
+      } else if (fields.gateway === 'AwsApiGateway') {
+        outputs.iam = await deployIamRole({ ...fields, name: inputs.name }, context)
+        outputs.apigateway = await deployApiGateway(
+          { ...fields, routes: { [key]: fields }, roleArn: outputs.iam.arn },
+          context
+        )
+        outputs.url = outputs.apigateway.url
+        context.saveState(this, {
+          ...state,
+          routes: {
+            ...state.routes,
+            [key]: {
+              roleArn: outputs.iam.arn,
+              apigArn: outputs.apigateway.arn,
+              url: outputs.url
+            }
+          }
+        })
+      }
+    }, flatRoutes)
+
     return Object.assign(this, outputs)
   },
 
   async remove(prevInstance, context) {
+    const state = context.getState(this)
     const inputs = pick(inputsProps, this)
-    if (inputs.gateway === 'eventgateway') {
-      await removeEventGateway(inputs, context)
-    } else if (inputs.gateway === 'aws-apigateway') {
-      await removeIamRole(inputs, context)
-      await removeApiGateway(inputs, context)
-    }
+    const flatRoutes = flattenRoutes(inputs.routes)
+    const routes = { ...state.routes, flatRoutes }
+
+    forEachObjIndexed(async (fields) => {
+      if (fields.gateway === 'eventgateway') {
+        await removeEventGateway(fields, context)
+      } else if (fields.gateway === 'aws-apigateway') {
+        await removeIamRole(fields, context)
+        await removeApiGateway(fields, context)
+      }
+    }, routes)
     context.saveState(this, {})
     return Object.assign(this, {})
   },
