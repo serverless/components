@@ -1,19 +1,10 @@
 name: SimpleService
 extends: Service
 
-providers:
-  aws:
-    type: AwsProvider
-    inputs:
-      credentials:
-        accessKeyId: xxx
-        secretAccessKey: xxx
-      region: us-east-1
-
 compute:
   type: AwsLambdaCompute
   inputs:
-    provider: ${this.providers.aws}
+    provider: ${inputs.providers.aws}
     runtime: nodejs
 
 functions:
@@ -29,4 +20,4 @@ components:
     type: Cron
     inputs:
       function: ${this.functions.hello}
-      rate: 1s
+      rate: 3m

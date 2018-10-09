@@ -1,6 +1,18 @@
 name: SimpleApp
 extends: App
 
+providers:
+  aws:
+    type: AwsProvider
+    inputs:
+      credentials:
+        accessKeyId: xxx
+        secretAccessKey: xxx
+      region: us-east-1
+
 services:
   simpleService:
     type: ./SimpleService
+    inputs:
+      providers: ${this.providers}
+

@@ -6,6 +6,7 @@ import loadTypeMetaFromPath from './loadTypeMetaFromPath'
 // TODO BRN: Replace this with something more configurable
 const NATIVE_NAMES = {
   Component: resolve(__dirname, '..', '..', 'types', 'Component'),
+  App: resolve(__dirname, '..', '..', 'types', 'App'),
   Function: resolve(__dirname, '..', '..', 'types', 'Function'),
   Compute: resolve(__dirname, '..', '..', 'types', 'Compute'),
   Object: resolve(__dirname, '..', '..', 'types', 'Object'),
