@@ -1,0 +1,24 @@
+name: RestApi
+extends: Component
+
+version: 0.3.0
+core: 0.3.x
+main: ./index.js
+
+description: "REST API type component."
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
+
+paths:
+  type: array
+  description: An array of registered URL's with relevant information.
+
+inputTypes:
+  name:
+    type: string
+    required: false
+    default: api-${self.instanceId}
+  routes:
+    type: object
+    required: true
