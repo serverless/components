@@ -1,23 +1,23 @@
 import BbPromise from 'bluebird'
 import { equals } from 'ramda'
 
-const attachRolePolicy = async (IAM, { name, policy }) => {
+const attachRolePolicy = async (IAM, { roleName, policy }) => {
   await IAM.attachRolePolicy({
-    RoleName: name,
+    RoleName: roleName,
     PolicyArn: policy.arn
   }).promise()
 
   return BbPromise.delay(15000)
 }
 
-const detachRolePolicy = async (IAM, { name, policy }) => {
+const detachRolePolicy = async (IAM, { roleName, policy }) => {
   await IAM.detachRolePolicy({
-    RoleName: name,
+    RoleName: roleName,
     PolicyArn: policy.arn
   }).promise()
 }
 
-const createRole = async (IAM, { name, service, policy }) => {
+const createRole = async (IAM, { roleName, service, policy }) => {
   const assumeRolePolicyDocument = {
     Version: '2012-10-17',
     Statement: {
@@ -29,23 +29,23 @@ const createRole = async (IAM, { name, service, policy }) => {
     }
   }
   const roleRes = await IAM.createRole({
-    RoleName: name,
+    RoleName: roleName,
     Path: '/',
     AssumeRolePolicyDocument: JSON.stringify(assumeRolePolicyDocument)
   }).promise()
 
   await attachRolePolicy(IAM, {
-    name,
+    roleName,
     policy
   })
 
   return roleRes.Role.Arn
 }
 
-const deleteRole = async (IAM, { name, policy }) => {
+const deleteRole = async (IAM, { roleName, policy }) => {
   try {
     await detachRolePolicy(IAM, {
-      name,
+      roleName,
       policy
     })
   } catch (error) {
@@ -55,13 +55,13 @@ const deleteRole = async (IAM, { name, policy }) => {
   }
 
   await IAM.deleteRole({
-    RoleName: name
+    RoleName: roleName
   }).promise()
 
   return null
 }
 
-const updateAssumeRolePolicy = async (IAM, { name, service }) => {
+const updateAssumeRolePolicy = async (IAM, { roleName, service }) => {
   const assumeRolePolicyDocument = {
     Version: '2012-10-17',
     Statement: {
@@ -73,7 +73,7 @@ const updateAssumeRolePolicy = async (IAM, { name, service }) => {
     }
   }
   await IAM.updateAssumeRolePolicy({
-    RoleName: name,
+    RoleName: roleName,
     PolicyDocument: JSON.stringify(assumeRolePolicyDocument)
   }).promise()
 }
@@ -86,7 +86,6 @@ const AwsIamRole = {
     this.policy = policy
   },
   async deploy(prevInstance, context) {
-    console.log('iam')
     const AWS = this.provider.getSdk()
     const IAM = new AWS.IAM()
 
@@ -95,29 +94,27 @@ const AwsIamRole = {
         arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
       }
     }
-
-    // this.arn = 'abc'
-
-    // if (!prevInstance) {
-    //   context.log(`Creating Role: ${this.name}`)
-    //   this.arn = await createRole(IAM, this)
-    // } else if (!this.name && prevInstance.name) {
-    //   context.log(`Removing Role: ${prevInstance.name}`)
-    //   this.arn = await deleteRole(IAM, prevInstance)
-    // } else if (prevInstance.name !== this.name) {
-    //   context.log(`Removing Role: ${prevInstance.name}`)
-    //   await deleteRole(IAM, prevInstance)
-    //   context.log(`Creating Role: ${this.name}`)
-    //   this.arn = await createRole(IAM, this)
-    // } else {
-    //   if (prevInstance.service !== this.service) {
-    //     await updateAssumeRolePolicy(IAM, this)
-    //   }
-    //   if (!equals(prevInstance.policy, this.policy)) {
-    //     await detachRolePolicy(IAM, this)
-    //     await attachRolePolicy(IAM, this)
-    //   }
-    // }
+    //
+    if (!prevInstance) {
+      context.log(`Creating Role: ${this.roleName}`)
+      this.arn = await createRole(IAM, this)
+    } else if (!this.roleName && prevInstance.roleName) {
+      context.log(`Removing Role: ${prevInstance.roleName}`)
+      this.arn = await deleteRole(IAM, prevInstance)
+    } else if (prevInstance.roleName !== this.roleName) {
+      context.log(`Removing Role: ${prevInstance.roleName}`)
+      await deleteRole(IAM, prevInstance)
+      context.log(`Creating Role: ${this.roleName}`)
+      this.arn = await createRole(IAM, this)
+    } else {
+      if (prevInstance.service !== this.service) {
+        await updateAssumeRolePolicy(IAM, this)
+      }
+      if (!equals(prevInstance.policy, this.policy)) {
+        await detachRolePolicy(IAM, this)
+        await attachRolePolicy(IAM, this)
+      }
+    }
 
     // await context.saveState(this, { arn: this.arn })
   },

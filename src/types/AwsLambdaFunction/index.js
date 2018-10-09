@@ -6,10 +6,10 @@ import { forEach, is } from '@serverless/utils'
 
 const createLambda = async (
   Lambda,
-  { name, handler, memory, timeout, runtime, environment, description, code, role }
+  { functionName, handler, memory, timeout, runtime, environment, description, code, role }
 ) => {
   const params = {
-    FunctionName: name,
+    FunctionName: functionName,
     Code: {
       ZipFile: code
     },
@@ -17,7 +17,7 @@ const createLambda = async (
     Handler: handler,
     MemorySize: memory,
     Publish: true,
-    Role: role,
+    Role: role.arn,
     Runtime: runtime,
     Timeout: timeout,
     Environment: {
@@ -26,16 +26,7 @@ const createLambda = async (
   }
 
   const res = await Lambda.createFunction(params).promise()
-  return {
-    name,
-    handler,
-    memory,
-    timeout,
-    description,
-    runtime,
-    arn: res.FunctionArn,
-    roleArn: role
-  }
+  return res.FunctionArn
 }
 
 const updateLambda = async (
@@ -95,7 +86,7 @@ const deleteLambda = async (Lambda, name) => {
 const AwsLambdaFunction = {
   construct(inputs) {
     this.provider = inputs.provider
-    this.functionName = inputs.functionName
+    this.functionName = 'v2-demo-hello-10'
     this.memorySize = inputs.memorySize
     this.timeout = inputs.timeout
     this.runtime = inputs.runtime
@@ -151,7 +142,7 @@ const AwsLambdaFunction = {
       this.role = await context.construct(
         DefaultRole,
         {
-          name: `${this.name}-execution-role`,
+          name: `${this.functionName}-execution-role`,
           service: 'lambda.amazonaws.com',
           provider: this.provider
         },
@@ -164,24 +155,23 @@ const AwsLambdaFunction = {
     const AWS = this.provider.getSdk()
     const Lambda = new AWS.Lambda()
     console.log('lambda')
+    await this.pack(context)
 
-    // await this.pack(context)
-    //
-    // if (!prevInstance) {
-    //   context.log(`Creating Lambda: ${this.name}`)
-    //   this.arn = await createLambda(Lambda, this)
-    // } else if (prevInstance.name && !this.name) {
-    //   context.log(`Removing Lambda: ${prevInstance.name}`)
-    //   this.arn = await deleteLambda(Lambda, prevInstance.name)
-    // } else if (this.name !== prevInstance.name) {
-    //   context.log(`Removing Lambda: ${prevInstance.name}`)
-    //   await deleteLambda(Lambda, prevInstance.name)
-    //   context.log(`Creating Lambda: ${this.name}`)
-    //   this.arn = await createLambda(Lambda, this)
-    // } else {
-    //   context.log(`Updating Lambda: ${this.name}`)
-    //   this.arn = await updateLambda(Lambda, this)
-    // }
+    if (!prevInstance) {
+      context.log(`Creating Lambda: ${this.functionName}`)
+      this.arn = await createLambda(Lambda, this)
+    } else if (prevInstance.name && !this.name) {
+      context.log(`Removing Lambda: ${prevInstance.name}`)
+      this.arn = await deleteLambda(Lambda, prevInstance.name)
+    } else if (this.name !== prevInstance.name) {
+      context.log(`Removing Lambda: ${prevInstance.name}`)
+      await deleteLambda(Lambda, prevInstance.name)
+      context.log(`Creating Lambda: ${this.name}`)
+      this.arn = await createLambda(Lambda, this)
+    } else {
+      context.log(`Updating Lambda: ${this.name}`)
+      this.arn = await updateLambda(Lambda, this)
+    }
     // await context.saveState({ arn: this.arn })
   },
   async remove(prevInstance, context) {
