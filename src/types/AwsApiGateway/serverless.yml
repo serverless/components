@@ -8,6 +8,16 @@ license: Apache-2.0
 author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
 repository: "github:serverless/components"
 
+id:
+  type: string
+  description: API Gateways id
+url:
+  type: string
+  description: The API Gateways base URL
+urls:
+  type: array
+  description: All the generated API Gateway URLs
+
 inputTypes:
   provider:
     type: AwsProvider
