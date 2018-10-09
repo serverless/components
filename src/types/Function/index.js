@@ -1,15 +1,26 @@
 import { forEachObjIndexed } from '@serverless/utils'
 
 const Function = {
+  // construct(inputs) {
+  //   this.functionName = inputs.functionName
+  //   this.functionDesription = inputs.functionDesription
+  //   this.memory = inputs.memory
+  //   this.timeout = inputs.timeout
+  //   this.runtime = inputs.runtime
+  //   this.code = inputs.code
+  //   this.handler = inputs.handler
+  //   this.compute = inputs.compute
+  //   this.environment = inputs.environment
+  //   this.tags = inputs.tags
+  // },
   async define(context) {
-    return { fn: await this.compute.defineFunction(this, context) }
+    const compute = this.compute.get()
+    return { fn: await compute.defineFunction(this, context) }
   },
   async defineSchedule(rate, context) {
-    if (this.compute.type === 'Compute') {
-      await this.compute.defineSchedule(this.children.fn, rate, context)
-    } else {
-      forEachObjIndexed(async (c) => await c.defineSchedule(rate, context), this.compute)
-    }
+    console.log("hoooo")
+    const compute = this.compute.get()
+    return compute.defineSchedule(this, rate, context)
   }
 }
 

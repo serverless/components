@@ -34,40 +34,49 @@ const getShimFile = (runtime) => {
 
 const AwsLambdaCompute = async (SuperClass, superContext) => {
   const AwsLambdaFunction = await superContext.loadType('AwsLambdaFunction')
-
   return {
     async defineFunction(functionInstance, context) {
-      const runtime = convertRuntime(functionInstance.runtime || this.runtime)
-      let { code } = functionInstance
+      // console.log(functionInstance.runtime)
+      const runtime = convertRuntime(this.runtime.get())
+      let code = functionInstance.code.get()
       if (isString(code)) {
         code = [code]
       }
       code = append(getShimFile(runtime), code)
 
       const inputs = {
-        provider: functionInstance.provider || this.provider,
-        functionName: functionInstance.functionName,
-        functionDescription: functionInstance.functionDescription,
-        memorySize: functionInstance.memory || this.memory,
-        timeout: functionInstance.timeout || this.timeout,
+        provider: this.provider.get(),
+        functionName: functionInstance.functionName.get(),
+        // functionDescription: functionInstance.functionDescription.get(),
+        memorySize: functionInstance.memory.get(),
+        timeout: functionInstance.timeout.get(),
         runtime,
         handler: 'shim.handler',
         environment: {
-          ...this.environment,
-          ...functionInstance.environment,
-          SERVERLESS_HANDLER: functionInstance.handler
+          // ...this.environment.get(),
+          // ...functionInstance.environment.get(),
+          SERVERLESS_HANDLER: functionInstance.handler.get()
         },
-        code: this.code,
-        tags: {
-          ...this.tags,
-          ...functionInstance.tags
-        }
+        code,
+        // tags: {
+        //   ...this.tags.get(),
+        //   ...functionInstance.tags.get()
+        // }
       }
+
+      // console.log(inputs)
 
       return context.construct(AwsLambdaFunction, inputs)
     },
     async defineSchedule(functionInstance, rate, context) {
-      return functionInstance.defineSchedule(parseRate(rate), context)
+      const AwsEventsRule = await context.loadType('AwsEventsRule')
+      const inputs = {
+        provider: this.provider.get(),
+        lambdaArn: functionInstance.arn,
+        schedule: parseRate(rate),
+        enabled: true
+      }
+      return context.construct(AwsEventsRule, inputs)
     }
   }
 }

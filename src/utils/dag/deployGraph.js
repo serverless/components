@@ -22,7 +22,8 @@ const deployNodeIds = async (nodeIds, graph, context) =>
 
 const deployLeaves = async (graph, context) => {
   const leaves = graph.sinks()
-
+  // console.log('leaves')
+  // console.log(leaves)
   if (isEmpty(leaves)) {
     return graph
   }

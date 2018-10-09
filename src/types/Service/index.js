@@ -6,18 +6,23 @@ const Service = async (SuperClass, superContext) => {
 
   return {
     async define(context) {
-      return Promise.props(
-        map(async (func, name) => {
+      const fns = await Promise.props(
+        map(async (func, functionName) => {
           return await context.construct(
             Fn,
             {
               ...func,
-              name
+              functionName
             },
             context
           )
         }, this.functions)
       )
+
+      return {
+        ...fns,
+        ...this.components // this define overwrites Component.define!
+      }
     }
   }
 }

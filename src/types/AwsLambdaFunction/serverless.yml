@@ -12,13 +12,6 @@ license: Apache-2.0
 author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
 repository: "github:serverless/components"
 
-arn:
-  type: string
-  description: The Lambda function's ARN
-role:
-  type: AwsIamRole
-  description: The AwsIamRole that is attached to this fucntion
-
 inputTypes:
   provider:
     type: AwsProvider

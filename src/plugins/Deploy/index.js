@@ -46,7 +46,7 @@ const Deploy = {
     const graph = buildGraph(nextInstance, prevInstance)
 
     await deployGraph(graph, nextContext)
-    await removeGraph(graph, prevContext) // nextInstance is the starting point, right?!
+    await removeGraph(graph, prevContext)
 
     // TODO BRN (high priority): build a deployment graph based upon the prevInstance and the nextInstance. Please note that all of the code in the "utils/dag" will need to be refactored based upon the following instructions. Please also update it to use imports/exports as we do in the rest of the utils folders.
     //

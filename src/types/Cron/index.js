@@ -1,6 +1,15 @@
 const Cron = {
+  construct(inputs) {
+    this.function = inputs.function
+    this.rate = inputs.rate
+  },
   async define(context) {
-    return { schedule: this.function.defineSchedule(this.rate, context) }
+    console.log('dude')
+    const fn = this.function.get()
+    const compute = fn.compute.get()
+    return {
+      schedule: await compute.defineSchedule(fn, this.rate, context)
+    }
   }
 }
 

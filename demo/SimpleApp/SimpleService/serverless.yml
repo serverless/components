@@ -6,8 +6,8 @@ providers:
     type: AwsProvider
     inputs:
       credentials:
-        accessKeyId: xxx
-        secretAccessKey: xxx
+        accessKeyId: AKIAJEMBJRTCIT24TDBA
+        secretAccessKey: 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
       region: us-east-1
 
 compute:
@@ -29,4 +29,4 @@ components:
     type: Cron
     inputs:
       function: ${this.functions.hello}
-      rate: 1s
+      schedule: 1s
