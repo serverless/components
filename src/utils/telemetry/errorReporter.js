@@ -14,7 +14,7 @@ const errorReporter = async () => {
     raven.config(sentryDSN, {
       environment,
       autoBreadcrumbs: true,
-      release: pkg.version
+      release: version
     })
     raven.disableConsoleAlerts()
     raven.install()
