@@ -22,7 +22,7 @@ const AwsEventsRule = {
     const cloudWatchEvents = new AWS.CloudWatchEvents()
     const lambda = new AWS.Lambda()
 
-    console.log('schedule')
+    console.log('Creating Schedule')
 
 
     const name = this.lambda.arn.split(':')[this.lambda.arn.split(':').length - 1]
