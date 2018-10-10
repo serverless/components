@@ -86,7 +86,7 @@ const deleteLambda = async (Lambda, name) => {
 const AwsLambdaFunction = {
   construct(inputs) {
     this.provider = inputs.provider
-    this.functionName = 'v2-demo-hello-10'
+    this.functionName = 'v2-demo-hello-world'
     this.memorySize = inputs.memorySize
     this.timeout = inputs.timeout
     this.runtime = inputs.runtime
@@ -154,7 +154,6 @@ const AwsLambdaFunction = {
   async deploy(prevInstance, context) {
     const AWS = this.provider.getSdk()
     const Lambda = new AWS.Lambda()
-    console.log('lambda')
     await this.pack(context)
 
     if (!prevInstance) {
@@ -172,7 +171,7 @@ const AwsLambdaFunction = {
       context.log(`Updating Lambda: ${this.name}`)
       this.arn = await updateLambda(Lambda, this)
     }
-    // await context.saveState({ arn: this.arn })
+    await context.saveState({ arn: this.arn })
   },
   async remove(prevInstance, context) {
     if (!prevInstance.name) return this
