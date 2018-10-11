@@ -171,10 +171,21 @@ module.exports = {
   },
 
   async define(context) {
+    const inputs = pick(inputsProps, this)
+    const flatRoutes = flattenRoutes(inputs.routes)
+    const functions = []
     const funcComponent = await context.loadType('Function')
-    const func = await context.construct(funcComponent, this.routes['/something'].get.function)
-    this.func = func
-    return { fn: func }
+    for (const route in flatRoutes) {
+      if (!flatRoutes.hasOwnProperty(route)) continue
+      for (const method in route) {
+        if (!route.hasOwnProperty(method)) continue
+        if (method.function) {
+          functions.push(await context.construct(funcComponent, method.function))
+        }
+      }
+    }
+    this.functions = functions
+    return { functions }
   },
 
   async deploy(prevInstance, context) {
