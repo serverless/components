@@ -1,61 +1,62 @@
-const { mapIndexed } = require('@serverless/utils')
+const { mapIndexed, pick } = require('@serverless/utils')
 const joinPath = require('path').join
-const { isEmpty, keys, union, not, map, forEachObjIndexed, pick } = require('ramda')
+const { isEmpty, keys, union, not, map, forEachObjIndexed } = require('ramda')
 const { joinUrl } = require('./utils')
 
 const catchallParameterPattern = /{\.{3}([^}]+?)}/g
 const pathParameterPattern = /{([^}]+?)}/g
 
-const inputsProps = ['name', 'routes']
+const inputsProps = ['name', 'routes', 'gateway', 'provider']
 
 // "private" functions
-async function deployIamRole(inputs, context) {
-  const name = `${inputs.name}-iam-role-${context.instanceId}`
+async function deployIamRole(inputs, context, rand) {
+  const name = `${inputs.name}-iam-role-${rand}`
   const service = 'apigateway.amazonaws.com'
 
-  const iamComponent = await context.load('aws-iam-role', 'iam', {
-    name,
-    service
-  })
-  const outputs = await iamComponent.deploy()
+  const iamComponent = await context.loadType('AwsIamRole')
+  const role = await context.construct(iamComponent, { name, service, provider: inputs.provider })
+  const outputs = await role.deploy(undefined, context)
   outputs.name = name
   outputs.service = service
   return outputs
 }
 
-function getAwsApiGatewayInputs(inputs) {
+async function getAwsApiGatewayInputs(inputs, context, func) {
   const apiGatewayInputs = {
     name: inputs.name,
     roleArn: inputs.roleArn,
     routes: {}
   }
 
-  forEachObjIndexed((methods, path) => {
+  for (const [path, methods] of Object.entries(inputs.routes)) {
     const reparameterizedPath = path.replace(catchallParameterPattern, '{$1+}')
     const normalizedPath = reparameterizedPath.replace(/^\/+/, '')
     const routeObject = {}
     apiGatewayInputs.routes[normalizedPath] = routeObject
 
-    forEachObjIndexed((methodObject, method) => {
+    for (const [method, methodObject] of Object.entries(methods)) {
       const normalizedMethod = method.toUpperCase()
 
       routeObject[normalizedMethod] = {
-        lambdaArn: methodObject.function.arn,
+        lambdaArn: func.children.fn.arn,
         ...methodObject
       }
       delete routeObject[normalizedMethod].function
-    }, methods)
-  }, inputs.routes)
+    }
+  }
 
   return apiGatewayInputs
 }
 
-async function deployApiGateway(inputs, context) {
-  const apiInputs = getAwsApiGatewayInputs(inputs)
+async function deployApiGateway(inputs, context, provider, func) {
+  const apiInputs = await getAwsApiGatewayInputs(inputs, context, func)
 
-  const apiGatewayComponent = await context.loadType('AwsApiGateway')
-  const apiGateway = context.construct(apiGatewayComponent, apiInputs)
-  const outputs = await apiGateway.deploy()
+  const apiGatewayComponent = await context.loadType('../../src/types/AwsApiGateway')
+  const apiGateway = await context.construct(apiGatewayComponent, {
+    ...apiInputs,
+    provider: provider
+  })
+  const outputs = await apiGateway.deploy(undefined, context)
   outputs.name = inputs.name
   return outputs
 }
@@ -108,11 +109,14 @@ async function removeIamRole(inputs, context) {
 }
 
 async function removeApiGateway(inputs, context, state) {
-  const apiInputs = getAwsApiGatewayInputs({
-    ...inputs,
-    roleArn: state.roleArn,
-    routes: {}
-  })
+  const apiInputs = await getAwsApiGatewayInputs(
+    {
+      ...inputs,
+      roleArn: state.roleArn,
+      routes: {}
+    },
+    context
+  )
   const apiGatewayComponent = await context.loadType('AwsApiGateway')
   const apiGateway = context.construct(apiGatewayComponent, apiInputs)
   return apiGateway.remove()
@@ -159,42 +163,54 @@ function flattenRoutes(routes) {
   return flattened
 }
 
-export default {
+module.exports = {
+  construct(inputs) {
+    Object.assign(this, inputs)
+  },
+
+  async define(context) {
+    const funcComponent = await context.loadType('Function')
+    const func = await context.construct(funcComponent, this.routes['/something'].get.function)
+    this.func = func
+    return { fn: func }
+  },
+
   async deploy(prevInstance, context) {
     const inputs = pick(inputsProps, this)
     const flatRoutes = flattenRoutes(inputs.routes)
+    const flatInputs = { ...inputs, routes: flatRoutes }
 
     const outputs = {}
-    const state = context.getState(this)
-    forEachObjIndexed(async (fields, key) => {
-      if (fields.gateway === 'EventGateway') {
-        // TODO: implement SLS EG support
-        outputs.eventgateway = await deployEventGateway(
-          { ...fields, routes: { [key]: fields } },
-          context
-        )
-        outputs.url = outputs.eventgateway.url
-        context.saveState(this, { url: outputs.url })
-      } else if (fields.gateway === 'AwsApiGateway') {
-        outputs.iam = await deployIamRole({ ...fields, name: inputs.name }, context)
-        outputs.apigateway = await deployApiGateway(
-          { ...fields, routes: { [key]: fields }, roleArn: outputs.iam.arn },
-          context
-        )
-        outputs.url = outputs.apigateway.url
-        context.saveState(this, {
-          ...state,
-          routes: {
-            ...state.routes,
-            [key]: {
-              roleArn: outputs.iam.arn,
-              apigArn: outputs.apigateway.arn,
-              url: outputs.url
-            }
-          }
-        })
-      }
-    }, flatRoutes)
+    if (inputs.gateway === 'eventgateway') {
+      outputs.eventgateway = await deployEventGateway(flatInputs, context)
+      outputs.url = outputs.eventgateway.url
+      context.saveState({ url: outputs.url })
+    } else if (inputs.gateway === 'AwsApiGateway') {
+      outputs.iam = await deployIamRole(
+        inputs,
+        context,
+        Math.random()
+          .toString(36)
+          .substring(7)
+      )
+      outputs.apigateway = await deployApiGateway(
+        {
+          ...flatInputs,
+          roleArn: outputs.iam.arn // TODO: add functionality to read from state so that update works
+        },
+        context,
+        inputs.provider,
+        this.func
+      )
+      outputs.url = outputs.apigateway.url
+      context.saveState({
+        roleArn: outputs.iam.arn,
+        apigArn: outputs.apigateway.arn,
+        url: outputs.url
+      })
+    }
+
+    context.log(JSON.stringify(['ding', outputs]))
 
     return Object.assign(this, outputs)
   },

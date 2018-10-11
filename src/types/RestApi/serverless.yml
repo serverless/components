@@ -15,6 +15,12 @@ paths:
   description: An array of registered URL's with relevant information.
 
 inputTypes:
+  provider:
+    type: AwsProvider
+    required: true
+  gateway:
+    type: string
+    enum: [AwsApiGateway]
   name:
     type: string
     required: false
