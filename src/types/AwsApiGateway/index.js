@@ -71,12 +71,15 @@ const updateApi = async (APIGateway, params) => {
   return outputs
 }
 
-export default {
+module.exports = {
+  construct(inputs) {
+    Object.assign(this, inputs)
+  },
+
   async deploy(prevInstance, context) {
-    const APIGateway = new this.provider.sdk.APIGateway({
-      region: process.env.AWS_DEFAULT_REGION || 'us-east-1'
-    })
     const inputs = pick(inputsProps, this)
+    const aws = this.provider.getSdk()
+    const APIGateway = new aws.APIGateway()
     const state = context.getState(this)
     const noChanges =
       inputs.name === state.name &&
@@ -88,7 +91,7 @@ export default {
       outputs = state
     } else if (inputs.name && !state.name) {
       context.log(`Creating API Gateway: "${inputs.name}"`)
-      outputs = await createApi(inputs)
+      outputs = await createApi(APIGateway, inputs)
     } else {
       context.log(`Updating API Gateway: "${inputs.name}"`)
       outputs = await updateApi(APIGateway, {
