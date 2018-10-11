@@ -138,7 +138,9 @@ function flattenRoutes(routes) {
       if (key.startsWith('/')) {
         doFlatten(value, joinPath(basePath, key))
       } else {
-        if (
+        if (key.toLowerCase() === 'routes') {
+          return doFlatten(value, basePath)
+        } else if (
           !['any', 'delete', 'get', 'head', 'options', 'patch', 'post', 'put'].includes(
             key.toLowerCase()
           )
