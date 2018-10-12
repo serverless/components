@@ -1,12 +1,13 @@
 import { map } from '@serverless/utils'
 import Promise from 'bluebird'
 
-const Service = async (SuperClass, superContext) => {
-  const Fn = await superContext.loadType('Function')
-
-  return {
+const Service = (SuperClass) =>
+  class extends SuperClass {
     async define(context) {
-      const fns = await Promise.props(
+      super.define(context)
+      const Fn = await context.loadType('Function')
+      const fns = this.functions.get() // why?!
+      this.functions = await Promise.props(
         map(async (func, functionName) => {
           return await context.construct(
             Fn,
@@ -16,15 +17,14 @@ const Service = async (SuperClass, superContext) => {
             },
             context
           )
-        }, this.functions)
+        }, fns)
       )
-
+      console.log(this.functions)
       return {
-        ...fns
-        // ...this.components // this define overwrites Component.define!
+        ...this.functions,
+        ...this.components
       }
     }
   }
-}
 
 export default Service

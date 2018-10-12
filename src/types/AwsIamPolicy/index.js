@@ -1,18 +1,16 @@
 import BbPromise from 'bluebird'
 
-const createPolicy = async (IAM, { name, document }) => {
+const createPolicy = async (IAM, { policyName, document }) => {
   const policyRes = await IAM.createPolicy({
-    PolicyName: name,
+    PolicyName: policyName,
     Path: '/',
     PolicyDocument: JSON.stringify(document)
   }).promise()
-  console.log(`Policy '${name}' created with arn: '${policyRes.Policy.Arn}'`)
+  console.log(`Policy '${policyName}' created with arn: '${policyRes.Policy.Arn}'`)
 
   await BbPromise.delay(15000)
 
-  return {
-    arn: policyRes.Policy.Arn
-  }
+  return policyRes.Policy.Arn
 }
 
 const deletePolicy = async (IAM, name, arn) => {
@@ -31,53 +29,41 @@ const deletePolicy = async (IAM, name, arn) => {
   }).promise()
   console.log(`Policy '${name}' deleted.`)
 
-  return {
-    arn: null
-  }
+  return null
 }
 
-const AwsIamPolicy = {
-  async deploy(prevInstance, context) {
-    const IAM = new this.provider.getSdk().IAM()
-    const state = context.getState(this)
-    if (!state.name && this.name) {
-      context.log(`Creating Policy: ${this.name}`)
-      this.arn = await createPolicy(IAM, this)
-    } else if (!this.name && state.name) {
-      context.log(`Removing Policy: ${state.name}`)
-      this.arn = await deletePolicy(IAM, state.name, state.arn)
-    } else if (state.name !== this.name) {
-      context.log(`Removing Policy: ${state.name}`)
-      await deletePolicy(IAM, state.name, state.arn)
-      context.log(`Creating Policy: ${this.name}`)
-      this.arn = await createPolicy(IAM, this)
-    }
-
-    const newState = {
-      provider: this.provider,
-      name: this.name,
-      document: this.document,
-      arn: this.arn
-    }
-
-    context.saveState(this, newState)
-  },
-  async remove(prevInstance, context) {
-    const IAM = new this.provider.getSdk().IAM()
-    const state = context.getState(this)
-    if (!state.name) return {}
-
-    try {
-      context.log(`Removing Policy: ${state.name}`)
-      await deletePolicy(IAM, state.name, state.arn)
-    } catch (e) {
-      if (!e.message.includes('does not exist or is not attachable')) {
-        throw new Error(e)
+const AwsIamPolicy = (SuperClass) =>
+  class extends SuperClass {
+    shouldDeploy(prevInstance) {
+      if (!prevInstance) {
+        return 'deploy'
+      }
+      if (prevInstance.policyName !== this.policyName) {
+        return 'replace'
       }
     }
 
-    context.saveState(this, {})
+    async deploy(prevInstance, context) {
+      const AWS = this.provider.getSdk()
+      const IAM = new AWS.IAM()
+
+      context.log(`Creating Policy: ${this.policyName}`)
+      this.arn = await createPolicy(IAM, this)
+    }
+
+    async remove(context) {
+      const AWS = this.provider.getSdk()
+      const IAM = new AWS.IAM()
+
+      try {
+        context.log(`Removing Policy: ${this.policyName}`)
+        this.arn = await deletePolicy(IAM, this.policyName, this.arn)
+      } catch (e) {
+        if (!e.message.includes('does not exist or is not attachable')) {
+          throw new Error(e)
+        }
+      }
+    }
   }
-}
 
 export default AwsIamPolicy

@@ -78,60 +78,57 @@ const updateAssumeRolePolicy = async (IAM, { roleName, service }) => {
   }).promise()
 }
 
-const AwsIamRole = {
-  construct({ provider, name, service, policy }) {
-    this.provider = provider
-    this.roleName = name
-    this.service = service
-    this.policy = policy
-  },
-  async deploy(prevInstance, context) {
-    const AWS = this.provider.getSdk()
-    const IAM = new AWS.IAM()
-
-    if (!this.policy) {
-      this.policy = {
+const AwsIamRole = (SuperClass) =>
+  class extends SuperClass {
+    construct(inputs, context) {
+      const defaultPolicy = {
         arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
       }
+      this.roleName = inputs.roleName
+      this.service = inputs.service
+      this.policy = inputs.policy || defaultPolicy
+      this.provider = inputs.provider || context.get('provider')
     }
-    //
-    if (!prevInstance) {
-      context.log(`Creating Role: ${this.roleName}`)
-      this.arn = await createRole(IAM, this)
-    } else if (!this.roleName && prevInstance.roleName) {
-      context.log(`Removing Role: ${prevInstance.roleName}`)
-      this.arn = await deleteRole(IAM, prevInstance)
-    } else if (prevInstance.roleName !== this.roleName) {
-      context.log(`Removing Role: ${prevInstance.roleName}`)
-      await deleteRole(IAM, prevInstance)
-      context.log(`Creating Role: ${this.roleName}`)
-      this.arn = await createRole(IAM, this)
-    } else {
-      if (prevInstance.service !== this.service) {
-        await updateAssumeRolePolicy(IAM, this)
+
+    shouldDeploy(prevInstance) {
+      if (!prevInstance) {
+        return 'deploy'
       }
-      if (!equals(prevInstance.policy, this.policy)) {
-        await detachRolePolicy(IAM, this)
-        await attachRolePolicy(IAM, this)
+      if (prevInstance.roleName !== this.roleName) {
+        return 'replace'
       }
     }
 
-    await context.saveState(this, { arn: this.arn })
-  },
+    async deploy(prevInstance, context) {
+      const AWS = this.provider.getSdk()
+      const IAM = new AWS.IAM()
 
-  async remove(prevInstance, context) {
-    const IAM = new this.provider.sdk.IAM()
-    if (!prevInstance.name) return this
+      if (!prevInstance) {
+        context.log(`Creating Role: ${this.roleName}`)
+        this.arn = await createRole(IAM, this)
+      } else {
+        if (prevInstance.service !== this.service) {
+          await updateAssumeRolePolicy(IAM, this)
+        }
+        if (!equals(prevInstance.policy, this.policy)) {
+          await detachRolePolicy(IAM, this)
+          await attachRolePolicy(IAM, this)
+        }
+      }
+    }
 
-    try {
-      context.log(`Removing Role: ${prevInstance.name}`)
-      this.arn = await deleteRole(IAM, prevInstance)
-    } catch (e) {
-      if (!e.message.includes('Role not found')) {
-        throw new Error(e)
+    async remove(context) {
+      const IAM = new this.provider.sdk.IAM()
+
+      try {
+        context.log(`Removing Role: ${this.name}`)
+        this.arn = await deleteRole(IAM, this)
+      } catch (e) {
+        if (!e.message.includes('Role not found')) {
+          throw new Error(e)
+        }
       }
     }
   }
-}
 
 export default AwsIamRole

@@ -8,7 +8,7 @@ inputTypes:
   provider:
     type: AwsProvider
     default: ${context.provider}
-  name:
+  roleName:
     type: string
     default: role-${self.instanceId}
     displayName: IAM role name

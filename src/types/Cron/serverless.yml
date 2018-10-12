@@ -3,8 +3,11 @@ extends: Component
 main: ./index.js
 version: 1.0.0
 
+function: ${inputs.function}
+rate: ${inputs.rate}
+
 inputTypes:
   function:
     type: Function
-  schedule:
+  rate:
     type: string
