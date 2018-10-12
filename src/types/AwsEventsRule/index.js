@@ -3,12 +3,9 @@ import { isEmpty, not, equals, pick } from 'ramda'
 const AwsEventsRule = {
   construct(inputs) {
     this.provider = inputs.provider
-    // this.lambdaArn = inputs.lambdaArn
-    this.function = inputs.function
+    this.lambda = inputs.lambda
     this.schedule = inputs.schedule
     this.enabled = inputs.enabled
-    // this.name = inputs.lambdaArn.split(':')[inputs.lambdaArn.split(':').length - 1]
-    this.ruleName = 'abc'
   },
 
   async define(context) {
@@ -24,10 +21,8 @@ const AwsEventsRule = {
 
     console.log('Creating Schedule')
 
-
-    const name = this.lambda.arn.split(':')[this.lambda.arn.split(':').length - 1]
+    this.functionRuleName = this.lambda.arn.split(':')[this.lambda.arn.split(':').length - 1]
     //
-
 
     // const inputsProps = ['name', 'lambdaArn', 'schedule', 'enabled']
     // const inputs = pick(inputsProps, this)
@@ -42,7 +37,7 @@ const AwsEventsRule = {
     //
     const State = this.enabled ? 'ENABLED' : 'DISABLED'
     const putRuleParams = {
-      Name: name,
+      Name: this.functionRuleName,
       ScheduleExpression: this.schedule,
       State
     }
@@ -52,11 +47,11 @@ const AwsEventsRule = {
     this.arn = putRuleRes.RuleArn
 
     const putTargetsParams = {
-      Rule: name,
+      Rule: this.functionRuleName,
       Targets: [
         {
           Arn: this.lambda.arn,
-          Id: name
+          Id: this.functionRuleName
         }
       ]
     }
@@ -65,8 +60,8 @@ const AwsEventsRule = {
 
     const addPermissionParams = {
       Action: 'lambda:InvokeFunction',
-      FunctionName: name,
-      StatementId: name,
+      FunctionName: this.functionRuleName,
+      StatementId: this.functionRuleName,
       Principal: 'events.amazonaws.com'
     }
 

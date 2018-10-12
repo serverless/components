@@ -8,7 +8,7 @@ compute:
     runtime: nodejs
 
 functions:
-  hello:
+  myUniqueFunctionName:
     compute: ${this.compute}
     handler: index.hello
     code: ./code

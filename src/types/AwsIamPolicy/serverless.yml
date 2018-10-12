@@ -7,16 +7,16 @@ author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
 repository: "github:serverless/components"
 
 provider: ${inputs.provider}
-name: ${inputs.name}
+policyName: ${inputs.policyName}
 document: ${inputs.document}
 
 inputTypes:
   provider:
     type: AwsProvider
     required: true
-  name:
+  policyName:
     type: string
-    default: policy-${self.instanceId}
+    default: policy-${this.instanceId}
     displayName: IAM Policy Name
     description: The friendly name of the policy
   document:
