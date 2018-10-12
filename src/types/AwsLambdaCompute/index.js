@@ -1,5 +1,6 @@
 import { append, isString } from '@serverless/utils'
 import path from 'path'
+import { resolve } from '../../utils/variable'
 
 const parseRate = (rate) => {
   const unit = rate.substr(rate.length - 1)
@@ -41,6 +42,7 @@ const AwsLambdaCompute = async (SuperClass, superContext) => {
   const AwsLambdaFunction = await superContext.loadType('AwsLambdaFunction')
   return {
     async defineFunction(functionInstance, context) {
+      const funcInstance = resolve(functionInstance)
       // need to resolve these two variables now to convert values
       const runtime = convertRuntime(this.runtime.get())
       let code = functionInstance.code.get()
@@ -51,21 +53,21 @@ const AwsLambdaCompute = async (SuperClass, superContext) => {
 
       const inputs = {
         provider: this.provider,
-        functionName: functionInstance.functionName,
-        functionDescription: functionInstance.functionDescription,
-        memorySize: functionInstance.memory,
-        timeout: functionInstance.timeout,
+        functionName: funcInstance.functionName,
+        functionDescription: funcInstance.functionDescription,
+        memorySize: funcInstance.memory,
+        timeout: funcInstance.timeout,
         runtime,
         handler: 'shim.handler',
         environment: {
-          ...this.environment.get(),
-          ...functionInstance.environment,
-          SERVERLESS_HANDLER: functionInstance.handler
+          ...resolve(this.environment),
+          ...resolve(funcInstance.environment),
+          SERVERLESS_HANDLER: funcInstance.handler
         },
         code,
         tags: {
-          ...this.tags,
-          ...functionInstance.tags
+          ...resolve(this.tags),
+          ...funcInstance.tags
         }
       }
 

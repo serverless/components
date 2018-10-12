@@ -1,5 +1,6 @@
 import BbPromise from 'bluebird'
 import { equals } from 'ramda'
+const { resolve } = require('../../utils/variable')
 
 const attachRolePolicy = async (IAM, { roleName, policy }) => {
   await IAM.attachRolePolicy({
@@ -100,7 +101,8 @@ const AwsIamRole = (SuperClass) =>
     }
 
     async deploy(prevInstance, context) {
-      const AWS = this.provider.getSdk()
+      const provider = resolve(this.provider)
+      const AWS = provider.getSdk()
       const IAM = new AWS.IAM()
 
       if (!prevInstance) {

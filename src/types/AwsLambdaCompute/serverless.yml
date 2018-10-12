@@ -9,6 +9,13 @@ license: Apache-2.0
 author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
 repository: "github:serverless/components"
 
+provider: ${inputs.provider}
+runtime: ${inputs.runtime}
+memory: ${inputs.memory}
+timeout: ${inputs.timeout}
+evironment: ${inputs.evironment}
+tags: ${inputs.tags}
+
 inputTypes:
   provider:
     type: Provider

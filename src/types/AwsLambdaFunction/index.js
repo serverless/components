@@ -3,6 +3,7 @@ import { tmpdir } from 'os'
 import archiver from 'archiver'
 import { createWriteStream, createReadStream, readFileSync } from 'fs'
 import { forEach, is } from '@serverless/utils'
+import { resolve } from '../../utils/variable'
 
 const createLambda = async (
   Lambda,
@@ -75,20 +76,24 @@ const AwsLambdaFunction = (SuperClass) =>
     }
 
     async define(context) {
-      if (!this.role) {
+      let role = resolve(this.role)
+      if (!role) {
         const DefaultRole = await context.loadType('AwsIamRole')
+        const rand = Math.random()
+          .toString(36)
+          .substring(7)
 
-        this.role = await context.construct(
+        role = this.role = await context.construct(
           DefaultRole,
           {
-            roleName: `${this.functionName}-execution-role`,
+            roleName: `${rand}-execution-role`,
             service: 'lambda.amazonaws.com',
             provider: this.provider
           },
           context
         )
       }
-      return { role: this.role }
+      return { role }
     }
 
     pack() {
@@ -134,24 +139,29 @@ const AwsLambdaFunction = (SuperClass) =>
     }
 
     async deploy(prevInstance, context) {
-      const AWS = this.provider.getSdk()
+      const provider = resolve(this.provider)
+      const functionName = Math.random()
+        .toString(36)
+        .substring(7)
+      const AWS = provider.getSdk()
       const Lambda = new AWS.Lambda()
       await this.pack(context)
 
       if (!prevInstance) {
-        context.log(`Creating Lambda: ${this.functionName}`)
-        this.arn = await createLambda(Lambda, this)
+        context.log(`Creating Lambda: ${functionName}`)
+        this.arn = await createLambda(Lambda, { ...this, functionName })
       } else {
-        context.log(`Updating Lambda: ${this.functionName}`)
-        this.arn = await updateLambda(Lambda, this)
+        context.log(`Updating Lambda: ${functionName}`)
+        this.arn = await updateLambda(Lambda, { ...this, functionName })
       }
     }
 
     async remove(context) {
-      context.log(`Removing Lambda: ${this.functionName}`)
+      const functionName = resolve(this.functionName)
+      context.log(`Removing Lambda: ${functionName}`)
 
       try {
-        await deleteLambda(this.functionName)
+        await deleteLambda(functionName)
       } catch (error) {
         if (!error.message.includes('Function not found')) {
           throw new Error(error)
