@@ -1,7 +1,7 @@
-const AwsSNSTopic = {
+const AwsSnsTopic = {
   async createSNSSubscription(context, { endpoint, protocol }) {
-    const AwsSNSSubscription = await context.loadType('AwsSNSSubscription')
-    const instance = context.construct(AwsSNSSubscription, {
+    const AwsSnsSubscription = await context.loadType('AwsSnsSubscription')
+    const instance = context.construct(AwsSnsSubscription, {
       endpoint,
       protocol
     })
@@ -33,9 +33,9 @@ const AwsSNSTopic = {
   getSinkConfig() {
     return {
       uri: this.arn,
-      protocol: 'AwsSNSTopic'
+      protocol: 'AwsSnsTopic'
     }
   }
 }
 
-export default AwsSNSTopic
+export default AwsSnsTopic

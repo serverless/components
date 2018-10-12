@@ -59,28 +59,27 @@ const TwilioApplication = {
     const prevInputs = pick(inputsProps, prevInstance)
     const inputs = pick(inputsProps, this)
     const noChanges = equals(inputs, prevInputs)
-    let state
+
     if (noChanges) {
-      state = pick(applicationProps, prevInstance)
+      return
     } else if (!prevInstance.sid) {
       context.log(`Creating Twilio Application: "${inputs.friendlyName}"`)
-      state = await createTwilioApplication(this.provider.getSdk(), inputs)
+      return createTwilioApplication(this.provider.getSdk(), inputs)
     } else {
       context.log(`Updating Twilio Application: "${inputs.friendlyName}"`)
-      state = await updateTwilioApplication({
+      return updateTwilioApplication({
         ...inputs,
         sid: prevInstance.sid
       })
     }
-    context.saveState(this, { ...state })
   },
+
   async remove(prevInstance, context) {
     context.log(`Removing Twilio Application: "${prevInstance.sid}"`)
-    await this.provider
+    return this.provider
       .getSdk()
       .applications(prevInstance.sid)
       .remove()
-    context.saveState(this, {})
   }
 }
 

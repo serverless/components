@@ -13,6 +13,9 @@ const {
   values
 } = require('@serverless/utils')
 
+const DEPLOY = 'deploy'
+const REPLACE = 'replace'
+
 const capitalize = (string) => `${string.charAt(0).toUpperCase()}${string.slice(1)}`
 const resolveInSequence = async (functionsToExecute) =>
   reduce(
@@ -30,7 +33,6 @@ const createSNSTopic = async (
   context.log(`Creating SNS topic: '${name}'`)
   const { TopicArn: topicArn } = await sns.createTopic({ Name: name }).promise()
   // save topic if attribute update fails
-  context.saveState({ name, topicArn })
   const topicAttributes = await updateAttributes(
     {
       displayName,
@@ -158,45 +160,36 @@ const removeSNSTopic = async (sns, topicArn) =>
     .promise()
 
 const AwsSnsTopic = {
+  shouldDeploy(prevInstance) {
+    if (!prevInstance) {
+      return DEPLOY
+    }
+    if (prevInstance.name !== this.name || prevInstance.policy !== this.policy) {
+      return REPLACE
+    }
+  },
+
   async deploy(prevInstance, context) {
     const sns = new this.provider.getSdk().SNS()
-    const state = context.getState(this)
-    let newState
 
-    if (!state.name && this.name) {
-      // if no name stored to state, create a new topic
-      newState = await createSNSTopic(sns, this, context)
-      context.log(`SNS topic '${newState.name}' created with arn: '${newState.topicArn}'`)
-    } else if (state.name && state.name === this.name) {
-      // if input name and state name is same, update only topic attributes
-      if (state.policy && !this.policy) {
-        context.log(`To remove the SNS topic '${this.name}' policy, the topic has to be recreated`)
-        await this.remove(prevInstance, context)
-        newState = await createSNSTopic(sns, this, context)
-      } else {
-        context.log(`Updating SNS topic: '${this.name}'`)
-        newState = merge(await updateAttributes(merge({ topicArn: state.topicArn }, this), state), {
+    if (prevInstance && prevInstance.name === this.name) {
+      return merge(
+        await updateAttributes(merge({ topicArn: prevInstance.topicArn }, this), prevInstance),
+        {
           name: this.name,
-          topicArn: state.topicArn
-        })
-      }
-      context.log(`SNS topic '${newState.name}' updated`)
+          topicArn: prevInstance.topicArn
+        }
+      )
     } else {
-      // topic name is changes, first remove the old topic then create a new one
-      await this.remove(prevInstance, context)
-      newState = await createSNSTopic(sns, this, context)
-      context.log(`SNS topic '${prevInstance.name} renamed to '${newState.name}'`)
+      return createSNSTopic(sns, this, context)
     }
-
-    context.saveState(this, newState)
   },
+
   async remove(prevInstance, context) {
     const sns = new this.provider.getSdk().SNS()
-    const state = context.getState(this)
-    context.log(`Removing SNS topic: '${state.name}'`)
-    await removeSNSTopic(sns, state)
-    context.log(`SNS topic '${state.name}' removed.`)
-    context.saveState(this, {})
+    context.log(`Removing SNS topic: '${this.name}'`)
+    await removeSNSTopic(sns, this)
+    context.log(`SNS topic '${this.name}' removed.`)
   }
 }
 
