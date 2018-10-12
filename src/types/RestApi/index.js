@@ -175,12 +175,11 @@ module.exports = {
     const flatRoutes = flattenRoutes(inputs.routes)
     const functions = []
     const funcComponent = await context.loadType('Function')
-    for (const route in flatRoutes) {
-      if (!flatRoutes.hasOwnProperty(route)) continue
-      for (const method in route) {
-        if (!route.hasOwnProperty(method)) continue
-        if (method.function) {
-          functions.push(await context.construct(funcComponent, method.function))
+    for (const [route, routeProps] of Object.entries(flatRoutes)) {
+      for (const [method, methodProps] of Object.entries(routeProps)) {
+        if (methodProps.function) {
+          const func = await context.construct(funcComponent, methodProps.function)
+          functions.push(func)
         }
       }
     }
@@ -213,7 +212,7 @@ module.exports = {
         },
         context,
         inputs.provider,
-        this.func
+        this.functions
       )
       outputs.url = outputs.apigateway.url
       context.saveState({
