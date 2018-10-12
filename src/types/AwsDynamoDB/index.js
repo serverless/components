@@ -190,7 +190,7 @@ const insertItem = (instance, state, tableName, data) => {
           reject(new Error(`Error inserting item to table: '${table.name}'\n${err.message}`))
         } else {
           const modelDataAttrs = JSON.stringify(modelIns.attrs)
-          console.log(`Item inserted to table: '${table.name}'\n${modelDataAttrs}`)
+          console.log(`Item inserted to table: '${table.name}'\n${modelDataAttrs}`) // eslint-disable-line
           resolve(modelDataAttrs)
         }
       })
@@ -210,7 +210,7 @@ const deleteItem = (instance, state, tableName, data) => {
         if (err) {
           reject(new Error(`Error deleting item from table: '${table.name}'\n${err.message}`))
         } else {
-          console.log(`Item deleted from table: '${table.name}'`)
+          console.log(`Item deleted from table: '${table.name}'`) // eslint-disable-line
           resolve()
         }
       })
@@ -231,7 +231,7 @@ const getItem = (instance, state, tableName, data) => {
           reject(new Error(`Error retrieving item from table: '${table.name}'\n${err.message}`))
         } else {
           const modelDataAttrs = JSON.stringify(modelIns.attrs)
-          console.log(`Item retrieved from table: '${table.name}'\n${modelDataAttrs}`)
+          console.log(`Item retrieved from table: '${table.name}'\n${modelDataAttrs}`) // eslint-disable-line
           resolve(modelDataAttrs)
         }
       })
@@ -242,36 +242,30 @@ const getItem = (instance, state, tableName, data) => {
 
 const AwsDynamoDB = {
   async deploy(prevInstance, context) {
-    const state = context.getState(this)
-    if (!state || !state.ddbtables || state.ddbtables.length !== this.tables.length) {
-      // TODO: Fix creating multiple tables on deploy. Restrict to one table for now
+    if (prevInstance && prevInstance.tables.length !== this.tables.length) {
       if (this.tables.length > 1) {
         context.log(
           'Cannot deploy multiple tables at this time. Please update your inputs and try again...'
         )
-        return {}
+        return
       }
       try {
         await createTables(this, context)
       } catch (err) {
-        console.log('Error in creating table(s)', err.message)
+        context.log('Error in creating table(s)', err.message)
       }
     }
   },
-  async remove(prevInstance, context) {
-    const state = context.getState(this)
-    if (!state.ddbtables || state.ddbtables.length === 0) return {}
 
-    let tableName
-    if (context.options && context.options.tablename) {
-      tableName = context.options.tablename
-    } else {
-      // TODO: when multiple tables are allowed, update to delete multiple tables
-      tableName = this.tables[0].name
-    }
-    let ddbTables = state.ddbtables
+  async remove(prevInstance, context) {
+    if (!prevInstance.tables || prevInstance.tables.length === 0) return
+
+    // TODO: when multiple tables are allowed, update to delete multiple tables
+    const tableName = this.tables[0].name
+
+    let ddbTables = prevInstance.tables
     // if table does not exist in state -> ddbtables, bail
-    if (!findOutputTableByName(state.ddbtables, tableName)) {
+    if (!findOutputTableByName(prevInstance.tables, tableName)) {
       context.log(`Table '${tableName}' does not exist`)
     } else {
       // remove table
@@ -288,54 +282,39 @@ const AwsDynamoDB = {
   },
 
   async insert(prevInstance, context) {
-    let outputs
-    const state = context.getState(this)
-
-    if (!state.ddbtables || state.ddbtables.length === 0) return {}
+    if (!prevInstance.tables || prevInstance.tables.length === 0) return {}
 
     if (context.options && context.options.tablename && context.options.itemdata) {
-      outputs = await insertItem(this, state, context.options.tablename, context.options.itemdata)
+      return insertItem(this, prevInstance, context.options.tablename, context.options.itemdata)
     } else {
       context.log(
         'Incorrect or insufficient parameters. \nUsage: insert --tablename <tablename> --itemdata <data in json format>'
       )
     }
-    return outputs
   },
-  async destroy(prevInstance, context) {
-    const state = context.getState(this)
-    let outputs
 
-    if (!state.ddbtables || state.ddbtables.length === 0) return {}
+  async destroy(prevInstance, context) {
+    if (!prevInstance.tables || prevInstance.tables.length === 0) return {}
 
     if (context.options && context.options.tablename && context.options.keydata) {
-      outputs = await deleteItem(this, state, context.options.tablename, context.options.keydata)
+      return deleteItem(this, prevInstance, context.options.tablename, context.options.keydata)
     } else {
       context.log(
         'Incorrect or insufficient parameters. \nUsage: destroy --tablename <tablename> --keydata <hashkey and rangekey key/value pairs in json format>'
       )
     }
-    return outputs
   },
-  async get(prevInstance, context) {
-    const state = context.getState(this)
-    let outputs
 
-    if (!state.ddbtables || state.ddbtables.length === 0) return {}
+  async get(prevInstance, context) {
+    if (!prevInstance.tables || prevInstance.tables.length === 0) return {}
 
     if (context.options && context.options.tablename && context.options.keydata) {
-      outputs = await getItem(
-        this,
-        context.state,
-        context.options.tablename,
-        context.options.keydata
-      )
+      return getItem(this, context.state, context.options.tablename, context.options.keydata)
     } else {
       context.log(
         'Incorrect or insufficient parameters. \nUsage: get --tablename <tablename> --keydata <hashkey and rangekey key/value pairs in json format>'
       )
     }
-    return outputs
   }
 }
 

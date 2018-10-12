@@ -1,4 +1,4 @@
-name: AwsSNSTopic
+name: AwsSnsTopic
 extends: Component
 implements:
   - ISource

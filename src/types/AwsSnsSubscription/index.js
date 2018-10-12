@@ -1,17 +1,9 @@
 import { getProtocol } from './protocols'
 import { setSubscriptionAttributes } from './protocols/lib'
-import {
-  concat,
-  contains,
-  equals,
-  head,
-  keys,
-  map,
-  merge,
-  reduce,
-  slice,
-  values
-} from '@serverless/utils'
+import { concat, contains, equals, head, keys, map, reduce, slice, values } from '@serverless/utils'
+
+const DEPLOY = 'deploy'
+const REPLACE = 'replace'
 
 const capitalize = (string) => `${head(string).toUpperCase()}${slice(1, Infinity, string)}`
 
@@ -60,33 +52,22 @@ const setAllSubscriptionAttributes = async (subscriptionArn, inputs, context) =>
 }
 
 const AwsSnsSubscription = {
-  async deploy(prevInstance, context) {
-    const state = context.getState(this)
-    if (
-      (state.topic && this.topic !== state.topic) ||
-      (state.protocol && this.protocol !== state.protocol)
-    ) {
-      await this.remove(prevInstance, context)
+  shouldDeploy(prevInstance) {
+    if (!prevInstance) {
+      return DEPLOY
     }
-
-    let newState = state
-    if (
-      !state ||
-      !state.topic ||
-      ((state.topic && this.topic !== state.topic) ||
-        (state.protocol && this.protocol !== state.protocol))
-    ) {
-      newState = await getProtocol(this.protocol).deploy(this, context)
+    if (prevInstance.protocol !== this.protocol && prevInstance.topic !== this.topic) {
+      return REPLACE
     }
-
-    await setAllSubscriptionAttributes(newState.subscriptionArn, this, context)
-
-    context.saveState(this, merge(newState, this))
   },
+
+  async deploy(prevInstance, context) {
+    const subscriptionArn = await getProtocol(this.protocol).deploy(this, context)
+    return setAllSubscriptionAttributes(subscriptionArn, this, context)
+  },
+
   async remove(prevInstance, context) {
-    const state = context.getState(this)
-    await getProtocol(state.protocol).remove(context)
-    context.saveState(this, {})
+    return getProtocol(this.protocol).remove(context)
   }
 }
 
