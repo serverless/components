@@ -11,8 +11,9 @@ import loadTypeMetaFromUrl from './loadTypeMetaFromUrl'
  * @param {string} query
  * @param {*} context
  * @returns {{
- *   root: string,
- *   props: string
+ *   props: string,
+ *   query: string,
+ *   root: string
  * }}
  */
 const loadTypeMeta = async (query, context) => {

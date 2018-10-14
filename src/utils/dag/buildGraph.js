@@ -1,45 +1,41 @@
 import { forEach, get } from '@serverless/utils'
 import { Graph } from 'graphlib'
 import getChildrenIds from '../component/getChildrenIds'
+import getParentId from '../component/getParentId'
 import walkReduceComponentDepthFirst from '../component/walkReduceComponentDepthFirst'
 
 const buildGraph = (nextInstance, prevInstance) => {
   let graph = new Graph()
 
   // nextInstance nodes
-  graph = walkReduceComponentDepthFirst(
-    (accum, currentInstance) => {
-      if (!currentInstance.instanceId) {
-        throw new Error(
-          `While building the dependency graph we detected a component instance doesn't have an instanceId. This shouldn't happen. Something has gone wrong. ${currentInstance}`
-        )
-      }
-      const node = {
-        instanceId: currentInstance.instanceId,
-        operation: currentInstance.shouldDeploy(),
-        nextInstance: currentInstance
-      }
-      accum.setNode(currentInstance.instanceId, node)
-      return accum
-    },
-    graph,
-    nextInstance
-  )
+  if (nextInstance && prevInstance.instanceId) {
+    graph = walkReduceComponentDepthFirst(
+      (accum, currentInstance) => {
+        if (!currentInstance.instanceId) {
+          throw new Error(
+            `While building the dependency graph we detected a component instance doesn't have an instanceId. This shouldn't happen. Something has gone wrong. ${currentInstance}`
+          )
+        }
+        const node = {
+          instanceId: currentInstance.instanceId,
+          operation: currentInstance.shouldDeploy(),
+          nextInstance: currentInstance
+        }
+        accum.setNode(currentInstance.instanceId, node)
 
-  // edges
-  graph = walkReduceComponentDepthFirst(
-    (accum, currentInstance) => {
-      const childrenIds = getChildrenIds(currentInstance)
-      forEach((childId) => {
-        accum.setEdge(currentInstance.instanceId, childId)
-      }, childrenIds)
-      return accum
-    },
-    graph,
-    nextInstance
-  )
+        // edges
+        const childrenIds = getChildrenIds(currentInstance)
+        forEach((childId) => {
+          accum.setEdge(currentInstance.instanceId, childId)
+        }, childrenIds)
+        return accum
+      },
+      graph,
+      nextInstance
+    )
+  }
 
-  if (prevInstance) {
+  if (prevInstance && prevInstance.instanceId) {
     // prevInstance nodes
     graph = walkReduceComponentDepthFirst(
       (accum, currentInstance) => {
@@ -59,10 +55,21 @@ const buildGraph = (nextInstance, prevInstance) => {
             nextInstance: {} // what should be nextInstance in that case?
           }
           accum.setNode(currentInstance.instanceId, node)
-          accum.setEdge(currentInstance.parent, currentInstance.instanceId) // edge from parent to child
+
+          // Add the removed node's child edges
+          const childrenIds = getChildrenIds(currentInstance)
+          forEach((childId) => {
+            accum.setEdge(currentInstance.instanceId, childId)
+          }, childrenIds)
+
+          // NOTE BRN: The parent node could still exist in the next instance. If it does, then we add an edge from it to this new node here. If it doesn't, then a node will be created for the parent when the walk proceeds up to the next level and an edge will be added from the parent to the child when the parent node's child edges are added.
+          const parentId = getParentId(currentInstance)
+          if (parentId && accum.node(parentId)) {
+            accum.setEdge(parentId, currentInstance.instanceId)
+          }
+          return accum
         }
         node.prevInstance = currentInstance
-        accum.setNode(currentInstance.instanceId, node)
         return accum
       },
       graph,

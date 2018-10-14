@@ -36,7 +36,11 @@ const loadTypeMetaFromName = async (typeName, context) => {
   if (!absoluteTypePath) {
     throw errorUnknownTypeName(typeName)
   }
-  return loadTypeMetaFromPath(absoluteTypePath, context)
+  const typeMeta = await loadTypeMetaFromPath(absoluteTypePath, context)
+  return {
+    ...typeMeta,
+    query: typeName
+  }
 }
 
 export default loadTypeMetaFromName

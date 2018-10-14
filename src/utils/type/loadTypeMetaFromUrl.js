@@ -22,7 +22,11 @@ const loadTypeMetaFromUrl = async (url, context) => {
     await downloadType(url, downloadedTypePath)
   }
 
-  return loadTypeMetaFromPath(downloadedTypePath, context)
+  const typeMeta = await loadTypeMetaFromPath(downloadedTypePath, context)
+  return {
+    ...typeMeta
+    query: url
+  }
 }
 
 export default loadTypeMetaFromUrl

@@ -1,10 +1,11 @@
-import { get, pick, set } from '@serverless/utils'
+import { get, isEmpty, pick, set } from '@serverless/utils'
 import { propOr } from 'ramda' // Eslam todo: move to @serverless/utils
 import loadApp from '../app/loadApp'
 import defineComponent from '../component/defineComponent'
 import defineComponentFromState from '../component/defineComponentFromState'
 import generateInstanceId from '../component/generateInstanceId'
-import { DEFAULT_PLUGINS } from '../constants'
+import setKey from '../component/setKey'
+import { DEFAULT_PLUGINS, SYMBOL_KEY } from '../constants'
 import createDeployment from '../deployment/createDeployment'
 import loadDeployment from '../deployment/loadDeployment'
 import loadPreviousDeployment from '../deployment/loadPreviousDeployment'
@@ -54,6 +55,15 @@ const newContext = (props) => {
         deployment
       })
       return nextContext.loadState()
+    },
+    createInstance: async () => {
+      let instance = await finalContext.construct(finalContext.project.Type)
+      instance = setKey('$', instance)
+
+      // NOTE BRN: instance gets defined based on serverless.yml and type code
+      instance = finalContext.defineComponent(instance)
+
+      return instance
     },
     defineComponent: (component) => defineComponent(component, finalContext),
     defineComponentFromState: (component) => defineComponentFromState(component, finalContext),
@@ -105,6 +115,17 @@ const newContext = (props) => {
         deployment
       })
       return nextContext.loadState()
+    },
+    loadInstanceFromState: async () => {
+      // WARNING BRN: this is the newer type. It is possible that this code has changed so much from the prev deployment that it's not possible to build an accurate represention of what was deployed. Could cause issues. Need a way to reconcile this eventually. Perhaps packaging up the project on each deployment and storing it away for use in this scenario (along with the config that was used to perform the deployment).
+      let instance
+      if (!isEmpty(finalContext.state)) {
+        instance = await finalContext.construct(finalContext.project.Type, {})
+        instance = setKey('$', instance)
+        // NOTE BRN: instance gets defined based on what was stored into state
+        instance = await finalContext.defineComponentFromState(instance)
+      }
+      return instance
     },
     loadPlugins: async () => {
       // TODO BRN: Allow for the plugins to be configured via options or config
@@ -159,12 +180,22 @@ const newContext = (props) => {
         ...context,
         ...value
       }),
-    saveState: (query, state) => {
-      const { deployment } = finalContext
+    saveState: async (query, newState) => {
+      const { deployment, state } = finalContext
       if (!deployment) {
         throw new Error(
           'saveState method expects context to have a deployment loaded. You must first call loadDeployment, loadPreviousDeployment or createDeployment on context before calling saveState'
         )
+      }
+
+      if (!query.instanceId) {
+        throw new Error('unknown query to saveState. Query did not have an instanceId')
+      }
+      state[query.instanceId] = {
+        instanceId: query.instanceId,
+        key: query[SYMBOL_KEY],
+        // inputs: query.inputs, // TODO BRN: Is this a good idea or not?
+        state: newState
       }
       return saveState(deployment, state)
     },

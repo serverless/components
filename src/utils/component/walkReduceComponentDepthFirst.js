@@ -4,9 +4,9 @@ import {
   forEachObjIndexed,
   isArray,
   isObject,
+  resolve,
   walk
 } from '@serverless/utils'
-import resolve from '../variable/resolve'
 
 const walkee = (accum, component, keys, iteratee, recur) => {
   let result = accum

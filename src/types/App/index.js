@@ -6,7 +6,7 @@ const App = (SuperClass) =>
     async define(context) {
       super.define(context)
       const children = {
-        ...this.services,
+        ...this.services
         // ...this.components
       }
       return children

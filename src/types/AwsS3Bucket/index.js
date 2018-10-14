@@ -1,4 +1,4 @@
-import { get } from '@serverless/utils'
+import { get, isString } from '@serverless/utils'
 import { createBucket, deleteBucket } from './utils'
 
 const DEPLOY = 'deploy'
@@ -7,33 +7,30 @@ const REPLACE = 'replace'
 const AwsS3Bucket = (SuperClass) =>
   class extends SuperClass {
     construct(inputs, context) {
-      console.log('AwsS3Bucket - construct called')
-      console.log('this:', this, '\n inputs:', inputs)
       this.bucketName = inputs.bucketName
       this.provider = inputs.provider || context.get('provider')
     }
 
-    hydrate(state, context) {
-      super.hydrate(state, context)
-      console.log('AwsS3Bucket - hydrate called - state:', state)
-      this.bucketName = state.bucketName || this.bucketName
-    }
+    // hydrate(state, context) {
+    //   super.hydrate(state, context)
+    //   this.bucketName = state.bucketName || this.bucketName
+    // }
 
     shouldDeploy(prevInstance) {
-      console.log('AwsS3Bucket - hydrate called - prevInstance:', prevInstance)
       if (!prevInstance) {
         return DEPLOY
       }
+
       if (prevInstance.bucketName !== this.bucketName) {
         return REPLACE
       }
     }
 
     async deploy(prevInstance, context) {
-      console.log('this:', this)
       context.log(`Creating Bucket: '${get('bucketName', this)}'`)
       await createBucket(this)
-      context.saveState(this, { bucketName: this.bucketName }) // provider?
+      // context.saveState(this, { bucketName: this.bucketName }) // provider?
+      // await context.saveState()
     }
 
     async remove(context) {

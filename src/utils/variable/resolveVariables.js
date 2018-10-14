@@ -1,5 +1,4 @@
-import { forEachIndexed, forEachObjIndexed, isArray, isObject } from '@serverless/utils'
-import resolve from '../variable/resolve'
+import { forEachIndexed, forEachObjIndexed, isArray, isObject, resolve } from '@serverless/utils'
 
 const visitVariables = (value, visited) => {
   value = resolve(value)

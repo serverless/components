@@ -19,6 +19,7 @@ describe('index', () => {
       defineComponentFromState: expect.any(Function),
       getChildrenIds: expect.any(Function),
       getKey: expect.any(Function),
+      getParentId: expect.any(Function),
       getParentIds: expect.any(Function),
       setKey: expect.any(Function),
       walkReduceComponent: expect.any(Function)
@@ -102,12 +103,14 @@ describe('index', () => {
   test('has variable methods', () => {
     const mod = require('./')
     expect(mod).toMatchObject({
+      defineVariable: expect.any(Function),
+      defineVariables: expect.any(Function),
       hasVariableString: expect.any(Function),
       isVariable: expect.any(Function),
       matchVariable: expect.any(Function),
       newVariable: expect.any(Function),
       regexVariable: expect.any(Object),
-      resolveVariable: expect.any(Function),
+      resolveVariableString: expect.any(Function),
       resolveVariables: expect.any(Function)
     })
   })

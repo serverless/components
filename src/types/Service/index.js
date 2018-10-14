@@ -1,12 +1,12 @@
-import { mapObjIndexed } from 'ramda'
-import Promise from 'bluebird'
+import { all, mapObjIndexed, resolve } from '@serverless/utils'
 
-const Service = (SuperClass) =>
-  class extends SuperClass {
-    async define(context) {
-      super.define(context)
-      const Fn = await context.loadType('Function')
-      const functionInstances = await Promise.props(
+const Service = async (SuperClass) => {
+  const Fn = await context.loadType('Function')
+
+  return class extends SuperClass {
+    async construct(inputs, context) {
+      const fns = resolve(this.functions)
+      this.functions = await all(
         mapObjIndexed(async (func, alias) => {
           return await context.construct(
             Fn,
@@ -18,12 +18,16 @@ const Service = (SuperClass) =>
           )
         }, this.functions)
       )
-      this.functions = functionInstances
+    }
+
+    async define(context) {
+      // TODO BRN: Change this once we support multiple layers here. This could cause collisions between functions and components that are named the same thing.
       return {
         ...this.functions,
         ...this.components
       }
     }
   }
+}
 
 export default Service

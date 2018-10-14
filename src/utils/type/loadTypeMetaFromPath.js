@@ -1,5 +1,5 @@
 import { findPath, get, readFile, set } from '@serverless/utils'
-import { dirname, isAbsolute, resolve } from 'path'
+import { dirname, isAbsolute, relative, resolve } from 'path'
 import errorTypeFileNotFound from './errorTypeFileNotFound'
 import findTypeFileAtPath from './findTypeFileAtPath'
 
@@ -12,7 +12,6 @@ import findTypeFileAtPath from './findTypeFileAtPath'
  * }}
  */
 const loadTypeMetaFromPath = async (typePath, context) => {
-  // console.log('typePath:', typePath)
   let absoluteTypePath = typePath
   if (!isAbsolute(typePath)) {
     const basePath = findPath(context.root, context.cwd, process.cwd())
@@ -32,8 +31,11 @@ const loadTypeMetaFromPath = async (typePath, context) => {
     throw errorTypeFileNotFound(absoluteTypePath)
   }
   typeMeta = {
-    root: dirname(typeFilePath),
-    props: await readFile(typeFilePath)
+    props: await readFile(typeFilePath),
+
+    // NOTE BRN: Not sure that this is right. We need a soure path that will be usable after this path is serialized. This means it could be loaded on another users machine and their machine would try to load from this path. Seems like being relative to the project might be the most predicatable way to find this file on a cross machine basis.
+    query: relative(context.project.path, absoluteTypePath),
+    root: dirname(typeFilePath)
   }
 
   // store type meta data in cache

@@ -1,54 +1,8 @@
-import { isEmpty } from '@serverless/utils'
-import { handleSignalEvents, setKey, buildGraph, deployGraph, removeGraph } from '../../utils'
-
-const createInstance = async (context) => {
-  let instance = await context.construct(context.project.Type)
-  instance = setKey('$', instance)
-
-  // NOTE BRN: instance gets defined based on serverless.yml and type code
-  instance = context.defineComponent(instance)
-
-  return instance
-}
-
-const loadInstanceFromState = async (context) => {
-  // WARNING BRN: this is the newer type. It is possible that this code has changed so much from the prev deployment that it's not possible to build an accurate represention of what was deployed. Could cause issues. Need a way to reconcile this eventually. Perhaps packaging up the project on each deployment and storing it away for use in this scenario (along with the config that was used to perform the deployment).
-  let instance
-  if (!isEmpty(context.state)) {
-    instance = await context.construct(context.project.Type, {})
-    instance = setKey('$', instance)
-    // NOTE BRN: instance gets defined based on what was stored into state
-    instance = await context.defineComponentFromState(instance)
-  }
-  return instance
-}
+import { handleSignalEvents, buildGraph, deployGraph, removeGraph } from '../../utils'
 
 const Deploy = {
   async run(context) {
-    // context.log('Deploy run executing - context:', context)
-
-    // TODO BRN (low priority): Add programmatic support for programmatically supplying the contents of serverless.yml. When programmatically supplied, we should use defType instead of loadType to get the Project type
-
-    context = await context.loadProject()
-    context = await context.loadApp()
-
-    const prevContext = await context.loadPreviousDeployment()
-    const nextContext = await context.createDeployment(prevContext.deployment)
-
-    // TODO BRN (low priority): Upgrade this signal handling so that we can tie in a handler that knows what to do when a SIGINT is received. In the case of deploy we may want to ignore the first one and log out the message, then if we receive anther one we stop the current deployment and start a rollback
-    handleSignalEvents(context)
-
-    // TODO BRN (low priority): inputs to the top level might be a way to inject project/deployment config
-
-    const prevInstance = await loadInstanceFromState(prevContext)
-    const nextInstance = await createInstance(nextContext)
-
-    const graph = buildGraph(nextInstance, prevInstance)
-
-    await deployGraph(graph, nextContext)
-    await removeGraph(graph, prevContext)
-
-    // TODO BRN (high priority): build a deployment graph based upon the prevInstance and the nextInstance. Please note that all of the code in the "utils/dag" will need to be refactored based upon the following instructions. Please also update it to use imports/exports as we do in the rest of the utils folders.
+    // NOTE BRN: here we build a deployment graph based upon the prevInstance and the nextInstance.
     //
     //  Building the nodes of the graph
     //  1. each node in the graph should have a nextInstance, prevInstance, instanceId and operation properties
@@ -73,6 +27,7 @@ const Deploy = {
     //  3. walkReduceComponentDepthFirst on the prevInstance tree
     //    - as you walk through each instance on the tree, load the corresponding node from the graph and set the prevInstance property on the node.
     //    - If the node does not exist on the graph, it means the node needs to be removed. Add the node to the graph. Set the prevInstance property, the instanceId and the operation to "remove". Also add an edge from the instances parent to the child that will be removed. You can access a child's parent using the `instance.parent` property
+    //
     // Deploying the Graph
     // We should execute the deployment of the graph in a few phases
     //  1. First execute all deploy operations.
@@ -86,13 +41,34 @@ const Deploy = {
     //    - remove should be called against the "prevInstance" value of the graph node
     //    - If a "replace" is encountered, call remove() on the prevInstance value in the graph node.
 
+    // TODO BRN (low priority): Add programmatic support for programmatically supplying the contents of serverless.yml. When programmatically supplied, we should use defType instead of loadType to get the Project type
+
+    context = await context.loadProject()
+    context = await context.loadApp()
+
+    const prevContext = await context.loadPreviousDeployment()
+    const nextContext = await context.createDeployment(prevContext.deployment)
+
+    // TODO BRN (low priority): Upgrade this signal handling so that we can tie in a handler that knows what to do when a SIGINT is received. In the case of deploy we may want to ignore the first one and log out the message, then if we receive anther one we stop the current deployment and start a rollback
+    handleSignalEvents(context)
+
+    // TODO BRN (low priority): inputs to the top level might be a way to inject project/deployment config
+
+    const prevInstance = await prevContext.loadInstanceFromState()
+    const nextInstance = await nextContext.createInstance()
+
+    const graph = buildGraph(nextInstance, prevInstance)
+
+    await deployGraph(graph, nextContext)
+    await removeGraph(graph, prevContext)
+
     // Deployment complete!
 
     // NOTE BRN: state is saved when saveState is called by each function. No need to call it here.
 
-    // Run the info command against the nextInstance project
+    // TODO BRN: Run the info command against the nextInstance project
 
-    return context
+    return nextContext
   }
 }
 

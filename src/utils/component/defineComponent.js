@@ -5,9 +5,9 @@ import {
   isArray,
   isFunction,
   isObject,
-  map
+  map,
+  resolve
 } from '@serverless/utils'
-import resolve from '../variable/resolve'
 import appendKey from './appendKey'
 import getKey from './getKey'
 import hydrateComponent from './hydrateComponent'
