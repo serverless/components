@@ -1,0 +1,13 @@
+{
+  "name": "@serverless-components/aws-sqs",
+  "version": "0.2.0",
+  "private": true,
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.224.1",
+    "lodash": "^4.17.11"
+  }
+}
