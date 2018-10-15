@@ -133,7 +133,7 @@ function getSwaggerDefinition(name, roleArn, routes) {
     forEachObjIndexed((methodObject, method) => {
       const normalizedMethod = getNormalizedMethod(method)
       const uri = `arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/${
-        methodObject.lambdaArn
+        methodObject.function.children.fn.arn
       }/invocations`
 
       let isCorsEnabled

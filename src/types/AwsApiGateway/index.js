@@ -1,6 +1,6 @@
-const { equals } = require('ramda')
-const { getSwaggerDefinition, generateUrl, generateUrls } = require('./utils')
-const { resolve } = require('../../utils/variable')
+import { getSwaggerDefinition, generateUrl, generateUrls } from './utils'
+import { equals } from '@serverless/utils'
+import { resolve } from '../../utils'
 
 const deleteApi = async (APIGateway, params) => {
   const { id } = params
@@ -17,7 +17,8 @@ const deleteApi = async (APIGateway, params) => {
 }
 
 const createApi = async (APIGateway, params) => {
-  const { name, roleArn, routes, authorizer } = params
+  const { name, role, routes, authorizer } = params
+  const roleArn = role.arn
 
   const swagger = getSwaggerDefinition(name, roleArn, routes)
   const json = JSON.stringify(swagger)
@@ -32,10 +33,14 @@ const createApi = async (APIGateway, params) => {
   }).promise()
 
   if (authorizer) {
+    const { function: func, ...authorizerParams } = authorizer
     await APIGateway.createAuthorizer({
       name: `${params.name}-${res.id}-authorizer`,
       restApiId: res.id,
-      ...authorizer
+      authorizerUri: `arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/${
+        func.children.fn.arn
+      }/invocations`,
+      ...authorizerParams
     }).promise()
   }
 
@@ -51,7 +56,8 @@ const createApi = async (APIGateway, params) => {
 }
 
 const updateApi = async (APIGateway, params) => {
-  const { name, roleArn, routes, id } = params
+  const { name, role, routes, id } = params
+  const roleArn = role.arn
 
   const swagger = getSwaggerDefinition(name, roleArn, routes)
   const json = JSON.stringify(swagger)
@@ -82,15 +88,23 @@ module.exports = {
     this.inputs = inputs
   },
 
+  async define() {
+    const childComponents = []
+    if (this.inputs.authorizer && this.inputs.authorizer.function) {
+      childComponents.push(resolve(this.inputs.authorizer.function))
+    }
+
+    return childComponents
+  },
+
   async deploy(prevInstance, context) {
     const inputs = this.inputs
-    const provider = resolve(inputs.provider)
-    const aws = provider.getSdk()
+    const aws = inputs.provider.getSdk()
     const APIGateway = new aws.APIGateway()
-    const state = context.getState(this)
+    const state = prevInstance || {}
     const noChanges =
       inputs.name === state.name &&
-      inputs.roleArn === state.roleArn &&
+      (inputs.role && state.role && inputs.role.arn === state.role.arn) &&
       equals(inputs.routes, state.routes)
 
     let outputs
@@ -107,7 +121,7 @@ module.exports = {
         url: state.url
       })
     }
-    context.saveState(this, { ...inputs, ...outputs })
+    // context.saveState(this, { ...inputs, ...outputs })
     return Object.assign(this, outputs)
   },
 

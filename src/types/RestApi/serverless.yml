@@ -13,6 +13,14 @@ repository: "github:serverless/components"
 paths:
   type: array
   description: An array of registered URL's with relevant information.
+baseUrl:
+  type: string
+authorizer:
+  type: object
+apiName:
+  type: string
+gateway:
+  type: object
 
 inputTypes:
   provider:

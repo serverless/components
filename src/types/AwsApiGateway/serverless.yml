@@ -27,8 +27,8 @@ inputTypes:
     type: string
     default: apig-${self.instanceId}
     description: Name of API gateway in AWS console
-  roleArn:
-    type: string
+  role:
+    type: AwsIamRole
     required: true
     description: AWS Arn role for API gateway to assume
   routes:

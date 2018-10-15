@@ -7,21 +7,15 @@ const { joinUrl } = require('./utils')
 const catchallParameterPattern = /{\.{3}([^}]+?)}/g
 const pathParameterPattern = /{([^}]+?)}/g
 
-async function getAwsApiGatewayInputs(inputs, context, funcs, authorizerFunc) {
+async function getAwsApiGatewayInputs(inputs, context, authorizerFunc) {
   const apiGatewayInputs = {
-    name: inputs.name,
-    roleArn: inputs.roleArn,
+    name: inputs.apiName,
+    role: inputs.role,
     routes: {}
   }
 
   if (authorizerFunc) {
-    const { function: _, ...authorizerParams } = inputs.authorizer
-    apiGatewayInputs.authorizer = {
-      authorizerUri: `arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/${
-        authorizerFunc.children.fn.arn
-      }/invocations`,
-      ...authorizerParams
-    }
+    apiGatewayInputs.authorizer = inputs.authorizer
   }
 
   for (const [path, methods] of Object.entries(inputs.routes)) {
@@ -32,32 +26,28 @@ async function getAwsApiGatewayInputs(inputs, context, funcs, authorizerFunc) {
 
     for (const [method, methodObject] of Object.entries(methods)) {
       const normalizedMethod = method.toUpperCase()
-      const { functionInstance } = funcs.find((obj) => obj.path === path && obj.method === method)
       routeObject[normalizedMethod] = methodObject
 
-      if (functionInstance) {
+      if (methodObject.function) {
         Object.assign(routeObject[normalizedMethod], {
-          lambdaArn: functionInstance.children.fn.arn
+          function: methodObject.function
         })
       }
-      delete routeObject[normalizedMethod].function
     }
   }
 
   return apiGatewayInputs
 }
 
-async function deployApiGateway(inputs, context, provider, funcs, authorizerFunc) {
-  const apiInputs = await getAwsApiGatewayInputs(inputs, context, funcs, authorizerFunc)
+async function constructApiGateway(inputs, context, provider, authorizerFunc) {
+  const apiInputs = await getAwsApiGatewayInputs(inputs, context, authorizerFunc)
 
   const apiGatewayComponent = await context.loadType('AwsApiGateway')
   const apiGateway = await context.construct(apiGatewayComponent, {
     ...apiInputs,
     provider: provider
   })
-  const outputs = await apiGateway.deploy(undefined, context)
-  outputs.name = inputs.name
-  return outputs
+  return apiGateway
 }
 
 function getEventGatewayInputs(inputs) {
@@ -97,7 +87,7 @@ async function deployEventGateway(inputs, context) {
 
 async function removeIamRole(inputs, context) {
   // TODO: remove duplicate code
-  const name = `${inputs.name}-iam-role`
+  const name = `${inputs.apiName}-iam-role`
   const service = 'apigateway.amazonaws.com'
 
   const iamComponent = await context.load('aws-iam-role', 'iam', {
@@ -111,7 +101,7 @@ async function removeApiGateway(inputs, context, state) {
   const apiInputs = await getAwsApiGatewayInputs(
     {
       ...inputs,
-      roleArn: state.roleArn,
+      role: state.role,
       routes: {}
     },
     context
@@ -165,79 +155,52 @@ function flattenRoutes(routes) {
 }
 
 module.exports = {
-  construct(inputs) {
+  async construct(inputs, context) {
     this.inputs = inputs
-  },
-
-  async define(context) {
-    const inputs = this.inputs
+    this.authorizer = inputs.authorizer
+    this.apiName = inputs.apiName
     const flatRoutes = flattenRoutes(inputs.routes)
-    const functions = []
-    const tr = []
-    for (const [route, routeProps] of Object.entries(flatRoutes)) {
-      for (const [method, methodProps] of Object.entries(routeProps)) {
-        if (methodProps.function) {
-          const func = resolve(methodProps.function)
-          functions.push({ path: route, method, functionInstance: func })
-        }
-      }
-    }
 
-    const name = `${inputs.name}-iam-role-${Math.random()
+    const childComponents = []
+
+    const name = `${inputs.apiName}-iam-role-${Math.random()
       .toString(36)
       .substring(7)}`
     const service = 'apigateway.amazonaws.com'
-
     const iamComponent = await context.loadType('AwsIamRole')
     this.role = await context.construct(iamComponent, {
       roleName: name,
       service,
       provider: inputs.provider
     })
+    childComponents.push(this.role)
 
+    // TODO: remove after variable resolution is fixed
+    let authorizerFunction
     if (inputs.authorizer && inputs.authorizer.function) {
-      const func = resolve(inputs.authorizer.function)
-      tr.push(func)
-      this.authorizerFunction = func
+      authorizerFunction = inputs.authorizer.function
     }
 
-    this.functions = functions
-    tr.concat([...functions.map((f) => f.functionInstance), this.role])
-    return tr
-  },
-
-  async deploy(prevInstance, context) {
-    const inputs = this.inputs
-    const flatRoutes = flattenRoutes(inputs.routes)
     const flatInputs = { ...inputs, routes: flatRoutes }
+    this.gateway = await constructApiGateway(
+      {
+        ...flatInputs,
+        role: this.role // TODO: add functionality to read from state so that update works
+      },
+      context,
+      inputs.provider,
+      authorizerFunction
+    )
+    childComponents.push(this.gateway)
 
-    const outputs = {}
-    if (inputs.gateway === 'eventgateway') {
-      outputs.eventgateway = await deployEventGateway(flatInputs, context)
-      outputs.url = outputs.eventgateway.url
-      context.saveState({ url: outputs.url })
-    } else if (inputs.gateway === 'AwsApiGateway') {
-      outputs.iam = this.role
-      outputs.apigateway = await deployApiGateway(
-        {
-          ...flatInputs,
-          roleArn: outputs.iam.arn // TODO: add functionality to read from state so that update works
-        },
-        context,
-        inputs.provider,
-        this.functions,
-        this.authorizerFunction
-      )
-      outputs.url = outputs.apigateway.url
-      context.saveState({
-        roleArn: outputs.iam.arn,
-        apigArn: outputs.apigateway.arn,
-        url: outputs.url
-      })
-    }
-
-    return Object.assign(this, outputs)
+    this.childComponents = childComponents
   },
+
+  async define(context) {
+    return this.childComponents || []
+  },
+
+  async deploy(prevInstance, context) {},
 
   async remove(prevInstance, context) {
     const state = context.getState(this)
