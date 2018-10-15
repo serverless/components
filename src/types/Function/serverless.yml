@@ -5,17 +5,6 @@ main: ./index.js
 version: 0.3.0
 description: "A cloud agnostic Severless Function"
 
-functionName: ${inputs.functionName}
-functionDescription: ${inputs.functionDescription}
-memory: ${inputs.memory}
-timeout: ${inputs.timeout}
-runtime: ${inputs.runtime}
-code: ${inputs.code}
-handler: ${inputs.handler}
-compute: ${inputs.compute}
-environment: ${inputs.environment}
-tags: ${inputs.tags}
-
 # TODO BRN: Add opt out for universal function signature
 inputTypes:
   functionName:

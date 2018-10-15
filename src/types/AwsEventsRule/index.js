@@ -9,8 +9,10 @@ const AwsEventsRule = {
   },
 
   async define(context) {
-    const compute = this.function.compute.get()
-    this.lambda = await compute.defineFunction(this.function, context)
+    // console.log('//////////////////////////////////////////////////')
+    // console.log(this.lambda)
+    const compute = this.lambda.compute.get()
+    this.lambda = await compute.defineFunction(this.lambda, context)
     return { lambda: this.lambda }
   },
 

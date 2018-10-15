@@ -66,6 +66,19 @@ const deleteLambda = async (Lambda, name) => {
 
 const AwsLambdaFunction = (SuperClass) =>
   class extends SuperClass {
+    construct(inputs) {
+      this.provider = inputs.provider
+      this.functionName = inputs.functionName
+      this.functionDescription = inputs.functionDescription
+      this.handler = inputs.handler
+      this.code = inputs.code
+      this.runtime = inputs.runtime
+      this.memorySize = inputs.memorySize
+      this.timeout = inputs.timeout
+      this.environment = inputs.environment
+      this.tags = inputs.tags
+      this.role = inputs.role
+    }
     shouldDeploy(prevInstance) {
       if (!prevInstance) {
         return 'deploy'
@@ -79,14 +92,11 @@ const AwsLambdaFunction = (SuperClass) =>
       let role = resolve(this.role)
       if (!role) {
         const DefaultRole = await context.loadType('AwsIamRole')
-        const rand = Math.random()
-          .toString(36)
-          .substring(7)
 
         role = this.role = await context.construct(
           DefaultRole,
           {
-            roleName: `${rand}-execution-role`,
+            roleName: `${this.functionName}-execution-role`,
             service: 'lambda.amazonaws.com',
             provider: this.provider
           },
@@ -104,7 +114,7 @@ const AwsLambdaFunction = (SuperClass) =>
       const outputFileName = `${String(Date.now())}.zip`
       const outputFilePath = path.join(tmpdir(), outputFileName)
 
-      return new Promise((resolve, reject) => {
+      return new Promise((rslv, reject) => {
         const output = createWriteStream(outputFilePath)
         const archive = archiver('zip', {
           zlib: { level: 9 }
@@ -113,7 +123,7 @@ const AwsLambdaFunction = (SuperClass) =>
         archive.on('error', (err) => reject(err))
         output.on('close', () => {
           this.code = readFileSync(outputFilePath)
-          return resolve(this)
+          return rslv(this)
         })
 
         archive.pipe(output)

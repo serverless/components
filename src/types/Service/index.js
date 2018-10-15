@@ -1,13 +1,13 @@
-import { map } from '@serverless/utils'
+import { mapObjIndexed } from 'ramda'
 import Promise from 'bluebird'
 
 const Service = (SuperClass) =>
   class extends SuperClass {
-    async construct(inputs, context) {
+    async define(context) {
+      super.define(context)
       const Fn = await context.loadType('Function')
-      const fns = this.functions
-      this.functions = await Promise.props(
-        map(async (func, alias) => {
+      const functionInstances = await Promise.props(
+        mapObjIndexed(async (func, alias) => {
           return await context.construct(
             Fn,
             {
@@ -16,13 +16,9 @@ const Service = (SuperClass) =>
             },
             context
           )
-        }, fns)
+        }, this.functions)
       )
-    }
-
-    async define(context) {
-      super.define(context)
-      console.log(this.functions)
+      this.functions = functionInstances
       return {
         ...this.functions,
         ...this.components

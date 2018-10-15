@@ -2,9 +2,9 @@ name: Service
 extends: Component
 main: ./index.js
 
-providers: ${inputs.providers}
-compute: ${inputs.compute}
-functions: ${inputs.functions}
+#providers: ${inputs.providers}
+#compute: ${inputs.compute}
+#functions: ${inputs.functions}
 
 inputTypes:
   providers:

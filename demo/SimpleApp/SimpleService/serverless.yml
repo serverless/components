@@ -19,5 +19,5 @@ components:
   cron:
     type: Cron
     inputs:
-      function: ${this.functions.hello}
+      function: ${this.functions.myUniqueFunctionName}
       rate: 3m

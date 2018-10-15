@@ -41,11 +41,19 @@ const getShimFile = (runtime) => {
 const AwsLambdaCompute = async (SuperClass, superContext) => {
   const AwsLambdaFunction = await superContext.loadType('AwsLambdaFunction')
   return {
+    construct(inputs) {
+      this.provider = inputs.provider
+      this.runtime = inputs.runtime
+      this.memory = inputs.memory
+      this.timeout = inputs.timeout
+      this.environment = inputs.environment
+      this.tags = inputs.tags
+    },
     async defineFunction(functionInstance, context) {
       const funcInstance = resolve(functionInstance)
       // need to resolve these two variables now to convert values
-      const runtime = convertRuntime(this.runtime.get())
-      let code = functionInstance.code.get()
+      const runtime = convertRuntime(this.runtime)
+      let code = functionInstance.code
       if (isString(code)) {
         code = [code]
       }
