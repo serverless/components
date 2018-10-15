@@ -1,31 +1,27 @@
-const { mapIndexed, pick } = require('@serverless/utils')
+const { mapIndexed } = require('@serverless/utils')
 const joinPath = require('path').join
 const { isEmpty, keys, union, not, map, forEachObjIndexed } = require('ramda')
+const { resolve } = require('../../utils/variable')
 const { joinUrl } = require('./utils')
 
 const catchallParameterPattern = /{\.{3}([^}]+?)}/g
 const pathParameterPattern = /{([^}]+?)}/g
 
-const inputsProps = ['name', 'routes', 'gateway', 'provider']
-
-// "private" functions
-async function deployIamRole(inputs, context, rand) {
-  const name = `${inputs.name}-iam-role-${rand}`
-  const service = 'apigateway.amazonaws.com'
-
-  const iamComponent = await context.loadType('AwsIamRole')
-  const role = await context.construct(iamComponent, { name, service, provider: inputs.provider })
-  const outputs = await role.deploy(undefined, context)
-  outputs.name = name
-  outputs.service = service
-  return outputs
-}
-
-async function getAwsApiGatewayInputs(inputs, context, func) {
+async function getAwsApiGatewayInputs(inputs, context, funcs, authorizerFunc) {
   const apiGatewayInputs = {
     name: inputs.name,
     roleArn: inputs.roleArn,
     routes: {}
+  }
+
+  if (authorizerFunc) {
+    const { function: _, ...authorizerParams } = inputs.authorizer
+    apiGatewayInputs.authorizer = {
+      authorizerUri: `arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/${
+        authorizerFunc.children.fn.arn
+      }/invocations`,
+      ...authorizerParams
+    }
   }
 
   for (const [path, methods] of Object.entries(inputs.routes)) {
@@ -36,10 +32,13 @@ async function getAwsApiGatewayInputs(inputs, context, func) {
 
     for (const [method, methodObject] of Object.entries(methods)) {
       const normalizedMethod = method.toUpperCase()
+      const { functionInstance } = funcs.find((obj) => obj.path === path && obj.method === method)
+      routeObject[normalizedMethod] = methodObject
 
-      routeObject[normalizedMethod] = {
-        lambdaArn: func.children.fn.arn,
-        ...methodObject
+      if (functionInstance) {
+        Object.assign(routeObject[normalizedMethod], {
+          lambdaArn: functionInstance.children.fn.arn
+        })
       }
       delete routeObject[normalizedMethod].function
     }
@@ -48,10 +47,10 @@ async function getAwsApiGatewayInputs(inputs, context, func) {
   return apiGatewayInputs
 }
 
-async function deployApiGateway(inputs, context, provider, func) {
-  const apiInputs = await getAwsApiGatewayInputs(inputs, context, func)
+async function deployApiGateway(inputs, context, provider, funcs, authorizerFunc) {
+  const apiInputs = await getAwsApiGatewayInputs(inputs, context, funcs, authorizerFunc)
 
-  const apiGatewayComponent = await context.loadType('../../src/types/AwsApiGateway')
+  const apiGatewayComponent = await context.loadType('AwsApiGateway')
   const apiGateway = await context.construct(apiGatewayComponent, {
     ...apiInputs,
     provider: provider
@@ -167,28 +166,48 @@ function flattenRoutes(routes) {
 
 module.exports = {
   construct(inputs) {
-    Object.assign(this, inputs)
+    this.inputs = inputs
   },
 
   async define(context) {
-    const inputs = pick(inputsProps, this)
+    const inputs = this.inputs
     const flatRoutes = flattenRoutes(inputs.routes)
     const functions = []
-    const funcComponent = await context.loadType('Function')
+    const tr = []
     for (const [route, routeProps] of Object.entries(flatRoutes)) {
       for (const [method, methodProps] of Object.entries(routeProps)) {
         if (methodProps.function) {
-          const func = await context.construct(funcComponent, methodProps.function)
-          functions.push(func)
+          const func = resolve(methodProps.function)
+          functions.push({ path: route, method, functionInstance: func })
         }
       }
     }
+
+    const name = `${inputs.name}-iam-role-${Math.random()
+      .toString(36)
+      .substring(7)}`
+    const service = 'apigateway.amazonaws.com'
+
+    const iamComponent = await context.loadType('AwsIamRole')
+    this.role = await context.construct(iamComponent, {
+      roleName: name,
+      service,
+      provider: inputs.provider
+    })
+
+    if (inputs.authorizer && inputs.authorizer.function) {
+      const func = resolve(inputs.authorizer.function)
+      tr.push(func)
+      this.authorizerFunction = func
+    }
+
     this.functions = functions
-    return { functions }
+    tr.concat([...functions.map((f) => f.functionInstance), this.role])
+    return tr
   },
 
   async deploy(prevInstance, context) {
-    const inputs = pick(inputsProps, this)
+    const inputs = this.inputs
     const flatRoutes = flattenRoutes(inputs.routes)
     const flatInputs = { ...inputs, routes: flatRoutes }
 
@@ -198,13 +217,7 @@ module.exports = {
       outputs.url = outputs.eventgateway.url
       context.saveState({ url: outputs.url })
     } else if (inputs.gateway === 'AwsApiGateway') {
-      outputs.iam = await deployIamRole(
-        inputs,
-        context,
-        Math.random()
-          .toString(36)
-          .substring(7)
-      )
+      outputs.iam = this.role
       outputs.apigateway = await deployApiGateway(
         {
           ...flatInputs,
@@ -212,7 +225,8 @@ module.exports = {
         },
         context,
         inputs.provider,
-        this.functions
+        this.functions,
+        this.authorizerFunction
       )
       outputs.url = outputs.apigateway.url
       context.saveState({
@@ -222,14 +236,12 @@ module.exports = {
       })
     }
 
-    context.log(JSON.stringify(['ding', outputs]))
-
     return Object.assign(this, outputs)
   },
 
   async remove(prevInstance, context) {
     const state = context.getState(this)
-    const inputs = pick(inputsProps, this)
+    const inputs = this.inputs
     const flatRoutes = flattenRoutes(inputs.routes)
     const routes = { ...state.routes, flatRoutes }
 
@@ -247,7 +259,7 @@ module.exports = {
 
   async info(prevInstance, context) {
     const state = context.getState(this)
-    const inputs = pick(inputsProps, this)
+    const inputs = this.inputs
     let message
     if (not(isEmpty(state))) {
       const baseUrl = state.url

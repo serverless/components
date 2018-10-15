@@ -21,10 +21,16 @@ inputTypes:
   gateway:
     type: string
     enum: [AwsApiGateway]
-  name:
+  apiName:
     type: string
     required: false
     default: api-${self.instanceId}
   routes:
     type: object
     required: true
+  authorizer:
+    type: object
+    example:
+      type: TOKEN
+      identitySource: method.request.header.Auth
+      authorizerUri: LAMBDA_ARN_HERE

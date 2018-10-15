@@ -1,8 +1,6 @@
 const { equals } = require('ramda')
-const { pick } = require('@serverless/utils')
 const { getSwaggerDefinition, generateUrl, generateUrls } = require('./utils')
-
-const inputsProps = ['provider', 'name', 'roleArn', 'routes']
+const { resolve } = require('../../utils/variable')
 
 const deleteApi = async (APIGateway, params) => {
   const { id } = params
@@ -19,7 +17,7 @@ const deleteApi = async (APIGateway, params) => {
 }
 
 const createApi = async (APIGateway, params) => {
-  const { name, roleArn, routes } = params
+  const { name, roleArn, routes, authorizer } = params
 
   const swagger = getSwaggerDefinition(name, roleArn, routes)
   const json = JSON.stringify(swagger)
@@ -32,6 +30,14 @@ const createApi = async (APIGateway, params) => {
     restApiId: res.id,
     stageName: 'dev'
   }).promise()
+
+  if (authorizer) {
+    await APIGateway.createAuthorizer({
+      name: `${params.name}-${res.id}-authorizer`,
+      restApiId: res.id,
+      ...authorizer
+    }).promise()
+  }
 
   const url = generateUrl(res.id)
   const urls = generateUrls(routes, res.id)
@@ -73,12 +79,13 @@ const updateApi = async (APIGateway, params) => {
 
 module.exports = {
   construct(inputs) {
-    Object.assign(this, inputs)
+    this.inputs = inputs
   },
 
   async deploy(prevInstance, context) {
-    const inputs = pick(inputsProps, this)
-    const aws = this.provider.getSdk()
+    const inputs = this.inputs
+    const provider = resolve(inputs.provider)
+    const aws = provider.getSdk()
     const APIGateway = new aws.APIGateway()
     const state = context.getState(this)
     const noChanges =
