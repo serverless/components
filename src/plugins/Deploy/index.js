@@ -43,6 +43,7 @@ const Deploy = {
 
     // TODO BRN (low priority): Add programmatic support for programmatically supplying the contents of serverless.yml. When programmatically supplied, we should use defType instead of loadType to get the Project type
 
+    context.log('Deploy running...')
     context = await context.loadProject()
     context = await context.loadApp()
 

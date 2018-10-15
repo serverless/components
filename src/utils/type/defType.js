@@ -9,37 +9,15 @@ import requireTypeMain from './requireTypeMain'
 const DEFAULT_MAIN = (SuperClass) => class extends SuperClass {}
 const LOADING_TYPES = new Set()
 
-/**
- * Define a type using the given root path and property declarations
- *
- * @param {{ root: string, props: Object }} def The type definition
- * @param {Context} context The context object
- * @returns {Type}
- */
-const defType = async ({ root, props }, context) => {
-  if (!isObject(props)) {
-    throw new Error('defType expects an object witha props property that is an object')
-  }
-  if (!isString(props.name)) {
-    throw new Error(
-      `Type declarations are expected to have a name. The type located at ${root} did not have one.`
-    )
-  }
-
-  // NOTE BRN: check for type definition in cache. If found return the original instance so that we don't create duplicate type definitions
-  const defsCache = get('types.defs', context.cache)
-  let typeDef = get([root], defsCache)
-  if (typeDef) {
-    return typeDef
-  }
-
+const loadDef = async (root, props, context) => {
   // NOTE BRN: When loading a type. If a re-entrant call (circular reference) is made when loading a type, we throw an error. We could work on allowing the circular reference to be resolved by stopping the def process here and returning early, but for now it's not supported.
   if (LOADING_TYPES.has(root)) {
+    console.log('LOADING_TYPES:', LOADING_TYPES)
     throw errorReentrantTypeLoad(props.name)
   }
   LOADING_TYPES.add(root)
 
-  typeDef = {
+  let typeDef = {
     root,
     props
   }
@@ -76,8 +54,35 @@ const defType = async ({ root, props }, context) => {
   typeDef = set('constructor', buildTypeConstructor(typeDef), typeDef)
 
   LOADING_TYPES.delete(root)
+  return typeDef
+}
+
+/**
+ * Define a type using the given root path and property declarations
+ *
+ * @param {{ root: string, props: Object }} def The type definition
+ * @param {Context} context The context object
+ * @returns {Type}
+ */
+const defType = async ({ root, props }, context) => {
+  if (!isObject(props)) {
+    throw new Error('defType expects an object witha props property that is an object')
+  }
+  if (!isString(props.name)) {
+    throw new Error(
+      `Type declarations are expected to have a name. The type located at ${root} did not have one.`
+    )
+  }
+
+  // NOTE BRN: check for type definition in cache. If found return the original instance so that we don't create duplicate type definitions
+  const defsCache = get('types.defs', context.cache)
+  let typeDef = get([root], defsCache)
+  if (typeDef) {
+    return typeDef
+  }
+  typeDef = loadDef(root, props, context)
   // NOTE BRN: store type def in cache to make sure
-  context.cache.types.defs = set([typeDef.root], typeDef, defsCache)
+  context.cache.types.defs = set([root], typeDef, defsCache)
 
   return typeDef
 }

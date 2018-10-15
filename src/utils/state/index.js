@@ -1,8 +1,2 @@
-export { default as getInputs } from './getInputs'
-export { default as getRootPath } from './getRootPath'
-export { default as getAppId } from './getAppId'
 export { default as getState } from './getState'
-export { default as readStateFile } from './readStateFile'
 export { default as saveState } from './saveState'
-export { default as setAppId } from './setAppId'
-export { default as writeStateFile } from './writeStateFile'

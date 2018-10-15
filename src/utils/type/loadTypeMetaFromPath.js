@@ -1,4 +1,4 @@
-import { findPath, get, readFile, set } from '@serverless/utils'
+import { findPath, get, has, readFile, set } from '@serverless/utils'
 import { dirname, isAbsolute, relative, resolve } from 'path'
 import errorTypeFileNotFound from './errorTypeFileNotFound'
 import findTypeFileAtPath from './findTypeFileAtPath'
@@ -34,7 +34,9 @@ const loadTypeMetaFromPath = async (typePath, context) => {
     props: await readFile(typeFilePath),
 
     // NOTE BRN: Not sure that this is right. We need a soure path that will be usable after this path is serialized. This means it could be loaded on another users machine and their machine would try to load from this path. Seems like being relative to the project might be the most predicatable way to find this file on a cross machine basis.
-    query: relative(context.project.path, absoluteTypePath),
+    query: has('project.path', context)
+      ? relative(context.project.path, absoluteTypePath)
+      : typePath,
     root: dirname(typeFilePath)
   }
 

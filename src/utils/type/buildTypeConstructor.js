@@ -1,4 +1,4 @@
-import { assign, clone, defineProperty, isFunction } from '@serverless/utils'
+import { assign, clone, defineProperty, get, isFunction } from '@serverless/utils'
 import { SYMBOL_TYPE } from '../constants'
 import interpretProps from './interpretProps'
 
@@ -17,7 +17,7 @@ const buildTypeConstructor = (type) => {
       // NOTE BRN: We have to do the instantiation async since we need to load and convert { type, inputs } combos to instances. The types have to be loaded first in order to do that. Any js constructor can divert the constructor to return any instance it wants by simply returning a value from the constructor. Here we return a promise instead of the instance and then have the promise return the instance after the async construction.
       return (async () => {
         // NOTE BRN: call super constructors first so that we dive to the bottom of the class constructor heirarchy and build our instance from the bottom up, first resolving props on the base classes and layering the higher level class's props on top of the lower level ones. This allows for overriding the lower level props.
-        let self = await super(inputs, context.merge({ Type: parent, root: parent.root }))
+        let self = await super(inputs, context.merge({ Type: parent, root: get('root', parent) }))
 
         // NOTE BRN: set the type onto the instance so that we can use it in cases of reflection.
         self[SYMBOL_TYPE] = Type

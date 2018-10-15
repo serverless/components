@@ -1,8 +1,8 @@
 import { handleSignalEvents, buildGraph, removeGraph } from '../../utils'
 
-const Deploy = {
+const Remove = {
   async run(context) {
-    context.log('Deploy run executing - context:', context)
+    context.log('Remove run executing - context:', context)
 
     // TODO BRN (low priority): Add programmatic support for programmatically supplying the contents of serverless.yml. When programmatically supplied, we should use defType instead of loadType to get the Project type
 

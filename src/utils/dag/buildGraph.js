@@ -8,7 +8,7 @@ const buildGraph = (nextInstance, prevInstance) => {
   let graph = new Graph()
 
   // nextInstance nodes
-  if (nextInstance && prevInstance.instanceId) {
+  if (nextInstance && nextInstance.instanceId) {
     graph = walkReduceComponentDepthFirst(
       (accum, currentInstance) => {
         if (!currentInstance.instanceId) {
