@@ -1,6 +1,6 @@
 import { all, mapObjIndexed, resolve } from '@serverless/utils'
 
-const Service = async (SuperClass) => {
+const Service = async (SuperClass, context) => {
   const Fn = await context.loadType('Function')
 
   return class extends SuperClass {
@@ -20,7 +20,7 @@ const Service = async (SuperClass) => {
       )
     }
 
-    async define(context) {
+    async define() {
       // TODO BRN: Change this once we support multiple layers here. This could cause collisions between functions and components that are named the same thing.
       return {
         ...this.functions,
