@@ -1,4 +1,4 @@
-import { createContext, SYMBOL_TYPE } from '../../src/utils'
+import { createContext } from '../../src/utils'
 
 jest.setTimeout(50000)
 

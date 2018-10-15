@@ -26,6 +26,15 @@ describe('index', () => {
     })
   })
 
+  test('has config methods', () => {
+    const mod = require('./')
+    expect(mod).toMatchObject({
+      createConfig: expect.any(Function),
+      getConfig: expect.any(Function),
+      getServerlessrcPath: expect.any(Function)
+    })
+  })
+
   test('has constants values', () => {
     const mod = require('./')
     expect(mod).toMatchObject({
@@ -87,6 +96,14 @@ describe('index', () => {
     })
   })
 
+  test('has serialize methods', () => {
+    const mod = require('./')
+    expect(mod).toMatchObject({
+      deserialize: expect.any(Function),
+      serialize: expect.any(Function)
+    })
+  })
+
   test('has type methods', () => {
     const mod = require('./')
     expect(mod).toMatchObject({
@@ -103,8 +120,6 @@ describe('index', () => {
   test('has variable methods', () => {
     const mod = require('./')
     expect(mod).toMatchObject({
-      defineVariable: expect.any(Function),
-      defineVariables: expect.any(Function),
       hasVariableString: expect.any(Function),
       isVariable: expect.any(Function),
       matchVariable: expect.any(Function),

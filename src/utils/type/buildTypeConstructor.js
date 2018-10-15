@@ -12,7 +12,7 @@ const buildTypeConstructor = (type) => {
   const constructor = class extends type.class {
     constructor(inputs, context) {
       const { Type } = context
-      const { main, props, parent } = Type
+      const { props, parent } = Type
 
       // NOTE BRN: We have to do the instantiation async since we need to load and convert { type, inputs } combos to instances. The types have to be loaded first in order to do that. Any js constructor can divert the constructor to return any instance it wants by simply returning a value from the constructor. Here we return a promise instead of the instance and then have the promise return the instance after the async construction.
       return (async () => {

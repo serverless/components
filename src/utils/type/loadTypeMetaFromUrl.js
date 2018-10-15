@@ -24,7 +24,7 @@ const loadTypeMetaFromUrl = async (url, context) => {
 
   const typeMeta = await loadTypeMetaFromPath(downloadedTypePath, context)
   return {
-    ...typeMeta
+    ...typeMeta,
     query: url
   }
 }

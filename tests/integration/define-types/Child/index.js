@@ -1,6 +1,6 @@
 import { mapAll } from '@serverless/utils'
 
-const Child = (SuperClass, context) => {
+const Child = async (SuperClass, context) => {
   const GrandChild = await context.load('./GrandChild')
 
   return {

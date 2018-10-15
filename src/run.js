@@ -1,4 +1,3 @@
-import { clone, isNil, isEmpty } from '@serverless/utils'
 import { version } from '../package.json'
 import { errorReporter, findPluginForCommand } from './utils'
 

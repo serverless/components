@@ -1,4 +1,3 @@
-import { SYMBOL_TYPE } from '../constants'
 import isType from './isType'
 
 describe('#isType()', () => {

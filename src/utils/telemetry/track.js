@@ -1,6 +1,7 @@
-import { fileExists, getConfig, readFile } from '@serverless/utils'
+import { fileExists, readFile } from '@serverless/utils'
 import path from 'path'
 import Analytics from 'analytics-node'
+import getConfig from '../config/getConfig'
 import getLocation from './getLocation'
 
 const track = async (eventName, data = {}) => {
