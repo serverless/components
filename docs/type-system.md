@@ -289,6 +289,8 @@ const MyChildType = (SuperClass, context) => {
 
   return {
     construct(inputs, context) {
+      // Must call super class's construct method!
+      SuperClass.prototype.construct.call(this, inputs, context)
       ...
     },
     foo(arg1, arg2, context) {
@@ -324,6 +326,10 @@ const MyChildType = (SuperClass, context) => {
   const AWSLambdaFunction = await context.loadType('AWSLambdaFunction')
 
   return class extends SuperClass {
+    construct(inputs, context) {
+      super.construct(inputs, context)
+      ...
+    },
     foo(arg1, arg2, context) {
       // super call
       super.foo(arg1, arg2, context)

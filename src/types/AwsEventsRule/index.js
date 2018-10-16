@@ -1,17 +1,10 @@
-import { isEmpty, not, equals, pick } from 'ramda'
+import { get, resolve } from '@serverless/utils'
 
 const AwsEventsRule = {
-  construct(inputs) {
-    this.provider = inputs.provider
-    this.lambda = inputs.lambda
-    this.schedule = inputs.schedule
-    this.enabled = inputs.enabled
-  },
-
   async define(context) {
     // console.log('//////////////////////////////////////////////////')
     // console.log(this.lambda)
-    const compute = this.lambda.compute.get()
+    const compute = resolve(get('compute', this.lambda))
     this.lambda = await compute.defineFunction(this.lambda, context)
     return { lambda: this.lambda }
   },
@@ -21,7 +14,7 @@ const AwsEventsRule = {
     const cloudWatchEvents = new AWS.CloudWatchEvents()
     const lambda = new AWS.Lambda()
 
-    console.log('Creating Schedule')
+    context.log('Creating Schedule')
 
     this.functionRuleName = this.lambda.arn.split(':')[this.lambda.arn.split(':').length - 1]
     //

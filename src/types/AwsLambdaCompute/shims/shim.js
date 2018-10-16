@@ -54,7 +54,7 @@ const transformAsyncEvent = (event) => {
   return cloudEvent
 }
 
-const transformSyncEvent = (event) => {}
+const transformSyncEvent = () => {}
 
 const transformResponse = (res) => {
   // there are two types of responses: http, or custom

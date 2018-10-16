@@ -12,7 +12,6 @@ const LOADING_TYPES = new Set()
 const loadDef = async (root, props, context) => {
   // NOTE BRN: When loading a type. If a re-entrant call (circular reference) is made when loading a type, we throw an error. We could work on allowing the circular reference to be resolved by stopping the def process here and returning early, but for now it's not supported.
   if (LOADING_TYPES.has(root)) {
-    console.log('LOADING_TYPES:', LOADING_TYPES)
     throw errorReentrantTypeLoad(props.name)
   }
   LOADING_TYPES.add(root)

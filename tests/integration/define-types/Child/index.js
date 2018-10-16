@@ -1,14 +1,16 @@
-import { mapAll } from '@serverless/utils'
+import { all, map } from '@serverless/utils'
 
-const Child = async (SuperClass, context) => {
-  const GrandChild = await context.load('./GrandChild')
+const Child = async (SuperClass, superContext) => {
+  const GrandChild = await superContext.load('./GrandChild')
 
   return {
     async define(context) {
-      return mapAll({
-        grandChildA: context.construct(GrandChild, { bar: '' }),
-        GrandChildB: context.construct()
-      })
+      return all(
+        map({
+          grandChildA: context.construct(GrandChild, { bar: '' }),
+          grandChildB: context.construct(GrandChild, { bar: '' })
+        })
+      )
     }
   }
 }

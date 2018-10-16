@@ -1,13 +1,15 @@
-import { append, get, reduce } from '@serverless/utils'
+import { append, get, keys, reduce, resolve } from '@serverless/utils'
 
 const getChildrenIds = (component) => {
-  return reduce(
-    (accum, child) => {
-      return append(get('instanceId', component.children[child]), accum)
-    },
-    [],
-    Object.keys(get('children', component))
-  )
+  const children = get('children', component)
+  if (children) {
+    return reduce(
+      (accum, childKey) => append(resolve(get('instanceId', children[childKey])), accum),
+      [],
+      keys(children)
+    )
+  }
+  return []
 }
 
 export default getChildrenIds

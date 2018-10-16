@@ -2,30 +2,36 @@ import { shallowEquals } from '@serverless/utils'
 
 const DEPLOY = 'deploy'
 
-const Component = {
-  hydrate(state, context) {
-    this.instanceId = state.instanceId || context.generateInstanceId()
-  },
-
-  async define() {
-    return {
-      ...this.components
+const Component = (SuperClass) =>
+  class extends SuperClass {
+    construct(inputs, context) {
+      super.construct(inputs, context)
+      this.instanceId = context.generateInstanceId()
     }
-  },
 
-  shouldDeploy(prevInstance, context) {
-    if (!prevInstance || !shallowEquals(prevInstance, this)) {
-      return DEPLOY
+    hydrate(state) {
+      this.instanceId = state.instanceId
     }
-  },
 
-  async deploy() {},
+    async define() {
+      return {
+        ...this.components
+      }
+    }
 
-  async remove() {},
+    shouldDeploy(prevInstance) {
+      if (!prevInstance || !shallowEquals(prevInstance, this)) {
+        return DEPLOY
+      }
+    }
 
-  toString() {
-    return `${this['@@key']} ${this.name} {  }`
+    async deploy() {}
+
+    async remove() {}
+
+    toString() {
+      return `${this['@@key']} ${this.name} {  }`
+    }
   }
-}
 
 export default Component

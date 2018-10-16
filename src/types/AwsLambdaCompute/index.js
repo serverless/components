@@ -1,6 +1,5 @@
-import { append, isString } from '@serverless/utils'
+import { append, isString, resolve } from '@serverless/utils'
 import path from 'path'
-import { resolve } from '../../utils/variable'
 
 const parseRate = (rate) => {
   const unit = rate.substr(rate.length - 1)
@@ -40,20 +39,13 @@ const getShimFile = (runtime) => {
 
 const AwsLambdaCompute = async (SuperClass, superContext) => {
   const AwsLambdaFunction = await superContext.loadType('AwsLambdaFunction')
+
   return {
-    construct(inputs) {
-      this.provider = inputs.provider
-      this.runtime = inputs.runtime
-      this.memory = inputs.memory
-      this.timeout = inputs.timeout
-      this.environment = inputs.environment
-      this.tags = inputs.tags
-    },
     async defineFunction(functionInstance, context) {
       const funcInstance = resolve(functionInstance)
       // need to resolve these two variables now to convert values
-      const runtime = convertRuntime(this.runtime)
-      let code = functionInstance.code
+      const runtime = convertRuntime(resolve(this.runtime))
+      let code = resolve(functionInstance.code)
       if (isString(code)) {
         code = [code]
       }
@@ -75,7 +67,7 @@ const AwsLambdaCompute = async (SuperClass, superContext) => {
         code,
         tags: {
           ...resolve(this.tags),
-          ...funcInstance.tags
+          ...resolve(funcInstance.tags)
         }
       }
 
@@ -86,7 +78,7 @@ const AwsLambdaCompute = async (SuperClass, superContext) => {
       const inputs = {
         provider: this.provider,
         lambda: functionInstance,
-        schedule: parseRate(rate),
+        schedule: parseRate(resolve(rate)),
         enabled: true
       }
       return context.construct(AwsEventsRule, inputs)

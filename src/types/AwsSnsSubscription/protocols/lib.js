@@ -30,9 +30,10 @@ const unsubscribe = async (instance, context) => {
 }
 
 const setSubscriptionAttributes = async (
-  { subscriptionArn, attributeName, attributeValue },
+  { provider, subscriptionArn, attributeName, attributeValue },
   context
 ) => {
+  const sns = new provider.getSdk().SNS()
   if (isEmpty(attributeValue)) {
     context.log(
       `Removing SNS Subscription Attribute '${attributeName}' from subscription ${subscriptionArn}`

@@ -1,4 +1,4 @@
-import { dirExists, toInteger } from '@serverless/utils'
+import { dirExists } from '@serverless/utils'
 import { join } from 'path'
 import newDeployment from './newDeployment'
 import parseDeploymentNumber from './parseDeploymentNumber'

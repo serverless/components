@@ -1,6 +1,4 @@
-import BbPromise from 'bluebird'
-import { equals } from 'ramda'
-const { resolve } = require('../../utils/variable')
+import { equals, resolve, sleep } from '@serverless/utils'
 
 const attachRolePolicy = async (IAM, { roleName, policy }) => {
   await IAM.attachRolePolicy({
@@ -8,7 +6,7 @@ const attachRolePolicy = async (IAM, { roleName, policy }) => {
     PolicyArn: policy.arn
   }).promise()
 
-  return BbPromise.delay(15000)
+  return sleep(15000)
 }
 
 const detachRolePolicy = async (IAM, { roleName, policy }) => {
@@ -82,6 +80,7 @@ const updateAssumeRolePolicy = async (IAM, { roleName, service }) => {
 const AwsIamRole = (SuperClass) =>
   class extends SuperClass {
     construct(inputs, context) {
+      super.construct(inputs, context)
       const defaultPolicy = {
         arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
       }

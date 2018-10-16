@@ -1,10 +1,8 @@
 import { fileExists, isEmpty, isNil, packDir, readFile } from '@serverless/utils'
 import path from 'path'
 import semver from 'semver'
-import log from '../logging/log'
-import validateCoreVersion from './validateCoreVersion'
 
-module.exports = async (options) => {
+module.exports = async (options, context) => {
   const format = options.format || 'zip'
   let componentPath = options.path || options.projectPath
   const { serverlessFileObject } = options
@@ -24,8 +22,6 @@ module.exports = async (options) => {
     slsYml = await readFile(slsYmlFilePath)
   }
 
-  validateCoreVersion(slsYml.type, slsYml.core)
-
   if (semver.valid(slsYml.version) === null) {
     throw new Error('Please provide a valid version for your component')
   }
@@ -35,7 +31,7 @@ module.exports = async (options) => {
 
   await packDir(componentPath, outputFilePath)
 
-  log(`Component has been packaged in ${outputFilePath}`)
+  context.log(`Component has been packaged in ${outputFilePath}`)
 
   return outputFilePath
 }

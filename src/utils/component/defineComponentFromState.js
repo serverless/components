@@ -1,9 +1,7 @@
-import { all, forEach, isFunction, map } from '@serverless/utils'
-
 /**
  *
  */
-const defineComponentFromState = async (component, context) => {
+const defineComponentFromState = async (component) => {
   // NOTE BRN: We only define children based on what was recorded in state here since we need this capability to determine changes in component tree from deployment to deployment
   // TODO BRN (priority high): Need to save children by instanceId in state
   // TODO BRN: load component state by instance

@@ -1,4 +1,4 @@
-import { assign, clone, defineProperty, get, isFunction } from '@serverless/utils'
+import { assign, clone, defineProperty, get } from '@serverless/utils'
 import { SYMBOL_TYPE } from '../constants'
 import interpretProps from './interpretProps'
 
@@ -40,11 +40,6 @@ const buildTypeConstructor = (type) => {
 
         // NOTE BRN: We set all props onto the instance after they have been resolved. We use the getOwnPropertyDescriptor and defineProperty so that we properly pass getters that may exist in the properties from the property resolution step
         self = assign(self, selfProps)
-
-        // NOTE BRN: If a construct method exists, call it now. This gives types one last chance to set values.
-        if (isFunction(Type.class.prototype.construct)) {
-          await Type.class.prototype.construct.call(self, inputs, context)
-        }
 
         // NOTE BRN: We return self (this) because the constructor is overridden to return a Promise. Therefore the promise must return the reference to the instance.
         return self

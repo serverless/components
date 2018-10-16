@@ -2,8 +2,7 @@ import path from 'path'
 import { tmpdir } from 'os'
 import archiver from 'archiver'
 import { createWriteStream, createReadStream, readFileSync } from 'fs'
-import { forEach, is } from '@serverless/utils'
-import { resolve } from '../../utils/variable'
+import { forEach, isArray, resolve } from '@serverless/utils'
 
 const createLambda = async (
   Lambda,
@@ -64,26 +63,15 @@ const deleteLambda = async (Lambda, name) => {
   await Lambda.deleteFunction(params).promise()
 }
 
-const AwsLambdaFunction = (SuperClass) =>
-  class extends SuperClass {
-    construct(inputs) {
-      this.provider = inputs.provider
-      this.functionName = inputs.functionName
-      this.functionDescription = inputs.functionDescription
-      this.handler = inputs.handler
-      this.code = inputs.code
-      this.runtime = inputs.runtime
-      this.memorySize = inputs.memorySize
-      this.timeout = inputs.timeout
-      this.environment = inputs.environment
-      this.tags = inputs.tags
-      this.role = inputs.role
-    }
+const AwsLambdaFunction = async (SuperClass, superContext) => {
+  const AwsIamRole = await superContext.loadType('AwsIamRole')
+
+  return class extends SuperClass {
     shouldDeploy(prevInstance) {
       if (!prevInstance) {
         return 'deploy'
       }
-      if (prevInstance.functionName !== this.functionName) {
+      if (resolve(prevInstance.functionName) !== resolve(this.functionName)) {
         return 'replace'
       }
     }
@@ -91,17 +79,16 @@ const AwsLambdaFunction = (SuperClass) =>
     async define(context) {
       let role = resolve(this.role)
       if (!role) {
-        const DefaultRole = await context.loadType('AwsIamRole')
-
-        role = this.role = await context.construct(
-          DefaultRole,
+        role = await context.construct(
+          AwsIamRole,
           {
-            roleName: `${this.functionName}-execution-role`,
+            roleName: `${resolve(this.functionName)}-execution-role`,
             service: 'lambda.amazonaws.com',
             provider: this.provider
           },
           context
         )
+        this.role = role
       }
       return { role }
     }
@@ -109,7 +96,9 @@ const AwsLambdaFunction = (SuperClass) =>
     pack() {
       let inputDirPath = this.code // string path to code dir
 
-      if (is(Array, this.code)) inputDirPath = this.code[0] // first item is path to code dir
+      if (isArray(this.code)) {
+        inputDirPath = this.code[0] // first item is path to code dir
+      }
 
       const outputFileName = `${String(Date.now())}.zip`
       const outputFilePath = path.join(tmpdir(), outputFileName)
@@ -128,7 +117,7 @@ const AwsLambdaFunction = (SuperClass) =>
 
         archive.pipe(output)
 
-        if (is(Array, this.code)) {
+        if (isArray(this.code)) {
           const shims = this.code
           shims.shift() // remove first item since it's the path to code dir
           forEach((shimFilePath) => {
@@ -179,5 +168,6 @@ const AwsLambdaFunction = (SuperClass) =>
       }
     }
   }
+}
 
 export default AwsLambdaFunction

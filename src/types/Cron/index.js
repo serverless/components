@@ -1,13 +1,11 @@
+import { resolve } from '@serverless/utils'
+
 const Cron = {
-  construct(inputs) {
-    this.function = inputs.function
-    this.rate = inputs.rate
-  },
   async define(context) {
-    const functionInstance = this.function.get()
-    const computeInstance = functionInstance.compute.get()
+    const functionInstance = resolve(this.function)
+    const computeInstance = resolve(functionInstance.compute)
     return {
-      schedule: await computeInstance.defineSchedule(functionInstance, this.rate, context)
+      schedule: await computeInstance.defineSchedule(functionInstance, resolve(this.rate), context)
     }
   }
 }

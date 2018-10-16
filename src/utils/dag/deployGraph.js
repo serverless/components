@@ -1,5 +1,4 @@
 import { all, isEmpty, map } from '@serverless/utils'
-import { Graph } from 'graphlib'
 import resolveVariables from '../variable/resolveVariables'
 import cloneGraph from './cloneGraph'
 

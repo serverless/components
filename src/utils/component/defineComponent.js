@@ -10,7 +10,7 @@ import {
 } from '@serverless/utils'
 import appendKey from './appendKey'
 import getKey from './getKey'
-import hydrateComponent from './hydrateComponent'
+// import hydrateComponent from './hydrateComponent'
 import setKey from './setKey'
 
 /**
@@ -18,7 +18,7 @@ import setKey from './setKey'
  */
 const defineComponent = async (component, context) => {
   // TODO BRN: If we ever need to retrigger define (redefine) hydrating state here may be an issue
-  component = hydrateComponent(component, context)
+  // component = hydrateComponent(component, context)
   if (isFunction(component.define)) {
     const children = resolve(await component.define(context)) || {}
     if (isArray(children)) {

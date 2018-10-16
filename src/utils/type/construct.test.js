@@ -6,16 +6,15 @@ describe('#construct()', () => {
   it('should construct the constructor', async () => {
     const context = await createContext({})
     const Type = {
-      main: {
+      props: {
+        name: 'Test'
+      },
+      class: class {
         construct(inpt, ctx) {
           this.inputs = inpt
           this.context = ctx
         }
-      },
-      props: {
-        name: 'Test'
-      },
-      class: class {}
+      }
     }
     Type.constructor = buildTypeConstructor(Type, context)
     const inputs = {}

@@ -1,4 +1,4 @@
-import { get, isString } from '@serverless/utils'
+import { get } from '@serverless/utils'
 import { createBucket, deleteBucket } from './utils'
 
 const DEPLOY = 'deploy'
@@ -7,6 +7,7 @@ const REPLACE = 'replace'
 const AwsS3Bucket = (SuperClass) =>
   class extends SuperClass {
     construct(inputs, context) {
+      super.construct(inputs, context)
       this.bucketName = inputs.bucketName
       this.provider = inputs.provider || context.get('provider')
     }

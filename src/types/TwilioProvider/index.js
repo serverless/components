@@ -1,12 +1,22 @@
+import { resolve } from '@serverless/utils'
 import twilio from 'twilio'
 
-const TwilioProvider = {
-  construct({ accountSid, authToken }) {
-    this.sdk = twilio(accountSid, authToken)
-  },
-  getSdk() {
-    return this.sdk
+const TwilioProvider = (SuperClass) =>
+  class extends SuperClass {
+    constructor(inputs, context) {
+      super(
+        {
+          credentials: {
+            accountSid: inputs.accountSid,
+            authToken: inputs.authToken
+          }
+        },
+        context
+      )
+    }
+    getSdk() {
+      return twilio(resolve(this.credentials.accountSid), resolve(this.credentials.authToken))
+    }
   }
-}
 
 export default TwilioProvider

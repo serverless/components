@@ -1,4 +1,4 @@
-import { forEach, get } from '@serverless/utils'
+import { forEach } from '@serverless/utils'
 import { Graph } from 'graphlib'
 import getChildrenIds from '../component/getChildrenIds'
 import getParentId from '../component/getParentId'
@@ -39,7 +39,6 @@ const buildGraph = (nextInstance, prevInstance) => {
     // prevInstance nodes
     graph = walkReduceComponentDepthFirst(
       (accum, currentInstance) => {
-        console.log('prevInstance nodes currentInstance:', currentInstance)
         if (!currentInstance.instanceId) {
           throw new Error(
             `While building the dependency graph we detected a component instance doesn't have an instanceId. This shouldn't happen. Something has gone wrong. ${currentInstance}`

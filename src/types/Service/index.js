@@ -1,22 +1,20 @@
 import { all, mapObjIndexed, resolve } from '@serverless/utils'
 
-const Service = async (SuperClass, context) => {
-  const Fn = await context.loadType('Function')
+const Service = async (SuperClass, superContext) => {
+  const Fn = await superContext.loadType('Function')
 
   return class extends SuperClass {
     async construct(inputs, context) {
-      const fns = resolve(this.functions)
+      super.construct(inputs, context)
       this.functions = await all(
-        mapObjIndexed(async (func, alias) => {
-          return await context.construct(
-            Fn,
-            {
+        mapObjIndexed(
+          async (func, alias) =>
+            context.construct(Fn, {
               ...func,
               functionName: func.functionName || alias
-            },
-            context
-          )
-        }, this.functions)
+            }),
+          resolve(this.functions)
+        )
       )
     }
 

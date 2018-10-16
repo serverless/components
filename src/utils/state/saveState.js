@@ -1,5 +1,4 @@
 import { writeFile } from '@serverless/utils'
-import { ensureFile } from 'fs-extra'
 import { join } from 'path'
 
 const saveState = async (deployment, state) => {

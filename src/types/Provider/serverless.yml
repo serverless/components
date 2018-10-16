@@ -2,7 +2,7 @@ name: Provider
 extends: Object
 main: './index.js'
 
-credentials: ${input.credentials}
+credentials: ${inputs.credentials}
 
 inputTypes:
   credentials:

@@ -1,5 +1,3 @@
-import { find, has } from '@serverless/utils'
-import getKey from '../component/getKey'
 import getStateObject from './getStateObject'
 
 const getState = (query, state) => {

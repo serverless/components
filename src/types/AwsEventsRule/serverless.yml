@@ -3,9 +3,14 @@ extends: Component
 main: ./index.js
 version: 1.0.0
 
+provider: ${inputs.provider}
+lambda: ${inputs.lambda}
+schedule: ${inputs.schdule}
+enabled: {$inputs.enabled}
+
 inputTypes:
-  lambdaArn:
-    type: string
+  lambda:
+    type: object
   schedule:
     type: string
   enabled:

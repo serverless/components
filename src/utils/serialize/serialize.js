@@ -1,4 +1,4 @@
-import { isArray, isObject, isPlainObject } from '@serverless/utils'
+import { isFunction } from '@serverless/utils'
 
 const getType = (value) => {
   if (isFunction(value.getType)) {
@@ -26,7 +26,9 @@ const serialize = (value) => {
   const instance = instances[refKey]
   if (!instance) {
     const type = getType(instance)
+    let source
     if (type) {
+      source = type.source
     }
     instance = {
       source

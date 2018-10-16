@@ -1,5 +1,4 @@
 import { map, pick } from '@serverless/utils'
-import { SYMBOL_KEY } from '../constants'
 import loadState from '../state/loadState'
 import saveState from '../state/saveState'
 import newDeployment from './newDeployment'
