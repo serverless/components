@@ -1,67 +1,98 @@
-function getS3Type(s3EventType) {
-  const splittedS3Event = s3EventType.split(':')
-  if (splittedS3Event[0] === 'ReducedRedundancyLostObject') {
-    return 'aws.s3.ReducedRedundancyLostObject'
-  } else if (splittedS3Event[0] === 'ObjectCreated' || splittedS3Event[0] === 'ObjectRemoved') {
-    if (splittedS3Event[1] === '*') {
-      return `aws.s3.${splittedS3Event[0]}`
-    } else if (typeof splittedS3Event[1] === 'string') {
-      return `aws.s3.${splittedS3Event[0]}.${splittedS3Event[1]}`
+const transformS3Event = (event) => {
+  const getS3Type = (s3EventType) => {
+    const splittedS3Event = s3EventType.split(':')
+    if (splittedS3Event[0] === 'ReducedRedundancyLostObject') {
+      return 'aws.s3.ReducedRedundancyLostObject'
+    } else if (splittedS3Event[0] === 'ObjectCreated' || splittedS3Event[0] === 'ObjectRemoved') {
+      if (splittedS3Event[1] === '*') {
+        return `aws.s3.${splittedS3Event[0]}`
+      } else if (typeof splittedS3Event[1] === 'string') {
+        return `aws.s3.${splittedS3Event[0]}.${splittedS3Event[1]}`
+      }
     }
+    return `aws.s3.${splittedS3Event[0]}`
   }
-  return `aws.s3.${splittedS3Event[0]}`
-}
-
-const transformAsyncEvent = (event) => {
   const cloudEvent = {
-    eventTime: new Date().getTime()
-  }
-  if (event.eventSource === 'aws:s3') {
-    cloudEvent.eventID = event.eventID || new Date().getTime()
-    cloudEvent.eventType = getS3Type(event.eventName)
-    cloudEvent.source = event.s3.bucket.arn
-    cloudEvent.data = {
+    eventTime: event.eventTime || new Date().getTime(),
+    eventID: event.eventID || new Date().getTime(),
+    eventType: getS3Type(event.eventName),
+    source: event.s3.bucket.arn,
+    data: {
       ...event.s3.object,
       bucket: event.s3.bucket.name
     }
-  } else if (event.eventSource === 'aws:sqs') {
-    cloudEvent.eventID = event.messageId
-    cloudEvent.eventType = 'aws.sqs'
-    cloudEvent.source = event.eventSourceARN
-    cloudEvent.data = JSON.parse(event.body)
-  } else if (event.eventSource === 'aws:ses') {
-    cloudEvent.eventID = event.ses.mail.messageId
-    cloudEvent.eventType = 'aws.ses'
-    cloudEvent.source = 'aws.ses'
-    cloudEvent.data = event.ses
-  } else if (event.EventSource === 'aws:sns') {
-    // it's EventSource (capital) in Sns case -_-
-    cloudEvent.eventID = event.Sns.MessageId
-    cloudEvent.eventType = 'aws.sns'
-    cloudEvent.source = event.Sns.TopicArn
-    cloudEvent.data = {
+  }
+  return cloudEvent
+}
+const transformSqsEvent = (event) => {
+  const cloudEvent = {
+    eventTime: event.eventTime || new Date().getTime(),
+    eventID: event.messageId,
+    eventType: 'aws.sqs',
+    source: event.eventSourceARN,
+    data: JSON.parse(event.body)
+  }
+  return cloudEvent
+}
+const transformSesEvent = (event) => {
+  const cloudEvent = {
+    eventTime: event.eventTime || new Date().getTime(),
+    eventID: event.ses.mail.messageId,
+    eventType: 'aws.ses',
+    source: 'aws.ses',
+    data: event.ses
+  }
+  return cloudEvent
+}
+const transformSnsEvent = (event) => {
+  const cloudEvent = {
+    eventTime: event.eventTime || new Date().getTime(),
+    eventID: event.Sns.MessageId,
+    eventType: 'aws.sns',
+    source: event.Sns.TopicArn,
+    data: {
       message: event.Sns.Message,
       messageId: event.Sns.MessageId,
       type: event.Sns.Type,
       subject: event.Sns.Subject
     }
-  } else if (event.eventSource === 'aws:dynamodb') {
-    cloudEvent.eventID = event.eventID || new Date().getTime()
-    cloudEvent.eventType = `aws.dynamodb.${event.eventName.toLowerCase()}`
-    cloudEvent.source = event.eventSourceARN
-    cloudEvent.data = event.dynamodb
   }
   return cloudEvent
 }
+const transformDynamoEvent = (event) => {
+  const cloudEvent = {
+    eventTime: event.eventTime || new Date().getTime(),
+    eventID: event.eventID || new Date().getTime(),
+    eventType: `aws.dynamodb.${event.eventName.toLowerCase()}`,
+    source: event.eventSourceARN,
+    data: event.dynamodb
+  }
+  return cloudEvent
+}
+const transformAsyncEvent = (event) => {
+  if (event.eventSource === 'aws:s3') return transformS3Event(event)
+  if (event.eventSource === 'aws:sqs') return transformSqsEvent(event)
+  if (event.eventSource === 'aws:ses') return transformSesEvent(event)
+  if (event.EventSource === 'aws:sns') return transformSnsEvent(event)
+  if (event.eventSource === 'aws:dynamodb') return transformDynamoEvent(event)
+  return event
+}
 
-const transformSyncEvent = () => {}
-
-const transformResponse = (res) => {
-  // there are two types of responses: http, or custom
-  //   - our EG standard http response is currently identical to AWS APIG
-  //   - custom response is any data returned from our universal function
-  //     which we pass to the cb as is.
-  return res
+const transformSyncEvent = (event) => {
+  if (event.httpMethod) {
+    const cloudEvent = {
+      eventTime: event.eventTime || new Date().getTime(),
+      eventID: event.requestContext.requestId,
+      eventType: `aws.apigateway.http`,
+      source: `https://${event.requestContext.apiId}.execute-api.${
+        process.env.AWS_REGION
+      }.amazonaws.com${event.requestContext.path}`,
+      data: event
+    }
+    return cloudEvent
+  } else {
+    return event
+  }
 }
 
 module.exports.handler = (e, ctx, cb) => {
@@ -70,8 +101,8 @@ module.exports.handler = (e, ctx, cb) => {
     name: ctx.functionName,
     invocationId: ctx.awsRequestId
   }
+
   try {
-    // console.log(typeof e.Records)
     const filePath = `./${process.env.SERVERLESS_HANDLER.split('.')[0]}.js`
     const library = require(filePath)
     const functionName = process.env.SERVERLESS_HANDLER.split('.')[1]
@@ -85,7 +116,7 @@ module.exports.handler = (e, ctx, cb) => {
       // sync events: http or invoke
       const returnValue = library[functionName](transformSyncEvent(e), context)
       return Promise.resolve(returnValue)
-        .then((res) => cb(null, transformResponse(res)))
+        .then((res) => cb(null, res))
         .catch((err) => cb(err))
     }
   } catch (err) {
