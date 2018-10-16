@@ -242,18 +242,16 @@ const getItem = (instance, state, tableName, data) => {
 
 const AwsDynamoDB = {
   async deploy(prevInstance, context) {
-    if (prevInstance && prevInstance.tables.length !== this.tables.length) {
-      if (this.tables.length > 1) {
-        context.log(
-          'Cannot deploy multiple tables at this time. Please update your inputs and try again...'
-        )
-        return
-      }
-      try {
-        await createTables(this, context)
-      } catch (err) {
-        context.log('Error in creating table(s)', err.message)
-      }
+    if (this.tables.length > 1) {
+      context.log(
+        'Cannot deploy multiple tables at this time. Please update your inputs and try again...'
+      )
+      return
+    }
+    try {
+      await createTables(this, context)
+    } catch (err) {
+      context.log('Error in creating table(s)', err.message)
     }
   },
 

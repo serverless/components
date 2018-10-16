@@ -1,23 +1,54 @@
 name: SimpleService
 extends: Service
 
-compute:
-  type: AwsLambdaCompute
-  inputs:
-    provider: ${inputs.providers.aws}
-    runtime: nodejs
+#compute:
+#  type: AwsLambdaCompute
+#  inputs:
+#    provider: ${inputs.providers.aws}
+#    runtime: nodejs
+#
+#functions:
+#  hello:
+#    compute: ${this.compute}
+#    handler: index.hello
+#    code: ./code
+#    memory: 1024
+#    timeout: 10
 
-functions:
-  hello:
-    compute: ${this.compute}
-    handler: index.hello
-    code: ./code
-    memory: 1024
-    timeout: 10
 
 components:
-  cron:
-    type: Cron
+  db:
+    type: AwsDynamoDB
     inputs:
-      function: ${this.functions.hello}
-      rate: 3m
+      provider:
+        type: AwsProvider
+        inputs:
+          credentials:
+            accessKeyId: xxx
+            secretAccessKey: xxx
+          region: us-east-1
+      tables:
+        - name: BlogPost
+          hashKey: authorEmail
+          rangeKey: title
+          indexes:
+            - name: BlogTitleIndex
+              type: global
+              hashKey: title
+              rangeKey: createdAt
+          schema:
+            id: uuid
+            authorName: string
+            authorEmail:
+              type: email
+              options:
+                required: true
+            title: string
+            content: binary
+            tags: stringset
+            published:
+              type: boolean
+              options:
+                default: false
+          options:
+            timestamps: true
