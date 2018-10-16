@@ -1,6 +1,8 @@
 import { forEach } from '@serverless/utils'
 import { Graph } from 'graphlib'
 import getChildrenIds from '../component/getChildrenIds'
+import getParentIds from '../component/getParentIds'
+import getDependenciesIds from '../component/getDependenciesIds'
 import getParentId from '../component/getParentId'
 import walkReduceComponentDepthFirst from '../component/walkReduceComponentDepthFirst'
 
@@ -25,9 +27,15 @@ const buildGraph = (nextInstance, prevInstance) => {
 
         // edges
         const childrenIds = getChildrenIds(currentInstance)
+        const parentIds = getParentIds(currentInstance)
+        const depsIds = getDependenciesIds(currentInstance, parentIds)
+
         forEach((childId) => {
           accum.setEdge(currentInstance.instanceId, childId)
         }, childrenIds)
+        forEach((depId) => {
+          accum.setEdge(currentInstance.instanceId, depId)
+        }, depsIds)
         return accum
       },
       graph,

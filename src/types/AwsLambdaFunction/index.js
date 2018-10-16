@@ -93,6 +93,10 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
       return { role }
     }
 
+    getId() {
+      return this.arn
+    }
+
     pack() {
       let inputDirPath = this.code // string path to code dir
 

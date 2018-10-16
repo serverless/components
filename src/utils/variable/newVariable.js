@@ -9,8 +9,8 @@ const newVariable = (variableString, data) => ({
     const pathParts = castPath(matchVariable(variableString).expression)
     return walkReducePath(
       (instances, value) => {
-        if (has('instanceId', value)) {
-          return append(value, instances)
+        if (value && value.get && has('instanceId', value.get())) {
+          return append(value.get().instanceId, instances)
         }
         return instances
       },

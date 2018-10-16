@@ -5,7 +5,7 @@ const Cron = {
     const functionInstance = resolve(this.function)
     const computeInstance = resolve(functionInstance.compute)
     return {
-      schedule: await computeInstance.defineSchedule(functionInstance, resolve(this.rate), context)
+      schedule: await computeInstance.defineSchedule(this.function, resolve(this.rate), context)
     }
   }
 }

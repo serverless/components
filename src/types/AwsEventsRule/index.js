@@ -1,14 +1,6 @@
-import { get, resolve } from '@serverless/utils'
+import { pick, not, isEmpty, equals } from 'ramda'
 
 const AwsEventsRule = {
-  async define(context) {
-    // console.log('//////////////////////////////////////////////////')
-    // console.log(this.lambda)
-    const compute = resolve(get('compute', this.lambda))
-    this.lambda = await compute.defineFunction(this.lambda, context)
-    return { lambda: this.lambda }
-  },
-
   async deploy(prevInstance, context) {
     const AWS = this.provider.getSdk()
     const cloudWatchEvents = new AWS.CloudWatchEvents()
@@ -17,19 +9,18 @@ const AwsEventsRule = {
     context.log('Creating Schedule')
 
     this.functionRuleName = this.lambda.arn.split(':')[this.lambda.arn.split(':').length - 1]
-    //
 
-    // const inputsProps = ['name', 'lambdaArn', 'schedule', 'enabled']
-    // const inputs = pick(inputsProps, this)
-    // const prevInputs = pick(inputsProps, prevInstance)
-    // const noChanges = equals(inputs, prevInputs)
-    //
-    // if (noChanges) {
-    //   return this
-    // } else if (not(isEmpty(prevInstance))) {
-    //   await this.remove(context)
-    // }
-    //
+    const inputsProps = ['name', 'lambdaArn', 'schedule', 'enabled']
+    const inputs = pick(inputsProps, this)
+    const prevInputs = pick(inputsProps, prevInstance)
+    const noChanges = equals(inputs, prevInputs)
+
+    if (noChanges) {
+      return this
+    } else if (not(isEmpty(prevInstance))) {
+      await this.remove(context)
+    }
+
     const State = this.enabled ? 'ENABLED' : 'DISABLED'
     const putRuleParams = {
       Name: this.functionRuleName,

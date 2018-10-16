@@ -15,7 +15,6 @@ const parseRate = (rate) => {
       if (unit === 'h') awsUnit = 'hours'
       if (unit === 'd') awsUnit = 'days'
     }
-
     return `rate(${period} ${awsUnit})`
   } else {
     return `cron(${rate})`
@@ -78,7 +77,7 @@ const AwsLambdaCompute = async (SuperClass, superContext) => {
       const inputs = {
         provider: this.provider,
         lambda: functionInstance,
-        schedule: parseRate(resolve(rate)),
+        schedule: parseRate(rate),
         enabled: true
       }
       return context.construct(AwsEventsRule, inputs)
