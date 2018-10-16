@@ -17,7 +17,7 @@ const deleteApi = async (APIGateway, params) => {
 }
 
 const createApi = async (APIGateway, params) => {
-  const { name, role, routes, authorizer } = params
+  const { name, role, routes } = params
   const roleArn = role.arn
 
   const swagger = getSwaggerDefinition(name, roleArn, routes)
@@ -31,18 +31,6 @@ const createApi = async (APIGateway, params) => {
     restApiId: res.id,
     stageName: 'dev'
   }).promise()
-
-  if (authorizer) {
-    const { function: func, ...authorizerParams } = authorizer
-    await APIGateway.createAuthorizer({
-      name: `${params.name}-${res.id}-authorizer`,
-      restApiId: res.id,
-      authorizerUri: `arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/${
-        func.children.fn.arn
-      }/invocations`,
-      ...authorizerParams
-    }).promise()
-  }
 
   const url = generateUrl(res.id)
   const urls = generateUrls(routes, res.id)
@@ -86,15 +74,6 @@ const updateApi = async (APIGateway, params) => {
 module.exports = {
   construct(inputs) {
     this.inputs = inputs
-  },
-
-  async define() {
-    const childComponents = []
-    if (this.inputs.authorizer && this.inputs.authorizer.function) {
-      childComponents.push(resolve(this.inputs.authorizer.function))
-    }
-
-    return childComponents
   },
 
   async deploy(prevInstance, context) {

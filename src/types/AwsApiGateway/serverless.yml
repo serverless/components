@@ -35,9 +35,3 @@ inputTypes:
     type: object
     required: true
     description: Declaration of routes
-  authorizer:
-    type: object
-    example:
-      type: TOKEN
-      indentitySource: method.request.header.Auth
-      authorizerUri: LAMBDA_ARN_HERE
