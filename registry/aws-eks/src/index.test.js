@@ -3,7 +3,7 @@ const eksComponent = require('./index');
 
 jest.mock('aws-sdk', () => {
   const mocks = {
-    createClusterMock: jest.fn().mockImplementation((params) => {
+    createClusterMock: jest.fn().mockImplementation((_) => {
       return Promise.resolve({data: {name: "kluster", arn: "1", status: "CREATING", endpoint: "https://endpoint" } });
     }),
 
