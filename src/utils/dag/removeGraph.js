@@ -4,7 +4,7 @@ import cloneGraph from './cloneGraph'
 
 const removeNode = async (node, context) => {
   const prevInstance = resolveVariables(node.prevInstance)
-  if (['remove', 'replace'].includes(node.operation)) {
+  if (prevInstance && ['remove', 'replace'].includes(node.operation)) {
     await prevInstance.remove(context)
   }
 }

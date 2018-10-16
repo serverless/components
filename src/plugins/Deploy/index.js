@@ -61,7 +61,7 @@ const Deploy = {
     const graph = buildGraph(nextInstance, prevInstance)
 
     await deployGraph(graph, nextContext)
-    if (prevInstance) await removeGraph(graph, prevContext)
+    await removeGraph(graph, prevContext)
 
     // Deployment complete!
 
