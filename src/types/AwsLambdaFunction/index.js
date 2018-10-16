@@ -143,19 +143,16 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
 
     async deploy(prevInstance, context) {
       const provider = resolve(this.provider)
-      const functionName = Math.random()
-        .toString(36)
-        .substring(7)
       const AWS = provider.getSdk()
       const Lambda = new AWS.Lambda()
       await this.pack(context)
 
       if (!prevInstance) {
-        context.log(`Creating Lambda: ${functionName}`)
-        this.arn = await createLambda(Lambda, { ...this, functionName })
+        context.log(`Creating Lambda: ${this.functionName}`)
+        this.arn = await createLambda(Lambda, this)
       } else {
-        context.log(`Updating Lambda: ${functionName}`)
-        this.arn = await updateLambda(Lambda, { ...this, functionName })
+        context.log(`Updating Lambda: ${this.functionName}`)
+        this.arn = await updateLambda(Lambda, this)
       }
     }
 
