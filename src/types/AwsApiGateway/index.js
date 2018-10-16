@@ -76,6 +76,27 @@ module.exports = {
     this.inputs = inputs
   },
 
+  async define(context) {
+    const childComponents = Object.entries(this.inputs.routes)
+      .map(([path, pathObject]) =>
+        Object.entries(pathObject)
+          .map(([method, methodObject]) => {
+            const instances = []
+            if (methodObject.function) {
+              instances.push(resolve(methodObject.function))
+            }
+            if (methodObject.authorizer && methodObject.authorizer.function) {
+              instances.push(resolve(methodObject.authorizer.function))
+            }
+            return instances
+          })
+          .reduce((acc, val) => acc.concat(val))
+      )
+      .reduce((acc, val) => acc.concat(val))
+
+    return childComponents
+  },
+
   async deploy(prevInstance, context) {
     const inputs = this.inputs
     const aws = inputs.provider.getSdk()

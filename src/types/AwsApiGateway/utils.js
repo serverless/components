@@ -120,9 +120,38 @@ function getCorsOptionsConfig() {
   }
 }
 
+function getSecurityDefinition(authorizerObj, name, region = 'us-east-1', path, method) {
+  if (authorizerObj) {
+    const { function: func, ...authorizerParams } = authorizerObj
+    return {
+      name: name,
+      definition: {
+        type: 'apiKey', // Required and the value must be "apiKey" for an API Gateway API.
+        name: 'Authorization', // The name of the header containing the authorization token.
+        in: 'header', // Required and the value must be "header" for an API Gateway API.
+        'x-amazon-apigateway-authtype': 'oauth2', // Specifies the authorization mechanism for the client.
+        'x-amazon-apigateway-authorizer': {
+          // An API Gateway Lambda authorizer definition
+          type: 'token', // Required property and the value must "token"
+          ...(func
+            ? {
+                authorizerUri: `arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/${
+                  func.children.fn.arn
+                }/invocations`
+              }
+            : {}),
+          authorizerResultTtlInSeconds: 60,
+          ...authorizerParams
+        }
+      }
+    }
+  }
+}
+
 // "public" function
 function getSwaggerDefinition(name, roleArn, routes) {
   let paths = {}
+  const securityDefinitions = {}
 
   // TODO: udpate code to be functional
   forEachObjIndexed((methods, path) => {
@@ -145,6 +174,13 @@ function getSwaggerDefinition(name, roleArn, routes) {
       }
 
       const apiGatewayIntegration = getApiGatewayIntegration(roleArn, uri, isCorsEnabled)
+      const securityDefinition = getSecurityDefinition(
+        methodObject.authorizer,
+        name,
+        undefined,
+        normalizedPath,
+        normalizedMethod
+      )
       const defaultResponses = getDefaultResponses(isCorsEnabled)
       updatedMethods = set(lensPath([normalizedMethod]), apiGatewayIntegration, updatedMethods)
       updatedMethods = set(
@@ -152,6 +188,14 @@ function getSwaggerDefinition(name, roleArn, routes) {
         defaultResponses,
         updatedMethods
       )
+      if (securityDefinition) {
+        updatedMethods = set(
+          lensPath([normalizedMethod, 'security']),
+          [{ [securityDefinition.name]: [] }],
+          updatedMethods
+        )
+        securityDefinitions[securityDefinition.name] = securityDefinition.definition
+      }
     }, methods)
 
     if (enableCorsOnPath) {
@@ -172,6 +216,7 @@ function getSwaggerDefinition(name, roleArn, routes) {
     schemes: ['https'],
     consumes: ['application/json'],
     produces: ['application/json'],
+    securityDefinitions,
     paths
   }
   return definition
