@@ -7,15 +7,11 @@ const { joinUrl } = require('./utils')
 const catchallParameterPattern = /{\.{3}([^}]+?)}/g
 const pathParameterPattern = /{([^}]+?)}/g
 
-async function getAwsApiGatewayInputs(inputs, context, authorizerFunc) {
+async function getAwsApiGatewayInputs(inputs, context) {
   const apiGatewayInputs = {
     name: inputs.apiName,
     role: inputs.role,
     routes: {}
-  }
-
-  if (authorizerFunc) {
-    apiGatewayInputs.authorizer = inputs.authorizer
   }
 
   for (const [path, methods] of Object.entries(inputs.routes)) {
@@ -27,20 +23,14 @@ async function getAwsApiGatewayInputs(inputs, context, authorizerFunc) {
     for (const [method, methodObject] of Object.entries(methods)) {
       const normalizedMethod = method.toUpperCase()
       routeObject[normalizedMethod] = methodObject
-
-      if (methodObject.function) {
-        Object.assign(routeObject[normalizedMethod], {
-          function: methodObject.function
-        })
-      }
     }
   }
 
   return apiGatewayInputs
 }
 
-async function constructApiGateway(inputs, context, provider, authorizerFunc) {
-  const apiInputs = await getAwsApiGatewayInputs(inputs, context, authorizerFunc)
+async function constructApiGateway(inputs, context, provider) {
+  const apiInputs = await getAwsApiGatewayInputs(inputs, context)
 
   const apiGatewayComponent = await context.loadType('AwsApiGateway')
   const apiGateway = await context.construct(apiGatewayComponent, {
@@ -157,7 +147,6 @@ function flattenRoutes(routes) {
 module.exports = {
   async construct(inputs, context) {
     this.inputs = inputs
-    this.authorizer = inputs.authorizer
     this.apiName = inputs.apiName
     const flatRoutes = flattenRoutes(inputs.routes)
 
@@ -175,12 +164,6 @@ module.exports = {
     })
     childComponents.push(this.role)
 
-    // TODO: remove after variable resolution is fixed
-    let authorizerFunction
-    if (inputs.authorizer && inputs.authorizer.function) {
-      authorizerFunction = inputs.authorizer.function
-    }
-
     const flatInputs = { ...inputs, routes: flatRoutes }
     this.gateway = await constructApiGateway(
       {
@@ -188,8 +171,7 @@ module.exports = {
         role: this.role // TODO: add functionality to read from state so that update works
       },
       context,
-      inputs.provider,
-      authorizerFunction
+      inputs.provider
     )
     childComponents.push(this.gateway)
 
