@@ -1,7 +1,7 @@
 const AwsSnsTopic = {
   async createSNSSubscription(context, { endpoint, protocol }) {
     const AwsSnsSubscription = await context.loadType('AwsSnsSubscription')
-    const instance = context.construct(AwsSnsSubscription, {
+    const instance = await context.construct(AwsSnsSubscription, {
       endpoint,
       protocol
     })

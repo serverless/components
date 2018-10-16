@@ -14,6 +14,9 @@ const deployNodeIds = async (nodeIds, graph, context) =>
   all(
     map(async (nodeId) => {
       const node = graph.node(nodeId)
+      if (!node) {
+        throw new Error('cloud not find node for nodeId:', nodeId)
+      }
       await deployNode(node, context)
       graph.removeNode(nodeId)
     }, nodeIds)

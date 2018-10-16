@@ -6,8 +6,8 @@ const REPLACE = 'replace'
 
 const AwsS3Bucket = (SuperClass) =>
   class extends SuperClass {
-    construct(inputs, context) {
-      super.construct(inputs, context)
+    async construct(inputs, context) {
+      await super.construct(inputs, context)
       this.bucketName = inputs.bucketName
       this.provider = inputs.provider || context.get('provider')
     }

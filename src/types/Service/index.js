@@ -5,7 +5,7 @@ const Service = async (SuperClass, superContext) => {
 
   return class extends SuperClass {
     async construct(inputs, context) {
-      super.construct(inputs, context)
+      await super.construct(inputs, context)
       this.functions = await all(
         mapObjIndexed(
           async (func, alias) =>

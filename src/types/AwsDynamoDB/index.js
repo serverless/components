@@ -305,7 +305,7 @@ const AwsDynamoDB = {
     }
   },
 
-  async get(prevInstance, context) {
+  async getItem(prevInstance, context) {
     if (!prevInstance.tables || prevInstance.tables.length === 0) return {}
 
     if (context.options && context.options.tablename && context.options.keydata) {

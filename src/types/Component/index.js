@@ -4,8 +4,8 @@ const DEPLOY = 'deploy'
 
 const Component = (SuperClass) =>
   class extends SuperClass {
-    construct(inputs, context) {
-      super.construct(inputs, context)
+    async construct(inputs, context) {
+      await super.construct(inputs, context)
       this.instanceId = context.generateInstanceId()
     }
 

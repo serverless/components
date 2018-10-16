@@ -83,7 +83,7 @@ describe('#buildTypeConstructor()', () => {
       }
     }
     const Class = class {
-      construct(inpt, ctx) {
+      async construct(inpt, ctx) {
         expect(inpt).toBe(inputs)
         expect(ctx).toBe(context)
         expect(this).toEqual({
@@ -139,7 +139,7 @@ describe('#buildTypeConstructor()', () => {
         foo1: null
       },
       class: class {
-        construct(inputs) {
+        async construct(inputs) {
           expect(inputs).toEqual({
             foo1: 'bar1'
           })
@@ -154,7 +154,7 @@ describe('#buildTypeConstructor()', () => {
         foo2: null
       },
       class: class {
-        construct(inputs) {
+        async construct(inputs) {
           expect(inputs).toEqual({
             foo2: 'bar2'
           })

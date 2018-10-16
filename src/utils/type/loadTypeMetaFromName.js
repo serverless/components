@@ -13,6 +13,7 @@ const NATIVE_NAMES = {
   Plugin: resolve(__dirname, '..', '..', 'types', 'Plugin'),
   Provider: resolve(__dirname, '..', '..', 'types', 'Provider'),
   Service: resolve(__dirname, '..', '..', 'types', 'Service'),
+  AwsDynamoDB: resolve(__dirname, '..', '..', 'types', 'AwsDynamoDB'),
   AwsProvider: resolve(__dirname, '..', '..', 'types', 'AwsProvider'),
   AwsLambdaFunction: resolve(__dirname, '..', '..', 'types', 'AwsLambdaFunction'),
   AwsIamRole: resolve(__dirname, '..', '..', 'types', 'AwsIamRole'),

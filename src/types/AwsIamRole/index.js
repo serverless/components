@@ -79,8 +79,8 @@ const updateAssumeRolePolicy = async (IAM, { roleName, service }) => {
 
 const AwsIamRole = (SuperClass) =>
   class extends SuperClass {
-    construct(inputs, context) {
-      super.construct(inputs, context)
+    async construct(inputs, context) {
+      await super.construct(inputs, context)
       const defaultPolicy = {
         arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
       }
