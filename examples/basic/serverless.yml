@@ -1,16 +1,20 @@
-name: MyProject
+name: BasicProject
 extends: Component
+
+provider:
+  type: AwsProvider
+  inputs:
+    credentials:
+      accessKeyId: ...
+      secretAccessKey: ...
+    region: us-east-1
 
 components:
   myFunction:
     type: AwsLambdaFunction
     inputs:
-      memory: 512
+      provider: ${this.provider}
+      memorySize: 512
       timeout: 10
-      handler: handler.handler
-      role:
-        arn: ${myRole.arn}
-  myRole:
-    type: AwsIamRole
-    inputs:
-      service: lambda.amazonaws.com
+      handler: index.handler
+      code: ./fn
