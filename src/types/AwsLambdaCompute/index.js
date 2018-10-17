@@ -43,6 +43,7 @@ const AwsLambdaCompute = async (SuperClass, superContext) => {
     async defineFunction(functionInstance, context) {
       const funcInstance = resolve(functionInstance)
       // need to resolve these two variables now to convert values
+      const ufs = resolve(this.ufs) || resolve(functionInstance.ufs) || false
       const runtime = convertRuntime(resolve(this.runtime))
       let code = resolve(functionInstance.code)
 
@@ -66,7 +67,7 @@ const AwsLambdaCompute = async (SuperClass, superContext) => {
         }
       }
 
-      if (resolve(functionInstance.ufs)) {
+      if (ufs) {
         code = [code, getShimFile(runtime)]
         inputs.code = code
         inputs.handler = 'shim.handler'

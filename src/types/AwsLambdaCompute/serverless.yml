@@ -16,6 +16,7 @@ timeout: ${inputs.timeout}
 evironment: ${inputs.evironment}
 tags: ${inputs.tags}
 role: ${inputs.role}
+ufs: ${inputs.ufs}
 
 inputTypes:
   provider:
