@@ -124,7 +124,7 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
         inputDirPath = this.code[0] // first item is path to code dir
       }
 
-      const outputFileName = `${String(Date.now())}.zip`
+      const outputFileName = `${this.instanceId}-${Date.now()}.zip`
       const outputFilePath = path.join(tmpdir(), outputFileName)
 
       return new Promise((rslv, reject) => {
