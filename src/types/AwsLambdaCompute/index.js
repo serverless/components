@@ -43,17 +43,17 @@ const AwsLambdaCompute = async (SuperClass, superContext) => {
     async defineFunction(functionInstance, context) {
       const funcInstance = resolve(functionInstance)
       // need to resolve these two variables now to convert values
-      const ufs = resolve(this.ufs) || resolve(functionInstance.ufs) || false
-      const runtime = convertRuntime(resolve(this.runtime))
-      let code = resolve(functionInstance.code)
+      const ufs = resolve(this.ufs) || resolve(funcInstance.ufs) || false
+      const runtime = convertRuntime(resolve(funcInstance.runtime) || resolve(this.runtime))
+      let code = resolve(funcInstance.code)
 
       const inputs = {
         provider: this.provider,
         role: this.role,
         functionName: funcInstance.functionName,
         functionDescription: funcInstance.functionDescription,
-        memorySize: funcInstance.memory,
-        timeout: funcInstance.timeout,
+        memorySize: funcInstance.memory || this.memory,
+        timeout: funcInstance.timeout || this.timeout,
         runtime,
         handler: resolve(funcInstance.handler),
         environment: {

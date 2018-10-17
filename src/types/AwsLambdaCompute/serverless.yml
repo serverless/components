@@ -36,6 +36,12 @@ inputTypes:
   environment:
     type: object
     required: false
+  role:
+    type: AwsIamRole
+    required: false
   tags:
     type: object
     required: false
+  ufs:
+    type: boolean
+    required: true
