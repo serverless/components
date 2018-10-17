@@ -48,6 +48,7 @@ const AwsLambdaCompute = async (SuperClass, superContext) => {
 
       const inputs = {
         provider: this.provider,
+        role: this.role,
         functionName: funcInstance.functionName,
         functionDescription: funcInstance.functionDescription,
         memorySize: funcInstance.memory,
