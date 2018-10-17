@@ -1,4 +1,4 @@
-name: aws-iam-policy
+name: AwsIamPolicy
 extends: Component
 
 description: "Provision AWS IAM Policies with the Serverless Framework"

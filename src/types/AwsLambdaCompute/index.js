@@ -52,8 +52,8 @@ const AwsLambdaCompute = async (SuperClass, superContext) => {
         role: this.role,
         functionName: funcInstance.functionName,
         functionDescription: funcInstance.functionDescription,
-        memorySize: funcInstance.memory || this.memory,
-        timeout: funcInstance.timeout || this.timeout,
+        memorySize: resolve(funcInstance.memory) || resolve(this.memory),
+        timeout: resolve(funcInstance.timeout) || resolve(this.timeout),
         runtime,
         handler: resolve(funcInstance.handler),
         environment: {

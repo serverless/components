@@ -16,11 +16,14 @@ const NATIVE_NAMES = {
   AwsDynamoDB: resolve(__dirname, '..', '..', 'types', 'AwsDynamoDB'),
   AwsProvider: resolve(__dirname, '..', '..', 'types', 'AwsProvider'),
   AwsLambdaFunction: resolve(__dirname, '..', '..', 'types', 'AwsLambdaFunction'),
+  AwsIamPolicy: resolve(__dirname, '..', '..', 'types', 'AwsIamPolicy'),
   AwsIamRole: resolve(__dirname, '..', '..', 'types', 'AwsIamRole'),
   AwsLambdaCompute: resolve(__dirname, '..', '..', 'types', 'AwsLambdaCompute'),
   AwsEventsRule: resolve(__dirname, '..', '..', 'types', 'AwsEventsRule'),
   Cron: resolve(__dirname, '..', '..', 'types', 'Cron'),
-  AwsS3Bucket: resolve(__dirname, '..', '..', 'types', 'AwsS3Bucket')
+  AwsS3Bucket: resolve(__dirname, '..', '..', 'types', 'AwsS3Bucket'),
+  AwsSnsSubscription: resolve(__dirname, '..', '..', 'types', 'AwsSnsSubscription'),
+  AwsSnsTopic: resolve(__dirname, '..', '..', 'types', 'AwsSnsTopic')
 }
 
 /**
