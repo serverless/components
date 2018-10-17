@@ -47,8 +47,18 @@ const AwsIamPolicy = (SuperClass) =>
       const AWS = this.provider.getSdk()
       const IAM = new AWS.IAM()
 
-      context.log(`Creating Policy: ${this.policyName}`)
-      this.arn = await createPolicy(IAM, this, context)
+      // HACK BRN: Temporary workaround until we add property type/default support
+      const policyName = this.policyName || `policy-${this.instanceId}`
+
+      context.log(`Creating Policy: ${policyName}`)
+      this.arn = await createPolicy(
+        IAM,
+        {
+          policyName,
+          document: this.document
+        },
+        context
+      )
     }
 
     async remove(context) {

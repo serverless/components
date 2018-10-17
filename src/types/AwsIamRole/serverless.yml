@@ -4,6 +4,11 @@ main: ./index.js
 
 version: 1.0.0
 
+provider: ${inputs.provider}
+roleName: ${inputs.roleName}
+service: ${inputs.service}
+policy: ${inputs.policy}
+
 inputTypes:
   provider:
     type: AwsProvider

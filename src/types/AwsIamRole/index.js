@@ -1,4 +1,4 @@
-import { equals, resolve, sleep } from '@serverless/utils'
+import { equals, is, resolve, sleep } from '@serverless/utils'
 
 const attachRolePolicy = async (IAM, { roleName, policy }) => {
   await IAM.attachRolePolicy({
@@ -77,19 +77,10 @@ const updateAssumeRolePolicy = async (IAM, { roleName, service }) => {
   }).promise()
 }
 
-const AwsIamRole = (SuperClass) =>
-  class extends SuperClass {
-    async construct(inputs, context) {
-      await super.construct(inputs, context)
-      const defaultPolicy = {
-        arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
-      }
-      this.roleName = inputs.roleName
-      this.service = inputs.service
-      this.policy = inputs.policy || defaultPolicy
-      this.provider = inputs.provider || context.get('provider')
-    }
+const AwsIamRole = async (SuperClass, superContext) => {
+  const AwsIamPolicy = await superContext.loadType('AwsIamPolicy')
 
+  return class extends SuperClass {
     shouldDeploy(prevInstance) {
       if (!prevInstance) {
         return 'deploy'
@@ -99,19 +90,40 @@ const AwsIamRole = (SuperClass) =>
       }
     }
 
+    async define() {
+      const policy = resolve(this.policy)
+      if (is(AwsIamPolicy.class, policy)) {
+        return {
+          policy
+        }
+      }
+      return {}
+    }
+
     async deploy(prevInstance, context) {
-      const provider = resolve(this.provider)
+      const provider = this.provider
       const AWS = provider.getSdk()
       const IAM = new AWS.IAM()
 
+      // HACK BRN: Temporary workaround until we add property type/default support
+      const roleName = this.roleName || `role-${this.instanceId}`
+      const defaultPolicy = {
+        arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
+      }
+      const policy = this.policy || defaultPolicy
+
       if (!prevInstance) {
-        context.log(`Creating Role: ${this.roleName}`)
-        this.arn = await createRole(IAM, this)
+        context.log(`Creating Role: ${roleName}`)
+        this.arn = await createRole(IAM, {
+          roleName,
+          service: this.service,
+          policy
+        })
       } else {
         if (prevInstance.service !== this.service) {
           await updateAssumeRolePolicy(IAM, this)
         }
-        if (!equals(prevInstance.policy, this.policy)) {
+        if (!equals(prevInstance.policy, policy)) {
           await detachRolePolicy(IAM, this)
           await attachRolePolicy(IAM, this)
         }
@@ -131,5 +143,6 @@ const AwsIamRole = (SuperClass) =>
       }
     }
   }
+}
 
 export default AwsIamRole
