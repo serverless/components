@@ -73,6 +73,7 @@ const transformAsyncEvent = (event) => {
   if (event.eventSource === 'aws:s3') return transformS3Event(event)
   if (event.eventSource === 'aws:sqs') return transformSqsEvent(event)
   if (event.eventSource === 'aws:ses') return transformSesEvent(event)
+  // it's upper case in case of SNS -_-
   if (event.EventSource === 'aws:sns') return transformSnsEvent(event)
   if (event.eventSource === 'aws:dynamodb') return transformDynamoEvent(event)
   return event
@@ -99,7 +100,8 @@ module.exports.handler = (e, ctx, cb) => {
   delete require.cache[require.resolve('./index')]
   const context = {
     name: ctx.functionName,
-    invocationId: ctx.awsRequestId
+    invocationId: ctx.awsRequestId,
+    provider: ctx
   }
 
   try {

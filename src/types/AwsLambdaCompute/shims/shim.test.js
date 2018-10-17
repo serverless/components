@@ -8,6 +8,12 @@ const ctxMock = {
   awsRequestId: 'zxc'
 }
 
+const expectedContext = {
+  name: ctxMock.functionName,
+  invocationId: ctxMock.awsRequestId,
+  ctxMock
+}
+
 beforeEach(() => {
   process.env.SERVERLESS_HANDLER = 'fn.hello'
   process.env.AWS_REGION = 'us-east-1'
@@ -34,11 +40,6 @@ describe('Shim Tests', () => {
           sequencer: '005BC0B74C2E7FEF50',
           bucket: 'bucketName'
         }
-      }
-
-      const expectedContext = {
-        name: ctxMock.functionName,
-        invocationId: ctxMock.awsRequestId
       }
 
       const eventMock = {
@@ -99,11 +100,6 @@ describe('Shim Tests', () => {
           type: 'Notification',
           subject: 'TestInvoke'
         }
-      }
-
-      const expectedContext = {
-        name: ctxMock.functionName,
-        invocationId: ctxMock.awsRequestId
       }
 
       const eventMock = {
@@ -235,11 +231,6 @@ describe('Shim Tests', () => {
         }
       }
 
-      const expectedContext = {
-        name: ctxMock.functionName,
-        invocationId: ctxMock.awsRequestId
-      }
-
       const eventMock = {
         Records: [
           {
@@ -347,11 +338,6 @@ describe('Shim Tests', () => {
         data: JSON.parse('{"foo":"bar"}')
       }
 
-      const expectedContext = {
-        name: ctxMock.functionName,
-        invocationId: ctxMock.awsRequestId
-      }
-
       const eventMock = {
         Records: [
           {
@@ -403,11 +389,6 @@ describe('Shim Tests', () => {
           SequenceNumber: '111',
           SizeBytes: 26
         }
-      }
-
-      const expectedContext = {
-        name: ctxMock.functionName,
-        invocationId: ctxMock.awsRequestId
       }
 
       const eventMock = {
@@ -474,11 +455,6 @@ describe('Shim Tests', () => {
         data: eventMock
       }
 
-      const expectedContext = {
-        name: ctxMock.functionName,
-        invocationId: ctxMock.awsRequestId
-      }
-
       shim.handler(eventMock, ctxMock, () => {})
 
       expect(fn.hello).toBeCalledWith(expectedCloudEvent, expectedContext)
@@ -486,11 +462,6 @@ describe('Shim Tests', () => {
     it('should NOT transform direct invocations', async () => {
       const eventMock = {
         hello: 'world'
-      }
-
-      const expectedContext = {
-        name: ctxMock.functionName,
-        invocationId: ctxMock.awsRequestId
       }
 
       shim.handler(eventMock, ctxMock, () => {})
