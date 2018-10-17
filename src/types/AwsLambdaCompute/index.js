@@ -1,4 +1,4 @@
-import { append, isString, resolve } from '@serverless/utils'
+import { resolve } from '@serverless/utils'
 import path from 'path'
 
 const parseRate = (rate) => {
@@ -45,10 +45,6 @@ const AwsLambdaCompute = async (SuperClass, superContext) => {
       // need to resolve these two variables now to convert values
       const runtime = convertRuntime(resolve(this.runtime))
       let code = resolve(functionInstance.code)
-      if (isString(code)) {
-        code = [code]
-      }
-      code = append(getShimFile(runtime), code)
 
       const inputs = {
         provider: this.provider,
@@ -57,17 +53,23 @@ const AwsLambdaCompute = async (SuperClass, superContext) => {
         memorySize: funcInstance.memory,
         timeout: funcInstance.timeout,
         runtime,
-        handler: 'shim.handler',
+        handler: resolve(funcInstance.handler),
         environment: {
           ...resolve(this.environment),
-          ...resolve(funcInstance.environment),
-          SERVERLESS_HANDLER: funcInstance.handler
+          ...resolve(funcInstance.environment)
         },
         code,
         tags: {
           ...resolve(this.tags),
           ...resolve(funcInstance.tags)
         }
+      }
+
+      if (resolve(functionInstance.ufs)) {
+        code = [code, getShimFile(runtime)]
+        inputs.code = code
+        inputs.handler = 'shim.handler'
+        inputs.environment.SERVERLESS_HANDLER = functionInstance.handler
       }
 
       return context.construct(AwsLambdaFunction, inputs)

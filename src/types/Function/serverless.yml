@@ -15,6 +15,7 @@ handler: ${inputs.handler}
 compute: ${inputs.compute}
 environment: ${inputs.environment}
 tags: ${inputs.tags}
+ufs: ${inputs.ufs}
 
 # TODO BRN: Add opt out for universal function signature
 inputTypes:
@@ -42,3 +43,6 @@ inputTypes:
     type: Object
   tags:
     type: Object
+  ufs:
+    type: boolean
+    description: opt in for universal function signature
