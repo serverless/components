@@ -6,16 +6,26 @@ import { forEach, isArray, resolve } from '@serverless/utils'
 
 const createLambda = async (
   Lambda,
-  { functionName, handler, memory, timeout, runtime, environment, description, code, role }
+  {
+    functionName,
+    handler,
+    memorySize,
+    timeout,
+    runtime,
+    environment,
+    functionDescription,
+    code,
+    role
+  }
 ) => {
   const params = {
     FunctionName: functionName,
     Code: {
       ZipFile: code
     },
-    Description: description,
+    Description: functionDescription,
     Handler: handler,
-    MemorySize: memory,
+    MemorySize: memorySize,
     Publish: true,
     Role: role.arn,
     Runtime: runtime,
@@ -31,7 +41,17 @@ const createLambda = async (
 
 const updateLambda = async (
   Lambda,
-  { functionName, handler, memory, timeout, runtime, environment, description, code, role }
+  {
+    functionName,
+    handler,
+    memorySize,
+    timeout,
+    runtime,
+    environment,
+    functionDescription,
+    code,
+    role
+  }
 ) => {
   const functionCodeParams = {
     FunctionName: functionName,
@@ -41,9 +61,9 @@ const updateLambda = async (
 
   const functionConfigParams = {
     FunctionName: functionName,
-    Description: description,
+    Description: functionDescription,
     Handler: handler,
-    MemorySize: memory,
+    MemorySize: memorySize,
     Role: role.arn,
     Runtime: runtime,
     Timeout: timeout,
