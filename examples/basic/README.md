@@ -1,13 +1,18 @@
 # Example: Basic Application
 
-An example of a basic application using serverless components. The application creates a AWS Lambda function and maps it to the handler code provided to it. It also creates an appropriate role and assigns it to the Lambda function. The application is deployable to AWS.
+An example of a basic application using a serverless component. The application creates a AWS Lambda function and maps it to the handler code provided to it. It also declares an AwsProvider that is uses for to hold the credentials to use to deploy the function. The application is deployable to AWS.
 
 ## Components
 
 The sample application is composed of the following components:
 
-* **Lambda function**: It creates one Lambda function with the handler code provided to it. The `aws-lambda` component encapsulates all that functionality.
-* **Role**: It creates a new role with a `AssumeRole` policy for the Lambda service. An existing `policy` can also be provided, in which case the `role` just uses that `policy`. The `aws-iam-role` component encapsulates all that functionality.
+* **Lambda function**: It creates one Lambda function with the handler code provided to it. The `AwsLambdaFunction` component encapsulates all that functionality.
+* **AWS Provider**: It holds the credentials and region that will be used to deploy the function
+
+
+## Setup
+
+Replace the `accessKeyId` and `secretAccessKey` with your AWS credentials.
 
 ## Operations
 
