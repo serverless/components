@@ -1,6 +1,5 @@
 import { getSwaggerDefinition, generateUrl, generateUrls } from './utils'
-import { equals } from '@serverless/utils'
-import { resolve } from '../../utils'
+import { equals, resolve } from '@serverless/utils'
 
 const deleteApi = async (APIGateway, params) => {
   const { id } = params
@@ -71,78 +70,74 @@ const updateApi = async (APIGateway, params) => {
   return outputs
 }
 
-module.exports = {
-  construct(inputs) {
-    this.inputs = inputs
-  },
-
-  async define(context) {
-    const childComponents = Object.entries(this.inputs.routes)
-      .map(([path, pathObject]) =>
-        Object.entries(pathObject)
-          .map(([method, methodObject]) => {
-            const instances = []
-            if (methodObject.function) {
-              instances.push(resolve(methodObject.function))
-            }
-            if (methodObject.authorizer && methodObject.authorizer.function) {
-              instances.push(resolve(methodObject.authorizer.function))
-            }
-            return instances
-          })
-          .reduce((acc, val) => acc.concat(val))
-      )
-      .reduce((acc, val) => acc.concat(val))
-
-    return childComponents
-  },
-
-  async deploy(prevInstance, context) {
-    const inputs = this.inputs
-    const aws = inputs.provider.getSdk()
-    const APIGateway = new aws.APIGateway()
-    const state = prevInstance || {}
-    const noChanges =
-      inputs.name === state.name &&
-      (inputs.role && state.role && inputs.role.arn === state.role.arn) &&
-      equals(inputs.routes, state.routes)
-
-    let outputs
-    if (noChanges) {
-      outputs = state
-    } else if (inputs.name && !state.name) {
-      context.log(`Creating API Gateway: "${inputs.name}"`)
-      outputs = await createApi(APIGateway, inputs)
-    } else {
-      context.log(`Updating API Gateway: "${inputs.name}"`)
-      outputs = await updateApi(APIGateway, {
-        ...inputs,
-        id: state.id,
-        url: state.url
-      })
+export default function(SuperClass, SuperContext) {
+  return class extends SuperClass {
+    async construct(inputs, context) {
+      await super.construct(inputs, context)
+      this.inputs = inputs
     }
-    // context.saveState(this, { ...inputs, ...outputs })
-    return Object.assign(this, outputs)
-  },
 
-  async remove(prevInstance, context) {
-    const outputs = {
-      id: null,
-      url: null,
-      urls: null
+    async define(context) {
+      const childComponents = Object.entries(this.inputs.routes)
+        .map(([path, pathObject]) =>
+          Object.entries(pathObject)
+            .map(([method, methodObject]) => {
+              const instances = []
+              if (methodObject.function) {
+                instances.push(resolve(methodObject.function))
+              }
+              if (methodObject.authorizer && methodObject.authorizer.function) {
+                instances.push(resolve(methodObject.authorizer.function))
+              }
+              return instances
+            })
+            .reduce((acc, val) => acc.concat(val))
+        )
+        .reduce((acc, val) => acc.concat(val))
+
+      return childComponents
     }
-    const state = context.getState(this)
 
-    try {
-      context.log(`Removing API Gateway: "${state.name}"`)
-      await deleteApi({ name: state.name, id: state.id })
-    } catch (e) {
-      if (!e.message.includes('Invalid REST API identifier specified')) {
-        throw e
+    async deploy(prevInstance, context) {
+      const inputs = this.inputs
+      const aws = inputs.provider.getSdk()
+      const APIGateway = new aws.APIGateway()
+      const state = prevInstance || {}
+      const noChanges =
+        inputs.name === state.name &&
+        (inputs.role && state.role && inputs.role.arn === state.role.arn) &&
+        equals(inputs.routes, state.routes)
+
+      let outputs
+      if (noChanges) {
+        outputs = state
+      } else if (inputs.name && !state.name) {
+        context.log(`Creating API Gateway: "${inputs.name}"`)
+        outputs = await createApi(APIGateway, inputs)
+      } else {
+        context.log(`Updating API Gateway: "${inputs.name}"`)
+        outputs = await updateApi(APIGateway, {
+          ...inputs,
+          id: state.id,
+          url: state.url
+        })
+      }
+      // context.saveState(this, { ...inputs, ...outputs })
+      return Object.assign(this, outputs)
+    }
+
+    async remove(context) {
+      const aws = this.inputs.provider.getSdk()
+      const APIGateway = new aws.APIGateway()
+
+      try {
+        context.log(`Removing API Gateway: "${this.name}"`)
+        await deleteApi(APIGateway, { name: this.name, id: this.id })
+      } catch (e) {
+        if (!e.message.includes('Invalid REST API identifier specified')) {
+          throw e
+        }
       }
     }
-
-    context.saveState(this, {})
-    return Object.assign(this, outputs)
   }
 }
