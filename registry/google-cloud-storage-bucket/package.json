@@ -2,9 +2,9 @@
   "name": "@serverless-components/google-storage-bucket",
   "version": "0.2.0",
   "private": true,
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest -v ."
   },
   "dependencies": {
     "@google-cloud/storage": "^2.0.3"

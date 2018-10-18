@@ -15,7 +15,7 @@ const deploy = async (inputs, context) => {
     } catch (e) {
       const msg = 'You already own this bucket. Please select another name.'
       if (!e.message.includes(msg)) {
-        throw new Error(e)
+        throw e
       } else {
         context.log(msg)
       }
