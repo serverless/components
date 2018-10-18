@@ -1,4 +1,4 @@
-const fetch = require('node-fetch')
+import { fetch } from '@serverless/utils'
 
 async function getToken(username, password, registryUrl) {
   const result = await fetch(`${registryUrl}/v2/users/login`, {

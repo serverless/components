@@ -30,7 +30,9 @@ const deploy = async (inputs, context) => {
 }
 
 const remove = async (inputs, context) => {
-  if (!context.state.name) return {}
+  if (!context.state.name) {
+    return {}
+  }
 
   context.log(`Removing Site: '${context.state.name}'`)
   context.saveState({})

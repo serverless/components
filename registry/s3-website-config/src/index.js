@@ -81,7 +81,9 @@ const deploy = async (inputs, context) => {
 }
 
 const remove = async (inputs, context) => {
-  if (!context.state.rootBucketName) return {}
+  if (!context.state.rootBucketName) {
+    return {}
+  }
 
   // context.log(`Unsetting website configuration for Bucket: '${context.state.rootBucketName}'`)
   // await unsetBucketConfig(context.state.rootBucketName)

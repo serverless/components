@@ -85,13 +85,12 @@ const TwilioPhoneNumber = {
     } else if (!prevInstance.sid) {
       context.log(`Creating Twilio Phone Number: "${inputs.friendlyName}"`)
       return createPhoneNumber(this.provider.getSdk(), inputs)
-    } else {
-      context.log(`Updating Twilio Phone Number: "${inputs.friendlyName}"`)
-      return await updatePhoneNumber(this.provider.getSdk(), {
-        ...inputs,
-        sid: prevInstance.sid
-      })
     }
+    context.log(`Updating Twilio Phone Number: "${inputs.friendlyName}"`)
+    return await updatePhoneNumber(this.provider.getSdk(), {
+      ...inputs,
+      sid: prevInstance.sid
+    })
   },
 
   async remove(prevInstance, context) {

@@ -1,11 +1,13 @@
 import { all, isEmpty, map } from '@serverless/utils'
-import resolveVariables from '../variable/resolveVariables'
+import resolveComponentVariables from '../component/resolveComponentVariables'
 import cloneGraph from './cloneGraph'
 
 const deployNode = async (node, context) => {
-  const nextInstance = resolveVariables(node.nextInstance)
-  const prevInstance = resolveVariables(node.prevInstance)
   if (['deploy', 'replace'].includes(node.operation)) {
+    const nextInstance = resolveComponentVariables(node.nextInstance)
+    const prevInstance = !isEmpty(node.prevInstance)
+      ? resolveComponentVariables(node.prevInstance)
+      : node.prevInstance
     await nextInstance.deploy(prevInstance, context)
   }
 }
@@ -15,7 +17,7 @@ const deployNodeIds = async (nodeIds, graph, context) =>
     map(async (nodeId) => {
       const node = graph.node(nodeId)
       if (!node) {
-        throw new Error('cloud not find node for nodeId:', nodeId)
+        throw new Error('could not find node for nodeId:', nodeId)
       }
       await deployNode(node, context)
       graph.removeNode(nodeId)
@@ -24,8 +26,6 @@ const deployNodeIds = async (nodeIds, graph, context) =>
 
 const deployLeaves = async (graph, context) => {
   const leaves = graph.sinks()
-  // console.log('leaves')
-  // console.log(leaves)
   if (isEmpty(leaves)) {
     return graph
   }

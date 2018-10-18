@@ -30,7 +30,9 @@ const deploy = async (inputs, context) => {
         })
       } else {
         // Ignore unnecessary files
-        if (source.includes('.DS_Store')) return
+        if (source.includes('.DS_Store')) {
+          return
+        }
 
         fs.copyFileSync(source, destination)
       }

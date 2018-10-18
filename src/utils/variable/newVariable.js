@@ -5,14 +5,14 @@ import resolveVariableString from './resolveVariableString'
 
 const newVariable = (variableString, data) => ({
   [SYMBOL_VARIABLE]: true,
-  findInstances() {
+  findInstanceIds() {
     const pathParts = castPath(matchVariable(variableString).expression)
     return walkReducePath(
-      (instances, value) => {
-        if (value && value.get && has('instanceId', value.get())) {
-          return append(value.get().instanceId, instances)
+      (instanceIds, value) => {
+        if (has('instanceId', value)) {
+          return append(value.instanceId, instanceIds)
         }
-        return instances
+        return instanceIds
       },
       pathParts,
       [],

@@ -3,9 +3,9 @@ extends: Object
 version: 1.0.0
 main: ./index.js
 
-components: ${inputs.components}
-
-inputTypes:
-  components:
-    type: Object
-    default: {}
+# components: ${inputs.components}
+#
+# inputTypes:
+#   components:
+#     type: Object
+#     default: {}

@@ -15,7 +15,9 @@ BbPromise.map(componentDirs, (componentDir) => {
   // eslint-disable-line consistent-return
   const componentDirPath = join(registryPath, componentDir)
 
-  if (!fs.lstatSync(componentDirPath).isDirectory()) return BbPromise.resolve()
+  if (!fs.lstatSync(componentDirPath).isDirectory()) {
+    return BbPromise.resolve()
+  }
 
   if (fs.existsSync(join(componentDirPath, 'node_modules'))) {
     const removeNodeModules = cp.spawn('rm', ['-rf', join(componentDirPath, 'node_modules')], {

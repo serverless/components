@@ -1,4 +1,4 @@
-const fetch = require('node-fetch')
+import { fetch } from '@serverless/utils'
 
 async function deleteImage(token, tag, registryUrl) {
   let [username, image] = tag.split('/').slice(-2) // eslint-disable-line

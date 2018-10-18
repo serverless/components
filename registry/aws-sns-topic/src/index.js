@@ -75,7 +75,9 @@ const updateAttributes = async (
 ) => {
   const topicAttributes = reduce(
     (result, value) => {
-      if (head(values(value))) return concat(result, [value])
+      if (head(values(value))) {
+        return concat(result, [value])
+      }
       return result
     },
     [],

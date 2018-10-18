@@ -52,7 +52,9 @@ const deploy = async (inputs, context) => {
 }
 
 const remove = async (inputs, context) => {
-  if (!context.state.contentPath) return {}
+  if (!context.state.contentPath) {
+    return {}
+  }
 
   context.saveState({})
   return {}

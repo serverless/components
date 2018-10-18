@@ -30,6 +30,7 @@ const AwsS3Bucket = (SuperClass) =>
     async deploy(prevInstance, context) {
       context.log(`Creating Bucket: '${get('bucketName', this)}'`)
       await createBucket(this)
+      context.log(`Bucket created: '${get('bucketName', this)}'`)
       // context.saveState(this, { bucketName: this.bucketName }) // provider?
       // await context.saveState()
     }

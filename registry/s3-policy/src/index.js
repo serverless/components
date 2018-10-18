@@ -81,7 +81,9 @@ const deploy = async (inputs, context) => {
 }
 
 const remove = async (inputs, context) => {
-  if (!context.state.bucketName) return {}
+  if (!context.state.bucketName) {
+    return {}
+  }
 
   try {
     context.log(`Removing policy for bucket: '${context.state.bucketName}'`)

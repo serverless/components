@@ -4,19 +4,25 @@ const util = require('util')
 
 const findTableByName = (tables, tableName) => {
   // eslint-disable-line arrow-body-style
-  if (!tables || tables.length === 0) return {}
+  if (!tables || tables.length === 0) {
+    return {}
+  }
   return tables.filter((table) => table.name === tableName)[0]
 }
 
 const findOutputTableByName = (tables, tableName) => {
   // eslint-disable-line arrow-body-style
-  if (!tables || tables.length === 0) return {}
+  if (!tables || tables.length === 0) {
+    return {}
+  }
   return tables.filter((table) => table[tableName])[0]
 }
 
 const removeOutputTableByName = (tables, tableName) => {
   // eslint-disable-line arrow-body-style
-  if (!tables || tables.length === 0) return { ddbtables: [] }
+  if (!tables || tables.length === 0) {
+    return { ddbtables: [] }
+  }
   const val = tables.filter((table) => !table[tableName])[0]
   if (val) {
     return { ddbtables: [val] }
@@ -97,7 +103,9 @@ const convertInputSchemaToNativeSchema = (credentials, inputSchema) => {
 
 const defineTable = (credentials, table) => {
   dynamo.AWS.config.update(credentials)
-  if (!table) return null
+  if (!table) {
+    return null
+  }
 
   const vIndexes = table.indexes
   const vSchema = table.schema
@@ -256,7 +264,9 @@ const AwsDynamoDB = {
   },
 
   async remove(prevInstance, context) {
-    if (!prevInstance.tables || prevInstance.tables.length === 0) return
+    if (!prevInstance.tables || prevInstance.tables.length === 0) {
+      return
+    }
 
     // TODO: when multiple tables are allowed, update to delete multiple tables
     const tableName = this.tables[0].name
@@ -280,39 +290,42 @@ const AwsDynamoDB = {
   },
 
   async insert(prevInstance, context) {
-    if (!prevInstance.tables || prevInstance.tables.length === 0) return {}
+    if (!prevInstance.tables || prevInstance.tables.length === 0) {
+      return {}
+    }
 
     if (context.options && context.options.tablename && context.options.itemdata) {
       return insertItem(this, prevInstance, context.options.tablename, context.options.itemdata)
-    } else {
-      context.log(
-        'Incorrect or insufficient parameters. \nUsage: insert --tablename <tablename> --itemdata <data in json format>'
-      )
     }
+    context.log(
+      'Incorrect or insufficient parameters. \nUsage: insert --tablename <tablename> --itemdata <data in json format>'
+    )
   },
 
   async destroy(prevInstance, context) {
-    if (!prevInstance.tables || prevInstance.tables.length === 0) return {}
+    if (!prevInstance.tables || prevInstance.tables.length === 0) {
+      return {}
+    }
 
     if (context.options && context.options.tablename && context.options.keydata) {
       return deleteItem(this, prevInstance, context.options.tablename, context.options.keydata)
-    } else {
-      context.log(
-        'Incorrect or insufficient parameters. \nUsage: destroy --tablename <tablename> --keydata <hashkey and rangekey key/value pairs in json format>'
-      )
     }
+    context.log(
+      'Incorrect or insufficient parameters. \nUsage: destroy --tablename <tablename> --keydata <hashkey and rangekey key/value pairs in json format>'
+    )
   },
 
   async getItem(prevInstance, context) {
-    if (!prevInstance.tables || prevInstance.tables.length === 0) return {}
+    if (!prevInstance.tables || prevInstance.tables.length === 0) {
+      return {}
+    }
 
     if (context.options && context.options.tablename && context.options.keydata) {
       return getItem(this, context.state, context.options.tablename, context.options.keydata)
-    } else {
-      context.log(
-        'Incorrect or insufficient parameters. \nUsage: get --tablename <tablename> --keydata <hashkey and rangekey key/value pairs in json format>'
-      )
     }
+    context.log(
+      'Incorrect or insufficient parameters. \nUsage: get --tablename <tablename> --keydata <hashkey and rangekey key/value pairs in json format>'
+    )
   }
 }
 

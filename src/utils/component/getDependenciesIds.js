@@ -1,21 +1,17 @@
-import isVariable from '../variable/isVariable'
-import { reject, flatten, concat } from 'ramda'
-import { isArray, isObject, map } from '@serverless/utils'
+import { concat, union, without } from '@serverless/utils'
+import getChildrenIds from './getChildrenIds'
+import getComponentReferenceIds from './getComponentReferenceIds'
+import getParentIds from './getParentIds'
+import getVariableInstanceIds from './getVariableInstanceIds'
 
-const getDepsIds = (value, deps = [], startId, parentIds) => {
-  if (isArray(value)) {
-    return map((v) => getDepsIds(v, deps, startId, parentIds), value)
-  } else if (isObject(value)) {
-    if (isVariable(value)) {
-      return concat(deps, reject((i) => parentIds.includes(i), value.findInstances()))
-    } else if (!value.instanceId || value.instanceId === startId) {
-      return map((k) => getDepsIds(value[k], deps, startId, parentIds), Object.keys(value))
-    }
-  }
-  return deps
-}
-
-const getDependenciesIds = (currentInstance, parentIds) =>
-  flatten(getDepsIds(currentInstance, [], currentInstance.instanceId, parentIds))
+//union this with component reference ids (the id of any component where a property in this component references that component )
+const getDependenciesIds = (component) =>
+  without(
+    union(getParentIds(component), [component.instanceId]),
+    union(
+      concat(getChildrenIds(component), getVariableInstanceIds(component)),
+      getComponentReferenceIds(component)
+    )
+  )
 
 export default getDependenciesIds

@@ -15,14 +15,21 @@ describe('index', () => {
   test('has component methods', () => {
     const mod = require('./')
     expect(mod).toMatchObject({
+      appendKey: expect.any(Function),
       defineComponent: expect.any(Function),
       defineComponentFromState: expect.any(Function),
       getChildrenIds: expect.any(Function),
+      getDependenciesIds: expect.any(Function),
       getKey: expect.any(Function),
       getParentId: expect.any(Function),
       getParentIds: expect.any(Function),
+      getVariableInstanceIds: expect.any(Function),
+      isComponent: expect.any(Function),
+      resolveComponentVariables: expect.any(Function),
       setKey: expect.any(Function),
-      walkReduceComponent: expect.any(Function)
+      walkReduceComponentChildren: expect.any(Function),
+      walkReduceComponentChildrenDepthFirst: expect.any(Function),
+      walkReduceComponentOwnVariables: expect.any(Function)
     })
   })
 
@@ -125,8 +132,7 @@ describe('index', () => {
       matchVariable: expect.any(Function),
       newVariable: expect.any(Function),
       regexVariable: expect.any(Object),
-      resolveVariableString: expect.any(Function),
-      resolveVariables: expect.any(Function)
+      resolveVariableString: expect.any(Function)
     })
   })
 })

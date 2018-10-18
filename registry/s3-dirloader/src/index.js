@@ -49,7 +49,9 @@ const deploy = async (inputs, context) => {
 }
 
 const remove = async (inputs, context) => {
-  if (!context.state.contentPath) return {}
+  if (!context.state.contentPath) {
+    return {}
+  }
 
   // context.log(`Removing files from Bucket: '${context.state.contentPath}'`)
   // outputs = await removeFiles(context.state.contentPath)

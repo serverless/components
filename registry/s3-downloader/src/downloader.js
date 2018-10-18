@@ -17,8 +17,11 @@ const putFileEntry = (fileUrl, fileName) =>
     }
 
     dbClient.put(params, (err) => {
-      if (err) reject(err)
-      else resolve(item)
+      if (err) {
+        reject(err)
+      } else {
+        resolve(item)
+      }
     })
   })
 

@@ -1,7 +1,10 @@
-const fetch = require('node-fetch')
+import { fetch } from '@serverless/utils'
 const deleteImage = require('./deleteImage')
 
-jest.mock('node-fetch')
+jest.mock('@serverless/utils', () => ({
+  ...require.requireActual('@serverless/utils'),
+  fetch: jest.fn()
+}))
 
 afterAll(() => {
   jest.restoreAllMocks()

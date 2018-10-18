@@ -1,10 +1,11 @@
 import { all, isEmpty, map } from '@serverless/utils'
-import resolveVariables from '../variable/resolveVariables'
+import resolveComponentVariables from '../component/resolveComponentVariables'
 import cloneGraph from './cloneGraph'
 
 const removeNode = async (node, context) => {
-  const prevInstance = resolveVariables(node.prevInstance)
-  if (prevInstance && ['remove', 'replace'].includes(node.operation)) {
+  let { prevInstance } = node
+  if (!isEmpty(prevInstance) && ['remove', 'replace'].includes(node.operation)) {
+    prevInstance = resolveComponentVariables(prevInstance)
     await prevInstance.remove(context)
   }
 }

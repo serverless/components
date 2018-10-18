@@ -1,17 +1,16 @@
 import { forEach } from '@serverless/utils'
 import { Graph } from 'graphlib'
 import getChildrenIds from '../component/getChildrenIds'
-import getParentIds from '../component/getParentIds'
 import getDependenciesIds from '../component/getDependenciesIds'
 import getParentId from '../component/getParentId'
-import walkReduceComponentDepthFirst from '../component/walkReduceComponentDepthFirst'
+import walkReduceComponentChildrenDepthFirst from '../component/walkReduceComponentChildrenDepthFirst'
 
 const buildGraph = (nextInstance, prevInstance) => {
   let graph = new Graph()
 
   // nextInstance nodes
   if (nextInstance && nextInstance.instanceId) {
-    graph = walkReduceComponentDepthFirst(
+    graph = walkReduceComponentChildrenDepthFirst(
       (accum, currentInstance) => {
         if (!currentInstance.instanceId) {
           throw new Error(
@@ -26,16 +25,10 @@ const buildGraph = (nextInstance, prevInstance) => {
         accum.setNode(currentInstance.instanceId, node)
 
         // edges
-        const childrenIds = getChildrenIds(currentInstance)
-        const parentIds = getParentIds(currentInstance)
-        const depsIds = getDependenciesIds(currentInstance, parentIds)
-
-        forEach((childId) => {
-          accum.setEdge(currentInstance.instanceId, childId)
-        }, childrenIds)
+        const depIds = getDependenciesIds(currentInstance)
         forEach((depId) => {
           accum.setEdge(currentInstance.instanceId, depId)
-        }, depsIds)
+        }, depIds)
         return accum
       },
       graph,
@@ -45,7 +38,7 @@ const buildGraph = (nextInstance, prevInstance) => {
 
   if (prevInstance && prevInstance.instanceId) {
     // prevInstance nodes
-    graph = walkReduceComponentDepthFirst(
+    graph = walkReduceComponentChildrenDepthFirst(
       (accum, currentInstance) => {
         if (!currentInstance.instanceId) {
           throw new Error(

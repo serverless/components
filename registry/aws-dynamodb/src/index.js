@@ -8,19 +8,25 @@ dynamo.AWS.config.update({ region: process.env.AWS_DEFAULT_REGION || 'us-east-1'
 
 const findTableByName = (tables, tableName) => {
   // eslint-disable-line arrow-body-style
-  if (!tables || tables.length === 0) return {}
+  if (!tables || tables.length === 0) {
+    return {}
+  }
   return tables.filter((table) => table.name === tableName)[0]
 }
 
 const findOutputTableByName = (tables, tableName) => {
   // eslint-disable-line arrow-body-style
-  if (!tables || tables.length === 0) return {}
+  if (!tables || tables.length === 0) {
+    return {}
+  }
   return tables.filter((table) => table[tableName])[0]
 }
 
 const removeOutputTableByName = (tables, tableName) => {
   // eslint-disable-line arrow-body-style
-  if (!tables || tables.length === 0) return { ddbtables: [] }
+  if (!tables || tables.length === 0) {
+    return { ddbtables: [] }
+  }
   const val = tables.filter((table) => !table[tableName])[0]
   if (val) {
     return { ddbtables: [val] }
@@ -99,7 +105,9 @@ const convertInputSchemaToNativeSchema = (inputSchema) => {
 }
 
 const defineTable = (table) => {
-  if (!table) return null
+  if (!table) {
+    return null
+  }
 
   const vIndexes = table.indexes
   const vSchema = table.schema
@@ -261,7 +269,9 @@ const deploy = async (inputs, context) => {
 }
 
 const remove = async (inputs, context) => {
-  if (!context.state.ddbtables || context.state.ddbtables.length === 0) return {}
+  if (!context.state.ddbtables || context.state.ddbtables.length === 0) {
+    return {}
+  }
 
   let tableName
   if (context.options && context.options.tablename) {
@@ -292,7 +302,9 @@ const remove = async (inputs, context) => {
 const insert = async (inputs, context) => {
   let outputs = context.state
 
-  if (!context.state.ddbtables || context.state.ddbtables.length === 0) return {}
+  if (!context.state.ddbtables || context.state.ddbtables.length === 0) {
+    return {}
+  }
 
   if (context.options && context.options.tablename && context.options.itemdata) {
     outputs = await insertItem(
@@ -312,7 +324,9 @@ const insert = async (inputs, context) => {
 const destroy = async (inputs, context) => {
   let outputs = context.state
 
-  if (!context.state.ddbtables || context.state.ddbtables.length === 0) return {}
+  if (!context.state.ddbtables || context.state.ddbtables.length === 0) {
+    return {}
+  }
 
   if (context.options && context.options.tablename && context.options.keydata) {
     outputs = await deleteItem(
@@ -332,7 +346,9 @@ const destroy = async (inputs, context) => {
 const get = async (inputs, context) => {
   let outputs = context.state
 
-  if (!context.state.ddbtables || context.state.ddbtables.length === 0) return {}
+  if (!context.state.ddbtables || context.state.ddbtables.length === 0) {
+    return {}
+  }
 
   if (context.options && context.options.tablename && context.options.keydata) {
     outputs = await getItem(

@@ -5,6 +5,5 @@ export { default as isVariable } from './isVariable'
 export { default as matchVariable } from './matchVariable'
 export { default as newVariable } from './newVariable'
 export { default as resolveVariableString } from './resolveVariableString'
-export { default as resolveVariables } from './resolveVariables'
 
 export { regexVariable }

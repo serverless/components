@@ -26,7 +26,9 @@ function buildComponents(watch, concurrency) {
       const componentDirPath = join(rootPath, componentDir)
 
       return new BbPromise((resolve, reject) => {
-        if (!fs.existsSync(join(componentDirPath, 'package.json'))) return resolve()
+        if (!fs.existsSync(join(componentDirPath, 'package.json'))) {
+          return resolve()
+        }
 
         let babel = join(componentDirPath, '..', 'node_modules', '.bin')
         babel = os.platform().startsWith('win') ? join(babel, 'babel.cmd') : join(babel, 'babel')

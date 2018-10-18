@@ -7,18 +7,29 @@ const parseRate = (rate) => {
     let awsUnit
     const period = rate.substr(0, rate.length - 1)
     if (period === '1') {
-      if (unit === 'm') awsUnit = 'minute'
-      if (unit === 'h') awsUnit = 'hour'
-      if (unit === 'd') awsUnit = 'day'
+      if (unit === 'm') {
+        awsUnit = 'minute'
+      }
+      if (unit === 'h') {
+        awsUnit = 'hour'
+      }
+      if (unit === 'd') {
+        awsUnit = 'day'
+      }
     } else {
-      if (unit === 'm') awsUnit = 'minutes'
-      if (unit === 'h') awsUnit = 'hours'
-      if (unit === 'd') awsUnit = 'days'
+      if (unit === 'm') {
+        awsUnit = 'minutes'
+      }
+      if (unit === 'h') {
+        awsUnit = 'hours'
+      }
+      if (unit === 'd') {
+        awsUnit = 'days'
+      }
     }
     return `rate(${period} ${awsUnit})`
-  } else {
-    return `cron(${rate})`
   }
+  return `cron(${rate})`
 }
 const convertRuntime = (runtime) => {
   if (runtime === 'nodejs') {

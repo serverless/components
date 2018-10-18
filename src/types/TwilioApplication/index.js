@@ -65,13 +65,12 @@ const TwilioApplication = {
     } else if (!prevInstance.sid) {
       context.log(`Creating Twilio Application: "${inputs.friendlyName}"`)
       return createTwilioApplication(this.provider.getSdk(), inputs)
-    } else {
-      context.log(`Updating Twilio Application: "${inputs.friendlyName}"`)
-      return updateTwilioApplication({
-        ...inputs,
-        sid: prevInstance.sid
-      })
     }
+    context.log(`Updating Twilio Application: "${inputs.friendlyName}"`)
+    return updateTwilioApplication({
+      ...inputs,
+      sid: prevInstance.sid
+    })
   },
 
   async remove(prevInstance, context) {

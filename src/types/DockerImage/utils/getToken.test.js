@@ -1,13 +1,14 @@
-const fetch = require('node-fetch')
+import { fetch } from '@serverless/utils'
 const getToken = require('./getToken')
 
-jest.mock('node-fetch', () =>
-  jest.fn(() =>
+jest.mock('@serverless/utils', () => ({
+  ...require.requireActual('@serverless/utils'),
+  fetch: jest.fn(() =>
     Promise.resolve({
       json: () => ({ token: 'jwt-auth-token' })
     })
   )
-)
+}))
 
 afterAll(() => {
   jest.restoreAllMocks()

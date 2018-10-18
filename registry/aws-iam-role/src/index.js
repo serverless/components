@@ -166,7 +166,9 @@ const deploy = async (inputs, context) => {
 }
 
 const remove = async (inputs, context) => {
-  if (!context.state.name) return {}
+  if (!context.state.name) {
+    return {}
+  }
 
   const outputs = {
     policy: null,

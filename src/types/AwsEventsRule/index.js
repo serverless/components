@@ -55,7 +55,9 @@ const AwsEventsRule = {
   },
 
   async remove(prevInstance) {
-    if (!prevInstance.name) return this
+    if (!prevInstance.name) {
+      return this
+    }
     const cloudWatchEvents = new this.provider.sdk.CloudWatchEvents()
     const removeTargetsParams = {
       Rule: this.name,

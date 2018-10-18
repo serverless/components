@@ -15,25 +15,25 @@ const cloudfunctions = google.cloudfunctions('v1')
 
 // "private" functions
 async function createFunction({
-  name,
-  description,
-  entryPoint,
-  sourceCodePath,
-  timeout,
-  availableMemoryMb,
-  labels,
-  sourceArchiveUrl,
-  sourceRepository,
-  sourceUploadUrl,
-  httpsTrigger,
-  eventTrigger,
-  runtime,
-  projectId,
-  locationId,
-  keyFilename,
-  environmentVariables,
-  deploymentBucket
-}) {
+                                name,
+                                description,
+                                entryPoint,
+                                sourceCodePath,
+                                timeout,
+                                availableMemoryMb,
+                                labels,
+                                sourceArchiveUrl,
+                                sourceRepository,
+                                sourceUploadUrl,
+                                httpsTrigger,
+                                eventTrigger,
+                                runtime,
+                                projectId,
+                                locationId,
+                                keyFilename,
+                                environmentVariables,
+                                deploymentBucket
+                              }) {
   const location = `projects/${projectId}/locations/${locationId}`
   const authClient = await getAuthClient(keyFilename)
   if (authClient) {

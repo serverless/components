@@ -6,11 +6,11 @@ describe('#generateInstanceId()', () => {
     const res = generateInstanceId(appId)
 
     const splitted = res.split('-')
-    const extractedServiceId = res.split('-')[0]
+    const extractedAppId = res.split('-')[0]
 
     expect(res).toMatch(/.+-.+/)
     expect(res.length).toEqual(19)
     expect(splitted.length).toEqual(2)
-    expect(extractedServiceId).toEqual(appId)
+    expect(extractedAppId).toEqual(appId)
   })
 })

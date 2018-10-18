@@ -22,7 +22,9 @@ function installComponents() {
       const componentDirPath = join(rootPath, componentDir)
 
       return new BbPromise((resolve, reject) => {
-        if (!fs.existsSync(join(componentDirPath, 'package.json'))) return resolve()
+        if (!fs.existsSync(join(componentDirPath, 'package.json'))) {
+          return resolve()
+        }
 
         const command = cp.spawn(npmCmd, ['install'], { env: process.env, cwd: componentDirPath })
         command.stdout.on('data', (data) => {

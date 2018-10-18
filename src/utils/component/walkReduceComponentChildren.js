@@ -34,7 +34,7 @@ const reduceWalkee = (accum, component, keys, iteratee, recur) => {
  * @param {Component} component The component to walk.
  * @returns {*} The final, accumulated value.
  */
-const walkReduceComponent = (iteratee, accum, component) =>
+const walkReduceComponentChildren = (iteratee, accum, component) =>
   walk(reduceWalkee, iteratee, accum, component, [])
 
-export default walkReduceComponent
+export default walkReduceComponentChildren

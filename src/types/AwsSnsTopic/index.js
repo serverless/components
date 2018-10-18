@@ -73,7 +73,9 @@ const updateAttributes = async (
 ) => {
   const topicAttributes = reduce(
     (result, value) => {
-      if (head(values(value))) return concat(result, [value])
+      if (head(values(value))) {
+        return concat(result, [value])
+      }
       return result
     },
     [],
@@ -180,9 +182,8 @@ const AwsSnsTopic = {
           topicArn: prevInstance.topicArn
         }
       )
-    } else {
-      return createSNSTopic(sns, this, context)
     }
+    return createSNSTopic(sns, this, context)
   },
 
   async remove(prevInstance, context) {

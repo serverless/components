@@ -20,16 +20,18 @@ describe('#resolveVariableString()', () => {
   })
 
   it('should resolve non exact matches to string', () => {
-    expect(resolveVariableString('dude, ${abc}'), { abc: 'sweet' }).toBe('dude, sweet')
-    expect(resolveVariableString('dude, ${abc}'), { abc: ['s', 'w', 'e', 'e', 't'] }).toBe(
+    expect(resolveVariableString('dude, ${abc}', { abc: 'sweet' })).toBe('dude, sweet')
+    expect(resolveVariableString('dude, ${abc}', { abc: ['s', 'w', 'e', 'e', 't'] })).toBe(
       'dude, s,w,e,e,t'
     )
-    expect(resolveVariableString('dude, ${abc}'), {
-      abc: {
-        toString() {
-          return 'sweet'
+    expect(
+      resolveVariableString('dude, ${abc}', {
+        abc: {
+          toString() {
+            return 'sweet'
+          }
         }
-      }
-    }).toBe('dude, sweet')
+      })
+    ).toBe('dude, sweet')
   })
 })

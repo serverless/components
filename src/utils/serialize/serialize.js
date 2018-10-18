@@ -9,7 +9,7 @@ const getType = (value) => {
 // NOTE BRN: This method belongs here and not in utils because the core has to have an understanding of how it serialized things and has to deal with backward compatability of older versions of serialized data. Will need a way of determining which serialization version was used. Later, this would probably be something that belongs in an SDK.
 
 const serialize = (value) => {
-  const refNumber = 0
+  let refNumber = 0
   const references = new WeakMap()
   const generateRefKey = (object) => {
     if (references.has(object)) {
@@ -23,7 +23,7 @@ const serialize = (value) => {
   const entry = generateRefKey(value)
   const instances = {}
   const refKey = generateRefKey(value)
-  const instance = instances[refKey]
+  let instance = instances[refKey]
   if (!instance) {
     const type = getType(instance)
     let source

@@ -23,9 +23,9 @@ const loadTypeMeta = async (query, context) => {
     return loadTypeMetaFromRegistry(query, context)
   } else if (isTypeName(query)) {
     return loadTypeMetaFromName(query, context)
-  } else {
-    return loadTypeMetaFromPath(query, context)
   }
+  return loadTypeMetaFromPath(query, context)
+
   throw errorBadTypeQuery(query)
 }
 
