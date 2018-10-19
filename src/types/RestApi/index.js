@@ -86,9 +86,7 @@ export default function(SuperClass, SuperContext) {
 
       const childComponents = []
 
-      const name = `${inputs.apiName}-iam-role-${Math.random()
-        .toString(36)
-        .substring(7)}`
+      const name = `${inputs.apiName}-iam-role`
       const service = 'apigateway.amazonaws.com'
       const iamComponent = await context.loadType('AwsIamRole')
       this.role = await context.construct(iamComponent, {
