@@ -3,6 +3,9 @@ extends: Provider
 version: 1.0.0
 main: ./index.js
 
+accountSid: ${inputs.accountSid}
+authToken: ${inputs.authToken}
+
 inputTypes:
   accountSid:
     type: string

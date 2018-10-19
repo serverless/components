@@ -1,0 +1,17 @@
+name: Apps
+extends: Component
+version: 1.0.0
+main: ./dist/index.js
+
+providers: ${inputs.providers}
+functions: ${inputs.functions}
+
+inputTypes:
+  providers:
+    type: Object
+    default: ${context.providers}
+    required: false
+  services:
+    type: Object
+    default: ${context.services}
+    required: false

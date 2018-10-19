@@ -7,7 +7,7 @@ const join = require('path').join
 const os = require('os')
 const cp = require('child_process')
 const BbPromise = require('bluebird')
-const { contains } = require('@serverless/utils')
+const contains = require('ramda').contains
 
 const rootPath = __dirname
 const dirsFilter = process.argv.slice(2)

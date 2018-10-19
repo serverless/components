@@ -5,24 +5,27 @@ import loadTypeMetaFromPath from './loadTypeMetaFromPath'
 
 // TODO BRN: Replace this with something more configurable
 const NATIVE_NAMES = {
+  App: resolve(__dirname, '..', '..', '..', 'registry', 'App'),
+  Function: resolve(__dirname, '..', '..', '..', 'registry', 'Function'),
+  Service: resolve(__dirname, '..', '..', '..', 'registry', 'Service'),
+  Cron: resolve(__dirname, '..', '..', '..', 'registry', 'Cron'),
+  AwsIamPolicy: resolve(__dirname, '..', '..', '..', 'registry', 'AwsIamPolicy'),
+  AwsIamRole: resolve(__dirname, '..', '..', '..', 'registry', 'AwsIamRole'),
+  AwsLambdaCompute: resolve(__dirname, '..', '..', '..', 'registry', 'AwsLambdaCompute'),
   Component: resolve(__dirname, '..', '..', 'types', 'Component'),
-  App: resolve(__dirname, '..', '..', 'types', 'App'),
-  Function: resolve(__dirname, '..', '..', 'types', 'Function'),
   Compute: resolve(__dirname, '..', '..', 'types', 'Compute'),
   Object: resolve(__dirname, '..', '..', 'types', 'Object'),
   Plugin: resolve(__dirname, '..', '..', 'types', 'Plugin'),
   Provider: resolve(__dirname, '..', '..', 'types', 'Provider'),
-  Service: resolve(__dirname, '..', '..', 'types', 'Service'),
   AwsDynamoDB: resolve(__dirname, '..', '..', 'types', 'AwsDynamoDB'),
   AwsProvider: resolve(__dirname, '..', '..', 'types', 'AwsProvider'),
   AwsLambdaFunction: resolve(__dirname, '..', '..', 'types', 'AwsLambdaFunction'),
-  AwsIamPolicy: resolve(__dirname, '..', '..', 'types', 'AwsIamPolicy'),
-  AwsIamRole: resolve(__dirname, '..', '..', 'types', 'AwsIamRole'),
-  AwsLambdaCompute: resolve(__dirname, '..', '..', 'types', 'AwsLambdaCompute'),
   AwsEventsRule: resolve(__dirname, '..', '..', 'types', 'AwsEventsRule'),
-  Cron: resolve(__dirname, '..', '..', 'types', 'Cron'),
   AwsS3Bucket: resolve(__dirname, '..', '..', 'types', 'AwsS3Bucket'),
   AwsSnsSubscription: resolve(__dirname, '..', '..', 'types', 'AwsSnsSubscription'),
+  TwilioApplication: resolve(__dirname, '..', '..', 'types', 'TwilioApplication'),
+  TwilioPhoneNumber: resolve(__dirname, '..', '..', 'types', 'TwilioPhoneNumber'),
+  TwilioProvider: resolve(__dirname, '..', '..', 'types', 'TwilioProvider'),
   AwsSnsTopic: resolve(__dirname, '..', '..', 'types', 'AwsSnsTopic')
 }
 

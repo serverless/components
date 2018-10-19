@@ -1,0 +1,47 @@
+name: Function
+extends: Component
+main: ./dist/index.js
+
+version: 0.3.0
+description: "A cloud agnostic Severless Function"
+
+functionName: ${inputs.functionName}
+functionDescription: ${inputs.functionDescription}
+memory: ${inputs.memory}
+timeout: ${inputs.timeout}
+runtime: ${inputs.runtime}
+code: ${inputs.code}
+handler: ${inputs.handler}
+compute: ${inputs.compute}
+environment: ${inputs.environment}
+tags: ${inputs.tags}
+ufs: ${inputs.ufs}
+
+inputTypes:
+  functionName:
+    type: string
+  description:
+    type: string
+  compute:
+    type: Compute
+    default: ${context.compute}
+  memory:
+    type: integer
+  timeout:
+    type: integer
+  runtime:
+    type: string
+    description: common format across providers that is converted by provider code
+  code:
+    type: string
+    description: path to folder for code
+  handler:
+    type: string
+    description: property path for function
+  environment:
+    type: Object
+  tags:
+    type: Object
+  ufs:
+    type: boolean
+    description: opt in for universal function signature

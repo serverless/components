@@ -1,0 +1,13 @@
+name: Cron
+extends: Component
+main: ./dist/index.js
+version: 1.0.0
+
+function: ${inputs.function}
+rate: ${inputs.rate}
+
+inputTypes:
+  function:
+    type: Function
+  rate:
+    type: string
