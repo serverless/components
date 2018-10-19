@@ -1,4 +1,4 @@
-import { SYMBOL_TYPE } from '../../utils'
+import { SYMBOL_TYPE } from '../../../dist/utils'
 
 const _Object = {
   async construct() {

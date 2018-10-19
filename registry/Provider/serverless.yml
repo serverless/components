@@ -1,6 +1,6 @@
 name: Provider
 extends: Object
-main: './index.js'
+main: './dist/index.js'
 
 credentials: ${inputs.credentials}
 

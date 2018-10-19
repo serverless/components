@@ -1,7 +1,7 @@
 name: Compute
 extends: Object
 version: 1.0.0
-main: ./index.js
+main: ./dist/index.js
 
 provider: ${inputs.provider}
 runtime: ${inputs.runtime}
