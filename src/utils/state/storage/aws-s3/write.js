@@ -1,4 +1,4 @@
-const AWS = require('aws-sdk')
+import AWS from 'aws-sdk'
 
 const s3 = new AWS.S3({ region: 'us-east-1' })
 
@@ -26,7 +26,9 @@ const writeObject = async (config, content) =>
     })
     .promise()
 
-module.exports = async (config, content) => {
+const write = async (config, content) => {
   await removeLock(config)
   return writeObject(config, content)
 }
+
+export default write

@@ -1,5 +1,5 @@
-const AWS = require('aws-sdk')
-const writeStateFile = require('./write')
+import AWS from 'aws-sdk'
+import writeStateFile from './write'
 
 jest.mock('../../../../utils/logging')
 

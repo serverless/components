@@ -1,7 +1,7 @@
-const { getTmpDir } = require('@serverless/utils')
-const { readJson } = require('fs-extra')
-const path = require('path')
-const writeStateFile = require('./write')
+import { getTmpDir } from '@serverless/utils'
+import { readJson } from 'fs-extra'
+import path from 'path'
+import writeStateFile from './write'
 
 describe('#writeStateFile()', () => {
   let oldCwd

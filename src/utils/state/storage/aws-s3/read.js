@@ -52,7 +52,9 @@ const fetchObject = async (config) => {
   }
 }
 
-module.exports = async (config) => {
+const read = async (config) => {
   await createLock(config)
   return fetchObject(config)
 }
+
+export default read

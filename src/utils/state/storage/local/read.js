@@ -1,7 +1,7 @@
-const path = require('path')
-const { fileExists, readFile } = require('@serverless/utils')
+import path from 'path'
+import { fileExists, readFile } from '@serverless/utils'
 
-module.exports = async (config) => {
+const read = async (config) => {
   const { projectPath, state } = config
   const stateFilePath =
     state && state.file ? path.resolve(state.file) : path.join(projectPath, 'state.json')
@@ -11,3 +11,5 @@ module.exports = async (config) => {
   const content = await readFile(stateFilePath)
   return content
 }
+
+export default read

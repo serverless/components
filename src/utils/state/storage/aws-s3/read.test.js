@@ -1,5 +1,5 @@
-const AWS = require('aws-sdk')
-const readStateFile = require('./read')
+import AWS from 'aws-sdk'
+import readStateFile from './read'
 
 jest.mock('../../../../utils/logging')
 
