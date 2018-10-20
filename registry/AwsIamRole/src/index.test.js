@@ -1,7 +1,10 @@
 import AwsIamRole from './index'
+import { sleep } from '@serverless/utils'
 
-// todo mock timers
-jest.setTimeout(16000)
+jest.mock('@serverless/utils', () => ({
+  ...require.requireActual('@serverless/utils'),
+  sleep: jest.fn()
+}))
 
 class SuperClass {
   constructor(inputs) {
@@ -105,6 +108,7 @@ describe('AwsIamRole', () => {
     expect(mocks.attachRolePolicyMock).toHaveBeenCalledTimes(1)
     expect(mocks.attachRolePolicyMock).toBeCalledWith(attachRolePolicyParams)
     expect(awsIamRole.arn).toEqual('abc:xyz')
+    expect(sleep).toBeCalledWith(15000)
   })
 
   it('should update service if changed', async () => {
@@ -176,6 +180,7 @@ describe('AwsIamRole', () => {
     expect(mocks.attachRolePolicyMock).toBeCalledWith(attachRolePolicyParams)
     expect(mocks.detachRolePolicyMock).toHaveBeenCalledTimes(1)
     expect(mocks.detachRolePolicyMock).toBeCalledWith(detachRolePolicyParams)
+    expect(sleep).toBeCalledWith(15000)
   })
 
   it('should remove role', async () => {
