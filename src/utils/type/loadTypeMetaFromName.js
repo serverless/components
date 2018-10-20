@@ -17,6 +17,7 @@ const NATIVE_NAMES = {
   Object: resolve(__dirname, '..', '..', '..', 'registry', 'Object'),
   Plugin: resolve(__dirname, '..', '..', '..', 'registry', 'Plugin'),
   Provider: resolve(__dirname, '..', '..', '..', 'registry', 'Provider'),
+  AwsS3Website: resolve(__dirname, '..', '..', '..', 'registry', 'AwsS3Website'),
   AwsDynamoDB: resolve(__dirname, '..', '..', 'types', 'AwsDynamoDB'),
   AwsProvider: resolve(__dirname, '..', '..', 'types', 'AwsProvider'),
   AwsLambdaFunction: resolve(__dirname, '..', '..', 'types', 'AwsLambdaFunction'),

@@ -1,0 +1,29 @@
+name: AwsS3Website
+extends: Component
+main: ./dist/index.js
+version: 1.0.0
+
+provider: ${inputs.provider}
+domain: ${inputs.domain}
+assets: ${inputs.assets}
+env: ${inputs.env}
+
+inputTypes:
+  provider:
+    type: AwsProvider
+    required: true
+  domain:
+    type: string
+    displayName: Domain Name
+    description: Domain name which your bucket will be named after
+    required: true
+  assets:
+    type: string
+    displayName: Assets
+    description: Path to static website assets
+    required: true
+  env:
+    type: object
+    displayName: Environment Variables
+    description: Environment variables to be included in a script with the front-end assets
+    required: false
