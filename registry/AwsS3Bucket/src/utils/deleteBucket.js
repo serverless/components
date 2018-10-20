@@ -1,7 +1,8 @@
 const deleteBucket = async ({ bucketName, provider }) => {
+  const SDK = provider.getSdk()
+  const s3 = new SDK.S3()
   try {
-    const sdk = provider.getSdk()
-    const res = await sdk.listObjectsV2({ Bucket: bucketName }).promise()
+    const res = await s3.listObjectsV2({ Bucket: bucketName }).promise()
 
     const objectsInBucket = []
     if (res) {
@@ -13,7 +14,7 @@ const deleteBucket = async ({ bucketName, provider }) => {
     }
 
     if (objectsInBucket.length) {
-      await sdk
+      await s3
         .deleteObjects({
           Bucket: bucketName,
           Delete: {
@@ -23,7 +24,7 @@ const deleteBucket = async ({ bucketName, provider }) => {
         .promise()
     }
 
-    return sdk.deleteBucket({ Bucket: bucketName }).promise()
+    return s3.deleteBucket({ Bucket: bucketName }).promise()
   } catch (error) {
     if (!error.message.includes('The specified bucket does not exist')) {
       throw error
