@@ -40,4 +40,4 @@ default.etcd
 state.json
 tracking-config.json
 *.sample
-/coverage
+coverage
