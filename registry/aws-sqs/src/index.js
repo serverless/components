@@ -60,9 +60,16 @@ const deploy = async (inputs, context) => {
 }
 
 const remove = async (inputs, context) => {
-  const { state } = context
+  let { state } = context
   context.log(`Removing Queue: ${state.queueName}`)
   await deleteQueue(state)
+  state = {
+    ...state,
+    queueUrl: null,
+    queueName: null,
+    attributes: null
+  }
+  return state
 }
 
 module.exports = {
