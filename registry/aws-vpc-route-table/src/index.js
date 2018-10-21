@@ -40,8 +40,8 @@ const remove = async (inputs, context) => {
       RouteTableId: state.routeTableId
     })
     .promise()
-  context.saveState({})
   context.log(`Route table "${state.routeTableId}" removed`)
+  context.saveState({})
   return {}
 }
 

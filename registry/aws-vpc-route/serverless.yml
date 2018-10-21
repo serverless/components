@@ -1,0 +1,64 @@
+---
+type: aws-vpc-route
+version: 0.2.0
+core: 0.2.x
+
+description: "My component description"
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
+
+inputTypes:
+  destinationCidrBlock:
+    type: string
+    displayName: Destination Ipv4 Cidr Block
+    description: Destination Ipv4 Cidr Block
+    example: 10.0.0.0/16
+    # replacement
+  destinationIpv6CidrBlock:
+    type: string
+    displayName: Destination Ipv6 Cidr Block
+    description: Destination Ipv6 Cidr Block
+    example: "2600:1f18:24c2:b200::/64"
+    # replacement
+  egressOnlyInternetGatewayId:
+    type: string
+    displayName: Egress Only Internet Gateway Id
+    description: Egress Only Internet Gateway Id
+    example: "123"
+  gatewayId:
+    type: string
+    displayName: Gateway Id
+    description: Gateway Id
+    example: "123"
+  instanceId:
+    type: string
+    displayName: Instance Id
+    description: Instance Id
+    example: "123"
+  natGatewayId:
+    type: string
+    displayName: Nat Gateway Id
+    description: Nat Gateway Id
+    example: "123"
+  networkInterfaceId:
+    type: string
+    displayName: NetworkInterface Id
+    description: NetworkInterface Id
+    example: "123"
+  routeTableId:
+    type: string
+    displayName: RouteTable Id
+    description: RouteTable Id
+    example: "123"
+    # replacement
+  vpcPeeringConnectionId:
+    type: string
+    displayName: Vpc Peering Connection Id
+    description: Vpc Peering Connection Id
+    example: "123"
+
+outputTypes:
+  myOutput:
+    type: string
+    description: my output string

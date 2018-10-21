@@ -1,0 +1,28 @@
+---
+type: aws-vpc-route-table-association
+version: 0.2.0
+core: 0.2.x
+
+description: "Provision AWS VPC Route Table Association with Serverless Components"
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
+
+inputTypes:
+  routeTableId:
+    type: string
+    displayName: AWS VPC route table id
+    description: AWS VPC route table id
+    example: rtb-abbaabba
+    required: true
+  subnetId:
+    type: string
+    displayName: AWS subnet id
+    description: AWS subnet id
+    example: subnet-abbaabba
+    required: true
+
+outputTypes:
+  associationId:
+    type: string
+    description: Route table association id
