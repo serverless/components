@@ -3,11 +3,11 @@ const awsVpcRouteTableComponent = require('./index')
 
 jest.mock('aws-sdk', () => {
   const mocks = {
-    createRouteTableMock: jest.fn(() => ({
+    createRouteTableMock: jest.fn().mockResolvedValue({
       RouteTable: {
         RouteTableId: 'rtb-abbaabba'
       }
-    })),
+    }),
     deleteRouteTableMock: jest.fn(({ RouteTableId }) => {
       if (RouteTableId === 'rtb-not-abba') {
         const error = new Error()

@@ -3,9 +3,9 @@ const awsVpcRouteTableAssociationComponent = require('./index')
 
 jest.mock('aws-sdk', () => {
   const mocks = {
-    associateRouteTableMock: jest.fn(() => ({
+    associateRouteTableMock: jest.fn().mockResolvedValue({
       AssociationId: 'rtbassoc-abbaabba'
-    })),
+    }),
     disassociateRouteTableMock: jest.fn(({ AssociationId }) => {
       if (AssociationId === 'rtbassoc-not-abba') {
         const error = new Error()
