@@ -1,0 +1,15 @@
+name: EnvironmentBasedConfiguration
+extends: Object
+main: ./src/index.js
+
+version: 1.0.0
+
+inputTypes:
+  variables:
+    type: array
+    required: true
+    displayName: List of environment variable names
+    description: An array of strings specifying the names of environment variables to access.
+    example:
+      - API_TOKEN
+      - API_URL

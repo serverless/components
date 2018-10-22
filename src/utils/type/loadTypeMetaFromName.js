@@ -15,6 +15,14 @@ const NATIVE_NAMES = {
   Component: resolve(__dirname, '..', '..', '..', 'registry', 'Component'),
   Compute: resolve(__dirname, '..', '..', '..', 'registry', 'Compute'),
   Object: resolve(__dirname, '..', '..', '..', 'registry', 'Object'),
+  EnvironmentBasedConfiguration: resolve(
+    __dirname,
+    '..',
+    '..',
+    '..',
+    'registry',
+    'EnvironmentBasedConfiguration'
+  ),
   Plugin: resolve(__dirname, '..', '..', '..', 'registry', 'Plugin'),
   Provider: resolve(__dirname, '..', '..', '..', 'registry', 'Provider'),
   AwsS3Website: resolve(__dirname, '..', '..', '..', 'registry', 'AwsS3Website'),
