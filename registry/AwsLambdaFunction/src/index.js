@@ -1,8 +1,7 @@
 import path from 'path'
 import { tmpdir } from 'os'
-import archiver from 'archiver'
-import { createWriteStream, createReadStream, readFileSync } from 'fs'
-import { forEach, isArray, resolve } from '@serverless/utils'
+import { readFileSync } from 'fs'
+import { isArray, resolve, packDir } from '@serverless/utils'
 
 const createLambda = async (
   Lambda,
@@ -117,48 +116,22 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
       return this.arn
     }
 
-    pack() {
-      let inputDirPath = this.code // string path to code dir
+    async pack() {
+      let shims = []
+      let inputDirPath = this.code
 
       if (isArray(this.code)) {
         inputDirPath = this.code[0] // first item is path to code dir
+        shims = this.code
+        shims.shift() // remove first item since it's the path to code dir
       }
 
       const outputFileName = `${this.instanceId}-${Date.now()}.zip`
       const outputFilePath = path.join(tmpdir(), outputFileName)
 
-      return new Promise((rslv, reject) => {
-        const output = createWriteStream(outputFilePath)
-        const archive = archiver('zip', {
-          zlib: { level: 9 }
-        })
-
-        archive.on('error', (err) => reject(err))
-        output.on('close', () => {
-          this.code = readFileSync(outputFilePath)
-          return rslv(this)
-        })
-
-        archive.pipe(output)
-
-        if (isArray(this.code)) {
-          const shims = this.code
-          shims.shift() // remove first item since it's the path to code dir
-          forEach((shimFilePath) => {
-            const shimStream = createReadStream(shimFilePath)
-            archive.append(shimStream, { name: path.basename(shimFilePath) })
-          }, shims)
-        }
-        archive.glob(
-          '**/*',
-          {
-            cwd: path.resolve(inputDirPath),
-            ignore: 'node_modules/aws-sdk/**'
-          },
-          {}
-        )
-        archive.finalize()
-      })
+      await packDir(inputDirPath, outputFilePath, shims)
+      this.code = readFileSync(outputFilePath)
+      return this.code
     }
 
     async deploy(prevInstance, context) {
@@ -177,11 +150,15 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
     }
 
     async remove(context) {
+      const provider = resolve(this.provider)
+      const AWS = provider.getSdk()
+      const Lambda = new AWS.Lambda()
       const functionName = resolve(this.functionName)
+
       context.log(`Removing Lambda: ${functionName}`)
 
       try {
-        await deleteLambda(functionName)
+        await deleteLambda(Lambda, functionName)
       } catch (error) {
         if (!error.message.includes('Function not found')) {
           throw new Error(error)

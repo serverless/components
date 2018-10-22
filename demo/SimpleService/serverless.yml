@@ -18,6 +18,7 @@ compute:
 
 functions:
   hello:
+    functionName: eahefnawy11
     compute: ${this.compute}
     handler: index.hello
     code: ./code

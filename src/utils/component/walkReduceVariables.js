@@ -25,22 +25,24 @@ const reduceWalkee = () => {
           return result
         }
       }
-      if (isArray(value)) {
-        visited.add(value)
-        forEachIndexed((childValue, childIndex) => {
-          if (!isComponent(childValue)) {
-            const newKeys = concat(keys, [childIndex])
-            result = recur(result, childValue, newKeys, iteratee)
-          }
-        }, value)
-      } else if (!isNativeObject(value)) {
-        visited.add(value)
-        forEachObjIndexed((childValue, childKey) => {
-          if (!isComponent(childValue)) {
-            const newKeys = concat(keys, [childKey])
-            result = recur(result, childValue, newKeys, iteratee)
-          }
-        }, value)
+      if (isObject(value)) {
+        if (isArray(value)) {
+          visited.add(value)
+          forEachIndexed((childValue, childIndex) => {
+            if (!isComponent(childValue)) {
+              const newKeys = concat(keys, [childIndex])
+              result = recur(result, childValue, newKeys, iteratee)
+            }
+          }, value)
+        } else if (!isNativeObject(value)) {
+          visited.add(value)
+          forEachObjIndexed((childValue, childKey) => {
+            if (!isComponent(childValue)) {
+              const newKeys = concat(keys, [childKey])
+              result = recur(result, childValue, newKeys, iteratee)
+            }
+          }, value)
+        }
       }
     }
     return result

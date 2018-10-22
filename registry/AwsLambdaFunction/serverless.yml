@@ -5,7 +5,7 @@ implements:
 
 version: 0.3.0
 core: 0.3.x
-main: ./index.js
+main: ./dist/index.js
 
 description: "AWS Lambda Serverless Component"
 license: Apache-2.0
