@@ -20,6 +20,7 @@ const NATIVE_NAMES = {
   AwsS3Website: resolve(__dirname, '..', '..', '..', 'registry', 'AwsS3Website'),
   AwsProvider: resolve(__dirname, '..', '..', '...', 'registry', 'AwsProvider'),
   AwsS3Bucket: resolve(__dirname, '..', '..', '..', 'registry', 'AwsS3Bucket'),
+  DockerImage: resolve(__dirname, '..', '..', '..', 'registry', 'DockerImage'),
   AwsDynamoDB: resolve(__dirname, '..', '..', 'types', 'AwsDynamoDB'),
   AwsLambdaFunction: resolve(__dirname, '..', '..', 'types', 'AwsLambdaFunction'),
   AwsEventsRule: resolve(__dirname, '..', '..', 'types', 'AwsEventsRule'),

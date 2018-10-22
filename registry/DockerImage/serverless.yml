@@ -1,12 +1,20 @@
 name: DockerImage
 extends: Component
-version: 0.2.0
+main: ./dist/index.js
+version: 0.1.0
 core: 0.2.x
 
 description: "Create and publish Docker images"
 license: Apache-2.0
 author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
 repository: "github:serverless/components"
+
+dockerfilePath: ${inputs.dockerfilePath}
+contextPath: ${inputs.contextPath}
+tag: ${inputs.tag}
+registryUrl: ${inputs.registryUrl}
+username: ${inputs.username}
+password: ${inputs.password}
 
 inputTypes:
   dockerfilePath:
