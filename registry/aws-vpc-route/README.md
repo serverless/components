@@ -1,7 +1,7 @@
 <!-- AUTO-GENERATED-CONTENT:START (COMPONENT_HEADER) -->
 # AWS Vpc Route
 
-My component description
+Provision AWS VPC Route with Serverless Components
 <!-- AUTO-GENERATED-CONTENT:END -->
 <!-- AUTO-GENERATED-CONTENT:START (TOC) -->
 - [Input Types](#input-types)
@@ -40,13 +40,13 @@ components:
     inputs:
       destinationCidrBlock: 10.0.0.0/16
       destinationIpv6CidrBlock: '2600:1f18:24c2:b200::/64'
-      egressOnlyInternetGatewayId: '123'
-      gatewayId: '123'
-      instanceId: '123'
-      natGatewayId: '123'
-      networkInterfaceId: '123'
-      routeTableId: '123'
-      vpcPeeringConnectionId: '123'
+      egressOnlyInternetGatewayId: eigw-abbaabba
+      gatewayId: igw-abbaabba
+      instanceId: i-abbaabba
+      natGatewayId: nat-abbaabba
+      networkInterfaceId: eni-abbaabba
+      routeTableId: rtb-abbaabba
+      vpcPeeringConnectionId: pcx-abbaabba
 
 ```
 <!-- AUTO-GENERATED-CONTENT:END -->

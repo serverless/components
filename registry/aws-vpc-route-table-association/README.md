@@ -32,7 +32,7 @@ components:
     type: aws-vpc-route-table-association
     inputs:
       routeTableId: rtb-abbaabba
-      subnetId: rtb-abbaabba
+      subnetId: subnet-abbaabba
 
 ```
 <!-- AUTO-GENERATED-CONTENT:END -->

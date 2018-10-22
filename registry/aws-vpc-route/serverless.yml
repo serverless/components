@@ -1,12 +1,11 @@
----
 type: aws-vpc-route
 version: 0.2.0
 core: 0.2.x
 
-description: "My component description"
+description: "Provision AWS VPC Route with Serverless Components"
 license: Apache-2.0
-author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
-repository: "github:serverless/components"
+author: 'Serverless, Inc. <hello@serverless.com> (https://serverless.com)'
+repository: 'github:serverless/components'
 
 inputTypes:
   destinationCidrBlock:
@@ -19,44 +18,44 @@ inputTypes:
     type: string
     displayName: Destination Ipv6 Cidr Block
     description: Destination Ipv6 Cidr Block
-    example: "2600:1f18:24c2:b200::/64"
+    example: '2600:1f18:24c2:b200::/64'
     # replacement
   egressOnlyInternetGatewayId:
     type: string
     displayName: Egress Only Internet Gateway Id
     description: Egress Only Internet Gateway Id
-    example: "123"
+    example: 'eigw-abbaabba'
   gatewayId:
     type: string
     displayName: Gateway Id
     description: Gateway Id
-    example: "123"
+    example: 'igw-abbaabba'
   instanceId:
     type: string
     displayName: Instance Id
     description: Instance Id
-    example: "123"
+    example: 'i-abbaabba'
   natGatewayId:
     type: string
     displayName: Nat Gateway Id
     description: Nat Gateway Id
-    example: "123"
+    example: 'nat-abbaabba'
   networkInterfaceId:
     type: string
     displayName: NetworkInterface Id
     description: NetworkInterface Id
-    example: "123"
+    example: 'eni-abbaabba'
   routeTableId:
     type: string
     displayName: RouteTable Id
     description: RouteTable Id
-    example: "123"
+    example: 'rtb-abbaabba'
     # replacement
   vpcPeeringConnectionId:
     type: string
     displayName: Vpc Peering Connection Id
     description: Vpc Peering Connection Id
-    example: "123"
+    example: 'pcx-abbaabba'
 
 outputTypes:
   myOutput:
