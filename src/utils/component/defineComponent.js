@@ -1,13 +1,4 @@
-import {
-  all,
-  forEachIndexed,
-  forEachObjIndexed,
-  isArray,
-  isFunction,
-  isObject,
-  map,
-  resolve
-} from '@serverless/utils'
+import { all, forEach, isFunction, isObject, map, resolve } from '@serverless/utils'
 import appendKey from './appendKey'
 import getKey from './getKey'
 // import hydrateComponent from './hydrateComponent'
@@ -21,18 +12,13 @@ const defineComponent = async (component, context) => {
   // component = hydrateComponent(component, context)
   if (isFunction(component.define)) {
     const children = resolve(await component.define(context)) || {}
-    if (isArray(children)) {
-      forEachIndexed((child, index) => {
+    if (isObject(children)) {
+      forEach((child, kdx) => {
         child = resolve(child)
-        child.parent = component
-        child = setKey(appendKey(getKey(component), index), child)
-      }, children)
-    } else if (isObject(children)) {
-      forEachObjIndexed((child, key) => {
-        child = resolve(child)
+
         // TODO BRN: Look for children that already have parents. If this is the case then someone has returned a child from define that was defined by another component (possibly passed along as a variable)
         child.parent = component
-        child = setKey(appendKey(getKey(component), key), child)
+        child = setKey(appendKey(getKey(component), kdx), child)
       }, children)
     } else {
       throw new Error(

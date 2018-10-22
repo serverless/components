@@ -1,10 +1,9 @@
-/* eslint-disable no-console */
-
-const { subscribe, unsubscribe } = require('./lib')
+import { subscribe, unsubscribe } from './lib'
 
 const deploy = async ({ provider, topic, protocol, endpoint }, context) => {
-  const lambda = new provider.getSdk().Lambda()
-  const response = Promise.all([
+  const SDK = provider.getSdk()
+  const lambda = new SDK.Lambda()
+  const [subscription, permission] = await Promise.all([
     subscribe({ provider, topic, protocol, endpoint }, context),
     lambda
       .addPermission({
@@ -15,18 +14,18 @@ const deploy = async ({ provider, topic, protocol, endpoint }, context) => {
         StatementId: `InvokeLamda${Date.now()}`
       })
       .promise()
-  ]).then(([subscription, permission]) => ({
+  ])
+  return {
     subscriptionArn: subscription.SubscriptionArn,
     statement: JSON.parse(permission.Statement)
-  }))
-  return response
+  }
 }
 
-const remove = async (instance, context) => {
-  const lambda = new instance.provider.getSdk().Lambda()
-  const { statement } = context.getState(instance)
+const remove = async ({ provider, statement, subscriptionArn }, context) => {
+  const SDK = provider.getSdk()
+  const lambda = new SDK.Lambda()
   const response = Promise.all([
-    unsubscribe(instance, context),
+    unsubscribe({ provider, subscriptionArn }, context),
     lambda
       .removePermission({
         FunctionName: statement ? statement.Resource : '',
@@ -39,8 +38,6 @@ const remove = async (instance, context) => {
   return response
 }
 
-module.exports = {
-  deploy,
-  remove,
-  types: ['lambda']
-}
+const types = ['lambda']
+
+export { deploy, remove, types }

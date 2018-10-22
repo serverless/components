@@ -1,4 +1,4 @@
-const { types, getProtocol } = require('./index')
+import { types, getProtocol } from './index'
 
 describe('SNS Subscription - Protocol index tests', () => {
   it('should return correct types', () => {

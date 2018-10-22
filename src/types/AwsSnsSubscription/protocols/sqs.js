@@ -1,9 +1,8 @@
-/* eslint-disable no-console */
-
-const { subscribe, unsubscribe, splitArn } = require('./lib')
+import { subscribe, unsubscribe, splitArn } from './lib'
 
 const deploy = async ({ provider, topic, protocol, endpoint }, context) => {
-  const sqs = new provider.getSdk().SQS()
+  const SDK = provider.getSdk()
+  const sqs = new SDK.SQS()
   const { region, accountId, resource } = splitArn(endpoint)
   const queueUrl = `https://sqs.${region}.amazonaws.com/${accountId}/${resource}`
   const { SubscriptionArn } = await subscribe({ provider, topic, protocol, endpoint }, context)
@@ -31,15 +30,18 @@ const deploy = async ({ provider, topic, protocol, endpoint }, context) => {
     }
   }
   await sqs.setQueueAttributes(permission).promise()
-  return { subscriptionArn: SubscriptionArn, permission }
+  return {
+    subscriptionArn: SubscriptionArn,
+    permission
+  }
 }
 
-const remove = async (instance, context) => {
-  const sqs = new instance.provider.getSdk().SQS()
-  const { permission } = context.state
+const remove = async ({ permission, provider, subscriptionArn }, context) => {
+  const SDK = provider.getSdk()
+  const sqs = new SDK.SQS()
   const { QueueUrl } = permission
   const response = Promise.all([
-    unsubscribe(instance, context),
+    unsubscribe({ provider, subscriptionArn }, context),
     sqs
       .setQueueAttributes({
         QueueUrl,
@@ -51,8 +53,7 @@ const remove = async (instance, context) => {
   ])
   return response
 }
-module.exports = {
-  deploy,
-  remove,
-  types: ['sqs']
-}
+
+const types = ['sqs']
+
+export { deploy, remove, types }

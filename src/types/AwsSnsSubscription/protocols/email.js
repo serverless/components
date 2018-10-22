@@ -1,6 +1,4 @@
-/* eslint-disable no-console */
-
-const { subscribe, unsubscribe, waitForConfirmation } = require('./lib')
+import { subscribe, unsubscribe, waitForConfirmation } from './lib'
 
 const deploy = async ({ provider, topic, protocol, endpoint }, context) =>
   new Promise((resolve) => {
@@ -27,9 +25,6 @@ const deploy = async ({ provider, topic, protocol, endpoint }, context) =>
   })
 
 const remove = async (instance, context) => unsubscribe(instance, context)
+const types = ['email', 'email-json']
 
-module.exports = {
-  deploy,
-  remove,
-  types: ['email', 'email-json']
-}
+export { deploy, remove, types }

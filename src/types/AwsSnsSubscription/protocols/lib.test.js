@@ -1,5 +1,5 @@
-const AWS = require('aws-sdk')
-const lib = require('./lib')
+import AWS from 'aws-sdk'
+import * as lib from './lib'
 
 jest.mock('aws-sdk', () => {
   const mocks = {
@@ -22,24 +22,26 @@ jest.mock('aws-sdk', () => {
     })
   }
 
-  const SNS = {
-    subscribe: (obj) => ({
-      promise: () => mocks.subscribeMock(obj)
-    }),
-    unsubscribe: (obj) => ({
-      promise: () => mocks.unsubscribeMock(obj)
-    }),
-    listSubscriptionsByTopic: (obj) => ({
-      promise: () => mocks.listSubscriptionsByTopicMock(obj)
-    }),
-    setSubscriptionAttributes: (obj) => ({
-      promise: () => mocks.setSubscriptionAttributesMock(obj)
-    })
+  const SNS = function() {
+    return {
+      subscribe: (obj) => ({
+        promise: () => mocks.subscribeMock(obj)
+      }),
+      unsubscribe: (obj) => ({
+        promise: () => mocks.unsubscribeMock(obj)
+      }),
+      listSubscriptionsByTopic: (obj) => ({
+        promise: () => mocks.listSubscriptionsByTopicMock(obj)
+      }),
+      setSubscriptionAttributes: (obj) => ({
+        promise: () => mocks.setSubscriptionAttributesMock(obj)
+      })
+    }
   }
 
   return {
     mocks,
-    SNS: jest.fn().mockImplementation(() => SNS)
+    SNS
   }
 })
 
@@ -59,16 +61,25 @@ describe('SNS Subscription - Protocol library tests', () => {
     const contextMock = {
       log: () => {}
     }
-    const inputs = { topic: 'topic-arn', protocol: 'protocol', endpoint: 'endpoint' }
-    const { SubscriptionArn } = await lib.subscribe(inputs, contextMock)
+    const instance = {
+      topic: 'topic-arn',
+      protocol: 'protocol',
+      endpoint: 'endpoint',
+      provider: {
+        getSdk() {
+          return AWS
+        }
+      }
+    }
+    const { SubscriptionArn } = await lib.subscribe(instance, contextMock)
     expect(SubscriptionArn).toBe(
-      `arn:aws:sns:us-east-1:000000000000:${inputs.topic}:00000000-0000-0000-0000-000000000000`
+      `arn:aws:sns:us-east-1:000000000000:${instance.topic}:00000000-0000-0000-0000-000000000000`
     )
     expect(AWS.mocks.subscribeMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        Endpoint: inputs.endpoint,
-        Protocol: inputs.protocol,
-        TopicArn: inputs.topic
+        Endpoint: instance.endpoint,
+        Protocol: instance.protocol,
+        TopicArn: instance.topic
       })
     )
     expect(AWS.mocks.subscribeMock).toHaveBeenCalledTimes(1)
@@ -76,16 +87,21 @@ describe('SNS Subscription - Protocol library tests', () => {
 
   it('should unsubscribe from SNS topic', async () => {
     const contextMock = {
-      state: {
-        subscriptionArn:
-          'arn:aws:sns:us-east-1:000000000000:topic-arn:00000000-0000-0000-0000-000000000000'
-      },
       log: () => {}
     }
-    await lib.unsubscribe(contextMock)
+    const instance = {
+      subscriptionArn:
+        'arn:aws:sns:us-east-1:000000000000:topic-arn:00000000-0000-0000-0000-000000000000',
+      provider: {
+        getSdk() {
+          return AWS
+        }
+      }
+    }
+    await lib.unsubscribe(instance, contextMock)
     expect(AWS.mocks.unsubscribeMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        SubscriptionArn: contextMock.state.subscriptionArn
+        SubscriptionArn: instance.subscriptionArn
       })
     )
     expect(AWS.mocks.unsubscribeMock).toHaveBeenCalledTimes(1)
@@ -95,18 +111,23 @@ describe('SNS Subscription - Protocol library tests', () => {
     const contextMock = {
       log: () => {}
     }
-    const inputs = {
+    const instance = {
       subscriptionArn:
         'arn:aws:sns:us-east-1:000000000000:topic:00000000-0000-0000-0000-000000000000',
       attributeName: 'DeliveryPolicy',
-      attributeValue: 'delivery-policy'
+      attributeValue: 'delivery-policy',
+      provider: {
+        getSdk() {
+          return AWS
+        }
+      }
     }
-    await lib.setSubscriptionAttributes(inputs, contextMock)
+    await lib.setSubscriptionAttributes(instance, contextMock)
     expect(AWS.mocks.setSubscriptionAttributesMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        AttributeName: inputs.attributeName,
-        AttributeValue: inputs.attributeValue,
-        SubscriptionArn: inputs.subscriptionArn
+        AttributeName: instance.attributeName,
+        AttributeValue: instance.attributeValue,
+        SubscriptionArn: instance.subscriptionArn
       })
     )
     expect(AWS.mocks.setSubscriptionAttributesMock).toHaveBeenCalledTimes(1)
@@ -116,18 +137,23 @@ describe('SNS Subscription - Protocol library tests', () => {
     const contextMock = {
       log: () => {}
     }
-    const inputs = {
+    const instance = {
       subscriptionArn:
         'arn:aws:sns:us-east-1:000000000000:topic:00000000-0000-0000-0000-000000000000',
       attributeName: 'RawMessageDelivery',
-      attributeValue: 'error-suppress'
+      attributeValue: 'error-suppress',
+      provider: {
+        getSdk() {
+          return AWS
+        }
+      }
     }
-    await lib.setSubscriptionAttributes(inputs, contextMock)
+    await lib.setSubscriptionAttributes(instance, contextMock)
     expect(AWS.mocks.setSubscriptionAttributesMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        AttributeName: inputs.attributeName,
-        AttributeValue: inputs.attributeValue,
-        SubscriptionArn: inputs.subscriptionArn
+        AttributeName: instance.attributeName,
+        AttributeValue: instance.attributeValue,
+        SubscriptionArn: instance.subscriptionArn
       })
     )
     expect(AWS.mocks.setSubscriptionAttributesMock).toHaveBeenCalledTimes(1)
@@ -137,24 +163,29 @@ describe('SNS Subscription - Protocol library tests', () => {
     const contextMock = {
       log: () => {}
     }
-    const inputs = {
+    const instance = {
       subscriptionArn:
         'arn:aws:sns:us-east-1:000000000000:topic:00000000-0000-0000-0000-000000000000',
       attributeName: 'RawMessageDelivery',
-      attributeValue: 'error'
+      attributeValue: 'error',
+      provider: {
+        getSdk() {
+          return AWS
+        }
+      }
     }
     let response
     try {
-      response = await lib.setSubscriptionAttributes(inputs, contextMock)
+      response = await lib.setSubscriptionAttributes(instance, contextMock)
     } catch (error) {
       expect(error.message).toBe('Error')
     }
 
     expect(AWS.mocks.setSubscriptionAttributesMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        AttributeName: inputs.attributeName,
-        AttributeValue: inputs.attributeValue,
-        SubscriptionArn: inputs.subscriptionArn
+        AttributeName: instance.attributeName,
+        AttributeValue: instance.attributeValue,
+        SubscriptionArn: instance.subscriptionArn
       })
     )
     expect(AWS.mocks.setSubscriptionAttributesMock).toHaveBeenCalledTimes(1)
@@ -163,29 +194,47 @@ describe('SNS Subscription - Protocol library tests', () => {
 
   it('should not wait for confirmation when SubscriptionArn is available', async () => {
     jest.setTimeout(7000)
-    const inputs = { topic: 'topic-arn', protocol: 'sms', endpoint: 'lambda-arn' }
+    const instance = {
+      topic: 'topic-arn',
+      protocol: 'sms',
+      endpoint: 'lambda-arn',
+      provider: {
+        getSdk() {
+          return AWS
+        }
+      }
+    }
     AWS.mocks.listSubscriptionsByTopicMock.mockReturnValue({
       Subscriptions: [
         {
-          Protocol: inputs.protocol,
-          Endpoint: inputs.endpoint,
+          Protocol: instance.protocol,
+          Endpoint: instance.endpoint,
           SubscriptionArn:
             'arn:aws:sns:us-east-1:000000000000:topic-arn:00000000-0000-0000-0000-000000000000'
         }
       ]
     })
-    await lib.waitForConfirmation(inputs)
+    await lib.waitForConfirmation(instance)
     expect(AWS.mocks.listSubscriptionsByTopicMock).toHaveBeenCalledTimes(1)
   })
 
   it('should wait for confirmation when SubscriptionArn is "PendingConfirmation"', async () => {
-    const inputs = { topic: 'topic-arn', protocol: 'sms', endpoint: 'lambda-arn' }
+    const instance = {
+      topic: 'topic-arn',
+      protocol: 'sms',
+      endpoint: 'lambda-arn',
+      provider: {
+        getSdk() {
+          return AWS
+        }
+      }
+    }
     AWS.mocks.listSubscriptionsByTopicMock
       .mockReturnValueOnce({
         Subscriptions: [
           {
-            Protocol: inputs.protocol,
-            Endpoint: inputs.endpoint,
+            Protocol: instance.protocol,
+            Endpoint: instance.endpoint,
             SubscriptionArn: 'PendingConfirmation'
           }
         ]
@@ -193,25 +242,34 @@ describe('SNS Subscription - Protocol library tests', () => {
       .mockReturnValue({
         Subscriptions: [
           {
-            Protocol: inputs.protocol,
-            Endpoint: inputs.endpoint,
+            Protocol: instance.protocol,
+            Endpoint: instance.endpoint,
             SubscriptionArn:
               'arn:aws:sns:us-east-1:000000000000:topic-arn:00000000-0000-0000-0000-000000000000'
           }
         ]
       })
-    await lib.waitForConfirmation(inputs, 300, 1000)
+    await lib.waitForConfirmation(instance, 300, 1000)
     expect(AWS.mocks.listSubscriptionsByTopicMock).toHaveBeenCalledTimes(2)
   })
 
   it('should wait for confirmation when SubscriptionArn is "pending confirmation"', async () => {
-    const inputs = { topic: 'topic-arn', protocol: 'sms', endpoint: 'lambda-arn' }
+    const instance = {
+      topic: 'topic-arn',
+      protocol: 'sms',
+      endpoint: 'lambda-arn',
+      provider: {
+        getSdk() {
+          return AWS
+        }
+      }
+    }
     AWS.mocks.listSubscriptionsByTopicMock
       .mockReturnValueOnce({
         Subscriptions: [
           {
-            Protocol: inputs.protocol,
-            Endpoint: inputs.endpoint,
+            Protocol: instance.protocol,
+            Endpoint: instance.endpoint,
             SubscriptionArn: 'pending confirmation'
           }
         ]
@@ -219,31 +277,40 @@ describe('SNS Subscription - Protocol library tests', () => {
       .mockReturnValue({
         Subscriptions: [
           {
-            Protocol: inputs.protocol,
-            Endpoint: inputs.endpoint,
+            Protocol: instance.protocol,
+            Endpoint: instance.endpoint,
             SubscriptionArn:
               'arn:aws:sns:us-east-1:000000000000:topic-arn:00000000-0000-0000-0000-000000000000'
           }
         ]
       })
-    await lib.waitForConfirmation(inputs, 300, 1000)
+    await lib.waitForConfirmation(instance, 300, 1000)
     expect(AWS.mocks.listSubscriptionsByTopicMock).toHaveBeenCalledTimes(2)
   })
 
   it('should time out when waiting for confirmation', async () => {
-    const inputs = { topic: 'topic-arn', protocol: 'sms', endpoint: 'lambda-arn' }
+    const instance = {
+      topic: 'topic-arn',
+      protocol: 'sms',
+      endpoint: 'lambda-arn',
+      provider: {
+        getSdk() {
+          return AWS
+        }
+      }
+    }
     AWS.mocks.listSubscriptionsByTopicMock.mockReturnValue({
       Subscriptions: [
         {
-          Protocol: inputs.protocol,
-          Endpoint: inputs.endpoint,
+          Protocol: instance.protocol,
+          Endpoint: instance.endpoint,
           SubscriptionArn: 'pending confirmation'
         }
       ]
     })
     let output
     try {
-      output = await lib.waitForConfirmation(inputs, 300, 700)
+      output = await lib.waitForConfirmation(instance, 300, 700)
     } catch (exception) {
       expect(exception).toBe('Confirmation timed out')
     }

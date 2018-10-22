@@ -1,5 +1,5 @@
-const AWS = require('aws-sdk')
-const protocol = require('./sms')
+import AWS from 'aws-sdk'
+import * as protocol from './sms'
 
 jest.mock('aws-sdk', () => {
   const mocks = {
@@ -11,18 +11,20 @@ jest.mock('aws-sdk', () => {
     unsubscribeMock: jest.fn()
   }
 
-  const SNS = {
-    subscribe: (obj) => ({
-      promise: () => mocks.subscribeMock(obj)
-    }),
-    unsubscribe: (obj) => ({
-      promise: () => mocks.unsubscribeMock(obj)
-    })
+  const SNS = function() {
+    return {
+      subscribe: (obj) => ({
+        promise: () => mocks.subscribeMock(obj)
+      }),
+      unsubscribe: (obj) => ({
+        promise: () => mocks.unsubscribeMock(obj)
+      })
+    }
   }
 
   return {
     mocks,
-    SNS: jest.fn().mockImplementation(() => SNS)
+    SNS
   }
 })
 
@@ -44,16 +46,25 @@ describe('SNS Subscription - SMS protocol tests', () => {
     const contextMock = {
       log: () => {}
     }
-    const inputs = { topic: 'topic-arn', protocol: 'sms', endpoint: '+1234567890' }
-    const { subscriptionArn } = await protocol.deploy(inputs, contextMock)
+    const instance = {
+      topic: 'topic-arn',
+      protocol: 'sms',
+      endpoint: '+1234567890',
+      provider: {
+        getSdk() {
+          return AWS
+        }
+      }
+    }
+    const { subscriptionArn } = await protocol.deploy(instance, contextMock)
     expect(subscriptionArn).toBe(
-      `arn:aws:sns:us-east-1:000000000000:${inputs.topic}:00000000-0000-0000-0000-000000000000`
+      `arn:aws:sns:us-east-1:000000000000:${instance.topic}:00000000-0000-0000-0000-000000000000`
     )
     expect(AWS.mocks.subscribeMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        Endpoint: inputs.endpoint,
-        Protocol: inputs.protocol,
-        TopicArn: inputs.topic
+        Endpoint: instance.endpoint,
+        Protocol: instance.protocol,
+        TopicArn: instance.topic
       })
     )
     expect(AWS.mocks.subscribeMock).toHaveBeenCalledTimes(1)
@@ -61,16 +72,21 @@ describe('SNS Subscription - SMS protocol tests', () => {
 
   it('should unsubscribe from SNS topic', async () => {
     const contextMock = {
-      state: {
-        subscriptionArn:
-          'arn:aws:sns:us-east-1:000000000000:topic-arn:00000000-0000-0000-0000-000000000000'
-      },
       log: () => {}
     }
-    await protocol.remove(contextMock)
+    const instance = {
+      subscriptionArn:
+        'arn:aws:sns:us-east-1:000000000000:topic-arn:00000000-0000-0000-0000-000000000000',
+      provider: {
+        getSdk() {
+          return AWS
+        }
+      }
+    }
+    await protocol.remove(instance, contextMock)
     expect(AWS.mocks.unsubscribeMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        SubscriptionArn: contextMock.state.subscriptionArn
+        SubscriptionArn: instance.subscriptionArn
       })
     )
     expect(AWS.mocks.unsubscribeMock).toHaveBeenCalledTimes(1)

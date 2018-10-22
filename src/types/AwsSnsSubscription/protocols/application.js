@@ -1,6 +1,4 @@
-/* eslint-disable no-console */
-
-const { subscribe, unsubscribe } = require('./lib')
+import { subscribe, unsubscribe } from './lib'
 
 const deploy = async (instance, context) => {
   const { SubscriptionArn } = await subscribe(instance, context)
@@ -8,9 +6,10 @@ const deploy = async (instance, context) => {
 }
 
 const remove = async (instance, context) => unsubscribe(instance, context)
+const types = ['application']
 
 module.exports = {
   deploy,
   remove,
-  types: ['application']
+  types
 }

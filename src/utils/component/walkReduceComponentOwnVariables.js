@@ -1,12 +1,4 @@
-import {
-  concat,
-  forEachIndexed,
-  forEachObjIndexed,
-  isArray,
-  isNativeObject,
-  isObject,
-  walk
-} from '@serverless/utils'
+import { concat, forEach, isArray, isNativeObject, isObject, walk } from '@serverless/utils'
 import isVariable from '../variable/isVariable'
 import isComponent from './isComponent'
 
@@ -16,26 +8,17 @@ const reduceWalkee = () => {
   return (accum, value, keys, iteratee, recur) => {
     let result = accum
     if (isObject(value) && !visited.has(value)) {
-      if (isArray(value)) {
+      if (isVariable(value)) {
         visited.add(value)
-        forEachIndexed((childValue, childIndex) => {
+        result = iteratee(result, value, keys)
+      } else if (isArray(value) || !isNativeObject(value)) {
+        visited.add(value)
+        forEach((childValue, childKdx) => {
           if (!isComponent(childValue)) {
-            const newKeys = concat(keys, [childIndex])
+            const newKeys = concat(keys, [childKdx])
             result = recur(result, childValue, newKeys, iteratee)
           }
         }, value)
-      } else if (!isNativeObject(value)) {
-        visited.add(value)
-        if (isVariable(value)) {
-          result = iteratee(result, value, keys)
-        } else {
-          forEachObjIndexed((childValue, childKey) => {
-            if (!isComponent(childValue)) {
-              const newKeys = concat(keys, [childKey])
-              result = recur(result, childValue, newKeys, iteratee)
-            }
-          }, value)
-        }
       }
     }
     return result

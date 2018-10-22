@@ -23,7 +23,7 @@
     "components": "./bin/components",
     "lint": "eslint . --fix --cache",
     "lint:staged": "lint-staged",
-    "test": "jest .",
+    "test": "jest",
     "test:travis": "jest . --runInBand --forceExit",
     "test:appveyor": "jest --testPathPattern=\"bin|examples|registry|src\" --colors --forceExit",
     "docs": "node ./scripts/doc-gen.js",
@@ -35,7 +35,7 @@
   "dependencies": {
     "@babel/polyfill": "^7.0.0",
     "@octokit/rest": "^14.0.5",
-    "@serverless/utils": "0.0.11",
+    "@serverless/utils": "0.0.12",
     "analytics-node": "^3.2.0",
     "archiver": "^3.0.0",
     "aws-sdk": "^2.214.1",

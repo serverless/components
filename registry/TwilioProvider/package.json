@@ -9,7 +9,7 @@
   "author": "Serverless, Inc.",
   "license": "Apache-2.0",
   "dependencies": {
-    "@serverless/utils": "0.0.11",
+    "@serverless/utils": "0.0.12",
     "twilio": "^3.21.0"
   }
 }

@@ -1,9 +1,8 @@
-/* eslint-disable no-console */
-
-const { find, isEmpty, isNil, whereEq } = require('ramda')
+import { find, isEmpty, isNil, whereEq } from '@serverless/utils'
 
 const subscribe = async ({ provider, topic, protocol, endpoint }, context) => {
-  const sns = new provider.getSdk().SNS()
+  const SDK = provider.getSdk()
+  const sns = new SDK.SNS()
   context.log(`Creating a SNS subcription to topic '${topic}'`)
   const response = await sns
     .subscribe({
@@ -16,16 +15,16 @@ const subscribe = async ({ provider, topic, protocol, endpoint }, context) => {
   return response
 }
 
-const unsubscribe = async (instance, context) => {
-  const sns = new instance.provider.getSdk().SNS()
-  const state = context.getState(instance)
-  context.log(`Removing the SNS Subscription '${state.subscriptionArn}'`)
+const unsubscribe = async ({ provider, subscriptionArn }, context) => {
+  const SDK = provider.getSdk()
+  const sns = new SDK.SNS()
+  context.log(`Removing the SNS Subscription '${subscriptionArn}'`)
   const response = await sns
     .unsubscribe({
-      SubscriptionArn: state.subscriptionArn
+      SubscriptionArn: subscriptionArn
     })
     .promise()
-  context.log(`SNS subcription '${state.subscriptionArn}' removed`)
+  context.log(`SNS subcription '${subscriptionArn}' removed`)
   return response
 }
 
@@ -33,7 +32,8 @@ const setSubscriptionAttributes = async (
   { provider, subscriptionArn, attributeName, attributeValue },
   context
 ) => {
-  const sns = new provider.getSdk().SNS()
+  const SDK = provider.getSdk()
+  const sns = new SDK.SNS()
   if (isEmpty(attributeValue)) {
     context.log(
       `Removing SNS Subscription Attribute '${attributeName}' from subscription ${subscriptionArn}`
@@ -68,8 +68,11 @@ const waitForConfirmation = async (
   timeout = 60000
 ) =>
   new Promise((resolve, reject) => {
-    const sns = new provider.getSdk().SNS()
+    const SDK = provider.getSdk()
+    const sns = SDK.SNS()
     const startTime = Date.now()
+    // TODO BRN: Move this poller functionality to utils.
+    // TODO BRN: This poller has a flaw where the duration of the call to the API could last longer than the interval. It should instead wait until the previous call is complete before executing the next call.
     const pollInterval = setInterval(async () => {
       if (Date.now() - startTime > timeout) {
         clearInterval(pollInterval)
@@ -121,10 +124,4 @@ function splitArn(arnToSplit) {
   }
 }
 
-module.exports = {
-  subscribe,
-  unsubscribe,
-  setSubscriptionAttributes,
-  waitForConfirmation,
-  splitArn
-}
+export { subscribe, unsubscribe, setSubscriptionAttributes, waitForConfirmation, splitArn }

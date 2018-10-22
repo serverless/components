@@ -1,13 +1,10 @@
-/* eslint-disable no-console */
-
-const { map, flatten, contains, find } = require('ramda')
-
-const application = require('./application')
-const email = require('./email')
-const http = require('./http')
-const lambda = require('./lambda')
-const sms = require('./sms')
-const sqs = require('./sqs')
+import { contains, find, flatten, map } from '@serverless/utils'
+import * as application from './application'
+import * as email from './email'
+import * as http from './http'
+import * as lambda from './lambda'
+import * as sms from './sms'
+import * as sqs from './sqs'
 
 const protocols = [application, email, http, lambda, sms, sqs]
 
@@ -20,7 +17,4 @@ const getProtocol = (protocol) => {
   return find(({ types: deployTypes }) => contains(protocol, deployTypes), protocols)
 }
 
-module.exports = {
-  types,
-  getProtocol: (protocol) => getProtocol(protocol)
-}
+export { getProtocol, types }

@@ -1,6 +1,4 @@
-/* eslint-disable no-console */
-
-const { subscribe, unsubscribe, waitForConfirmation } = require('./lib')
+import { subscribe, unsubscribe, waitForConfirmation } from './lib'
 
 const deploy = async ({ provider, topic, protocol, endpoint }, context) =>
   new Promise((resolve) => {
@@ -26,9 +24,6 @@ const deploy = async ({ provider, topic, protocol, endpoint }, context) =>
   })
 
 const remove = async (instance, context) => unsubscribe(instance, context)
+const types = ['http', 'https']
 
-module.exports = {
-  deploy,
-  remove,
-  types: ['http', 'https']
-}
+export { deploy, remove, types }

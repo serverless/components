@@ -1,5 +1,5 @@
-const AWS = require('aws-sdk')
-const protocol = require('./sqs')
+import AWS from 'aws-sdk'
+import * as protocol from './sqs'
 
 jest.mock('aws-sdk', () => {
   const mocks = {
@@ -12,25 +12,29 @@ jest.mock('aws-sdk', () => {
     setQueueAttributesMock: jest.fn()
   }
 
-  const SNS = {
-    subscribe: (obj) => ({
-      promise: () => mocks.subscribeMock(obj)
-    }),
-    unsubscribe: (obj) => ({
-      promise: () => mocks.unsubscribeMock(obj)
-    })
+  const SNS = function() {
+    return {
+      subscribe: (obj) => ({
+        promise: () => mocks.subscribeMock(obj)
+      }),
+      unsubscribe: (obj) => ({
+        promise: () => mocks.unsubscribeMock(obj)
+      })
+    }
   }
 
-  const SQS = {
-    setQueueAttributes: (obj) => ({
-      promise: () => mocks.setQueueAttributesMock(obj)
-    })
+  const SQS = function() {
+    return {
+      setQueueAttributes: (obj) => ({
+        promise: () => mocks.setQueueAttributesMock(obj)
+      })
+    }
   }
 
   return {
     mocks,
-    SNS: jest.fn().mockImplementation(() => SNS),
-    SQS: jest.fn().mockImplementation(() => SQS)
+    SNS,
+    SQS
   }
 })
 
@@ -55,10 +59,19 @@ describe('SNS Subscription - SQS protocol tests', () => {
     const contextMock = {
       log: () => {}
     }
-    const inputs = { topic: 'topic-arn', protocol: 'sqs', endpoint: 'sqs-arn' }
-    const { subscriptionArn, permission } = await protocol.deploy(inputs, contextMock)
+    const instance = {
+      topic: 'topic-arn',
+      protocol: 'sqs',
+      endpoint: 'sqs-arn',
+      provider: {
+        getSdk() {
+          return AWS
+        }
+      }
+    }
+    const { subscriptionArn, permission } = await protocol.deploy(instance, contextMock)
     expect(subscriptionArn).toBe(
-      `arn:aws:sns:us-east-1:000000000000:${inputs.topic}:00000000-0000-0000-0000-000000000000`
+      `arn:aws:sns:us-east-1:000000000000:${instance.topic}:00000000-0000-0000-0000-000000000000`
     )
     expect(permission).toEqual({
       Attributes: {
@@ -69,9 +82,9 @@ describe('SNS Subscription - SQS protocol tests', () => {
     })
     expect(AWS.mocks.subscribeMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        Endpoint: inputs.endpoint,
-        Protocol: inputs.protocol,
-        TopicArn: inputs.topic
+        Endpoint: instance.endpoint,
+        Protocol: instance.protocol,
+        TopicArn: instance.topic
       })
     )
     expect(AWS.mocks.subscribeMock).toHaveBeenCalledTimes(1)
@@ -81,23 +94,28 @@ describe('SNS Subscription - SQS protocol tests', () => {
 
   it('should unsubscribe from SNS topic', async () => {
     const contextMock = {
-      state: {
-        subscriptionArn:
-          'arn:aws:sns:us-east-1:000000000000:topic-arn:00000000-0000-0000-0000-000000000000',
-        permission: {
-          Attributes: {
-            Policy:
-              '{"Version":"2012-10-17","Id":"SQSQueuePolicy0","Statement":[{"Sid":"SQSStatement0","Effect":"Allow","Principal":"*","Action":["sqs:SendMessage"],"Resource":"sqs-arn","Condition":{"ArnEquals":{"aws:SourceArn":"topic-arn"}}}]}'
-          },
-          QueueUrl: 'https://sqs.undefined.amazonaws.com/undefined/undefined'
-        }
-      },
       log: () => {}
     }
-    await protocol.remove(contextMock)
+    const instance = {
+      subscriptionArn:
+        'arn:aws:sns:us-east-1:000000000000:topic-arn:00000000-0000-0000-0000-000000000000',
+      permission: {
+        Attributes: {
+          Policy:
+            '{"Version":"2012-10-17","Id":"SQSQueuePolicy0","Statement":[{"Sid":"SQSStatement0","Effect":"Allow","Principal":"*","Action":["sqs:SendMessage"],"Resource":"sqs-arn","Condition":{"ArnEquals":{"aws:SourceArn":"topic-arn"}}}]}'
+        },
+        QueueUrl: 'https://sqs.undefined.amazonaws.com/undefined/undefined'
+      },
+      provider: {
+        getSdk() {
+          return AWS
+        }
+      }
+    }
+    await protocol.remove(instance, contextMock)
     expect(AWS.mocks.unsubscribeMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        SubscriptionArn: contextMock.state.subscriptionArn
+        SubscriptionArn: instance.subscriptionArn
       })
     )
     expect(AWS.mocks.unsubscribeMock).toHaveBeenCalledTimes(1)
