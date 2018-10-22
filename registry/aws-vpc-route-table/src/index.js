@@ -35,11 +35,17 @@ const deploy = async (inputs, context) => {
 const remove = async (inputs, context) => {
   const { state } = context
   context.log(`Removing the route table "${state.routeTableId}"`)
-  await ec2
-    .deleteRouteTable({
-      RouteTableId: state.routeTableId
-    })
-    .promise()
+  try {
+    await ec2
+      .deleteRouteTable({
+        RouteTableId: state.routeTableId
+      })
+      .promise()
+  } catch (error) {
+    if (error.code !== 'InvalidRouteTableID.NotFound') {
+      throw error
+    }
+  }
   context.log(`Route table "${state.routeTableId}" removed`)
   context.saveState({})
   return {}
