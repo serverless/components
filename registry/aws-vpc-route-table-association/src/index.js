@@ -42,23 +42,23 @@ const deploy = async (inputs, context) => {
 const remove = async (inputs, context) => {
   const { state } = context
   context.log(`Removing the route table association "${state.associationId}"`)
-  await ec2
-    .disassociateRouteTable({
-      AssociationId: state.associationId
-    })
-    .promise()
+  try {
+    await ec2
+      .disassociateRouteTable({
+        AssociationId: state.associationId
+      })
+      .promise()
+  } catch (error) {
+    if (error.code !== 'InvalidAssociationID.NotFound') {
+      throw error
+    }
+  }
   context.log(`Route table "${state.associationId}" removed`)
   context.saveState({})
   return {}
 }
 
-const replacement = (inputs, context) => {
-  const { state } = context
-  return !isEmpty(state) && inputs.vpcId !== state.vpcId
-}
-
 module.exports = {
   deploy,
-  remove,
-  replacement
+  remove
 }
