@@ -1,6 +1,6 @@
 name: EnvironmentBasedConfiguration
 extends: Object
-main: ./src/index.js
+main: ./dist/index.js
 
 version: 1.0.0
 
