@@ -5,12 +5,12 @@ const {
   filter,
   find,
   head,
-  isNil,
+  isNil, // need to add to utils
   keys,
   map,
   merge,
   reduce,
-  values
+  values // need to add to utils
 } = require('@serverless/utils')
 
 const DEPLOY = 'deploy'

@@ -1,4 +1,4 @@
-import { resolve } from '@serverless/utils'
+import { get } from '@serverless/utils'
 import twilio from 'twilio'
 
 const TwilioProvider = (SuperClass) =>
@@ -15,7 +15,7 @@ const TwilioProvider = (SuperClass) =>
       )
     }
     getSdk() {
-      return twilio(resolve(this.credentials.accountSid), resolve(this.credentials.authToken))
+      return twilio(get('credentials.accountSid', this), get('credentials.authToken', this))
     }
   }
 

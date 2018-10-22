@@ -22,12 +22,12 @@ const NATIVE_NAMES = {
   AwsS3Bucket: resolve(__dirname, '..', '..', '..', 'registry', 'AwsS3Bucket'),
   DockerImage: resolve(__dirname, '..', '..', '..', 'registry', 'DockerImage'),
   AwsLambdaFunction: resolve(__dirname, '..', '..', '..', 'registry', 'AwsLambdaFunction'),
+  TwilioProvider: resolve(__dirname, '..', '..', '..', 'registry', 'TwilioProvider'),
   AwsDynamoDB: resolve(__dirname, '..', '..', 'types', 'AwsDynamoDB'),
   AwsEventsRule: resolve(__dirname, '..', '..', 'types', 'AwsEventsRule'),
   AwsSnsSubscription: resolve(__dirname, '..', '..', 'types', 'AwsSnsSubscription'),
   TwilioApplication: resolve(__dirname, '..', '..', 'types', 'TwilioApplication'),
   TwilioPhoneNumber: resolve(__dirname, '..', '..', 'types', 'TwilioPhoneNumber'),
-  TwilioProvider: resolve(__dirname, '..', '..', 'types', 'TwilioProvider'),
   AwsSnsTopic: resolve(__dirname, '..', '..', 'types', 'AwsSnsTopic')
 }
 
