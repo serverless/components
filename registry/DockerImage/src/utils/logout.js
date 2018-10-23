@@ -1,5 +1,5 @@
-const execa = require('execa')
-const { DOCKER_HUB_URL } = require('./constants')
+import execa from 'execa'
+import { DOCKER_HUB_URL } from './constants'
 
 async function logout(registryUrl) {
   if (registryUrl === DOCKER_HUB_URL) {
@@ -11,4 +11,4 @@ async function logout(registryUrl) {
   return true
 }
 
-module.exports = logout
+export default logout

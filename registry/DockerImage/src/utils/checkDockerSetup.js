@@ -1,5 +1,5 @@
-const isDockerInstalled = require('./isDockerInstalled')
-const isDockerRunning = require('./isDockerRunning')
+import isDockerInstalled from './isDockerInstalled'
+import isDockerRunning from './isDockerRunning'
 
 async function checkDockerSetup() {
   if (!(await isDockerInstalled())) {
@@ -17,4 +17,4 @@ async function checkDockerSetup() {
   return true
 }
 
-module.exports = checkDockerSetup
+export default checkDockerSetup

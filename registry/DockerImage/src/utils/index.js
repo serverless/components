@@ -1,23 +1,10 @@
-const buildImage = require('./buildImage')
-const checkDockerSetup = require('./checkDockerSetup')
-const deleteImage = require('./deleteImage')
-const getToken = require('./getToken')
-const isDockerInstalled = require('./isDockerInstalled')
-const isDockerRunning = require('./isDockerRunning')
-const login = require('./login')
-const logout = require('./logout')
-const pushImage = require('./pushImage')
-const removeImage = require('./removeImage')
-
-module.exports = {
-  buildImage,
-  checkDockerSetup,
-  deleteImage,
-  getToken,
-  isDockerInstalled,
-  isDockerRunning,
-  login,
-  logout,
-  pushImage,
-  removeImage
-}
+export { default as buildImage } from './buildImage'
+export { default as checkDockerSetup } from './checkDockerSetup'
+export { default as deleteImage } from './deleteImage'
+export { default as getToken } from './getToken'
+export { default as isDockerInstalled } from './isDockerInstalled'
+export { default as isDockerRunning } from './isDockerRunning'
+export { default as login } from './login'
+export { default as logout } from './logout'
+export { default as pushImage } from './pushImage'
+export { default as removeImage } from './removeImage'

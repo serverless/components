@@ -1,4 +1,4 @@
-const execa = require('execa')
+import execa from 'execa'
 
 async function isDockerRunning() {
   return execa('docker', ['version'])
@@ -6,4 +6,4 @@ async function isDockerRunning() {
     .catch(() => false)
 }
 
-module.exports = isDockerRunning
+export default isDockerRunning

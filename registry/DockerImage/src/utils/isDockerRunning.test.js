@@ -1,5 +1,5 @@
-const execa = require('execa')
-const isDockerRunning = require('./isDockerRunning')
+import execa from 'execa'
+import isDockerRunning from './isDockerRunning'
 
 jest.mock('execa')
 

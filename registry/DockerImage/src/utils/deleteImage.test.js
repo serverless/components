@@ -1,5 +1,5 @@
 import { fetch } from '@serverless/utils'
-const deleteImage = require('./deleteImage')
+import deleteImage from './deleteImage'
 
 jest.mock('@serverless/utils', () => ({
   ...require.requireActual('@serverless/utils'),

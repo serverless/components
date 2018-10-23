@@ -14,4 +14,4 @@ async function getToken(username, password, registryUrl) {
   return result.token
 }
 
-module.exports = getToken
+export default getToken

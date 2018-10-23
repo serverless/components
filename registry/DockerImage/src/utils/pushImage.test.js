@@ -1,5 +1,5 @@
-const execa = require('execa')
-const pushImage = require('./pushImage')
+import execa from 'execa'
+import pushImage from './pushImage'
 
 jest.mock('execa')
 

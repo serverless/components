@@ -1,5 +1,5 @@
 import { fetch } from '@serverless/utils'
-const getToken = require('./getToken')
+import getToken from './getToken'
 
 jest.mock('@serverless/utils', () => ({
   ...require.requireActual('@serverless/utils'),

@@ -31,7 +31,7 @@ afterAll(() => {
 })
 
 describe('DockerImage', () => {
-  it('should build and deploy if it is the first deployment', async () => {
+  it.only('should build and deploy if it is the first deployment', async () => {
     let context = await createContext({
       cwd: path.join(__dirname, '..')
     })

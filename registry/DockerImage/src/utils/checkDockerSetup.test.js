@@ -1,6 +1,6 @@
-const checkDockerSetup = require('./checkDockerSetup')
-const isDockerInstalled = require('./isDockerInstalled')
-const isDockerRunning = require('./isDockerRunning')
+import checkDockerSetup from './checkDockerSetup'
+import isDockerInstalled from './isDockerInstalled'
+import isDockerRunning from './isDockerRunning'
 
 jest.mock('./isDockerInstalled')
 jest.mock('./isDockerRunning')

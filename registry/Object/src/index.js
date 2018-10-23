@@ -1,8 +1,9 @@
 import { SYMBOL_TYPE } from '../../../dist/utils'
 
 const _Object = {
-  async construct() {
+  async construct(inputs) {
     // NOTE BRN: This method is here as a catch all to avoid errors when a type does not implement a construct method.
+    this.inputs = inputs
     return this
   },
   getType() {

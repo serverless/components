@@ -1,5 +1,5 @@
-const which = require('which')
-const BbPromise = require('bluebird')
+import which from 'which'
+import BbPromise from 'bluebird'
 
 async function isDockerInstalled() {
   return BbPromise.fromCallback((callback) => {
@@ -9,4 +9,4 @@ async function isDockerInstalled() {
     .catch(() => false)
 }
 
-module.exports = isDockerInstalled
+export default isDockerInstalled

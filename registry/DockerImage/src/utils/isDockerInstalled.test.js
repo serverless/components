@@ -1,5 +1,5 @@
-const which = require('which')
-const isDockerInstalled = require('./isDockerInstalled')
+import which from 'which'
+import isDockerInstalled from './isDockerInstalled'
 
 jest.mock('which')
 

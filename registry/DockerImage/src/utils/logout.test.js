@@ -1,5 +1,5 @@
-const execa = require('execa')
-const logout = require('./logout')
+import execa from 'execa'
+import logout from './logout'
 
 jest.mock('execa')
 

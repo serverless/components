@@ -31,10 +31,10 @@ const NATIVE_NAMES = {
   DockerImage: resolve(__dirname, '..', '..', '..', 'registry', 'DockerImage'),
   AwsLambdaFunction: resolve(__dirname, '..', '..', '..', 'registry', 'AwsLambdaFunction'),
   TwilioProvider: resolve(__dirname, '..', '..', '..', 'registry', 'TwilioProvider'),
+  TwilioApplication: resolve(__dirname, '..', '..', '..', 'registry', 'TwilioApplication'),
   AwsDynamoDB: resolve(__dirname, '..', '..', 'types', 'AwsDynamoDB'),
   AwsEventsRule: resolve(__dirname, '..', '..', 'types', 'AwsEventsRule'),
   AwsSnsSubscription: resolve(__dirname, '..', '..', 'types', 'AwsSnsSubscription'),
-  TwilioApplication: resolve(__dirname, '..', '..', 'types', 'TwilioApplication'),
   TwilioPhoneNumber: resolve(__dirname, '..', '..', 'types', 'TwilioPhoneNumber'),
   AwsSnsTopic: resolve(__dirname, '..', '..', 'types', 'AwsSnsTopic')
 }

@@ -1,4 +1,4 @@
-const execa = require('execa')
+import execa from 'execa'
 
 async function buildImage(dockerfilePath, tag, contextPath) {
   await execa('docker', ['build', '--file', dockerfilePath, '--tag', tag, contextPath])
@@ -6,4 +6,4 @@ async function buildImage(dockerfilePath, tag, contextPath) {
   return tag
 }
 
-module.exports = buildImage
+export default buildImage

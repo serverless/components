@@ -1,5 +1,5 @@
-const execa = require('execa')
-const { DOCKER_HUB_URL } = require('./constants')
+import execa from 'execa'
+import { DOCKER_HUB_URL } from './constants'
 
 async function login(username, password, registryUrl) {
   if (registryUrl === DOCKER_HUB_URL) {
@@ -13,4 +13,4 @@ async function login(username, password, registryUrl) {
   return true
 }
 
-module.exports = login
+export default login

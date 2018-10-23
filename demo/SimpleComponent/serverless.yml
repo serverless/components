@@ -1,0 +1,16 @@
+name: SimpleComponent
+extends: Component
+
+providers:
+  twilio:
+    type: TwilioProvider
+    inputs:
+      accountSid: xxx
+      authToken: xxx
+
+components:
+  twilioApp:
+    type: TwilioApplication
+    inputs:
+      provider: ${this.providers.twilio}
+      friendlyName: myFriendlyName

@@ -15,4 +15,4 @@ async function deleteImage(token, tag, registryUrl) {
   })
 }
 
-module.exports = deleteImage
+export default deleteImage

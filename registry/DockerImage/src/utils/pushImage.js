@@ -1,8 +1,8 @@
-const execa = require('execa')
+import execa from 'execa'
 
 async function pushImage(tag) {
   await execa('docker', ['push', tag])
   return tag
 }
 
-module.exports = pushImage
+export default pushImage

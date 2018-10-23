@@ -1,5 +1,5 @@
-const execa = require('execa')
-const login = require('./login')
+import execa from 'execa'
+import login from './login'
 
 jest.mock('execa')
 
