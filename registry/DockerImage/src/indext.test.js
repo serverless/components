@@ -30,8 +30,8 @@ afterAll(() => {
   jest.restoreAllMocks()
 })
 
-describe('DockerImage', () => {
-  it.only('should build and deploy if it is the first deployment', async () => {
+describe.skip('DockerImage', () => {
+  it('should build and deploy if it is the first deployment', async () => {
     let context = await createContext({
       cwd: path.join(__dirname, '..')
     })

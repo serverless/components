@@ -1,14 +1,12 @@
 name: AwsEventsRule
 extends: Component
-main: ./index.js
+main: ./dist/index.js
 version: 1.0.0
 
-provider: ${inputs.provider}
-lambda: ${inputs.lambda}
-schedule: ${inputs.schdule}
-enabled: {$inputs.enabled}
-
 inputTypes:
+  provider:
+    type: AwsProvider
+    required: true
   lambda:
     type: object
   schedule:

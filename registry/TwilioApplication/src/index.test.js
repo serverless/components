@@ -51,7 +51,7 @@ const provider = {
   getSdk: () => twilioMock
 }
 
-describe('TwilioApplication', () => {
+describe.skip('TwilioApplication', () => {
   it('should return if no changes detected', async () => {
     let context = await createContext({
       cwd: path.join(__dirname, '..')

@@ -1,7 +1,5 @@
-// import { resolve } from '@serverless/utils'
-// import path from 'path'
-const { resolve } = require('@serverless/utils')
-const path = require('path')
+import { resolve } from '@serverless/utils'
+import path from 'path'
 
 const parseRate = (rate) => {
   const unit = rate.substr(rate.length - 1)
@@ -102,5 +100,4 @@ const AwsLambdaCompute = async (SuperClass, superContext) => {
   }
 }
 
-// export default AwsLambdaCompute
-module.exports = AwsLambdaCompute
+export default AwsLambdaCompute
