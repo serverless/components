@@ -76,7 +76,7 @@ const createPhoneNumber = async (twilio, params) => {
 
 const TwilioPhoneNumber = {
   async deploy(prevInstance, context) {
-    const prevInputs = pick(inputsProps, prevInstance)
+    const prevInputs = prevInstance ? pick(inputsProps, prevInstance) : {}
     const inputs = pick(inputsProps, this)
     const noChanges = equals(prevInputs, inputs)
 
