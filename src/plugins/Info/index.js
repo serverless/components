@@ -35,7 +35,7 @@ const printArray = (arr, log, level = 1) => {
     if (!title && data.title) {
       title = data.title
     }
-    log(`|\n|- ${`  `.repeat(level)}${title} - ${type}`)
+    log(`\n|- ${`  `.repeat(level)}${title} - ${type}`)
     if (Array.isArray(data)) {
       printArray(data, log, level + 2)
     } else {
@@ -58,10 +58,10 @@ const printObj = (obj, log, level = 1) => {
     Object.entries(obj).forEach(([key, val]) => {
       const space = '  '
       if (isObject(val)) {
-        log(`|${space.repeat(level)}${key}:`)
+        log(`${space.repeat(level)}${key}:`)
         printObj(val, log, level + 1)
       } else {
-        log(`|${space.repeat(level)}${key}: ${val}`)
+        log(`${space.repeat(level)}${key}: ${val}`)
       }
     })
   }
