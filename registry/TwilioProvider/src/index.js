@@ -4,7 +4,7 @@ import twilio from 'twilio'
 const TwilioProvider = (SuperClass) =>
   class extends SuperClass {
     constructor(inputs, context) {
-      super(
+      return super(
         {
           credentials: {
             accountSid: inputs.accountSid,
