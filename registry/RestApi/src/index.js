@@ -1,6 +1,6 @@
 const joinPath = require('path').join
-const { isEmpty, keys, union, not, map, forEachObjIndexed } = require('ramda')
-const { joinUrl } = require('./utils')
+const { forEachObjIndexed } = require('ramda')
+const { resolve } = require('@serverless/utils')
 
 const catchallParameterPattern = /{\.{3}([^}]+?)}/g
 
@@ -114,35 +114,31 @@ export default function(SuperClass) {
       return this.childComponents || []
     }
 
-    async info(prevInstance, context) {
-      const state = context.getState(this)
+    async info() {
       const inputs = this.inputs
-      let message
-      if (not(isEmpty(state))) {
-        const baseUrl = state.url
-
-        const flattenedRoutes = flattenRoutes(inputs.routes)
-        let urlObjects = []
-        forEachObjIndexed((route, path) => {
-          const urlObject = {
-            path,
-            method: keys(route)
-              .pop()
-              .toUpperCase()
+      const flatRoutes = {}
+      for (const [path, pathObject] of Object.entries(flattenRoutes(inputs.routes))) {
+        const newPathObject = { ...pathObject }
+        for (const [method, methodObject] of Object.entries(pathObject)) {
+          const newMethodObject = { ...methodObject }
+          if (methodObject.function) {
+            const func = resolve(methodObject.function)
+            newMethodObject.function = `$${resolve(func.functionName)}`
           }
-          urlObjects = union(urlObjects, [urlObject])
-        }, flattenedRoutes)
+          if (methodObject.authorizer) {
+            const auth = resolve(methodObject.authorizer)
+            const authFunc = resolve(auth.function)
+            newMethodObject.authorizer = Object.assign(auth, {
+              function: `$${resolve(authFunc.functionName)}`
+            })
+          }
 
-        const printableUrls = map((urlObject) => {
-          const joinedUrl = joinUrl(baseUrl, [urlObject.path])
-          return `  ${urlObject.method} - ${joinedUrl}`
-        }, urlObjects)
-
-        message = ['REST API resources:', ...printableUrls].join('\n')
-      } else {
-        message = 'No REST API state information available. Have you deployed it?'
+          Object.assign(newPathObject, { [method]: newMethodObject })
+        }
+        Object.assign(flatRoutes, { [path]: newPathObject })
       }
-      context.log(message)
+
+      return { title: this.apiName, type: this.extends, data: { routes: flatRoutes } }
     }
   }
 }
