@@ -76,18 +76,20 @@ const createPhoneNumber = async (twilio, params) => {
 
 const TwilioPhoneNumber = {
   async deploy(prevInstance, context) {
-    const prevInputs = prevInstance ? pick(inputsProps, prevInstance) : {}
     const inputs = pick(inputsProps, this)
+    if (!prevInstance) {
+      context.log(`Creating Twilio Phone Number: "${inputs.friendlyName}"`)
+      return createPhoneNumber(this.provider.getSdk(), inputs)
+    }
+
+    const prevInputs = pick(inputsProps, prevInstance)
     const noChanges = equals(prevInputs, inputs)
 
     if (noChanges) {
       return
-    } else if (!prevInstance.sid) {
-      context.log(`Creating Twilio Phone Number: "${inputs.friendlyName}"`)
-      return createPhoneNumber(this.provider.getSdk(), inputs)
     }
     context.log(`Updating Twilio Phone Number: "${inputs.friendlyName}"`)
-    return await updatePhoneNumber(this.provider.getSdk(), {
+    return updatePhoneNumber(this.provider.getSdk(), {
       ...inputs,
       sid: prevInstance.sid
     })
