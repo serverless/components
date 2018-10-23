@@ -45,7 +45,9 @@ describe('aws-sqs unit tests', () => {
     }
 
     const inputs = {
-      QueueName: 'myQueue'
+      queueName: 'myQueue',
+      delaySeconds: '21',
+      maximumMessageSize: '1024'
     }
 
     const outputs = await sqsComponent.deploy(inputs, sqsContextMock)
@@ -66,7 +68,7 @@ describe('aws-sqs unit tests', () => {
     }
 
     const inputs = {
-      QueueName: 'myQueue'
+      queueName: 'myQueue'
     }
 
     const outputs = await sqsComponent.deploy(inputs, sqsContextMock)

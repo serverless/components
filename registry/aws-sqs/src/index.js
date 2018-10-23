@@ -17,12 +17,24 @@ const deleteQueue = async (state) => {
   return SQS.deleteQueue(state.queueUrl).promise()
 }
 
+const capitalizeKeys = (obj) => {
+  _.keys(obj).map((key) => {
+    obj[capitalizeString(key)] = obj[key]
+    delete obj[key]
+  })
+  return obj
+}
+
+const capitalizeString = (str) => {
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}
+
 const deploy = async (inputs, context) => {
   let { state } = context
 
-  const queueName = inputs.QueueName
-  delete inputs.QueueName
-  const attributes = inputs
+  const queueName = inputs.queueName
+  delete inputs.queueName
+  const attributes = capitalizeKeys(inputs)
 
   if (!state.queueName && queueName) {
     context.log(`Creating Queue: ${queueName}`)
