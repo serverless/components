@@ -2,6 +2,10 @@ import fs from 'fs'
 import path from 'path'
 import klawSync from 'klaw-sync'
 
+/*
+* Create Website Bucket
+*/
+
 const createWebsiteBucket = async (s3, bucketName) => {
   const s3BucketPolicy = {
     Version: '2012-10-17',
@@ -28,6 +32,7 @@ const createWebsiteBucket = async (s3, bucketName) => {
       }
     }
   }
+
   const putPostDeleteHeadRule = {
     AllowedMethods: ['PUT', 'POST', 'DELETE', 'HEAD'],
     AllowedOrigins: ['https://*.amazonaws.com'],
@@ -61,6 +66,11 @@ const createWebsiteBucket = async (s3, bucketName) => {
 
   await s3.putBucketWebsite(staticHostParams).promise()
 }
+
+/*
+* Upload Directory
+* - Uploads folder to S3 Bucket
+*/
 
 const uploadDir = async (s3, bucketName, assets, env = {}) => {
   return new Promise((resolve, reject) => {
@@ -150,6 +160,10 @@ const uploadDir = async (s3, bucketName, assets, env = {}) => {
   })
 }
 
+/*
+* Delete Website Bucket
+*/
+
 const deleteWebsiteBucket = async (s3, bucketName) => {
   const data = await s3.listObjects({ Bucket: bucketName }).promise()
 
@@ -166,35 +180,44 @@ const deleteWebsiteBucket = async (s3, bucketName) => {
   await s3.deleteBucket({ Bucket: bucketName }).promise()
 }
 
+/*
+* Component: AWS S3 Website
+*/
+
 const AwsS3Website = {
   shouldDeploy(prevInstance) {
     if (!prevInstance) {
       return 'deploy'
     }
-    if (prevInstance.domain !== this.domain) {
+    if (prevInstance.bucket !== this.bucket) {
       return 'replace'
     }
   },
+
   async deploy(prevInstance, context) {
     const provider = this.provider
     const AWS = provider.getSdk()
     const s3 = new AWS.S3()
 
-    await createWebsiteBucket(s3, this.domain)
-    await uploadDir(s3, this.domain, this.assets, this.env)
+    // Ensure bucket is lowercase
+    this.bucket = this.bucket.toLowerCase()
 
-    const s3Domain = `http://${this.domain}.s3-website-${this.provider.region}.amazonaws.com`
+    await createWebsiteBucket(s3, this.bucket)
+    await uploadDir(s3, this.bucket, this.assets, this.env)
+
+    const s3Domain = `http://${this.bucket}.s3-website-${this.provider.region}.amazonaws.com`
     context.log('Website Successfully Deployed:')
     context.log(`  ${s3Domain}`)
   },
+
   async remove(context) {
     const provider = this.provider
     const AWS = provider.getSdk()
     const s3 = new AWS.S3()
 
-    await deleteWebsiteBucket(s3, this.domain)
+    await deleteWebsiteBucket(s3, this.bucket)
 
-    const s3Domain = `http://${this.domain}.s3-website-${this.provider.region}.amazonaws.com`
+    const s3Domain = `http://${this.bucket}.s3-website-${this.provider.region}.amazonaws.com`
     context.log('Website Successfully Removed:')
     context.log(`  ${s3Domain}`)
   }

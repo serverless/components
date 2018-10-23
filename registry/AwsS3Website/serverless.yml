@@ -4,7 +4,7 @@ main: ./dist/index.js
 version: 1.0.0
 
 provider: ${inputs.provider}
-domain: ${inputs.domain}
+bucket: ${inputs.bucket}
 assets: ${inputs.assets}
 env: ${inputs.env}
 
@@ -12,10 +12,10 @@ inputTypes:
   provider:
     type: AwsProvider
     required: true
-  domain:
+  bucket:
     type: string
-    displayName: Domain Name
-    description: Domain name which your bucket will be named after
+    displayName: Bucket Name
+    description: Your AWS S3 bucket name, which is also used as a domain.
     required: true
   assets:
     type: string
