@@ -1,18 +1,69 @@
+import { handleSignalEvents } from '../../utils'
+import { isFunction, isObject } from '@serverless/utils'
+
 const Info = {
   async run(context) {
-    // TODO BRN (priority high): load the last deployment and construct/define based on previous state
-    // Execute a walkReduceComponentChildren against the entire component tree. Give each component an opportunity to execute an info method. Each info method should return an object where the key is the category of how the info should be organized and the value is an item to output for that category
+    context.log('Deploy running...')
+    context = await context.loadProject()
+    context = await context.loadApp()
 
-    // merge and then sort based on category names
+    const prevContext = await context.loadPreviousDeployment()
+    const nextContext = await context.createDeployment(prevContext.deployment)
 
-    // context.log
-    // [category name]
-    // [item 1]
-    // [item 2]
+    // TODO BRN (low priority): Upgrade this signal handling so that we can tie in a handler that knows what to do when a SIGINT is received. In the case of deploy we may want to ignore the first one and log out the message, then if we receive anther one we stop the current deployment and start a rollback
+    handleSignalEvents(context)
 
-    context.log('TODO: implement info command')
+    // TODO BRN (low priority): inputs to the top level might be a way to inject project/deployment config
 
-    return context
+    // const prevInstance = await prevContext.loadInstanceFromState()
+    const nextInstance = await nextContext.createInstance()
+
+    if (nextInstance && isFunction(nextInstance.info)) {
+      const { title, type, data } = await nextInstance.info(context)
+      context.log(`${title} - ${type}`)
+      if (Array.isArray(data)) {
+        printArray(data, context.log)
+      }
+    }
+  }
+}
+
+const printArray = (arr, log, level = 1) => {
+  arr.forEach((item) => {
+    const { type, data } = item
+    let { title } = item
+    if (!title && data.title) {
+      title = data.title
+    }
+    log(`|\n|_ ${`  `.repeat(level)}${title} - ${type}`)
+    if (Array.isArray(data)) {
+      printArray(data, log, level + 1)
+    } else {
+      printObj(data, log, level + 1)
+    }
+  })
+}
+
+const printObj = (obj, log, level = 1) => {
+  if (!obj) {
+    return
+  }
+  if (Object.keys(obj).length === 3 && obj.title && obj.type && obj.data) {
+    if (Array.isArray(obj.data)) {
+      printArray(obj.data, log, level + 1)
+    } else {
+      printObj(obj.data, log, level)
+    }
+  } else {
+    Object.entries(obj).forEach(([key, val]) => {
+      const space = '  '
+      if (isObject(val)) {
+        log(`|${space.repeat(level)}${key}`)
+        printObj(val, log, level + 1)
+      } else {
+        log(`|${space.repeat(level)}${key}: ${val}`)
+      }
+    })
   }
 }
 
