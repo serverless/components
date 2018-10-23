@@ -1,6 +1,6 @@
 name: AwsProvider
 extends: Provider
-version: 1.0.0
+version: 0.3.0
 main: ./dist/index.js
 
 credentials: ${inputs.credentials}

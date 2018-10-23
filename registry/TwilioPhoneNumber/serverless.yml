@@ -1,6 +1,6 @@
 name: TwilioPhoneNumber
 extends: Component
-version: 1.0.0
+version: 0.3.0
 main: ./dist/index.js
 
 description: "Provision Twilio Phone Numbers with the Serverless Framework"

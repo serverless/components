@@ -1,6 +1,7 @@
 name: Service
 extends: Component
 main: ./dist/index.js
+version: 0.3.0
 
 providers: ${inputs.providers}
 compute: ${inputs.compute}

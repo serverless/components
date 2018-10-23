@@ -1,7 +1,7 @@
 name: AwsEventsRule
 extends: Component
 main: ./dist/index.js
-version: 1.0.0
+version: 0.3.0
 
 inputTypes:
   provider:

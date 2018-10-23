@@ -6,6 +6,7 @@ main: ./dist/index.js
 
 version: 0.3.0
 core: 0.3.x
+
 description: "Provision AWS s3 buckets with serverless components"
 license: Apache-2.0
 author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"

@@ -1,6 +1,7 @@
 name: AwsIamPolicy
 extends: Component
 main: ./dist/index.js
+version: 0.3.0
 
 description: "Provision AWS IAM Policies with the Serverless Framework"
 license: Apache-2.0

@@ -1,7 +1,7 @@
 name: AwsS3Website
 extends: Component
 main: ./dist/index.js
-version: 1.0.0
+version: 0.3.0
 
 provider: ${inputs.provider}
 bucket: ${inputs.bucket}

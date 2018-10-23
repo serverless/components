@@ -1,6 +1,6 @@
 name: TwilioApplication
 extends: Component
-version: 1.0.0
+version: 0.3.0
 main: ./dist/index.js
 
 description: "Provision Twilio Applications with the Serverless Framework"

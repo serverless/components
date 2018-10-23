@@ -1,6 +1,7 @@
 name: Provider
 extends: Object
 main: './dist/index.js'
+version: 0.3.0
 
 credentials: ${inputs.credentials}
 
