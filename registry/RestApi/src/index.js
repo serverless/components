@@ -128,9 +128,11 @@ export default function(SuperClass) {
           if (methodObject.authorizer) {
             const auth = resolve(methodObject.authorizer)
             const authFunc = resolve(auth.function)
-            newMethodObject.authorizer = Object.assign(auth, {
-              function: `$${resolve(authFunc.functionName)}`
-            })
+            if (authFunc) {
+              newMethodObject.authorizer = Object.assign(auth, {
+                function: `$${resolve(authFunc.functionName)}`
+              })
+            }
           }
 
           Object.assign(newPathObject, { [method]: newMethodObject })
