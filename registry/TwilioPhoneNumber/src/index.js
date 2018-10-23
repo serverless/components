@@ -32,7 +32,6 @@ const phoneNumberProps = [
 ]
 
 const inputsProps = [
-  'provider',
   'phoneNumber',
   'areaCode',
   'friendlyName',
@@ -79,27 +78,29 @@ const TwilioPhoneNumber = {
     const inputs = pick(inputsProps, this)
     if (!prevInstance) {
       context.log(`Creating Twilio Phone Number: "${inputs.friendlyName}"`)
-      return createPhoneNumber(this.provider.getSdk(), inputs)
-    }
+      const props = await createPhoneNumber(this.provider.getSdk(), inputs)
+      Object.assign(this, props)
+    } else {
+      const prevInputs = pick(inputsProps, prevInstance)
+      const noChanges = equals(prevInputs, inputs)
 
-    const prevInputs = pick(inputsProps, prevInstance)
-    const noChanges = equals(prevInputs, inputs)
-
-    if (noChanges) {
-      return
+      if (noChanges) {
+        return
+      }
+      context.log(`Updating Twilio Phone Number: "${inputs.friendlyName}"`)
+      const props = await updatePhoneNumber(this.provider.getSdk(), {
+        ...inputs,
+        sid: prevInstance.sid
+      })
+      Object.assign(this, props)
     }
-    context.log(`Updating Twilio Phone Number: "${inputs.friendlyName}"`)
-    return updatePhoneNumber(this.provider.getSdk(), {
-      ...inputs,
-      sid: prevInstance.sid
-    })
   },
 
-  async remove(prevInstance, context) {
-    context.log(`Removing Twilio Phone Number: "${prevInstance.sid}"`)
+  async remove(context) {
+    context.log(`Removing Twilio Phone Number: "${this.sid}"`)
     return this.provider
       .getSdk()
-      .incomingPhoneNumbers(prevInstance.sid)
+      .incomingPhoneNumbers(this.sid)
       .remove()
   }
 }

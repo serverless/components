@@ -1,0 +1,14 @@
+{
+  "name": "@serverless-components/twilio-phone-number",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Serverless, Inc.",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@serverless/utils": "0.0.11"
+  }
+}
