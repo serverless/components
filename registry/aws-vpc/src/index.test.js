@@ -32,6 +32,12 @@ jest.mock('aws-sdk', () => {
         return Promise.reject('Something went wrong')
       }
       return Promise.resolve({ InternetGateways: [] })
+    }),
+    describeRouteTablesMock: jest.fn().mockImplementation((value) => {
+      if (value.Filters[0].Values[0] === 'vpc-error-describe') {
+        return Promise.reject('Something went wrong')
+      }
+      return Promise.resolve({ RouteTables: [] })
     })
   }
 
@@ -47,6 +53,9 @@ jest.mock('aws-sdk', () => {
     }),
     describeInternetGateways: (obj) => ({
       promise: () => mocks.describeInternetGatewaysMock(obj)
+    }),
+    describeRouteTables: (obj) => ({
+      promise: () => mocks.describeRouteTablesMock(obj)
     })
   }
   return {
@@ -90,7 +99,8 @@ describe('AWS VPC Unit Tests', () => {
   it('should remove an existing VPC', async () => {
     const contextMock = {
       state: {
-        vpcId: 'vpc-subnets'
+        vpcId: 'vpc-subnets',
+        defaultRouteTableIds: { 'vpc-subnets': 'rtb-default' }
       },
       log: () => {},
       saveState: jest.fn()
@@ -112,6 +122,14 @@ describe('AWS VPC Unit Tests', () => {
       ]
     })
 
+    AWS.mocks.describeRouteTablesMock.mockImplementationOnce().mockResolvedValueOnce({
+      RouteTables: [
+        {
+          RouteTableId: 'rtb-123'
+        }
+      ]
+    })
+
     const inputs = {}
 
     await awsVpcComponent.remove(inputs, contextMock)
@@ -120,6 +138,7 @@ describe('AWS VPC Unit Tests', () => {
     expect(AWS.mocks.deleteVpcMock).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.describeSubnetsMock).toHaveBeenCalledTimes(2)
     expect(AWS.mocks.describeInternetGatewaysMock).toHaveBeenCalledTimes(2)
+    expect(AWS.mocks.describeRouteTablesMock).toHaveBeenCalledTimes(2)
     expect(contextMock.saveState).toHaveBeenCalledTimes(1)
   })
 
@@ -140,6 +159,7 @@ describe('AWS VPC Unit Tests', () => {
     expect(AWS.mocks.deleteVpcMock).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.describeSubnetsMock).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.describeInternetGatewaysMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.describeRouteTablesMock).toHaveBeenCalledTimes(1)
     expect(contextMock.saveState).toHaveBeenCalledTimes(1)
 
     AWS.mocks.describeInternetGatewaysMock.mockClear()
