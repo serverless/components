@@ -1,7 +1,7 @@
 name: AwsSnsTopic
 extends: Component
-version: 1.0.0
-main: ./index.js
+version: 0.3.0
+main: ./dist/index.js
 
 description: "Provision AWS SNS Topic with the Serverless Framework"
 license: Apache-2.0
@@ -9,7 +9,7 @@ author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
 repository: "github:serverless/components"
 
 provider: ${inputs.provider}
-name: ${inputs.name}
+topicName: ${inputs.topicName}
 displayName: ${inputs.displayName}
 policy: ${inputs.policy}
 deliveryPolicy: ${inputs.deliveryPolicy}
@@ -19,7 +19,7 @@ inputTypes:
   provider:
     type: AwsProvider
     required: true
-  name:
+  topicName:
     type: string
     required: true
     default: sns-${self.instanceId}
