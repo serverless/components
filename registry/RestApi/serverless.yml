@@ -3,7 +3,7 @@ extends: Component
 
 version: 0.3.0
 core: 0.3.x
-main: ./index.js
+main: ./dist/index.js
 
 description: "REST API type component."
 license: Apache-2.0

@@ -1,6 +1,6 @@
 name: AwsApiGateway
 extends: Component
-main: ./index.js
+main: ./dist/index.js
 version: 0.2.0
 
 description: "Provision AWS API Gateway with serverless components."

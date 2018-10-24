@@ -1,5 +1,5 @@
 import { getSwaggerDefinition, generateUrl, generateUrls } from './utils'
-import { equals, resolve } from '@serverless/utils'
+import { equals, resolve, reduce } from '@serverless/utils'
 
 const deleteApi = async (APIGateway, params) => {
   const { id } = params
@@ -70,30 +70,27 @@ const updateApi = async (APIGateway, params) => {
   return outputs
 }
 
-module.exports = function(SuperClass, SuperContext) {
+module.exports = function(SuperClass) {
   return class extends SuperClass {
     async construct(inputs, context) {
       await super.construct(inputs, context)
       this.inputs = inputs
     }
 
-    async define(context) {
-      const childComponents = Object.entries(this.inputs.routes)
-        .map(([path, pathObject]) =>
-          Object.entries(pathObject)
-            .map(([method, methodObject]) => {
-              const instances = []
-              if (methodObject.function) {
-                instances.push(resolve(methodObject.function))
-              }
-              if (methodObject.authorizer && methodObject.authorizer.function) {
-                instances.push(resolve(methodObject.authorizer.function))
-              }
-              return instances
-            })
-            .reduce((acc, val) => acc.concat(val))
-        )
-        .reduce((acc, val) => acc.concat(val))
+    async define() {
+      const childComponents = reduce(
+        reduce((pathAcc, methodObject) => {
+          if (methodObject.function) {
+            pathAcc.push(resolve(methodObject.function))
+          }
+          if (methodObject.authorizer && methodObject.authorizer.function) {
+            pathAcc.push(resolve(methodObject.authorizer.function))
+          }
+          return pathAcc
+        }),
+        [],
+        this.inputs.routes
+      )
 
       return childComponents
     }

@@ -120,7 +120,7 @@ function getCorsOptionsConfig() {
   }
 }
 
-function getSecurityDefinition(authorizerObj, name, region = 'us-east-1', path, method) {
+function getSecurityDefinition(authorizerObj, name, region = 'us-east-1' /*, path , method */) {
   if (authorizerObj) {
     const { function: func, ...authorizerParams } = authorizerObj
     return {

@@ -4,7 +4,7 @@ const { joinUrl } = require('./utils')
 
 const catchallParameterPattern = /{\.{3}([^}]+?)}/g
 
-async function getAwsApiGatewayInputs(inputs, context) {
+async function getAwsApiGatewayInputs(inputs) {
   const apiGatewayInputs = {
     name: inputs.apiName,
     role: inputs.role,
@@ -27,7 +27,7 @@ async function getAwsApiGatewayInputs(inputs, context) {
 }
 
 async function constructApiGateway(inputs, context, provider) {
-  const apiInputs = await getAwsApiGatewayInputs(inputs, context)
+  const apiInputs = await getAwsApiGatewayInputs(inputs)
 
   const apiGatewayComponent = await context.loadType('AwsApiGateway')
   const apiGateway = await context.construct(apiGatewayComponent, {
@@ -71,7 +71,7 @@ function flattenRoutes(routes) {
   return flattened
 }
 
-export default function(SuperClass, SuperContext) {
+export default function(SuperClass) {
   return class extends SuperClass {
     async construct(inputs, context) {
       await super.construct(inputs, context)
@@ -110,7 +110,7 @@ export default function(SuperClass, SuperContext) {
       this.childComponents = childComponents
     }
 
-    async define(context) {
+    async define() {
       return this.childComponents || []
     }
 
