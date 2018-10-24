@@ -1,6 +1,6 @@
 const AWS = require('aws-sdk')
 const SQS = new AWS.SQS({ region: process.env.AWS_DEFAULT_REGION || 'us-east-1' })
-const _ = require('lodash')
+const { keys, equals } = require('ramda')
 
 const createQueue = async (queueName, attributes) => {
   const params = {
@@ -18,7 +18,7 @@ const deleteQueue = async (state) => {
 }
 
 const capitalizeKeys = (obj) => {
-  _.keys(obj).map((key) => {
+  keys(obj).map((key) => {
     obj[capitalizeString(key)] = obj[key]
     delete obj[key]
   })
@@ -54,7 +54,7 @@ const deploy = async (inputs, context) => {
       queueName: null,
       attributes: null
     }
-  } else if (state.queueName !== queueName || !_.isEqual(state.attributes, attributes)) {
+  } else if (!equals(state.queueName, queueName) || !equals(state.attributes, attributes)) {
     context.log(`Removing Queue: ${state.queueName}`)
     await deleteQueue(state)
     context.log(`Creating Queue: ${queueName}`)

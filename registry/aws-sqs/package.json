@@ -8,6 +8,6 @@
   },
   "dependencies": {
     "aws-sdk": "^2.224.1",
-    "lodash": "^4.17.11"
+    "ramda": "^0.25.0"
   }
 }

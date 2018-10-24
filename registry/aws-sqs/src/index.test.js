@@ -78,6 +78,30 @@ describe('aws-sqs unit tests', () => {
     expect(outputs).toEqual('https://sqs.us-east-1.amazonaws.com/123/myQueue')
   })
 
+  it('should deploy aws-sqs queue without error', async () => {
+    const sqsContextMock = {
+      state: {
+        queueName: 'myQueue',
+        queueUrl: 'https://sqs.us-east-1.amazonaws.com/123/myQueue'
+      },
+      archive: {},
+      log: () => {},
+      saveState: () => {}
+    }
+
+    const inputs = {
+      queueName: 'myQueue',
+      delaySeconds: '21',
+      maximumMessageSize: '1024'
+    }
+
+    const outputs = await sqsComponent.deploy(inputs, sqsContextMock)
+    expect(AWS.SQS).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.deleteQueueMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.createQueueMock).toHaveBeenCalledTimes(1)
+    expect(outputs).toEqual('https://sqs.us-east-1.amazonaws.com/123/myQueue')
+  })
+
   it('should remove deployed aws-sqs queue without error', async () => {
     const sqsContextMock = {
       state: {
