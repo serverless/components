@@ -14,7 +14,14 @@ const createQueue = async (queueName, attributes) => {
 }
 
 const deleteQueue = async (state) => {
-  return SQS.deleteQueue(state.queueUrl).promise()
+  try {
+    await SQS.deleteQueue(state.queueUrl).promise()
+  } catch (error) {
+    if (!error.message.includes('The specified queue does not exist')) {
+      throw new Error(error)
+    }
+  }
+  return null
 }
 
 const capitalizeKeys = (obj) => {
