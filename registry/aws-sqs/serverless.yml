@@ -10,6 +10,7 @@ repository: 'github:serverless/components'
 inputTypes:
   queueName:
     type: string
+    required: true
     displayName: AWS SQS name
     description: The name of the SQS to create
     example: myQueue
