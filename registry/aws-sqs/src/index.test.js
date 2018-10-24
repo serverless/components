@@ -35,6 +35,10 @@ afterEach(() => {
   AWS.mocks.deleteQueueMock.mockClear()
 })
 
+afterAll(() => {
+  jest.restoreAllMocks()
+})
+
 describe('aws-sqs unit tests', () => {
   it('should deploy aws-sqs queue without error', async () => {
     const sqsContextMock = {
