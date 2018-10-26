@@ -92,7 +92,7 @@ const AwsApiGateway = function(SuperClass) {
           return pathAcc
         }),
         [],
-        this.inputs.routes
+        this.inputs.routes || {}
       )
 
       return childComponents
