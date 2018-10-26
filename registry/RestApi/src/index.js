@@ -1,5 +1,5 @@
 import { join as joinPath } from 'path'
-import { isEmpty, keys, union, not, map, forEachObjIndexed } from '@serverless/utils'
+import { isEmpty, keys, union, not, map, forEach } from '@serverless/utils'
 import { joinUrl } from './utils'
 
 const catchallParameterPattern = /{\.{3}([^}]+?)}/g
@@ -40,7 +40,7 @@ async function constructApiGateway(inputs, context, provider) {
 function flattenRoutes(routes) {
   const flattened = {}
   function doFlatten(subRoutes, basePath) {
-    forEachObjIndexed((value, key) => {
+    forEach((value, key) => {
       if (key.startsWith('/')) {
         doFlatten(value, joinPath(basePath, key))
       } else {
@@ -123,7 +123,7 @@ const RestApi = function(SuperClass) {
 
         const flattenedRoutes = flattenRoutes(inputs.routes)
         let urlObjects = []
-        forEachObjIndexed((route, path) => {
+        forEach((route, path) => {
           const urlObject = {
             path,
             method: keys(route)
