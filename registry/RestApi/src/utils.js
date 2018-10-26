@@ -25,6 +25,4 @@ function joinUrl(base, ...parts) {
   )
 }
 
-module.exports = {
-  joinUrl
-}
+export { joinUrl }
