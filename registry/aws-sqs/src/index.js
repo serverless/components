@@ -1,6 +1,6 @@
 const AWS = require('aws-sdk')
 const SQS = new AWS.SQS({ region: process.env.AWS_DEFAULT_REGION || 'us-east-1' })
-const { keys, equals } = require('ramda')
+const { keys, equals, reduce, merge } = require('ramda')
 
 const createQueue = async (queueName, attributes) => {
   const params = {
@@ -15,7 +15,7 @@ const createQueue = async (queueName, attributes) => {
 
 const deleteQueue = async (state) => {
   try {
-    await SQS.deleteQueue(state.queueUrl).promise()
+    await SQS.deleteQueue({ QueueUrl: state.queueUrl }).promise()
   } catch (error) {
     if (!error.message.includes('The specified queue does not exist')) {
       throw new Error(error)
@@ -24,13 +24,8 @@ const deleteQueue = async (state) => {
   return null
 }
 
-const capitalizeKeys = (obj) => {
-  keys(obj).map((key) => {
-    obj[capitalizeString(key)] = obj[key]
-    delete obj[key]
-  })
-  return obj
-}
+const capitalizeKeys = (obj) =>
+  reduce((result, key) => merge(result, { [capitalizeString(key)]: obj[key] }), {}, keys(obj))
 
 const capitalizeString = (str) => {
   return str.charAt(0).toUpperCase() + str.slice(1)
