@@ -1,5 +1,3 @@
-import { has } from '@serverless/utils'
-
-const isComponent = (value) => has('instanceId', value)
+const isComponent = (value) => value != null && value.instanceId
 
 export default isComponent
