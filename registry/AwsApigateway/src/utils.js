@@ -1,4 +1,4 @@
-const { forEachObjIndexed, keys, map, set, lensPath } = require('ramda')
+import { forEachObjIndexed, keys, map, set, lensPath } from '@serverless/utils'
 
 // TODO: remove hardcoding of region (e.g. like us-east-1)
 
