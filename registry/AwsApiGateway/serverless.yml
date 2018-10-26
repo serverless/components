@@ -1,7 +1,9 @@
 name: AwsApiGateway
 extends: Component
+
+version: 0.3.0
+core: 0.3.x
 main: ./dist/index.js
-version: 0.2.0
 
 description: "Provision AWS API Gateway with serverless components."
 license: Apache-2.0
