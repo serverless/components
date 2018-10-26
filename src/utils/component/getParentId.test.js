@@ -31,6 +31,6 @@ describe('#getParentId()', () => {
     const Component = await context.loadType('Component')
     const component = await context.construct(Component, {})
 
-    expect(getParentId(component)).toBe(undefined)
+    expect(getParentId(component)).toBe(null)
   })
 })
