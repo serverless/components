@@ -70,7 +70,7 @@ const updateApi = async (APIGateway, params) => {
   return outputs
 }
 
-export default function(SuperClass) {
+const AwsApiGateway = function(SuperClass) {
   return class extends SuperClass {
     async construct(inputs, context) {
       await super.construct(inputs, context)
@@ -141,3 +141,5 @@ export default function(SuperClass) {
     }
   }
 }
+
+export default AwsApiGateway
