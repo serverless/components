@@ -1,5 +1,5 @@
 import { join as joinPath } from 'path'
-import { isEmpty, keys, union, not, map, forEach, resolve } from '@serverless/utils'
+import { isEmpty, keys, union, not, map, forEach, resolve, reduce } from '@serverless/utils'
 import { joinUrl } from './utils'
 
 const catchallParameterPattern = /{\.{3}([^}]+?)}/g
@@ -11,17 +11,25 @@ async function getAwsApiGatewayInputs(inputs) {
     routes: {}
   }
 
-  for (const [path, methods] of Object.entries(inputs.routes)) {
-    const reparameterizedPath = path.replace(catchallParameterPattern, '{$1+}')
-    const normalizedPath = reparameterizedPath.replace(/^\/+/, '')
-    const routeObject = {}
-    apiGatewayInputs.routes[normalizedPath] = routeObject
-
-    for (const [method, methodObject] of Object.entries(methods)) {
-      const normalizedMethod = method.toUpperCase()
-      routeObject[normalizedMethod] = methodObject
-    }
-  }
+  apiGatewayInputs.routes = reduce(
+    (pathAcc, methods, path) => {
+      const reparameterizedPath = path.replace(catchallParameterPattern, '{$1+}')
+      const normalizedPath = reparameterizedPath.replace(/^\/+/, '')
+      const methodDefinitions = reduce(
+        (methodAcc, methodObject, method) => {
+          const normalizedMethod = method.toUpperCase()
+          methodAcc[normalizedMethod] = methodObject
+          return methodAcc
+        },
+        {},
+        methods
+      )
+      pathAcc[normalizedPath] = methodDefinitions
+      return pathAcc
+    },
+    {},
+    inputs.routes
+  )
 
   return apiGatewayInputs
 }
