@@ -70,7 +70,7 @@ const updateApi = async (APIGateway, params) => {
   return outputs
 }
 
-module.exports = function(SuperClass) {
+export default function(SuperClass) {
   return class extends SuperClass {
     async construct(inputs, context) {
       await super.construct(inputs, context)
