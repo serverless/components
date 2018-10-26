@@ -80,6 +80,9 @@ export default function(SuperClass) {
     async define() {
       const childComponents = reduce(
         reduce((pathAcc, methodObject) => {
+          if (!methodObject) {
+            return pathAcc
+          }
           if (methodObject.function) {
             pathAcc.push(resolve(methodObject.function))
           }
