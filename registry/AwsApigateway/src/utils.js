@@ -234,8 +234,4 @@ function generateUrls(routes, restApiId) {
   }, paths)
 }
 
-module.exports = {
-  getSwaggerDefinition,
-  generateUrl,
-  generateUrls
-}
+export { getSwaggerDefinition, generateUrl, generateUrls }
