@@ -31,12 +31,12 @@ const createApi = async (APIGateway, params) => {
     stageName: 'dev'
   }).promise()
 
-  const url = generateUrl(res.id)
+  const baseUrl = generateUrl(res.id)
   const urls = generateUrls(routes, res.id)
 
   const outputs = {
     id: res.id,
-    url,
+    baseUrl,
     urls
   }
   return outputs
@@ -59,12 +59,12 @@ const updateApi = async (APIGateway, params) => {
     stageName: 'dev'
   }).promise()
 
-  const url = generateUrl(id)
+  const baseUrl = generateUrl(id)
   const urls = generateUrls(routes, id)
 
   const outputs = {
     id,
-    url,
+    baseUrl,
     urls
   }
   return outputs
@@ -119,7 +119,7 @@ const AwsApiGateway = function(SuperClass) {
         outputs = await updateApi(APIGateway, {
           ...inputs,
           id: state.id,
-          url: state.url
+          baseUrl: state.baseUrl
         })
       }
       // context.saveState(this, { ...inputs, ...outputs })

@@ -11,7 +11,7 @@ repository: "github:serverless/components"
 id:
   type: string
   description: API Gateways id
-url:
+baseUrl:
   type: string
   description: The API Gateways base URL
 urls:
