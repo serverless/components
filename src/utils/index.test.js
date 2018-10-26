@@ -28,8 +28,7 @@ describe('index', () => {
       resolveComponentVariables: expect.any(Function),
       setKey: expect.any(Function),
       walkReduceComponentChildren: expect.any(Function),
-      walkReduceComponentChildrenDepthFirst: expect.any(Function),
-      walkReduceComponentOwnVariables: expect.any(Function)
+      walkReduceComponentChildrenDepthFirst: expect.any(Function)
     })
   })
 
