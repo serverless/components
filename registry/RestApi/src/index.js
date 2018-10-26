@@ -1,5 +1,5 @@
 import { join as joinPath } from 'path'
-import { isEmpty, keys, union, not, map, forEach } from '@serverless/utils'
+import { isEmpty, keys, union, not, map, forEach, resolve } from '@serverless/utils'
 import { joinUrl } from './utils'
 
 const catchallParameterPattern = /{\.{3}([^}]+?)}/g
@@ -79,15 +79,16 @@ const RestApi = async function(SuperClass, SuperContext) {
       await super.construct(inputs, context)
       this.inputs = inputs
       this.apiName = inputs.apiName
+    }
 
+    async define(context) {
+      const inputs = this.inputs
       if (!['AwsApiGateway'].includes(inputs.gateway)) {
         throw new Error('Specified "gateway" is not supported.')
       }
 
-      const flatRoutes = flattenRoutes(inputs.routes)
-
+      const flatRoutes = flattenRoutes(resolve(inputs.routes))
       const childComponents = []
-
       const name = `${inputs.apiName}-iam-role`
       const service = 'apigateway.amazonaws.com'
       this.role = await context.construct(iamComponent, {
@@ -108,11 +109,7 @@ const RestApi = async function(SuperClass, SuperContext) {
       )
       childComponents.push(this.gateway)
 
-      this.childComponents = childComponents
-    }
-
-    async define() {
-      return this.childComponents || []
+      return childComponents
     }
 
     async info(prevInstance, context) {
