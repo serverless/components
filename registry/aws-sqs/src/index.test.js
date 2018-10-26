@@ -8,12 +8,11 @@ jest.mock('aws-sdk', () => {
       .mockReturnValue(
         Promise.resolve({ QueueUrl: 'https://sqs.us-east-1.amazonaws.com/123/myQueue' })
       ),
-    deleteQueueMock: jest.fn().mockImplementation((queueUrl) => {
-      if (queueUrl === 'https://sqs.us-east-1.amazonaws.com/123/1234MyQueue') {
-        return Promise.reject(new Error('The specified queue does not exist'))
-      }
-      return Promise.resolve({ QueueUrl: 'https://sqs.us-east-1.amazonaws.com/123/myQueue' })
-    })
+    deleteQueueMock: jest
+      .fn()
+      .mockReturnValue(
+        Promise.resolve({ QueueUrl: 'https://sqs.us-east-1.amazonaws.com/123/myQueue' })
+      )
   }
 
   const SQS = {
@@ -156,6 +155,10 @@ describe('aws-sqs unit tests', () => {
       saveState: () => {}
     }
 
+    AWS.mocks.deleteQueueMock = jest
+      .fn()
+      .mockImplementationOnce(() => Promise.reject(new Error('The specified queue does not exist')))
+
     const inputs = {}
 
     const outputs = await sqsComponent.remove(inputs, sqsContextMock)
@@ -163,5 +166,30 @@ describe('aws-sqs unit tests', () => {
     expect(AWS.SQS).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.deleteQueueMock).toHaveBeenCalledTimes(1)
     expect(outputs.queueUrl).toEqual(null)
+  })
+
+  it('should throw an error if something unexpected happens on delete', async () => {
+    const sqsContextMock = {
+      state: {
+        queueName: 'myQueueOld',
+        queueUrl: 'https://sqs.us-east-1.amazonaws.com/123/1234MyQueue'
+      },
+      archive: {},
+      log: () => {},
+      saveState: () => {}
+    }
+
+    AWS.mocks.deleteQueueMock = jest
+      .fn()
+      .mockImplementationOnce(() => Promise.reject(new Error('Something went wrong')))
+
+    const inputs = {}
+
+    await expect(sqsComponent.remove(inputs, sqsContextMock)).rejects.toThrow(
+      'Error: Something went wrong'
+    )
+
+    expect(AWS.SQS).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.deleteQueueMock).toHaveBeenCalledTimes(1)
   })
 })
