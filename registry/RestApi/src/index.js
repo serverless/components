@@ -71,7 +71,7 @@ function flattenRoutes(routes) {
   return flattened
 }
 
-export default function(SuperClass) {
+const RestApi = function(SuperClass) {
   return class extends SuperClass {
     async construct(inputs, context) {
       await super.construct(inputs, context)
@@ -146,3 +146,5 @@ export default function(SuperClass) {
     }
   }
 }
+
+export default RestApi
