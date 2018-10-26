@@ -21,7 +21,7 @@ function getDefaultResponses(useCors) {
   if (useCors) {
     let defaultResponsesWithCors = { ...defaultResponses }
     defaultResponsesWithCors = set(
-      lensPath([200]),
+      [200],
       {
         headers: {
           'Access-Control-Allow-Headers': {
@@ -182,7 +182,7 @@ function getSwaggerDefinition(name, roleArn, routes) {
         normalizedMethod
       )
       const defaultResponses = getDefaultResponses(isCorsEnabled)
-      updatedMethods = set(lensPath([normalizedMethod]), apiGatewayIntegration, updatedMethods)
+      updatedMethods = set([normalizedMethod], apiGatewayIntegration, updatedMethods)
       updatedMethods = set(
         lensPath([normalizedMethod, 'responses']),
         defaultResponses,
@@ -200,11 +200,11 @@ function getSwaggerDefinition(name, roleArn, routes) {
 
     if (enableCorsOnPath) {
       const corsOptionsMethod = getCorsOptionsConfig()
-      updatedMethods = set(lensPath(['options']), corsOptionsMethod, updatedMethods)
+      updatedMethods = set(['options'], corsOptionsMethod, updatedMethods)
     }
 
     // set the paths
-    paths = set(lensPath([normalizedPath]), updatedMethods, paths)
+    paths = set([normalizedPath], updatedMethods, paths)
   }, routes)
 
   const definition = {
