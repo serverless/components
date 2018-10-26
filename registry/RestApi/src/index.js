@@ -40,7 +40,9 @@ async function constructApiGateway(inputs, context, provider) {
 function flattenRoutes(routes) {
   const flattened = {}
   function doFlatten(subRoutes, basePath) {
-    forEach((value, key) => {
+    forEach((valueO, keyO) => {
+      const key = resolve(keyO)
+      const value = resolve(valueO)
       if (key.startsWith('/')) {
         doFlatten(value, joinPath(basePath, key))
       } else {
@@ -83,18 +85,19 @@ const RestApi = async function(SuperClass, SuperContext) {
 
     async define(context) {
       const inputs = this.inputs
-      if (!['AwsApiGateway'].includes(inputs.gateway)) {
+      if (!['AwsApiGateway'].includes(resolve(inputs.gateway))) {
         throw new Error('Specified "gateway" is not supported.')
       }
 
+      const provider = resolve(inputs.provider)
       const flatRoutes = flattenRoutes(resolve(inputs.routes))
       const childComponents = []
-      const name = `${inputs.apiName}-iam-role`
+      const name = `${resolve(inputs.apiName)}-iam-role`
       const service = 'apigateway.amazonaws.com'
       this.role = await context.construct(iamComponent, {
         roleName: name,
         service,
-        provider: inputs.provider
+        provider
       })
       childComponents.push(this.role)
 
@@ -105,11 +108,22 @@ const RestApi = async function(SuperClass, SuperContext) {
           role: this.role // TODO: add functionality to read from state so that update works
         },
         context,
-        inputs.provider
+        provider
       )
       childComponents.push(this.gateway)
 
       return childComponents
+    }
+
+    async deploy() {
+      Object.assign(this, {
+        apiName: resolve(this.inputs.apiName),
+        paths: this.gateway.urls,
+        baseUrl: this.gateway.baseUrl,
+        gateway: {
+          id: this.gateway.id
+        }
+      })
     }
 
     async info(prevInstance, context) {
