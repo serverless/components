@@ -31,6 +31,8 @@ const buildTypeConstructor = (type) => {
             this: self,
             self,
             context,
+            root: context.root,
+            path: context.root,
 
             // NOTE BRN: variables in inputs should already be interpreted to variable instances outside of the call to this constructor method. There should be no need to interpret them again here.
             inputs
