@@ -71,7 +71,9 @@ function flattenRoutes(routes) {
   return flattened
 }
 
-const RestApi = function(SuperClass) {
+const RestApi = async function(SuperClass, SuperContext) {
+  const iamComponent = await SuperContext.loadType('AwsIamRole')
+
   return class extends SuperClass {
     async construct(inputs, context) {
       await super.construct(inputs, context)
@@ -88,7 +90,6 @@ const RestApi = function(SuperClass) {
 
       const name = `${inputs.apiName}-iam-role`
       const service = 'apigateway.amazonaws.com'
-      const iamComponent = await context.loadType('AwsIamRole')
       this.role = await context.construct(iamComponent, {
         roleName: name,
         service,
