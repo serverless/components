@@ -2,15 +2,21 @@ name: SimpleComponent
 extends: Component
 
 providers:
-  twilio:
-    type: TwilioProvider
+  aws:
+    type: AwsProvider
     inputs:
-      accountSid: xxx
-      authToken: xxx
+      credentials:
+        accessKeyId: xxx
+        secretAccessKey: xxx
+      region: us-east-1
 
 components:
-  twilioApp:
-    type: TwilioApplication
+  topic:
+    type: AwsSnsTopic
     inputs:
-      provider: ${this.providers.twilio}
-      friendlyName: myFriendlyName
+      provider: ${this.providers.aws}
+      topicName: myTopicName
+#      displayName: myTopicDisplayName
+#      policy: {}
+#      deliveryPolicy: {}
+#      deliveryStatusAttributes: []

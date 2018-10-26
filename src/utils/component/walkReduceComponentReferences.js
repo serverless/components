@@ -1,4 +1,5 @@
 import { concat, forEach, isArray, isNativeObject, isObject, walk } from '@serverless/utils'
+import isVariable from '../variable/isVariable'
 import isComponent from './isComponent'
 
 const reduceWalkee = () => {
@@ -7,7 +8,7 @@ const reduceWalkee = () => {
   return (accum, value, keys, iteratee, recur) => {
     let result = accum
     if (isObject(value) && !visited.has(value)) {
-      if (isArray(value) || !isNativeObject(value)) {
+      if (isArray(value) || (!isNativeObject(value) && !isVariable(value))) {
         visited.add(value)
         forEach((childValue, childKdx) => {
           const newKeys = concat(keys, [childKdx])

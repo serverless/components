@@ -27,6 +27,9 @@ const buildGraph = (nextInstance, prevInstance) => {
         // edges
         const depIds = getDependenciesIds(currentInstance)
         forEach((depId) => {
+          if (!depId) {
+            throw new Error(`Bad dependency ID detected ${depId}`)
+          }
           accum.setEdge(currentInstance.instanceId, depId)
         }, depIds)
         return accum

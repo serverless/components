@@ -1,5 +1,5 @@
 {
-  "name": "@serverless-components/aws-lambda-compute",
+  "name": "@serverless-components/aws-sns-topic",
   "version": "0.3.0",
   "description": "",
   "main": "dist/index.js",
