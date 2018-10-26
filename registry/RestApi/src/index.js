@@ -1,6 +1,6 @@
-const joinPath = require('path').join
-const { isEmpty, keys, union, not, map, forEachObjIndexed } = require('ramda')
-const { joinUrl } = require('./utils')
+import { join as joinPath } from 'path'
+import { isEmpty, keys, union, not, map, forEachObjIndexed } from '@serverless/utils'
+import { joinUrl } from './utils'
 
 const catchallParameterPattern = /{\.{3}([^}]+?)}/g
 
