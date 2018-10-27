@@ -1,4 +1,4 @@
-import { forEachObjIndexed, keys, map, set, lensPath } from '@serverless/utils'
+import { forEachObjIndexed, keys, map, set } from '@serverless/utils'
 
 // TODO: remove hardcoding of region (e.g. like us-east-1)
 
@@ -60,7 +60,7 @@ function getApiGatewayIntegration(roleArn, uri, useCors) {
   if (useCors) {
     let apiGatewayIntegrationWithCors = { ...apiGatewayIntegration }
     apiGatewayIntegrationWithCors = set(
-      lensPath(['x-amazon-apigateway-integration', 'responses', 'default', 'responseParameters']),
+      ['x-amazon-apigateway-integration', 'responses', 'default', 'responseParameters'],
       {
         'method.response.header.Access-Control-Allow-Headers':
           "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'",
@@ -183,14 +183,10 @@ function getSwaggerDefinition(name, roleArn, routes) {
       )
       const defaultResponses = getDefaultResponses(isCorsEnabled)
       updatedMethods = set([normalizedMethod], apiGatewayIntegration, updatedMethods)
-      updatedMethods = set(
-        lensPath([normalizedMethod, 'responses']),
-        defaultResponses,
-        updatedMethods
-      )
+      updatedMethods = set([normalizedMethod, 'responses'], defaultResponses, updatedMethods)
       if (securityDefinition) {
         updatedMethods = set(
-          lensPath([normalizedMethod, 'security']),
+          [normalizedMethod, 'security'],
           [{ [securityDefinition.name]: [] }],
           updatedMethods
         )
@@ -200,7 +196,7 @@ function getSwaggerDefinition(name, roleArn, routes) {
 
     if (enableCorsOnPath) {
       const corsOptionsMethod = getCorsOptionsConfig()
-      updatedMethods = set(['options'], corsOptionsMethod, updatedMethods)
+      updatedMethods = set('options', corsOptionsMethod, updatedMethods)
     }
 
     // set the paths
