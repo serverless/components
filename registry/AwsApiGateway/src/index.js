@@ -79,18 +79,29 @@ const AwsApiGateway = function(SuperClass) {
 
     async define() {
       const childComponents = reduce(
-        reduce((pathAcc, methodObject) => {
-          if (!methodObject) {
+        (pathAcc, pathObj) => {
+          if (!pathObj) {
             return pathAcc
           }
-          if (methodObject.function) {
-            pathAcc.push(resolve(methodObject.function))
-          }
-          if (methodObject.authorizer && methodObject.authorizer.function) {
-            pathAcc.push(resolve(methodObject.authorizer.function))
-          }
-          return pathAcc
-        }),
+          return pathAcc.concat(
+            reduce(
+              (methodAcc, methodObject) => {
+                if (!methodObject) {
+                  return pathAcc
+                }
+                if (methodObject.function) {
+                  methodAcc.push(resolve(methodObject.function))
+                }
+                if (methodObject.authorizer && methodObject.authorizer.function) {
+                  methodAcc.push(resolve(methodObject.authorizer.function))
+                }
+                return methodAcc
+              },
+              [],
+              pathObj
+            )
+          )
+        },
         [],
         this.inputs.routes || {}
       )
