@@ -1,5 +1,5 @@
 import { getSwaggerDefinition, generateUrl, generateUrls } from './utils'
-import { equals, resolve, reduce } from '@serverless/utils'
+import { append, equals, get, has, or, resolve, reduce } from '@serverless/utils'
 
 const deleteApi = async (APIGateway, params) => {
   const { id } = params
@@ -80,30 +80,28 @@ const AwsApiGateway = function(SuperClass) {
     async define() {
       const childComponents = reduce(
         (pathAcc, pathObj) => {
-          if (!pathObj) {
+          if (!resolve(pathObj)) {
             return pathAcc
           }
-          return pathAcc.concat(
-            reduce(
-              (methodAcc, methodObject) => {
-                if (!methodObject) {
-                  return pathAcc
-                }
-                if (methodObject.function) {
-                  methodAcc.push(resolve(methodObject.function))
-                }
-                if (methodObject.authorizer && methodObject.authorizer.function) {
-                  methodAcc.push(resolve(methodObject.authorizer.function))
-                }
-                return methodAcc
-              },
-              [],
-              pathObj
-            )
+          return reduce(
+            (methodAcc, methodObject) => {
+              if (!resolve(methodObject)) {
+                return pathAcc
+              }
+              if (has('function', methodObject)) {
+                methodAcc = append(get('function', methodObject), methodAcc)
+              }
+              if (has('authorizer.function', methodObject)) {
+                methodAcc = append(get('authorizer.function', methodObject), methodAcc)
+              }
+              return methodAcc
+            },
+            pathAcc,
+            pathObj
           )
         },
         [],
-        this.inputs.routes || {}
+        or(get('inputs.routes', this), {})
       )
 
       return childComponents
@@ -124,7 +122,7 @@ const AwsApiGateway = function(SuperClass) {
         outputs = state
       } else if (inputs.name && !state.name) {
         context.log(`Creating API Gateway: "${inputs.name}"`)
-        outputs = await createApi(APIGateway, inputs, this.provider.inputs.region)
+        outputs = await createApi(APIGateway, inputs, this.inputs.provider.region)
       } else {
         context.log(`Updating API Gateway: "${inputs.name}"`)
         outputs = await updateApi(
@@ -134,7 +132,7 @@ const AwsApiGateway = function(SuperClass) {
             id: state.id,
             baseUrl: state.baseUrl
           },
-          this.provider.inputs.region
+          this.inputs.provider.region
         )
       }
       // context.saveState(this, { ...inputs, ...outputs })
