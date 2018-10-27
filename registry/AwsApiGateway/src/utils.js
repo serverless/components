@@ -149,7 +149,7 @@ function getSecurityDefinition(authorizerObj, name, region = 'us-east-1' /*, pat
 }
 
 // "public" function
-function getSwaggerDefinition(name, roleArn, routes) {
+function getSwaggerDefinition(name, roleArn, routes, region = 'us-east-1') {
   let paths = {}
   const securityDefinitions = {}
 
@@ -161,7 +161,7 @@ function getSwaggerDefinition(name, roleArn, routes) {
 
     forEachObjIndexed((methodObject, method) => {
       const normalizedMethod = getNormalizedMethod(method)
-      const uri = `arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/${
+      const uri = `arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/${
         methodObject.function.children.fn.arn
       }/invocations`
 
@@ -222,10 +222,10 @@ function generateUrl(id, region = 'us-east-1', stage = 'dev') {
   return `https://${id}.execute-api.${region}.amazonaws.com/${stage}/`
 }
 
-function generateUrls(routes, restApiId) {
+function generateUrls(routes, restApiId, region = 'us-east-1') {
   const paths = keys(routes)
   return map((path) => {
-    const baseUrl = generateUrl(restApiId)
+    const baseUrl = generateUrl(restApiId, region)
     return `${baseUrl}${path.replace(/^\/+/, '')}`
   }, paths)
 }

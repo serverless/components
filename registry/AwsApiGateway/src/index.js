@@ -15,11 +15,11 @@ const deleteApi = async (APIGateway, params) => {
   return outputs
 }
 
-const createApi = async (APIGateway, params) => {
+const createApi = async (APIGateway, params, region = 'us-east-1') => {
   const { name, role, routes } = params
   const roleArn = role.arn
 
-  const swagger = getSwaggerDefinition(name, roleArn, routes)
+  const swagger = getSwaggerDefinition(name, roleArn, routes, region)
   const json = JSON.stringify(swagger)
 
   const res = await APIGateway.importRestApi({
@@ -31,8 +31,8 @@ const createApi = async (APIGateway, params) => {
     stageName: 'dev'
   }).promise()
 
-  const baseUrl = generateUrl(res.id)
-  const urls = generateUrls(routes, res.id)
+  const baseUrl = generateUrl(res.id, region)
+  const urls = generateUrls(routes, res.id, region)
 
   const outputs = {
     id: res.id,
@@ -42,11 +42,11 @@ const createApi = async (APIGateway, params) => {
   return outputs
 }
 
-const updateApi = async (APIGateway, params) => {
+const updateApi = async (APIGateway, params, region = 'us-east-1') => {
   const { name, role, routes, id } = params
   const roleArn = role.arn
 
-  const swagger = getSwaggerDefinition(name, roleArn, routes)
+  const swagger = getSwaggerDefinition(name, roleArn, routes, region)
   const json = JSON.stringify(swagger)
 
   await APIGateway.putRestApi({
@@ -59,8 +59,8 @@ const updateApi = async (APIGateway, params) => {
     stageName: 'dev'
   }).promise()
 
-  const baseUrl = generateUrl(id)
-  const urls = generateUrls(routes, id)
+  const baseUrl = generateUrl(id, region)
+  const urls = generateUrls(routes, id, region)
 
   const outputs = {
     id,
@@ -124,14 +124,18 @@ const AwsApiGateway = function(SuperClass) {
         outputs = state
       } else if (inputs.name && !state.name) {
         context.log(`Creating API Gateway: "${inputs.name}"`)
-        outputs = await createApi(APIGateway, inputs)
+        outputs = await createApi(APIGateway, inputs, this.provider.inputs.region)
       } else {
         context.log(`Updating API Gateway: "${inputs.name}"`)
-        outputs = await updateApi(APIGateway, {
-          ...inputs,
-          id: state.id,
-          baseUrl: state.baseUrl
-        })
+        outputs = await updateApi(
+          APIGateway,
+          {
+            ...inputs,
+            id: state.id,
+            baseUrl: state.baseUrl
+          },
+          this.provider.inputs.region
+        )
       }
       // context.saveState(this, { ...inputs, ...outputs })
       return Object.assign(this, outputs)
