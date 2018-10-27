@@ -25,6 +25,8 @@ const NATIVE_NAMES = {
   ),
   Plugin: resolve(__dirname, '..', '..', '..', 'registry', 'Plugin'),
   Provider: resolve(__dirname, '..', '..', '..', 'registry', 'Provider'),
+  AwsApiGateway: resolve(__dirname, '..', '..', '..', 'registry', 'AwsApiGateway'),
+  RestApi: resolve(__dirname, '..', '..', '..', 'registry', 'RestApi'),
   AwsS3Website: resolve(__dirname, '..', '..', '..', 'registry', 'AwsS3Website'),
   AwsProvider: resolve(__dirname, '..', '..', '..', 'registry', 'AwsProvider'),
   AwsS3Bucket: resolve(__dirname, '..', '..', '..', 'registry', 'AwsS3Bucket'),
