@@ -77,7 +77,7 @@ const TwilioPhoneNumber = {
   async deploy(prevInstance, context) {
     const inputs = pick(inputsProps, this)
     if (!prevInstance) {
-      context.log(`Creating Twilio Phone Number: "${inputs.friendlyName}"`)
+      context.log(`Creating Twilio Phone Number: "${inputs.friendlyName || inputs.phoneNumber}"`)
       const props = await createPhoneNumber(this.provider.getSdk(), inputs)
       Object.assign(this, props)
     } else {
