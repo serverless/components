@@ -25,6 +25,8 @@ const NATIVE_NAMES = {
   ),
   Plugin: resolve(__dirname, '..', '..', '..', 'registry', 'Plugin'),
   Provider: resolve(__dirname, '..', '..', '..', 'registry', 'Provider'),
+  AwsApiGateway: resolve(__dirname, '..', '..', '..', 'registry', 'AwsApiGateway'),
+  RestApi: resolve(__dirname, '..', '..', '..', 'registry', 'RestApi'),
   AwsS3Website: resolve(__dirname, '..', '..', '..', 'registry', 'AwsS3Website'),
   AwsProvider: resolve(__dirname, '..', '..', '..', 'registry', 'AwsProvider'),
   AwsS3Bucket: resolve(__dirname, '..', '..', '..', 'registry', 'AwsS3Bucket'),
@@ -34,9 +36,9 @@ const NATIVE_NAMES = {
   TwilioApplication: resolve(__dirname, '..', '..', '..', 'registry', 'TwilioApplication'),
   AwsEventsRule: resolve(__dirname, '..', '..', '..', 'registry', 'AwsEventsRule'),
   TwilioPhoneNumber: resolve(__dirname, '..', '..', '..', 'registry', 'TwilioPhoneNumber'),
+  AwsSnsTopic: resolve(__dirname, '..', '..', '..', 'registry', 'AwsSnsTopic'),
   AwsDynamoDB: resolve(__dirname, '..', '..', 'types', 'AwsDynamoDB'),
-  AwsSnsSubscription: resolve(__dirname, '..', '..', 'types', 'AwsSnsSubscription'),
-  AwsSnsTopic: resolve(__dirname, '..', '..', 'types', 'AwsSnsTopic')
+  AwsSnsSubscription: resolve(__dirname, '..', '..', 'types', 'AwsSnsSubscription')
 }
 
 /**

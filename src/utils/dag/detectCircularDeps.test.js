@@ -1,5 +1,5 @@
-const graphlib = require('graphlib')
-const detectCircularDeps = require('./detectCircularDeps')
+import graphlib from 'graphlib'
+import detectCircularDeps from './detectCircularDeps'
 
 describe('#detectCircularDeps()', () => {
   let graph

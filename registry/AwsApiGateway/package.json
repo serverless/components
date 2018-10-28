@@ -2,13 +2,13 @@
   "name": "@serverless-components/awsapigateway",
   "version": "0.3.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Serverless, Inc.",
   "license": "Apache-2.0",
   "dependencies": {
-    "@serverless/utils": "0.0.12"
+    "@serverless/utils": "0.0.15"
   }
 }

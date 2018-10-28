@@ -1,4 +1,4 @@
-const { isEmpty, prepend, reduce } = require('ramda')
+import { isEmpty, prepend, reduce } from '@serverless/utils'
 
 // "private" functions
 function removeSlashes(str) {
@@ -25,6 +25,4 @@ function joinUrl(base, ...parts) {
   )
 }
 
-module.exports = {
-  joinUrl
-}
+export { joinUrl }

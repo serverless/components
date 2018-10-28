@@ -1,6 +1,6 @@
 import { assign, clone, defineProperty, get } from '@serverless/utils'
 import { SYMBOL_TYPE } from '../constants'
-import interpretProps from './interpretProps'
+import interpretProps from '../interpreter/interpretProps'
 
 const buildTypeConstructor = (type) => {
   // construction process
@@ -31,6 +31,8 @@ const buildTypeConstructor = (type) => {
             this: self,
             self,
             context,
+            root: context.root,
+            path: context.root,
 
             // NOTE BRN: variables in inputs should already be interpreted to variable instances outside of the call to this constructor method. There should be no need to interpret them again here.
             inputs

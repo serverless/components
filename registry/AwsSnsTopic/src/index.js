@@ -5,12 +5,12 @@ const {
   filter,
   find,
   head,
-  isNil, // need to add to utils
+  isNil,
   keys,
   map,
   merge,
   reduce,
-  values // need to add to utils
+  values
 } = require('@serverless/utils')
 
 const DEPLOY = 'deploy'
@@ -27,13 +27,12 @@ const resolveInSequence = async (functionsToExecute) =>
 
 const createSNSTopic = async (
   sns,
-  { name, displayName, policy, deliveryPolicy, deliveryStatusAttributes },
-  context
+  { topicName, displayName, policy, deliveryPolicy, deliveryStatusAttributes }
 ) => {
-  context.log(`Creating SNS topic: '${name}'`)
-  const { TopicArn: topicArn } = await sns.createTopic({ Name: name }).promise()
+  const { TopicArn: topicArn } = await sns.createTopic({ Name: topicName }).promise()
   // save topic if attribute update fails
   const topicAttributes = await updateAttributes(
+    sns,
     {
       displayName,
       policy,
@@ -43,7 +42,7 @@ const createSNSTopic = async (
     },
     {}
   )
-  return merge({ topicArn, name }, topicAttributes)
+  return merge({ topicArn, topicName }, topicAttributes)
 }
 
 const concatInputsAndState = (inputs, state = []) => {
@@ -68,8 +67,9 @@ const concatInputsAndState = (inputs, state = []) => {
 }
 
 const updateAttributes = async (
+  sns,
   { displayName, policy, deliveryPolicy, deliveryStatusAttributes = [], topicArn },
-  state
+  prevInstance
 ) => {
   const topicAttributes = reduce(
     (result, value) => {
@@ -82,16 +82,16 @@ const updateAttributes = async (
     [{ displayName }, { policy }, { deliveryPolicy }]
   )
 
-  const stateTopicAttributes = filter((item) => !isNil(head(values(item))))([
-    { displayName: state.displayName },
-    { policy: state.policy },
-    { deliveryPolicy: state.deliveryPolicy }
+  const prevInstanceTopicAttributes = filter((item) => !isNil(head(values(item))))([
+    { displayName: prevInstance.displayName },
+    { policy: prevInstance.policy },
+    { deliveryPolicy: prevInstance.deliveryPolicy }
   ])
 
   // combine inputs and check if something is removed
-  const topicAttributesToUpdate = concatInputsAndState(topicAttributes, stateTopicAttributes)
+  const topicAttributesToUpdate = concatInputsAndState(topicAttributes, prevInstanceTopicAttributes)
 
-  await updateTopicAttributes({ topicAttributes: topicAttributesToUpdate, topicArn })
+  await updateTopicAttributes(sns, { topicAttributes: topicAttributesToUpdate, topicArn })
 
   // flatten delivery status attributes array
   const flatDeliveryStatusAttributes = reduce(
@@ -104,11 +104,11 @@ const updateAttributes = async (
   // combine inputs and check if something is removed and select only ones that differs in state and inputs
   const deliveryStatusAttributesToUpdate = concatInputsAndState(
     flatDeliveryStatusAttributes,
-    state.deliveryStatusAttributes
+    prevInstance.deliveryStatusAttributes
   )
 
   // update delivery status attributes
-  await updateDeliveryStatusAttributes({
+  await updateDeliveryStatusAttributes(sns, {
     deliveryStatusAttributes: deliveryStatusAttributesToUpdate,
     topicArn
   })
@@ -154,43 +154,51 @@ const updateDeliveryStatusAttributes = async (sns, { deliveryStatusAttributes, t
     )
   )
 
-const removeSNSTopic = async (sns, topicArn) =>
-  sns
-    .deleteTopic({
-      TopicArn: topicArn
-    })
-    .promise()
-
 const AwsSnsTopic = {
   shouldDeploy(prevInstance) {
     if (!prevInstance) {
       return DEPLOY
     }
-    if (prevInstance.name !== this.name || prevInstance.policy !== this.policy) {
+    if (prevInstance.topicName !== this.topicName || prevInstance.policy !== this.policy) {
       return REPLACE
     }
   },
 
   async deploy(prevInstance, context) {
-    const sns = new this.provider.getSdk().SNS()
+    const provider = this.provider
+    const AWS = provider.getSdk()
+    const sns = new AWS.SNS()
 
-    if (prevInstance && prevInstance.name === this.name) {
-      return merge(
-        await updateAttributes(merge({ topicArn: prevInstance.topicArn }, this), prevInstance),
+    if (prevInstance && prevInstance.topicName === this.topicName) {
+      context.log(`Updating SNS topic: '${this.topicName}'...`)
+      const props = merge(
+        await updateAttributes(sns, merge({ topicArn: prevInstance.topicArn }, this), prevInstance),
         {
-          name: this.name,
+          name: this.topicName,
           topicArn: prevInstance.topicArn
         }
       )
+      Object.assign(this, props)
+      context.log(`SNS Topic '${this.topicName}' Updated.`)
+    } else {
+      context.log(`Creating SNS topic: '${this.topicName}'...`)
+      const props = await createSNSTopic(sns, this)
+      Object.assign(this, props)
+      context.log(`SNS Topic '${this.topicName}' Created.`)
     }
-    return createSNSTopic(sns, this, context)
   },
 
-  async remove(prevInstance, context) {
-    const sns = new this.provider.getSdk().SNS()
-    context.log(`Removing SNS topic: '${this.name}'`)
-    await removeSNSTopic(sns, this)
-    context.log(`SNS topic '${this.name}' removed.`)
+  async remove(context) {
+    const provider = this.provider
+    const AWS = provider.getSdk()
+    const sns = new AWS.SNS()
+    context.log(`Removing SNS topic: '${this.topicName}'`)
+    await sns
+      .deleteTopic({
+        TopicArn: this.topicArn
+      })
+      .promise()
+    context.log(`SNS topic '${this.topicName}' removed.`)
   }
 }
 

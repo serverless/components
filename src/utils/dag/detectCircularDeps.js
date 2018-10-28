@@ -1,13 +1,12 @@
-const { forEachIndexed } = require('@serverless/utils')
-const graphlib = require('graphlib')
-const { not } = require('ramda')
+import { forEach, not } from '@serverless/utils'
+import graphlib from 'graphlib'
 
-function detectCircularDeps(graph) {
+const detectCircularDeps = (graph) => {
   const isAcyclic = graphlib.alg.isAcyclic(graph)
   if (not(isAcyclic)) {
     const cycles = graphlib.alg.findCycles(graph)
     let msg = ['Your serverless.yml file has circular dependencies:']
-    forEachIndexed((cycle, index) => {
+    forEach((cycle, index) => {
       let fromAToB = cycle.join(' --> ')
       fromAToB = `${(index += 1)}. ${fromAToB}`
       const fromBToA = cycle.reverse().join(' <-- ')
@@ -21,4 +20,4 @@ function detectCircularDeps(graph) {
   return graph
 }
 
-module.exports = detectCircularDeps
+export default detectCircularDeps

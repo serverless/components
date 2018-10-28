@@ -63,6 +63,7 @@ const Deploy = {
     await deployGraph(graph, nextContext)
     await removeGraph(graph, prevContext)
 
+    context.log('Deployment complete!')
     // Deployment complete!
 
     // NOTE BRN: state is saved when saveState is called by each function. No need to call it here.

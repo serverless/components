@@ -24,7 +24,7 @@
     "prettier": "^1.12.1"
   },
   "dependencies": {
-    "@serverless/utils": "0.0.12",
+    "@serverless/utils": "0.0.15",
     "bluebird": "^3.5.1"
   }
 }

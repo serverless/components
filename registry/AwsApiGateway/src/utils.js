@@ -1,4 +1,4 @@
-const { forEachObjIndexed, keys, map, set, lensPath } = require('ramda')
+import { forEachObjIndexed, keys, map, set } from '@serverless/utils'
 
 // TODO: remove hardcoding of region (e.g. like us-east-1)
 
@@ -21,7 +21,7 @@ function getDefaultResponses(useCors) {
   if (useCors) {
     let defaultResponsesWithCors = { ...defaultResponses }
     defaultResponsesWithCors = set(
-      lensPath([200]),
+      [200],
       {
         headers: {
           'Access-Control-Allow-Headers': {
@@ -60,7 +60,7 @@ function getApiGatewayIntegration(roleArn, uri, useCors) {
   if (useCors) {
     let apiGatewayIntegrationWithCors = { ...apiGatewayIntegration }
     apiGatewayIntegrationWithCors = set(
-      lensPath(['x-amazon-apigateway-integration', 'responses', 'default', 'responseParameters']),
+      ['x-amazon-apigateway-integration', 'responses', 'default', 'responseParameters'],
       {
         'method.response.header.Access-Control-Allow-Headers':
           "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'",
@@ -149,7 +149,7 @@ function getSecurityDefinition(authorizerObj, name, region = 'us-east-1' /*, pat
 }
 
 // "public" function
-function getSwaggerDefinition(name, roleArn, routes) {
+function getSwaggerDefinition(name, roleArn, routes, region = 'us-east-1') {
   let paths = {}
   const securityDefinitions = {}
 
@@ -161,7 +161,7 @@ function getSwaggerDefinition(name, roleArn, routes) {
 
     forEachObjIndexed((methodObject, method) => {
       const normalizedMethod = getNormalizedMethod(method)
-      const uri = `arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/${
+      const uri = `arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/${
         methodObject.function.children.fn.arn
       }/invocations`
 
@@ -182,15 +182,11 @@ function getSwaggerDefinition(name, roleArn, routes) {
         normalizedMethod
       )
       const defaultResponses = getDefaultResponses(isCorsEnabled)
-      updatedMethods = set(lensPath([normalizedMethod]), apiGatewayIntegration, updatedMethods)
-      updatedMethods = set(
-        lensPath([normalizedMethod, 'responses']),
-        defaultResponses,
-        updatedMethods
-      )
+      updatedMethods = set([normalizedMethod], apiGatewayIntegration, updatedMethods)
+      updatedMethods = set([normalizedMethod, 'responses'], defaultResponses, updatedMethods)
       if (securityDefinition) {
         updatedMethods = set(
-          lensPath([normalizedMethod, 'security']),
+          [normalizedMethod, 'security'],
           [{ [securityDefinition.name]: [] }],
           updatedMethods
         )
@@ -200,11 +196,11 @@ function getSwaggerDefinition(name, roleArn, routes) {
 
     if (enableCorsOnPath) {
       const corsOptionsMethod = getCorsOptionsConfig()
-      updatedMethods = set(lensPath(['options']), corsOptionsMethod, updatedMethods)
+      updatedMethods = set('options', corsOptionsMethod, updatedMethods)
     }
 
     // set the paths
-    paths = set(lensPath([normalizedPath]), updatedMethods, paths)
+    paths = set([normalizedPath], updatedMethods, paths)
   }, routes)
 
   const definition = {
@@ -226,16 +222,12 @@ function generateUrl(id, region = 'us-east-1', stage = 'dev') {
   return `https://${id}.execute-api.${region}.amazonaws.com/${stage}/`
 }
 
-function generateUrls(routes, restApiId) {
+function generateUrls(routes, restApiId, region = 'us-east-1') {
   const paths = keys(routes)
   return map((path) => {
-    const baseUrl = generateUrl(restApiId)
+    const baseUrl = generateUrl(restApiId, region)
     return `${baseUrl}${path.replace(/^\/+/, '')}`
   }, paths)
 }
 
-module.exports = {
-  getSwaggerDefinition,
-  generateUrl,
-  generateUrls
-}
+export { getSwaggerDefinition, generateUrl, generateUrls }

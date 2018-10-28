@@ -1,5 +1,5 @@
 import { getSwaggerDefinition, generateUrl, generateUrls } from './utils'
-import { equals, resolve, reduce } from '@serverless/utils'
+import { append, equals, get, has, or, resolve, reduce } from '@serverless/utils'
 
 const deleteApi = async (APIGateway, params) => {
   const { id } = params
@@ -15,11 +15,11 @@ const deleteApi = async (APIGateway, params) => {
   return outputs
 }
 
-const createApi = async (APIGateway, params) => {
+const createApi = async (APIGateway, params, region = 'us-east-1') => {
   const { name, role, routes } = params
   const roleArn = role.arn
 
-  const swagger = getSwaggerDefinition(name, roleArn, routes)
+  const swagger = getSwaggerDefinition(name, roleArn, routes, region)
   const json = JSON.stringify(swagger)
 
   const res = await APIGateway.importRestApi({
@@ -31,22 +31,22 @@ const createApi = async (APIGateway, params) => {
     stageName: 'dev'
   }).promise()
 
-  const url = generateUrl(res.id)
-  const urls = generateUrls(routes, res.id)
+  const baseUrl = generateUrl(res.id, region)
+  const urls = generateUrls(routes, res.id, region)
 
   const outputs = {
     id: res.id,
-    url,
+    baseUrl,
     urls
   }
   return outputs
 }
 
-const updateApi = async (APIGateway, params) => {
+const updateApi = async (APIGateway, params, region = 'us-east-1') => {
   const { name, role, routes, id } = params
   const roleArn = role.arn
 
-  const swagger = getSwaggerDefinition(name, roleArn, routes)
+  const swagger = getSwaggerDefinition(name, roleArn, routes, region)
   const json = JSON.stringify(swagger)
 
   await APIGateway.putRestApi({
@@ -59,18 +59,18 @@ const updateApi = async (APIGateway, params) => {
     stageName: 'dev'
   }).promise()
 
-  const url = generateUrl(id)
-  const urls = generateUrls(routes, id)
+  const baseUrl = generateUrl(id, region)
+  const urls = generateUrls(routes, id, region)
 
   const outputs = {
     id,
-    url,
+    baseUrl,
     urls
   }
   return outputs
 }
 
-module.exports = function(SuperClass) {
+const AwsApiGateway = function(SuperClass) {
   return class extends SuperClass {
     async construct(inputs, context) {
       await super.construct(inputs, context)
@@ -79,17 +79,29 @@ module.exports = function(SuperClass) {
 
     async define() {
       const childComponents = reduce(
-        reduce((pathAcc, methodObject) => {
-          if (methodObject.function) {
-            pathAcc.push(resolve(methodObject.function))
+        (pathAcc, pathObj) => {
+          if (!resolve(pathObj)) {
+            return pathAcc
           }
-          if (methodObject.authorizer && methodObject.authorizer.function) {
-            pathAcc.push(resolve(methodObject.authorizer.function))
-          }
-          return pathAcc
-        }),
+          return reduce(
+            (methodAcc, methodObject) => {
+              if (!resolve(methodObject)) {
+                return pathAcc
+              }
+              if (has('function', methodObject)) {
+                methodAcc = append(get('function', methodObject), methodAcc)
+              }
+              if (has('authorizer.function', methodObject)) {
+                methodAcc = append(get('authorizer.function', methodObject), methodAcc)
+              }
+              return methodAcc
+            },
+            pathAcc,
+            pathObj
+          )
+        },
         [],
-        this.inputs.routes
+        or(get('inputs.routes', this), {})
       )
 
       return childComponents
@@ -110,17 +122,21 @@ module.exports = function(SuperClass) {
         outputs = state
       } else if (inputs.name && !state.name) {
         context.log(`Creating API Gateway: "${inputs.name}"`)
-        outputs = await createApi(APIGateway, inputs)
+        outputs = await createApi(APIGateway, inputs, this.inputs.provider.region)
       } else {
         context.log(`Updating API Gateway: "${inputs.name}"`)
-        outputs = await updateApi(APIGateway, {
-          ...inputs,
-          id: state.id,
-          url: state.url
-        })
+        outputs = await updateApi(
+          APIGateway,
+          {
+            ...inputs,
+            id: state.id,
+            baseUrl: state.baseUrl
+          },
+          this.inputs.provider.region
+        )
       }
       // context.saveState(this, { ...inputs, ...outputs })
-      return Object.assign(this, outputs)
+      Object.assign(this, outputs)
     }
 
     async remove(context) {
@@ -138,3 +154,5 @@ module.exports = function(SuperClass) {
     }
   }
 }
+
+export default AwsApiGateway

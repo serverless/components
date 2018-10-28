@@ -42,7 +42,7 @@ describe('#newVariable()', () => {
     ])
   })
 
-  it('walks a path that includes variables in the path', async () => {
+  it('finds instances in a path that includes variables in the path', async () => {
     const context = await createContext(
       {},
       {
@@ -68,5 +68,34 @@ describe('#newVariable()', () => {
       compB.instanceId,
       compC.instanceId
     ])
+  })
+
+  it('finds instances in a path that are from variables pointing to anohter variable', async () => {
+    const context = await createContext({}, { app: { id: 'test' } })
+    const Component = await context.loadType('Component')
+    const compA = await context.construct(Component, {})
+    const compB = await context.construct(Component, {})
+    compA.foo = newVariable('${compB}', {
+      compB
+    })
+    const variable = newVariable('${compA.foo}', {
+      compA
+    })
+    expect(variable.findInstanceIds()).toEqual([compA.instanceId, compB.instanceId])
+  })
+
+  it('finds instances across the full path of both variables when a variable points to another variable', async () => {
+    const context = await createContext({}, { app: { id: 'test' } })
+    const Component = await context.loadType('Component')
+    const compA = await context.construct(Component, {})
+    const compB = await context.construct(Component, {})
+    compA.foo = newVariable('${compB.bar}', {
+      compB
+    })
+    compB.bar = 'bar'
+    const variable = newVariable('${compA.foo}', {
+      compA
+    })
+    expect(variable.findInstanceIds()).toEqual([compA.instanceId, compB.instanceId])
   })
 })

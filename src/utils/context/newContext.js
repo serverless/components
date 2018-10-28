@@ -9,6 +9,7 @@ import { DEFAULT_PLUGINS, SYMBOL_KEY } from '../constants'
 import createDeployment from '../deployment/createDeployment'
 import loadDeployment from '../deployment/loadDeployment'
 import loadPreviousDeployment from '../deployment/loadPreviousDeployment'
+import debug from '../logging/debug'
 import log from '../logging/log'
 import loadPlugins from '../plugin/loadPlugins'
 import loadProject from '../project/loadProject'
@@ -65,6 +66,7 @@ const newContext = (props) => {
 
       return instance
     },
+    debug: (...args) => debug(finalContext, ...args),
     defineComponent: (component) => defineComponent(component, finalContext),
     defineComponentFromState: (component) => defineComponentFromState(component, finalContext),
     generateInstanceId: () => {
@@ -174,7 +176,7 @@ const newContext = (props) => {
       })
     },
     loadType: (...args) => loadType(...args, finalContext),
-    log,
+    log: (...args) => log(finalContext, ...args),
     merge: (value) =>
       newContext({
         ...context,

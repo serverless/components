@@ -1,6 +1,5 @@
-const joinPath = require('path').join
-const { forEachObjIndexed } = require('ramda')
-const { resolve } = require('@serverless/utils')
+import { join as joinPath } from 'path'
+import { forEach, resolve, reduce } from '@serverless/utils'
 
 const catchallParameterPattern = /{\.{3}([^}]+?)}/g
 
@@ -11,17 +10,25 @@ async function getAwsApiGatewayInputs(inputs) {
     routes: {}
   }
 
-  for (const [path, methods] of Object.entries(inputs.routes)) {
-    const reparameterizedPath = path.replace(catchallParameterPattern, '{$1+}')
-    const normalizedPath = reparameterizedPath.replace(/^\/+/, '')
-    const routeObject = {}
-    apiGatewayInputs.routes[normalizedPath] = routeObject
-
-    for (const [method, methodObject] of Object.entries(methods)) {
-      const normalizedMethod = method.toUpperCase()
-      routeObject[normalizedMethod] = methodObject
-    }
-  }
+  apiGatewayInputs.routes = reduce(
+    (pathAcc, methods, path) => {
+      const reparameterizedPath = path.replace(catchallParameterPattern, '{$1+}')
+      const normalizedPath = reparameterizedPath.replace(/^\/+/, '')
+      const methodDefinitions = reduce(
+        (methodAcc, methodObject, method) => {
+          const normalizedMethod = method.toUpperCase()
+          methodAcc[normalizedMethod] = methodObject
+          return methodAcc
+        },
+        {},
+        methods
+      )
+      pathAcc[normalizedPath] = methodDefinitions
+      return pathAcc
+    },
+    {},
+    inputs.routes
+  )
 
   return apiGatewayInputs
 }
@@ -40,7 +47,9 @@ async function constructApiGateway(inputs, context, provider) {
 function flattenRoutes(routes) {
   const flattened = {}
   function doFlatten(subRoutes, basePath) {
-    forEachObjIndexed((value, key) => {
+    forEach((valueO, keyO) => {
+      const key = resolve(keyO)
+      const value = resolve(valueO)
       if (key.startsWith('/')) {
         doFlatten(value, joinPath(basePath, key))
       } else {
@@ -71,28 +80,31 @@ function flattenRoutes(routes) {
   return flattened
 }
 
-export default function(SuperClass) {
+const RestApi = async function(SuperClass, SuperContext) {
+  const iamComponent = await SuperContext.loadType('AwsIamRole')
+
   return class extends SuperClass {
     async construct(inputs, context) {
       await super.construct(inputs, context)
       this.inputs = inputs
       this.apiName = inputs.apiName
+    }
 
-      if (!['AwsApiGateway'].includes(inputs.gateway)) {
+    async define(context) {
+      const inputs = this.inputs
+      if (!['AwsApiGateway'].includes(resolve(inputs.gateway))) {
         throw new Error('Specified "gateway" is not supported.')
       }
 
-      const flatRoutes = flattenRoutes(inputs.routes)
-
+      const provider = resolve(inputs.provider)
+      const flatRoutes = flattenRoutes(resolve(inputs.routes))
       const childComponents = []
-
-      const name = `${inputs.apiName}-iam-role`
+      const name = `${resolve(inputs.apiName)}-iam-role`
       const service = 'apigateway.amazonaws.com'
-      const iamComponent = await context.loadType('AwsIamRole')
       this.role = await context.construct(iamComponent, {
         roleName: name,
         service,
-        provider: inputs.provider
+        provider
       })
       childComponents.push(this.role)
 
@@ -103,15 +115,22 @@ export default function(SuperClass) {
           role: this.role // TODO: add functionality to read from state so that update works
         },
         context,
-        inputs.provider
+        provider
       )
       childComponents.push(this.gateway)
 
-      this.childComponents = childComponents
+      return childComponents
     }
 
-    async define() {
-      return this.childComponents || []
+    async deploy() {
+      Object.assign(this, {
+        apiName: resolve(this.inputs.apiName),
+        paths: this.gateway.urls,
+        baseUrl: this.gateway.baseUrl,
+        gateway: {
+          id: this.gateway.id
+        }
+      })
     }
 
     async info() {
@@ -144,3 +163,5 @@ export default function(SuperClass) {
     }
   }
 }
+
+export default RestApi
