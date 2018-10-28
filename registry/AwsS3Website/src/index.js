@@ -157,14 +157,14 @@ const AwsS3Website = (SuperClass) =>
 
     async deploy(prevInstance, context) {
       // Include Environment Variables if they exist
-      let script = 'var env = {};'
+      let script = 'export const env = {\n'
       if (this.env) {
         for (const e in this.env) {
         // eslint-disable-line
-        script += `env.${e}=${JSON.stringify(resolve(this.env[e]))};` // eslint-disable-line
+        script += `${e}: ${JSON.stringify(resolve(this.env[e]))}\n` // eslint-disable-line
         }
       }
-      script += 'if(module){module.exports=env;}'
+      script += '}'
 
       fs.writeFileSync(this.envFileLocation, script)
 
