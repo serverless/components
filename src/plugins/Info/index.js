@@ -36,7 +36,7 @@ const printArray = (arr, log, level = 1) => {
       title = data.title
     }
     log(`\n|- ${`  `.repeat(level)}${title} - ${type}`)
-    if (Array.isArray(data)) {
+    if (isArray(data)) {
       printArray(data, log, level + 2)
     } else {
       printObj(data, log, level + 2)
