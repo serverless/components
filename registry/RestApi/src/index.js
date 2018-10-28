@@ -153,10 +153,9 @@ const RestApi = async function(SuperClass, SuperContext) {
               })
             }
           }
-
-          Object.assign(newPathObject, { [method]: newMethodObject })
+          newPathObject[method] = newMethodObject
         }
-        Object.assign(flatRoutes, { [path]: newPathObject })
+        flatRoutes[path] = newPathObject
       }
 
       return { title: this.apiName, type: this.extends, data: { routes: flatRoutes } }
