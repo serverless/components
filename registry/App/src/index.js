@@ -1,4 +1,4 @@
-import { all, isFunction, mapObjIndexed, resolve } from '@serverless/utils'
+import { isFunction, map, resolve, keys, reduce, merge, forEach } from '@serverless/utils'
 
 const App = (SuperClass) =>
   class extends SuperClass {
@@ -12,39 +12,38 @@ const App = (SuperClass) =>
     async info(context) {
       const services = []
       const components = []
-      await all(
-        mapObjIndexed(async (serv) => {
-          let output = {}
-          if (isFunction(serv.info)) {
-            output = await serv.info(context)
-          } else {
-            output = Object.keys(serv.inputTypes).reduce(
-              (prev, current) =>
-                !serv[current] || Object.assign(prev, { [current]: serv[current] }),
-              {}
-            )
-          }
-          services.push(output)
-        }, resolve(this.services))
-      )
+      await map(async (serv) => {
+        let output = {}
+        if (isFunction(serv.info)) {
+          output = await serv.info(context)
+        } else {
+          output = reduce(
+            (acc, current) => !serv[current] || merge(acc, { [current]: serv[current] }),
+            {},
+            keys(serv.inputTypes)
+          )
+        }
+        services.push(output)
+      }, this.services)
 
-      await all(
-        mapObjIndexed(async (comp) => {
-          let output = {}
-          if (isFunction(comp.info)) {
-            output = await comp.info(context)
-          } else {
-            output = {}
-            ;['name', 'license', 'version', 'inputs'].forEach((el) => {
+      await map(async (comp) => {
+        let output = {}
+        if (isFunction(comp.info)) {
+          output = await comp.info(context)
+        } else {
+          output = {}
+          forEach(
+            (el) => {
               const val = resolve(comp[el])
               if (val) {
                 output[el] = val
               }
-            })
-          }
-          components.push({ title: output.functionName, type: comp.name, data: output })
-        }, resolve(this.components))
-      )
+            },
+            ['name', 'license', 'version', 'inputs']
+          )
+        }
+        components.push({ title: output.functionName, type: comp.name, data: output })
+      }, this.components)
 
       return {
         title: this.name,

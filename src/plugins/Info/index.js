@@ -1,9 +1,9 @@
 import { handleSignalEvents } from '../../utils'
-import { isFunction, isObject } from '@serverless/utils'
+import { forEach, isFunction, isObject, isArray, keys } from '@serverless/utils'
 
 const Info = {
   async run(context) {
-    context.log('Deploy running...')
+    context.log('Running info...')
     context = await context.loadProject()
     context = await context.loadApp()
 
@@ -21,8 +21,10 @@ const Info = {
     if (nextInstance && isFunction(nextInstance.info)) {
       const { title, type, data } = await nextInstance.info(context)
       context.log(`${title} - ${type}`)
-      if (Array.isArray(data)) {
+      if (isArray(data)) {
         printArray(data, context.log)
+      } else {
+        printObj(data, context.log)
       }
     }
   }
@@ -48,14 +50,14 @@ const printObj = (obj, log, level = 1) => {
   if (!obj) {
     return
   }
-  if (Object.keys(obj).length === 3 && obj.title && obj.type && obj.data) {
-    if (Array.isArray(obj.data)) {
+  if (keys(obj).length === 3 && obj.title && obj.type && obj.data) {
+    if (isArray(obj.data)) {
       printArray(obj.data, log, level + 1)
     } else {
       printObj(obj.data, log, level)
     }
   } else {
-    Object.entries(obj).forEach(([key, val]) => {
+    forEach((val, key) => {
       const space = '  '
       if (isObject(val)) {
         log(`${space.repeat(level)}${key}:`)
@@ -63,7 +65,7 @@ const printObj = (obj, log, level = 1) => {
       } else {
         log(`${space.repeat(level)}${key}: ${val}`)
       }
-    })
+    }, obj)
   }
 }
 
