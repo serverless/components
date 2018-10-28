@@ -17,6 +17,7 @@ const buildGraph = (nextInstance, prevInstance) => {
             `While building the dependency graph we detected a component instance doesn't have an instanceId. This shouldn't happen. Something has gone wrong. ${currentInstance}`
           )
         }
+
         const node = {
           instanceId: currentInstance.instanceId,
           operation: currentInstance.shouldDeploy(),
@@ -55,7 +56,7 @@ const buildGraph = (nextInstance, prevInstance) => {
           node = {
             instanceId: currentInstance.instanceId,
             operation: 'remove',
-            nextInstance: {} // what should be nextInstance in that case?
+            nextInstance: null // what should be nextInstance in that case?
           }
           accum.setNode(currentInstance.instanceId, node)
 

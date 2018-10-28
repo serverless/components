@@ -136,7 +136,7 @@ const AwsApiGateway = function(SuperClass) {
         )
       }
       // context.saveState(this, { ...inputs, ...outputs })
-      return Object.assign(this, outputs)
+      Object.assign(this, outputs)
     }
 
     async remove(context) {
