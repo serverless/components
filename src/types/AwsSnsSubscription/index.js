@@ -27,8 +27,8 @@ const concatSubscriptionAttributes = (inputs, state = {}) =>
 
 const setAllSubscriptionAttributes = async (subscriptionArn, inputs, context) => {
   const inputsAndState = concatSubscriptionAttributes(
-    inputs.subscriptionAttributes,
-    context.state.subscriptionAttributes
+    inputs.subscriptionAttributes || {},
+    context.state.subscriptionAttributes || {}
   )
 
   return Promise.all(
