@@ -57,7 +57,9 @@ const printObj = (obj, log, level = 1) => {
   } else {
     forEach((val, key) => {
       const space = '  '
-      if (isObject(val)) {
+      if (isArray(val)) {
+        printArray(val, log, level + 1)
+      } else if (isObject(val)) {
         log(`${space.repeat(level)}${key}:`)
         printObj(val, log, level + 1)
       } else {
