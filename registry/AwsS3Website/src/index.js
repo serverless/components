@@ -142,6 +142,20 @@ const AwsS3Website = (SuperClass) =>
         throw new Error('projectDir must be an absolute path. Construct local paths using ${path}.')
       }
 
+      this.envFileLocation = path.resolve(this.projectDir, resolve(inputs.envFileLocation))
+      this.assets = path.resolve(this.projectDir, resolve(inputs.assets))
+    }
+
+    shouldDeploy(prevInstance) {
+      if (!prevInstance) {
+        return 'deploy'
+      }
+      if (prevInstance.bucket !== this.bucket) {
+        return 'replace'
+      }
+    }
+
+    async deploy(prevInstance, context) {
       // Include Environment Variables if they exist
       let script = 'var env = {};'
       if (this.env) {
@@ -151,9 +165,6 @@ const AwsS3Website = (SuperClass) =>
         }
       }
       script += 'if(module){module.exports=env;}'
-
-      this.envFileLocation = path.resolve(this.projectDir, resolve(inputs.envFileLocation))
-      this.assets = path.resolve(this.projectDir, resolve(inputs.assets))
 
       fs.writeFileSync(this.envFileLocation, script)
 
@@ -172,18 +183,7 @@ const AwsS3Website = (SuperClass) =>
           }
         )
       }
-    }
 
-    shouldDeploy(prevInstance) {
-      if (!prevInstance) {
-        return 'deploy'
-      }
-      if (prevInstance.bucket !== this.bucket) {
-        return 'replace'
-      }
-    }
-
-    async deploy(prevInstance, context) {
       const provider = this.provider
       const AWS = provider.getSdk()
       const s3 = new AWS.S3()
