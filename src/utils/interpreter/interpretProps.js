@@ -1,7 +1,7 @@
 import { getParent, isString, last, walkReduceDepthFirst } from '@serverless/utils'
 import hasVariableString from '../variable/hasVariableString'
 import newVariable from '../variable/newVariable'
-import isTypeConstruct from './isTypeConstruct'
+import isTypeConstruct from '../type/isTypeConstruct'
 
 const interpretProps = async (props, data, context) => {
   // NOTE BRN: This step walks depth first through the properties and creates instances for any property that has both a 'type' and 'inputs' combo. Lower level instances are created first so in case we have nested constructions the higher construction will receive an instance as an input instead of the { type, inputs }.

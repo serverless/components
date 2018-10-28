@@ -1,6 +1,6 @@
 import { assign, clone, defineProperty, get } from '@serverless/utils'
 import { SYMBOL_TYPE } from '../constants'
-import interpretProps from './interpretProps'
+import interpretProps from '../interpreter/interpretProps'
 
 const buildTypeConstructor = (type) => {
   // construction process
