@@ -8,18 +8,16 @@ const Info = {
     context = await context.loadApp()
 
     const prevContext = await context.loadPreviousDeployment()
-    const nextContext = await context.createDeployment(prevContext.deployment)
 
     // TODO BRN (low priority): Upgrade this signal handling so that we can tie in a handler that knows what to do when a SIGINT is received. In the case of deploy we may want to ignore the first one and log out the message, then if we receive anther one we stop the current deployment and start a rollback
     handleSignalEvents(context)
 
     // TODO BRN (low priority): inputs to the top level might be a way to inject project/deployment config
 
-    // const prevInstance = await prevContext.loadInstanceFromState()
-    const nextInstance = await nextContext.createInstance()
+    const prevInstance = await prevContext.loadInstanceFromState()
 
-    if (nextInstance && isFunction(nextInstance.info)) {
-      const { title, type, data } = await nextInstance.info(context)
+    if (prevInstance && isFunction(prevInstance.info)) {
+      const { title, type, data } = await prevInstance.info(context)
       context.log(`${title} - ${type}`)
       if (isArray(data)) {
         printArray(data, context.log)
