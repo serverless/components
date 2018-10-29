@@ -15,7 +15,7 @@ const findOutputTableByName = (tables, tableName) => {
   if (!tables || tables.length === 0) {
     return {}
   }
-  return tables.filter((table) => table[tableName])[0]
+  return tables.filter((table) => table.name === tableName)[0]
 }
 
 const removeOutputTableByName = (tables, tableName) => {
@@ -156,7 +156,9 @@ const createTables = async (instance, context) => {
         return obj
       })
       .catch((err) => {
-        throw err
+        if (!err.message.includes('already exists')) {
+          throw err
+        }
       })
   })
 
@@ -263,17 +265,18 @@ const AwsDynamoDB = {
     }
   },
 
-  async remove(prevInstance, context) {
-    if (!prevInstance.tables || prevInstance.tables.length === 0) {
+  async remove(context) {
+    if (!this.tables || this.tables.length === 0) {
       return
     }
 
     // TODO: when multiple tables are allowed, update to delete multiple tables
     const tableName = this.tables[0].name
 
-    let ddbTables = prevInstance.tables
+    let ddbTables = this.tables
+
     // if table does not exist in state -> ddbtables, bail
-    if (!findOutputTableByName(prevInstance.tables, tableName)) {
+    if (!findOutputTableByName(this.tables, tableName)) {
       context.log(`Table '${tableName}' does not exist`)
     } else {
       // remove table
