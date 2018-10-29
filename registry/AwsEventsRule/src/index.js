@@ -1,4 +1,4 @@
-import { pick, equals, resolve } from '@serverless/utils'
+import { pick, equals } from '@serverless/utils'
 
 const AwsEventsRule = (SuperClass) =>
   class extends SuperClass {
@@ -19,13 +19,9 @@ const AwsEventsRule = (SuperClass) =>
       return 'deploy'
     }
     async deploy(prevInstance = {}, context) {
-      const provider = resolve(this.provider)
-      const fnInstance = resolve(this.lambda)
-      if (!prevInstance) {
-        prevInstance = {}
-      }
-      this.functionRuleName = fnInstance.getId().split(':')[
-        fnInstance.getId().split(':').length - 1
+      const provider = this.provider
+      this.functionRuleName = this.lambda.getId().split(':')[
+        this.lambda.getId().split(':').length - 1
       ]
       const AWS = provider.getSdk()
       const cloudWatchEvents = new AWS.CloudWatchEvents()
@@ -33,7 +29,7 @@ const AwsEventsRule = (SuperClass) =>
 
       const inputsProps = ['functionRuleName', 'schedule', 'enabled']
       const inputs = pick(inputsProps, this)
-      const prevInputs = pick(inputsProps, prevInstance)
+      const prevInputs = pick(inputsProps, prevInstance || {})
       const noChanges = equals(inputs, prevInputs)
 
       if (noChanges) {
@@ -58,7 +54,7 @@ const AwsEventsRule = (SuperClass) =>
         Rule: this.functionRuleName,
         Targets: [
           {
-            Arn: fnInstance.getId(),
+            Arn: this.lambda.getId(),
             Id: this.functionRuleName
           }
         ]

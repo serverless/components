@@ -150,9 +150,11 @@ const AwsS3Website = (SuperClass) =>
       if (!prevInstance) {
         return 'deploy'
       }
-      if (prevInstance.bucket !== this.bucket) {
+      if (prevInstance.bucket !== resolve(this.bucket).toLowerCase()) {
         return 'replace'
       }
+
+      // return 'deploy'
     }
 
     async deploy(prevInstance, context) {

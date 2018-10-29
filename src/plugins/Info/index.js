@@ -3,16 +3,18 @@ import { compact, forEach, isFunction, isObject, isArray, keys } from '@serverle
 const Info = {
   async run(context) {
     context.log('Getting info...')
-    context = await context.loadProject()
-    context = await context.loadApp()
-    context = await context.loadPreviousDeployment()
-    if (!context.previousDeployment) {
-      context.log('Nothing deployed!')
-      return
+    if (!context.instance) {
+      context = await context.loadProject()
+      context = await context.loadApp()
+      context = await context.loadPreviousDeployment()
+      if (!context.previousDeployment) {
+        context.log('Nothing deployed!')
+        return
+      }
+      context = await context.loadState()
+      // Load the instance from state instead of serverless.yml
+      context = await context.loadInstance()
     }
-    context = await context.loadState()
-    // Load the instance from state instead of serverless.yml
-    context = await context.loadInstance()
 
     const { instance } = context
     if (!instance) {

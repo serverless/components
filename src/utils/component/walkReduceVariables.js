@@ -15,15 +15,15 @@ const reduceWalkee = () => {
 
   return (accum, value, keys, iteratee, recur) => {
     let result = accum
-    if (isObject(value) && !visited.has(value)) {
-      if (isVariable(value)) {
-        visited.add(value)
-        result = iteratee(result, value, keys)
-        value = resolve(value)
-        if (isComponent(value) || !isObject(value)) {
-          return result
-        }
+    if (isVariable(value)) {
+      visited.add(value)
+      result = iteratee(result, value, keys)
+      value = resolve(value)
+      if (isComponent(value) || !isObject(value)) {
+        return result
       }
+    }
+    if (isObject(value) && !visited.has(value)) {
       if (isArray(value) || !isNativeObject(value)) {
         visited.add(value)
         forEach((childValue, childKdx) => {

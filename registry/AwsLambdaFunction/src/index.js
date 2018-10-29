@@ -90,9 +90,12 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
       if (!prevInstance) {
         return 'deploy'
       }
-      if (resolve(prevInstance.functionName) !== resolve(this.functionName)) {
+      if (prevInstance.functionName !== resolve(this.functionName)) {
         return 'replace'
       }
+
+      // check each individual property
+      // check code changes
       return 'deploy'
     }
 
