@@ -80,7 +80,7 @@
     "eslint-plugin-import": "^2.9.0",
     "eslint-plugin-prettier": "^2.6.0",
     "jest": "^22.4.2",
-    "lint-staged": "^7.0.4",
+    "lint-staged": "^8.0.0",
     "markdown-magic": "^0.1.21",
     "pre-commit": "^1.2.2",
     "prettier": "^1.12.1"
