@@ -6,15 +6,13 @@ const Service = async (SuperClass, superContext) => {
   return class extends SuperClass {
     async construct(inputs, context) {
       await super.construct(inputs, context)
-      this.functions = map(async (func, alias) =>
-        context.construct(
-          Fn,
-          {
+      this.functions = await map(
+        async (func, alias) =>
+          context.construct(Fn, {
             ...func,
             functionName: func.functionName || alias
-          },
-          this.functions
-        )
+          }),
+        this.functions
       )
     }
 

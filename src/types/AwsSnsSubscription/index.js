@@ -62,12 +62,13 @@ const AwsSnsSubscription = {
   },
 
   async deploy(prevInstance, context) {
-    const subscriptionArn = await getProtocol(this.protocol).deploy(this, context)
-    return setAllSubscriptionAttributes(subscriptionArn, this, context)
+    const outputs = await getProtocol(this.protocol).deploy(this, context)
+    await setAllSubscriptionAttributes(outputs.subscriptionArn, this, context)
+    Object.assign(this, outputs)
   },
 
-  async remove(prevInstance, context) {
-    return getProtocol(this.protocol).remove(context)
+  async remove(context) {
+    return getProtocol(this.protocol).remove(this, context)
   }
 }
 

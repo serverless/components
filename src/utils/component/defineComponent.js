@@ -1,7 +1,8 @@
-import { forEach, get, isFunction, isObject, map, resolve } from '@serverless/utils'
+import { filter, forEach, get, isFunction, isObject, map, or, resolve } from '@serverless/utils'
 import appendKey from './appendKey'
 import getKey from './getKey'
 import hydrateComponent from './hydrateComponent'
+import isComponent from './isComponent'
 import setKey from './setKey'
 
 /**
@@ -9,13 +10,18 @@ import setKey from './setKey'
  */
 const defineComponent = async (component, state, context) => {
   // TODO BRN: If we ever need to retrigger define (redefine) hydrating state here may be an issue
+  if (!isComponent(component)) {
+    throw new TypeError(
+      `defineComponent expected component parameter to be a component. Instead received ${component}`
+    )
+  }
   component = hydrateComponent(component, state, context)
   if (isFunction(component.define)) {
-    const children = resolve(await component.define(context)) || {}
+    let children = await or(component.define(context), {})
+    children = filter(isComponent, map(resolve, children))
+
     if (isObject(children)) {
       forEach((child, kdx) => {
-        child = resolve(child)
-
         // TODO BRN: Look for children that already have parents. If this is the case then someone has returned a child from define that was defined by another component (possibly passed along as a variable)
         child.parent = component
         child = setKey(appendKey(getKey(component), kdx), child)

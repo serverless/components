@@ -73,6 +73,16 @@ const createPhoneNumber = async (twilio, params) => {
   return pick(phoneNumberProps, phoneNumber)
 }
 
+const removePhoneNumber = async (twilio, sid) => {
+  try {
+    await twilio.incomingPhoneNumbers(sid).remove()
+  } catch (error) {
+    if (error.code !== 20404) {
+      throw error
+    }
+  }
+}
+
 const TwilioPhoneNumber = {
   async deploy(prevInstance, context) {
     const inputs = pick(inputsProps, this)
@@ -98,10 +108,7 @@ const TwilioPhoneNumber = {
 
   async remove(context) {
     context.log(`Removing Twilio Phone Number: "${this.sid}"`)
-    return this.provider
-      .getSdk()
-      .incomingPhoneNumbers(this.sid)
-      .remove()
+    return removePhoneNumber(this.provider.getSdk(), this.sid)
   }
 }
 
