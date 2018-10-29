@@ -1,35 +1,41 @@
-import { handleSignalEvents } from '../../utils'
-import { forEach, isFunction, isObject, isArray, keys } from '@serverless/utils'
+import { compact, forEach, isFunction, isObject, isArray, keys } from '@serverless/utils'
 
 const Info = {
   async run(context) {
-    context.log('Running info...')
+    context.log('Getting info...')
     context = await context.loadProject()
     context = await context.loadApp()
+    context = await context.loadPreviousDeployment()
+    if (!context.previousDeployment) {
+      context.log('Nothing deployed!')
+      return
+    }
+    context = await context.loadState()
+    // Load the instance from state instead of serverless.yml
+    context = await context.loadInstance()
 
-    const prevContext = await context.loadPreviousDeployment()
+    const { instance } = context
+    if (!instance) {
+      context.log('Nothing deployed!')
+      return
+    }
+    if (!isFunction(instance.info)) {
+      throw new Error(`info method is not implemented for the component ${instance.name}`)
+    }
 
-    // TODO BRN (low priority): Upgrade this signal handling so that we can tie in a handler that knows what to do when a SIGINT is received. In the case of deploy we may want to ignore the first one and log out the message, then if we receive anther one we stop the current deployment and start a rollback
-    handleSignalEvents(context)
-
-    // TODO BRN (low priority): inputs to the top level might be a way to inject project/deployment config
-
-    const prevInstance = await prevContext.loadInstanceFromState()
-
-    if (prevInstance && isFunction(prevInstance.info)) {
-      const { title, type, data } = await prevInstance.info(context)
-      context.log(`${title} - ${type}`)
-      if (isArray(data)) {
-        printArray(data, context.log)
-      } else {
-        printObj(data, context.log)
-      }
+    const { title, type, data, children } = await instance.info(context)
+    context.log(`${title} - ${type}`)
+    printObj(compact(data), context.log)
+    if (isArray(children)) {
+      printArray(compact(children), context.log)
+    } else {
+      printObj(compact(children), context.log)
     }
   }
 }
 
-const printArray = (arr, log, level = 1) => {
-  arr.forEach((item) => {
+const printArray = (arr, log, level = 1) =>
+  forEach((item) => {
     const { type, data } = item
     let { title } = item
     if (!title && data.title) {
@@ -41,8 +47,7 @@ const printArray = (arr, log, level = 1) => {
     } else {
       printObj(data, log, level + 2)
     }
-  })
-}
+  }, arr)
 
 const printObj = (obj, log, level = 1) => {
   if (!obj) {

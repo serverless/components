@@ -1,4 +1,10 @@
-import { handleSignalEvents, buildGraph, deployGraph, removeGraph } from '../../utils'
+import {
+  buildGraph,
+  deployGraph,
+  findPluginForCommand,
+  handleSignalEvents,
+  removeGraph
+} from '../../utils'
 
 const Deploy = {
   async run(context) {
@@ -46,31 +52,37 @@ const Deploy = {
     context.log('Deploy running...')
     context = await context.loadProject()
     context = await context.loadApp()
+    context = await context.loadPreviousDeployment()
+    context = await context.createDeployment()
 
-    const prevContext = await context.loadPreviousDeployment()
-    const nextContext = await context.createDeployment(prevContext.deployment)
+    // TODO BRN (low priority): inputs to the top level might be a way to inject project/deployment config
+
+    context = await context.loadPreviousInstance()
+    context = await context.createInstance()
+
+    const graph = buildGraph(context.instance, context.previousInstance)
 
     // TODO BRN (low priority): Upgrade this signal handling so that we can tie in a handler that knows what to do when a SIGINT is received. In the case of deploy we may want to ignore the first one and log out the message, then if we receive anther one we stop the current deployment and start a rollback
     handleSignalEvents(context)
 
-    // TODO BRN (low priority): inputs to the top level might be a way to inject project/deployment config
+    try {
+      await deployGraph(graph, context)
+      await removeGraph(graph, context)
 
-    const prevInstance = await prevContext.loadInstanceFromState()
-    const nextInstance = await nextContext.createInstance()
+      // Deployment complete!
+      context.log('Deployment complete!')
 
-    const graph = buildGraph(nextInstance, prevInstance)
-
-    await deployGraph(graph, nextContext)
-    await removeGraph(graph, prevContext)
-
-    context.log('Deployment complete!')
-    // Deployment complete!
-
-    // NOTE BRN: state is saved when saveState is called by each function. No need to call it here.
-
-    // TODO BRN: Run the info command against the nextInstance project
-
-    return nextContext
+      // Run info command
+      const Info = findPluginForCommand('info', context)
+      return Info.run(context)
+    } catch (error) {
+      context.log('Error occurred during deployment')
+      context.log(error)
+      // TODO BRN: we SHOULD rollback to the previous state here.
+    } finally {
+      // TODO BRN: In the event that we only do a partial deployment we need a path to recovery...
+      await context.saveState()
+    }
   }
 }
 

@@ -1,15 +1,15 @@
-import { all, forEach, isFunction, isObject, map, resolve } from '@serverless/utils'
+import { forEach, get, isFunction, isObject, map, resolve } from '@serverless/utils'
 import appendKey from './appendKey'
 import getKey from './getKey'
-// import hydrateComponent from './hydrateComponent'
+import hydrateComponent from './hydrateComponent'
 import setKey from './setKey'
 
 /**
  *
  */
-const defineComponent = async (component, context) => {
+const defineComponent = async (component, state, context) => {
   // TODO BRN: If we ever need to retrigger define (redefine) hydrating state here may be an issue
-  // component = hydrateComponent(component, context)
+  component = hydrateComponent(component, state, context)
   if (isFunction(component.define)) {
     const children = resolve(await component.define(context)) || {}
     if (isObject(children)) {
@@ -25,7 +25,10 @@ const defineComponent = async (component, context) => {
         `define() method must return either an object or an array. Instead received ${children} from ${component}.`
       )
     }
-    component.children = await all(map((child) => defineComponent(child, context), children))
+    component.children = await map(
+      async (child, key) => defineComponent(child, get(['children', key], state), context),
+      children
+    )
   }
   return component
 }

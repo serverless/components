@@ -1,3 +1,4 @@
+// TODO BRN: import this from 'serverless'
 import { SYMBOL_TYPE } from '../../../dist/utils'
 
 const _Object = {

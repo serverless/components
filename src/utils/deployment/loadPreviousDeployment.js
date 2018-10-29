@@ -25,6 +25,7 @@ const loadPreviousDeployment = async (app) => {
       return loadDeployment(previousDeploymentId, app)
     }
   }
+  return null
 }
 
 export default loadPreviousDeployment

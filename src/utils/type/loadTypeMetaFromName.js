@@ -50,7 +50,6 @@ const NATIVE_NAMES = {
  * }}
  */
 const loadTypeMetaFromName = async (typeName, context) => {
-  // console.log('loadTypeMetaFromName - typeName:', typeName)
   const absoluteTypePath = getProp(typeName, NATIVE_NAMES)
   if (!absoluteTypePath) {
     throw errorUnknownTypeName(typeName)

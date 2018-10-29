@@ -1,4 +1,4 @@
-import { shallowEquals } from '@serverless/utils'
+import { append, get, or, pick, reduce, shallowEquals } from '@serverless/utils'
 
 const DEPLOY = 'deploy'
 
@@ -10,7 +10,7 @@ const Component = (SuperClass) =>
     }
 
     hydrate(state) {
-      this.instanceId = state.instanceId
+      this.instanceId = get('instanceId', state) || this.instanceId
     }
 
     async define() {
@@ -28,6 +28,20 @@ const Component = (SuperClass) =>
     async deploy() {}
 
     async remove() {}
+
+    async info() {
+      const children = await reduce(
+        async (accum, component) => append(await component.info(), accum),
+        [],
+        or(this.components, {})
+      )
+      return {
+        title: this.name,
+        type: this.extends,
+        data: pick(['name', 'license', 'version'], this),
+        children
+      }
+    }
 
     toString() {
       return `${this['@@key']} ${this.name} {  }`

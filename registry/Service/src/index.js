@@ -1,4 +1,4 @@
-import { forEach, isEmpty, isFunction, map, resolve } from '@serverless/utils'
+import { append, map, or, reduce } from '@serverless/utils'
 
 const Service = async (SuperClass, superContext) => {
   const Fn = await superContext.loadType('Function')
@@ -26,64 +26,23 @@ const Service = async (SuperClass, superContext) => {
       }
     }
 
-    async info(context) {
-      const functions = []
-      const components = []
-      await map(async (func) => {
-        let output = {}
-        if (isFunction(func.info)) {
-          output = await func.info(context)
-          functions.push(output)
-        } else {
-          output = {}
-          forEach(
-            (el) => {
-              const val = resolve(func[el])
-              if (val) {
-                output[el] = val
-              }
-            },
-            [
-              'code',
-              'environment',
-              'functionDescription',
-              'functionName',
-              'memory',
-              'ufs',
-              'timeout',
-              'runtime',
-              'tags'
-            ]
-          )
-          if (!isEmpty(output)) {
-            functions.push({ title: output.functionName, type: func.name, data: output })
-          }
-        }
-      }, this.functions)
-
-      await map(async (comp) => {
-        let output = {}
-        if (isFunction(comp.info)) {
-          output = await comp.info(context)
-        } else {
-          output = {}
-          forEach(
-            (el) => {
-              const val = resolve(comp[el])
-              if (val) {
-                output[el] = val
-              }
-            },
-            ['name', 'license', 'version', 'inputs']
-          )
-        }
-        components.push({ title: output.functionName, type: comp.name, data: output })
-      }, this.components)
+    async info() {
+      const functions = await reduce(
+        async (accum, func) => append(await func.info(), accum),
+        [],
+        or(this.functions, {})
+      )
+      const components = await reduce(
+        async (accum, component) => append(await component.info(), accum),
+        [],
+        or(this.components, {})
+      )
 
       return {
         title: this.name,
         type: this.extends,
-        data: [...functions, ...components]
+        data: {},
+        children: [...functions, ...components]
       }
     }
   }

@@ -5,7 +5,7 @@ import detectCircularDeps from './detectCircularDeps'
 
 const deployNode = async (node, context) => {
   context.debug(
-    `checking node - operation: ${node.operation} instanceId: ${
+    `checking node for deploy - operation: ${node.operation} instanceId: ${
       node.instanceId
     } nextInstance: ${get('nextInstance.name', node)} prevInstance: ${get(
       'prevInstance.name',
@@ -13,6 +13,9 @@ const deployNode = async (node, context) => {
     )}`
   )
   if (['deploy', 'replace'].includes(node.operation)) {
+    if (!node.nextInstance) {
+      throw new Error('deployGraph expected nextInstance to be defined for deploy operation')
+    }
     context.debug(`deploying node: ${node.nextInstance.name} { instanceId: ${node.instanceId} }`)
     if (node.nextInstance.name === undefined) {
       context.debug(`This instance has an undefined name`)
@@ -23,7 +26,10 @@ const deployNode = async (node, context) => {
       ? resolveComponentVariables(node.prevInstance)
       : node.prevInstance
     await nextInstance.deploy(prevInstance, context)
-    context.debug(`node complete: ${node.nextInstance.name} { instanceId: ${node.instanceId} }`)
+    context.debug(
+      `node deployment complete: ${nextInstance.name} { instanceId: ${node.instanceId} }`
+    )
+    // TODO BRN: We should probably save state incrementally as we deploy each node
   }
 }
 

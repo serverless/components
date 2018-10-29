@@ -1,18 +1,20 @@
-import { get, isEmpty, pick, set } from '@serverless/utils'
-import { propOr } from 'ramda' // Eslam todo: move to @serverless/utils
+import { get, isUndefined, pick, propOr, set } from '@serverless/utils'
 import loadApp from '../app/loadApp'
 import defineComponent from '../component/defineComponent'
 import defineComponentFromState from '../component/defineComponentFromState'
 import generateInstanceId from '../component/generateInstanceId'
 import setKey from '../component/setKey'
-import { DEFAULT_PLUGINS, SYMBOL_KEY } from '../constants'
+import { DEFAULT_PLUGINS } from '../constants'
 import createDeployment from '../deployment/createDeployment'
+import createRemovalDeployment from '../deployment/createRemovalDeployment'
 import loadDeployment from '../deployment/loadDeployment'
 import loadPreviousDeployment from '../deployment/loadPreviousDeployment'
 import debug from '../logging/debug'
 import log from '../logging/log'
 import loadPlugins from '../plugin/loadPlugins'
 import loadProject from '../project/loadProject'
+import deserialize from '../serialize/deserialize'
+import serialize from '../serialize/serialize'
 import getState from '../state/getState'
 import saveState from '../state/saveState'
 import loadState from '../state/loadState'
@@ -27,13 +29,17 @@ const newContext = (props) => {
       'cwd',
       'data',
       'deployment',
+      'instance',
       'options',
       'overrides',
       'plugins',
+      'previousDeployment',
+      'previousInstance',
       'project',
       'registry',
       'root',
       'state',
+      'symbolMap',
       'Type'
     ],
     props
@@ -42,11 +48,16 @@ const newContext = (props) => {
   const finalContext = {
     ...context,
     construct: (type, inputs) => construct(type, inputs, finalContext),
-    createDeployment: async (previousDeployment) => {
-      const { app } = finalContext
+    createDeployment: async () => {
+      const { app, previousDeployment } = finalContext
       if (!app) {
         throw new Error(
           'createDeployment method expects context to have an app loaded. You must first call loadApp on context before calling createDeployment'
+        )
+      }
+      if (isUndefined(previousDeployment)) {
+        throw new Error(
+          'createDeployment method expects context to have an previousDeployment loaded. You must first call loadPreviousDeployment on context before calling createDeployment'
         )
       }
       const deployment = await createDeployment(previousDeployment, app)
@@ -57,17 +68,47 @@ const newContext = (props) => {
       })
       return nextContext.loadState()
     },
+    createRemovalDeployment: async () => {
+      const { app, previousDeployment } = finalContext
+      if (!app) {
+        throw new Error(
+          'createDeployment method expects context to have an app loaded. You must first call loadApp on context before calling createDeployment'
+        )
+      }
+      if (isUndefined(previousDeployment)) {
+        throw new Error(
+          'createDeployment method expects context to have an previousDeployment loaded. You must first call loadPreviousDeployment on context before calling createDeployment'
+        )
+      }
+      const deployment = await createRemovalDeployment(previousDeployment, app)
+
+      const nextContext = newContext({
+        ...context,
+        deployment
+      })
+      return nextContext.loadState()
+    },
     createInstance: async () => {
-      let instance = await finalContext.construct(finalContext.project.Type)
+      const { project, state } = finalContext
+      if (!project) {
+        throw new Error(
+          'createInstance method expects context to have a project loaded. You must first call loadProject on context before calling createInstance'
+        )
+      }
+      let instance = await finalContext.construct(project.Type)
       instance = setKey('$', instance)
 
+      const stateInstance = await deserialize(state.instance, finalContext)
       // NOTE BRN: instance gets defined based on serverless.yml and type code
-      instance = finalContext.defineComponent(instance)
+      instance = await finalContext.defineComponent(instance, stateInstance)
 
-      return instance
+      return newContext({
+        ...context,
+        instance
+      })
     },
     debug: (...args) => debug(finalContext, ...args),
-    defineComponent: (component) => defineComponent(component, finalContext),
+    defineComponent: (component, state) => defineComponent(component, state, finalContext),
     defineComponentFromState: (component) => defineComponentFromState(component, finalContext),
     generateInstanceId: () => {
       const { app } = finalContext
@@ -118,16 +159,39 @@ const newContext = (props) => {
       })
       return nextContext.loadState()
     },
-    loadInstanceFromState: async () => {
-      // WARNING BRN: this is the newer type. It is possible that this code has changed so much from the prev deployment that it's not possible to build an accurate represention of what was deployed. Could cause issues. Need a way to reconcile this eventually. Perhaps packaging up the project on each deployment and storing it away for use in this scenario (along with the config that was used to perform the deployment).
-      let instance
-      if (!isEmpty(finalContext.state)) {
-        instance = await finalContext.construct(finalContext.project.Type, {})
-        instance = setKey('$', instance)
-        // NOTE BRN: instance gets defined based on what was stored into state
-        instance = await finalContext.defineComponentFromState(instance)
+    loadInstance: async () => {
+      const { state } = finalContext
+      if (!state) {
+        throw new Error(
+          'loadInstance method expects context to have state loaded. You must first call loadState on context before calling loadInstance'
+        )
       }
-      return instance
+      let { instance } = state
+      instance = await deserialize(instance, finalContext)
+
+      // TODO BRN: Add hydrate step for instance
+
+      return newContext({
+        ...context,
+        instance
+      })
+    },
+    loadPreviousInstance: async () => {
+      const { state } = finalContext
+      if (!state) {
+        throw new Error(
+          'loadPreviousInstance method expects context to have state loaded. You must first call loadState on context before calling loadPreviousInstance'
+        )
+      }
+      let { previousInstance } = state
+      previousInstance = await deserialize(previousInstance, finalContext)
+
+      // TODO BRN: Add hydrate step for previous instance
+
+      return newContext({
+        ...context,
+        previousInstance
+      })
     },
     loadPlugins: async () => {
       // TODO BRN: Allow for the plugins to be configured via options or config
@@ -144,15 +208,11 @@ const newContext = (props) => {
           'loadPreviousDeployment method expects context to have an app loaded. You must first call loadApp on context before calling loadPreviousDeployment'
         )
       }
-      const deployment = await loadPreviousDeployment(app)
-      if (!deployment) {
-        return finalContext
-      }
-      const nextContext = newContext({
+      const previousDeployment = await loadPreviousDeployment(app)
+      return newContext({
         ...context,
-        deployment
+        previousDeployment
       })
-      return nextContext.loadState()
     },
     loadProject: async () => {
       const projectPath = propOr(finalContext.cwd, 'project', finalContext.options)
@@ -162,13 +222,17 @@ const newContext = (props) => {
         project
       })
     },
-    loadState: async () => {
-      const { deployment } = finalContext
+    loadState: async (deployment) => {
+      if (!deployment) {
+        deployment = finalContext.deployment || finalContext.previousDeployment
+      }
       if (!deployment) {
         throw new Error(
           'loadState method expects context to have a deployment loaded. You must first call loadDeployment, loadPreviousDeployment or createDeployment on context before calling loadState'
         )
       }
+
+      // NOTE BRN: This loads state from the current deployment which should already have state set during the createDeployment step. That step loads the state from the previous deployment and coppies it over as a starting point for the new deployment.
       const state = await loadState(deployment)
       return newContext({
         ...context,
@@ -182,24 +246,32 @@ const newContext = (props) => {
         ...context,
         ...value
       }),
-    saveState: async (query, newState) => {
-      const { deployment, state } = finalContext
+    saveState: async () => {
+      const { deployment, instance, previousInstance } = finalContext
       if (!deployment) {
         throw new Error(
-          'saveState method expects context to have a deployment loaded. You must first call loadDeployment, loadPreviousDeployment or createDeployment on context before calling saveState'
+          'saveState method expects context to have a deployment loaded. You must first call loadDeployment or createDeployment on context before calling saveState'
         )
       }
-
-      if (!query.instanceId) {
-        throw new Error('unknown query to saveState. Query did not have an instanceId')
+      if (isUndefined(previousInstance)) {
+        throw new Error(
+          'saveState method expects context to have a previousInstance loaded. You must first call loadPreviousInstance on context before calling saveState'
+        )
       }
-      state[query.instanceId] = {
-        instanceId: query.instanceId,
-        key: query[SYMBOL_KEY],
-        // inputs: query.inputs, // TODO BRN: Is this a good idea or not?
-        state: newState
+      if (isUndefined(instance)) {
+        throw new Error(
+          'saveState method expects context to have an instance loaded. You must first call createInstance or loadInstance on context before calling saveState'
+        )
       }
-      return saveState(deployment, state)
+      const state = {
+        instance: serialize(instance, finalContext),
+        previousInstance: serialize(previousInstance, finalContext)
+      }
+      await saveState(deployment, state)
+      return newContext({
+        ...context,
+        state
+      })
     },
     set: (selector, value) =>
       newContext({

@@ -9,7 +9,7 @@ import requireTypeMain from './requireTypeMain'
 const DEFAULT_MAIN = (SuperClass) => class extends SuperClass {}
 const LOADING_TYPES = new Set()
 
-const loadDef = async (root, props, context) => {
+const loadDef = async ({ root, props, query }, context) => {
   // NOTE BRN: When loading a type. If a re-entrant call (circular reference) is made when loading a type, we throw an error. We could work on allowing the circular reference to be resolved by stopping the def process here and returning early, but for now it's not supported.
   if (LOADING_TYPES.has(root)) {
     throw errorReentrantTypeLoad(props.name)
@@ -18,7 +18,8 @@ const loadDef = async (root, props, context) => {
 
   let typeDef = {
     root,
-    props
+    props,
+    query
   }
 
   // NOTE BRN: If the type defintion's propeties do not have an `extends` property, default it to 'Object'
@@ -63,7 +64,7 @@ const loadDef = async (root, props, context) => {
  * @param {Context} context The context object
  * @returns {Type}
  */
-const defType = async ({ root, props }, context) => {
+const defType = async ({ root, props, query }, context) => {
   if (!isObject(props)) {
     throw new Error('defType expects an object witha props property that is an object')
   }
@@ -79,7 +80,7 @@ const defType = async ({ root, props }, context) => {
   if (typeDef) {
     return typeDef
   }
-  typeDef = loadDef(root, props, context)
+  typeDef = loadDef({ root, props, query }, context)
   // NOTE BRN: store type def in cache to make sure
   context.cache.types.defs = set([root], typeDef, defsCache)
 
