@@ -1,7 +1,7 @@
 name: AwsSnsSubscription
 extends: Component
 version: 1.0.0
-main: ./index.js
+main: ./dist/index.js
 
 description: 'Provision AWS SNS Subscription with the Serverless Framework'
 license: Apache-2.0
@@ -12,6 +12,7 @@ provider: ${inputs.provider}
 topic: ${inputs.topic}
 protocol: ${inputs.protocol}
 endpoint: ${inputs.endpoint}
+subscriptionAttributes: ${inputs.subscriptionAttributes}
 
 inputTypes:
   provider:
@@ -36,3 +37,8 @@ inputTypes:
     displayName: SNS Topic Display Name
     description: The endpoint that you want to receive notifications
     example: https://example.com/
+  subscriptionAttributes:
+    type: array
+    required: false
+    displayName: SNS Subscription Attributes
+    description: SNS Subscription Attributes
