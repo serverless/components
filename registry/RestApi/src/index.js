@@ -1,6 +1,5 @@
 import { join as joinPath } from 'path'
-import { isEmpty, keys, union, not, map, forEach, resolve, reduce } from '@serverless/utils'
-import { joinUrl } from './utils'
+import { forEach, resolve, reduce } from '@serverless/utils'
 
 const catchallParameterPattern = /{\.{3}([^}]+?)}/g
 
@@ -134,35 +133,32 @@ const RestApi = async function(SuperClass, SuperContext) {
       })
     }
 
-    async info(prevInstance, context) {
-      const state = context.getState(this)
+    async info() {
       const inputs = this.inputs
-      let message
-      if (not(isEmpty(state))) {
-        const baseUrl = state.url
-
-        const flattenedRoutes = flattenRoutes(inputs.routes)
-        let urlObjects = []
-        forEach((route, path) => {
-          const urlObject = {
-            path,
-            method: keys(route)
-              .pop()
-              .toUpperCase()
+      const flatRoutes = {}
+      for (const [path, pathObject] of Object.entries(flattenRoutes(inputs.routes))) {
+        const newPathObject = { ...pathObject }
+        for (const [method, methodObject] of Object.entries(pathObject)) {
+          const newMethodObject = { ...methodObject }
+          if (methodObject.function) {
+            const func = resolve(methodObject.function)
+            newMethodObject.function = `$${resolve(func.functionName)}`
           }
-          urlObjects = union(urlObjects, [urlObject])
-        }, flattenedRoutes)
-
-        const printableUrls = map((urlObject) => {
-          const joinedUrl = joinUrl(baseUrl, [urlObject.path])
-          return `  ${urlObject.method} - ${joinedUrl}`
-        }, urlObjects)
-
-        message = ['REST API resources:', ...printableUrls].join('\n')
-      } else {
-        message = 'No REST API state information available. Have you deployed it?'
+          if (methodObject.authorizer) {
+            const auth = resolve(methodObject.authorizer)
+            const authFunc = resolve(auth.function)
+            if (authFunc) {
+              newMethodObject.authorizer = Object.assign(auth, {
+                function: `$${resolve(authFunc.functionName)}`
+              })
+            }
+          }
+          newPathObject[method] = newMethodObject
+        }
+        flatRoutes[path] = newPathObject
       }
-      context.log(message)
+
+      return { title: this.apiName, type: this.extends, data: { routes: flatRoutes } }
     }
   }
 }

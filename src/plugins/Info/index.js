@@ -1,18 +1,71 @@
+import { handleSignalEvents } from '../../utils'
+import { forEach, isFunction, isObject, isArray, keys } from '@serverless/utils'
+
 const Info = {
   async run(context) {
-    // TODO BRN (priority high): load the last deployment and construct/define based on previous state
-    // Execute a walkReduceComponentChildren against the entire component tree. Give each component an opportunity to execute an info method. Each info method should return an object where the key is the category of how the info should be organized and the value is an item to output for that category
+    context.log('Running info...')
+    context = await context.loadProject()
+    context = await context.loadApp()
 
-    // merge and then sort based on category names
+    const prevContext = await context.loadPreviousDeployment()
 
-    // context.log
-    // [category name]
-    // [item 1]
-    // [item 2]
+    // TODO BRN (low priority): Upgrade this signal handling so that we can tie in a handler that knows what to do when a SIGINT is received. In the case of deploy we may want to ignore the first one and log out the message, then if we receive anther one we stop the current deployment and start a rollback
+    handleSignalEvents(context)
 
-    context.log('TODO: implement info command')
+    // TODO BRN (low priority): inputs to the top level might be a way to inject project/deployment config
 
-    return context
+    const prevInstance = await prevContext.loadInstanceFromState()
+
+    if (prevInstance && isFunction(prevInstance.info)) {
+      const { title, type, data } = await prevInstance.info(context)
+      context.log(`${title} - ${type}`)
+      if (isArray(data)) {
+        printArray(data, context.log)
+      } else {
+        printObj(data, context.log)
+      }
+    }
+  }
+}
+
+const printArray = (arr, log, level = 1) => {
+  arr.forEach((item) => {
+    const { type, data } = item
+    let { title } = item
+    if (!title && data.title) {
+      title = data.title
+    }
+    log(`\n|- ${`  `.repeat(level)}${title} - ${type}`)
+    if (isArray(data)) {
+      printArray(data, log, level + 2)
+    } else {
+      printObj(data, log, level + 2)
+    }
+  })
+}
+
+const printObj = (obj, log, level = 1) => {
+  if (!obj) {
+    return
+  }
+  if (keys(obj).length === 3 && obj.title && obj.type && obj.data) {
+    if (isArray(obj.data)) {
+      printArray(obj.data, log, level + 1)
+    } else {
+      printObj(obj.data, log, level)
+    }
+  } else {
+    forEach((val, key) => {
+      const space = '  '
+      if (isArray(val)) {
+        printArray(val, log, level + 1)
+      } else if (isObject(val)) {
+        log(`${space.repeat(level)}${key}:`)
+        printObj(val, log, level + 1)
+      } else {
+        log(`${space.repeat(level)}${key}: ${val}`)
+      }
+    }, obj)
   }
 }
 
