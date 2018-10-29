@@ -93,6 +93,7 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
       if (resolve(prevInstance.functionName) !== resolve(this.functionName)) {
         return 'replace'
       }
+      return 'deploy'
     }
 
     async define(context) {
@@ -135,12 +136,12 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
     }
 
     async deploy(prevInstance, context) {
-      const provider = resolve(this.provider)
+      const provider = this.provider
       const AWS = provider.getSdk()
       const Lambda = new AWS.Lambda()
       await this.pack(context)
 
-      if (!prevInstance) {
+      if (!prevInstance || this.functionName !== prevInstance.functionName) {
         context.log(`Creating Lambda: ${this.functionName}`)
         this.arn = await createLambda(Lambda, this)
       } else {

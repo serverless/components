@@ -85,9 +85,10 @@ const AwsIamRole = async (SuperClass, superContext) => {
       if (!prevInstance) {
         return 'deploy'
       }
-      if (prevInstance.roleName !== this.roleName) {
+      if (prevInstance.roleName !== resolve(this.roleName)) {
         return 'replace'
       }
+      return 'deploy'
     }
 
     async define() {
@@ -111,22 +112,22 @@ const AwsIamRole = async (SuperClass, superContext) => {
         arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
       }
 
-      const policy = this.policy || defaultPolicy
+      this.policy = this.policy || defaultPolicy
 
-      if (!prevInstance) {
+      if (!prevInstance || this.roleName !== prevInstance.roleName) {
         context.log(`Creating Role: ${roleName}`)
         this.arn = await createRole(IAM, {
           roleName,
           service: this.service,
-          policy
+          policy: this.policy
         })
       } else {
         if (prevInstance.service !== this.service) {
           await updateAssumeRolePolicy(IAM, this)
         }
-        if (!equals(prevInstance.policy, policy)) {
+        if (!equals(prevInstance.policy, this.policy)) {
           await detachRolePolicy(IAM, prevInstance)
-          await attachRolePolicy(IAM, { roleName: this.roleName, policy })
+          await attachRolePolicy(IAM, { roleName: this.roleName, policy: this.policy })
         }
       }
     }
