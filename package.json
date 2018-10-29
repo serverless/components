@@ -12,7 +12,9 @@
   },
   "homepage": "https://github.com/serverless/components#readme",
   "bin": {
-    "components": "./bin/components"
+    "components": "./bin/components",
+    "serverless": "./bin/serverless",
+    "sls": "./bin/sls"
   },
   "scripts": {
     "build": "npm-run-all --parallel build:*",
