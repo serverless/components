@@ -1,8 +1,8 @@
 {
-  "name": "@serverless-components/AwsDynamoDb",
+  "name": "@serverless-components/aws-dynamo-db",
   "version": "0.3.0",
   "private": true,
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
