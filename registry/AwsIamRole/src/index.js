@@ -81,6 +81,29 @@ const AwsIamRole = async (SuperClass, superContext) => {
   const AwsIamPolicy = await superContext.loadType('AwsIamPolicy')
 
   return class extends SuperClass {
+    async construct(inputs, context) {
+      await super.construct(inputs, context)
+
+      // HACK BRN: Temporary workaround until we add property type/default support
+      const defaultPolicy = {
+        arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
+      }
+      this.provider = inputs.provider
+      this.service = inputs.service
+      this.policy = inputs.policy || defaultPolicy
+      this.roleName = inputs.roleName || `role-${this.instanceId}`
+    }
+
+    shouldDeploy(prevInstance) {
+      if (!prevInstance) {
+        return 'deploy'
+      }
+      if (prevInstance.roleName !== resolve(this.roleName)) {
+        return 'replace'
+      }
+      return 'deploy'
+    }
+
     async define() {
       const policy = resolve(this.policy)
       if (is(AwsIamPolicy.class, policy)) {
@@ -96,15 +119,7 @@ const AwsIamRole = async (SuperClass, superContext) => {
       const AWS = provider.getSdk()
       const IAM = new AWS.IAM()
 
-      // HACK BRN: Temporary workaround until we add property type/default support
-      const defaultPolicy = {
-        arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
-      }
-
-      this.roleName = this.roleName || `role-${this.instanceId}`
-      this.policy = this.policy || defaultPolicy
-
-      if (!prevInstance) {
+      if (!prevInstance || this.roleName !== prevInstance.roleName) {
         context.log(`Creating Role: ${this.roleName}`)
         this.arn = await createRole(IAM, {
           roleName: this.roleName,
