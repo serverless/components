@@ -1,4 +1,4 @@
-import { all, sleep, map } from '@serverless/utils'
+import { all, resolve, sleep, map } from '@serverless/utils'
 
 const createPolicy = async (IAM, { policyName, document }, context) => {
   const policyRes = await IAM.createPolicy({
@@ -33,11 +33,18 @@ const deletePolicy = async (IAM, arn) => {
 
 const AwsIamPolicy = (SuperClass) =>
   class extends SuperClass {
+    async construct(inputs, context) {
+      await super.construct(inputs, context)
+
+      this.provider = inputs.provider
+      this.policyName = inputs.policyName || `policy-${this.instanceId}`
+    }
+
     shouldDeploy(prevInstance) {
       if (!prevInstance) {
         return 'deploy'
       }
-      if (prevInstance.policyName !== this.policyName) {
+      if (prevInstance.policyName !== resolve(this.policyName)) {
         return 'replace'
       }
     }
@@ -46,14 +53,11 @@ const AwsIamPolicy = (SuperClass) =>
       const AWS = this.provider.getSdk()
       const IAM = new AWS.IAM()
 
-      // HACK BRN: Temporary workaround until we add property type/default support
-      const policyName = this.policyName || `policy-${this.instanceId}`
-
-      context.log(`Creating Policy: ${policyName}`)
+      context.log(`Creating Policy: ${this.policyName}`)
       this.arn = await createPolicy(
         IAM,
         {
-          policyName,
+          policyName: this.policyName,
           document: this.document
         },
         context

@@ -1,40 +1,27 @@
+import AWS from 'aws-sdk'
 import path from 'path'
-import { createContext } from '../../../src/utils'
+import {
+  createContext,
+  deserialize,
+  resolveComponentVariables,
+  serialize
+} from '../../../src/utils'
 
-const mocks = {
-  createBucketMock: jest.fn().mockReturnValue('bucket-abc'),
-  deleteBucketMock: jest.fn(),
-  listObjectsV2Mock: jest.fn().mockImplementation((params) => {
-    if (params.Bucket === 'some-already-removed-bucket') {
-      return Promise.reject(new Error('The specified bucket does not exist'))
-    }
-    return Promise.resolve({ Contents: [{ Key: 'abc' }] })
-  }),
-  deleteObjectsMock: jest.fn()
-}
-
-const provider = {
-  getSdk: () => {
-    return {
-      S3: function() {
-        return {
-          createBucket: (obj) => ({
-            promise: () => mocks.createBucketMock(obj)
-          }),
-          listObjectsV2: (obj) => ({
-            promise: () => mocks.listObjectsV2Mock(obj)
-          }),
-          deleteBucket: (obj) => ({
-            promise: () => mocks.deleteBucketMock(obj)
-          }),
-          deleteObjects: (obj) => ({
-            promise: () => mocks.deleteObjectsMock(obj)
-          })
-        }
+const createTestContext = async () =>
+  createContext(
+    {
+      cwd: path.join(__dirname, '..'),
+      overrides: {
+        debug: () => {},
+        log: () => {}
+      }
+    },
+    {
+      app: {
+        id: 'test'
       }
     }
-  }
-}
+  )
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -45,48 +32,138 @@ afterAll(() => {
 })
 
 describe('AwsS3Bucket', () => {
-  it('should deploy bucket', async () => {
-    let context = await createContext({
-      cwd: path.join(__dirname, '..')
-    })
+  it(
+    'should deploy bucket when none exists',
+    async () => {
+      const context = await createTestContext()
 
-    context = await context.loadProject()
-    context = await context.loadApp()
+      const AwsProvider = await context.loadType('AwsProvider')
+      const AwsS3Bucket = await context.loadType('./')
 
-    const inputs = {
-      provider,
-      bucketName: 'bucket-abc'
-    }
+      let awsS3Bucket = await context.construct(AwsS3Bucket, {
+        provider: await context.construct(AwsProvider, {}),
+        bucketName: 'bucket-abc'
+      })
+      awsS3Bucket = await context.defineComponent(awsS3Bucket)
+      awsS3Bucket = resolveComponentVariables(awsS3Bucket)
 
+      await awsS3Bucket.deploy(null, context)
+
+      expect(AWS.mocks.createBucketMock).toBeCalledWith({ Bucket: 'bucket-abc' })
+    },
+    20000
+  )
+
+  it('should update when bucket name has changed', async () => {
+    const context = await createTestContext()
+
+    const AwsProvider = await context.loadType('AwsProvider')
     const AwsS3Bucket = await context.loadType('./')
-    const awsS3Bucket = await context.construct(AwsS3Bucket, inputs)
 
-    awsS3Bucket.deploy(undefined, context)
+    let awsS3Bucket = await context.construct(AwsS3Bucket, {
+      provider: await context.construct(AwsProvider, {}),
+      bucketName: 'bucket-abc'
+    })
+    awsS3Bucket = await context.defineComponent(awsS3Bucket)
+    awsS3Bucket = resolveComponentVariables(awsS3Bucket)
+    await awsS3Bucket.deploy(null, context)
 
-    expect(mocks.createBucketMock).toBeCalledWith({ Bucket: 'bucket-abc' })
+    const prevAwsS3Bucket = await deserialize(serialize(awsS3Bucket, context), context)
+
+    // NOTE BRN: To simulate what core does, we create an entirely new instance here but hydrate it with the previous instance
+
+    let nextAwsS3Bucket = await context.construct(AwsS3Bucket, {
+      provider: await context.construct(AwsProvider, {}),
+      bucketName: 'bucket-123' // changed!
+    })
+    nextAwsS3Bucket = await context.defineComponent(nextAwsS3Bucket, prevAwsS3Bucket)
+    nextAwsS3Bucket = resolveComponentVariables(nextAwsS3Bucket)
+
+    await nextAwsS3Bucket.deploy(prevAwsS3Bucket, context)
+
+    expect(AWS.mocks.createBucketMock).toBeCalledWith({ Bucket: 'bucket-123' })
+  })
+
+  it('shouldDeploy should return undefined when no changes have occurred', async () => {
+    const context = await createTestContext()
+
+    const AwsProvider = await context.loadType('AwsProvider')
+    const AwsS3Bucket = await context.loadType('./')
+
+    let awsS3Bucket = await context.construct(AwsS3Bucket, {
+      provider: await context.construct(AwsProvider, {}),
+      bucketName: 'bucket-abc'
+    })
+    awsS3Bucket = await context.defineComponent(awsS3Bucket)
+    awsS3Bucket = resolveComponentVariables(awsS3Bucket)
+    await awsS3Bucket.deploy(null, context)
+
+    const prevAwsS3Bucket = await deserialize(serialize(awsS3Bucket, context), context)
+
+    // NOTE BRN: To simulate what core does, we create an entirely new instance here but hydrate it with the previous instance
+
+    let nextAwsS3Bucket = await context.construct(AwsS3Bucket, {
+      provider: await context.construct(AwsProvider, {}),
+      bucketName: 'bucket-abc'
+    })
+    nextAwsS3Bucket = await context.defineComponent(nextAwsS3Bucket, prevAwsS3Bucket)
+    nextAwsS3Bucket = resolveComponentVariables(awsS3Bucket)
+
+    const result = nextAwsS3Bucket.shouldDeploy(prevAwsS3Bucket, context)
+
+    expect(result).toBe(undefined)
+  })
+
+  it('shouldDeploy should returns "replace" when bucket name has changed', async () => {
+    const context = await createTestContext()
+
+    const AwsProvider = await context.loadType('AwsProvider')
+    const AwsS3Bucket = await context.loadType('./')
+
+    let awsS3Bucket = await context.construct(AwsS3Bucket, {
+      provider: await context.construct(AwsProvider, {}),
+      bucketName: 'bucket-abc'
+    })
+    awsS3Bucket = await context.defineComponent(awsS3Bucket)
+    awsS3Bucket = resolveComponentVariables(awsS3Bucket)
+    await awsS3Bucket.deploy(null, context)
+
+    const prevAwsS3Bucket = await deserialize(serialize(awsS3Bucket, context), context)
+
+    // NOTE BRN: To simulate what core does, we create an entirely new instance here but hydrate it with the previous instance
+
+    let nextAwsS3Bucket = await context.construct(AwsS3Bucket, {
+      provider: await context.construct(AwsProvider, {}),
+      bucketName: 'bucket-123' // changed!
+    })
+    nextAwsS3Bucket = await context.defineComponent(nextAwsS3Bucket, prevAwsS3Bucket)
+    nextAwsS3Bucket = resolveComponentVariables(nextAwsS3Bucket)
+
+    const result = nextAwsS3Bucket.shouldDeploy(prevAwsS3Bucket, context)
+
+    expect(result).toBe('replace')
   })
 
   it('should remove bucket', async () => {
-    let context = await createContext({
-      cwd: path.join(__dirname, '..')
-    })
+    const context = await createTestContext()
 
-    context = await context.loadProject()
-    context = await context.loadApp()
-
-    const inputs = {
-      provider,
-      bucketName: 'bucket-abc'
-    }
-
+    const AwsProvider = await context.loadType('AwsProvider')
     const AwsS3Bucket = await context.loadType('./')
-    const awsS3Bucket = await context.construct(AwsS3Bucket, inputs)
 
-    await awsS3Bucket.remove(context)
+    let awsS3Bucket = await context.construct(AwsS3Bucket, {
+      provider: await context.construct(AwsProvider, {}),
+      bucketName: 'bucket-abc'
+    })
+    awsS3Bucket = await context.defineComponent(awsS3Bucket)
+    awsS3Bucket = resolveComponentVariables(awsS3Bucket)
+    await awsS3Bucket.deploy(null, context)
 
-    expect(mocks.deleteBucketMock).toBeCalledWith({ Bucket: 'bucket-abc' })
-    expect(mocks.listObjectsV2Mock).toBeCalledWith({ Bucket: 'bucket-abc' })
-    expect(mocks.deleteObjectsMock).toBeCalledWith({
+    const prevAwsS3Bucket = await deserialize(serialize(awsS3Bucket, context), context)
+    await prevAwsS3Bucket.remove(context)
+
+    expect(AWS.mocks.deleteBucketMock).toBeCalledWith({ Bucket: 'bucket-abc' })
+    expect(AWS.mocks.listObjectsV2Mock).toBeCalledWith({ Bucket: 'bucket-abc' })
+    expect(AWS.mocks.deleteObjectsMock).toBeCalledWith({
       Bucket: 'bucket-abc',
       Delete: { Objects: [{ Key: 'abc' }] }
     })

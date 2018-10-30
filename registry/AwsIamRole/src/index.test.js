@@ -1,23 +1,14 @@
-import AwsIamRole from './index'
+import path from 'path'
 import { sleep } from '@serverless/utils'
+import { createContext } from '../../../src/utils'
 
 jest.mock('@serverless/utils', () => ({
   ...require.requireActual('@serverless/utils'),
   sleep: jest.fn()
 }))
 
-class SuperClass {
-  constructor(inputs) {
-    this.provider = inputs.provider
-    this.roleName = inputs.roleName
-    this.service = inputs.service
-    this.policy = inputs.policy
-  }
-}
-
-const SuperContext = {
-  loadType: async () => {}
-}
+let AwsIamRole
+let context
 
 const mocks = {
   createRoleMock: jest.fn().mockReturnValue({ Role: { Arn: 'abc:xyz' } }),
@@ -30,11 +21,6 @@ const mocks = {
   attachRolePolicyMock: jest.fn(),
   detachRolePolicyMock: jest.fn(),
   updateAssumeRolePolicyMock: jest.fn()
-}
-
-const context = {
-  get: () => {},
-  log: () => {}
 }
 
 const provider = {
@@ -72,14 +58,29 @@ afterAll(() => {
 })
 
 describe('AwsIamRole', () => {
+  beforeEach(async () => {
+    context = await createContext(
+      {
+        cwd: path.join(__dirname, '..')
+      },
+      {
+        app: {
+          id: 'test'
+        }
+      }
+    )
+
+    AwsIamRole = await context.loadType('./')
+  })
+
   it('should create role if first deployment', async () => {
     const inputs = {
       roleName: 'abc',
       service: 'lambda.amazonaws.com',
       provider
     }
-    let awsIamRole = await AwsIamRole(SuperClass, SuperContext)
-    awsIamRole = new awsIamRole(inputs, context)
+
+    const awsIamRole = await context.construct(AwsIamRole, inputs)
 
     await awsIamRole.deploy(undefined, context)
 
@@ -111,41 +112,16 @@ describe('AwsIamRole', () => {
     expect(sleep).toBeCalledWith(15000)
   })
 
-  it('should do nothing if role was not changed', async () => {
-    const inputs = {
-      roleName: 'abc',
-      service: 'lambda.amazonaws.com',
-      provider
-    }
-    let awsIamRole = await AwsIamRole(SuperClass, SuperContext)
-    awsIamRole = new awsIamRole(inputs, context)
-
-    const prevInstance = {
-      service: 'lambda.amazonaws.com',
-      policy: {
-        arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
-      }
-    }
-
-    await awsIamRole.deploy(prevInstance, context)
-
-    expect(mocks.createRoleMock).not.toHaveBeenCalled()
-    expect(mocks.deleteRoleMock).not.toHaveBeenCalled()
-    expect(mocks.attachRolePolicyMock).not.toHaveBeenCalled()
-    expect(mocks.detachRolePolicyMock).not.toHaveBeenCalled()
-    expect(mocks.updateAssumeRolePolicyMock).not.toHaveBeenCalled()
-  })
-
   it('should update service if changed', async () => {
     const inputs = {
       roleName: 'abc',
       service: 'apig.amazonaws.com',
       provider
     }
-    let awsIamRole = await AwsIamRole(SuperClass, SuperContext)
-    awsIamRole = new awsIamRole(inputs, context)
+    const awsIamRole = await context.construct(AwsIamRole, inputs)
 
     const prevInstance = {
+      roleName: 'abc',
       service: 'lambda.amazonaws.com',
       policy: {
         arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
@@ -178,8 +154,7 @@ describe('AwsIamRole', () => {
       service: 'lambda.amazonaws.com',
       provider
     }
-    let awsIamRole = await AwsIamRole(SuperClass, SuperContext)
-    awsIamRole = new awsIamRole(inputs, context)
+    const awsIamRole = await context.construct(AwsIamRole, inputs)
 
     const prevInstance = {
       roleName: 'abc',
@@ -209,6 +184,16 @@ describe('AwsIamRole', () => {
   })
 
   it('should remove role', async () => {
+    // TODO: mimic core here and don't rely on inputs
+    const inputs = {
+      provider,
+      roleName: 'abc',
+      policy: {
+        arn: 'arn:aws:iam::aws:policy/oldPolicy'
+      }
+    }
+    const awsIamRole = await context.construct(AwsIamRole, inputs)
+
     const prevInstance = {
       provider,
       roleName: 'abc',
@@ -217,8 +202,6 @@ describe('AwsIamRole', () => {
         arn: 'arn:aws:iam::aws:policy/oldPolicy'
       }
     }
-    let awsIamRole = await AwsIamRole(SuperClass, SuperContext)
-    awsIamRole = new awsIamRole(prevInstance, context)
 
     const deleteRoleParams = {
       RoleName: prevInstance.roleName

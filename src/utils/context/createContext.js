@@ -1,7 +1,7 @@
-import { findPath, prop, propOr } from '@serverless/utils'
+import { findPath, prop } from '@serverless/utils'
 import { resolve } from 'path'
 import { SYMBOL_KEY, SYMBOL_VARIABLE } from '../constants'
-import getStateStore from '../state/getStateStore'
+// import getStateStore from '../state/getStateStore'
 import newContext from './newContext'
 
 /**
@@ -14,7 +14,8 @@ import newContext from './newContext'
  */
 const createContext = async (options = {}, context = {}) => {
   const cwd = resolve(findPath(prop('cwd', options), process.cwd()))
-  const state = getStateStore(propOr('local', 'stateStore', options))
+  // const state = getStateStore(propOr('local', 'stateStore', options))
+  const state = {}
   const { overrides } = options
 
   return newContext({

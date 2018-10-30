@@ -2,9 +2,9 @@ import { isNil } from '@serverless/utils'
 import AWS from 'aws-sdk'
 import log from '../../../logging/log'
 
-const dynamo = new AWS.DynamoDB.DocumentClient({ region: 'us-east-1' })
-
 const createLockAndFetch = async (config) => {
+  const dynamo = new AWS.DynamoDB.DocumentClient({ region: 'us-east-1' })
+
   log('Checking if state is locked')
   let locked = false
   const { Item } = await dynamo

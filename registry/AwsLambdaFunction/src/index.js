@@ -1,7 +1,8 @@
 import path from 'path'
 import { tmpdir } from 'os'
 import { readFileSync } from 'fs'
-import { isArray, resolve, packDir } from '@serverless/utils'
+import { hashElement } from 'folder-hash'
+import { isArray, resolve, packDir, pick, not, equals, keys } from '@serverless/utils'
 
 const createLambda = async (
   Lambda,
@@ -13,14 +14,14 @@ const createLambda = async (
     runtime,
     environment,
     functionDescription,
-    code,
+    zip,
     role
   }
 ) => {
   const params = {
     FunctionName: functionName,
     Code: {
-      ZipFile: code
+      ZipFile: zip
     },
     Description: functionDescription,
     Handler: handler,
@@ -48,13 +49,13 @@ const updateLambda = async (
     runtime,
     environment,
     functionDescription,
-    code,
+    zip,
     role
   }
 ) => {
   const functionCodeParams = {
     FunctionName: functionName,
-    ZipFile: code,
+    ZipFile: zip,
     Publish: true
   }
 
@@ -86,17 +87,57 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
   const AwsIamRole = await superContext.loadType('AwsIamRole')
 
   return class extends SuperClass {
-    shouldDeploy(prevInstance) {
-      if (!prevInstance) {
-        return 'deploy'
-      }
-      if (prevInstance.functionName !== resolve(this.functionName)) {
-        return 'replace'
+    async construct(inputs, context) {
+      await super.construct(inputs, context)
+      const options = {
+        folders: { exclude: ['node_modules'] }
       }
 
-      // check each individual property
-      // check code changes
-      return 'deploy'
+      this.provider = inputs.provider
+      this.role = inputs.role
+      this.functionName = inputs.functionName
+      this.functionDescription = inputs.functionDescription
+      this.handler = inputs.handler
+      this.code = resolve(inputs.code)
+      this.runtime = inputs.runtime
+      this.memorySize = inputs.memorySize
+      this.timeout = inputs.timeout
+      this.environment = inputs.environment
+      this.tags = inputs.tags
+
+      let folderToHash = this.code
+
+      if (isArray(this.code)) {
+        folderToHash = this.code[0]
+      }
+
+      const hashObj = await hashElement(folderToHash, options)
+      this.hash = hashObj.hash
+    }
+    shouldDeploy(prevInstance) {
+      const currentConfig = {
+        functionName: resolve(this.functionName),
+        functionDescription: resolve(this.functionDescription),
+        handler: resolve(this.handler),
+        code: resolve(this.code),
+        runtime: resolve(this.runtime),
+        memorySize: resolve(this.memorySize),
+        timeout: resolve(this.timeout),
+        // environment: resolve(this.environment), this has a variable value
+        hash: resolve(this.hash),
+        tags: resolve(this.tags)
+      }
+      const prevConfig = prevInstance ? pick(keys(currentConfig), prevInstance) : {}
+      const configChanged = not(equals(currentConfig, prevConfig))
+      const roleChanged = prevInstance
+        ? resolve(this.role).roleName === prevInstance.role.roleName
+        : true
+
+      if (prevInstance && prevInstance.functionName !== currentConfig.functionName) {
+        return 'replace'
+      } else if (!prevInstance || configChanged || roleChanged) {
+        return 'deploy'
+      }
     }
 
     async define(context) {
@@ -126,7 +167,7 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
 
       if (isArray(this.code)) {
         inputDirPath = this.code[0] // first item is path to code dir
-        shims = this.code
+        shims = this.code.slice() // clone array
         shims.shift() // remove first item since it's the path to code dir
       }
 
@@ -134,8 +175,8 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
       const outputFilePath = path.join(tmpdir(), outputFileName)
 
       await packDir(inputDirPath, outputFilePath, shims)
-      this.code = readFileSync(outputFilePath)
-      return this.code
+      this.zip = readFileSync(outputFilePath)
+      return this.zip
     }
 
     async deploy(prevInstance, context) {
@@ -154,10 +195,10 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
     }
 
     async remove(context) {
-      const provider = resolve(this.provider)
+      const provider = this.provider
       const AWS = provider.getSdk()
       const Lambda = new AWS.Lambda()
-      const functionName = resolve(this.functionName)
+      const functionName = this.functionName
 
       context.log(`Removing Lambda: ${functionName}`)
 
