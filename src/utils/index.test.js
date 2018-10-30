@@ -65,7 +65,6 @@ describe('index', () => {
     const mod = require('./dag')
     expect(mod).toMatchObject({
       buildGraph: expect.any(Function),
-      cloneGraph: expect.any(Function),
       deployGraph: expect.any(Function),
       detectCircularDeps: expect.any(Function),
       removeGraph: expect.any(Function)
@@ -76,17 +75,11 @@ describe('index', () => {
     const mod = require('./deployment')
     expect(mod).toEqual({
       createDeployment: expect.any(Function),
+      createRemovalDeployment: expect.any(Function),
       loadDeployment: expect.any(Function),
       loadPreviousDeployment: expect.any(Function),
       newDeployment: expect.any(Function),
       parseDeploymentNumber: expect.any(Function)
-    })
-  })
-
-  test('has interpret methods', () => {
-    const mod = require('./interpret')
-    expect(mod).toMatchObject({
-      interpretProps: expect.any(Function)
     })
   })
 
