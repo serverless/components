@@ -1,4 +1,4 @@
-import { pick, equals } from '@serverless/utils'
+import { resolve } from '@serverless/utils'
 
 const AwsEventsRule = (SuperClass) =>
   class extends SuperClass {
@@ -10,38 +10,31 @@ const AwsEventsRule = (SuperClass) =>
       this.schedule = inputs.schedule
     }
     shouldDeploy(prevInstance) {
-      if (!prevInstance) {
+      if (
+        prevInstance &&
+        prevInstance.lambda.functionName !== resolve(resolve(this.lambda).functionName)
+      ) {
+        return 'replace'
+      } else if (
+        !prevInstance ||
+        prevInstance.schedule !== resolve(this.schedule) ||
+        prevInstance.enabled !== resolve(this.enabled)
+      ) {
         return 'deploy'
       }
-      if (prevInstance.schedule !== this.schedule) {
-        return 'replace'
-      }
-      return 'deploy'
     }
-    async deploy(prevInstance = {}, context) {
-      const provider = this.provider
-      this.functionRuleName = this.lambda.getId().split(':')[
-        this.lambda.getId().split(':').length - 1
-      ]
-      const AWS = provider.getSdk()
+    async deploy(prevInstance, context) {
+      // eslint-disable-line
+      const AWS = this.provider.getSdk()
       const cloudWatchEvents = new AWS.CloudWatchEvents()
       const lambda = new AWS.Lambda()
 
-      const inputsProps = ['functionRuleName', 'schedule', 'enabled']
-      const inputs = pick(inputsProps, this)
-      const prevInputs = pick(inputsProps, prevInstance || {})
-      const noChanges = equals(inputs, prevInputs)
-
-      if (noChanges) {
-        return this
-      }
-
-      context.log('Creating Schedule...')
+      context.log(`Scheduling Function: ${this.lambda.functionName}...`)
 
       const State = this.enabled ? 'ENABLED' : 'DISABLED'
 
       const putRuleParams = {
-        Name: this.functionRuleName,
+        Name: this.lambda.functionName,
         ScheduleExpression: this.schedule,
         State
       }
@@ -51,11 +44,11 @@ const AwsEventsRule = (SuperClass) =>
       this.arn = putRuleRes.RuleArn
 
       const putTargetsParams = {
-        Rule: this.functionRuleName,
+        Rule: this.lambda.functionName,
         Targets: [
           {
             Arn: this.lambda.getId(),
-            Id: this.functionRuleName
+            Id: this.lambda.functionName
           }
         ]
       }
@@ -64,36 +57,33 @@ const AwsEventsRule = (SuperClass) =>
 
       const addPermissionParams = {
         Action: 'lambda:InvokeFunction',
-        FunctionName: this.functionRuleName,
-        StatementId: `${this.functionRuleName}-${Math.random()
+        FunctionName: this.lambda.functionName,
+        StatementId: `${this.lambda.functionName}-${Math.random()
           .toString(36)
           .substring(7)}`,
         Principal: 'events.amazonaws.com'
       }
 
       await lambda.addPermission(addPermissionParams).promise()
-      context.log('Schedule Created.')
     }
     async remove(context) {
       const AWS = this.provider.getSdk()
       const cloudWatchEvents = new AWS.CloudWatchEvents()
 
-      context.log('Removing Schedule...')
+      context.log(`Removing Schedule: ${this.lambda.functionName}`)
 
       const removeTargetsParams = {
-        Rule: this.functionRuleName,
-        Ids: [this.functionRuleName]
+        Rule: this.lambda.functionName,
+        Ids: [this.lambda.functionName]
       }
 
       await cloudWatchEvents.removeTargets(removeTargetsParams).promise()
 
       const deleteRuleParams = {
-        Name: this.functionRuleName
+        Name: this.lambda.functionName
       }
 
       await cloudWatchEvents.deleteRule(deleteRuleParams).promise()
-
-      context.log('Schedule Removed.')
     }
   }
 
