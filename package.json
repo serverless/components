@@ -18,7 +18,7 @@
   },
   "scripts": {
     "build": "npm-run-all --parallel build:*",
-    "build:core": "babel src --out-dir dist --source-maps --copy-files --ignore '**/node_modules' --ignore '**/*.test.js'",
+    "build:core": "bash ./scripts/build-core.sh",
     "build:registry": "node ./registry/build.js",
     "watch:core": "babel --watch src --out-dir dist --source-maps --copy-files --ignore '**/node_modules' --ignore '**/*.test.js'",
     "watch:registry": "node ./registry/watch.js",
