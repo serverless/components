@@ -1,9 +1,9 @@
 import utils from '@serverless/utils'
 import errorReporter from './errorReporter'
 
-describe('#errorReporter()', () => {
-  jest.mock('@serverless/utils')
+jest.mock('@serverless/utils')
 
+describe('#errorReporter()', () => {
   afterAll(() => {
     jest.restoreAllMocks()
   })
