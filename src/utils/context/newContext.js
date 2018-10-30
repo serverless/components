@@ -19,6 +19,7 @@ import getState from '../state/getState'
 import saveState from '../state/saveState'
 import loadState from '../state/loadState'
 import construct from '../type/construct'
+import create from '../type/create'
 import loadType from '../type/loadType'
 
 const newContext = (props) => {
@@ -48,6 +49,7 @@ const newContext = (props) => {
   const finalContext = {
     ...context,
     construct: (type, inputs) => construct(type, inputs, finalContext),
+    create,
     createDeployment: async () => {
       const { app, previousDeployment } = finalContext
       if (!app) {

@@ -1,8 +1,7 @@
 import AWS from 'aws-sdk'
 
-const s3 = new AWS.S3({ region: 'us-east-1' })
-
 const removeLock = async (config) => {
+  const s3 = new AWS.S3({ region: 'us-east-1' })
   try {
     await s3
       .deleteObject({
@@ -17,14 +16,16 @@ const removeLock = async (config) => {
   }
 }
 
-const writeObject = async (config, content) =>
-  s3
+const writeObject = async (config, content) => {
+  const s3 = new AWS.S3({ region: 'us-east-1' })
+  return s3
     .putObject({
       Bucket: config.state.bucket,
       Key: config.state.file,
       Body: JSON.stringify(content)
     })
     .promise()
+}
 
 const write = async (config, content) => {
   await removeLock(config)
