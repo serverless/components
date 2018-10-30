@@ -30,14 +30,16 @@ const loadTypeMetaFromPath = async (typePath, context) => {
   if (!typeFilePath) {
     throw errorTypeFileNotFound(absoluteTypePath)
   }
+  const typeProps = await readFile(typeFilePath)
   typeMeta = {
-    props: await readFile(typeFilePath),
+    props: typeProps,
 
     // NOTE BRN: Not sure that this is right. We need a soure path that will be usable after this path is serialized. This means it could be loaded on another users machine and their machine would try to load from this path. Seems like being relative to the project might be the most predicatable way to find this file on a cross machine basis.
     query: has('project.path', context)
       ? relative(context.project.path, absoluteTypePath)
       : typePath,
-    root: dirname(typeFilePath)
+    root: dirname(typeFilePath),
+    name: typeProps.name
   }
 
   // store type meta data in cache

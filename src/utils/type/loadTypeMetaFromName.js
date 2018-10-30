@@ -25,6 +25,8 @@ const NATIVE_NAMES = {
   ),
   Plugin: resolve(__dirname, '..', '..', '..', 'registry', 'Plugin'),
   Provider: resolve(__dirname, '..', '..', '..', 'registry', 'Provider'),
+  AwsApiGateway: resolve(__dirname, '..', '..', '..', 'registry', 'AwsApiGateway'),
+  RestApi: resolve(__dirname, '..', '..', '..', 'registry', 'RestApi'),
   AwsS3Website: resolve(__dirname, '..', '..', '..', 'registry', 'AwsS3Website'),
   AwsProvider: resolve(__dirname, '..', '..', '..', 'registry', 'AwsProvider'),
   AwsS3Bucket: resolve(__dirname, '..', '..', '..', 'registry', 'AwsS3Bucket'),
@@ -35,8 +37,8 @@ const NATIVE_NAMES = {
   AwsEventsRule: resolve(__dirname, '..', '..', '..', 'registry', 'AwsEventsRule'),
   TwilioPhoneNumber: resolve(__dirname, '..', '..', '..', 'registry', 'TwilioPhoneNumber'),
   AwsSnsTopic: resolve(__dirname, '..', '..', '..', 'registry', 'AwsSnsTopic'),
-  AwsDynamoDB: resolve(__dirname, '..', '..', 'types', 'AwsDynamoDB'),
-  AwsSnsSubscription: resolve(__dirname, '..', '..', 'types', 'AwsSnsSubscription')
+  AwsSnsSubscription: resolve(__dirname, '..', '..', '..', 'registry', 'AwsSnsSubscription'),
+  AwsDynamoDB: resolve(__dirname, '..', '..', '..', 'registry', 'AwsDynamoDB')
 }
 
 /**
@@ -48,7 +50,6 @@ const NATIVE_NAMES = {
  * }}
  */
 const loadTypeMetaFromName = async (typeName, context) => {
-  // console.log('loadTypeMetaFromName - typeName:', typeName)
   const absoluteTypePath = getProp(typeName, NATIVE_NAMES)
   if (!absoluteTypePath) {
     throw errorUnknownTypeName(typeName)

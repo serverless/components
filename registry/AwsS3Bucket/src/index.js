@@ -1,4 +1,4 @@
-import { get } from '@serverless/utils'
+import { get, pick } from '@serverless/utils'
 import { createBucket, deleteBucket } from './utils'
 
 const DEPLOY = 'deploy'
@@ -11,11 +11,6 @@ const AwsS3Bucket = (SuperClass) =>
       this.bucketName = inputs.bucketName
       this.provider = inputs.provider || context.get('provider')
     }
-
-    // hydrate(state, context) {
-    //   super.hydrate(state, context)
-    //   this.bucketName = state.bucketName || this.bucketName
-    // }
 
     shouldDeploy(prevInstance) {
       if (!prevInstance) {
@@ -31,13 +26,19 @@ const AwsS3Bucket = (SuperClass) =>
       context.log(`Creating Bucket: '${get('bucketName', this)}'`)
       await createBucket(this)
       context.log(`Bucket created: '${get('bucketName', this)}'`)
-      // context.saveState(this, { bucketName: this.bucketName }) // provider?
-      // await context.saveState()
     }
 
     async remove(context) {
       context.log(`Removing Bucket: '${this.bucketName}'`)
       await deleteBucket(this)
+    }
+
+    async info() {
+      return {
+        title: this.name,
+        type: this.extends,
+        data: pick(['name', 'license', 'version', 'bucketName'], this)
+      }
     }
 
     async updateS3Config({ event, filter, function: func }) {

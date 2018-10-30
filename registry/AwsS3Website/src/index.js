@@ -1,6 +1,9 @@
 import fs from 'fs'
 import path from 'path'
 import klawSync from 'klaw-sync'
+import mime from 'mime-types'
+const { execSync } = require('child_process')
+import { resolve } from '@serverless/utils'
 
 /*
 * Create Website Bucket
@@ -72,92 +75,34 @@ const createWebsiteBucket = async (s3, bucketName) => {
 * - Uploads folder to S3 Bucket
 */
 
-const uploadDir = async (s3, bucketName, assets, env = {}) => {
-  return new Promise((resolve, reject) => {
-    let items
+const uploadDir = async (s3, bucketName, assets) => {
+  const items = await new Promise((res, rej) => {
     try {
-      items = klawSync(assets)
+      res(klawSync(assets))
     } catch (error) {
-      reject(error)
+      rej(error)
+    }
+  })
+
+  const uploadItems = []
+  items.forEach((item) => {
+    if (item.stats.isDirectory()) {
+      return
     }
 
-    const uploadItems = []
-    items.forEach((item) => {
-      if (item.stats.isDirectory()) {
-        return
-      }
+    const itemParams = {
+      Bucket: bucketName,
+      Key: path.relative(assets, item.path),
+      Body: fs.readFileSync(item.path)
+    }
+    const file = path.basename(item.path)
 
-      const itemParams = {
-        Bucket: bucketName,
-        Key: path.relative(assets, item.path),
-        Body: fs.readFileSync(item.path)
-      }
-      const file = path.basename(item.path)
+    itemParams.ContentType = mime.lookup(file) || 'application/octet-stream'
 
-      if (file.slice(-5) == '.html') {
-        itemParams.ContentType = 'text/html'
-      }
-      if (file.slice(-4) == '.css') {
-        itemParams.ContentType = 'text/css'
-      }
-      if (file.slice(-3) == '.js') {
-        itemParams.ContentType = 'application/javascript'
-      }
-      if (file.slice(-5) == '.json') {
-        itemParams.ContentType = 'application/json'
-      }
-      if (file.slice(-4) == '.zip') {
-        itemParams.ContentType = 'application/zip'
-      }
-      if (file.slice(-4) == '.png') {
-        itemParams.ContentType = 'text/png'
-      }
-      if (file.slice(-4) == '.jpg') {
-        itemParams.ContentType = 'text/jpeg'
-      }
-      if (file.slice(-5) == '.jpeg') {
-        itemParams.ContentType = 'text/jpeg'
-      }
-      if (file.slice(-4) == '.gif') {
-        itemParams.ContentType = 'text/gif'
-      }
-      if (file.slice(-4) == '.svg') {
-        itemParams.ContentType = 'image/svg+xml'
-      }
-      if (file.slice(-5) == '.woff') {
-        itemParams.ContentType = 'font/woff'
-      }
-      if (file.slice(-6) == '.woff2') {
-        itemParams.ContentType = 'font/woff2'
-      }
-
-      uploadItems.push(s3.upload(itemParams).promise())
-    })
-
-    return Promise.all(uploadItems)
-      .then(() => {
-        // Include Environment Variables if they exist
-        let script = 'env = {};'
-        if (env) {
-          for (const e in env) {
-            // eslint-disable-line
-            script = script + `env.${e}="${env[e]}";` // eslint-disable-line
-          }
-        }
-
-        return s3
-          .upload({
-            Bucket: bucketName,
-            Key: 'env.js',
-            Body: Buffer.from(script, 'utf8')
-          })
-          .promise()
-          .catch((error) => {
-            console.log(error) // eslint-disable-line
-          })
-      })
-      .then(resolve)
+    uploadItems.push(s3.upload(itemParams).promise())
   })
+
+  await Promise.all(uploadItems)
 }
 
 /*
@@ -184,43 +129,90 @@ const deleteWebsiteBucket = async (s3, bucketName) => {
 * Component: AWS S3 Website
 */
 
-const AwsS3Website = {
-  shouldDeploy(prevInstance) {
-    if (!prevInstance) {
-      return 'deploy'
+const AwsS3Website = (SuperClass) =>
+  class extends SuperClass {
+    async construct(inputs, context) {
+      await super.construct(inputs, context)
+
+      this.projectDir = resolve(inputs.projectDir)
+      this.buildCmd = resolve(inputs.buildCmd)
+      this.env = resolve(inputs.env)
+
+      if (!path.isAbsolute(this.projectDir)) {
+        throw new Error('projectDir must be an absolute path. Construct local paths using ${path}.')
+      }
+
+      this.envFileLocation = path.resolve(this.projectDir, resolve(inputs.envFileLocation))
+      this.assets = path.resolve(this.projectDir, resolve(inputs.assets))
     }
-    if (prevInstance.bucket !== this.bucket) {
-      return 'replace'
+
+    shouldDeploy(prevInstance) {
+      if (!prevInstance) {
+        return 'deploy'
+      }
+      if (prevInstance.bucket !== resolve(this.bucket).toLowerCase()) {
+        return 'replace'
+      }
+
+      // return 'deploy'
     }
-  },
 
-  async deploy(prevInstance, context) {
-    const provider = this.provider
-    const AWS = provider.getSdk()
-    const s3 = new AWS.S3()
+    async deploy(prevInstance, context) {
+      // Include Environment Variables if they exist
+      let script = 'export const env = {\n'
+      if (this.env) {
+        for (const e in this.env) {
+        // eslint-disable-line
+        script += `${e}: ${JSON.stringify(resolve(this.env[e]))}\n` // eslint-disable-line
+        }
+      }
+      script += '}'
 
-    // Ensure bucket is lowercase
-    this.bucket = this.bucket.toLowerCase()
+      fs.writeFileSync(this.envFileLocation, script)
 
-    await createWebsiteBucket(s3, this.bucket)
-    await uploadDir(s3, this.bucket, this.assets, this.env)
+      if (this.buildCmd) {
+        console.log('Building website...') // eslint-disable-line no-console
+        execSync(
+          this.buildCmd,
+          {
+            cwd: this.projectDir
+          },
+          (error, stdErr) => {
+            if (error) {
+              console.error(stdErr) // eslint-disable-line no-console
+              throw new Error(error)
+            }
+          }
+        )
+      }
 
-    const s3Domain = `http://${this.bucket}.s3-website-${this.provider.region}.amazonaws.com`
-    context.log('Website Successfully Deployed:')
-    context.log(`  ${s3Domain}`)
-  },
+      const provider = this.provider
+      const AWS = provider.getSdk()
+      const s3 = new AWS.S3()
 
-  async remove(context) {
-    const provider = this.provider
-    const AWS = provider.getSdk()
-    const s3 = new AWS.S3()
+      // Ensure bucket is lowercase
+      this.bucket = this.bucket.toLowerCase()
 
-    await deleteWebsiteBucket(s3, this.bucket)
+      await createWebsiteBucket(s3, this.bucket)
+      // this.assets = assets
+      await uploadDir(s3, this.bucket, this.assets)
 
-    const s3Domain = `http://${this.bucket}.s3-website-${this.provider.region}.amazonaws.com`
-    context.log('Website Successfully Removed:')
-    context.log(`  ${s3Domain}`)
+      const s3Domain = `http://${this.bucket}.s3-website-${this.provider.region}.amazonaws.com`
+      context.log('Website Successfully Deployed:')
+      context.log(`  ${s3Domain}`)
+    }
+
+    async remove(context) {
+      const provider = this.provider
+      const AWS = provider.getSdk()
+      const s3 = new AWS.S3()
+
+      await deleteWebsiteBucket(s3, this.bucket)
+
+      const s3Domain = `http://${this.bucket}.s3-website-${this.provider.region}.amazonaws.com`
+      context.log('Website Successfully Removed:')
+      context.log(`  ${s3Domain}`)
+    }
   }
-}
 
 export default AwsS3Website

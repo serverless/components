@@ -1,0 +1,96 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`#serialize() serialize a simple component 1`] = `
+Object {
+  "entryKey": "@@ref-1",
+  "referenceables": Object {
+    "@@ref-1": Object {
+      "props": Object {
+        "components": Object {
+          "type": "undefined",
+        },
+        "extends": Object {
+          "data": "Object",
+          "type": "string",
+        },
+        "inputTypes": Object {
+          "@@ref": "@@ref-2",
+        },
+        "inputs": Object {
+          "@@ref": "@@ref-3",
+        },
+        "instanceId": Object {
+          "data": "test",
+          "type": "string",
+        },
+        "main": Object {
+          "data": "./dist/index.js",
+          "type": "string",
+        },
+        "name": Object {
+          "data": "Component",
+          "type": "string",
+        },
+        "version": Object {
+          "data": "0.3.0",
+          "type": "string",
+        },
+        Symbol(@@type): Object {
+          "props": Object {
+            "parent": Object {
+              "@@ref": "@@ref-5",
+            },
+            "props": Object {
+              "@@ref": "@@ref-4",
+            },
+            "query": Object {
+              "data": "Component",
+              "type": "string",
+            },
+            "root": Object {
+              "data": "/Users/brianneisler/Sites/serverless/components/registry/Component",
+              "type": "string",
+            },
+          },
+          "symbols": Object {},
+          "type": "object",
+        },
+      },
+      "symbols": Object {},
+      "type": "Component",
+    },
+    "@@ref-2": Object {
+      "props": Object {
+        "components": Object {
+          "@@ref": "@@ref-6",
+        },
+      },
+      "symbols": Object {},
+      "type": "object",
+    },
+    "@@ref-3": Object {
+      "props": Object {},
+      "symbols": Object {},
+      "type": "object",
+    },
+    "@@ref-6": Object {
+      "props": Object {
+        "default": Object {
+          "@@ref": "@@ref-7",
+        },
+        "type": Object {
+          "data": "Object",
+          "type": "string",
+        },
+      },
+      "symbols": Object {},
+      "type": "object",
+    },
+    "@@ref-7": Object {
+      "props": Object {},
+      "symbols": Object {},
+      "type": "object",
+    },
+  },
+}
+`;

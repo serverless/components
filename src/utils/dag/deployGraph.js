@@ -1,14 +1,35 @@
-import { all, isEmpty, map } from '@serverless/utils'
+import { all, get, isEmpty, map } from '@serverless/utils'
 import resolveComponentVariables from '../component/resolveComponentVariables'
 import cloneGraph from './cloneGraph'
+import detectCircularDeps from './detectCircularDeps'
 
 const deployNode = async (node, context) => {
+  context.debug(
+    `checking node for deploy - operation: ${node.operation} instanceId: ${
+      node.instanceId
+    } nextInstance: ${get('nextInstance.name', node)} prevInstance: ${get(
+      'prevInstance.name',
+      node
+    )}`
+  )
   if (['deploy', 'replace'].includes(node.operation)) {
+    if (!node.nextInstance) {
+      throw new Error('deployGraph expected nextInstance to be defined for deploy operation')
+    }
+    context.debug(`deploying node: ${node.nextInstance.name} { instanceId: ${node.instanceId} }`)
+    if (node.nextInstance.name === undefined) {
+      context.debug(`This instance has an undefined name`)
+      context.debug(node.nextInstance)
+    }
     const nextInstance = resolveComponentVariables(node.nextInstance)
     const prevInstance = !isEmpty(node.prevInstance)
       ? resolveComponentVariables(node.prevInstance)
       : node.prevInstance
     await nextInstance.deploy(prevInstance, context)
+    context.debug(
+      `node deployment complete: ${nextInstance.name} { instanceId: ${node.instanceId} }`
+    )
+    // TODO BRN: We should probably save state incrementally as we deploy each node
   }
 }
 
@@ -17,7 +38,7 @@ const deployNodeIds = async (nodeIds, graph, context) =>
     map(async (nodeId) => {
       const node = graph.node(nodeId)
       if (!node) {
-        throw new Error('could not find node for nodeId:', nodeId)
+        throw new Error(`could not find node for nodeId:${nodeId}`)
       }
       await deployNode(node, context)
       graph.removeNode(nodeId)
@@ -26,7 +47,13 @@ const deployNodeIds = async (nodeIds, graph, context) =>
 
 const deployLeaves = async (graph, context) => {
   const leaves = graph.sinks()
+  context.debug('checking leaves:', leaves)
   if (isEmpty(leaves)) {
+    context.debug('leaves empty:', leaves)
+    if (graph.nodeCount() > 0) {
+      detectCircularDeps(graph)
+      throw new Error('Graph deployment did not complete')
+    }
     return graph
   }
 

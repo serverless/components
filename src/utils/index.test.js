@@ -6,14 +6,14 @@ describe('index', () => {
   })
 
   test('has cli methods', () => {
-    const mod = require('./')
+    const mod = require('./cli')
     expect(mod).toMatchObject({
       createCli: expect.any(Function)
     })
   })
 
   test('has component methods', () => {
-    const mod = require('./')
+    const mod = require('./component')
     expect(mod).toMatchObject({
       appendKey: expect.any(Function),
       defineComponent: expect.any(Function),
@@ -33,7 +33,7 @@ describe('index', () => {
   })
 
   test('has config methods', () => {
-    const mod = require('./')
+    const mod = require('./config')
     expect(mod).toMatchObject({
       createConfig: expect.any(Function),
       getConfig: expect.any(Function),
@@ -42,7 +42,7 @@ describe('index', () => {
   })
 
   test('has constants values', () => {
-    const mod = require('./')
+    const mod = require('./constants')
     expect(mod).toMatchObject({
       DEFAULT_PLUGINS: expect.any(Object),
       PLUGINS_DIR: expect.any(String),
@@ -54,38 +54,59 @@ describe('index', () => {
   })
 
   test('has context methods', () => {
-    const mod = require('./')
+    const mod = require('./context')
     expect(mod).toMatchObject({
       createContext: expect.any(Function),
       newContext: expect.any(Function)
     })
   })
 
-  test('has deployment methods', () => {
-    const mod = require('./')
+  test('has dag methods', () => {
+    const mod = require('./dag')
     expect(mod).toMatchObject({
+      buildGraph: expect.any(Function),
+      cloneGraph: expect.any(Function),
+      deployGraph: expect.any(Function),
+      detectCircularDeps: expect.any(Function),
+      removeGraph: expect.any(Function)
+    })
+  })
+
+  test('has deployment methods', () => {
+    const mod = require('./deployment')
+    expect(mod).toEqual({
       createDeployment: expect.any(Function),
       loadDeployment: expect.any(Function),
-      newDeployment: expect.any(Function)
+      loadPreviousDeployment: expect.any(Function),
+      newDeployment: expect.any(Function),
+      parseDeploymentNumber: expect.any(Function)
+    })
+  })
+
+  test('has interpret methods', () => {
+    const mod = require('./interpret')
+    expect(mod).toMatchObject({
+      interpretProps: expect.any(Function)
     })
   })
 
   test('has logging methods', () => {
-    const mod = require('./')
-    expect(mod).toMatchObject({
+    const mod = require('./logging')
+    expect(mod).toEqual({
+      debug: expect.any(Function),
       log: expect.any(Function)
     })
   })
 
   test('has misc methods', () => {
-    const mod = require('./')
+    const mod = require('./misc')
     expect(mod).toMatchObject({
       handleSignalEvents: expect.any(Function)
     })
   })
 
   test('has plugin methods', () => {
-    const mod = require('./')
+    const mod = require('./plugin')
     expect(mod).toMatchObject({
       findPluginForCommand: expect.any(Function),
       loadPlugin: expect.any(Function),
@@ -94,7 +115,7 @@ describe('index', () => {
   })
 
   test('has registry methods', () => {
-    const mod = require('./')
+    const mod = require('./registry')
     expect(mod).toMatchObject({
       getRegistryBucketRoot: expect.any(Function),
       isSemver: expect.any(Function),
@@ -103,7 +124,7 @@ describe('index', () => {
   })
 
   test('has serialize methods', () => {
-    const mod = require('./')
+    const mod = require('./serialize')
     expect(mod).toMatchObject({
       deserialize: expect.any(Function),
       serialize: expect.any(Function)
@@ -111,7 +132,7 @@ describe('index', () => {
   })
 
   test('has type methods', () => {
-    const mod = require('./')
+    const mod = require('./type')
     expect(mod).toMatchObject({
       anyTypeFileExistsAtPath: expect.any(Function),
       construct: expect.any(Function),
@@ -124,7 +145,7 @@ describe('index', () => {
   })
 
   test('has variable methods', () => {
-    const mod = require('./')
+    const mod = require('./variable')
     expect(mod).toMatchObject({
       hasVariableString: expect.any(Function),
       isVariable: expect.any(Function),

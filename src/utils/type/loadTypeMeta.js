@@ -1,5 +1,4 @@
 import { isUrl } from '@serverless/utils'
-import errorBadTypeQuery from './errorBadTypeQuery'
 import isTypeName from './isTypeName'
 import isTypeRegistryQuery from './isTypeRegistryQuery'
 import loadTypeMetaFromName from './loadTypeMetaFromName'
@@ -25,8 +24,6 @@ const loadTypeMeta = async (query, context) => {
     return loadTypeMetaFromName(query, context)
   }
   return loadTypeMetaFromPath(query, context)
-
-  throw errorBadTypeQuery(query)
 }
 
 export default loadTypeMeta

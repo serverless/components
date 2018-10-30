@@ -81,15 +81,6 @@ const AwsIamRole = async (SuperClass, superContext) => {
   const AwsIamPolicy = await superContext.loadType('AwsIamPolicy')
 
   return class extends SuperClass {
-    shouldDeploy(prevInstance) {
-      if (!prevInstance) {
-        return 'deploy'
-      }
-      if (prevInstance.roleName !== this.roleName) {
-        return 'replace'
-      }
-    }
-
     async define() {
       const policy = resolve(this.policy)
       if (is(AwsIamPolicy.class, policy)) {
@@ -106,27 +97,27 @@ const AwsIamRole = async (SuperClass, superContext) => {
       const IAM = new AWS.IAM()
 
       // HACK BRN: Temporary workaround until we add property type/default support
-      const roleName = this.roleName || `role-${this.instanceId}`
       const defaultPolicy = {
         arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
       }
 
-      const policy = this.policy || defaultPolicy
+      this.roleName = this.roleName || `role-${this.instanceId}`
+      this.policy = this.policy || defaultPolicy
 
       if (!prevInstance) {
-        context.log(`Creating Role: ${roleName}`)
+        context.log(`Creating Role: ${this.roleName}`)
         this.arn = await createRole(IAM, {
-          roleName,
+          roleName: this.roleName,
           service: this.service,
-          policy
+          policy: this.policy
         })
       } else {
         if (prevInstance.service !== this.service) {
           await updateAssumeRolePolicy(IAM, this)
         }
-        if (!equals(prevInstance.policy, policy)) {
+        if (!equals(prevInstance.policy, this.policy)) {
           await detachRolePolicy(IAM, prevInstance)
-          await attachRolePolicy(IAM, { roleName: this.roleName, policy })
+          await attachRolePolicy(IAM, { roleName: this.roleName, policy: this.policy })
         }
       }
     }
@@ -141,7 +132,7 @@ const AwsIamRole = async (SuperClass, superContext) => {
         this.arn = await deleteRole(IAM, this)
       } catch (e) {
         if (!e.message.includes('Role not found')) {
-          throw new Error(e)
+          throw e
         }
       }
     }

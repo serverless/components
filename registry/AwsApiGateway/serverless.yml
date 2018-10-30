@@ -1,0 +1,39 @@
+name: AwsApiGateway
+extends: Component
+
+version: 0.3.0
+core: 0.3.x
+main: ./dist/index.js
+
+description: "Provision AWS API Gateway with serverless components."
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
+
+id:
+  type: string
+  description: API Gateways id
+baseUrl:
+  type: string
+  description: The API Gateways base URL
+urls:
+  type: array
+  description: All the generated API Gateway URLs
+
+inputTypes:
+  provider:
+    type: AwsProvider
+    required: true
+    description: "The AWS provider the holds the AWS credentials and SDK instance"
+  name:
+    type: string
+    default: apig-${self.instanceId}
+    description: Name of API gateway in AWS console
+  role:
+    type: AwsIamRole
+    required: true
+    description: AWS Arn role for API gateway to assume
+  routes:
+    type: object
+    required: true
+    description: Declaration of routes

@@ -12,10 +12,14 @@
   },
   "homepage": "https://github.com/serverless/components#readme",
   "bin": {
-    "components": "./bin/components"
+    "components": "./bin/components",
+    "serverless": "./bin/serverless",
+    "sls": "./bin/sls"
   },
   "scripts": {
-    "build": "babel src --out-dir dist --source-maps --copy-files --ignore '**/node_modules' --ignore '**/*.test.js'",
+    "build": "npm-run-all --parallel build:*",
+    "build:core": "babel src --out-dir dist --source-maps --copy-files --ignore '**/node_modules' --ignore '**/*.test.js'",
+    "build:registry": "node ./registry/build.js",
     "watch:core": "babel --watch src --out-dir dist --source-maps --copy-files --ignore '**/node_modules' --ignore '**/*.test.js'",
     "watch:registry": "node ./registry/watch.js",
     "watch": "npm-run-all --parallel watch:*",
@@ -35,7 +39,7 @@
   "dependencies": {
     "@babel/polyfill": "^7.0.0",
     "@octokit/rest": "^14.0.5",
-    "@serverless/utils": "0.0.14",
+    "@serverless/utils": "0.0.15",
     "analytics-node": "^3.2.0",
     "archiver": "^3.0.0",
     "aws-sdk": "^2.214.1",
@@ -78,7 +82,7 @@
     "eslint-plugin-import": "^2.9.0",
     "eslint-plugin-prettier": "^2.6.0",
     "jest": "^22.4.2",
-    "lint-staged": "^7.0.4",
+    "lint-staged": "^8.0.0",
     "markdown-magic": "^0.1.21",
     "pre-commit": "^1.2.2",
     "prettier": "^1.12.1"

@@ -1,4 +1,4 @@
-import { all, mapObjIndexed, resolve } from '@serverless/utils'
+import { append, map, or, reduce } from '@serverless/utils'
 
 const Service = async (SuperClass, superContext) => {
   const Fn = await superContext.loadType('Function')
@@ -6,15 +6,13 @@ const Service = async (SuperClass, superContext) => {
   return class extends SuperClass {
     async construct(inputs, context) {
       await super.construct(inputs, context)
-      this.functions = await all(
-        mapObjIndexed(
-          async (func, alias) =>
-            context.construct(Fn, {
-              ...func,
-              functionName: func.functionName || alias
-            }),
-          resolve(this.functions)
-        )
+      this.functions = await map(
+        async (func, alias) =>
+          context.construct(Fn, {
+            ...func,
+            functionName: func.functionName || alias
+          }),
+        this.functions
       )
     }
 
@@ -23,6 +21,26 @@ const Service = async (SuperClass, superContext) => {
       return {
         ...this.functions,
         ...this.components
+      }
+    }
+
+    async info() {
+      const functions = await reduce(
+        async (accum, func) => append(await func.info(), accum),
+        [],
+        or(this.functions, {})
+      )
+      const components = await reduce(
+        async (accum, component) => append(await component.info(), accum),
+        [],
+        or(this.components, {})
+      )
+
+      return {
+        title: this.name,
+        type: this.extends,
+        data: {},
+        children: [...functions, ...components]
       }
     }
   }

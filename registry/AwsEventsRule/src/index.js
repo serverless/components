@@ -8,33 +8,35 @@ const AwsEventsRule = (SuperClass) =>
       this.lambda = inputs.lambda
       this.enabled = inputs.enabled
       this.schedule = inputs.schedule
-      this.functionRuleName = inputs.lambda.getId().split(':')[
-        inputs.lambda.getId().split(':').length - 1
-      ]
     }
     shouldDeploy(prevInstance) {
       if (!prevInstance) {
         return 'deploy'
       }
-      if (prevInstance.functionRuleName !== this.functionRuleName) {
+      if (prevInstance.schedule !== this.schedule) {
         return 'replace'
       }
+      return 'deploy'
     }
     async deploy(prevInstance = {}, context) {
-      const AWS = this.provider.getSdk()
+      const provider = this.provider
+      this.functionRuleName = this.lambda.getId().split(':')[
+        this.lambda.getId().split(':').length - 1
+      ]
+      const AWS = provider.getSdk()
       const cloudWatchEvents = new AWS.CloudWatchEvents()
       const lambda = new AWS.Lambda()
 
-      context.log('Creating Schedule...')
-
       const inputsProps = ['functionRuleName', 'schedule', 'enabled']
       const inputs = pick(inputsProps, this)
-      const prevInputs = pick(inputsProps, prevInstance)
+      const prevInputs = pick(inputsProps, prevInstance || {})
       const noChanges = equals(inputs, prevInputs)
 
       if (noChanges) {
         return this
       }
+
+      context.log('Creating Schedule...')
 
       const State = this.enabled ? 'ENABLED' : 'DISABLED'
 
@@ -63,7 +65,9 @@ const AwsEventsRule = (SuperClass) =>
       const addPermissionParams = {
         Action: 'lambda:InvokeFunction',
         FunctionName: this.functionRuleName,
-        StatementId: this.functionRuleName,
+        StatementId: `${this.functionRuleName}-${Math.random()
+          .toString(36)
+          .substring(7)}`,
         Principal: 'events.amazonaws.com'
       }
 

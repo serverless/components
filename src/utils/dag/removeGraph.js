@@ -1,12 +1,28 @@
-import { all, isEmpty, map } from '@serverless/utils'
+import { all, get, isEmpty, map } from '@serverless/utils'
 import resolveComponentVariables from '../component/resolveComponentVariables'
 import cloneGraph from './cloneGraph'
 
 const removeNode = async (node, context) => {
-  let { prevInstance } = node
-  if (!isEmpty(prevInstance) && ['remove', 'replace'].includes(node.operation)) {
-    prevInstance = resolveComponentVariables(prevInstance)
+  context.debug(
+    `checking node for removal - operation: ${node.operation} instanceId: ${
+      node.instanceId
+    } nextInstance: ${get('nextInstance.name', node)} prevInstance: ${get(
+      'prevInstance.name',
+      node
+    )}`
+  )
+  if (['remove', 'replace'].includes(node.operation)) {
+    if (!node.prevInstance) {
+      throw new Error('deployGraph expected prevInstance to be defined for deploy operation')
+    }
+    context.debug(`removing node: ${node.prevInstance.name} { instanceId: ${node.instanceId} }`)
+    if (node.prevInstance.name === undefined) {
+      context.debug(`This instance has an undefined name`)
+      context.debug(node.prevInstance)
+    }
+    const prevInstance = resolveComponentVariables(node.prevInstance)
     await prevInstance.remove(context)
+    context.debug(`node removal complete: ${prevInstance.name} { instanceId: ${node.instanceId} }`)
   }
 }
 

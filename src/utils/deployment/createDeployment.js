@@ -1,14 +1,17 @@
-import { map, pick } from '@serverless/utils'
 import loadState from '../state/loadState'
 import saveState from '../state/saveState'
 import newDeployment from './newDeployment'
 
 const createDeployment = async (previousDeployment, app) => {
-  let state = {}
+  const state = {
+    previousInstance: null,
+    instance: {}
+  }
   let number = 1
   if (previousDeployment) {
-    state = await loadState(previousDeployment)
-    state = map((stateObject) => pick(['instanceId', 'key'], stateObject), state)
+    const previousState = await loadState(previousDeployment)
+    state.previousInstance = previousState.instance
+    state.instance = previousState.instance
     number = previousDeployment.number + 1
   }
   const id = `${app.id}-${number}`

@@ -111,6 +111,31 @@ describe('AwsIamRole', () => {
     expect(sleep).toBeCalledWith(15000)
   })
 
+  it('should do nothing if role was not changed', async () => {
+    const inputs = {
+      roleName: 'abc',
+      service: 'lambda.amazonaws.com',
+      provider
+    }
+    let awsIamRole = await AwsIamRole(SuperClass, SuperContext)
+    awsIamRole = new awsIamRole(inputs, context)
+
+    const prevInstance = {
+      service: 'lambda.amazonaws.com',
+      policy: {
+        arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
+      }
+    }
+
+    await awsIamRole.deploy(prevInstance, context)
+
+    expect(mocks.createRoleMock).not.toHaveBeenCalled()
+    expect(mocks.deleteRoleMock).not.toHaveBeenCalled()
+    expect(mocks.attachRolePolicyMock).not.toHaveBeenCalled()
+    expect(mocks.detachRolePolicyMock).not.toHaveBeenCalled()
+    expect(mocks.updateAssumeRolePolicyMock).not.toHaveBeenCalled()
+  })
+
   it('should update service if changed', async () => {
     const inputs = {
       roleName: 'abc',

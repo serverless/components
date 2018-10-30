@@ -1,5 +1,5 @@
-const hydrateComponent = (component, context) => {
-  const state = context.getState(component)
+const hydrateComponent = (component, state, context) => {
+  // const state = context.getState(component)
   component.hydrate(state, context)
   if (!component.instanceId) {
     throw new Error(

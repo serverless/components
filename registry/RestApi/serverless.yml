@@ -1,0 +1,36 @@
+name: RestApi
+extends: Component
+
+version: 0.3.0
+core: 0.3.x
+main: ./dist/index.js
+
+description: "REST API type component."
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
+
+paths:
+  type: array
+  description: An array of registered URL's with relevant information.
+baseUrl:
+  type: string
+apiName:
+  type: string
+gateway:
+  type: object
+
+inputTypes:
+  provider:
+    type: AwsProvider
+    required: true
+  gateway:
+    type: string
+    enum: [AwsApiGateway]
+  apiName:
+    type: string
+    required: false
+    default: api-${self.instanceId}
+  routes:
+    type: object
+    required: true
