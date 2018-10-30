@@ -14,6 +14,10 @@ jest.mock('fs', () => ({
   readFileSync: jest.fn().mockReturnValue('zipfilecontent')
 }))
 
+jest.mock('folder-hash', () => ({
+  hashElement: jest.fn().mockReturnValue({ hash: 'abc' })
+}))
+
 const mocks = {
   createFunctionMock: jest.fn().mockReturnValue({ FunctionArn: 'abc:zxc' }),
   updateFunctionCodeMock: jest.fn().mockReturnValue({ FunctionArn: 'abc:zxc' }),
@@ -75,7 +79,8 @@ describe('AwsLambdaFunction', () => {
 
     expect(packDir).toBeCalledWith('./code', outputFilePath, [])
     expect(readFileSync).toBeCalledWith(outputFilePath)
-    expect(awsLambdaFunction.code).toEqual('zipfilecontent')
+    expect(awsLambdaFunction.zip).toEqual('zipfilecontent')
+    expect(awsLambdaFunction.code).toEqual('./code')
     expect(file).toEqual('zipfilecontent')
 
     Date.now.mockRestore()
@@ -103,7 +108,8 @@ describe('AwsLambdaFunction', () => {
 
     expect(packDir).toBeCalledWith('./code', outputFilePath, ['./shim/path.js'])
     expect(readFileSync).toBeCalledWith(outputFilePath)
-    expect(awsLambdaFunction.code).toEqual('zipfilecontent')
+    expect(awsLambdaFunction.code).toEqual(awsLambdaFunction.code)
+    expect(awsLambdaFunction.zip).toEqual('zipfilecontent')
     expect(file).toEqual('zipfilecontent')
 
     Date.now.mockRestore()
@@ -127,6 +133,7 @@ describe('AwsLambdaFunction', () => {
     awsLambdaFunction.functionDescription = 'hello description'
     awsLambdaFunction.handler = 'index.handler'
     awsLambdaFunction.code = './code'
+    awsLambdaFunction.zip = 'zipfilecontent'
     awsLambdaFunction.runtime = 'nodejs8.10'
     awsLambdaFunction.memorySize = 512
     awsLambdaFunction.timeout = 10
@@ -143,7 +150,7 @@ describe('AwsLambdaFunction', () => {
     const createFunctionParams = {
       FunctionName: awsLambdaFunction.functionName,
       Code: {
-        ZipFile: awsLambdaFunction.code
+        ZipFile: awsLambdaFunction.zip
       },
       Description: awsLambdaFunction.functionDescription,
       Handler: awsLambdaFunction.handler,
@@ -179,6 +186,7 @@ describe('AwsLambdaFunction', () => {
     awsLambdaFunction.functionDescription = 'hello description'
     awsLambdaFunction.handler = 'index.handler'
     awsLambdaFunction.code = './code'
+    awsLambdaFunction.zip = 'zipfilecontent'
     awsLambdaFunction.runtime = 'nodejs8.10'
     awsLambdaFunction.memorySize = 512
     awsLambdaFunction.timeout = 10
@@ -190,7 +198,7 @@ describe('AwsLambdaFunction', () => {
       arn: 'some:aws:arn'
     }
 
-    await awsLambdaFunction.deploy({ some: 'prob' }, context)
+    await awsLambdaFunction.deploy({ functionName: 'hello' }, context)
 
     const updateFunctionConfigurationParams = {
       FunctionName: awsLambdaFunction.functionName,
@@ -207,7 +215,7 @@ describe('AwsLambdaFunction', () => {
 
     const updateFunctionCodeParams = {
       FunctionName: awsLambdaFunction.functionName,
-      ZipFile: awsLambdaFunction.code,
+      ZipFile: awsLambdaFunction.zip,
       Publish: true
     }
 
@@ -281,8 +289,13 @@ describe('AwsLambdaFunction', () => {
     const awsLambdaFunction = await context.construct(AwsLambdaFunction, {})
 
     awsLambdaFunction.functionName = 'hello'
+    awsLambdaFunction.role = {
+      roleName: 'roleName'
+    }
 
-    expect(awsLambdaFunction.shouldDeploy({ functionName: 'world' })).toEqual('replace')
+    expect(
+      awsLambdaFunction.shouldDeploy({ functionName: 'world', role: { roleName: 'roleName' } })
+    ).toEqual('replace')
   })
 
   it('should define AwsIamRole as child if role is not provided', async () => {
@@ -302,8 +315,8 @@ describe('AwsLambdaFunction', () => {
     const children = await awsLambdaFunction.define(context)
 
     expect(children.role.name).toEqual('AwsIamRole')
-    expect(children.role.roleName.get()).toEqual(`${awsLambdaFunction.functionName}-execution-role`)
-    expect(children.role.service.get()).toEqual('lambda.amazonaws.com')
-    expect(children.role.provider.get()).toEqual(provider)
+    expect(children.role.roleName).toEqual(`${awsLambdaFunction.functionName}-execution-role`)
+    expect(children.role.service).toEqual('lambda.amazonaws.com')
+    expect(children.role.provider).toEqual(provider)
   })
 })
