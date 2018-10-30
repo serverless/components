@@ -21,6 +21,7 @@ describe('Integration Test - define types', () => {
         name: 'Object',
         version: '0.3.0'
       },
+      query: 'Object',
       root: expect.stringMatching(/^.*Object$/)
     })
   })
