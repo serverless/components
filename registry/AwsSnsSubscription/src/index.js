@@ -69,6 +69,19 @@ const AwsSnsSubscription = {
 
   async remove(context) {
     return getProtocol(this.protocol).remove(this, context)
+  },
+
+  async info() {
+    return {
+      title: this.subscriptionArn,
+      type: this.extends,
+      data: {
+        arn: this.subscriptionArn,
+        topic: this.topic,
+        protocol: this.protocol,
+        endpoint: this.endpoint
+      }
+    }
   }
 }
 

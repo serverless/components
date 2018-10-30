@@ -199,6 +199,17 @@ const AwsSnsTopic = {
       })
       .promise()
     context.log(`SNS topic '${this.topicName}' removed.`)
+  },
+
+  async info() {
+    return {
+      title: this.topicName,
+      type: this.extends,
+      data: {
+        topicName: this.topicName,
+        arn: this.topicArn
+      }
+    }
   }
 }
 
