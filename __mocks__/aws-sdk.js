@@ -7,7 +7,12 @@ const mocks = {
     }
     return Promise.resolve({ Contents: [{ Key: 'abc' }] })
   }),
-  deleteObjectsMock: jest.fn()
+  deleteObjects: jest.fn(),
+  putRule: jest.fn().mockReturnValue({ RuleArn: 'abc:zxc' }),
+  putTargets: jest.fn(),
+  removeTargets: jest.fn(),
+  deleteRule: jest.fn(),
+  addPermission: jest.fn()
 }
 
 const S3 = function() {
@@ -27,10 +32,37 @@ const S3 = function() {
   }
 }
 
+const Lambda = function() {
+  return {
+    addPermission: (obj) => ({
+      promise: () => mocks.addPermission(obj)
+    })
+  }
+}
+
+const CloudWatchEvents = function() {
+  return {
+    putRule: (obj) => ({
+      promise: () => mocks.putRule(obj)
+    }),
+    putTargets: (obj) => ({
+      promise: () => mocks.putTargets(obj)
+    }),
+    removeTargets: (obj) => ({
+      promise: () => mocks.removeTargets(obj)
+    }),
+    deleteRule: (obj) => ({
+      promise: () => mocks.deleteRule(obj)
+    })
+  }
+}
+
 export default {
   mocks,
   config: {
     update: jest.fn()
   },
-  S3
+  S3,
+  Lambda,
+  CloudWatchEvents
 }
