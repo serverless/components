@@ -7,7 +7,7 @@ const mocks = {
     }
     return Promise.resolve({ Contents: [{ Key: 'abc' }] })
   }),
-  deleteObjects: jest.fn(),
+  deleteObjectsMock: jest.fn(),
   putRule: jest.fn().mockReturnValue({ RuleArn: 'abc:zxc' }),
   putTargets: jest.fn(),
   removeTargets: jest.fn(),
