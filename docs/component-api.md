@@ -1,6 +1,6 @@
 # Component Lifecycle
 
-Components are constructed in different ways depending upon the command that is taken.
+Components are constructed in different ways depending upon the command that is executed.
 
 ## Concepts
 
@@ -16,14 +16,32 @@ A component application
 
 This document outlines the component methods that are available and gives a detailed explanation of the purpose of each method along with how to think about using and implementing the API for each component.
 
-## construct()
+## construct(inputs, context)
 
-Similar to a class constructor, this method can be used to assign properties to your component instance.
+Similar to a class constructor, this method can be used to assign properties to your component instance. You can also define any data for you instance as well like default values or instantiation of more complex data types.  (see note)
 
-## hydrate()
+NOTE: This method is async and **must** be declared as async and **must** call and await the `super.construct` method. This will likely be changed in the near future to be sync to prevent confusion associated with writing this method.
+```js
+const MyComponent = {
+  async construct(inputs, context) {
+    await super.construct(inputs, context)
+    this.myProp = inputs.myProp
+  }
+}
+```
 
-## shouldDeploy()
+## define(context)
+  - programmatically define your component's children
 
-## deploy()
+## hydrate(previousInstance, context)
+- setup any values in your instance using the state of a previous instance. Used for preserving values across multiple calls to deploy when values don't change. Can also be used to rebuild complex data types that don't get persisted in state.  
 
-## remove()
+
+## shouldDeploy(previousInstance, context)
+- perform comparisons against the previous instance from state and indicate to the core whether your component should be deployed at all
+
+## deploy(previousInstance, context)
+- if your component is responsible for a specific resource, make the sdk calls to deploy the resource now
+
+## remove(context)
+  - if your component is responsible for a specific resource, make the sdk calls to remove the resource now
