@@ -22,6 +22,7 @@ describe('#newContext()', () => {
       app: {},
       cache: {},
       construct: expect.any(Function),
+      create: expect.any(Function),
       createDeployment: expect.any(Function),
       createInstance: expect.any(Function),
       createRemovalDeployment: expect.any(Function),
