@@ -135,7 +135,7 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
       const prevConfig = prevInstance ? pick(keys(currentConfig), prevInstance) : {}
       const configChanged = not(equals(currentConfig, prevConfig))
       const roleChanged = prevInstance
-        ? resolve(this.role).roleName === prevInstance.role.roleName
+        ? resolve(this.role).roleName !== prevInstance.role.roleName
         : true
 
       if (prevInstance && prevInstance.functionName !== currentConfig.functionName) {

@@ -1,8 +1,16 @@
+import AWS from 'aws-sdk'
 import path from 'path'
 import { tmpdir } from 'os'
-import { createContext } from '../../../src/utils'
 import { packDir } from '@serverless/utils'
 import { readFileSync } from 'fs'
+import {
+  createContext,
+  deserialize,
+  resolveComponentVariables,
+  serialize
+} from '../../../src/utils'
+
+jest.setTimeout(10000)
 
 jest.mock('@serverless/utils', () => ({
   ...require.requireActual('@serverless/utils'),
@@ -18,36 +26,6 @@ jest.mock('folder-hash', () => ({
   hashElement: jest.fn().mockReturnValue({ hash: 'abc' })
 }))
 
-const mocks = {
-  createFunctionMock: jest.fn().mockReturnValue({ FunctionArn: 'abc:zxc' }),
-  updateFunctionCodeMock: jest.fn().mockReturnValue({ FunctionArn: 'abc:zxc' }),
-  updateFunctionConfigurationMock: jest.fn().mockReturnValue({ FunctionArn: 'abc:zxc' }),
-  deleteFunctionMock: jest.fn()
-}
-
-const provider = {
-  getSdk: () => {
-    return {
-      Lambda: function() {
-        return {
-          createFunction: (obj) => ({
-            promise: () => mocks.createFunctionMock(obj)
-          }),
-          updateFunctionConfiguration: (obj) => ({
-            promise: () => mocks.updateFunctionConfigurationMock(obj)
-          }),
-          updateFunctionCode: (obj) => ({
-            promise: () => mocks.updateFunctionCodeMock(obj)
-          }),
-          deleteFunction: (obj) => ({
-            promise: () => mocks.deleteFunctionMock(obj)
-          })
-        }
-      }
-    }
-  }
-}
-
 beforeEach(() => {
   jest.clearAllMocks()
 })
@@ -56,21 +34,43 @@ afterAll(() => {
   jest.restoreAllMocks()
 })
 
+const createTestContext = async () =>
+  createContext(
+    {
+      cwd: path.join(__dirname, '..'),
+      overrides: {
+        debug: () => {},
+        log: () => {}
+      }
+    },
+    {
+      app: {
+        id: 'test'
+      }
+    }
+  )
+
 describe('AwsLambdaFunction', () => {
   it('should pack lambda without shim', async () => {
-    let context = await createContext({
-      cwd: path.join(__dirname, '..')
+    Date.now = jest.fn(() => '1')
+    const context = await createTestContext()
+
+    const AwsProvider = await context.loadType('AwsProvider')
+    const AwsLambdaFunction = await context.loadType('./')
+
+    let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+      provider: await context.construct(AwsProvider, {}),
+      code: './code',
+      functionName: 'hello'
     })
 
-    context = await context.loadProject()
-    context = await context.loadApp()
+    awsLambdaFunction['@@key'] = 'hello' // for some reason this does not get auto set!
 
-    const AwsLambdaFunction = await context.loadType('./')
-    const awsLambdaFunction = await context.construct(AwsLambdaFunction, {})
+    awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
 
-    awsLambdaFunction.code = './code'
+    awsLambdaFunction = resolveComponentVariables(awsLambdaFunction)
+
     awsLambdaFunction.instanceId = 'instanceId'
-    Date.now = jest.fn(() => '1')
 
     const file = await awsLambdaFunction.pack()
 
@@ -87,19 +87,25 @@ describe('AwsLambdaFunction', () => {
   })
 
   it('should pack lambda with shim', async () => {
-    let context = await createContext({
-      cwd: path.join(__dirname, '..')
+    Date.now = jest.fn(() => '1')
+    const context = await createTestContext()
+
+    const AwsProvider = await context.loadType('AwsProvider')
+    const AwsLambdaFunction = await context.loadType('./')
+
+    let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+      provider: await context.construct(AwsProvider, {}),
+      code: ['./code', './shim/path.js'],
+      functionName: 'hello'
     })
 
-    context = await context.loadProject()
-    context = await context.loadApp()
+    awsLambdaFunction['@@key'] = 'hello' // for some reason this does not get auto set!
 
-    const AwsLambdaFunction = await context.loadType('./')
-    const awsLambdaFunction = await context.construct(AwsLambdaFunction, {})
+    awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
 
-    awsLambdaFunction.code = ['./code', './shim/path.js']
+    awsLambdaFunction = resolveComponentVariables(awsLambdaFunction)
+
     awsLambdaFunction.instanceId = 'instanceId'
-    Date.now = jest.fn(() => '1')
 
     const file = await awsLambdaFunction.pack()
 
@@ -108,44 +114,47 @@ describe('AwsLambdaFunction', () => {
 
     expect(packDir).toBeCalledWith('./code', outputFilePath, ['./shim/path.js'])
     expect(readFileSync).toBeCalledWith(outputFilePath)
-    expect(awsLambdaFunction.code).toEqual(awsLambdaFunction.code)
     expect(awsLambdaFunction.zip).toEqual('zipfilecontent')
+    expect(awsLambdaFunction.code).toEqual(['./code', './shim/path.js'])
     expect(file).toEqual('zipfilecontent')
 
     Date.now.mockRestore()
   })
 
-  it('should create lambda', async () => {
-    let context = await createContext({
-      cwd: path.join(__dirname, '..')
+  it('should create lambda when non exists', async () => {
+    const context = await createTestContext()
+
+    const AwsProvider = await context.loadType('AwsProvider')
+    const AwsLambdaFunction = await context.loadType('./')
+
+    let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+      provider: await context.construct(AwsProvider, {}),
+      code: './code',
+      functionName: 'hello',
+      functionDescription: 'hello description',
+      handler: 'index.handler',
+      zip: 'zipfilecontent',
+      runtime: 'nodejs8.10',
+      memorySize: 512,
+      timeout: 10,
+      environment: {
+        ENV_VAR: 'env value'
+      },
+      tags: 'abc',
+      role: {
+        arn: 'abc:aws'
+      }
     })
 
-    context = await context.loadProject()
-    context = await context.loadApp()
+    awsLambdaFunction['@@key'] = 'hello' // for some reason this does not get auto set!
 
-    const AwsLambdaFunction = await context.loadType('./')
-    const awsLambdaFunction = await context.construct(AwsLambdaFunction, {})
+    awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
+
+    awsLambdaFunction = resolveComponentVariables(awsLambdaFunction)
 
     awsLambdaFunction.pack = jest.fn()
 
-    awsLambdaFunction.provider = provider
-    awsLambdaFunction.functionName = 'hello'
-    awsLambdaFunction.functionDescription = 'hello description'
-    awsLambdaFunction.handler = 'index.handler'
-    awsLambdaFunction.code = './code'
-    awsLambdaFunction.zip = 'zipfilecontent'
-    awsLambdaFunction.runtime = 'nodejs8.10'
-    awsLambdaFunction.memorySize = 512
-    awsLambdaFunction.timeout = 10
-    awsLambdaFunction.environment = {
-      ENV_VAR: 'env value'
-    }
-    awsLambdaFunction.tags = 'abc'
-    awsLambdaFunction.role = {
-      arn: 'some:aws:arn'
-    }
-
-    await awsLambdaFunction.deploy(undefined, context)
+    await awsLambdaFunction.deploy(null, context)
 
     const createFunctionParams = {
       FunctionName: awsLambdaFunction.functionName,
@@ -165,100 +174,228 @@ describe('AwsLambdaFunction', () => {
     }
     expect(awsLambdaFunction.pack).toHaveBeenCalled()
     expect(awsLambdaFunction.arn).toEqual('abc:zxc')
-    expect(mocks.createFunctionMock).toBeCalledWith(createFunctionParams)
+    expect(AWS.mocks.createFunctionMock).toBeCalledWith(createFunctionParams)
   })
 
-  it('should update lambda', async () => {
-    let context = await createContext({
-      cwd: path.join(__dirname, '..')
+  it('should update lambda config', async () => {
+    const context = await createTestContext()
+
+    const AwsProvider = await context.loadType('AwsProvider')
+    const AwsLambdaFunction = await context.loadType('./')
+
+    let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+      provider: await context.construct(AwsProvider, {}),
+      code: './code',
+      functionName: 'hello',
+      functionDescription: 'hello description',
+      handler: 'index.handler',
+      zip: 'zipfilecontent',
+      runtime: 'nodejs8.10',
+      memorySize: 512,
+      timeout: 10,
+      environment: {
+        ENV_VAR: 'env value'
+      },
+      tags: 'abc',
+      role: {
+        arn: 'abc:aws'
+      }
     })
 
-    context = await context.loadProject()
-    context = await context.loadApp()
+    awsLambdaFunction['@@key'] = 'hello' // for some reason this does not get auto set!
 
-    const AwsLambdaFunction = await context.loadType('./')
-    const awsLambdaFunction = await context.construct(AwsLambdaFunction, {})
+    awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
+
+    awsLambdaFunction = resolveComponentVariables(awsLambdaFunction)
 
     awsLambdaFunction.pack = jest.fn()
 
-    awsLambdaFunction.provider = provider
-    awsLambdaFunction.functionName = 'hello'
-    awsLambdaFunction.functionDescription = 'hello description'
-    awsLambdaFunction.handler = 'index.handler'
-    awsLambdaFunction.code = './code'
-    awsLambdaFunction.zip = 'zipfilecontent'
-    awsLambdaFunction.runtime = 'nodejs8.10'
-    awsLambdaFunction.memorySize = 512
-    awsLambdaFunction.timeout = 10
-    awsLambdaFunction.environment = {
-      ENV_VAR: 'env value'
-    }
-    awsLambdaFunction.tags = 'abc'
-    awsLambdaFunction.role = {
-      arn: 'some:aws:arn'
-    }
+    await awsLambdaFunction.deploy(null, context)
 
-    await awsLambdaFunction.deploy({ functionName: 'hello' }, context)
+    const prevAwsLambdaFunction = await deserialize(serialize(awsLambdaFunction, context), context)
+
+    let nextAwsLambdaFunction = await context.construct(AwsLambdaFunction, {
+      provider: await context.construct(AwsProvider, {}),
+      code: './code',
+      functionName: 'hello',
+      functionDescription: 'hello description',
+      handler: 'index.handler',
+      zip: 'zipfilecontent',
+      runtime: 'nodejs8.10',
+      memorySize: 1024, // changed!
+      timeout: 10,
+      environment: {
+        ENV_VAR: 'env value'
+      },
+      tags: 'abc',
+      role: {
+        arn: 'abc:aws'
+      }
+    })
+    nextAwsLambdaFunction = await context.defineComponent(
+      nextAwsLambdaFunction,
+      prevAwsLambdaFunction
+    )
+    nextAwsLambdaFunction = resolveComponentVariables(nextAwsLambdaFunction)
+
+    await nextAwsLambdaFunction.deploy(prevAwsLambdaFunction, context)
 
     const updateFunctionConfigurationParams = {
-      FunctionName: awsLambdaFunction.functionName,
-      Description: awsLambdaFunction.functionDescription,
-      Handler: awsLambdaFunction.handler,
-      MemorySize: awsLambdaFunction.memorySize,
-      Role: awsLambdaFunction.role.arn,
-      Runtime: awsLambdaFunction.runtime,
-      Timeout: awsLambdaFunction.timeout,
+      FunctionName: nextAwsLambdaFunction.functionName,
+      Description: nextAwsLambdaFunction.functionDescription,
+      Handler: nextAwsLambdaFunction.handler,
+      MemorySize: nextAwsLambdaFunction.memorySize,
+      Role: nextAwsLambdaFunction.role.arn,
+      Runtime: nextAwsLambdaFunction.runtime,
+      Timeout: nextAwsLambdaFunction.timeout,
       Environment: {
-        Variables: awsLambdaFunction.environment
+        Variables: nextAwsLambdaFunction.environment
       }
     }
 
     const updateFunctionCodeParams = {
-      FunctionName: awsLambdaFunction.functionName,
-      ZipFile: awsLambdaFunction.zip,
+      FunctionName: nextAwsLambdaFunction.functionName,
+      ZipFile: nextAwsLambdaFunction.zip,
       Publish: true
     }
 
     expect(awsLambdaFunction.pack).toHaveBeenCalled()
     expect(awsLambdaFunction.arn).toEqual('abc:zxc')
-    expect(mocks.updateFunctionCodeMock).toBeCalledWith(updateFunctionCodeParams)
-    expect(mocks.updateFunctionConfigurationMock).toBeCalledWith(updateFunctionConfigurationParams)
+    expect(AWS.mocks.updateFunctionCodeMock).toBeCalledWith(updateFunctionCodeParams)
+    expect(AWS.mocks.updateFunctionConfigurationMock).toBeCalledWith(
+      updateFunctionConfigurationParams
+    )
+  })
+
+  it('should create lambda if name changed', async () => {
+    const context = await createTestContext()
+
+    const AwsProvider = await context.loadType('AwsProvider')
+    const AwsLambdaFunction = await context.loadType('./')
+
+    let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+      provider: await context.construct(AwsProvider, {}),
+      code: './code',
+      functionName: 'hello',
+      functionDescription: 'hello description',
+      handler: 'index.handler',
+      zip: 'zipfilecontent',
+      runtime: 'nodejs8.10',
+      memorySize: 512,
+      timeout: 10,
+      environment: {
+        ENV_VAR: 'env value'
+      },
+      tags: 'abc',
+      role: {
+        arn: 'abc:aws'
+      }
+    })
+
+    awsLambdaFunction['@@key'] = 'hello' // for some reason this does not get auto set!
+
+    awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
+
+    awsLambdaFunction = resolveComponentVariables(awsLambdaFunction)
+
+    awsLambdaFunction.pack = jest.fn()
+
+    await awsLambdaFunction.deploy(null, context)
+
+    const prevAwsLambdaFunction = await deserialize(serialize(awsLambdaFunction, context), context)
+
+    let nextAwsLambdaFunction = await context.construct(AwsLambdaFunction, {
+      provider: await context.construct(AwsProvider, {}),
+      code: './code',
+      functionName: 'world', // changed!
+      functionDescription: 'hello description',
+      handler: 'index.handler',
+      zip: 'zipfilecontent',
+      runtime: 'nodejs8.10',
+      memorySize: 512,
+      timeout: 10,
+      environment: {
+        ENV_VAR: 'env value'
+      },
+      tags: 'abc',
+      role: {
+        arn: 'abc:aws'
+      }
+    })
+    nextAwsLambdaFunction = await context.defineComponent(
+      nextAwsLambdaFunction,
+      prevAwsLambdaFunction
+    )
+    nextAwsLambdaFunction = resolveComponentVariables(nextAwsLambdaFunction)
+
+    await nextAwsLambdaFunction.deploy(prevAwsLambdaFunction, context)
+
+    const createFunctionParams = {
+      FunctionName: nextAwsLambdaFunction.functionName,
+      Code: {
+        ZipFile: nextAwsLambdaFunction.zip
+      },
+      Description: nextAwsLambdaFunction.functionDescription,
+      Handler: nextAwsLambdaFunction.handler,
+      MemorySize: nextAwsLambdaFunction.memorySize,
+      Publish: true,
+      Role: nextAwsLambdaFunction.role.arn,
+      Runtime: nextAwsLambdaFunction.runtime,
+      Timeout: nextAwsLambdaFunction.timeout,
+      Environment: {
+        Variables: nextAwsLambdaFunction.environment
+      }
+    }
+
+    expect(awsLambdaFunction.pack).toHaveBeenCalled()
+    expect(awsLambdaFunction.arn).toEqual('abc:zxc')
+    expect(AWS.mocks.createFunctionMock).toBeCalledWith(createFunctionParams)
   })
 
   it('should remove lambda', async () => {
-    let context = await createContext({
-      cwd: path.join(__dirname, '..')
+    const context = await createTestContext()
+
+    const AwsProvider = await context.loadType('AwsProvider')
+    const AwsLambdaFunction = await context.loadType('./')
+
+    let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+      provider: await context.construct(AwsProvider, {}),
+      code: './code',
+      functionName: 'hello',
+      functionDescription: 'hello description',
+      handler: 'index.handler',
+      zip: 'zipfilecontent',
+      runtime: 'nodejs8.10',
+      memorySize: 512,
+      timeout: 10,
+      environment: {
+        ENV_VAR: 'env value'
+      },
+      tags: 'abc',
+      role: {
+        arn: 'abc:aws'
+      }
     })
 
-    context = await context.loadProject()
-    context = await context.loadApp()
+    awsLambdaFunction['@@key'] = 'hello' // for some reason this does not get auto set!
 
-    const AwsLambdaFunction = await context.loadType('./')
-    const awsLambdaFunction = await context.construct(AwsLambdaFunction, {})
+    awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
 
-    awsLambdaFunction.provider = provider
-    awsLambdaFunction.functionName = 'hello'
-    awsLambdaFunction.functionDescription = 'hello description'
-    awsLambdaFunction.handler = 'index.handler'
-    awsLambdaFunction.code = './code'
-    awsLambdaFunction.runtime = 'nodejs8.10'
-    awsLambdaFunction.memorySize = 512
-    awsLambdaFunction.timeout = 10
-    awsLambdaFunction.environment = {
-      ENV_VAR: 'env value'
-    }
-    awsLambdaFunction.tags = 'abc'
-    awsLambdaFunction.role = {
-      arn: 'some:aws:arn'
-    }
+    awsLambdaFunction = resolveComponentVariables(awsLambdaFunction)
 
-    await awsLambdaFunction.remove(context)
+    awsLambdaFunction.pack = jest.fn()
+
+    await awsLambdaFunction.deploy(null, context)
+
+    const prevAwsLambdaFunction = await deserialize(serialize(awsLambdaFunction, context), context)
+
+    await prevAwsLambdaFunction.remove(context)
 
     const deleteFunctionParams = {
       FunctionName: awsLambdaFunction.functionName
     }
 
-    expect(mocks.deleteFunctionMock).toBeCalledWith(deleteFunctionParams)
+    expect(AWS.mocks.deleteFunctionMock).toBeCalledWith(deleteFunctionParams)
   })
 
   it('should return lambda arn when calling getId()', async () => {
@@ -278,45 +415,409 @@ describe('AwsLambdaFunction', () => {
   })
 
   it('shouldDeploy should return replace if name changed', async () => {
-    let context = await createContext({
-      cwd: path.join(__dirname, '..')
+    const context = await createTestContext()
+
+    const AwsProvider = await context.loadType('AwsProvider')
+    const AwsLambdaFunction = await context.loadType('./')
+
+    let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+      provider: await context.construct(AwsProvider, {}),
+      code: './code',
+      functionName: 'hello',
+      functionDescription: 'hello description',
+      handler: 'index.handler',
+      zip: 'zipfilecontent',
+      runtime: 'nodejs8.10',
+      memorySize: 512,
+      timeout: 10,
+      environment: {
+        ENV_VAR: 'env value'
+      },
+      tags: 'abc',
+      role: {
+        arn: 'abc:aws'
+      }
     })
 
-    context = await context.loadProject()
-    context = await context.loadApp()
+    awsLambdaFunction['@@key'] = 'hello' // for some reason this does not get auto set!
 
-    const AwsLambdaFunction = await context.loadType('./')
-    const awsLambdaFunction = await context.construct(AwsLambdaFunction, {})
+    awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
 
-    awsLambdaFunction.functionName = 'hello'
-    awsLambdaFunction.role = {
-      roleName: 'roleName'
-    }
+    awsLambdaFunction = resolveComponentVariables(awsLambdaFunction)
 
-    expect(
-      awsLambdaFunction.shouldDeploy({ functionName: 'world', role: { roleName: 'roleName' } })
-    ).toEqual('replace')
+    awsLambdaFunction.pack = jest.fn()
+
+    await awsLambdaFunction.deploy(null, context)
+
+    const prevAwsLambdaFunction = await deserialize(serialize(awsLambdaFunction, context), context)
+
+    let nextAwsLambdaFunction = await context.construct(AwsLambdaFunction, {
+      provider: await context.construct(AwsProvider, {}),
+      code: './code',
+      functionName: 'world', // changed!
+      functionDescription: 'hello description',
+      handler: 'index.handler',
+      zip: 'zipfilecontent',
+      runtime: 'nodejs8.10',
+      memorySize: 512,
+      timeout: 10,
+      environment: {
+        ENV_VAR: 'env value'
+      },
+      tags: 'abc',
+      role: {
+        arn: 'abc:aws'
+      }
+    })
+    nextAwsLambdaFunction = await context.defineComponent(
+      nextAwsLambdaFunction,
+      prevAwsLambdaFunction
+    )
+    nextAwsLambdaFunction = resolveComponentVariables(nextAwsLambdaFunction)
+
+    const result = await nextAwsLambdaFunction.shouldDeploy(prevAwsLambdaFunction, context)
+
+    expect(result).toBe('replace')
   })
 
-  it('should define AwsIamRole as child if role is not provided', async () => {
-    let context = await createContext({
-      cwd: path.join(__dirname, '..')
+  it('shouldDeploy should return deploy if config changed', async () => {
+    const context = await createTestContext()
+
+    const AwsProvider = await context.loadType('AwsProvider')
+    const AwsLambdaFunction = await context.loadType('./')
+
+    let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+      provider: await context.construct(AwsProvider, {}),
+      code: './code',
+      functionName: 'hello',
+      functionDescription: 'hello description',
+      handler: 'index.handler',
+      zip: 'zipfilecontent',
+      runtime: 'nodejs8.10',
+      memorySize: 512,
+      timeout: 10,
+      environment: {
+        ENV_VAR: 'env value'
+      },
+      tags: 'abc',
+      role: {
+        arn: 'abc:aws'
+      }
     })
 
-    context = await context.loadProject()
-    context = await context.loadApp()
+    awsLambdaFunction['@@key'] = 'hello' // for some reason this does not get auto set!
 
+    awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
+
+    awsLambdaFunction = resolveComponentVariables(awsLambdaFunction)
+
+    awsLambdaFunction.pack = jest.fn()
+
+    await awsLambdaFunction.deploy(null, context)
+
+    const prevAwsLambdaFunction = await deserialize(serialize(awsLambdaFunction, context), context)
+
+    let nextAwsLambdaFunction = await context.construct(AwsLambdaFunction, {
+      provider: await context.construct(AwsProvider, {}),
+      code: './code',
+      functionName: 'hello',
+      functionDescription: 'hello description',
+      handler: 'index.handler',
+      zip: 'zipfilecontent',
+      runtime: 'nodejs8.10',
+      memorySize: 1024, // changed!
+      timeout: 10,
+      environment: {
+        ENV_VAR: 'env value'
+      },
+      tags: 'abc',
+      role: {
+        arn: 'abc:aws'
+      }
+    })
+    nextAwsLambdaFunction = await context.defineComponent(
+      nextAwsLambdaFunction,
+      prevAwsLambdaFunction
+    )
+    nextAwsLambdaFunction = resolveComponentVariables(nextAwsLambdaFunction)
+
+    const result = await nextAwsLambdaFunction.shouldDeploy(prevAwsLambdaFunction, context)
+
+    expect(result).toBe('deploy')
+  })
+
+  it('shouldDeploy should return undefined if nothing changed', async () => {
+    const context = await createTestContext()
+
+    const AwsProvider = await context.loadType('AwsProvider')
     const AwsLambdaFunction = await context.loadType('./')
-    const awsLambdaFunction = await context.construct(AwsLambdaFunction, {})
 
-    awsLambdaFunction.provider = provider
-    awsLambdaFunction.functionName = 'hello'
+    let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+      provider: await context.construct(AwsProvider, {}),
+      code: './code',
+      functionName: 'hello',
+      functionDescription: 'hello description',
+      handler: 'index.handler',
+      zip: 'zipfilecontent',
+      runtime: 'nodejs8.10',
+      memorySize: 512,
+      timeout: 10,
+      environment: {
+        ENV_VAR: 'env value'
+      },
+      tags: 'abc',
+      role: {
+        roleName: 'roleName',
+        arn: 'abc:aws'
+      }
+    })
+
+    awsLambdaFunction['@@key'] = 'hello' // for some reason this does not get auto set!
+
+    awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
+
+    awsLambdaFunction = resolveComponentVariables(awsLambdaFunction)
+
+    awsLambdaFunction.pack = jest.fn()
+
+    await awsLambdaFunction.deploy(null, context)
+
+    const prevAwsLambdaFunction = await deserialize(serialize(awsLambdaFunction, context), context)
+
+    let nextAwsLambdaFunction = await context.construct(AwsLambdaFunction, {
+      provider: await context.construct(AwsProvider, {}),
+      code: './code',
+      functionName: 'hello',
+      functionDescription: 'hello description',
+      handler: 'index.handler',
+      zip: 'zipfilecontent',
+      runtime: 'nodejs8.10',
+      memorySize: 512,
+      timeout: 10,
+      environment: {
+        ENV_VAR: 'env value'
+      },
+      tags: 'abc',
+      role: {
+        roleName: 'roleName',
+        arn: 'abc:aws'
+      }
+    })
+    nextAwsLambdaFunction = await context.defineComponent(
+      nextAwsLambdaFunction,
+      prevAwsLambdaFunction
+    )
+    nextAwsLambdaFunction = resolveComponentVariables(nextAwsLambdaFunction)
+
+    const result = await nextAwsLambdaFunction.shouldDeploy(prevAwsLambdaFunction, context)
+
+    expect(result).toBe(undefined)
+  })
+
+  it('shouldDeploy should return deploy if role changed', async () => {
+    const context = await createTestContext()
+
+    const AwsProvider = await context.loadType('AwsProvider')
+    const AwsLambdaFunction = await context.loadType('./')
+
+    let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+      provider: await context.construct(AwsProvider, {}),
+      code: './code',
+      functionName: 'hello',
+      functionDescription: 'hello description',
+      handler: 'index.handler',
+      zip: 'zipfilecontent',
+      runtime: 'nodejs8.10',
+      memorySize: 512,
+      timeout: 10,
+      environment: {
+        ENV_VAR: 'env value'
+      },
+      tags: 'abc',
+      role: {
+        roleName: 'roleName',
+        arn: 'abc:aws'
+      }
+    })
+
+    awsLambdaFunction['@@key'] = 'hello' // for some reason this does not get auto set!
+
+    awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
+
+    awsLambdaFunction = resolveComponentVariables(awsLambdaFunction)
+
+    awsLambdaFunction.pack = jest.fn()
+
+    await awsLambdaFunction.deploy(null, context)
+
+    const prevAwsLambdaFunction = await deserialize(serialize(awsLambdaFunction, context), context)
+
+    let nextAwsLambdaFunction = await context.construct(AwsLambdaFunction, {
+      provider: await context.construct(AwsProvider, {}),
+      code: './code',
+      functionName: 'hello',
+      functionDescription: 'hello description',
+      handler: 'index.handler',
+      zip: 'zipfilecontent',
+      runtime: 'nodejs8.10',
+      memorySize: 512,
+      timeout: 10,
+      environment: {
+        ENV_VAR: 'env value'
+      },
+      tags: 'abc',
+      role: {
+        roleName: 'newRoleName', // changed
+        arn: 'abc:aws:new' // changed
+      }
+    })
+    nextAwsLambdaFunction = await context.defineComponent(
+      nextAwsLambdaFunction,
+      prevAwsLambdaFunction
+    )
+    nextAwsLambdaFunction = resolveComponentVariables(nextAwsLambdaFunction)
+
+    const result = await nextAwsLambdaFunction.shouldDeploy(prevAwsLambdaFunction, context)
+
+    expect(result).toBe('deploy')
+  })
+
+  it('shouldDeploy should return deploy if code changed', async () => {
+    const context = await createTestContext()
+
+    const AwsProvider = await context.loadType('AwsProvider')
+    const AwsLambdaFunction = await context.loadType('./')
+
+    let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+      provider: await context.construct(AwsProvider, {}),
+      code: './code',
+      functionName: 'hello',
+      functionDescription: 'hello description',
+      handler: 'index.handler',
+      zip: 'zipfilecontent',
+      runtime: 'nodejs8.10',
+      memorySize: 512,
+      timeout: 10,
+      environment: {
+        ENV_VAR: 'env value'
+      },
+      tags: 'abc',
+      role: {
+        roleName: 'roleName',
+        arn: 'abc:aws'
+      }
+    })
+
+    awsLambdaFunction['@@key'] = 'hello' // for some reason this does not get auto set!
+
+    awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
+
+    awsLambdaFunction = resolveComponentVariables(awsLambdaFunction)
+
+    awsLambdaFunction.pack = jest.fn()
+
+    await awsLambdaFunction.deploy(null, context)
+
+    const prevAwsLambdaFunction = await deserialize(serialize(awsLambdaFunction, context), context)
+
+    let nextAwsLambdaFunction = await context.construct(AwsLambdaFunction, {
+      provider: await context.construct(AwsProvider, {}),
+      code: './code',
+      functionName: 'hello',
+      functionDescription: 'hello description',
+      handler: 'index.handler',
+      zip: 'zipfilecontent',
+      runtime: 'nodejs8.10',
+      memorySize: 512,
+      timeout: 10,
+      environment: {
+        ENV_VAR: 'env value'
+      },
+      tags: 'abc',
+      role: {
+        roleName: 'roleName',
+        arn: 'abc:aws'
+      }
+    })
+    nextAwsLambdaFunction = await context.defineComponent(
+      nextAwsLambdaFunction,
+      prevAwsLambdaFunction
+    )
+    nextAwsLambdaFunction = resolveComponentVariables(nextAwsLambdaFunction)
+    nextAwsLambdaFunction.hash = 'newHash'
+
+    const result = await nextAwsLambdaFunction.shouldDeploy(prevAwsLambdaFunction, context)
+
+    expect(result).toBe('deploy')
+  })
+
+  it('should not load AwsIamRole if role is provided', async () => {
+    const context = await createTestContext()
+
+    const AwsProvider = await context.loadType('AwsProvider')
+    const AwsLambdaFunction = await context.loadType('./')
+
+    let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+      provider: await context.construct(AwsProvider, {}),
+      code: './code',
+      functionName: 'hello',
+      functionDescription: 'hello description',
+      handler: 'index.handler',
+      zip: 'zipfilecontent',
+      runtime: 'nodejs8.10',
+      memorySize: 512,
+      timeout: 10,
+      environment: {
+        ENV_VAR: 'env value'
+      },
+      tags: 'abc',
+      role: {
+        roleName: 'roleName',
+        arn: 'abc:aws'
+      }
+    })
+
+    awsLambdaFunction['@@key'] = 'hello' // for some reason this does not get auto set!
+
+    awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
+
+    awsLambdaFunction = resolveComponentVariables(awsLambdaFunction)
 
     const children = await awsLambdaFunction.define(context)
 
-    expect(children.role.name).toEqual('AwsIamRole')
-    expect(children.role.roleName).toEqual(`${awsLambdaFunction.functionName}-execution-role`)
-    expect(children.role.service).toEqual('lambda.amazonaws.com')
-    expect(children.role.provider).toEqual(provider)
+    expect(children.role.roleName).toBe('roleName')
+  })
+
+  it('should load AwsIamRole if role is not provided', async () => {
+    const context = await createTestContext()
+
+    const AwsProvider = await context.loadType('AwsProvider')
+    const AwsLambdaFunction = await context.loadType('./')
+
+    let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+      provider: await context.construct(AwsProvider, {}),
+      code: './code',
+      functionName: 'hello',
+      functionDescription: 'hello description',
+      handler: 'index.handler',
+      zip: 'zipfilecontent',
+      runtime: 'nodejs8.10',
+      memorySize: 512,
+      timeout: 10,
+      environment: {
+        ENV_VAR: 'env value'
+      },
+      tags: 'abc'
+    })
+
+    awsLambdaFunction['@@key'] = 'hello' // for some reason this does not get auto set!
+
+    awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
+
+    awsLambdaFunction = resolveComponentVariables(awsLambdaFunction)
+
+    const children = await awsLambdaFunction.define(context)
+
+    expect(children.role.roleName).toBe(`${awsLambdaFunction.functionName}-execution-role`)
   })
 })

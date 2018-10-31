@@ -7,7 +7,11 @@ const mocks = {
     }
     return Promise.resolve({ Contents: [{ Key: 'abc' }] })
   }),
-  deleteObjectsMock: jest.fn()
+  deleteObjectsMock: jest.fn(),
+  createFunctionMock: jest.fn().mockReturnValue({ FunctionArn: 'abc:zxc' }),
+  updateFunctionCodeMock: jest.fn().mockReturnValue({ FunctionArn: 'abc:zxc' }),
+  updateFunctionConfigurationMock: jest.fn().mockReturnValue({ FunctionArn: 'abc:zxc' }),
+  deleteFunctionMock: jest.fn()
 }
 
 const S3 = function() {
@@ -27,10 +31,28 @@ const S3 = function() {
   }
 }
 
+const Lambda = function() {
+  return {
+    createFunction: (obj) => ({
+      promise: () => mocks.createFunctionMock(obj)
+    }),
+    updateFunctionConfiguration: (obj) => ({
+      promise: () => mocks.updateFunctionConfigurationMock(obj)
+    }),
+    updateFunctionCode: (obj) => ({
+      promise: () => mocks.updateFunctionCodeMock(obj)
+    }),
+    deleteFunction: (obj) => ({
+      promise: () => mocks.deleteFunctionMock(obj)
+    })
+  }
+}
+
 export default {
   mocks,
   config: {
     update: jest.fn()
   },
-  S3
+  S3,
+  Lambda
 }
