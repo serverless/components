@@ -1,4 +1,4 @@
-import { get, pick } from '@serverless/utils'
+import { get, pick, resolve } from '@serverless/utils'
 import { createBucket, deleteBucket } from './utils'
 
 const DEPLOY = 'deploy'
@@ -9,7 +9,7 @@ const AwsS3Bucket = (SuperClass) =>
     async construct(inputs, context) {
       await super.construct(inputs, context)
       this.bucketName = inputs.bucketName
-      this.provider = inputs.provider || context.get('provider')
+      this.provider = resolve(inputs.provider) || context.get('provider')
     }
 
     shouldDeploy(prevInstance) {
@@ -17,7 +17,7 @@ const AwsS3Bucket = (SuperClass) =>
         return DEPLOY
       }
 
-      if (prevInstance.bucketName !== this.bucketName) {
+      if (prevInstance.bucketName !== resolve(this.bucketName)) {
         return REPLACE
       }
     }

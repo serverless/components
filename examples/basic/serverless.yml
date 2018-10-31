@@ -1,4 +1,4 @@
-name: BasicProject
+name: Basic
 extends: Component
 
 provider:
