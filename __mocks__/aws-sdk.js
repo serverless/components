@@ -29,7 +29,12 @@ const mocks = {
   }),
   attachRolePolicyMock: jest.fn(),
   detachRolePolicyMock: jest.fn(),
-  updateAssumeRolePolicyMock: jest.fn()
+  updateAssumeRolePolicyMock: jest.fn(),
+  // SNS
+  subscribeMock: jest.fn().mockReturnValue({
+    SubscriptionArn: 'arn:aws:sns:region:XXXXX:test-subscription:r4nd0m'
+  }),
+  unsubscribeMock: jest.fn()
 }
 
 const S3 = function() {
@@ -106,6 +111,17 @@ const CloudWatchEvents = function() {
   }
 }
 
+const SNS = function() {
+  return {
+    subscribe: (obj) => ({
+      promise: () => mocks.subscribeMock(obj)
+    }),
+    unsubscribe: (obj) => ({
+      promise: () => mocks.unsubscribeMock(obj)
+    })
+  }
+}
+
 export default {
   mocks,
   config: {
@@ -115,4 +131,6 @@ export default {
   Lambda,
   CloudWatchEvents,
   IAM
+  IAM,
+  SNS
 }

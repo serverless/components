@@ -1,6 +1,6 @@
 import { findPath, prop } from '@serverless/utils'
 import { resolve } from 'path'
-import { SYMBOL_KEY, SYMBOL_VARIABLE } from '../constants'
+import { SYMBOL_VARIABLE } from '../constants'
 // import getStateStore from '../state/getStateStore'
 import newContext from './newContext'
 
@@ -30,7 +30,7 @@ const createContext = async (options = {}, context = {}) => {
     options,
     overrides,
     symbolMap: {
-      [SYMBOL_KEY]: '@@key',
+      // [SYMBOL_KEY]: '@@key',
       [SYMBOL_VARIABLE]: '@@variable'
     },
     state

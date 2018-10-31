@@ -64,8 +64,6 @@ describe('AwsLambdaFunction', () => {
       functionName: 'hello'
     })
 
-    awsLambdaFunction['@@key'] = 'hello' // for some reason this does not get auto set!
-
     awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
 
     awsLambdaFunction = resolveComponentVariables(awsLambdaFunction)
@@ -98,8 +96,6 @@ describe('AwsLambdaFunction', () => {
       code: ['./code', './shim/path.js'],
       functionName: 'hello'
     })
-
-    awsLambdaFunction['@@key'] = 'hello' // for some reason this does not get auto set!
 
     awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
 
@@ -145,8 +141,6 @@ describe('AwsLambdaFunction', () => {
         arn: 'abc:aws'
       }
     })
-
-    awsLambdaFunction['@@key'] = 'hello' // for some reason this does not get auto set!
 
     awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
 
@@ -201,8 +195,6 @@ describe('AwsLambdaFunction', () => {
         arn: 'abc:aws'
       }
     })
-
-    awsLambdaFunction['@@key'] = 'hello' // for some reason this does not get auto set!
 
     awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
 
@@ -292,8 +284,6 @@ describe('AwsLambdaFunction', () => {
       }
     })
 
-    awsLambdaFunction['@@key'] = 'hello' // for some reason this does not get auto set!
-
     awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
 
     awsLambdaFunction = resolveComponentVariables(awsLambdaFunction)
@@ -377,8 +367,6 @@ describe('AwsLambdaFunction', () => {
       }
     })
 
-    awsLambdaFunction['@@key'] = 'hello' // for some reason this does not get auto set!
-
     awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
 
     awsLambdaFunction = resolveComponentVariables(awsLambdaFunction)
@@ -438,8 +426,6 @@ describe('AwsLambdaFunction', () => {
         arn: 'abc:aws'
       }
     })
-
-    awsLambdaFunction['@@key'] = 'hello' // for some reason this does not get auto set!
 
     awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
 
@@ -505,8 +491,6 @@ describe('AwsLambdaFunction', () => {
       }
     })
 
-    awsLambdaFunction['@@key'] = 'hello' // for some reason this does not get auto set!
-
     awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
 
     awsLambdaFunction = resolveComponentVariables(awsLambdaFunction)
@@ -571,8 +555,6 @@ describe('AwsLambdaFunction', () => {
         arn: 'abc:aws'
       }
     })
-
-    awsLambdaFunction['@@key'] = 'hello' // for some reason this does not get auto set!
 
     awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
 
@@ -640,8 +622,6 @@ describe('AwsLambdaFunction', () => {
       }
     })
 
-    awsLambdaFunction['@@key'] = 'hello' // for some reason this does not get auto set!
-
     awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
 
     awsLambdaFunction = resolveComponentVariables(awsLambdaFunction)
@@ -707,8 +687,6 @@ describe('AwsLambdaFunction', () => {
         arn: 'abc:aws'
       }
     })
-
-    awsLambdaFunction['@@key'] = 'hello' // for some reason this does not get auto set!
 
     awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
 
@@ -777,8 +755,6 @@ describe('AwsLambdaFunction', () => {
       }
     })
 
-    awsLambdaFunction['@@key'] = 'hello' // for some reason this does not get auto set!
-
     awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
 
     awsLambdaFunction = resolveComponentVariables(awsLambdaFunction)
@@ -809,8 +785,6 @@ describe('AwsLambdaFunction', () => {
       },
       tags: 'abc'
     })
-
-    awsLambdaFunction['@@key'] = 'hello' // for some reason this does not get auto set!
 
     awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
 

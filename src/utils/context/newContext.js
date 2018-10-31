@@ -3,7 +3,7 @@ import loadApp from '../app/loadApp'
 import defineComponent from '../component/defineComponent'
 import defineComponentFromState from '../component/defineComponentFromState'
 import generateInstanceId from '../component/generateInstanceId'
-import setKey from '../component/setKey'
+// import setKey from '../component/setKey'
 import { DEFAULT_PLUGINS } from '../constants'
 import createDeployment from '../deployment/createDeployment'
 import createRemovalDeployment from '../deployment/createRemovalDeployment'
@@ -98,7 +98,7 @@ const newContext = (props) => {
         )
       }
       let instance = await finalContext.construct(project.Type)
-      instance = setKey('$', instance)
+      // instance = setKey('$', instance)
 
       const stateInstance = await deserialize(state.instance, finalContext)
       // NOTE BRN: instance gets defined based on serverless.yml and type code
