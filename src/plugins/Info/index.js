@@ -33,6 +33,8 @@ const Info = {
     } else {
       printObj(compact(children), context.log)
     }
+
+    return context
   }
 }
 

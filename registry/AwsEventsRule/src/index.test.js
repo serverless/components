@@ -1,73 +1,49 @@
 import path from 'path'
-import { createContext } from '../../../src/utils'
+import { createContext, resolveComponentVariables } from '../../../src/utils'
+import AWS from 'aws-sdk'
 
-const mocks = {
-  putRuleMock: jest.fn().mockReturnValue({ RuleArn: 'abc:zxc' }),
-  putTargetsMock: jest.fn(),
-  removeTargetsMock: jest.fn(),
-  putTargetsMock: jest.fn(),
-  deleteRuleMock: jest.fn(),
-  addPermissionMock: jest.fn()
-}
-
-const provider = {
-  getSdk: () => {
-    return {
-      Lambda: function() {
-        return {
-          addPermission: (obj) => ({
-            promise: () => mocks.addPermissionMock(obj)
-          })
-        }
-      },
-      CloudWatchEvents: function() {
-        return {
-          putRule: (obj) => ({
-            promise: () => mocks.putRuleMock(obj)
-          }),
-          putTargets: (obj) => ({
-            promise: () => mocks.putTargetsMock(obj)
-          }),
-          removeTargets: (obj) => ({
-            promise: () => mocks.removeTargetsMock(obj)
-          }),
-          deleteRule: (obj) => ({
-            promise: () => mocks.deleteRuleMock(obj)
-          })
-        }
+const createTestContext = async () =>
+  createContext(
+    {
+      cwd: path.join(__dirname, '..'),
+      overrides: {
+        debug: () => {},
+        log: () => {}
+      }
+    },
+    {
+      app: {
+        id: 'test'
       }
     }
-  }
-}
+  )
 
 describe('AwsEventsRule', () => {
   it('should create schedule', async () => {
-    let context = await createContext({
-      cwd: path.join(__dirname, '..')
-    })
-
-    context = await context.loadProject()
-    context = await context.loadApp()
-
-    const inputs = {
-      provider,
-      enabled: true,
-      schedule: 'rate(5 minutes)',
-      lambda: {
-        getId: () => 'arn:aws:lambda:us-east-1:1234567890:function:hello'
-      }
-    }
-
+    const context = await createTestContext()
+    const AwsProvider = await context.loadType('AwsProvider')
     const AwsEventsRule = await context.loadType('./')
-    const awsEventsRule = await context.construct(AwsEventsRule, inputs)
-
-    await awsEventsRule.deploy(undefined, context)
 
     const putRuleParams = {
       Name: 'hello',
       ScheduleExpression: 'rate(5 minutes)',
       State: 'ENABLED'
     }
+    const inputs = {
+      provider: await context.construct(AwsProvider, {}),
+      enabled: true,
+      schedule: 'rate(5 minutes)',
+      lambda: {
+        functionName: putRuleParams.Name,
+        getId: () => 'arn:aws:lambda:us-east-1:1234567890:function:hello'
+      }
+    }
+
+    let awsEventsRule = await context.construct(AwsEventsRule, inputs)
+    awsEventsRule = await context.defineComponent(awsEventsRule)
+    awsEventsRule = resolveComponentVariables(awsEventsRule)
+
+    await awsEventsRule.deploy(null, context)
 
     const putTargetsParams = {
       Rule: 'hello',
@@ -87,31 +63,32 @@ describe('AwsEventsRule', () => {
     }
 
     expect(awsEventsRule.arn).toEqual('abc:zxc')
-    expect(mocks.putRuleMock).toBeCalledWith(putRuleParams)
-    expect(mocks.putTargetsMock).toBeCalledWith(putTargetsParams)
-    expect(mocks.addPermissionMock).toBeCalledWith(addPermissionParams)
+    expect(AWS.mocks.putRule).toBeCalledWith(putRuleParams)
+    expect(AWS.mocks.putTargets).toBeCalledWith(putTargetsParams)
+    expect(AWS.mocks.addPermission).toBeCalledWith(addPermissionParams)
   })
 
   it('should remove schedule', async () => {
-    let context = await createContext({
-      cwd: path.join(__dirname, '..')
-    })
+    const context = await createTestContext()
+    const AwsProvider = await context.loadType('AwsProvider')
+    const AwsEventsRule = await context.loadType('./')
 
-    context = await context.loadProject()
-    context = await context.loadApp()
-
+    const deleteRuleParams = {
+      Name: 'hello'
+    }
     const inputs = {
-      provider,
+      provider: await context.construct(AwsProvider, {}),
       enabled: true,
       schedule: 'rate(5 minutes)',
       lambda: {
+        functionName: deleteRuleParams.Name,
         getId: () => 'arn:aws:lambda:us-east-1:1234567890:function:hello'
       }
     }
 
-    const AwsEventsRule = await context.loadType('./')
-    const awsEventsRule = await context.construct(AwsEventsRule, inputs)
-
+    let awsEventsRule = await context.construct(AwsEventsRule, inputs)
+    awsEventsRule = await context.defineComponent(awsEventsRule)
+    awsEventsRule = resolveComponentVariables(awsEventsRule)
     await awsEventsRule.remove(context)
 
     const removeTargetsParams = {
@@ -119,11 +96,7 @@ describe('AwsEventsRule', () => {
       Ids: ['hello']
     }
 
-    const deleteRuleParams = {
-      Name: 'hello'
-    }
-
-    expect(mocks.removeTargetsMock).toBeCalledWith(removeTargetsParams)
-    expect(mocks.deleteRuleMock).toBeCalledWith(deleteRuleParams)
+    expect(AWS.mocks.removeTargets).toBeCalledWith(removeTargetsParams)
+    expect(AWS.mocks.deleteRule).toBeCalledWith(deleteRuleParams)
   })
 })

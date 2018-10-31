@@ -14,21 +14,20 @@ providers:
       subscriptionId: 1234567890
       directoryId: 1234567890
       appId: 1234567890
-      subscriptionId: 1234567890
       location: us-east-1
 
 compute:
   awsLambda:
     type: AwsLambdaCompute
     inputs:
-      provider: ${input.providers.aws}
+      provider: ${this.providers.aws}
       runtime: nodejs
       memory: 512
       timeout: 10
   azureFunctions:
     type: AzureFunctionsCompute
     inputs:
-      provider: ${input.providers.azure}
+      provider: ${this.providers.azure}
       runtime: nodejs
       memory: 512
       timeout: 10
@@ -36,13 +35,13 @@ compute:
 functions:
   hello:
     compute:
-      aws: ${inputs.compute.awsLambda}
+      aws: ${this.compute.awsLambda}
     handler: index.hello
     code: ./code
     memory: 1024
   world:
     compute:
       aws: ${inputs.compute.awsLambda}
-      azure: ${inputs.compute.azureFunctions}
+      azure: ${this.compute.azureFunctions}
     handler: index.world
     code: ./code

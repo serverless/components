@@ -83,6 +83,8 @@ const Deploy = {
       // TODO BRN: In the event that we only do a partial deployment we need a path to recovery...
       await context.saveState()
     }
+
+    return context
   }
 }
 

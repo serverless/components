@@ -1,3 +1,3 @@
-const isComponent = (value) => value != null && value.instanceId
+const isComponent = (value) => !!(value != null && value.instanceId)
 
 export default isComponent

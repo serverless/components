@@ -22,13 +22,15 @@ const Service = async (SuperClass, superContext) => {
   return class extends SuperClass {
     async construct(inputs, context) {
       await super.construct(inputs, context)
-      this.functions = await map(async (func, alias) => {
-        return context.construct(Fn, {
-          ...func,
-          functionName: resolve(func.functionName) || alias,
-          code: resolveCodePath(resolve(func.code), this.getType().root)
-        })
-      }, or(resolve(this.functions), {}))
+      this.functions = await map(
+        async (func, alias) =>
+          context.construct(Fn, {
+            ...func,
+            functionName: resolve(func.functionName) || alias,
+            code: resolveCodePath(resolve(func.code), this.getType().root)
+          }),
+        or(this.functions, {})
+      )
     }
 
     async define() {

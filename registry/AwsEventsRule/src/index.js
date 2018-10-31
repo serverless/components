@@ -58,9 +58,7 @@ const AwsEventsRule = (SuperClass) =>
       const addPermissionParams = {
         Action: 'lambda:InvokeFunction',
         FunctionName: this.lambda.functionName,
-        StatementId: `${this.lambda.functionName}-${Math.random()
-          .toString(36)
-          .substring(7)}`,
+        StatementId: `${this.lambda.functionName}`,
         Principal: 'events.amazonaws.com'
       }
 

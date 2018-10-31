@@ -9,6 +9,11 @@ const mocks = {
     return Promise.resolve({ Contents: [{ Key: 'abc' }] })
   }),
   deleteObjectsMock: jest.fn(),
+  putRule: jest.fn().mockReturnValue({ RuleArn: 'abc:zxc' }),
+  putTargets: jest.fn(),
+  removeTargets: jest.fn(),
+  deleteRule: jest.fn(),
+  addPermission: jest.fn(),
   // Lambda
   createFunctionMock: jest.fn().mockReturnValue({ FunctionArn: 'abc:zxc' }),
   updateFunctionCodeMock: jest.fn().mockReturnValue({ FunctionArn: 'abc:zxc' }),
@@ -71,6 +76,9 @@ const IAM = function() {
 
 const Lambda = function() {
   return {
+    addPermission: (obj) => ({
+      promise: () => mocks.addPermission(obj)
+    }),
     createFunction: (obj) => ({
       promise: () => mocks.createFunctionMock(obj)
     }),
@@ -82,6 +90,23 @@ const Lambda = function() {
     }),
     deleteFunction: (obj) => ({
       promise: () => mocks.deleteFunctionMock(obj)
+    })
+  }
+}
+
+const CloudWatchEvents = function() {
+  return {
+    putRule: (obj) => ({
+      promise: () => mocks.putRule(obj)
+    }),
+    putTargets: (obj) => ({
+      promise: () => mocks.putTargets(obj)
+    }),
+    removeTargets: (obj) => ({
+      promise: () => mocks.removeTargets(obj)
+    }),
+    deleteRule: (obj) => ({
+      promise: () => mocks.deleteRule(obj)
     })
   }
 }
@@ -104,6 +129,8 @@ export default {
   },
   S3,
   Lambda,
+  CloudWatchEvents,
+  IAM
   IAM,
   SNS
 }

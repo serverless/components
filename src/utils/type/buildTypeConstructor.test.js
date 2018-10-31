@@ -103,7 +103,6 @@ describe('#buildTypeConstructor()', () => {
 
     expect(instance).toEqual({
       name: 'Test',
-      ran: true,
       [SYMBOL_TYPE]: Type
     })
   })

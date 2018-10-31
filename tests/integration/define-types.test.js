@@ -17,10 +17,11 @@ describe('Integration Test - define types', () => {
       },
       parent: undefined,
       props: {
-        main: './index.js',
+        main: './dist/index.js',
         name: 'Object',
-        version: '1.0.0'
+        version: '0.3.0'
       },
+      query: 'Object',
       root: expect.stringMatching(/^.*Object$/)
     })
   })

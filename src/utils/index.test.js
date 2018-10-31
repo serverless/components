@@ -28,8 +28,7 @@ describe('index', () => {
       resolveComponentVariables: expect.any(Function),
       setKey: expect.any(Function),
       walkReduceComponentChildren: expect.any(Function),
-      walkReduceComponentChildrenDepthFirst: expect.any(Function),
-      walkReduceComponentOwnVariables: expect.any(Function)
+      walkReduceComponentChildrenDepthFirst: expect.any(Function)
     })
   })
 
@@ -47,9 +46,9 @@ describe('index', () => {
     expect(mod).toMatchObject({
       DEFAULT_PLUGINS: expect.any(Object),
       PLUGINS_DIR: expect.any(String),
-      SYMBOL_KEY: expect.any(Symbol),
-      SYMBOL_TYPE: expect.any(Symbol),
-      SYMBOL_VARIABLE: expect.any(Symbol),
+      SYMBOL_KEY: expect.any(String),
+      SYMBOL_TYPE: expect.anything(),
+      SYMBOL_VARIABLE: expect.anything(),
       TYPE_FILE_NAMES: expect.any(Array)
     })
   })
@@ -66,7 +65,6 @@ describe('index', () => {
     const mod = require('./dag')
     expect(mod).toMatchObject({
       buildGraph: expect.any(Function),
-      cloneGraph: expect.any(Function),
       deployGraph: expect.any(Function),
       detectCircularDeps: expect.any(Function),
       removeGraph: expect.any(Function)
@@ -77,17 +75,11 @@ describe('index', () => {
     const mod = require('./deployment')
     expect(mod).toEqual({
       createDeployment: expect.any(Function),
+      createRemovalDeployment: expect.any(Function),
       loadDeployment: expect.any(Function),
       loadPreviousDeployment: expect.any(Function),
       newDeployment: expect.any(Function),
       parseDeploymentNumber: expect.any(Function)
-    })
-  })
-
-  test('has interpret methods', () => {
-    const mod = require('./interpret')
-    expect(mod).toMatchObject({
-      interpretProps: expect.any(Function)
     })
   })
 
