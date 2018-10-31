@@ -35,26 +35,6 @@ Object {
           "data": "0.3.0",
           "type": "string",
         },
-        Symbol(@@type): Object {
-          "props": Object {
-            "parent": Object {
-              "@@ref": "@@ref-5",
-            },
-            "props": Object {
-              "@@ref": "@@ref-4",
-            },
-            "query": Object {
-              "data": "Component",
-              "type": "string",
-            },
-            "root": Object {
-              "data": "/Users/brianneisler/Sites/serverless/components/registry/Component",
-              "type": "string",
-            },
-          },
-          "symbols": Object {},
-          "type": "object",
-        },
       },
       "symbols": Object {},
       "type": "Component",
@@ -62,7 +42,7 @@ Object {
     "@@ref-2": Object {
       "props": Object {
         "components": Object {
-          "@@ref": "@@ref-6",
+          "@@ref": "@@ref-4",
         },
       },
       "symbols": Object {},
@@ -73,10 +53,10 @@ Object {
       "symbols": Object {},
       "type": "object",
     },
-    "@@ref-6": Object {
+    "@@ref-4": Object {
       "props": Object {
         "default": Object {
-          "@@ref": "@@ref-7",
+          "@@ref": "@@ref-5",
         },
         "type": Object {
           "data": "Object",
@@ -86,7 +66,7 @@ Object {
       "symbols": Object {},
       "type": "object",
     },
-    "@@ref-7": Object {
+    "@@ref-5": Object {
       "props": Object {},
       "symbols": Object {},
       "type": "object",
