@@ -160,8 +160,12 @@ const AwsSnsTopic = (SuperClass) =>
     async construct(inputs, context) {
       await super.construct(inputs, context)
 
-      this.topicName = inputs.topicName || `sns-${this.instanceId}`
       this.provider = inputs.provider || context.get('provider')
+      this.topicName = inputs.topicName || `sns-${this.instanceId}`
+      this.displayName = inputs.displayName
+      this.policy = inputs.policy
+      this.deliveryPolicy = inputs.deliveryPolicy
+      this.deliveryStatusAttributes = inputs.deliveryStatusAttributes
     }
 
     shouldDeploy(prevInstance) {
