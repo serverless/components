@@ -2,7 +2,8 @@ import createContext from '../createContext'
 import run from '../run'
 
 const deploy = async (options) => {
-  const context = await createContext(options)
+  let context = await createContext(options)
+  context = await context.loadPlugins()
   return run('deploy', context)
 }
 
