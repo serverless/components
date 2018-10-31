@@ -46,9 +46,9 @@ describe('index', () => {
     expect(mod).toMatchObject({
       DEFAULT_PLUGINS: expect.any(Object),
       PLUGINS_DIR: expect.any(String),
-      SYMBOL_KEY: expect.any(Symbol),
-      SYMBOL_TYPE: expect.any(Symbol),
-      SYMBOL_VARIABLE: expect.any(Symbol),
+      SYMBOL_KEY: expect.any(String),
+      SYMBOL_TYPE: expect.anything(),
+      SYMBOL_VARIABLE: expect.anything(),
       TYPE_FILE_NAMES: expect.any(Array)
     })
   })
