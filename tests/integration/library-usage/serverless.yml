@@ -1,9 +1,18 @@
-type: library-usage
-version: 0.0.1
+name: LibraryUsage
+extends: Service
+
+providers:
+  aws:
+    type: AwsProvider
+    inputs:
+      credentials:
+        accessKeyId: xxxxx
+        secretAccessKey: xxxxx
+      region: us-east-1
 
 components:
-  myRole:
-    type: tests-integration-iam-mock
+  myBucket:
+    type: AwsS3Bucket
     inputs:
-      name: my-role
-      service: my.role.service
+      bucketName: mySuperBucket
+      provider: ${this.providers.aws}
