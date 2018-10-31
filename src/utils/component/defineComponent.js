@@ -1,9 +1,9 @@
 import { filter, forEach, get, isFunction, isObject, map, or, resolve } from '@serverless/utils'
-import appendKey from './appendKey'
-import getKey from './getKey'
+// import appendKey from './appendKey'
+// import getKey from './getKey'
 import hydrateComponent from './hydrateComponent'
 import isComponent from './isComponent'
-import setKey from './setKey'
+// import setKey from './setKey'
 
 /**
  *
@@ -21,10 +21,10 @@ const defineComponent = async (component, state, context) => {
     children = filter(isComponent, map(resolve, children))
 
     if (isObject(children)) {
-      forEach((child, kdx) => {
+      forEach((child) => {
         // TODO BRN: Look for children that already have parents. If this is the case then someone has returned a child from define that was defined by another component (possibly passed along as a variable)
         child.parent = component
-        child = setKey(appendKey(getKey(component), kdx), child)
+        // child = setKey(appendKey(getKey(component), kdx), child)
       }, children)
     } else {
       throw new Error(

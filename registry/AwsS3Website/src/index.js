@@ -3,7 +3,8 @@ import path from 'path'
 import klawSync from 'klaw-sync'
 import mime from 'mime-types'
 const { execSync } = require('child_process')
-import { resolve } from '@serverless/utils'
+import { hashElement } from 'folder-hash'
+import { resolve, pick, equals, not, keys } from '@serverless/utils'
 
 /*
 * Create Website Bucket
@@ -144,17 +145,35 @@ const AwsS3Website = (SuperClass) =>
 
       this.envFileLocation = path.resolve(this.projectDir, resolve(inputs.envFileLocation))
       this.assets = path.resolve(this.projectDir, resolve(inputs.assets))
+
+      const options = {
+        folders: { exclude: ['node_modules'] }
+      }
+
+      const hashObj = await hashElement(this.projectDir, options)
+      this.hash = hashObj.hash
     }
 
     shouldDeploy(prevInstance) {
-      if (!prevInstance) {
-        return 'deploy'
-      }
-      if (prevInstance.bucket !== resolve(this.bucket).toLowerCase()) {
-        return 'replace'
+      const inputs = {
+        bucket: resolve(this.bucket).toLowerCase(),
+        projectDir: resolve(this.projectDir),
+        assets: resolve(this.assets),
+        envFileLocation: resolve(this.envFileLocation),
+        hash: resolve(this.hash),
+        // env: resolve(this.env), the value of this is a variable
+        buildCmd: resolve(this.buildCmd)
       }
 
-      // return 'deploy'
+      this.bucket = resolve(this.bucket).toLowerCase() // convert to lowercase
+
+      const prevInputs = prevInstance ? pick(keys(inputs), prevInstance) : {}
+      const configChanged = not(equals(prevInputs, inputs))
+      if (prevInstance && prevInstance.bucket !== resolve(this.bucket).toLowerCase()) {
+        return 'replace'
+      } else if (!prevInstance || configChanged) {
+        return 'deploy'
+      }
     }
 
     async deploy(prevInstance, context) {
