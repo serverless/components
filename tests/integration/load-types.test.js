@@ -1,3 +1,4 @@
+import path from 'path'
 import { createContext, SYMBOL_TYPE } from '../../src/utils'
 
 jest.setTimeout(50000)
@@ -219,15 +220,17 @@ describe('Integration Test - load types', () => {
   })
 
   it.only('should load Function', async () => {
-    const context = await createContext({
-      cwd: __dirname
+    let context = await createContext({
+      cwd: path.join(__dirname, 'load-types', 'emptyProject')
     })
+    context = await context.loadProject()
+    context = await context.loadApp()
     const AwsProvider = await context.loadType('AwsProvider')
     const AwsProviderInputs = {
       region: 'us-east-1',
       credentials: {
-        accessKeyId: 'AKIAIJKIIU5OJU37BTCQ',
-        secretAccessKey: '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'
+        accessKeyId: 'xxx',
+        secretAccessKey: 'xxx'
       }
     }
     const awsProvider = await context.construct(AwsProvider, AwsProviderInputs, context)
@@ -257,7 +260,9 @@ describe('Integration Test - load types', () => {
       handler: 'index.hello'
     }
     const fn = await context.construct(Function, FunctionInputs, context)
-
-    await fn.deploy(context)
+    expect(fn).toBeInstanceOf(Function.class)
+    expect(fn).toMatchObject({
+      instanceId: expect.any(String)
+    })
   })
 })
