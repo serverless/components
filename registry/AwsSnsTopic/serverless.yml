@@ -3,10 +3,10 @@ extends: Component
 version: 0.3.0
 main: ./dist/index.js
 
-description: "Provision AWS SNS Topic with the Serverless Framework"
+description: 'Provision AWS SNS Topic with the Serverless Framework'
 license: Apache-2.0
-author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
-repository: "github:serverless/components"
+author: 'Serverless, Inc. <hello@serverless.com> (https://serverless.com)'
+repository: 'github:serverless/components'
 
 provider: ${inputs.provider}
 topicName: ${inputs.topicName}
@@ -19,9 +19,12 @@ inputTypes:
   provider:
     type: AwsProvider
     required: true
+    default: ${context.provider}
+    displayName: AWS Provider
+    description: The AWSProvider instance that contains the credentials for AWS
   topicName:
     type: string
-    required: true
+    required: false
     default: sns-${self.instanceId}
     description: The name of your SNS topic
     displayName: SNS Topic Name
@@ -38,27 +41,27 @@ inputTypes:
     displayName: SNS Policy
     description: The policy for your SNS topic
     example:
-      Version: "2008-10-17"
+      Version: '2008-10-17'
       Id: policy_id
       Statement:
-      - Effect: Allow
-        Sid: statement_id
-        Principal:
-          AWS: "*"
-        Action:
-          - SNS:Publish
-          - SNS:RemovePermission
-          - SNS:SetTopicAttributes
-          - SNS:DeleteTopic
-          - SNS:ListSubscriptionsByTopic
-          - SNS:GetTopicAttributes
-          - SNS:Receive
-          - SNS:AddPermission
-          - SNS:Subscribe
-        Resource: arn:aws:sns:us-east-1:000000000000:my-sns-topic
-        Condition:
-          StringEquals:
-            AWS:SourceOwner: "000000000000"
+        - Effect: Allow
+          Sid: statement_id
+          Principal:
+            AWS: '*'
+          Action:
+            - SNS:Publish
+            - SNS:RemovePermission
+            - SNS:SetTopicAttributes
+            - SNS:DeleteTopic
+            - SNS:ListSubscriptionsByTopic
+            - SNS:GetTopicAttributes
+            - SNS:Receive
+            - SNS:AddPermission
+            - SNS:Subscribe
+          Resource: arn:aws:sns:us-east-1:000000000000:my-sns-topic
+          Condition:
+            StringEquals:
+              AWS:SourceOwner: '000000000000'
   deliveryPolicy:
     type: object
     required: false
