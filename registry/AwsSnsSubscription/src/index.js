@@ -1,6 +1,17 @@
 import { getProtocol } from './protocols'
 import { setSubscriptionAttributes } from './protocols/lib'
-import { concat, contains, equals, head, keys, map, reduce, slice, values } from '@serverless/utils'
+import {
+  concat,
+  contains,
+  equals,
+  head,
+  keys,
+  map,
+  reduce,
+  slice,
+  values,
+  resolve
+} from '@serverless/utils'
 
 const DEPLOY = 'deploy'
 const REPLACE = 'replace'
@@ -51,38 +62,52 @@ const setAllSubscriptionAttributes = async (subscriptionArn, inputs, context) =>
   )
 }
 
-const AwsSnsSubscription = {
-  shouldDeploy(prevInstance) {
-    if (!prevInstance) {
-      return DEPLOY
+const AwsSnsSubscription = (SuperClass) =>
+  class extends SuperClass {
+    async construct(inputs, context) {
+      await super.construct(inputs, context)
+
+      this.provider = inputs.provider || context.get('provider')
+      this.topic = inputs.topic
+      this.protocol = inputs.protocol || 'https'
+      this.endpoint = inputs.endpoint
+      this.subscriptionAttributes = inputs.subscriptionAttributes
     }
-    if (prevInstance.protocol !== this.protocol && prevInstance.topic !== this.topic) {
-      return REPLACE
+
+    shouldDeploy(prevInstance) {
+      if (!prevInstance) {
+        return DEPLOY
+      }
+      if (
+        prevInstance.protocol !== resolve(this.protocol) &&
+        prevInstance.topic !== resolve(this.topic)
+      ) {
+        return REPLACE
+      }
     }
-  },
 
-  async deploy(prevInstance, context) {
-    const outputs = await getProtocol(this.protocol).deploy(this, context)
-    await setAllSubscriptionAttributes(outputs.subscriptionArn, this, context)
-    Object.assign(this, outputs)
-  },
+    async deploy(prevInstance, context) {
+      const outputs = await getProtocol(this.protocol).deploy(this, context)
+      await setAllSubscriptionAttributes(outputs.subscriptionArn, this, context)
+      Object.assign(this, outputs)
+    }
 
-  async remove(context) {
-    return getProtocol(this.protocol).remove(this, context)
-  },
+    async remove(context) {
+      return getProtocol(this.protocol).remove(this, context)
+    }
 
-  async info() {
-    return {
-      title: this.subscriptionArn,
-      type: this.extends,
-      data: {
-        arn: this.subscriptionArn,
-        topic: this.topic,
-        protocol: this.protocol,
-        endpoint: this.endpoint
+    async info() {
+      return {
+        title: this.subscriptionArn,
+        type: this.extends,
+        data: {
+          arn: this.subscriptionArn,
+          topic: this.topic,
+          protocol: this.protocol,
+          endpoint: this.endpoint
+        }
       }
     }
   }
-}
 
 export default AwsSnsSubscription

@@ -69,7 +69,7 @@ const waitForConfirmation = async (
 ) =>
   new Promise((resolve, reject) => {
     const SDK = provider.getSdk()
-    const sns = SDK.SNS()
+    const sns = new SDK.SNS()
     const startTime = Date.now()
     // TODO BRN: Move this poller functionality to utils.
     // TODO BRN: This poller has a flaw where the duration of the call to the API could last longer than the interval. It should instead wait until the previous call is complete before executing the next call.

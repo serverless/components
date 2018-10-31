@@ -28,13 +28,13 @@ inputTypes:
     type: string
     required: true
     default: https
-    displayName: SNS Topic Display Name
+    displayName: Protocol
     description: The protocol of the subscription, possible values are http, https, email, email-json, sms, sqs, application, and lambda
     example: https
   endpoint:
     type: string
     required: false
-    displayName: SNS Topic Display Name
+    displayName: Endpoint
     description: The endpoint that you want to receive notifications
     example: https://example.com/
   subscriptionAttributes:

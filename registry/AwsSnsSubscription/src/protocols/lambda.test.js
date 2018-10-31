@@ -10,7 +10,7 @@ jest.mock('aws-sdk', () => {
     })),
     unsubscribeMock: jest.fn(),
     addPermissionMock: jest.fn(() => ({
-      Statement: JSON.stringify({ mock: 'statement' })
+      Statement: '{ "mock": "statement" }'
     })),
     removePermissionMock: jest.fn()
   }
@@ -78,7 +78,7 @@ describe('SNS Subscription - Lambda protocol tests', () => {
     expect(subscriptionArn).toBe(
       `arn:aws:sns:us-east-1:000000000000:${instance.topic}:00000000-0000-0000-0000-000000000000`
     )
-    expect(statement).toEqual({ mock: 'statement' })
+    expect(statement).toEqual('{ "mock": "statement" }')
     expect(AWS.mocks.subscribeMock).toHaveBeenCalledWith(
       expect.objectContaining({
         Endpoint: instance.endpoint,
@@ -88,6 +88,7 @@ describe('SNS Subscription - Lambda protocol tests', () => {
     )
     expect(AWS.mocks.subscribeMock).toHaveBeenCalledTimes(1)
   })
+
   it('should unsubscribe from SNS topic', async () => {
     const instance = {
       subscriptionArn:
@@ -112,10 +113,7 @@ describe('SNS Subscription - Lambda protocol tests', () => {
 
   it('should unsubscribe from SNS topic when Resource and Sid is defined in state', async () => {
     const instance = {
-      statement: {
-        Resource: 'resource',
-        Sid: 'sid'
-      },
+      statement: '{ "Resource": "resource", "Sid": "sid" }',
       subscriptionArn:
         'arn:aws:sns:us-east-1:000000000000:topic-arn:00000000-0000-0000-0000-000000000000',
       provider: {
