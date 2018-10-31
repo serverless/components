@@ -39,7 +39,7 @@ describe('RestApi', () => {
     })
     const gateway = children.shift()
     expect(gateway).toMatchObject({
-      name: 'AwsApiGateway',
+      name: inputs.apiName,
       inputs: expect.any(Object)
     })
     expect(gateway.inputs).toMatchObject({
