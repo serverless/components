@@ -4,8 +4,8 @@ const App = (SuperClass) =>
   class extends SuperClass {
     async define() {
       return {
-        ...this.services,
-        ...this.components
+        ...or(this.services, {}),
+        ...or(this.components, {})
       }
     }
 

@@ -8,5 +8,7 @@
   },
   "author": "Serverless, Inc.",
   "license": "Apache-2.0",
-  "dependencies": {}
+  "dependencies": {
+    "@serverless/utils": "0.0.15"
+  }
 }

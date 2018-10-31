@@ -116,6 +116,7 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
     }
 
     hydrate(prevInstance) {
+      super.hydrate(prevInstance)
       this.arn = get('arn', prevInstance)
     }
 

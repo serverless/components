@@ -1,10 +1,10 @@
-name: Apps
+name: App
 extends: Component
 version: 0.3.0
 main: ./dist/index.js
 
 providers: ${inputs.providers}
-functions: ${inputs.functions}
+services: ${inputs.services}
 
 inputTypes:
   providers:
