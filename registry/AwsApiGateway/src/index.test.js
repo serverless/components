@@ -98,24 +98,30 @@ describe('AwsApiGateway', () => {
   })
 
   it('should remove deployment', async () => {
-    // const prevInstance = {
-    //   provider,
-    //   id: 'something'
-    // }
-    // const context = await createContext(
-    //     {},
-    //     {
-    //       app: {
-    //         id: 'test'
-    //       }
-    //     }
-    //   )
-    // const AwsApiGateway = await context.loadType('AwsApiGateway')
-    // let awsApiGateway = context.construct(AwsApiGateway, inputs)
-    // Object.assign(awsApiGateway, prevInstance)
-    //
-    // await awsApiGateway.remove(context)
-    //
-    // expect(mocks.deleteRestApi).toBeCalledWith({ restApiId: prevInstance.id })
+    const inputs = {
+      provider,
+      name: 'somethingNew',
+      role: { arn: 'someArn' },
+      routes: {}
+    }
+    const prevInstance = {
+      provider,
+      id: 'something'
+    }
+    const context = await createContext(
+      {},
+      {
+        app: {
+          id: 'test'
+        }
+      }
+    )
+    const AwsApiGateway = await context.loadType('AwsApiGateway')
+    const awsApiGateway = await context.construct(AwsApiGateway, inputs)
+    Object.assign(awsApiGateway, prevInstance)
+
+    await awsApiGateway.remove(context)
+
+    expect(mocks.deleteRestApi).toBeCalledWith({ restApiId: prevInstance.id })
   })
 })
