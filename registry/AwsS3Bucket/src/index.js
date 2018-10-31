@@ -8,8 +8,9 @@ const AwsS3Bucket = (SuperClass) =>
   class extends SuperClass {
     async construct(inputs, context) {
       await super.construct(inputs, context)
-      this.bucketName = inputs.bucketName
-      this.provider = resolve(inputs.provider) || context.get('provider')
+      // NOTE: the bucket name needs to be lower case when auto-generating
+      this.bucketName = inputs.bucketName || `bucket-${this.instanceId.toLowerCase()}`
+      this.provider = inputs.provider || context.get('provider')
     }
 
     shouldDeploy(prevInstance) {
