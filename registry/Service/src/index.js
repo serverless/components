@@ -12,7 +12,7 @@ const Service = async (SuperClass, superContext) => {
             ...func,
             functionName: func.functionName || alias
           }),
-        this.functions
+        or(this.functions, [])
       )
     }
 
