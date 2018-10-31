@@ -329,6 +329,16 @@ const AwsDynamoDB = {
     context.log(
       'Incorrect or insufficient parameters. \nUsage: get --tablename <tablename> --keydata <hashkey and rangekey key/value pairs in json format>'
     )
+  },
+
+  async info() {
+    return {
+      title: this.tables[0].name,
+      type: this.extends,
+      data: {
+        tableName: this.tables[0].name
+      }
+    }
   }
 }
 

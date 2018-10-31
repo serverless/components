@@ -197,9 +197,9 @@ const AwsS3Website = (SuperClass) =>
       // this.assets = assets
       await uploadDir(s3, this.bucket, this.assets)
 
-      const s3Domain = `http://${this.bucket}.s3-website-${this.provider.region}.amazonaws.com`
+      this.domain = `${this.bucket}.s3-website-${this.provider.region}.amazonaws.com`
       context.log('Website Successfully Deployed:')
-      context.log(`  ${s3Domain}`)
+      context.log(`  http://${this.domain}`)
     }
 
     async remove(context) {
@@ -209,9 +209,20 @@ const AwsS3Website = (SuperClass) =>
 
       await deleteWebsiteBucket(s3, this.bucket)
 
-      const s3Domain = `http://${this.bucket}.s3-website-${this.provider.region}.amazonaws.com`
+      const domain = `${this.bucket}.s3-website-${this.provider.region}.amazonaws.com`
       context.log('Website Successfully Removed:')
-      context.log(`  ${s3Domain}`)
+      context.log(`  http://${domain}`)
+    }
+
+    async info() {
+      return {
+        title: this.domain,
+        type: this.extends,
+        data: {
+          domain: this.domain,
+          projectDir: this.projectDir
+        }
+      }
     }
   }
 

@@ -78,6 +78,16 @@ const AwsIamPolicy = (SuperClass) =>
         }
       }
     }
+
+    async info() {
+      return {
+        title: this.policyName,
+        type: this.extends,
+        data: {
+          arn: this.arn
+        }
+      }
+    }
   }
 
 export default AwsIamPolicy

@@ -151,6 +151,18 @@ const AwsIamRole = async (SuperClass, superContext) => {
         }
       }
     }
+
+    async info() {
+      return {
+        title: this.roleName,
+        type: this.extends,
+        data: {
+          arn: this.arn,
+          service: this.service,
+          policy: this.policy
+        }
+      }
+    }
   }
 }
 

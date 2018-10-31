@@ -97,7 +97,7 @@ const TwilioPhoneNumber = {
       if (noChanges) {
         return
       }
-      context.log(`Updating Twilio Phone Number: "${inputs.friendlyName}"`)
+      context.log(`Updating Twilio Phone Number: "${inputs.friendlyName || inputs.phoneNumber}"`)
       const props = await updatePhoneNumber(this.provider.getSdk(), {
         ...inputs,
         sid: prevInstance.sid
@@ -107,8 +107,19 @@ const TwilioPhoneNumber = {
   },
 
   async remove(context) {
-    context.log(`Removing Twilio Phone Number: "${this.sid}"`)
+    context.log(`Removing Twilio Phone Number: "${this.friendlyName || this.phoneNumber}"`)
     return removePhoneNumber(this.provider.getSdk(), this.sid)
+  },
+
+  async info() {
+    return {
+      title: this.friendlyName || this.phoneNumber,
+      type: this.extends,
+      data: {
+        phoneNumber: this.phoneNumber,
+        sid: this.sid
+      }
+    }
   }
 }
 

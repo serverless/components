@@ -19,10 +19,12 @@ const serializeObject = curry((context, object) =>
             return set(['symbols', symbolString], serializeValue(context, value), accum)
           }
           // context.log(`unhandled symbol detected ${toString(key)}`)
-        } else if (isSerializableReferenceable(value)) {
-          return set(['props', key], toReference(context, value), accum)
+        } else {
+          if (isSerializableReferenceable(value)) {
+            return set(['props', key], toReference(context, value), accum)
+          }
+          return set(['props', key], serializeValue(context, value), accum)
         }
-        return set(['props', key], serializeValue(context, value), accum)
       }
       return accum
     },
