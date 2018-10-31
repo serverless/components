@@ -1,53 +1,37 @@
+import AWS from 'aws-sdk'
 import path from 'path'
 import { sleep } from '@serverless/utils'
-import { createContext } from '../../../src/utils'
+import {
+  createContext,
+  deserialize,
+  resolveComponentVariables,
+  serialize
+} from '../../../src/utils'
+
+let context
+let provider
+let AwsIamRole
+
+const createTestContext = async () =>
+  createContext(
+    {
+      cwd: path.join(__dirname, '..'),
+      overrides: {
+        debug: () => {},
+        log: () => {}
+      }
+    },
+    {
+      app: {
+        id: 'test'
+      }
+    }
+  )
 
 jest.mock('@serverless/utils', () => ({
   ...require.requireActual('@serverless/utils'),
   sleep: jest.fn()
 }))
-
-let AwsIamRole
-let context
-
-const mocks = {
-  createRoleMock: jest.fn().mockReturnValue({ Role: { Arn: 'abc:xyz' } }),
-  deleteRoleMock: jest.fn().mockImplementation((params) => {
-    if (params.RoleName === 'some-already-removed-role') {
-      return Promise.reject(new Error('Role not found'))
-    }
-    return Promise.resolve({ Role: { Arn: null } })
-  }),
-  attachRolePolicyMock: jest.fn(),
-  detachRolePolicyMock: jest.fn(),
-  updateAssumeRolePolicyMock: jest.fn()
-}
-
-const provider = {
-  getSdk: () => {
-    return {
-      IAM: function() {
-        return {
-          createRole: (obj) => ({
-            promise: () => mocks.createRoleMock(obj)
-          }),
-          deleteRole: (obj) => ({
-            promise: () => mocks.deleteRoleMock(obj)
-          }),
-          attachRolePolicy: (obj) => ({
-            promise: () => mocks.attachRolePolicyMock(obj)
-          }),
-          detachRolePolicy: (obj) => ({
-            promise: () => mocks.detachRolePolicyMock(obj)
-          }),
-          updateAssumeRolePolicy: (obj) => ({
-            promise: () => mocks.updateAssumeRolePolicyMock(obj)
-          })
-        }
-      }
-    }
-  }
-}
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -59,18 +43,11 @@ afterAll(() => {
 
 describe('AwsIamRole', () => {
   beforeEach(async () => {
-    context = await createContext(
-      {
-        cwd: path.join(__dirname, '..')
-      },
-      {
-        app: {
-          id: 'test'
-        }
-      }
-    )
-
+    context = await createTestContext()
     AwsIamRole = await context.loadType('./')
+
+    const AwsProvider = await context.loadType('AwsProvider')
+    provider = await context.construct(AwsProvider, {})
   })
 
   it('should create role if first deployment', async () => {
@@ -80,7 +57,9 @@ describe('AwsIamRole', () => {
       provider
     }
 
-    const awsIamRole = await context.construct(AwsIamRole, inputs)
+    let awsIamRole = await context.construct(AwsIamRole, inputs)
+    awsIamRole = await context.defineComponent(awsIamRole)
+    awsIamRole = resolveComponentVariables(awsIamRole)
 
     await awsIamRole.deploy(undefined, context)
 
@@ -104,12 +83,39 @@ describe('AwsIamRole', () => {
       PolicyArn: 'arn:aws:iam::aws:policy/AdministratorAccess'
     }
 
-    expect(mocks.createRoleMock).toHaveBeenCalledTimes(1)
-    expect(mocks.createRoleMock).toBeCalledWith(createRoleParams)
-    expect(mocks.attachRolePolicyMock).toHaveBeenCalledTimes(1)
-    expect(mocks.attachRolePolicyMock).toBeCalledWith(attachRolePolicyParams)
-    expect(awsIamRole.arn).toEqual('abc:xyz')
+    expect(AWS.mocks.createRoleMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.createRoleMock).toBeCalledWith(createRoleParams)
+    expect(AWS.mocks.attachRolePolicyMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.attachRolePolicyMock).toBeCalledWith(attachRolePolicyParams)
+    expect(awsIamRole.arn).toEqual('arn:aws:iam::XXXXX:role/test-role')
     expect(sleep).toBeCalledWith(15000)
+  })
+
+  it('should update if role name has changed', async () => {
+    let oldAwsIamRole = await context.construct(AwsIamRole, {
+      roleName: 'old-role-name',
+      provider
+    })
+    oldAwsIamRole = await context.defineComponent(oldAwsIamRole)
+    oldAwsIamRole = resolveComponentVariables(oldAwsIamRole)
+    await oldAwsIamRole.deploy(null, context)
+
+    const prevAwsIamRole = await deserialize(serialize(oldAwsIamRole, context), context)
+
+    let newAwsIamRole = await context.construct(AwsIamRole, {
+      roleName: 'new-role-name',
+      provider
+    })
+    newAwsIamRole = await context.defineComponent(newAwsIamRole)
+    newAwsIamRole = resolveComponentVariables(newAwsIamRole)
+    await newAwsIamRole.deploy(prevAwsIamRole, context)
+
+    expect(AWS.mocks.createRoleMock).toBeCalledWith({
+      AssumeRolePolicyDocument:
+        '{"Version":"2012-10-17","Statement":{"Effect":"Allow","Principal":{},"Action":"sts:AssumeRole"}}',
+      Path: '/',
+      RoleName: 'new-role-name'
+    })
   })
 
   it('should update service if changed', async () => {
@@ -118,7 +124,10 @@ describe('AwsIamRole', () => {
       service: 'apig.amazonaws.com',
       provider
     }
-    const awsIamRole = await context.construct(AwsIamRole, inputs)
+
+    let awsIamRole = await context.construct(AwsIamRole, inputs)
+    awsIamRole = await context.defineComponent(awsIamRole)
+    awsIamRole = resolveComponentVariables(awsIamRole)
 
     const prevInstance = {
       roleName: 'abc',
@@ -144,8 +153,8 @@ describe('AwsIamRole', () => {
 
     await awsIamRole.deploy(prevInstance, context)
 
-    expect(mocks.updateAssumeRolePolicyMock).toHaveBeenCalledTimes(1)
-    expect(mocks.updateAssumeRolePolicyMock).toBeCalledWith(updateAssumeRolePolicyParams)
+    expect(AWS.mocks.updateAssumeRolePolicyMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.updateAssumeRolePolicyMock).toBeCalledWith(updateAssumeRolePolicyParams)
   })
 
   it('should update policy if changed', async () => {
@@ -154,7 +163,10 @@ describe('AwsIamRole', () => {
       service: 'lambda.amazonaws.com',
       provider
     }
-    const awsIamRole = await context.construct(AwsIamRole, inputs)
+
+    let awsIamRole = await context.construct(AwsIamRole, inputs)
+    awsIamRole = await context.defineComponent(awsIamRole)
+    awsIamRole = resolveComponentVariables(awsIamRole)
 
     const prevInstance = {
       roleName: 'abc',
@@ -176,47 +188,36 @@ describe('AwsIamRole', () => {
 
     await awsIamRole.deploy(prevInstance, context)
 
-    expect(mocks.attachRolePolicyMock).toHaveBeenCalledTimes(1)
-    expect(mocks.attachRolePolicyMock).toBeCalledWith(attachRolePolicyParams)
-    expect(mocks.detachRolePolicyMock).toHaveBeenCalledTimes(1)
-    expect(mocks.detachRolePolicyMock).toBeCalledWith(detachRolePolicyParams)
+    expect(AWS.mocks.attachRolePolicyMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.attachRolePolicyMock).toBeCalledWith(attachRolePolicyParams)
+    expect(AWS.mocks.detachRolePolicyMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.detachRolePolicyMock).toBeCalledWith(detachRolePolicyParams)
     expect(sleep).toBeCalledWith(15000)
   })
 
   it('should remove role', async () => {
-    // TODO: mimic core here and don't rely on inputs
-    const inputs = {
+    let oldAwsIamRole = await context.construct(AwsIamRole, {
       provider,
       roleName: 'abc',
       policy: {
         arn: 'arn:aws:iam::aws:policy/oldPolicy'
       }
-    }
-    const awsIamRole = await context.construct(AwsIamRole, inputs)
+    })
+    oldAwsIamRole = await context.defineComponent(oldAwsIamRole)
+    oldAwsIamRole = resolveComponentVariables(oldAwsIamRole)
+    await oldAwsIamRole.deploy(null, context)
 
-    const prevInstance = {
-      provider,
-      roleName: 'abc',
-      service: 'lambda.amazonaws.com',
-      policy: {
-        arn: 'arn:aws:iam::aws:policy/oldPolicy'
-      }
-    }
+    const prevAwsIamRole = await deserialize(serialize(oldAwsIamRole, context), context)
+    await prevAwsIamRole.remove(context)
 
-    const deleteRoleParams = {
-      RoleName: prevInstance.roleName
-    }
-
-    const detachRolePolicyParams = {
-      RoleName: prevInstance.roleName,
-      PolicyArn: prevInstance.policy.arn
-    }
-
-    await awsIamRole.remove(context)
-
-    expect(mocks.deleteRoleMock).toHaveBeenCalledTimes(1)
-    expect(mocks.deleteRoleMock).toBeCalledWith(deleteRoleParams)
-    expect(mocks.detachRolePolicyMock).toHaveBeenCalledTimes(1)
-    expect(mocks.detachRolePolicyMock).toBeCalledWith(detachRolePolicyParams)
+    expect(AWS.mocks.deleteRoleMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.deleteRoleMock).toBeCalledWith({
+      RoleName: prevAwsIamRole.roleName
+    })
+    expect(AWS.mocks.detachRolePolicyMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.detachRolePolicyMock).toBeCalledWith({
+      RoleName: prevAwsIamRole.roleName,
+      PolicyArn: prevAwsIamRole.policy.arn
+    })
   })
 })

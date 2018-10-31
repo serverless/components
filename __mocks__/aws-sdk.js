@@ -1,4 +1,5 @@
 const mocks = {
+  // S3
   createBucketMock: jest.fn().mockReturnValue('bucket-abc'),
   deleteBucketMock: jest.fn(),
   listObjectsV2Mock: jest.fn().mockImplementation((params) => {
@@ -13,10 +14,22 @@ const mocks = {
   removeTargets: jest.fn(),
   deleteRule: jest.fn(),
   addPermission: jest.fn(),
+  // Lambda
   createFunctionMock: jest.fn().mockReturnValue({ FunctionArn: 'abc:zxc' }),
   updateFunctionCodeMock: jest.fn().mockReturnValue({ FunctionArn: 'abc:zxc' }),
   updateFunctionConfigurationMock: jest.fn().mockReturnValue({ FunctionArn: 'abc:zxc' }),
-  deleteFunctionMock: jest.fn()
+  deleteFunctionMock: jest.fn(),
+  // IAM
+  createRoleMock: jest.fn().mockReturnValue({ Role: { Arn: 'arn:aws:iam::XXXXX:role/test-role' } }),
+  deleteRoleMock: jest.fn().mockImplementation((params) => {
+    if (params.RoleName === 'some-already-removed-role') {
+      return Promise.reject(new Error('Role not found'))
+    }
+    return Promise.resolve({ Role: { Arn: null } })
+  }),
+  attachRolePolicyMock: jest.fn(),
+  detachRolePolicyMock: jest.fn(),
+  updateAssumeRolePolicyMock: jest.fn()
 }
 
 const S3 = function() {
@@ -32,6 +45,26 @@ const S3 = function() {
     }),
     deleteObjects: (obj) => ({
       promise: () => mocks.deleteObjectsMock(obj)
+    })
+  }
+}
+
+const IAM = function() {
+  return {
+    createRole: (obj) => ({
+      promise: () => mocks.createRoleMock(obj)
+    }),
+    deleteRole: (obj) => ({
+      promise: () => mocks.deleteRoleMock(obj)
+    }),
+    attachRolePolicy: (obj) => ({
+      promise: () => mocks.attachRolePolicyMock(obj)
+    }),
+    detachRolePolicy: (obj) => ({
+      promise: () => mocks.detachRolePolicyMock(obj)
+    }),
+    updateAssumeRolePolicy: (obj) => ({
+      promise: () => mocks.updateAssumeRolePolicyMock(obj)
     })
   }
 }
@@ -81,4 +114,5 @@ export default {
   S3,
   Lambda,
   CloudWatchEvents,
+  IAM
 }
