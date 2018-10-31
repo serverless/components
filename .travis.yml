@@ -23,6 +23,7 @@ install:
 - npm install -g codecov
 - pushd examples/restapi/code && npm install && popd
 script:
+- npm run build
 - npm run lint
 - npm run test:travis
 - codecov
