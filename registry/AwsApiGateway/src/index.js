@@ -74,7 +74,11 @@ const AwsApiGateway = function(SuperClass) {
   return class extends SuperClass {
     async construct(inputs, context) {
       await super.construct(inputs, context)
-      this.inputs = inputs
+
+      this.provider = inputs.provider || context.get('provider')
+      this.name = inputs.name || `apig-${this.instanceId}`
+      this.role = inputs.role
+      this.routes = inputs.routes
     }
 
     async define() {
@@ -108,34 +112,34 @@ const AwsApiGateway = function(SuperClass) {
     }
 
     async deploy(prevInstance, context) {
-      const inputs = this.inputs
-      const aws = inputs.provider.getSdk()
+      const aws = this.provider.getSdk()
       const APIGateway = new aws.APIGateway()
-      const state = prevInstance || {}
       const noChanges =
-        inputs.name === state.name &&
-        (inputs.role && state.role && inputs.role.arn === state.role.arn) &&
-        equals(inputs.routes, state.routes)
+        prevInstance &&
+        resolve(this.name) === prevInstance.name &&
+        (resolve(this.role) &&
+          prevInstance.role &&
+          resolve(this.role.arn) === prevInstance.role.arn) &&
+        equals(resolve(this.routes), prevInstance.routes)
 
       let outputs
       if (noChanges) {
-        outputs = state
-      } else if (inputs.name && !state.name) {
-        context.log(`Creating API Gateway: "${inputs.name}"`)
-        outputs = await createApi(APIGateway, inputs, this.inputs.provider.region)
+        outputs = prevInstance
+      } else if (!prevInstance || (resolve(this.name) && !prevInstance.name)) {
+        context.log(`Creating API Gateway: "${this.name}"`)
+        outputs = await createApi(APIGateway, this, this.provider.region)
       } else {
-        context.log(`Updating API Gateway: "${inputs.name}"`)
+        context.log(`Updating API Gateway: "${this.name}"`)
         outputs = await updateApi(
           APIGateway,
           {
-            ...inputs,
-            id: state.id,
-            baseUrl: state.baseUrl
+            ...this,
+            id: prevInstance.id,
+            baseUrl: prevInstance.baseUrl
           },
           this.inputs.provider.region
         )
       }
-      // context.saveState(this, { ...inputs, ...outputs })
       Object.assign(this, outputs)
     }
 
