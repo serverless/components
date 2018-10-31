@@ -8,7 +8,7 @@ compute:
     runtime: nodejs
 
 functions:
-  myUniqueFunctionName:
+  hello:
     compute: ${this.compute}
     handler: index.hello
     code: ./code
@@ -20,5 +20,5 @@ components:
   cron:
     type: Cron
     inputs:
-      function: ${this.functions.myUniqueFunctionName}
+      function: ${this.functions.hello}
       rate: 3m
