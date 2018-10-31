@@ -10,7 +10,8 @@ const {
   map,
   merge,
   reduce,
-  values
+  values,
+  resolve
 } = require('@serverless/utils')
 
 const DEPLOY = 'deploy'
@@ -154,63 +155,79 @@ const updateDeliveryStatusAttributes = async (sns, { deliveryStatusAttributes, t
     )
   )
 
-const AwsSnsTopic = {
-  shouldDeploy(prevInstance) {
-    if (!prevInstance) {
-      return DEPLOY
-    }
-    if (prevInstance.topicName !== this.topicName || prevInstance.policy !== this.policy) {
-      return REPLACE
-    }
-  },
+const AwsSnsTopic = (SuperClass) =>
+  class extends SuperClass {
+    async construct(inputs, context) {
+      await super.construct(inputs, context)
 
-  async deploy(prevInstance, context) {
-    const provider = this.provider
-    const AWS = provider.getSdk()
-    const sns = new AWS.SNS()
+      this.provider = inputs.provider || context.get('provider')
+      this.topicName = inputs.topicName || `sns-${this.instanceId}`
+      this.displayName = inputs.displayName
+      this.policy = inputs.policy
+      this.deliveryPolicy = inputs.deliveryPolicy
+      this.deliveryStatusAttributes = inputs.deliveryStatusAttributes
+    }
 
-    if (prevInstance && prevInstance.topicName === this.topicName) {
-      context.log(`Updating SNS topic: '${this.topicName}'...`)
-      const props = merge(
-        await updateAttributes(sns, merge({ topicArn: prevInstance.topicArn }, this), prevInstance),
-        {
-          name: this.topicName,
-          topicArn: prevInstance.topicArn
+    shouldDeploy(prevInstance) {
+      if (!prevInstance) {
+        return DEPLOY
+      }
+      if (prevInstance.topicName !== this.topicName || prevInstance.policy !== this.policy) {
+        return REPLACE
+      }
+    }
+
+    async deploy(prevInstance, context) {
+      const provider = this.provider
+      const AWS = provider.getSdk()
+      const sns = new AWS.SNS()
+
+      if (prevInstance && prevInstance.topicName === resolve(this.topicName)) {
+        context.log(`Updating SNS topic: '${this.topicName}'...`)
+        const props = merge(
+          await updateAttributes(
+            sns,
+            merge({ topicArn: prevInstance.topicArn }, this),
+            prevInstance
+          ),
+          {
+            name: this.topicName,
+            topicArn: prevInstance.topicArn
+          }
+        )
+        Object.assign(this, props)
+        context.log(`SNS Topic '${this.topicName}' Updated.`)
+      } else {
+        context.log(`Creating SNS topic: '${this.topicName}'...`)
+        const props = await createSNSTopic(sns, this)
+        Object.assign(this, props)
+        context.log(`SNS Topic '${this.topicName}' Created.`)
+      }
+    }
+
+    async remove(context) {
+      const provider = this.provider
+      const AWS = provider.getSdk()
+      const sns = new AWS.SNS()
+      context.log(`Removing SNS topic: '${this.topicName}'`)
+      await sns
+        .deleteTopic({
+          TopicArn: this.topicArn
+        })
+        .promise()
+      context.log(`SNS topic '${this.topicName}' removed.`)
+    }
+
+    async info() {
+      return {
+        title: this.topicName,
+        type: this.extends,
+        data: {
+          topicName: this.topicName,
+          arn: this.topicArn
         }
-      )
-      Object.assign(this, props)
-      context.log(`SNS Topic '${this.topicName}' Updated.`)
-    } else {
-      context.log(`Creating SNS topic: '${this.topicName}'...`)
-      const props = await createSNSTopic(sns, this)
-      Object.assign(this, props)
-      context.log(`SNS Topic '${this.topicName}' Created.`)
-    }
-  },
-
-  async remove(context) {
-    const provider = this.provider
-    const AWS = provider.getSdk()
-    const sns = new AWS.SNS()
-    context.log(`Removing SNS topic: '${this.topicName}'`)
-    await sns
-      .deleteTopic({
-        TopicArn: this.topicArn
-      })
-      .promise()
-    context.log(`SNS topic '${this.topicName}' removed.`)
-  },
-
-  async info() {
-    return {
-      title: this.topicName,
-      type: this.extends,
-      data: {
-        topicName: this.topicName,
-        arn: this.topicArn
       }
     }
   }
-}
 
 export default AwsSnsTopic

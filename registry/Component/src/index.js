@@ -9,8 +9,8 @@ const Component = (SuperClass) =>
       this.instanceId = context.generateInstanceId()
     }
 
-    hydrate(state) {
-      this.instanceId = get('instanceId', state) || this.instanceId
+    hydrate(previousInstance) {
+      this.instanceId = get('instanceId', previousInstance) || this.instanceId
     }
 
     async define() {

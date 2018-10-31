@@ -1,5 +1,5 @@
 {
-  "name": "@serverless-components/registry",
+  "name": "@serverless-components/registry-old",
   "version": "0.2.0",
   "private": true,
   "scripts": {

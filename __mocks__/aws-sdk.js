@@ -12,7 +12,11 @@ const mocks = {
   putTargets: jest.fn(),
   removeTargets: jest.fn(),
   deleteRule: jest.fn(),
-  addPermission: jest.fn()
+  addPermission: jest.fn(),
+  createFunctionMock: jest.fn().mockReturnValue({ FunctionArn: 'abc:zxc' }),
+  updateFunctionCodeMock: jest.fn().mockReturnValue({ FunctionArn: 'abc:zxc' }),
+  updateFunctionConfigurationMock: jest.fn().mockReturnValue({ FunctionArn: 'abc:zxc' }),
+  deleteFunctionMock: jest.fn()
 }
 
 const S3 = function() {
@@ -36,6 +40,18 @@ const Lambda = function() {
   return {
     addPermission: (obj) => ({
       promise: () => mocks.addPermission(obj)
+    }),
+    createFunction: (obj) => ({
+      promise: () => mocks.createFunctionMock(obj)
+    }),
+    updateFunctionConfiguration: (obj) => ({
+      promise: () => mocks.updateFunctionConfigurationMock(obj)
+    }),
+    updateFunctionCode: (obj) => ({
+      promise: () => mocks.updateFunctionCodeMock(obj)
+    }),
+    deleteFunction: (obj) => ({
+      promise: () => mocks.deleteFunctionMock(obj)
     })
   }
 }
@@ -64,5 +80,6 @@ export default {
   },
   S3,
   Lambda,
-  CloudWatchEvents
+  CloudWatchEvents,
+  Lambda
 }

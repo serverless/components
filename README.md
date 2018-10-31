@@ -25,84 +25,86 @@ Serverless Components can deploy anything, but they're biased toward SaaS & clou
 
 ## Example
 
-This example shows how an entire retail application can be assembled from components available. It provides the static frontend website, the REST API supporting the frontend and the database backing the REST API. Checkout the full example [here](./examples/retail-app).
+This example shows how an entire web application can be assembled from components available. It provides the static frontend website, the REST API supporting the frontend and several services backing the REST API. Checkout the full example [here](https://github.com/serverless/serverless-web-application).
 
 ```yaml
-type: retail-app
+name: ServerlessWebApp
+extends: Component
 
-components:
-  webFrontend:
-    type: static-website
-    inputs:
-      name: retail-frontend
-      contentPath: ${self.path}/frontend # define where to find the static files
-      # mustache templating is built in to the static-website component
-      templateValues:
-        apiUrl: ${productsApi.url}
-      contentIndex: index.html
+# Using the "EnvironmentBasedConfiguration" type lets you access environment
+# variables, so that you can avoid including credentials or contextual values
+# in your application's serverless.yml.
+# The name "credentials" has no special significance, and is only used in
+# referring to the values elsewhere in the file.
+credentials:
+  type: EnvironmentBasedConfiguration
+  inputs:
+    # EnvironmentBasedConfiguration takes a list of variables to be captured.
+    variables:
+    - TWILIO_ACCOUNT_SID
+    - TWILIO_AUTH_TOKEN
+    - AWS_ACCESS_KEY_ID
+    - AWS_SECRET_ACCESS_KEY
 
-  productsApi:
-    type: rest-api
+# This section defines the your service provider configuration. This application
+# uses AWS and Twilio.
+providers:
+  twilio:
+    type: TwilioProvider
     inputs:
-      gateway: aws-apigateway
-      routes:
-        /products: # routes begin with a slash
-          post: # HTTP method names are used to attach handlers
-            function: ${createProduct}
-            cors: true
-
-          # sub-routes can be declared hierarchically
-          /{id}: # path parameters use curly braces
-            get:
-              function: ${getProduct}
-              cors: true # CORS can be allowed with this flag
-
-        # multi-segment routes can be declared all at once
-        /catalog/{...categories}: # catch-all path parameters use ellipses
-          get:
-            function: ${listProducts}
-            cors: true
-
-  createProduct:
-    type: aws-lambda
+      # The "credentials" section can be accessed with ${this.credentials}.
+      # The EnvironmentBasedConfiguration outputs a property named "values" that
+      # contains the values of the specified environment variables.
+      accountSid: ${this.credentials.values.TWILIO_ACCOUNT_SID}
+      authToken: ${this.credentials.values.TWILIO_AUTH_TOKEN}
+  aws:
+    type: AwsProvider
     inputs:
-      handler: products.create
-      root: ${self.path}/code
-      env:
-        productTableName: products-${self.appId}
-  getProduct:
-    type: aws-lambda
-    inputs:
-      handler: products.get
-      root: ${self.path}/code
-      env:
-        productTableName: products-${self.appId}
-  listProducts:
-    type: aws-lambda
-    inputs:
-      handler: products.list
-      root: ${self.path}/code
-      env:
-        productTableName: products-${self.appId}
-
-  productsDb:
-    type: aws-dynamodb
-    inputs:
+      credentials:
+        accessKeyId: ${this.credentials.values.AWS_ACCESS_KEY_ID}
+        secretAccessKey: ${this.credentials.values.AWS_SECRET_ACCESS_KEY}
       region: us-east-1
-      tables:
-        - name: products-${self.appId}
-          hashKey: id
-          indexes:
-            - name: ProductIdIndex
-              type: global
-              hashKey: id
-          schema:
-            id: number
-            name: string
-            description: string
-            price: number
-          options:
-            timestamps: true
+
+# The "components" section defines any number of component instances to deploy
+# when deploying the application.
+components:
+
+  # The "users" service serves up an API for registering and authenticating users
+  users:
+     # The "type" property can refer to a local directory, which should contain
+     # its own serverless.yml.
+    type: ./users
+    inputs:
+      # The "users" module expects an input containing the providers, It uses
+      # the AWS provider to deploy some resources. In ./users/serverless.yml
+      # you can see the input being used.
+      providers: ${this.providers}
+
+  # The "sms" module sends messages to users.
+  sms:
+    type: ./sms
+    inputs:
+      # Similarly to the "users" module, the "sms" module needs the providers.
+      # It uses both Twilio and AWS. See the usage in ./sms/serverless.yml
+      providers: ${this.providers}
+      # The module also needs direct access to the Twilio credentials at runtime
+      accountSid: ${this.credentials.values.TWILIO_ACCOUNT_SID}
+      authToken: ${this.credentials.values.TWILIO_AUTH_TOKEN}
+      # The "users" module outputs the ARN of an SNS topic that notifies when a
+      # user registers a new account. The SMS module attaches some behavior to
+      # that notification.
+      userCreatedTopic: ${this.components.users.userCreatedTopic}
+
+      # Change this to any available phone number on Twilio that you'd like to
+      # claim, or else to a number that you have already claimed with Twilio.
+      smsPhoneNumber: "+14159495267"
+
+  # The "web" module deploys the application front-end.
+  web:
+    type: ./web
+    inputs:
+      providers: ${this.providers}
+      apiUrl: ${this.components.users.apiUrl}
 ```
 
 [![serverless](http://public.serverless.com/badges/v3.svg)](http://www.serverless.com)
@@ -113,7 +115,7 @@ components:
 
 [Website](http://www.serverless.com) • [Slack](https://serverless.com/slack) • [Newsletter](http://eepurl.com/b8dv4P) • [Forum](http://forum.serverless.com) • [Meetups](http://serverlessmeetups.com) • [Twitter](https://twitter.com/goserverless) • [We're Hiring](https://serverless.com/company/jobs/)
 
-Also please do join the _Components_ channel on our public [Serverless-Contrib Slack](https://serverless-contrib.slack.com/messages/C9U3RA55M) to continue the conversation.
+Also please do join the _Components_ channel on our public [Serverless-Contrib Slack](https://serverless.com/slack) to continue the conversation.
 
 ## Table of Contents
 
@@ -124,7 +126,7 @@ Also please do join the _Components_ channel on our public [Serverless-Contrib S
   * [Components](#components)
   * [Composition](#composition)
   * [Input types & Inputs](#input-types--inputs)
-  * [Output types & Outputs](#output-types--outputs)
+  * [Properties](#properties)
   * [State](#state)
   * [Variables](#variables)
   * [Setting Environment Variables](#env-variables)
@@ -142,89 +144,66 @@ Also please do join the _Components_ channel on our public [Serverless-Contrib S
     * [info](#info)
     * [remove](#remove)
   * [Programmatic usage](#programmatic-usage)
-    * [deploy](#deploy)
+    * [deploy](#deploy-method)
+    * [info](#info)
     * [package](#package)
     * [remove](#remove)
   * [Component Docs](#component-docs)
-    * [aws-apigateway](./registry/aws-apigateway)
-    * [aws-cloudfront](./registry/aws-cloudfront)
-    * [aws-dynamodb](./registry/aws-dynamodb)
-    * [aws-iam-policy](./registry/aws-iam-policy)
-    * [aws-iam-role](./registry/aws-iam-role)
-    * [aws-internetgateway](./registry/aws-internetgateway)
-    * [aws-lambda](./registry/aws-lambda)
-    * [aws-lambda-secure](./registry/aws-lambda-secure)
-    * [aws-route53](./registry/aws-route53)
-    * [aws-s3-bucket](./registry/aws-s3-bucket)
-    * [aws-sns-platform-application](./registry/aws-sns-platform-application)
-    * [aws-sns-platform-endpoint](./registry/aws-sns-platform-endpoint)
-    * [aws-sns-subscription](./registry/aws-sns-subscription)
-    * [aws-sns-topic](./registry/aws-sns-topic)
-    * [aws-subnet](./registry/aws-subnet)
-    * [aws-vpc](./registry/aws-vpc)
-    * [aws-vpcgatewayattachment](./registry/aws-vpcgatewayattachment)
-    * [cloudflare-workers](./registry/cloudflare-workers)
-    * [docker-image](./registry/docker-image)
-    * [eventgateway](./registry/eventgateway)
-    * [github-webhook](./registry/github-webhook)
-    * [github-webhook-aws](./registry/github-webhook-aws)
-    * [google-cloud-function](./registry/google-cloud-function)
-    * [mustache](./registry/mustache)
-    * [netlify-site](./registry/netlify-site)
-    * [rest-api](./registry/rest-api)
-    * [s3-dirloader](./registry/s3-dirloader)
-    * [s3-downloader](./registry/s3-downloader)
-    * [s3-policy](./registry/s3-policy)
-    * [s3-sync](./registry/s3-sync)
-    * [s3-uploader](./registry/s3-uploader)
-    * [s3-website-config](./registry/s3-website-config)
-    * [serverless-eventgateway-cors](./registry/serverless-eventgateway-cors)
-    * [serverless-eventgateway-event-type](./registry/serverless-eventgateway-event-type)
-    * [serverless-eventgateway-function](./registry/serverless-eventgateway-function)
-    * [serverless-eventgateway-subscription](./registry/serverless-eventgateway-subscription)
-    * [static-website](./registry/static-website)
-    * [twilio-application](./registry/twilio-application)
-    * [twilio-phone-number](./registry/twilio-phone-number)
+    * [App](./registry/App)
+    * [AwsApiGateway](./registry/AwsApiGateway)
+    * [AwsDynamoDB](./registry/AwsDynamoDB)
+    * [AwsEventsRule](./registry/AwsEventsRule)
+    * [AwsIamPolicy](./registry/AwsIamPolicy)
+    * [AwsIamRole](./registry/AwsIamRole)
+    * [AwsLambdaCompute](./registry/AwsLambdaCompute)
+    * [AwsLambdaFunction](./registry/AwsLambdaFunction)
+    * [AwsProvider](./registry/AwsProvider)
+    * [AwsS3Bucket](./registry/AwsS3Bucket)
+    * [AwsS3Website](./registry/AwsS3Website)
+    * [AwsSnsSubscription](./registry/AwsSnsSubscription)
+    * [AwsSnsTopic](./registry/AwsSnsTopic)
+    * [Component](./registry/Component)
+    * [Compute](./registry/Compute)
+    * [Cron](./registry/Cron)
+    * [DockerImage](./registry/DockerImage)
+    * [EnvironmentBasedConfiguration](./registry/EnvironmentBasedConfiguration)
+    * [Function](./registry/Function)
+    * [Object](./registry/Object)
+    * [Plugin](./registry/Plugin)
+    * [Provider](./registry/Provider)
+    * [RestApi](./registry/RestApi)
+    * [Service](./registry/Service)
+    * [Subscription](./registry/Subscription)
+    * [TwilioApplication](./registry/TwilioApplication)
+    * [TwilioPhoneNumber](./registry/TwilioPhoneNumber)
+    * [TwilioProvider](./registry/TwilioProvider)
 * [Examples](#examples)
-  * [Basic Lambda Example](./examples/basic)
-  * [Blog Example](./examples/blog)
-  * [Github Webhook Example](./examples/basic)
-  * [Landing Page Example](./examples/landing-page)
-  * [Netlify Site Example](./examples/netlify-site-example)
-  * [Rest API Example](./examples/restapi)
-  * [Retail App](./examples/retail-app)
+  * [Basic Example](./examples/Basic)
+
 
 ## Getting Started
 
-**Note:** Make sure you have Node.js 8+ and npm installed on your machine.
+**Note:** Make sure you have Node.js 6+ and npm installed on your machine.
 
-1.  `npm install --global serverless-components`
-1.  Set up the environment variables depending on your cloud provider
-    * `export AWS_ACCESS_KEY_ID=my_access_key_id`
-    * `export AWS_SECRET_ACCESS_KEY=my_secret_access_key`
-    * `export CLOUDFLARE_AUTH_KEY=my_secret_auth_key`
-    * `export CLOUDFLARE_AUTH_EMAIL=my_email@example.com`
+1.  `npm install --global serverless`
+
 
 Run commands with:
 
 ```
-components [Command]
+serverless [Command]
 ```
 
 Checkout the [CLI docs](#cli-usage) for a list of all the available commands and instructions on how they work.
 
 ## Trying it out
 
-The best way to give components a try is to deploy one of the examples. We recommend checking out our [retail-app example](./examples/retail-app) and to follow along with the instructions there.
+The best way to give components a try is to deploy one of the examples. We recommend checking out our [Serverless web application example]() and to follow along with the instructions there.
 
 ## Current Limitations
 
 The following is a list with some limitations one should be aware of when using this project.
 **NOTE:** We're currently working on fixes for such issues and will announce them in our release notes / changelogs.
-
-### `us-east-1` only
-
-Right now the only supported region of AWS is `us-east-1`
 
 ### No rollback support
 
@@ -796,38 +775,34 @@ Options:
 
 ### Component Docs
 
-* [aws-apigateway](./registry/aws-apigateway)
-* [aws-cloudfront](./registry/aws-cloudfront)
-* [aws-dynamodb](./registry/aws-dynamodb)
-* [aws-iam-policy](./registry/aws-iam-policy)
-* [aws-iam-role](./registry/aws-iam-role)
-* [aws-internetgateway](./registry/aws-internetgateway)
-* [aws-lambda](./registry/aws-lambda)
-* [aws-route53](./registry/aws-route53)
-* [aws-s3-bucket](./registry/aws-s3-bucket)
-* [aws-sns-platform-application](./registry/aws-sns-platform-application)
-* [aws-sns-platform-endpoint](./registry/aws-sns-platform-endpoint)
-* [aws-sns-subscription](./registry/aws-sns-subscription)
-* [aws-sns-topic](./registry/aws-sns-topic)
-* [aws-subnet](./registry/aws-subnet)
-* [aws-vpc](./registry/aws-vpc)
-* [aws-vpcgatewayattachment](./registry/aws-vpcgatewayattachment)
-* [cloudflare-workers](./registry/cloudflare-workers)
-* [docker-image](./registry/docker-image)
-* [eventgateway](./registry/eventgateway)
-* [github-webhook](./registry/github-webhook)
-* [github-webhook-aws](./registry/github-webhook-aws)
-* [google-cloud-function](./registry/google-cloud-function)
-* [mustache](./registry/mustache)
-* [netlify-site](./registry/netlify-site)
-* [rest-api](./registry/rest-api)
-* [s3-dirloader](./registry/s3-dirloader)
-* [s3-downloader](./registry/s3-downloader)
-* [s3-policy](./registry/s3-policy)
-* [s3-sync](./registry/s3-sync)
-* [s3-uploader](./registry/s3-uploader)
-* [s3-website-config](./registry/s3-website-config)
-* [static-website](./registry/static-website)
+* [App](./registry/App)
+* [AwsApiGateway](./registry/AwsApiGateway)
+* [AwsDynamoDB](./registry/AwsDynamoDB)
+* [AwsEventsRule](./registry/AwsEventsRule)
+* [AwsIamPolicy](./registry/AwsIamPolicy)
+* [AwsIamRole](./registry/AwsIamRole)
+* [AwsLambdaCompute](./registry/AwsLambdaCompute)
+* [AwsLambdaFunction](./registry/AwsLambdaFunction)
+* [AwsProvider](./registry/AwsProvider)
+* [AwsS3Bucket](./registry/AwsS3Bucket)
+* [AwsS3Website](./registry/AwsS3Website)
+* [AwsSnsSubscription](./registry/AwsSnsSubscription)
+* [AwsSnsTopic](./registry/AwsSnsTopic)
+* [Component](./registry/Component)
+* [Compute](./registry/Compute)
+* [Cron](./registry/Cron)
+* [DockerImage](./registry/DockerImage)
+* [EnvironmentBasedConfiguration](./registry/EnvironmentBasedConfiguration)
+* [Function](./registry/Function)
+* [Object](./registry/Object)
+* [Plugin](./registry/Plugin)
+* [Provider](./registry/Provider)
+* [RestApi](./registry/RestApi)
+* [Service](./registry/Service)
+* [Subscription](./registry/Subscription)
+* [TwilioApplication](./registry/TwilioApplication)
+* [TwilioPhoneNumber](./registry/TwilioPhoneNumber)
+* [TwilioProvider](./registry/TwilioProvider)
 
 ## Examples
 

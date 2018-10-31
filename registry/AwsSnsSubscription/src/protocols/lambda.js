@@ -17,13 +17,14 @@ const deploy = async ({ provider, topic, protocol, endpoint }, context) => {
   ])
   return {
     subscriptionArn: subscription.SubscriptionArn,
-    statement: JSON.parse(permission.Statement)
+    statement: permission.Statement
   }
 }
 
 const remove = async ({ provider, statement, subscriptionArn }, context) => {
   const SDK = provider.getSdk()
   const lambda = new SDK.Lambda()
+  statement = statement ? JSON.parse(statement) : null
   const response = Promise.all([
     unsubscribe({ provider, subscriptionArn }, context),
     lambda

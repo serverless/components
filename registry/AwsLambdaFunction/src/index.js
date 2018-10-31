@@ -2,7 +2,7 @@ import path from 'path'
 import { tmpdir } from 'os'
 import { readFileSync } from 'fs'
 import { hashElement } from 'folder-hash'
-import { isArray, resolve, packDir, pick, not, equals, keys } from '@serverless/utils'
+import { equals, get, isArray, keys, not, packDir, pick, resolve } from '@serverless/utils'
 
 const createLambda = async (
   Lambda,
@@ -114,6 +114,11 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
       const hashObj = await hashElement(folderToHash, options)
       this.hash = hashObj.hash
     }
+
+    hydrate(prevInstance) {
+      this.arn = get('arn', prevInstance)
+    }
+
     shouldDeploy(prevInstance) {
       const currentConfig = {
         functionName: resolve(this.functionName),
@@ -130,7 +135,7 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
       const prevConfig = prevInstance ? pick(keys(currentConfig), prevInstance) : {}
       const configChanged = not(equals(currentConfig, prevConfig))
       const roleChanged = prevInstance
-        ? resolve(this.role).roleName === prevInstance.role.roleName
+        ? resolve(this.role).roleName !== prevInstance.role.roleName
         : true
 
       if (prevInstance && prevInstance.functionName !== currentConfig.functionName) {

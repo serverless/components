@@ -38,6 +38,7 @@ const AwsIamPolicy = (SuperClass) =>
 
       this.provider = inputs.provider
       this.policyName = inputs.policyName || `policy-${this.instanceId}`
+      this.document = inputs.document
     }
 
     shouldDeploy(prevInstance) {
