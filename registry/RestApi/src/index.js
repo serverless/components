@@ -158,7 +158,11 @@ const RestApi = async function(SuperClass, SuperContext) {
         flatRoutes[path] = newPathObject
       }
 
-      return { title: this.apiName, type: this.extends, data: { routes: flatRoutes } }
+      return {
+        title: this.apiName,
+        type: this.extends,
+        data: { routes: flatRoutes, baseUrl: this.baseUrl }
+      }
     }
   }
 }
