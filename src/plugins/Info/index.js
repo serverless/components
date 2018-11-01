@@ -28,51 +28,70 @@ const Info = {
     const { title, type, data, children } = await instance.info(context)
     context.log(`${title} - ${type}`)
     printObj(compact(data), context.log)
-    if (isArray(children)) {
-      printArray(compact(children), context.log)
-    } else {
-      printObj(compact(children), context.log)
+    if (children) {
+      if (isArray(children)) {
+        printArray(compact(children), context.log)
+      } else {
+        printObj(compact(children), context.log)
+      }
     }
 
     return context
   }
 }
 
-const printArray = (arr, log, level = 1) =>
+const printArray = (arr, log, level = 0) =>
   forEach((item) => {
-    const { type, data } = item
-    let { title } = item
-    if (!title && data.title) {
-      title = data.title
-    }
-    log(`\n|- ${`  `.repeat(level)}${title} - ${type}`)
+    const { type, data, children } = item
+    const title = item.title || data.title
+    log(`|- ${title} - ${type}`)
+    const subLog = (line) => log(`   ${line}`)
     if (isArray(data)) {
-      printArray(data, log, level + 2)
+      printArray(compact(data), subLog, level + 1)
     } else {
-      printObj(data, log, level + 2)
+      printObj(compact(data), subLog, level + 1)
+    }
+    if (children && level <= 1) {
+      if (isArray(children)) {
+        printArray(compact(children), subLog)
+      } else {
+        printObj(compact(children), subLog)
+      }
     }
   }, arr)
 
-const printObj = (obj, log, level = 1) => {
+const printObj = (obj, log, level = 0) => {
   if (!obj) {
     return
   }
-  if (keys(obj).length === 3 && obj.title && obj.type && obj.data) {
+  if (
+    (keys(obj).length === 3 || (keys(obj).length === 4 && obj.children)) &&
+    obj.title &&
+    obj.type &&
+    obj.data
+  ) {
+    const subLog = (line) => log(`   ${line}`)
     if (isArray(obj.data)) {
-      printArray(obj.data, log, level + 1)
+      printArray(compact(obj.data), subLog, level + 1)
     } else {
-      printObj(obj.data, log, level)
+      printObj(compact(obj.data), subLog, level)
+    }
+    if (obj.children && level <= 1) {
+      if (isArray(obj.children)) {
+        printArray(compact(obj.children), subLog)
+      } else {
+        printObj(compact(obj.children), subLog)
+      }
     }
   } else {
     forEach((val, key) => {
-      const space = '  '
       if (isArray(val)) {
         printArray(val, log, level + 1)
       } else if (isObject(val)) {
-        log(`${space.repeat(level)}${key}:`)
+        log(`${key}:`)
         printObj(val, log, level + 1)
       } else {
-        log(`${space.repeat(level)}${key}: ${val}`)
+        log(`${key}: ${val}`)
       }
     }, obj)
   }
