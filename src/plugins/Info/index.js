@@ -64,13 +64,13 @@ const printObj = (obj, log, level = 0) => {
   if (!obj) {
     return
   }
+  const subLog = (line) => log(`   ${line}`)
   if (
     (keys(obj).length === 3 || (keys(obj).length === 4 && obj.children)) &&
     obj.title &&
     obj.type &&
     obj.data
   ) {
-    const subLog = (line) => log(`   ${line}`)
     if (isArray(obj.data)) {
       printArray(compact(obj.data), subLog, level + 1)
     } else {
@@ -86,10 +86,10 @@ const printObj = (obj, log, level = 0) => {
   } else {
     forEach((val, key) => {
       if (isArray(val)) {
-        printArray(val, log, level + 1)
+        printArray(val, subLog, level + 1)
       } else if (isObject(val)) {
         log(`${key}:`)
-        printObj(val, log, level + 1)
+        printObj(val, subLog, level + 1)
       } else {
         log(`${key}: ${val}`)
       }
