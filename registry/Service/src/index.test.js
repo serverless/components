@@ -39,6 +39,7 @@ describe('Service', () => {
     }
     let service = await Service(SuperClass, SuperContext)
     service = new service()
+    service.getType = () => ({ root: './' })
     await service.construct(inputs, context)
 
     expect(context.construct).toBeCalledWith(Fn, { functionName: 'hello' })

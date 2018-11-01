@@ -130,7 +130,6 @@ export default {
   S3,
   Lambda,
   CloudWatchEvents,
-  IAM
   IAM,
   SNS
 }

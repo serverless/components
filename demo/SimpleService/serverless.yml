@@ -6,8 +6,8 @@ providers:
     type: AwsProvider
     inputs:
       credentials:
-        accessKeyId: AKIAJKJ4Q2CPPX56MN6Q
-        secretAccessKey: 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
+        accessKeyId: xxx
+        secretAccessKey: xxx
       region: us-east-1
 
 compute:

@@ -1,28 +1,46 @@
-import App from './index'
+import path from 'path'
+import { createContext } from '../../../src/utils'
 
-class SuperClass {
-  constructor(inputs) {
-    this.services = inputs.services
-    this.components = inputs.components
-  }
-}
+const createTestContext = async () =>
+  createContext(
+    {
+      cwd: path.join(__dirname, '..'),
+      overrides: {
+        debug: () => {},
+        log: () => {}
+      }
+    },
+    {
+      app: {
+        id: 'test'
+      }
+    }
+  )
 
 describe('App', () => {
   it('should define services and components as children', async () => {
+    const context = await createTestContext()
     const inputs = {
       services: {
-        users: {
-          name: 'users'
+        hello: {
+          type: 'Function',
+          inputs: {
+            handler: 'index.hello'
+          }
         }
       },
       components: {
         cron: {
-          name: 'cron'
+          type: 'Cron',
+          inputs: {
+            rate: '3m'
+          }
         }
       }
     }
-    let app = await App(SuperClass, {})
-    app = new app(inputs)
+
+    const App = await context.loadType('./')
+    const app = await context.construct(App, inputs)
 
     const children = await app.define()
 

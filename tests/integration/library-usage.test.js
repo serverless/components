@@ -1,14 +1,10 @@
 import AWS from 'aws-sdk'
 
 const path = require('path')
-const fse = require('fs-extra')
-const BbPromise = require('bluebird')
 const { fileExists, getTmpDir } = require('@serverless/utils')
 const { removeFiles } = require('../helpers')
 
 const { deploy, remove } = require('../../src')
-
-const fsp = BbPromise.promisifyAll(fse)
 
 describe('Integration Test - Library Usage', () => {
   jest.setTimeout(40000)
