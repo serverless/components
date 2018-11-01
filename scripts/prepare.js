@@ -43,6 +43,6 @@ function installRegistryDependencies() {
 
 ;(() => {
   return BbPromise.resolve()
-    .then(build)
     .then(installRegistryDependencies)
+    .then(build)
 })()
