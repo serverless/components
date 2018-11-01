@@ -16,7 +16,6 @@ const Function = {
       type: this.extends,
       data: pick(
         [
-          'code',
           'environment',
           'functionDescription',
           'functionName',
