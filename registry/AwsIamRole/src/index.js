@@ -1,4 +1,4 @@
-import { equals, is, resolve, sleep } from '@serverless/utils'
+import { equals, is, resolve, sleep, or, resolvable } from '@serverless/utils'
 
 const attachRolePolicy = async (IAM, { roleName, policy }) => {
   await IAM.attachRolePolicy({
@@ -90,8 +90,8 @@ const AwsIamRole = async (SuperClass, superContext) => {
       }
       this.provider = inputs.provider
       this.service = inputs.service
-      this.policy = inputs.policy || defaultPolicy
-      this.roleName = inputs.roleName || `role-${this.instanceId}`
+      this.policy = resolvable(() => or(inputs.policy, defaultPolicy))
+      this.roleName = resolvable(() => or(inputs.roleName, `role-${this.instanceId}`))
     }
 
     shouldDeploy(prevInstance) {

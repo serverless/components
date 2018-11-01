@@ -98,7 +98,7 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
       this.functionName = inputs.functionName
       this.functionDescription = inputs.functionDescription
       this.handler = inputs.handler
-      this.code = resolve(inputs.code)
+      this.code = resolve(inputs.code) // todo use resolvable
       this.runtime = inputs.runtime
       this.memorySize = inputs.memorySize
       this.timeout = inputs.timeout
@@ -129,7 +129,7 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
         runtime: resolve(this.runtime),
         memorySize: resolve(this.memorySize),
         timeout: resolve(this.timeout),
-        // environment: resolve(this.environment), this has a variable value
+        // environment: resolve(this.environment), todo this has a variable value
         hash: resolve(this.hash),
         tags: resolve(this.tags)
       }

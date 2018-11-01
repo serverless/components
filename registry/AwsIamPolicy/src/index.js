@@ -1,4 +1,4 @@
-import { all, resolve, sleep, map } from '@serverless/utils'
+import { all, resolve, sleep, map, or, resolvable } from '@serverless/utils'
 
 const createPolicy = async (IAM, { policyName, document }, context) => {
   const policyRes = await IAM.createPolicy({
@@ -37,7 +37,7 @@ const AwsIamPolicy = (SuperClass) =>
       await super.construct(inputs, context)
 
       this.provider = inputs.provider
-      this.policyName = inputs.policyName || `policy-${this.instanceId}`
+      this.policyName = resolvable(() => or(inputs.policyName, `policy-${this.instanceId}`))
       this.document = inputs.document
     }
 

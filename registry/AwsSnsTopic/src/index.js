@@ -11,7 +11,9 @@ const {
   merge,
   reduce,
   values,
-  resolve
+  resolve,
+  resolvable,
+  or
 } = require('@serverless/utils')
 
 const DEPLOY = 'deploy'
@@ -160,8 +162,8 @@ const AwsSnsTopic = (SuperClass) =>
     async construct(inputs, context) {
       await super.construct(inputs, context)
 
-      this.provider = inputs.provider || context.get('provider')
-      this.topicName = inputs.topicName || `sns-${this.instanceId}`
+      this.provider = resolvable(() => or(inputs.provider, context.get('provider')))
+      this.topicName = resolvable(() => or(inputs.topicName, `sns-${this.instanceId}`))
       this.displayName = inputs.displayName
       this.policy = inputs.policy
       this.deliveryPolicy = inputs.deliveryPolicy

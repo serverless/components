@@ -1,5 +1,5 @@
 import { getSwaggerDefinition, generateUrl, generateUrls } from './utils'
-import { append, equals, get, has, or, resolve, reduce } from '@serverless/utils'
+import { append, equals, get, has, or, resolve, reduce, resolvable } from '@serverless/utils'
 
 const deleteApi = async (APIGateway, params) => {
   const { id } = params
@@ -75,8 +75,8 @@ const AwsApiGateway = function(SuperClass) {
     async construct(inputs, context) {
       await super.construct(inputs, context)
 
-      this.provider = inputs.provider || context.get('provider')
-      this.name = inputs.name || `apig-${this.instanceId}`
+      this.provider = resolvable(() => or(inputs.provider, context.get('provider')))
+      this.name = resolvable(() => or(inputs.name, `apig-${this.instanceId}`))
       this.role = inputs.role
       this.routes = inputs.routes
     }

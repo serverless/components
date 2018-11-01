@@ -10,7 +10,9 @@ import {
   reduce,
   slice,
   values,
-  resolve
+  resolve,
+  resolvable,
+  or
 } from '@serverless/utils'
 
 const DEPLOY = 'deploy'
@@ -67,9 +69,9 @@ const AwsSnsSubscription = (SuperClass) =>
     async construct(inputs, context) {
       await super.construct(inputs, context)
 
-      this.provider = inputs.provider || context.get('provider')
+      this.provider = resolvable(() => or(inputs.provider, context.get('provider')))
       this.topic = inputs.topic
-      this.protocol = inputs.protocol || 'https'
+      this.protocol = resolvable(() => or(inputs.protocol, 'https'))
       this.endpoint = inputs.endpoint
       this.subscriptionAttributes = inputs.subscriptionAttributes
     }

@@ -1,5 +1,15 @@
 import path from 'path'
-import { append, map, or, isArray, reduce, resolve, not, isString } from '@serverless/utils'
+import {
+  append,
+  map,
+  or,
+  isArray,
+  reduce,
+  resolve,
+  not,
+  isString,
+  resolvable
+} from '@serverless/utils'
 
 // temp solution...
 const resolveCodePath = (code, root) => {
@@ -26,8 +36,8 @@ const Service = async (SuperClass, superContext) => {
         async (func, alias) =>
           context.construct(Fn, {
             ...func,
-            functionName: resolve(func.functionName) || alias,
-            code: resolveCodePath(resolve(func.code), this.getType().root)
+            functionName: resolvable(() => or(func.functionName, alias)),
+            code: resolvable(() => resolveCodePath(resolve(func.code), this.getType().root))
           }),
         or(this.functions, {})
       )
