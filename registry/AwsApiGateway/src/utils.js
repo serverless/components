@@ -1,4 +1,4 @@
-import { forEachObjIndexed, keys, map, set } from '@serverless/utils'
+import { forEachObjIndexed, keys, map, set, or } from '@serverless/utils'
 
 // TODO: remove hardcoding of region (e.g. like us-east-1)
 
@@ -192,7 +192,7 @@ function getSwaggerDefinition(name, roleArn, routes, region = 'us-east-1') {
         )
         securityDefinitions[securityDefinition.name] = securityDefinition.definition
       }
-    }, methods)
+    }, or(methods, {}))
 
     if (enableCorsOnPath) {
       const corsOptionsMethod = getCorsOptionsConfig()
@@ -201,7 +201,7 @@ function getSwaggerDefinition(name, roleArn, routes, region = 'us-east-1') {
 
     // set the paths
     paths = set([normalizedPath], updatedMethods, paths)
-  }, routes)
+  }, or(routes, {}))
 
   const definition = {
     swagger: '2.0',
