@@ -1,5 +1,13 @@
 import path from 'path'
-import { createContext } from '../../../src/utils'
+import {
+  createContext,
+  deserialize,
+  resolveComponentEvaluables,
+  serialize
+} from '../../../src/utils'
+
+let context
+let ComponentType
 
 const mocks = {
   setTopicAttributesMock: jest.fn(),
@@ -36,11 +44,12 @@ afterAll(() => {
 })
 
 describe('AwsSnsTopic', () => {
-  it('should create topic if first deployment', async () => {
-    let context = await createContext({
-      cwd: path.join(__dirname, '..')
-    })
+  beforeEach(async () => {
+    context = await createContext({ cwd: path.join(__dirname, '..') }, { app: { id: 'test' } })
+    ComponentType = await context.loadType('./')
+  })
 
+  it('should create topic if first deployment', async () => {
     context = await context.loadProject()
     context = await context.loadApp()
 
@@ -52,8 +61,7 @@ describe('AwsSnsTopic', () => {
       deliveryPolicy: {},
       deliveryStatusAttributes: []
     }
-    const AwsSnsTopic = await context.loadType('./')
-    const awsSnsTopic = await context.construct(AwsSnsTopic, inputs)
+    const awsSnsTopic = await context.construct(ComponentType, inputs)
 
     awsSnsTopic.provider = inputs.provider
     awsSnsTopic.topicName = inputs.topicName
@@ -69,10 +77,6 @@ describe('AwsSnsTopic', () => {
   })
 
   it('should update topic if not first deployment', async () => {
-    let context = await createContext({
-      cwd: path.join(__dirname, '..')
-    })
-
     context = await context.loadProject()
     context = await context.loadApp()
 
@@ -93,8 +97,7 @@ describe('AwsSnsTopic', () => {
       deliveryPolicy: {},
       deliveryStatusAttributes: []
     }
-    const AwsSnsTopic = await context.loadType('./')
-    const awsSnsTopic = await context.construct(AwsSnsTopic, inputs)
+    const awsSnsTopic = await context.construct(ComponentType, inputs)
 
     awsSnsTopic.provider = inputs.provider
     awsSnsTopic.topicName = inputs.topicName
@@ -110,10 +113,6 @@ describe('AwsSnsTopic', () => {
   })
 
   it('should remove topic', async () => {
-    let context = await createContext({
-      cwd: path.join(__dirname, '..')
-    })
-
     context = await context.loadProject()
     context = await context.loadApp()
 
@@ -126,8 +125,7 @@ describe('AwsSnsTopic', () => {
       deliveryStatusAttributes: []
     }
 
-    const AwsSnsTopic = await context.loadType('./')
-    const awsSnsTopic = await context.construct(AwsSnsTopic, inputs)
+    const awsSnsTopic = await context.construct(ComponentType, inputs)
 
     awsSnsTopic.provider = inputs.provider
     awsSnsTopic.topicName = inputs.topicName
@@ -142,5 +140,72 @@ describe('AwsSnsTopic', () => {
     expect(mocks.createTopicMock).not.toHaveBeenCalled()
     expect(mocks.setTopicAttributesMock).not.toHaveBeenCalled()
     expect(mocks.deleteTopicMock).toHaveBeenCalled()
+  })
+
+  it('shouldDeploy should return "undefined" if nothing changed', async () => {
+    const inputs = {
+      topicName: 'myTopic',
+      displayName: 'My Topic',
+      policy: {},
+      deliveryPolicy: {},
+      deliveryStatusAttributes: [],
+      provider
+    }
+    let oldComponent = await context.construct(ComponentType, inputs)
+    oldComponent = await context.defineComponent(oldComponent)
+    oldComponent = resolveComponentEvaluables(oldComponent)
+    await oldComponent.deploy(null, context)
+
+    const prevComponent = await deserialize(serialize(oldComponent, context), context)
+
+    let newComponent = await context.construct(ComponentType, inputs)
+    newComponent = await context.defineComponent(newComponent)
+    newComponent = resolveComponentEvaluables(newComponent)
+
+    const res = newComponent.shouldDeploy(prevComponent)
+    expect(res).toBe(undefined)
+  })
+
+  it('shouldDeploy should return "replace" if "topic" changed', async () => {
+    const inputs = {
+      topicName: 'myTopic',
+      displayName: 'My Topic',
+      policy: {},
+      deliveryPolicy: {},
+      deliveryStatusAttributes: [],
+      provider
+    }
+    let oldComponent = await context.construct(ComponentType, inputs)
+    oldComponent = await context.defineComponent(oldComponent)
+    oldComponent = resolveComponentEvaluables(oldComponent)
+    await oldComponent.deploy(null, context)
+
+    const prevComponent = await deserialize(serialize(oldComponent, context), context)
+
+    let newComponent = await context.construct(ComponentType, {
+      ...inputs,
+      topicName: 'myOtherTopic'
+    })
+    newComponent = await context.defineComponent(newComponent)
+    newComponent = resolveComponentEvaluables(newComponent)
+
+    const res = newComponent.shouldDeploy(prevComponent)
+    expect(res).toBe('replace')
+  })
+
+  it('shouldDeploy should return deploy if first deployment', async () => {
+    const inputs = {
+      topicName: 'myTopic',
+      displayName: 'My Topic',
+      policy: {},
+      deliveryPolicy: {},
+      deliveryStatusAttributes: [],
+      provider
+    }
+    let oldComponent = await context.construct(ComponentType, inputs)
+    oldComponent = await context.defineComponent(oldComponent)
+    oldComponent = resolveComponentEvaluables(oldComponent)
+    const res = oldComponent.shouldDeploy(null, context)
+    expect(res).toBe('deploy')
   })
 })
