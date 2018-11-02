@@ -1,4 +1,4 @@
-const { equals, isEmpty, pick } = require('@serverless/utils')
+const { equals, isEmpty, pick, not } = require('@serverless/utils')
 
 const phoneNumberProps = [
   'addressRequirements',
@@ -84,6 +84,22 @@ const removePhoneNumber = async (twilio, sid) => {
 }
 
 const TwilioPhoneNumber = {
+  shouldDeploy(prevInstance) {
+    if (!prevInstance) {
+      return 'deploy'
+    }
+    const inputs = pick(inputsProps, this)
+    const prevInputs = prevInstance ? pick(inputsProps, prevInstance) : {}
+    const configChanged = not(equals(inputs, prevInputs))
+    if (not(equals(prevInstance.phoneNumber, inputs.phoneNumber))) {
+      return 'replace'
+    } else if (configChanged) {
+      return 'deploy'
+    }
+
+    return undefined
+  },
+
   async deploy(prevInstance, context) {
     const inputs = pick(inputsProps, this)
     if (!prevInstance) {

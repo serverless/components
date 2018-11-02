@@ -1,5 +1,11 @@
 import path from 'path'
-import { createContext } from '../../../src/utils'
+import { merge } from '@serverless/utils'
+import {
+  createContext,
+  deserialize,
+  resolveComponentEvaluables,
+  serialize
+} from '../../../src/utils'
 
 const expectedOutputs = {
   accountSid: 'accountSid',
@@ -34,6 +40,9 @@ const expectedOutputs = {
   voiceUrl: 'voiceUrl'
 }
 
+let context
+let ComponentType
+
 const updateMock = jest.fn().mockReturnValue(expectedOutputs)
 const removeMock = jest.fn()
 
@@ -62,16 +71,16 @@ const provider = {
 }
 
 describe('TwilioPhoneNumber', () => {
-  it('should create phone number if first deployment', async () => {
-    let context = await createContext({
-      cwd: path.join(__dirname, '..')
-    })
+  beforeEach(async () => {
+    context = await createContext({ cwd: path.join(__dirname, '..') }, { app: { id: 'test' } })
+    ComponentType = await context.loadType('./')
+  })
 
+  it('should create phone number if first deployment', async () => {
     context = await context.loadProject()
     context = await context.loadApp()
 
-    const TwilioPhoneNumber = await context.loadType('./')
-    const twilioPhoneNumber = await context.construct(TwilioPhoneNumber, {})
+    const twilioPhoneNumber = await context.construct(ComponentType, {})
 
     twilioPhoneNumber.provider = provider
     twilioPhoneNumber.phoneNumber = '+1234567890'
@@ -84,15 +93,10 @@ describe('TwilioPhoneNumber', () => {
   })
 
   it('should update phone number if not first deployment', async () => {
-    let context = await createContext({
-      cwd: path.join(__dirname, '..')
-    })
-
     context = await context.loadProject()
     context = await context.loadApp()
 
-    const TwilioPhoneNumber = await context.loadType('./')
-    const twilioPhoneNumber = await context.construct(TwilioPhoneNumber, {})
+    const twilioPhoneNumber = await context.construct(ComponentType, {})
 
     twilioPhoneNumber.provider = provider
     twilioPhoneNumber.phoneNumber = '+1234567890'
@@ -104,15 +108,10 @@ describe('TwilioPhoneNumber', () => {
   })
 
   it('should remove phone number', async () => {
-    let context = await createContext({
-      cwd: path.join(__dirname, '..')
-    })
-
     context = await context.loadProject()
     context = await context.loadApp()
 
-    const TwilioPhoneNumber = await context.loadType('./')
-    const twilioPhoneNumber = await context.construct(TwilioPhoneNumber, {})
+    const twilioPhoneNumber = await context.construct(ComponentType, {})
 
     twilioPhoneNumber.provider = provider
     twilioPhoneNumber.sid = 'sid'
@@ -120,5 +119,58 @@ describe('TwilioPhoneNumber', () => {
     await twilioPhoneNumber.remove(context)
 
     expect(removeMock).toHaveBeenCalled()
+  })
+
+  it('shouldDeploy should return undefined if nothing changed', async () => {
+    let oldComponent = await context.construct(ComponentType, merge(expectedOutputs, { provider }))
+    oldComponent = await context.defineComponent(oldComponent)
+    oldComponent = resolveComponentEvaluables(oldComponent)
+    await oldComponent.deploy(null, context)
+
+    const prevComponent = await deserialize(serialize(oldComponent, context), context)
+
+    let newComponent = await context.construct(ComponentType, merge(expectedOutputs, { provider }))
+    newComponent = await context.defineComponent(newComponent)
+    newComponent = resolveComponentEvaluables(newComponent)
+
+    const res = newComponent.shouldDeploy(prevComponent)
+    expect(res).toBe(undefined)
+  })
+
+  it('shouldDeploy should return "replace" if "topic" changed', async () => {
+    let oldComponent = await context.construct(ComponentType, {
+      provider,
+      phoneNumber: 'phoneNumber',
+      friendlyName: 'friendlyName'
+    })
+    oldComponent = await context.defineComponent(oldComponent)
+    oldComponent = resolveComponentEvaluables(oldComponent)
+    await oldComponent.deploy(null, context)
+
+    const prevComponent = await deserialize(serialize(oldComponent, context), context)
+
+    let newComponent = await context.construct(ComponentType, {
+      provider,
+      phoneNumber: '+1234566890',
+      friendlyName: 'friendlyName'
+    })
+    newComponent = await context.defineComponent(newComponent)
+    newComponent = resolveComponentEvaluables(newComponent)
+
+    const res = newComponent.shouldDeploy(prevComponent)
+    expect(res).toBe('replace')
+  })
+
+  it('shouldDeploy should return deploy if first deployment', async () => {
+    context = await createContext({ cwd: __dirname }, { app: { id: 'test' } })
+    let oldComponent = await context.construct(ComponentType, {
+      provider,
+      phoneNumber: 'phoneNumber',
+      friendlyName: 'friendlyName'
+    })
+    oldComponent = await context.defineComponent(oldComponent)
+    oldComponent = resolveComponentEvaluables(oldComponent)
+    const res = oldComponent.shouldDeploy(null, context)
+    expect(res).toBe('deploy')
   })
 })
