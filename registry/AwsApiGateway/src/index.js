@@ -28,10 +28,10 @@ const deleteApi = async (APIGateway, params) => {
 }
 
 const createApi = async (APIGateway, params, region = 'us-east-1') => {
-  const { name, role, routes } = params
+  const { apiName, role, routes } = params
   const roleArn = role.arn
 
-  const swagger = getSwaggerDefinition(name, roleArn, routes, region)
+  const swagger = getSwaggerDefinition(apiName, roleArn, routes, region)
   const json = JSON.stringify(swagger)
 
   const res = await APIGateway.importRestApi({
@@ -55,10 +55,10 @@ const createApi = async (APIGateway, params, region = 'us-east-1') => {
 }
 
 const updateApi = async (APIGateway, params, region = 'us-east-1') => {
-  const { name, role, routes, id } = params
+  const { apiName, role, routes, id } = params
   const roleArn = role.arn
 
-  const swagger = getSwaggerDefinition(name, roleArn, routes, region)
+  const swagger = getSwaggerDefinition(apiName, roleArn, routes, region)
   const json = JSON.stringify(swagger)
 
   await APIGateway.putRestApi({
@@ -88,7 +88,7 @@ const AwsApiGateway = function(SuperClass) {
       await super.construct(inputs, context)
 
       this.provider = resolvable(() => or(inputs.provider, context.get('provider')))
-      this.name = resolvable(() => or(inputs.name, `apig-${this.instanceId}`))
+      this.apiName = resolvable(() => or(inputs.apiName, `apig-${this.instanceId}`))
       this.role = inputs.role
       this.routes = inputs.routes
     }
@@ -98,18 +98,18 @@ const AwsApiGateway = function(SuperClass) {
         return 'deploy'
       }
       const inputs = {
-        name: resolvable(() => or(this.name, `apig-${this.instanceId}`)),
+        apiName: resolve(or(this.apiName, `apig-${this.instanceId}`)),
         role: resolve(this.role),
-        routes: resolve(inputs.routes)
+        routes: resolve(this.routes)
       }
       const prevInputs = prevInstance ? pick(keys(inputs), prevInstance) : {}
       const configChanged = not(equals(inputs, prevInputs))
       if (
-        not(equals(prevInstance.name, inputs.name)) ||
+        not(equals(prevInstance.apiName, inputs.apiName)) ||
         not(equals(prevInstance.role, inputs.role))
       ) {
         return 'replace'
-      } else if (configChanged) {
+      } else if (configChanged || not(equals(prevInstance.routes, inputs.routes))) {
         return 'deploy'
       }
 
@@ -151,7 +151,7 @@ const AwsApiGateway = function(SuperClass) {
       const APIGateway = new aws.APIGateway()
       const noChanges =
         prevInstance &&
-        resolve(this.name) === prevInstance.name &&
+        resolve(this.apiName) === prevInstance.apiName &&
         (resolve(this.role) &&
           prevInstance.role &&
           resolve(this.role.arn) === prevInstance.role.arn) &&
@@ -160,11 +160,11 @@ const AwsApiGateway = function(SuperClass) {
       let outputs
       if (noChanges) {
         outputs = prevInstance
-      } else if (!prevInstance || (resolve(this.name) && !prevInstance.name)) {
-        context.log(`Creating API Gateway: "${this.name}"`)
+      } else if (!prevInstance || (resolve(this.apiName) && !prevInstance.apiName)) {
+        context.log(`Creating API Gateway: "${this.apiName}"`)
         outputs = await createApi(APIGateway, this, this.provider.region)
       } else {
-        context.log(`Updating API Gateway: "${this.name}"`)
+        context.log(`Updating API Gateway: "${this.apiName}"`)
         outputs = await updateApi(
           APIGateway,
           {
@@ -183,8 +183,8 @@ const AwsApiGateway = function(SuperClass) {
       const APIGateway = new aws.APIGateway()
 
       try {
-        context.log(`Removing API Gateway: "${this.name}"`)
-        await deleteApi(APIGateway, { name: this.name, id: this.id })
+        context.log(`Removing API Gateway: "${this.apiName}"`)
+        await deleteApi(APIGateway, { apiName: this.apiName, id: this.id })
       } catch (e) {
         if (!e.message.includes('Invalid REST API identifier specified')) {
           throw e
