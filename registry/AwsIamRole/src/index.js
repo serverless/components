@@ -1,4 +1,4 @@
-import { equals, is, resolve, sleep, or, resolvable } from '@serverless/utils'
+import { equals, is, resolve, sleep, or, resolvable, not, pick, keys } from '@serverless/utils'
 
 const attachRolePolicy = async (IAM, { roleName, policy }) => {
   await IAM.attachRolePolicy({
@@ -95,13 +95,18 @@ const AwsIamRole = async (SuperClass, superContext) => {
     }
 
     shouldDeploy(prevInstance) {
-      if (!prevInstance) {
+      const inputs = {
+        roleName: resolve(this.roleName),
+        service: resolve(this.service),
+        policy: resolve(this.policy)
+      }
+      const prevInputs = prevInstance ? pick(keys(inputs), prevInstance) : {}
+      const configChanged = not(equals(inputs, prevInputs))
+      if (prevInstance && prevInstance.roleName !== inputs.roleName) {
+        return 'replace'
+      } else if (!prevInstance || configChanged) {
         return 'deploy'
       }
-      if (prevInstance.roleName !== resolve(this.roleName)) {
-        return 'replace'
-      }
-      return 'deploy'
     }
 
     async define() {

@@ -220,4 +220,102 @@ describe('AwsIamRole', () => {
       PolicyArn: prevAwsIamRole.policy.arn
     })
   })
+
+  it('shouldDeploy should return undefined if nothing changed', async () => {
+    let oldAwsIamRole = await context.construct(AwsIamRole, {
+      provider,
+      roleName: 'abc',
+      policy: {
+        arn: 'arn:aws:iam::aws:policy/oldPolicy'
+      }
+    })
+    oldAwsIamRole = await context.defineComponent(oldAwsIamRole)
+    oldAwsIamRole = resolveComponentEvaluables(oldAwsIamRole)
+    await oldAwsIamRole.deploy(null, context)
+
+    const prevAwsIamRole = await deserialize(serialize(oldAwsIamRole, context), context)
+
+    let newAwsIamRole = await context.construct(AwsIamRole, {
+      provider,
+      roleName: 'abc',
+      policy: {
+        arn: 'arn:aws:iam::aws:policy/oldPolicy'
+      }
+    })
+    newAwsIamRole = await context.defineComponent(newAwsIamRole)
+    newAwsIamRole = resolveComponentEvaluables(newAwsIamRole)
+
+    const res = newAwsIamRole.shouldDeploy(prevAwsIamRole)
+    expect(res).toBe(undefined)
+  })
+
+  it('shouldDeploy should return replace if roleName changed', async () => {
+    let oldAwsIamRole = await context.construct(AwsIamRole, {
+      provider,
+      roleName: 'abc',
+      policy: {
+        arn: 'arn:aws:iam::aws:policy/oldPolicy'
+      }
+    })
+    oldAwsIamRole = await context.defineComponent(oldAwsIamRole)
+    oldAwsIamRole = resolveComponentEvaluables(oldAwsIamRole)
+    await oldAwsIamRole.deploy(null, context)
+
+    const prevAwsIamRole = await deserialize(serialize(oldAwsIamRole, context), context)
+
+    let newAwsIamRole = await context.construct(AwsIamRole, {
+      provider,
+      roleName: 'zxc', // changed
+      policy: {
+        arn: 'arn:aws:iam::aws:policy/oldPolicy'
+      }
+    })
+    newAwsIamRole = await context.defineComponent(newAwsIamRole)
+    newAwsIamRole = resolveComponentEvaluables(newAwsIamRole)
+
+    const res = newAwsIamRole.shouldDeploy(prevAwsIamRole)
+    expect(res).toBe('replace')
+  })
+
+  it('shouldDeploy should return deploy if config changed', async () => {
+    let oldAwsIamRole = await context.construct(AwsIamRole, {
+      provider,
+      roleName: 'abc',
+      policy: {
+        arn: 'arn:aws:iam::aws:policy/oldPolicy'
+      }
+    })
+    oldAwsIamRole = await context.defineComponent(oldAwsIamRole)
+    oldAwsIamRole = resolveComponentEvaluables(oldAwsIamRole)
+    await oldAwsIamRole.deploy(null, context)
+
+    const prevAwsIamRole = await deserialize(serialize(oldAwsIamRole, context), context)
+
+    let newAwsIamRole = await context.construct(AwsIamRole, {
+      provider,
+      roleName: 'abc',
+      policy: {
+        arn: 'arn:aws:iam::aws:policy/newPolicy' // changed
+      }
+    })
+    newAwsIamRole = await context.defineComponent(newAwsIamRole)
+    newAwsIamRole = resolveComponentEvaluables(newAwsIamRole)
+
+    const res = newAwsIamRole.shouldDeploy(prevAwsIamRole)
+    expect(res).toBe('deploy')
+  })
+
+  it('shouldDeploy should return deploy if first deployment', async () => {
+    let oldAwsIamRole = await context.construct(AwsIamRole, {
+      provider,
+      roleName: 'abc',
+      policy: {
+        arn: 'arn:aws:iam::aws:policy/oldPolicy'
+      }
+    })
+    oldAwsIamRole = await context.defineComponent(oldAwsIamRole)
+    oldAwsIamRole = resolveComponentEvaluables(oldAwsIamRole)
+    const res = oldAwsIamRole.shouldDeploy(null, context)
+    expect(res).toBe('deploy')
+  })
 })
