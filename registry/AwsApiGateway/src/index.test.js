@@ -1,3 +1,5 @@
+import path from 'path'
+
 import {
   createContext,
   deserialize,
@@ -9,7 +11,7 @@ import {
 jest.setTimeout(16000)
 
 let context
-let AwsApiGateway
+let ComponentType
 
 const mocks = {
   importRestApi: jest.fn().mockReturnValue({ id: 'my-new-id' }),
@@ -44,8 +46,8 @@ afterAll(() => {
 
 describe('AwsApiGateway', () => {
   beforeEach(async () => {
-    context = await createContext({}, { app: { id: 'test' } })
-    AwsApiGateway = await context.loadType('AwsApiGateway')
+    context = await createContext({ cwd: path.join(__dirname, '..') }, { app: { id: 'test' } })
+    ComponentType = await context.loadType('./')
   })
 
   it('should create ApiGateway if first deployment', async () => {
@@ -55,7 +57,7 @@ describe('AwsApiGateway', () => {
       role: { arn: 'someArn' },
       routes: {}
     }
-    let awsApiGateway = await context.construct(AwsApiGateway, inputs)
+    let awsApiGateway = await context.construct(ComponentType, inputs)
     awsApiGateway = resolveComponentEvaluables(awsApiGateway)
 
     await awsApiGateway.deploy(undefined, context)
@@ -77,7 +79,7 @@ describe('AwsApiGateway', () => {
       role: { arn: 'someArn' },
       routes: {}
     }
-    let awsApiGateway = await context.construct(AwsApiGateway, inputs)
+    let awsApiGateway = await context.construct(ComponentType, inputs)
     awsApiGateway = resolveComponentEvaluables(awsApiGateway)
 
     const prevInstance = {
@@ -103,7 +105,7 @@ describe('AwsApiGateway', () => {
       provider,
       id: 'something'
     }
-    const awsApiGateway = await context.construct(AwsApiGateway, inputs)
+    const awsApiGateway = await context.construct(ComponentType, inputs)
     Object.assign(awsApiGateway, prevInstance)
 
     await awsApiGateway.remove(context)
@@ -112,90 +114,85 @@ describe('AwsApiGateway', () => {
   })
 
   it('shouldDeploy should return undefined if nothing changed', async () => {
-    let oldAwsApiGateway = await context.construct(AwsApiGateway, {
-      provider,
-      apiName: 'somethingOld',
-      role: { arn: 'someArn' },
-      routes: {}
-    })
-    oldAwsApiGateway = await context.defineComponent(oldAwsApiGateway)
-    oldAwsApiGateway = resolveComponentEvaluables(oldAwsApiGateway)
-    await oldAwsApiGateway.deploy(null, context)
-
-    const prevAwsApiGateway = await deserialize(serialize(oldAwsApiGateway, context), context)
-
-    let newAwsApiGateway = await context.construct(AwsApiGateway, {
-      provider,
-      apiName: 'somethingOld',
-      role: { arn: 'someArn' },
-      routes: {}
-    })
-    newAwsApiGateway = await context.defineComponent(newAwsApiGateway)
-    newAwsApiGateway = resolveComponentEvaluables(newAwsApiGateway)
-
-    const res = newAwsApiGateway.shouldDeploy(prevAwsApiGateway)
-    expect(res).toBe(undefined)
-  })
-
-  it('shouldDeploy should return replace if name changed', async () => {
-    let oldAwsApiGateway = await context.construct(AwsApiGateway, {
-      provider,
-      apiName: 'somethingOld',
-      role: { arn: 'someArn' },
-      routes: {}
-    })
-    oldAwsApiGateway = await context.defineComponent(oldAwsApiGateway)
-    oldAwsApiGateway = resolveComponentEvaluables(oldAwsApiGateway)
-    await oldAwsApiGateway.deploy(null, context)
-
-    const prevAwsApiGateway = await deserialize(serialize(oldAwsApiGateway, context), context)
-
-    let newAwsApiGateway = await context.construct(AwsApiGateway, {
+    const inputs = {
       provider,
       apiName: 'somethingNew',
       role: { arn: 'someArn' },
       routes: {}
-    })
-    newAwsApiGateway = await context.defineComponent(newAwsApiGateway)
-    newAwsApiGateway = resolveComponentEvaluables(newAwsApiGateway)
+    }
+    let oldComponent = await context.construct(ComponentType, inputs)
+    oldComponent = await context.defineComponent(oldComponent)
+    oldComponent = resolveComponentEvaluables(oldComponent)
+    await oldComponent.deploy(null, context)
 
-    const res = newAwsApiGateway.shouldDeploy(prevAwsApiGateway)
+    const prevComponent = await deserialize(serialize(oldComponent, context), context)
+
+    let newComponent = await context.construct(ComponentType, inputs)
+    newComponent = await context.defineComponent(newComponent)
+    newComponent = resolveComponentEvaluables(newComponent)
+
+    const res = newComponent.shouldDeploy(prevComponent)
+    expect(res).toBe(undefined)
+  })
+
+  it('shouldDeploy should return replace if name changed', async () => {
+    const inputs = {
+      provider,
+      apiName: 'somethingOld',
+      role: { arn: 'someArn' },
+      routes: {}
+    }
+    let oldComponent = await context.construct(ComponentType, inputs)
+    oldComponent = await context.defineComponent(oldComponent)
+    oldComponent = resolveComponentEvaluables(oldComponent)
+    await oldComponent.deploy(null, context)
+
+    const prevComponent = await deserialize(serialize(oldComponent, context), context)
+
+    let newComponent = await context.construct(ComponentType, {
+      ...inputs,
+      apiName: 'somethingNew'
+    })
+    newComponent = await context.defineComponent(newComponent)
+    newComponent = resolveComponentEvaluables(newComponent)
+
+    const res = newComponent.shouldDeploy(prevComponent)
     expect(res).toBe('replace')
   })
 
   it('shouldDeploy should return deploy if routes changed', async () => {
-    let oldAwsApiGateway = await context.construct(AwsApiGateway, {
+    const inputs = {
       provider,
       apiName: 'something',
       role: { arn: 'someArn' },
       routes: { '/path': null }
-    })
-    oldAwsApiGateway = await context.defineComponent(oldAwsApiGateway)
-    oldAwsApiGateway = resolveComponentEvaluables(oldAwsApiGateway)
-    await oldAwsApiGateway.deploy(null, context)
+    }
+    let oldComponent = await context.construct(ComponentType, inputs)
+    oldComponent = await context.defineComponent(oldComponent)
+    oldComponent = resolveComponentEvaluables(oldComponent)
+    await oldComponent.deploy(null, context)
 
-    const prevAwsApiGateway = await deserialize(serialize(oldAwsApiGateway, context), context)
+    const prevComponent = await deserialize(serialize(oldComponent, context), context)
 
-    let newAwsApiGateway = await context.construct(AwsApiGateway, {
-      provider,
-      apiName: 'something',
-      role: { arn: 'someArn' },
+    let newComponent = await context.construct(ComponentType, {
+      ...inputs,
       routes: { '/anotherPath': null }
     })
-    newAwsApiGateway = await context.defineComponent(newAwsApiGateway)
-    newAwsApiGateway = resolveComponentEvaluables(newAwsApiGateway)
+    newComponent = await context.defineComponent(newComponent)
+    newComponent = resolveComponentEvaluables(newComponent)
 
-    const res = newAwsApiGateway.shouldDeploy(prevAwsApiGateway)
+    const res = newComponent.shouldDeploy(prevComponent)
     expect(res).toBe('deploy')
   })
 
   it('shouldDeploy should return deploy if first deployment', async () => {
-    let oldAwsApiGateway = await context.construct(AwsApiGateway, {
+    const inputs = {
       provider,
       apiName: 'something',
       role: { arn: 'someArn' },
       routes: { '/another': null }
-    })
+    }
+    let oldAwsApiGateway = await context.construct(ComponentType, inputs)
     oldAwsApiGateway = await context.defineComponent(oldAwsApiGateway)
     oldAwsApiGateway = resolveComponentEvaluables(oldAwsApiGateway)
     const res = oldAwsApiGateway.shouldDeploy(null, context)
