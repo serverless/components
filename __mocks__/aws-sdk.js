@@ -9,6 +9,10 @@ const mocks = {
     return Promise.resolve({ Contents: [{ Key: 'abc' }] })
   }),
   deleteObjectsMock: jest.fn(),
+  putBucketWebsiteMock: jest.fn(),
+  putBucketPolicyMock: jest.fn(),
+  putBucketCorsMock: jest.fn(),
+  uploadMock: jest.fn(),
   putRule: jest.fn().mockReturnValue({ RuleArn: 'abc:zxc' }),
   putTargets: jest.fn(),
   removeTargets: jest.fn(),
@@ -130,6 +134,18 @@ const S3 = function() {
     }),
     deleteObjects: (obj) => ({
       promise: () => mocks.deleteObjectsMock(obj)
+    }),
+    upload: (obj) => ({
+      promise: () => mocks.uploadMock(obj)
+    }),
+    putBucketPolicy: (obj) => ({
+      promise: () => mocks.putBucketPolicyMock(obj)
+    }),
+    putBucketCors: (obj) => ({
+      promise: () => mocks.putBucketCorsMock(obj)
+    }),
+    putBucketWebsite: (obj) => ({
+      promise: () => mocks.putBucketWebsiteMock(obj)
     })
   }
 }
