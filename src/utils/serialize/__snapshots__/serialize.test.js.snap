@@ -7,17 +7,17 @@ Object {
     "@@ref-1": Object {
       "props": Object {
         "components": Object {
-          "type": "undefined",
+          "@@ref": "@@ref-2",
         },
         "extends": Object {
           "data": "Object",
           "type": "string",
         },
         "inputTypes": Object {
-          "@@ref": "@@ref-2",
+          "@@ref": "@@ref-3",
         },
         "inputs": Object {
-          "@@ref": "@@ref-3",
+          "@@ref": "@@ref-4",
         },
         "instanceId": Object {
           "data": "test",
@@ -40,23 +40,28 @@ Object {
       "type": "Component",
     },
     "@@ref-2": Object {
+      "props": Object {},
+      "symbols": Object {},
+      "type": "object",
+    },
+    "@@ref-3": Object {
       "props": Object {
         "components": Object {
-          "@@ref": "@@ref-4",
+          "@@ref": "@@ref-5",
         },
       },
       "symbols": Object {},
       "type": "object",
     },
-    "@@ref-3": Object {
+    "@@ref-4": Object {
       "props": Object {},
       "symbols": Object {},
       "type": "object",
     },
-    "@@ref-4": Object {
+    "@@ref-5": Object {
       "props": Object {
         "default": Object {
-          "@@ref": "@@ref-5",
+          "@@ref": "@@ref-6",
         },
         "type": Object {
           "data": "Object",
@@ -66,7 +71,7 @@ Object {
       "symbols": Object {},
       "type": "object",
     },
-    "@@ref-5": Object {
+    "@@ref-6": Object {
       "props": Object {},
       "symbols": Object {},
       "type": "object",

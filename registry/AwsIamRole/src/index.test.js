@@ -4,7 +4,7 @@ import { sleep } from '@serverless/utils'
 import {
   createContext,
   deserialize,
-  resolveComponentVariables,
+  resolveComponentEvaluables,
   serialize
 } from '../../../src/utils'
 
@@ -59,7 +59,7 @@ describe('AwsIamRole', () => {
 
     let awsIamRole = await context.construct(AwsIamRole, inputs)
     awsIamRole = await context.defineComponent(awsIamRole)
-    awsIamRole = resolveComponentVariables(awsIamRole)
+    awsIamRole = resolveComponentEvaluables(awsIamRole)
 
     await awsIamRole.deploy(undefined, context)
 
@@ -97,7 +97,7 @@ describe('AwsIamRole', () => {
       provider
     })
     oldAwsIamRole = await context.defineComponent(oldAwsIamRole)
-    oldAwsIamRole = resolveComponentVariables(oldAwsIamRole)
+    oldAwsIamRole = resolveComponentEvaluables(oldAwsIamRole)
     await oldAwsIamRole.deploy(null, context)
 
     const prevAwsIamRole = await deserialize(serialize(oldAwsIamRole, context), context)
@@ -107,7 +107,7 @@ describe('AwsIamRole', () => {
       provider
     })
     newAwsIamRole = await context.defineComponent(newAwsIamRole)
-    newAwsIamRole = resolveComponentVariables(newAwsIamRole)
+    newAwsIamRole = resolveComponentEvaluables(newAwsIamRole)
     await newAwsIamRole.deploy(prevAwsIamRole, context)
 
     expect(AWS.mocks.createRoleMock).toBeCalledWith({
@@ -127,7 +127,7 @@ describe('AwsIamRole', () => {
 
     let awsIamRole = await context.construct(AwsIamRole, inputs)
     awsIamRole = await context.defineComponent(awsIamRole)
-    awsIamRole = resolveComponentVariables(awsIamRole)
+    awsIamRole = resolveComponentEvaluables(awsIamRole)
 
     const prevInstance = {
       roleName: 'abc',
@@ -166,7 +166,7 @@ describe('AwsIamRole', () => {
 
     let awsIamRole = await context.construct(AwsIamRole, inputs)
     awsIamRole = await context.defineComponent(awsIamRole)
-    awsIamRole = resolveComponentVariables(awsIamRole)
+    awsIamRole = resolveComponentEvaluables(awsIamRole)
 
     const prevInstance = {
       roleName: 'abc',
@@ -204,7 +204,7 @@ describe('AwsIamRole', () => {
       }
     })
     oldAwsIamRole = await context.defineComponent(oldAwsIamRole)
-    oldAwsIamRole = resolveComponentVariables(oldAwsIamRole)
+    oldAwsIamRole = resolveComponentEvaluables(oldAwsIamRole)
     await oldAwsIamRole.deploy(null, context)
 
     const prevAwsIamRole = await deserialize(serialize(oldAwsIamRole, context), context)

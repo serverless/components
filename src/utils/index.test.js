@@ -25,7 +25,7 @@ describe('index', () => {
       getParentIds: expect.any(Function),
       getVariableInstanceIds: expect.any(Function),
       isComponent: expect.any(Function),
-      resolveComponentVariables: expect.any(Function),
+      resolveComponentEvaluables: expect.any(Function),
       setKey: expect.any(Function),
       walkReduceComponentChildren: expect.any(Function),
       walkReduceComponentChildrenDepthFirst: expect.any(Function)
@@ -141,6 +141,7 @@ describe('index', () => {
     const mod = require('./variable')
     expect(mod).toMatchObject({
       hasVariableString: expect.any(Function),
+      isEvaluable: expect.any(Function),
       isVariable: expect.any(Function),
       matchVariable: expect.any(Function),
       newVariable: expect.any(Function),

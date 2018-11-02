@@ -3,7 +3,7 @@ import path from 'path'
 import {
   createContext,
   deserialize,
-  resolveComponentVariables,
+  resolveComponentEvaluables,
   serialize
 } from '../../../src/utils'
 
@@ -56,7 +56,7 @@ describe('AwsSnsSubscription', () => {
 
     let awsSnsSubscription = await context.construct(AwsSnsSubscription, inputs)
     awsSnsSubscription = await context.defineComponent(awsSnsSubscription)
-    awsSnsSubscription = resolveComponentVariables(awsSnsSubscription)
+    awsSnsSubscription = resolveComponentEvaluables(awsSnsSubscription)
 
     await awsSnsSubscription.deploy(undefined, context)
 
@@ -75,7 +75,7 @@ describe('AwsSnsSubscription', () => {
       provider
     })
     oldAwsSnsSubscription = await context.defineComponent(oldAwsSnsSubscription)
-    oldAwsSnsSubscription = resolveComponentVariables(oldAwsSnsSubscription)
+    oldAwsSnsSubscription = resolveComponentEvaluables(oldAwsSnsSubscription)
     await oldAwsSnsSubscription.deploy(null, context)
 
     const prevAwsSnsSubscription = await deserialize(
@@ -89,7 +89,7 @@ describe('AwsSnsSubscription', () => {
       provider
     })
     newAwsSnsSubscription = await context.defineComponent(newAwsSnsSubscription)
-    newAwsSnsSubscription = resolveComponentVariables(newAwsSnsSubscription)
+    newAwsSnsSubscription = resolveComponentEvaluables(newAwsSnsSubscription)
     await newAwsSnsSubscription.deploy(prevAwsSnsSubscription, context)
 
     expect(AWS.mocks.subscribeMock).toBeCalledWith({
@@ -106,7 +106,7 @@ describe('AwsSnsSubscription', () => {
       provider
     })
     oldAwsSnsSubscription = await context.defineComponent(oldAwsSnsSubscription)
-    oldAwsSnsSubscription = resolveComponentVariables(oldAwsSnsSubscription)
+    oldAwsSnsSubscription = resolveComponentEvaluables(oldAwsSnsSubscription)
     await oldAwsSnsSubscription.deploy(null, context)
 
     const prevAwsSnsSubscription = await deserialize(

@@ -43,4 +43,24 @@ describe('Component', () => {
 
     expect(component.shouldDeploy(undefined)).toEqual('deploy')
   })
+
+  it('should preserve instanceId on hydrate', async () => {
+    let context = await createContext({
+      cwd: path.join(__dirname, '..')
+    })
+
+    context = await context.loadProject()
+    context = await context.loadApp()
+
+    const Component = await context.loadType('./')
+    const component = await context.construct(Component, {})
+
+    component.components = {
+      myComponent: {
+        name: 'abc'
+      }
+    }
+
+    expect(component.shouldDeploy(undefined)).toEqual('deploy')
+  })
 })

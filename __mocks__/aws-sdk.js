@@ -34,22 +34,45 @@ const mocks = {
   subscribeMock: jest.fn().mockReturnValue({
     SubscriptionArn: 'arn:aws:sns:region:XXXXX:test-subscription:r4nd0m'
   }),
-  unsubscribeMock: jest.fn()
+  unsubscribeMock: jest.fn(),
+
+  // APIGateway
+  importRestApi: jest.fn().mockReturnValue({ id: 'my-new-id' }),
+  createDeployment: jest.fn(),
+  putRestApi: jest.fn(),
+  deleteRestApi: jest.fn()
 }
 
-const S3 = function() {
+const APIGateway = function() {
   return {
-    createBucket: (obj) => ({
-      promise: () => mocks.createBucketMock(obj)
+    importRestApi: (obj) => ({
+      promise: () => mocks.importRestApi(obj)
     }),
-    listObjectsV2: (obj) => ({
-      promise: () => mocks.listObjectsV2Mock(obj)
+    createDeployment: (obj) => ({
+      promise: () => mocks.createDeployment(obj)
     }),
-    deleteBucket: (obj) => ({
-      promise: () => mocks.deleteBucketMock(obj)
+    putRestApi: (obj) => ({
+      promise: () => mocks.putRestApi(obj)
     }),
-    deleteObjects: (obj) => ({
-      promise: () => mocks.deleteObjectsMock(obj)
+    deleteRestApi: (obj) => ({
+      promise: () => mocks.deleteRestApi(obj)
+    })
+  }
+}
+
+const CloudWatchEvents = function() {
+  return {
+    putRule: (obj) => ({
+      promise: () => mocks.putRule(obj)
+    }),
+    putTargets: (obj) => ({
+      promise: () => mocks.putTargets(obj)
+    }),
+    removeTargets: (obj) => ({
+      promise: () => mocks.removeTargets(obj)
+    }),
+    deleteRule: (obj) => ({
+      promise: () => mocks.deleteRule(obj)
     })
   }
 }
@@ -94,19 +117,19 @@ const Lambda = function() {
   }
 }
 
-const CloudWatchEvents = function() {
+const S3 = function() {
   return {
-    putRule: (obj) => ({
-      promise: () => mocks.putRule(obj)
+    createBucket: (obj) => ({
+      promise: () => mocks.createBucketMock(obj)
     }),
-    putTargets: (obj) => ({
-      promise: () => mocks.putTargets(obj)
+    listObjectsV2: (obj) => ({
+      promise: () => mocks.listObjectsV2Mock(obj)
     }),
-    removeTargets: (obj) => ({
-      promise: () => mocks.removeTargets(obj)
+    deleteBucket: (obj) => ({
+      promise: () => mocks.deleteBucketMock(obj)
     }),
-    deleteRule: (obj) => ({
-      promise: () => mocks.deleteRule(obj)
+    deleteObjects: (obj) => ({
+      promise: () => mocks.deleteObjectsMock(obj)
     })
   }
 }
@@ -127,9 +150,10 @@ export default {
   config: {
     update: jest.fn()
   },
-  S3,
-  Lambda,
+  APIGateway,
   CloudWatchEvents,
   IAM,
+  Lambda,
+  S3,
   SNS
 }

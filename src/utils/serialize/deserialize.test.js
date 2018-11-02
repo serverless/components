@@ -1,4 +1,4 @@
-import resolveComponentVariables from '../component/resolveComponentVariables'
+import resolveComponentEvaluables from '../component/resolveComponentEvaluables'
 import createContext from '../context/createContext'
 import deserialize from './deserialize'
 import serialize from './serialize'
@@ -81,6 +81,6 @@ describe('deserialize', () => {
     component.instanceId = 'test'
     const serialized = serialize(component, context)
     const result = await deserialize(serialized, context)
-    expect(result).toEqual(resolveComponentVariables(component))
+    expect(result).toEqual(resolveComponentEvaluables(component))
   })
 })

@@ -1,71 +1,74 @@
-import Service from './index'
+import { resolve } from '@serverless/utils'
+import path from 'path'
+import { createContext } from '../../../src/utils'
 
-const Fn = {
-  functionName: 'hello',
-  class: true
-}
+const createTestContext = async () =>
+  createContext(
+    {
+      cwd: path.join(__dirname, '..'),
+      overrides: {
+        debug: () => {},
+        log: () => {}
+      }
+    },
+    {
+      app: {
+        id: 'test'
+      }
+    }
+  )
 
-const fn = {
-  functionName: 'hello',
-  instance: true
-}
-
-class SuperClass {
-  async construct(inputs) {
-    this.functions = inputs.functions
-  }
-}
-
-const SuperContext = {
-  loadType: async () => Fn
-}
-
-const context = {
-  construct: jest.fn().mockReturnValue(fn)
-}
+beforeEach(() => {
+  jest.clearAllMocks()
+})
 
 afterAll(() => {
   jest.restoreAllMocks()
 })
 
 describe('Service', () => {
-  it('should create function instances', async () => {
-    const inputs = {
-      functions: {
-        hello: {
-          functionName: 'hello'
-        }
-      }
-    }
-    let service = await Service(SuperClass, SuperContext)
-    service = new service()
-    service.getType = () => ({ root: './' })
-    await service.construct(inputs, context)
+  it('should default components and functions to empty objects', async () => {
+    const context = await createTestContext()
+    const Service = await context.loadType('Service')
+    const service = await context.construct(Service, {})
 
-    expect(context.construct).toBeCalledWith(Fn, { functionName: 'hello' })
-    expect(service.functions.hello).toEqual(fn)
+    expect(resolve(service.components)).toEqual({})
+    expect(resolve(service.functions)).toEqual({})
   })
 
-  it('should define functions and components as instances', async () => {
-    const scope = {
+  it('should construct function instances when construct is called', async () => {
+    const context = await createTestContext()
+    const Service = await context.loadType('Service')
+    const Function = await context.loadType('Function')
+
+    const service = await context.construct(Service, {
       functions: {
         hello: {
           functionName: 'hello'
         }
-      },
-      components: {
-        myComponent: {
-          name: 'myComponent'
+      }
+    })
+
+    expect(service.functions.hello).toBeInstanceOf(Function.class)
+    expect(resolve(service.functions.hello.functionName)).toBe('hello')
+  })
+
+  it('should define functions as instances', async () => {
+    const context = await createTestContext()
+    const Service = await context.loadType('Service')
+    const Fn = await context.loadType('Function')
+
+    const service = await context.construct(Service, {
+      functions: {
+        hello: {
+          functionName: 'hello'
         }
       }
-    }
-    let service = await Service(SuperClass, SuperContext)
-    service = new service()
+    })
 
-    const children = await service.define.call(scope)
-    expect(children).toEqual({
-      ...scope.functions,
-      ...scope.components
+    const children = await service.define(context)
+    expect(children).toMatchObject({
+      hello: expect.any(Fn.class)
     })
   })
 })

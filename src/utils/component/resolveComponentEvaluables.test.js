@@ -1,8 +1,8 @@
 import createContext from '../context/createContext'
 import newVariable from '../variable/newVariable'
-import resolveComponentVariables from './resolveComponentVariables'
+import resolveComponentEvaluables from './resolveComponentEvaluables'
 
-describe('#resolveComponentVariables()', () => {
+describe('#resolveComponentEvaluables()', () => {
   it('resolve component variables', async () => {
     const context = await createContext(
       {},
@@ -42,7 +42,7 @@ describe('#resolveComponentVariables()', () => {
     const ignoreVariable = newVariable('${ignore}', { ignore: false })
     componentB.ignore = ignoreVariable
 
-    const result = resolveComponentVariables(componentA)
+    const result = resolveComponentEvaluables(componentA)
     expect(result).toMatchObject({
       foo: 'foo',
       bar: { var: 'bar' },

@@ -3,7 +3,7 @@ import path from 'path'
 import {
   createContext,
   deserialize,
-  resolveComponentVariables,
+  resolveComponentEvaluables,
   serialize
 } from '../../../src/utils'
 
@@ -45,7 +45,7 @@ describe('AwsS3Bucket', () => {
         bucketName: 'bucket-abc'
       })
       awsS3Bucket = await context.defineComponent(awsS3Bucket)
-      awsS3Bucket = resolveComponentVariables(awsS3Bucket)
+      awsS3Bucket = resolveComponentEvaluables(awsS3Bucket)
 
       await awsS3Bucket.deploy(null, context)
 
@@ -65,7 +65,7 @@ describe('AwsS3Bucket', () => {
       bucketName: 'bucket-abc'
     })
     awsS3Bucket = await context.defineComponent(awsS3Bucket)
-    awsS3Bucket = resolveComponentVariables(awsS3Bucket)
+    awsS3Bucket = resolveComponentEvaluables(awsS3Bucket)
     await awsS3Bucket.deploy(null, context)
 
     const prevAwsS3Bucket = await deserialize(serialize(awsS3Bucket, context), context)
@@ -77,7 +77,7 @@ describe('AwsS3Bucket', () => {
       bucketName: 'bucket-123' // changed!
     })
     nextAwsS3Bucket = await context.defineComponent(nextAwsS3Bucket, prevAwsS3Bucket)
-    nextAwsS3Bucket = resolveComponentVariables(nextAwsS3Bucket)
+    nextAwsS3Bucket = resolveComponentEvaluables(nextAwsS3Bucket)
 
     await nextAwsS3Bucket.deploy(prevAwsS3Bucket, context)
 
@@ -95,7 +95,7 @@ describe('AwsS3Bucket', () => {
       bucketName: 'bucket-abc'
     })
     awsS3Bucket = await context.defineComponent(awsS3Bucket)
-    awsS3Bucket = resolveComponentVariables(awsS3Bucket)
+    awsS3Bucket = resolveComponentEvaluables(awsS3Bucket)
     await awsS3Bucket.deploy(null, context)
 
     const prevAwsS3Bucket = await deserialize(serialize(awsS3Bucket, context), context)
@@ -107,7 +107,7 @@ describe('AwsS3Bucket', () => {
       bucketName: 'bucket-abc'
     })
     nextAwsS3Bucket = await context.defineComponent(nextAwsS3Bucket, prevAwsS3Bucket)
-    nextAwsS3Bucket = resolveComponentVariables(awsS3Bucket)
+    nextAwsS3Bucket = resolveComponentEvaluables(awsS3Bucket)
 
     const result = nextAwsS3Bucket.shouldDeploy(prevAwsS3Bucket, context)
 
@@ -125,7 +125,7 @@ describe('AwsS3Bucket', () => {
       bucketName: 'bucket-abc'
     })
     awsS3Bucket = await context.defineComponent(awsS3Bucket)
-    awsS3Bucket = resolveComponentVariables(awsS3Bucket)
+    awsS3Bucket = resolveComponentEvaluables(awsS3Bucket)
     await awsS3Bucket.deploy(null, context)
 
     const prevAwsS3Bucket = await deserialize(serialize(awsS3Bucket, context), context)
@@ -137,7 +137,7 @@ describe('AwsS3Bucket', () => {
       bucketName: 'bucket-123' // changed!
     })
     nextAwsS3Bucket = await context.defineComponent(nextAwsS3Bucket, prevAwsS3Bucket)
-    nextAwsS3Bucket = resolveComponentVariables(nextAwsS3Bucket)
+    nextAwsS3Bucket = resolveComponentEvaluables(nextAwsS3Bucket)
 
     const result = nextAwsS3Bucket.shouldDeploy(prevAwsS3Bucket, context)
 
@@ -155,7 +155,7 @@ describe('AwsS3Bucket', () => {
       bucketName: 'bucket-abc'
     })
     awsS3Bucket = await context.defineComponent(awsS3Bucket)
-    awsS3Bucket = resolveComponentVariables(awsS3Bucket)
+    awsS3Bucket = resolveComponentEvaluables(awsS3Bucket)
     await awsS3Bucket.deploy(null, context)
 
     const prevAwsS3Bucket = await deserialize(serialize(awsS3Bucket, context), context)

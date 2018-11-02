@@ -1,4 +1,4 @@
-import { createContext, resolveComponentVariables } from '../../../src/utils'
+import { createContext, resolveComponentEvaluables } from '../../../src/utils'
 
 // todo mock timers
 jest.setTimeout(16000)
@@ -52,7 +52,7 @@ describe('AwsApiGateway', () => {
     )
     const AwsApiGateway = await context.loadType('AwsApiGateway')
     let awsApiGateway = await context.construct(AwsApiGateway, inputs)
-    awsApiGateway = resolveComponentVariables(awsApiGateway)
+    awsApiGateway = resolveComponentEvaluables(awsApiGateway)
 
     await awsApiGateway.deploy(undefined, context)
 
@@ -83,7 +83,7 @@ describe('AwsApiGateway', () => {
     )
     const AwsApiGateway = await context.loadType('AwsApiGateway')
     let awsApiGateway = await context.construct(AwsApiGateway, inputs)
-    awsApiGateway = resolveComponentVariables(awsApiGateway)
+    awsApiGateway = resolveComponentEvaluables(awsApiGateway)
 
     const prevInstance = {
       name: 'something',

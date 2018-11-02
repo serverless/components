@@ -31,10 +31,6 @@ describe('#walkReduceComponentOwnVariables()', () => {
     )
     expect(result).toEqual([
       {
-        keys: ['components'],
-        value: component.components
-      },
-      {
         keys: ['foo'],
         value: fooVariable
       },

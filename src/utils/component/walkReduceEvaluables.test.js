@@ -1,7 +1,7 @@
 import newVariable from '../variable/newVariable'
-import walkReduceVariables from './walkReduceVariables'
+import walkReduceEvaluables from './walkReduceEvaluables'
 
-describe('#walkReduceVariables()', () => {
+describe('#walkReduceEvaluables()', () => {
   it('should resolve variables when it is referenced twice', async () => {
     const fooVariable = newVariable('${foo}', { foo: 'foo' })
     const component = {
@@ -9,7 +9,7 @@ describe('#walkReduceVariables()', () => {
       bar: fooVariable
     }
 
-    const result = walkReduceVariables(
+    const result = walkReduceEvaluables(
       (accum, value, keys) => {
         accum.push({ value, keys })
         return accum
@@ -36,7 +36,7 @@ describe('#walkReduceVariables()', () => {
     }
 
     component.bar = component
-    const result = walkReduceVariables(
+    const result = walkReduceEvaluables(
       (accum, value, keys) => {
         accum.push({ value, keys })
         return accum

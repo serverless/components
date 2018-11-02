@@ -8,9 +8,10 @@ export { default as getParentId } from './getParentId'
 export { default as getParentIds } from './getParentIds'
 export { default as getVariableInstanceIds } from './getVariableInstanceIds'
 export { default as isComponent } from './isComponent'
-export { default as resolveComponentVariables } from './resolveComponentVariables'
+export { default as resolveComponentEvaluables } from './resolveComponentEvaluables'
 export { default as setKey } from './setKey'
 export { default as walkReduceComponentChildren } from './walkReduceComponentChildren'
 export {
   default as walkReduceComponentChildrenDepthFirst
 } from './walkReduceComponentChildrenDepthFirst'
+export { default as walkReduceEvaluables } from './walkReduceEvaluables'
