@@ -34,6 +34,15 @@ const mocks = {
   attachRolePolicyMock: jest.fn(),
   detachRolePolicyMock: jest.fn(),
   updateAssumeRolePolicyMock: jest.fn(),
+  createPolicyMock: jest.fn().mockReturnValue({ Policy: { Arn: 'abc:xyz' } }),
+  deletePolicyMock: jest.fn(),
+  listEntitiesForPolicyMock: jest.fn().mockReturnValue({
+    PolicyGroups: ['group'],
+    PolicyRoles: ['role'],
+    PolicyUsers: ['user']
+  }),
+  detachGroupPolicyMock: jest.fn(),
+  detachUserPolicyMock: jest.fn(),
   // SNS
   subscribeMock: jest.fn().mockReturnValue({
     SubscriptionArn: 'arn:aws:sns:region:XXXXX:test-subscription:r4nd0m'
@@ -97,6 +106,21 @@ const IAM = function() {
     }),
     updateAssumeRolePolicy: (obj) => ({
       promise: () => mocks.updateAssumeRolePolicyMock(obj)
+    }),
+    createPolicy: (obj) => ({
+      promise: () => mocks.createPolicyMock(obj)
+    }),
+    deletePolicy: (obj) => ({
+      promise: () => mocks.deletePolicyMock(obj)
+    }),
+    listEntitiesForPolicy: (obj) => ({
+      promise: () => mocks.listEntitiesForPolicyMock(obj)
+    }),
+    detachGroupPolicy: (obj) => ({
+      promise: () => mocks.detachGroupPolicyMock(obj)
+    }),
+    detachUserPolicy: (obj) => ({
+      promise: () => mocks.detachUserPolicyMock(obj)
     })
   }
 }
