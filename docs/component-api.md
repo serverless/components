@@ -12,8 +12,8 @@ Similar to a class constructor, this method can be used to assign properties to 
 <br />
 
 **Params**
-<p>`inputs`: `Object` - The inputs object given to this component.</p>
-<p>`context`: `Context` - The application's context</p>
+<p><code>inputs</code>: <code>Object</code> - The inputs object given to this component.</p>
+<p><code>context</code>: <code>Context</code> - The application's context</p>
 
 *NOTE:* inputs can be variables. Variables must be resolved before their value can be accessed. However, often you likely want the value of a variable after the variable's referenced value has been updated during deployment. If you assign a variable to your component's property, it will be resolved for you before the `deploy` method is called.<br />
 <br />
@@ -23,7 +23,7 @@ Similar to a class constructor, this method can be used to assign properties to 
 <br />
 
 **Example**
-<p>The `construct()` method from AwsIamRole</p>
+<p>The <code>construct()</code> method from AwsIamRole</p>
 
 ```js
 const AwsIamRole = async (SuperClass, superContext) => {
@@ -57,7 +57,7 @@ NOTE: This method is optional to define. If you don't define this method, it wil
 <br />
 
 **Params**
-<p>`context`: `Context` - The application's context.</p>
+<p><code>context</code>: <code>Context</code> - The application's context.</p>
 <br />
 
 **Returns**
@@ -65,7 +65,7 @@ NOTE: This method is optional to define. If you don't define this method, it wil
 <br />
 
 **Example**
-<p>The `define()` method from `AwsLambdaFunction`</p>
+<p>The <code>define()</code> method from <code>AwsLambdaFunction</code></p>
 
 ```js
 import { resolve } from '@serverless/utils'
@@ -102,8 +102,8 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
 This method is used to setup any values in your instance using a previous instance. Used for preserving values across multiple calls to deploy when values don't change. Can also be used to rebuild complex data types that don't get persisted in state.  
 
 **Params**<br />
-<p>`prevInstance`: `Component` - The previous component instance, or `null` if there is no previous instance of this component.</p>
-<p>`context`: `Context` - The application's context.</p>
+<p><code>prevInstance</code>: <code>Component</code> - The previous component instance, or <code>null</code> if there is no previous instance of this component.</p>
+<p><code>context</code>: <code>Context</code> - The application's context.</p>
 <br />
 
 
@@ -112,7 +112,7 @@ This method is used to setup any values in your instance using a previous instan
 <br />
 
 **Example**
-<p>The `hydrate()` method from `AwsLambdaFunction`</p>
+<p>The <code>hydrate()</code> method from <code>AwsLambdaFunction</code></p>
 
 ```js
 const AwsLambdaFunction = async (SuperClass, superContext) => {
@@ -135,23 +135,26 @@ This method is used to perform comparisons against the previous instance from st
 <br />
 
 **Params**
-<p>`prevInstance`: `Component` - The previous component instance, or `null` if there is no previous instance of this component.</p>
-<p>`context`: `Context` - The application's context.</p>
+<p><code>prevInstance</code>: <code>Component</code> - The previous component instance, or <code>null</code> if there is no previous instance of this component.</p>
+<p><code>context</code>: <code>Context</code> - The application's context.</p>
 <br />
 
 
 **Returns**
-- If no operation should be taken by core, then this method should return `undefined`.
-- If the component should be updated or created, this method should return the string `'deploy'`.
-- If the component should be replaced (removed then deployed again), this method should return the string `'replace'`.
+<ul>
+  <li>If no operation should be taken by core, then this method should return `undefined`.</li>
+  <li>If the component should be updated or created, this method should return the string `'deploy'`</li>
+  <li>If the component should be replaced (removed then deployed again), this method should return the string `'replace'`</li>
+</ul>
 
+<p>
 *Note:* replacements are performed in the order of first creating all new infrastructure for all components that are being both deployed and replaced and then finally removing all the old infrastructure.
+</p>
 
 <br />
-
-
 **Example**
-<p>The `shouldDeploy()` method for `AwsS3Bucket`</p>
+<p>The <code>shouldDeploy()</code> method for <code>AwsS3Bucket</code></p>
+
 ```js
 import { resolve } from '@serverless/utils'
 
@@ -182,8 +185,8 @@ If your component is responsible for a specific resource, make the sdk calls to 
 
 
 **Params**
-<p>`prevInstance`: `Component` - The previous component instance, or `null` if there is no previous instance of this component.</p>
-<p>`context`: `Context` - The application's context.</p>
+<p><code>prevInstance</code>: <code>Component</code> - The previous component instance, or <code>null</code> if there is no previous instance of this component.</p>
+<p><code>context</code>: <code>Context</code> - The application's context.</p>
 <br />
 
 **Returns**
@@ -191,7 +194,8 @@ If your component is responsible for a specific resource, make the sdk calls to 
 <br />
 
 **Example:**
-<p>The `deploy()` method for `AwsS3Bucket`</p>
+<p>The <code>deploy()</code> method for <code>AwsS3Bucket</code></p>
+
 ```js
 const AwsS3Bucket = (SuperClass) =>
   class extends SuperClass {
@@ -206,12 +210,12 @@ const AwsS3Bucket = (SuperClass) =>
 }
 ```
 
-
+<br /><br />
 ## remove(context)
 If your component is responsible for a specific resource, make the sdk calls to remove the resource now.
 
 **Params**
-<p>`context`: `Context` - The application's context.</p>
+<p><code>context</code>: <code>Context</code> - The application's context.</p>
 <br />
 
 **Returns**
@@ -219,7 +223,8 @@ If your component is responsible for a specific resource, make the sdk calls to 
 <br />
 
 **Example:**
-<p> The `remove()` method for `AwsS3Bucket`</p>
+<p>The <code>remove()</code> method for <code>AwsS3Bucket</code></p>
+
 ```js
 const AwsS3Bucket = (SuperClass) =>
   class extends SuperClass {
@@ -255,7 +260,8 @@ This method is used to return data for pretty printing to the CLI. Users use the
 
 <br />
 **Example:**
-<p>The `info()` method from `AwsS3Bucket`</p>
+<p>The <code>info()</code> method from <code>AwsS3Bucket</code></p>
+
 ```js
 const AwsS3Bucket = (SuperClass) =>
   class extends SuperClass {
