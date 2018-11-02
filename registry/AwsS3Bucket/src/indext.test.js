@@ -1,29 +1,9 @@
 import AWS from 'aws-sdk'
 import path from 'path'
-import {
-  createContext,
-  deserialize,
-  resolveComponentEvaluables,
-  serialize
-} from '../../../src/utils'
+import { deserialize, resolveComponentEvaluables, serialize } from '../../../src/utils'
+import { createTestContext } from '../../../test'
 
-const createTestContext = async () =>
-  createContext(
-    {
-      cwd: path.join(__dirname, '..'),
-      overrides: {
-        debug: () => {},
-        log: () => {}
-      }
-    },
-    {
-      app: {
-        id: 'test'
-      }
-    }
-  )
-
-beforeEach(() => {
+beforeEach(async () => {
   jest.clearAllMocks()
 })
 
@@ -32,16 +12,24 @@ afterAll(() => {
 })
 
 describe('AwsS3Bucket', () => {
+  const cwd = path.resolve(__dirname, '..')
+  let context
+  let provider
+  let AwsProvider
+  let AwsS3Bucket
+
+  beforeEach(async () => {
+    context = await createTestContext({ cwd })
+    AwsProvider = await context.loadType('AwsProvider')
+    AwsS3Bucket = await context.loadType('./')
+    provider = await context.construct(AwsProvider, {})
+  })
+
   it(
     'should deploy bucket when none exists',
     async () => {
-      const context = await createTestContext()
-
-      const AwsProvider = await context.loadType('AwsProvider')
-      const AwsS3Bucket = await context.loadType('./')
-
       let awsS3Bucket = await context.construct(AwsS3Bucket, {
-        provider: await context.construct(AwsProvider, {}),
+        provider,
         bucketName: 'bucket-abc'
       })
       awsS3Bucket = await context.defineComponent(awsS3Bucket)
@@ -55,13 +43,8 @@ describe('AwsS3Bucket', () => {
   )
 
   it('should update when bucket name has changed', async () => {
-    const context = await createTestContext()
-
-    const AwsProvider = await context.loadType('AwsProvider')
-    const AwsS3Bucket = await context.loadType('./')
-
     let awsS3Bucket = await context.construct(AwsS3Bucket, {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       bucketName: 'bucket-abc'
     })
     awsS3Bucket = await context.defineComponent(awsS3Bucket)
@@ -85,13 +68,8 @@ describe('AwsS3Bucket', () => {
   })
 
   it('shouldDeploy should return undefined when no changes have occurred', async () => {
-    const context = await createTestContext()
-
-    const AwsProvider = await context.loadType('AwsProvider')
-    const AwsS3Bucket = await context.loadType('./')
-
     let awsS3Bucket = await context.construct(AwsS3Bucket, {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       bucketName: 'bucket-abc'
     })
     awsS3Bucket = await context.defineComponent(awsS3Bucket)
@@ -115,13 +93,8 @@ describe('AwsS3Bucket', () => {
   })
 
   it('shouldDeploy should returns "replace" when bucket name has changed', async () => {
-    const context = await createTestContext()
-
-    const AwsProvider = await context.loadType('AwsProvider')
-    const AwsS3Bucket = await context.loadType('./')
-
     let awsS3Bucket = await context.construct(AwsS3Bucket, {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       bucketName: 'bucket-abc'
     })
     awsS3Bucket = await context.defineComponent(awsS3Bucket)
@@ -145,13 +118,8 @@ describe('AwsS3Bucket', () => {
   })
 
   it('should remove bucket', async () => {
-    const context = await createTestContext()
-
-    const AwsProvider = await context.loadType('AwsProvider')
-    const AwsS3Bucket = await context.loadType('./')
-
     let awsS3Bucket = await context.construct(AwsS3Bucket, {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       bucketName: 'bucket-abc'
     })
     awsS3Bucket = await context.defineComponent(awsS3Bucket)

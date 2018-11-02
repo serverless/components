@@ -1,5 +1,5 @@
 import path from 'path'
-import { createContext } from '../../../src/utils'
+import createTestContext from '../../../test/createTestContext'
 
 const expectedOutputs = {
   accountSid: 'accountSid',
@@ -49,12 +49,12 @@ const twilioMock = {
 twilioMock.incomingPhoneNumbers.create = jest.fn().mockReturnValue(expectedOutputs)
 twilioMock.incomingPhoneNumbers.list = jest.fn().mockReturnValue([])
 
-afterAll(() => {
-  jest.restoreAllMocks()
+beforeEach(async () => {
+  jest.clearAllMocks()
 })
 
-beforeEach(() => {
-  jest.clearAllMocks()
+afterAll(() => {
+  jest.restoreAllMocks()
 })
 
 const provider = {
@@ -62,15 +62,18 @@ const provider = {
 }
 
 describe('TwilioPhoneNumber', () => {
-  it('should create phone number if first deployment', async () => {
-    let context = await createContext({
-      cwd: path.join(__dirname, '..')
-    })
+  const cwd = path.resolve(__dirname, '..')
+  let context
+  let TwilioPhoneNumber
 
+  beforeEach(async () => {
+    context = await createTestContext({ cwd })
     context = await context.loadProject()
     context = await context.loadApp()
+    TwilioPhoneNumber = await context.loadType('./')
+  })
 
-    const TwilioPhoneNumber = await context.loadType('./')
+  it('should create phone number if first deployment', async () => {
     const twilioPhoneNumber = await context.construct(TwilioPhoneNumber, {})
 
     twilioPhoneNumber.provider = provider
@@ -84,14 +87,6 @@ describe('TwilioPhoneNumber', () => {
   })
 
   it('should update phone number if not first deployment', async () => {
-    let context = await createContext({
-      cwd: path.join(__dirname, '..')
-    })
-
-    context = await context.loadProject()
-    context = await context.loadApp()
-
-    const TwilioPhoneNumber = await context.loadType('./')
     const twilioPhoneNumber = await context.construct(TwilioPhoneNumber, {})
 
     twilioPhoneNumber.provider = provider
@@ -104,14 +99,6 @@ describe('TwilioPhoneNumber', () => {
   })
 
   it('should remove phone number', async () => {
-    let context = await createContext({
-      cwd: path.join(__dirname, '..')
-    })
-
-    context = await context.loadProject()
-    context = await context.loadApp()
-
-    const TwilioPhoneNumber = await context.loadType('./')
     const twilioPhoneNumber = await context.construct(TwilioPhoneNumber, {})
 
     twilioPhoneNumber.provider = provider

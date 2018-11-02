@@ -12,23 +12,40 @@ const deployNode = async (node, context) => {
       node
     )}`
   )
+
+  // NOTE BRN: Start by resolving all evaluables on this node. This will enable us to run deploy and shouldDeploy without having to manually resolve evaluables in the method.
+  const { prevInstance, instanceId } = node
+  let { nextInstance } = node
+  if (!isEmpty(nextInstance)) {
+    nextInstance = resolveComponentEvaluables(nextInstance)
+  }
+
+  // NOTE BRN: This only makes sense if we end up persisting variables into state
+  // if (!isEmpty(prevInstance)) {
+  //   resolveComponentEvaluables(prevInstance)
+  // }
+
+  // NOTE BRN: We wait till the last minute to run should deploy so that
+  // 1. evaluables are resolved
+  // 2. all values within evaluables that this node depends on have had a chance to update during their deploy step.
+  if (!node.operation) {
+    node.operation = await nextInstance.shouldDeploy(prevInstance, context)
+  }
+
   if (['deploy', 'replace'].includes(node.operation)) {
-    if (!node.nextInstance) {
+    if (!nextInstance) {
       throw new Error('deployGraph expected nextInstance to be defined for deploy operation')
     }
-    context.debug(`deploying node: ${node.nextInstance.name} { instanceId: ${node.instanceId} }`)
-    if (node.nextInstance.name === undefined) {
-      context.debug(`This instance has an undefined name`)
-      context.debug(node.nextInstance)
+    if (!instanceId) {
+      throw new Error('deployGraph expected instanceId to be defined for deploy operation')
     }
-    const nextInstance = resolveComponentEvaluables(node.nextInstance)
-    const prevInstance = !isEmpty(node.prevInstance)
-      ? resolveComponentEvaluables(node.prevInstance)
-      : node.prevInstance
+    context.debug(`deploying node: ${nextInstance.name} { instanceId: ${instanceId} }`)
+    if (nextInstance.name === undefined) {
+      context.debug(`This instance has an undefined name`)
+      context.debug(nextInstance)
+    }
     await nextInstance.deploy(prevInstance, context)
-    context.debug(
-      `node deployment complete: ${nextInstance.name} { instanceId: ${node.instanceId} }`
-    )
+    context.debug(`node deployment complete: ${nextInstance.name} { instanceId: ${instanceId} }`)
     // TODO BRN: We should probably save state incrementally as we deploy each node
   }
 }

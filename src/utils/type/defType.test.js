@@ -1,12 +1,14 @@
+import { getTmpDir } from '@serverless/utils'
 import createContext from '../context/createContext'
 import defType from './defType'
 import loadType from './loadType'
 
 describe('#defType()', () => {
   it('should default to Object as the parent type if extends property is not set', async () => {
+    const root = await getTmpDir()
     const context = await createContext({})
     const type = {
-      root: './test',
+      root,
       props: {
         name: 'Test'
       }
@@ -22,7 +24,7 @@ describe('#defType()', () => {
         extends: 'Object',
         name: 'Test'
       },
-      root: './test'
+      root
     })
   })
 })

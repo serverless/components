@@ -50,7 +50,11 @@ const mocks = {
   }),
   detachGroupPolicyMock: jest.fn(),
   detachUserPolicyMock: jest.fn(),
+
   // SNS
+  createTopicMock: jest.fn().mockReturnValue({ TopicArn: 'abc:zxc' }),
+  deleteTopicMock: jest.fn(),
+  setTopicAttributesMock: jest.fn(),
   subscribeMock: jest.fn().mockReturnValue({
     SubscriptionArn: 'arn:aws:sns:region:XXXXX:test-subscription:r4nd0m'
   }),
@@ -189,6 +193,15 @@ const S3 = function() {
 
 const SNS = function() {
   return {
+    createTopic: (obj) => ({
+      promise: () => mocks.createTopicMock(obj)
+    }),
+    deleteTopic: (obj) => ({
+      promise: () => mocks.deleteTopicMock(obj)
+    }),
+    setTopicAttributes: (obj) => ({
+      promise: () => mocks.setTopicAttributesMock(obj)
+    }),
     subscribe: (obj) => ({
       promise: () => mocks.subscribeMock(obj)
     }),

@@ -1,16 +1,9 @@
-import createContext from '../context/createContext'
+import createTestContext from '../../../test/createTestContext'
 import walkReduceComponentReferences from './walkReduceComponentReferences'
 
 describe('#walkReduceComponentReferences()', () => {
   it('walk reduce component references', async () => {
-    const context = await createContext(
-      {},
-      {
-        app: {
-          id: 'test'
-        }
-      }
-    )
+    const context = await createTestContext()
     const Component = await context.loadType('Component')
     const component = await context.construct(Component, {})
     const fooComponent = await context.construct(Component, {})

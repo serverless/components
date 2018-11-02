@@ -1,11 +1,10 @@
 import AWS from 'aws-sdk'
-import log from '../../../logging/log'
 
-const createLock = async (config) => {
+const createLock = async (config, context) => {
   const s3 = new AWS.S3({ region: 'us-east-1' })
 
   const lockFile = `${config.state.file}.lock`
-  log('Checking if state is locked')
+  context.log('Checking if state is locked')
   let locked = false
   try {
     await s3
@@ -34,11 +33,11 @@ const createLock = async (config) => {
     .promise()
 }
 
-const fetchObject = async (config) => {
+const fetchObject = async (config, context) => {
   const s3 = new AWS.S3({ region: 'us-east-1' })
 
   try {
-    log(`Fetching state file ${config.state.bucket}/${config.state.file}`)
+    context.log(`Fetching state file ${config.state.bucket}/${config.state.file}`)
     const { Body } = await s3
       .getObject({
         Bucket: config.state.bucket,
@@ -54,9 +53,9 @@ const fetchObject = async (config) => {
   }
 }
 
-const read = async (config) => {
-  await createLock(config)
-  return fetchObject(config)
+const read = async (config, context) => {
+  await createLock(config, context)
+  return fetchObject(config, context)
 }
 
 export default read
