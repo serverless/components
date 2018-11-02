@@ -6,16 +6,19 @@ const Component = (SuperClass) =>
   class extends SuperClass {
     async construct(inputs, context) {
       await super.construct(inputs, context)
+
+      // TODO BRN: this is not the best solution, this is causing problems
       this.instanceId = context.generateInstanceId()
+      this.components = or(get('components', inputs), this.components, {})
     }
 
     hydrate(previousInstance) {
-      this.instanceId = get('instanceId', previousInstance) || this.instanceId
+      this.instanceId = or(get('instanceId', previousInstance), this.instanceId)
     }
 
     async define() {
       return {
-        ...this.components
+        ...or(this.components, {})
       }
     }
 

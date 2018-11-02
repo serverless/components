@@ -1,5 +1,5 @@
 import { all, get, isEmpty, map } from '@serverless/utils'
-import resolveComponentVariables from '../component/resolveComponentVariables'
+import resolveComponentEvaluables from '../component/resolveComponentEvaluables'
 import cloneGraph from './cloneGraph'
 
 const removeNode = async (node, context) => {
@@ -20,7 +20,7 @@ const removeNode = async (node, context) => {
       context.debug(`This instance has an undefined name`)
       context.debug(node.prevInstance)
     }
-    const prevInstance = resolveComponentVariables(node.prevInstance)
+    const prevInstance = resolveComponentEvaluables(node.prevInstance)
     await prevInstance.remove(context)
     context.debug(`node removal complete: ${prevInstance.name} { instanceId: ${node.instanceId} }`)
   }

@@ -1,5 +1,5 @@
 import { all, get, isEmpty, map } from '@serverless/utils'
-import resolveComponentVariables from '../component/resolveComponentVariables'
+import resolveComponentEvaluables from '../component/resolveComponentEvaluables'
 import cloneGraph from './cloneGraph'
 import detectCircularDeps from './detectCircularDeps'
 
@@ -21,9 +21,9 @@ const deployNode = async (node, context) => {
       context.debug(`This instance has an undefined name`)
       context.debug(node.nextInstance)
     }
-    const nextInstance = resolveComponentVariables(node.nextInstance)
+    const nextInstance = resolveComponentEvaluables(node.nextInstance)
     const prevInstance = !isEmpty(node.prevInstance)
-      ? resolveComponentVariables(node.prevInstance)
+      ? resolveComponentEvaluables(node.prevInstance)
       : node.prevInstance
     await nextInstance.deploy(prevInstance, context)
     context.debug(

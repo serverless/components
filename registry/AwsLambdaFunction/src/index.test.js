@@ -6,7 +6,7 @@ import { readFileSync } from 'fs'
 import {
   createContext,
   deserialize,
-  resolveComponentVariables,
+  resolveComponentEvaluables,
   serialize
 } from '../../../src/utils'
 
@@ -66,7 +66,7 @@ describe('AwsLambdaFunction', () => {
 
     awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
 
-    awsLambdaFunction = resolveComponentVariables(awsLambdaFunction)
+    awsLambdaFunction = resolveComponentEvaluables(awsLambdaFunction)
 
     awsLambdaFunction.instanceId = 'instanceId'
 
@@ -99,7 +99,7 @@ describe('AwsLambdaFunction', () => {
 
     awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
 
-    awsLambdaFunction = resolveComponentVariables(awsLambdaFunction)
+    awsLambdaFunction = resolveComponentEvaluables(awsLambdaFunction)
 
     awsLambdaFunction.instanceId = 'instanceId'
 
@@ -144,7 +144,7 @@ describe('AwsLambdaFunction', () => {
 
     awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
 
-    awsLambdaFunction = resolveComponentVariables(awsLambdaFunction)
+    awsLambdaFunction = resolveComponentEvaluables(awsLambdaFunction)
 
     awsLambdaFunction.pack = jest.fn()
 
@@ -198,7 +198,7 @@ describe('AwsLambdaFunction', () => {
 
     awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
 
-    awsLambdaFunction = resolveComponentVariables(awsLambdaFunction)
+    awsLambdaFunction = resolveComponentEvaluables(awsLambdaFunction)
 
     awsLambdaFunction.pack = jest.fn()
 
@@ -228,7 +228,7 @@ describe('AwsLambdaFunction', () => {
       nextAwsLambdaFunction,
       prevAwsLambdaFunction
     )
-    nextAwsLambdaFunction = resolveComponentVariables(nextAwsLambdaFunction)
+    nextAwsLambdaFunction = resolveComponentEvaluables(nextAwsLambdaFunction)
 
     await nextAwsLambdaFunction.deploy(prevAwsLambdaFunction, context)
 
@@ -286,7 +286,7 @@ describe('AwsLambdaFunction', () => {
 
     awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
 
-    awsLambdaFunction = resolveComponentVariables(awsLambdaFunction)
+    awsLambdaFunction = resolveComponentEvaluables(awsLambdaFunction)
 
     awsLambdaFunction.pack = jest.fn()
 
@@ -316,7 +316,7 @@ describe('AwsLambdaFunction', () => {
       nextAwsLambdaFunction,
       prevAwsLambdaFunction
     )
-    nextAwsLambdaFunction = resolveComponentVariables(nextAwsLambdaFunction)
+    nextAwsLambdaFunction = resolveComponentEvaluables(nextAwsLambdaFunction)
 
     await nextAwsLambdaFunction.deploy(prevAwsLambdaFunction, context)
 
@@ -369,7 +369,7 @@ describe('AwsLambdaFunction', () => {
 
     awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
 
-    awsLambdaFunction = resolveComponentVariables(awsLambdaFunction)
+    awsLambdaFunction = resolveComponentEvaluables(awsLambdaFunction)
 
     awsLambdaFunction.pack = jest.fn()
 
@@ -429,7 +429,7 @@ describe('AwsLambdaFunction', () => {
 
     awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
 
-    awsLambdaFunction = resolveComponentVariables(awsLambdaFunction)
+    awsLambdaFunction = resolveComponentEvaluables(awsLambdaFunction)
 
     awsLambdaFunction.pack = jest.fn()
 
@@ -459,7 +459,7 @@ describe('AwsLambdaFunction', () => {
       nextAwsLambdaFunction,
       prevAwsLambdaFunction
     )
-    nextAwsLambdaFunction = resolveComponentVariables(nextAwsLambdaFunction)
+    nextAwsLambdaFunction = resolveComponentEvaluables(nextAwsLambdaFunction)
 
     const result = await nextAwsLambdaFunction.shouldDeploy(prevAwsLambdaFunction, context)
 
@@ -493,7 +493,7 @@ describe('AwsLambdaFunction', () => {
 
     awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
 
-    awsLambdaFunction = resolveComponentVariables(awsLambdaFunction)
+    awsLambdaFunction = resolveComponentEvaluables(awsLambdaFunction)
 
     awsLambdaFunction.pack = jest.fn()
 
@@ -523,7 +523,7 @@ describe('AwsLambdaFunction', () => {
       nextAwsLambdaFunction,
       prevAwsLambdaFunction
     )
-    nextAwsLambdaFunction = resolveComponentVariables(nextAwsLambdaFunction)
+    nextAwsLambdaFunction = resolveComponentEvaluables(nextAwsLambdaFunction)
 
     const result = await nextAwsLambdaFunction.shouldDeploy(prevAwsLambdaFunction, context)
 
@@ -558,7 +558,7 @@ describe('AwsLambdaFunction', () => {
 
     awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
 
-    awsLambdaFunction = resolveComponentVariables(awsLambdaFunction)
+    awsLambdaFunction = resolveComponentEvaluables(awsLambdaFunction)
 
     awsLambdaFunction.pack = jest.fn()
 
@@ -589,7 +589,7 @@ describe('AwsLambdaFunction', () => {
       nextAwsLambdaFunction,
       prevAwsLambdaFunction
     )
-    nextAwsLambdaFunction = resolveComponentVariables(nextAwsLambdaFunction)
+    nextAwsLambdaFunction = resolveComponentEvaluables(nextAwsLambdaFunction)
 
     const result = await nextAwsLambdaFunction.shouldDeploy(prevAwsLambdaFunction, context)
 
@@ -624,7 +624,7 @@ describe('AwsLambdaFunction', () => {
 
     awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
 
-    awsLambdaFunction = resolveComponentVariables(awsLambdaFunction)
+    awsLambdaFunction = resolveComponentEvaluables(awsLambdaFunction)
 
     awsLambdaFunction.pack = jest.fn()
 
@@ -655,7 +655,7 @@ describe('AwsLambdaFunction', () => {
       nextAwsLambdaFunction,
       prevAwsLambdaFunction
     )
-    nextAwsLambdaFunction = resolveComponentVariables(nextAwsLambdaFunction)
+    nextAwsLambdaFunction = resolveComponentEvaluables(nextAwsLambdaFunction)
 
     const result = await nextAwsLambdaFunction.shouldDeploy(prevAwsLambdaFunction, context)
 
@@ -690,7 +690,7 @@ describe('AwsLambdaFunction', () => {
 
     awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
 
-    awsLambdaFunction = resolveComponentVariables(awsLambdaFunction)
+    awsLambdaFunction = resolveComponentEvaluables(awsLambdaFunction)
 
     awsLambdaFunction.pack = jest.fn()
 
@@ -721,7 +721,7 @@ describe('AwsLambdaFunction', () => {
       nextAwsLambdaFunction,
       prevAwsLambdaFunction
     )
-    nextAwsLambdaFunction = resolveComponentVariables(nextAwsLambdaFunction)
+    nextAwsLambdaFunction = resolveComponentEvaluables(nextAwsLambdaFunction)
     nextAwsLambdaFunction.hash = 'newHash'
 
     const result = await nextAwsLambdaFunction.shouldDeploy(prevAwsLambdaFunction, context)
@@ -757,7 +757,7 @@ describe('AwsLambdaFunction', () => {
 
     awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
 
-    awsLambdaFunction = resolveComponentVariables(awsLambdaFunction)
+    awsLambdaFunction = resolveComponentEvaluables(awsLambdaFunction)
 
     const children = await awsLambdaFunction.define(context)
 
@@ -788,7 +788,7 @@ describe('AwsLambdaFunction', () => {
 
     awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
 
-    awsLambdaFunction = resolveComponentVariables(awsLambdaFunction)
+    awsLambdaFunction = resolveComponentEvaluables(awsLambdaFunction)
 
     const children = await awsLambdaFunction.define(context)
 

@@ -1,5 +1,5 @@
 import path from 'path'
-import { createContext, resolveComponentVariables } from '../../../src/utils'
+import { createContext, resolveComponentEvaluables } from '../../../src/utils'
 import AWS from 'aws-sdk'
 
 const createTestContext = async () =>
@@ -41,7 +41,7 @@ describe('AwsEventsRule', () => {
 
     let awsEventsRule = await context.construct(AwsEventsRule, inputs)
     awsEventsRule = await context.defineComponent(awsEventsRule)
-    awsEventsRule = resolveComponentVariables(awsEventsRule)
+    awsEventsRule = resolveComponentEvaluables(awsEventsRule)
 
     await awsEventsRule.deploy(null, context)
 
@@ -88,7 +88,7 @@ describe('AwsEventsRule', () => {
 
     let awsEventsRule = await context.construct(AwsEventsRule, inputs)
     awsEventsRule = await context.defineComponent(awsEventsRule)
-    awsEventsRule = resolveComponentVariables(awsEventsRule)
+    awsEventsRule = resolveComponentEvaluables(awsEventsRule)
     await awsEventsRule.remove(context)
 
     const removeTargetsParams = {

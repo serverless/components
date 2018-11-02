@@ -43,7 +43,13 @@ describe('Integration Test - Library Usage', () => {
 
     describe('when running through a typical component usage lifecycle', () => {
       it('should deploy the "AwsS3Bucket" component', async () => {
-        const context = await deploy({ cwd: testServiceDir })
+        const context = await deploy({
+          cwd: testServiceDir,
+          overrides: {
+            debug: () => {},
+            log: () => {}
+          }
+        })
         expect(AWS.mocks.createBucketMock).toBeCalledWith({ Bucket: 'mySuperBucket' })
         const service = context.instance
         expect(service).not.toBeFalsy()
@@ -59,9 +65,22 @@ describe('Integration Test - Library Usage', () => {
           instanceId: expect.any(String)
         })
       })
+
       it('should remove the "AwsS3Bucket" components', async () => {
-        let context = await deploy({ cwd: testServiceDir })
-        context = await remove({ cwd: testServiceDir })
+        let context = await deploy({
+          cwd: testServiceDir,
+          overrides: {
+            debug: () => {},
+            log: () => {}
+          }
+        })
+        context = await remove({
+          cwd: testServiceDir,
+          overrides: {
+            debug: () => {},
+            log: () => {}
+          }
+        })
         expect(AWS.mocks.deleteBucketMock).toBeCalledWith({ Bucket: 'mySuperBucket' })
         expect(AWS.mocks.listObjectsV2Mock).toBeCalledWith({ Bucket: 'mySuperBucket' })
         expect(AWS.mocks.deleteObjectsMock).toBeCalledWith({

@@ -1,4 +1,4 @@
-import { get, pick, resolve, resolvable, or } from '@serverless/utils'
+import { get, or, pick, resolve, resolvable } from '@serverless/utils'
 import { createBucket, deleteBucket } from './utils'
 
 const DEPLOY = 'deploy'

@@ -6,9 +6,9 @@ import {
   isArray,
   reduce,
   resolve,
+  resolvable,
   not,
-  isString,
-  resolvable
+  isString
 } from '@serverless/utils'
 
 // temp solution...
@@ -46,7 +46,7 @@ const Service = async (SuperClass, superContext) => {
     async define() {
       // TODO BRN: Change this once we support multiple layers here. This could cause collisions between functions and components that are named the same thing.
       return {
-        ...or(resolve(this.functions), {}),
+        ...or(this.functions, {}),
         ...or(this.components, {})
       }
     }

@@ -16,8 +16,8 @@ describe('#isComponent()', () => {
     expect(isComponent(component)).toBe(true)
   })
 
-  it('returns true for anything with an instanceId', async () => {
-    expect(isComponent({ instanceId: 'foo' })).toBe(true)
+  it('returns true for anything with a deploy and remove method', async () => {
+    expect(isComponent({ deploy: () => {}, remove: () => {} })).toBe(true)
   })
 
   test('returns false for all other values', () => {

@@ -41,6 +41,6 @@ function installComponents() {
 
 ;(() => {
   return BbPromise.resolve()
-    .then(() => buildComponents(false, concurrency))
     .then(installComponents)
+    .then(() => buildComponents(false, concurrency))
 })()

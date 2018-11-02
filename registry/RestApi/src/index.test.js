@@ -1,4 +1,4 @@
-import { createContext, resolveComponentVariables } from '../../../src/utils'
+import { createContext, resolveComponentEvaluables } from '../../../src/utils'
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -26,7 +26,7 @@ describe('RestApi', () => {
     )
     const RestApi = await context.loadType('RestApi')
     let restApi = await context.construct(RestApi, inputs)
-    restApi = resolveComponentVariables(restApi)
+    restApi = resolveComponentEvaluables(restApi)
 
     const children = await restApi.define(context)
 
