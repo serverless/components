@@ -10,7 +10,6 @@ import {
   reduce,
   slice,
   values,
-  resolve,
   resolvable,
   or
 } from '@serverless/utils'
@@ -80,10 +79,7 @@ const AwsSnsSubscription = (SuperClass) =>
       if (!prevInstance) {
         return DEPLOY
       }
-      if (
-        prevInstance.protocol !== resolve(this.protocol) &&
-        prevInstance.topic !== resolve(this.topic)
-      ) {
+      if (prevInstance.protocol !== this.protocol && prevInstance.topic !== this.topic) {
         return REPLACE
       }
     }

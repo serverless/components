@@ -45,11 +45,9 @@ const buildGraph = (nextInstance, prevInstance) => {
         let node = accum.node(currentInstance.instanceId)
         if (node) {
           node.nextInstance = currentInstance
-          node.operation = currentInstance.shouldDeploy(node.prevInstance)
         } else {
           node = {
             instanceId: currentInstance.instanceId,
-            operation: currentInstance.shouldDeploy(null),
             nextInstance: currentInstance,
             prevInstance: null
           }

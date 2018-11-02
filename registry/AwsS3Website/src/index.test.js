@@ -1,11 +1,7 @@
 import AWS from 'aws-sdk'
 import path from 'path'
-import {
-  createContext,
-  deserialize,
-  resolveComponentEvaluables,
-  serialize
-} from '../../../src/utils'
+import { deserialize, resolveComponentEvaluables, serialize } from '../../../src/utils'
+import { createTestContext } from '../../../test'
 
 jest.mock('folder-hash', () => ({
   hashElement: jest.fn().mockReturnValue({ hash: 'abc' })
@@ -17,26 +13,6 @@ jest.mock('fs', () => ({
   readFileSync: jest.fn()
 }))
 
-let context
-let provider
-let AwsS3Website
-
-const createTestContext = async () =>
-  createContext(
-    {
-      cwd: path.join(__dirname, '..'),
-      overrides: {
-        debug: () => {},
-        log: () => {}
-      }
-    },
-    {
-      app: {
-        id: 'test'
-      }
-    }
-  )
-
 beforeEach(() => {
   jest.clearAllMocks()
 })
@@ -46,8 +22,13 @@ afterAll(() => {
 })
 
 describe('AwsS3Website', () => {
+  const cwd = path.resolve(__dirname, '..')
+  let context
+  let provider
+  let AwsS3Website
+
   beforeEach(async () => {
-    context = await createTestContext()
+    context = await createTestContext({ cwd })
     AwsS3Website = await context.loadType('./')
 
     const AwsProvider = await context.loadType('AwsProvider')
@@ -102,6 +83,7 @@ describe('AwsS3Website', () => {
     })
     oldAwsS3Website = await context.defineComponent(oldAwsS3Website)
     oldAwsS3Website = resolveComponentEvaluables(oldAwsS3Website)
+    await oldAwsS3Website.shouldDeploy(null, context)
     await oldAwsS3Website.deploy(null, context)
 
     const prevAwsS3Website = await deserialize(serialize(oldAwsS3Website, context), context)
@@ -116,7 +98,7 @@ describe('AwsS3Website', () => {
     newAwsS3Website = await context.defineComponent(newAwsS3Website)
     newAwsS3Website = resolveComponentEvaluables(newAwsS3Website)
 
-    const res = newAwsS3Website.shouldDeploy(prevAwsS3Website)
+    const res = await newAwsS3Website.shouldDeploy(prevAwsS3Website)
     expect(res).toBe(undefined)
   })
 
@@ -158,7 +140,7 @@ describe('AwsS3Website', () => {
     newAwsS3Website = await context.defineComponent(newAwsS3Website)
     newAwsS3Website = resolveComponentEvaluables(newAwsS3Website)
 
-    const res = newAwsS3Website.shouldDeploy(prevAwsS3Website)
+    const res = await newAwsS3Website.shouldDeploy(prevAwsS3Website)
     expect(res).toBe('deploy')
   })
 
@@ -186,7 +168,7 @@ describe('AwsS3Website', () => {
     newAwsS3Website = await context.defineComponent(newAwsS3Website)
     newAwsS3Website = resolveComponentEvaluables(newAwsS3Website)
 
-    const res = newAwsS3Website.shouldDeploy(prevAwsS3Website)
+    const res = await newAwsS3Website.shouldDeploy(prevAwsS3Website)
     expect(res).toBe('replace')
   })
 })

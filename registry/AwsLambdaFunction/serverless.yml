@@ -12,6 +12,19 @@ license: Apache-2.0
 author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
 repository: "github:serverless/components"
 
+
+provider: ${inputs.provider}
+role: ${inputs.role}
+functionName: ${inputs.functionName}
+functionDescription: ${inputs.functionDescription}
+handler: ${inputs.handler}
+code: ${inputs.code}
+runtime: ${inputs.runtime}
+memorySize: ${inputs.memorySize}
+timeout: ${inputs.timeout}
+environment: ${inputs.environment}
+tags: ${inputs.tags}
+
 inputTypes:
   provider:
     type: AwsProvider

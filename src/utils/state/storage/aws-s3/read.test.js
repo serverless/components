@@ -1,6 +1,6 @@
 import AWS from 'aws-sdk'
 import readStateFile from './read'
-import createTestContext from '../../../../../test/createTestContext'
+import { createTestContext } from '../../../../../test'
 
 jest.mock('aws-sdk', () => {
   const mocks = {
@@ -100,9 +100,13 @@ describe('#readStateFile()', () => {
       }
     }
   }
+  let context
+
+  beforeEach(async () => {
+    context = await createTestContext()
+  })
 
   it('should read the projects state file if present', async () => {
-    const context = await createTestContext()
     const res = await readStateFile({ state: { bucket: 'my-bucket', file: 'state.json' } }, context)
     expect(AWS.mocks.headObjectMock).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.putObjectMock).toHaveBeenCalledTimes(1)
@@ -111,7 +115,6 @@ describe('#readStateFile()', () => {
   })
 
   it('should return an empty object if the project does not contain a state file', async () => {
-    const context = await createTestContext()
     const res = await readStateFile(
       { state: { bucket: 'my-bucket', file: 'no-state.json' } },
       context
@@ -123,7 +126,6 @@ describe('#readStateFile()', () => {
   })
 
   it('should throw error if lock file exists', async () => {
-    const context = await createTestContext()
     let res
     try {
       res = await readStateFile(
@@ -141,7 +143,6 @@ describe('#readStateFile()', () => {
   })
 
   it('should throw error on invalid lock call', async () => {
-    const context = await createTestContext()
     let res
     try {
       res = await readStateFile({ state: { bucket: 'my-bucket', file: 'invalid-lock' } }, context)
@@ -156,7 +157,6 @@ describe('#readStateFile()', () => {
   })
 
   it('should throw error on invalid state call', async () => {
-    const context = await createTestContext()
     let res
     try {
       res = await readStateFile({ state: { bucket: 'my-bucket', file: 'invalid-state' } }, context)

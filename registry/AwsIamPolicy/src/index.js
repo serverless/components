@@ -1,15 +1,4 @@
-import {
-  all,
-  resolve,
-  sleep,
-  map,
-  or,
-  resolvable,
-  pick,
-  keys,
-  not,
-  equals
-} from '@serverless/utils'
+import { all, sleep, map, or, resolvable, pick, keys, not, equals } from '@serverless/utils'
 
 const createPolicy = async (IAM, { policyName, document }, context) => {
   const policyRes = await IAM.createPolicy({
@@ -54,8 +43,8 @@ const AwsIamPolicy = (SuperClass) =>
 
     shouldDeploy(prevInstance) {
       const inputs = {
-        policyName: resolve(this.policyName),
-        document: resolve(this.document)
+        policyName: this.policyName,
+        document: this.document
       }
       const prevInputs = prevInstance ? pick(keys(inputs), prevInstance) : {}
       const configChanged = not(equals(inputs, prevInputs))

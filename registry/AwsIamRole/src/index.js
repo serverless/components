@@ -96,9 +96,9 @@ const AwsIamRole = async (SuperClass, superContext) => {
 
     shouldDeploy(prevInstance) {
       const inputs = {
-        roleName: resolve(this.roleName),
-        service: resolve(this.service),
-        policy: resolve(this.policy)
+        roleName: this.roleName,
+        service: this.service,
+        policy: this.policy
       }
       const prevInputs = prevInstance ? pick(keys(inputs), prevInstance) : {}
       const configChanged = not(equals(inputs, prevInputs))

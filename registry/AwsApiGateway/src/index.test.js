@@ -1,30 +1,10 @@
-import { createContext, resolveComponentEvaluables } from '../../../src/utils'
+import AWS from 'aws-sdk'
+import path from 'path'
+import { resolveComponentEvaluables } from '../../../src/utils'
+import { createTestContext } from '../../../test'
 
 // todo mock timers
 jest.setTimeout(16000)
-
-const mocks = {
-  importRestApi: jest.fn().mockReturnValue({ id: 'my-new-id' }),
-  createDeployment: jest.fn(),
-  putRestApi: jest.fn(),
-  deleteRestApi: jest.fn()
-}
-
-const provider = {
-  getSdk: () => {
-    return {
-      APIGateway: function() {
-        return {
-          importRestApi: (obj) => ({ promise: () => mocks.importRestApi(obj) }),
-          createDeployment: (obj) => ({ promise: () => mocks.createDeployment(obj) }),
-          putRestApi: (obj) => ({ promise: () => mocks.putRestApi(obj) }),
-          deleteRestApi: (obj) => ({ promise: () => mocks.deleteRestApi(obj) })
-        }
-      }
-    }
-  },
-  region: 'us-east-1'
-}
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -35,22 +15,25 @@ afterAll(() => {
 })
 
 describe('AwsApiGateway', () => {
+  const cwd = path.resolve(__dirname, '..')
+  let context
+  let AwsProvider
+  let AwsApiGateway
+
+  beforeEach(async () => {
+    context = await createTestContext({ cwd })
+    AwsProvider = await context.loadType('AwsProvider')
+    AwsApiGateway = await context.loadType('AwsApiGateway')
+  })
+
   it('should create ApiGateway if first deployment', async () => {
     const inputs = {
-      provider,
+      provider: await context.construct(AwsProvider, {}),
       name: 'something',
       role: { arn: 'someArn' },
       routes: {}
     }
-    const context = await createContext(
-      {},
-      {
-        app: {
-          id: 'test'
-        }
-      }
-    )
-    const AwsApiGateway = await context.loadType('AwsApiGateway')
+
     let awsApiGateway = await context.construct(AwsApiGateway, inputs)
     awsApiGateway = resolveComponentEvaluables(awsApiGateway)
 
@@ -61,27 +44,19 @@ describe('AwsApiGateway', () => {
       stageName: 'dev'
     }
 
-    expect(mocks.importRestApi).toHaveBeenCalledTimes(1)
-    expect(mocks.createDeployment).toBeCalledWith(createDeploymentParams)
+    expect(AWS.mocks.importRestApi).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.createDeployment).toBeCalledWith(createDeploymentParams)
     expect(awsApiGateway.id).toEqual('my-new-id')
   })
 
   it('should update service if changed', async () => {
     const inputs = {
-      provider,
+      provider: await context.construct(AwsProvider, {}),
       name: 'somethingNew',
       role: { arn: 'someArn' },
       routes: {}
     }
-    const context = await createContext(
-      {},
-      {
-        app: {
-          id: 'test'
-        }
-      }
-    )
-    const AwsApiGateway = await context.loadType('AwsApiGateway')
+
     let awsApiGateway = await context.construct(AwsApiGateway, inputs)
     awsApiGateway = resolveComponentEvaluables(awsApiGateway)
 
@@ -93,35 +68,29 @@ describe('AwsApiGateway', () => {
 
     await awsApiGateway.deploy(prevInstance, context)
 
-    expect(mocks.putRestApi).toHaveBeenCalledTimes(1)
-    expect(mocks.createDeployment).toBeCalledWith({ restApiId: prevInstance.id, stageName: 'dev' })
+    expect(AWS.mocks.putRestApi).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.createDeployment).toBeCalledWith({
+      restApiId: prevInstance.id,
+      stageName: 'dev'
+    })
   })
 
   it('should remove deployment', async () => {
     const inputs = {
-      provider,
+      provider: await context.construct(AwsProvider, {}),
       name: 'somethingNew',
       role: { arn: 'someArn' },
       routes: {}
     }
     const prevInstance = {
-      provider,
+      provider: await context.construct(AwsProvider, {}),
       id: 'something'
     }
-    const context = await createContext(
-      {},
-      {
-        app: {
-          id: 'test'
-        }
-      }
-    )
-    const AwsApiGateway = await context.loadType('AwsApiGateway')
     const awsApiGateway = await context.construct(AwsApiGateway, inputs)
     Object.assign(awsApiGateway, prevInstance)
 
     await awsApiGateway.remove(context)
 
-    expect(mocks.deleteRestApi).toBeCalledWith({ restApiId: prevInstance.id })
+    expect(AWS.mocks.deleteRestApi).toBeCalledWith({ restApiId: prevInstance.id })
   })
 })
