@@ -152,6 +152,7 @@ This method is used to perform comparisons against the previous instance from st
 </p>
 
 <br />
+
 **Example**
 <p>The <code>shouldDeploy()</code> method for <code>AwsS3Bucket</code></p>
 
@@ -249,6 +250,7 @@ This method is used to return data for pretty printing to the CLI. Users use the
 
 **Returns**
 <p>An object in the following shape</p>
+
 ```js
 {
   title: string,
@@ -259,6 +261,7 @@ This method is used to return data for pretty printing to the CLI. Users use the
 ```
 
 <br />
+
 **Example:**
 <p>The <code>info()</code> method from <code>AwsS3Bucket</code></p>
 
