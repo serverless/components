@@ -49,11 +49,11 @@ describe('RestApi', () => {
     })
     const gateway = resolveComponentEvaluables(children.shift())
     expect(gateway).toMatchObject({
-      name: inputs.apiName,
+      apiName: inputs.apiName,
       inputs: expect.any(Object)
     })
     expect(gateway.inputs).toMatchObject({
-      name: inputs.apiName,
+      apiName: inputs.apiName,
       routes: expect.any(Object)
     })
   })
