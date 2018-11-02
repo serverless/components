@@ -1,4 +1,4 @@
-import { append, resolve } from '@serverless/utils'
+import { append, isNil, resolve } from '@serverless/utils'
 import isComponent from './isComponent'
 import walkReduceComponentReferences from './walkReduceComponentReferences'
 
@@ -10,7 +10,15 @@ const getComponentReferenceIds = (value) => {
     )
   }
   return walkReduceComponentReferences(
-    (accum, componentReference) => append(componentReference.instanceId, accum),
+    (accum, componentReference) => {
+      const { instanceId } = componentReference
+      if (isNil(instanceId)) {
+        throw new Error(
+          `Found a Component reference without an instanceId while getting reference ids. This should not happen. The reference was ${componentReference} and belongs to component ${component}`
+        )
+      }
+      return append(instanceId, accum)
+    },
     [],
     component
   )

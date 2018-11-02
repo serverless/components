@@ -791,7 +791,7 @@ describe('AwsLambdaFunction', () => {
     awsLambdaFunction = resolveComponentEvaluables(awsLambdaFunction)
 
     const children = await awsLambdaFunction.define(context)
-
-    expect(children.role.roleName).toBe(`${awsLambdaFunction.functionName}-execution-role`)
+    const role = resolveComponentEvaluables(children.role)
+    expect(role.roleName).toBe(`${awsLambdaFunction.functionName}-execution-role`)
   })
 })
