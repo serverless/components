@@ -212,7 +212,9 @@ const AwsS3Website = (SuperClass) =>
       // Ensure bucket is lowercase
       this.bucket = this.bucket.toLowerCase()
 
-      await createWebsiteBucket(s3, this.bucket)
+      if (!prevInstance || this.bucket !== prevInstance.bucket) {
+        await createWebsiteBucket(s3, this.bucket)
+      }
       // this.assets = assets
       await uploadDir(s3, this.bucket, this.assets)
 

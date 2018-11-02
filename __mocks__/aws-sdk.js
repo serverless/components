@@ -2,12 +2,19 @@ const mocks = {
   // S3
   createBucketMock: jest.fn().mockReturnValue('bucket-abc'),
   deleteBucketMock: jest.fn(),
+  listObjectsMock: jest.fn().mockImplementation((params) => {
+    if (params.Bucket === 'some-already-removed-bucket') {
+      return Promise.reject(new Error('The specified bucket does not exist'))
+    }
+    return Promise.resolve({ Contents: [{ Key: 'abc' }] })
+  }),
   listObjectsV2Mock: jest.fn().mockImplementation((params) => {
     if (params.Bucket === 'some-already-removed-bucket') {
       return Promise.reject(new Error('The specified bucket does not exist'))
     }
     return Promise.resolve({ Contents: [{ Key: 'abc' }] })
   }),
+  deleteObjectMock: jest.fn(),
   deleteObjectsMock: jest.fn(),
   putBucketWebsiteMock: jest.fn(),
   putBucketPolicyMock: jest.fn(),
@@ -153,11 +160,17 @@ const S3 = function() {
     listObjectsV2: (obj) => ({
       promise: () => mocks.listObjectsV2Mock(obj)
     }),
+    listObjects: (obj) => ({
+      promise: () => mocks.listObjectsMock(obj)
+    }),
     deleteBucket: (obj) => ({
       promise: () => mocks.deleteBucketMock(obj)
     }),
     deleteObjects: (obj) => ({
       promise: () => mocks.deleteObjectsMock(obj)
+    }),
+    deleteObject: (obj) => ({
+      promise: () => mocks.deleteObjectMock(obj)
     }),
     upload: (obj) => ({
       promise: () => mocks.uploadMock(obj)

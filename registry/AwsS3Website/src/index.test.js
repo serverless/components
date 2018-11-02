@@ -1,3 +1,4 @@
+import AWS from 'aws-sdk'
 import path from 'path'
 import {
   createContext,
@@ -52,6 +53,45 @@ describe('AwsS3Website', () => {
     const AwsProvider = await context.loadType('AwsProvider')
     provider = await context.construct(AwsProvider, {})
   })
+
+  it('should create bucket if first deployment', async () => {
+    let oldAwsS3Website = await context.construct(AwsS3Website, {
+      provider,
+      bucket: 'abc',
+      projectDir: path.resolve('./registry'),
+      assets: path.resolve('./registry'),
+      envFileLocation: path.resolve('./src/index.js')
+    })
+    oldAwsS3Website = await context.defineComponent(oldAwsS3Website)
+    oldAwsS3Website = resolveComponentEvaluables(oldAwsS3Website)
+    await oldAwsS3Website.deploy(null, context)
+
+    expect(AWS.mocks.createBucketMock).toBeCalledWith({ Bucket: 'abc' })
+    expect(AWS.mocks.putBucketPolicyMock).toHaveBeenCalled()
+    expect(AWS.mocks.putBucketCorsMock).toHaveBeenCalled()
+    expect(AWS.mocks.putBucketWebsiteMock).toHaveBeenCalled()
+  })
+
+  it('should remove bucket', async () => {
+    let oldAwsS3Website = await context.construct(AwsS3Website, {
+      provider,
+      bucket: 'abc',
+      projectDir: path.resolve('./registry'),
+      assets: path.resolve('./registry'),
+      envFileLocation: path.resolve('./src/index.js')
+    })
+    oldAwsS3Website = await context.defineComponent(oldAwsS3Website)
+    oldAwsS3Website = resolveComponentEvaluables(oldAwsS3Website)
+    await oldAwsS3Website.deploy(null, context)
+
+    const prevAwsS3Website = await deserialize(serialize(oldAwsS3Website, context), context)
+    await prevAwsS3Website.remove(context)
+
+    expect(AWS.mocks.deleteBucketMock).toBeCalledWith({ Bucket: 'abc' })
+    expect(AWS.mocks.listObjectsMock).toBeCalledWith({ Bucket: 'abc' })
+    expect(AWS.mocks.deleteObjectMock).toHaveBeenCalled()
+  })
+
   it('shouldDeploy should return undefined if no changes', async () => {
     let oldAwsS3Website = await context.construct(AwsS3Website, {
       provider,
