@@ -1,5 +1,17 @@
 import { getSwaggerDefinition, generateUrl, generateUrls } from './utils'
-import { append, equals, get, has, or, resolve, reduce, resolvable } from '@serverless/utils'
+import {
+  append,
+  equals,
+  get,
+  has,
+  or,
+  resolve,
+  reduce,
+  resolvable,
+  pick,
+  keys,
+  not
+} from '@serverless/utils'
 
 const deleteApi = async (APIGateway, params) => {
   const { id } = params
@@ -79,6 +91,29 @@ const AwsApiGateway = function(SuperClass) {
       this.name = resolvable(() => or(inputs.name, `apig-${this.instanceId}`))
       this.role = inputs.role
       this.routes = inputs.routes
+    }
+
+    shouldDeploy(prevInstance) {
+      if (!prevInstance) {
+        return 'deploy'
+      }
+      const inputs = {
+        name: resolvable(() => or(this.name, `apig-${this.instanceId}`)),
+        role: resolve(this.role),
+        routes: resolve(inputs.routes)
+      }
+      const prevInputs = prevInstance ? pick(keys(inputs), prevInstance) : {}
+      const configChanged = not(equals(inputs, prevInputs))
+      if (
+        not(equals(prevInstance.name, inputs.name)) ||
+        not(equals(prevInstance.role, inputs.role))
+      ) {
+        return 'replace'
+      } else if (configChanged) {
+        return 'deploy'
+      }
+
+      return undefined
     }
 
     async define() {
