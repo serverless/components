@@ -35,6 +35,11 @@ const convertRuntime = (runtime) => {
   if (runtime === 'nodejs') {
     return 'nodejs8.10'
   }
+
+  if (runtime === 'java') {
+    return 'java8'
+  }
+
   // TODO: other runtimes
   throw new Error(`unknown runtime value in compute ${runtime}`)
 }

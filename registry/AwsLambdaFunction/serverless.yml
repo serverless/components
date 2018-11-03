@@ -41,7 +41,7 @@ inputTypes:
     type: string || array || buffer
     required: true
     displayName: Path source code
-    description: Path to the folder that contains the source code for the function
+    description: Path to the folder or the archive file that contains the source code for the function
     example: ${this.path}/code
   runtime:
     type: string
