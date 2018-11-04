@@ -79,10 +79,10 @@ const AwsSnsSubscription = (SuperClass) =>
         return 'deploy'
       }
       const inputs = {
-        topic: resolve(this.topic),
-        protocol: resolve(this.protocol),
-        endpoint: resolve(this.endpoint),
-        subscriptionAttributes: resolve(this.subscriptionAttributes)
+        topic: this.topic,
+        protocol: this.protocol,
+        endpoint: this.endpoint,
+        subscriptionAttributes: this.subscriptionAttributes
       }
       const prevInputs = prevInstance ? pick(keys(inputs), prevInstance) : {}
       const configChanged = not(equals(inputs, prevInputs))

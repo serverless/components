@@ -91,7 +91,7 @@ const TwilioPhoneNumber = {
     const inputs = pick(inputsProps, this)
     const prevInputs = prevInstance ? pick(inputsProps, prevInstance) : {}
     const configChanged = not(equals(inputs, prevInputs))
-    if (not(equals(prevInstance.phoneNumber, inputs.phoneNumber))) {
+    if (not(equals(prevInputs.phoneNumber, inputs.phoneNumber))) {
       return 'replace'
     } else if (configChanged) {
       return 'deploy'

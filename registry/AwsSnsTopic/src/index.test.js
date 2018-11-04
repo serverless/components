@@ -113,14 +113,14 @@ describe('AwsSnsTopic', () => {
       deliveryStatusAttributes: [],
       provider
     }
-    let oldComponent = await context.construct(ComponentType, inputs)
+    let oldComponent = await context.construct(AwsSnsTopic, inputs)
     oldComponent = await context.defineComponent(oldComponent)
     oldComponent = resolveComponentEvaluables(oldComponent)
     await oldComponent.deploy(null, context)
 
     const prevComponent = await deserialize(serialize(oldComponent, context), context)
 
-    let newComponent = await context.construct(ComponentType, inputs)
+    let newComponent = await context.construct(AwsSnsTopic, inputs)
     newComponent = await context.defineComponent(newComponent)
     newComponent = resolveComponentEvaluables(newComponent)
 
@@ -137,14 +137,14 @@ describe('AwsSnsTopic', () => {
       deliveryStatusAttributes: [],
       provider
     }
-    let oldComponent = await context.construct(ComponentType, inputs)
+    let oldComponent = await context.construct(AwsSnsTopic, inputs)
     oldComponent = await context.defineComponent(oldComponent)
     oldComponent = resolveComponentEvaluables(oldComponent)
     await oldComponent.deploy(null, context)
 
     const prevComponent = await deserialize(serialize(oldComponent, context), context)
 
-    let newComponent = await context.construct(ComponentType, {
+    let newComponent = await context.construct(AwsSnsTopic, {
       ...inputs,
       topicName: 'myOtherTopic'
     })
@@ -164,7 +164,7 @@ describe('AwsSnsTopic', () => {
       deliveryStatusAttributes: [],
       provider
     }
-    let oldComponent = await context.construct(ComponentType, inputs)
+    let oldComponent = await context.construct(AwsSnsTopic, inputs)
     oldComponent = await context.defineComponent(oldComponent)
     oldComponent = resolveComponentEvaluables(oldComponent)
     const res = oldComponent.shouldDeploy(null, context)

@@ -67,6 +67,26 @@ describe('AwsS3Bucket', () => {
     expect(AWS.mocks.createBucketMock).toBeCalledWith({ Bucket: 'bucket-123' })
   })
 
+  it('should remove bucket', async () => {
+    let awsS3Bucket = await context.construct(AwsS3Bucket, {
+      provider,
+      bucketName: 'bucket-abc'
+    })
+    awsS3Bucket = await context.defineComponent(awsS3Bucket)
+    awsS3Bucket = resolveComponentEvaluables(awsS3Bucket)
+    await awsS3Bucket.deploy(null, context)
+
+    const prevAwsS3Bucket = await deserialize(serialize(awsS3Bucket, context), context)
+    await prevAwsS3Bucket.remove(context)
+
+    expect(AWS.mocks.deleteBucketMock).toBeCalledWith({ Bucket: 'bucket-abc' })
+    expect(AWS.mocks.listObjectsV2Mock).toBeCalledWith({ Bucket: 'bucket-abc' })
+    expect(AWS.mocks.deleteObjectsMock).toBeCalledWith({
+      Bucket: 'bucket-abc',
+      Delete: { Objects: [{ Key: 'abc' }] }
+    })
+  })
+
   it('shouldDeploy should return undefined when no changes have occurred', async () => {
     let awsS3Bucket = await context.construct(AwsS3Bucket, {
       provider,
@@ -115,25 +135,5 @@ describe('AwsS3Bucket', () => {
     const result = nextAwsS3Bucket.shouldDeploy(prevAwsS3Bucket, context)
 
     expect(result).toBe('replace')
-  })
-
-  it('should remove bucket', async () => {
-    let awsS3Bucket = await context.construct(AwsS3Bucket, {
-      provider,
-      bucketName: 'bucket-abc'
-    })
-    awsS3Bucket = await context.defineComponent(awsS3Bucket)
-    awsS3Bucket = resolveComponentEvaluables(awsS3Bucket)
-    await awsS3Bucket.deploy(null, context)
-
-    const prevAwsS3Bucket = await deserialize(serialize(awsS3Bucket, context), context)
-    await prevAwsS3Bucket.remove(context)
-
-    expect(AWS.mocks.deleteBucketMock).toBeCalledWith({ Bucket: 'bucket-abc' })
-    expect(AWS.mocks.listObjectsV2Mock).toBeCalledWith({ Bucket: 'bucket-abc' })
-    expect(AWS.mocks.deleteObjectsMock).toBeCalledWith({
-      Bucket: 'bucket-abc',
-      Delete: { Objects: [{ Key: 'abc' }] }
-    })
   })
 })
