@@ -53,6 +53,9 @@ This method can be used to programmatically define your component's children. Us
 To define a component, simply construct any number of components and return them in either an object or an array.
 
 NOTE: This method is optional to define. If you don't define this method, it will default to defining all components declared in `serverless.yml` as your component's children. If you DO define this method, you will also need to return any components declared in the components property in order for core to know about them.
+
+This method optionally can be `async`.
+
 <br />
 <br />
 
@@ -101,6 +104,8 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
 
 This method is used to setup any values in your instance using a previous instance. Used for preserving values across multiple calls to deploy when values don't change. Can also be used to rebuild complex data types that don't get persisted in state.  
 
+This method is *sync only*
+
 **Params**<br />
 <p><code>prevInstance</code>: <code>Component</code> - The previous component instance, or <code>null</code> if there is no previous instance of this component.</p>
 <p><code>context</code>: <code>Context</code> - The application's context.</p>
@@ -131,6 +136,9 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
 ## shouldDeploy(prevInstance, context)
 
 This method is used to perform comparisons against the previous instance from state and indicate to the core whether your component should be deployed at all.
+
+This method optionally can be `async`.
+
 <br />
 <br />
 
@@ -244,6 +252,7 @@ const AwsS3Bucket = (SuperClass) =>
 
 This method is used to return data for pretty printing to the CLI. Users use the info command to get info about what was deployed on specific deployments.
 
+This method optionally can be `async`.
 
 **Params**
 <p>None</p><br />
@@ -270,7 +279,7 @@ const AwsS3Bucket = (SuperClass) =>
   class extends SuperClass {
     ...
 
-    async info() {
+    info() {
       return {
         title: this.name,
         type: this.extends,

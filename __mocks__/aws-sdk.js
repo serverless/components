@@ -2,13 +2,24 @@ const mocks = {
   // S3
   createBucketMock: jest.fn().mockReturnValue('bucket-abc'),
   deleteBucketMock: jest.fn(),
+  listObjectsMock: jest.fn().mockImplementation((params) => {
+    if (params.Bucket === 'some-already-removed-bucket') {
+      return Promise.reject(new Error('The specified bucket does not exist'))
+    }
+    return Promise.resolve({ Contents: [{ Key: 'abc' }] })
+  }),
   listObjectsV2Mock: jest.fn().mockImplementation((params) => {
     if (params.Bucket === 'some-already-removed-bucket') {
       return Promise.reject(new Error('The specified bucket does not exist'))
     }
     return Promise.resolve({ Contents: [{ Key: 'abc' }] })
   }),
+  deleteObjectMock: jest.fn(),
   deleteObjectsMock: jest.fn(),
+  putBucketWebsiteMock: jest.fn(),
+  putBucketPolicyMock: jest.fn(),
+  putBucketCorsMock: jest.fn(),
+  uploadMock: jest.fn(),
   putRule: jest.fn().mockReturnValue({ RuleArn: 'abc:zxc' }),
   putTargets: jest.fn(),
   removeTargets: jest.fn(),
@@ -30,7 +41,20 @@ const mocks = {
   attachRolePolicyMock: jest.fn(),
   detachRolePolicyMock: jest.fn(),
   updateAssumeRolePolicyMock: jest.fn(),
+  createPolicyMock: jest.fn().mockReturnValue({ Policy: { Arn: 'abc:xyz' } }),
+  deletePolicyMock: jest.fn(),
+  listEntitiesForPolicyMock: jest.fn().mockReturnValue({
+    PolicyGroups: ['group'],
+    PolicyRoles: ['role'],
+    PolicyUsers: ['user']
+  }),
+  detachGroupPolicyMock: jest.fn(),
+  detachUserPolicyMock: jest.fn(),
+
   // SNS
+  createTopicMock: jest.fn().mockReturnValue({ TopicArn: 'abc:zxc' }),
+  deleteTopicMock: jest.fn(),
+  setTopicAttributesMock: jest.fn(),
   subscribeMock: jest.fn().mockReturnValue({
     SubscriptionArn: 'arn:aws:sns:region:XXXXX:test-subscription:r4nd0m'
   }),
@@ -93,6 +117,21 @@ const IAM = function() {
     }),
     updateAssumeRolePolicy: (obj) => ({
       promise: () => mocks.updateAssumeRolePolicyMock(obj)
+    }),
+    createPolicy: (obj) => ({
+      promise: () => mocks.createPolicyMock(obj)
+    }),
+    deletePolicy: (obj) => ({
+      promise: () => mocks.deletePolicyMock(obj)
+    }),
+    listEntitiesForPolicy: (obj) => ({
+      promise: () => mocks.listEntitiesForPolicyMock(obj)
+    }),
+    detachGroupPolicy: (obj) => ({
+      promise: () => mocks.detachGroupPolicyMock(obj)
+    }),
+    detachUserPolicy: (obj) => ({
+      promise: () => mocks.detachUserPolicyMock(obj)
     })
   }
 }
@@ -125,17 +164,44 @@ const S3 = function() {
     listObjectsV2: (obj) => ({
       promise: () => mocks.listObjectsV2Mock(obj)
     }),
+    listObjects: (obj) => ({
+      promise: () => mocks.listObjectsMock(obj)
+    }),
     deleteBucket: (obj) => ({
       promise: () => mocks.deleteBucketMock(obj)
     }),
     deleteObjects: (obj) => ({
       promise: () => mocks.deleteObjectsMock(obj)
+    }),
+    deleteObject: (obj) => ({
+      promise: () => mocks.deleteObjectMock(obj)
+    }),
+    upload: (obj) => ({
+      promise: () => mocks.uploadMock(obj)
+    }),
+    putBucketPolicy: (obj) => ({
+      promise: () => mocks.putBucketPolicyMock(obj)
+    }),
+    putBucketCors: (obj) => ({
+      promise: () => mocks.putBucketCorsMock(obj)
+    }),
+    putBucketWebsite: (obj) => ({
+      promise: () => mocks.putBucketWebsiteMock(obj)
     })
   }
 }
 
 const SNS = function() {
   return {
+    createTopic: (obj) => ({
+      promise: () => mocks.createTopicMock(obj)
+    }),
+    deleteTopic: (obj) => ({
+      promise: () => mocks.deleteTopicMock(obj)
+    }),
+    setTopicAttributes: (obj) => ({
+      promise: () => mocks.setTopicAttributesMock(obj)
+    }),
     subscribe: (obj) => ({
       promise: () => mocks.subscribeMock(obj)
     }),

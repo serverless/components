@@ -3,12 +3,8 @@ import path from 'path'
 import { tmpdir } from 'os'
 import { packDir } from '@serverless/utils'
 import { readFileSync } from 'fs'
-import {
-  createContext,
-  deserialize,
-  resolveComponentEvaluables,
-  serialize
-} from '../../../src/utils'
+import { deserialize, resolveComponentEvaluables, serialize } from '../../../src/utils'
+import { createTestContext } from '../../../test'
 
 jest.setTimeout(10000)
 
@@ -34,32 +30,25 @@ afterAll(() => {
   jest.restoreAllMocks()
 })
 
-const createTestContext = async () =>
-  createContext(
-    {
-      cwd: path.join(__dirname, '..'),
-      overrides: {
-        debug: () => {},
-        log: () => {}
-      }
-    },
-    {
-      app: {
-        id: 'test'
-      }
-    }
-  )
-
 describe('AwsLambdaFunction', () => {
+  const cwd = path.resolve(__dirname, '..')
+  let context
+  let AwsProvider
+  let AwsLambdaFunction
+  let provider
+
+  beforeEach(async () => {
+    context = await createTestContext({ cwd })
+    AwsProvider = await context.loadType('AwsProvider')
+    AwsLambdaFunction = await context.loadType('./')
+    provider = await context.construct(AwsProvider, {})
+  })
+
   it('should pack lambda without shim', async () => {
     Date.now = jest.fn(() => '1')
-    const context = await createTestContext()
-
-    const AwsProvider = await context.loadType('AwsProvider')
-    const AwsLambdaFunction = await context.loadType('./')
 
     let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       code: './code',
       functionName: 'hello'
     })
@@ -86,13 +75,8 @@ describe('AwsLambdaFunction', () => {
 
   it('should pack lambda with shim', async () => {
     Date.now = jest.fn(() => '1')
-    const context = await createTestContext()
-
-    const AwsProvider = await context.loadType('AwsProvider')
-    const AwsLambdaFunction = await context.loadType('./')
-
     let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       code: ['./code', './shim/path.js'],
       functionName: 'hello'
     })
@@ -118,13 +102,8 @@ describe('AwsLambdaFunction', () => {
   })
 
   it('should create lambda when non exists', async () => {
-    const context = await createTestContext()
-
-    const AwsProvider = await context.loadType('AwsProvider')
-    const AwsLambdaFunction = await context.loadType('./')
-
     let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       code: './code',
       functionName: 'hello',
       functionDescription: 'hello description',
@@ -172,13 +151,8 @@ describe('AwsLambdaFunction', () => {
   })
 
   it('should update lambda config', async () => {
-    const context = await createTestContext()
-
-    const AwsProvider = await context.loadType('AwsProvider')
-    const AwsLambdaFunction = await context.loadType('./')
-
     let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       code: './code',
       functionName: 'hello',
       functionDescription: 'hello description',
@@ -260,13 +234,8 @@ describe('AwsLambdaFunction', () => {
   })
 
   it('should create lambda if name changed', async () => {
-    const context = await createTestContext()
-
-    const AwsProvider = await context.loadType('AwsProvider')
-    const AwsLambdaFunction = await context.loadType('./')
-
     let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       code: './code',
       functionName: 'hello',
       functionDescription: 'hello description',
@@ -343,13 +312,8 @@ describe('AwsLambdaFunction', () => {
   })
 
   it('should remove lambda', async () => {
-    const context = await createTestContext()
-
-    const AwsProvider = await context.loadType('AwsProvider')
-    const AwsLambdaFunction = await context.loadType('./')
-
     let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       code: './code',
       functionName: 'hello',
       functionDescription: 'hello description',
@@ -387,14 +351,6 @@ describe('AwsLambdaFunction', () => {
   })
 
   it('should return lambda arn when calling getId()', async () => {
-    let context = await createContext({
-      cwd: path.join(__dirname, '..')
-    })
-
-    context = await context.loadProject()
-    context = await context.loadApp()
-
-    const AwsLambdaFunction = await context.loadType('./')
     const awsLambdaFunction = await context.construct(AwsLambdaFunction, {})
 
     awsLambdaFunction.arn = 'some:arn'
@@ -403,13 +359,8 @@ describe('AwsLambdaFunction', () => {
   })
 
   it('shouldDeploy should return replace if name changed', async () => {
-    const context = await createTestContext()
-
-    const AwsProvider = await context.loadType('AwsProvider')
-    const AwsLambdaFunction = await context.loadType('./')
-
     let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       code: './code',
       functionName: 'hello',
       functionDescription: 'hello description',
@@ -467,13 +418,8 @@ describe('AwsLambdaFunction', () => {
   })
 
   it('shouldDeploy should return deploy if config changed', async () => {
-    const context = await createTestContext()
-
-    const AwsProvider = await context.loadType('AwsProvider')
-    const AwsLambdaFunction = await context.loadType('./')
-
     let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       code: './code',
       functionName: 'hello',
       functionDescription: 'hello description',
@@ -531,13 +477,8 @@ describe('AwsLambdaFunction', () => {
   })
 
   it('shouldDeploy should return undefined if nothing changed', async () => {
-    const context = await createTestContext()
-
-    const AwsProvider = await context.loadType('AwsProvider')
-    const AwsLambdaFunction = await context.loadType('./')
-
     let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       code: './code',
       functionName: 'hello',
       functionDescription: 'hello description',
@@ -562,6 +503,7 @@ describe('AwsLambdaFunction', () => {
 
     awsLambdaFunction.pack = jest.fn()
 
+    await awsLambdaFunction.shouldDeploy(null, context)
     await awsLambdaFunction.deploy(null, context)
 
     const prevAwsLambdaFunction = await deserialize(serialize(awsLambdaFunction, context), context)
@@ -597,13 +539,8 @@ describe('AwsLambdaFunction', () => {
   })
 
   it('shouldDeploy should return deploy if role changed', async () => {
-    const context = await createTestContext()
-
-    const AwsProvider = await context.loadType('AwsProvider')
-    const AwsLambdaFunction = await context.loadType('./')
-
     let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       code: './code',
       functionName: 'hello',
       functionDescription: 'hello description',
@@ -663,13 +600,8 @@ describe('AwsLambdaFunction', () => {
   })
 
   it('shouldDeploy should return deploy if code changed', async () => {
-    const context = await createTestContext()
-
-    const AwsProvider = await context.loadType('AwsProvider')
-    const AwsLambdaFunction = await context.loadType('./')
-
     let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       code: './code',
       functionName: 'hello',
       functionDescription: 'hello description',
@@ -730,13 +662,8 @@ describe('AwsLambdaFunction', () => {
   })
 
   it('should not load AwsIamRole if role is provided', async () => {
-    const context = await createTestContext()
-
-    const AwsProvider = await context.loadType('AwsProvider')
-    const AwsLambdaFunction = await context.loadType('./')
-
     let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       code: './code',
       functionName: 'hello',
       functionDescription: 'hello description',
@@ -765,13 +692,8 @@ describe('AwsLambdaFunction', () => {
   })
 
   it('should load AwsIamRole if role is not provided', async () => {
-    const context = await createTestContext()
-
-    const AwsProvider = await context.loadType('AwsProvider')
-    const AwsLambdaFunction = await context.loadType('./')
-
     let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       code: './code',
       functionName: 'hello',
       functionDescription: 'hello description',

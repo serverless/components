@@ -1,28 +1,17 @@
-import { resolve } from '@serverless/utils'
-
 const AwsEventsRule = (SuperClass) =>
   class extends SuperClass {
-    async construct(inputs, context) {
-      await super.construct(inputs, context)
-      this.provider = inputs.provider
-      this.lambda = inputs.lambda
-      this.enabled = inputs.enabled
-      this.schedule = inputs.schedule
-    }
     shouldDeploy(prevInstance) {
-      if (
-        prevInstance &&
-        prevInstance.lambda.functionName !== resolve(resolve(this.lambda).functionName)
-      ) {
+      if (prevInstance && prevInstance.lambda.functionName !== this.lambda.functionName) {
         return 'replace'
       } else if (
         !prevInstance ||
-        prevInstance.schedule !== resolve(this.schedule) ||
-        prevInstance.enabled !== resolve(this.enabled)
+        prevInstance.schedule !== this.schedule ||
+        prevInstance.enabled !== this.enabled
       ) {
         return 'deploy'
       }
     }
+
     async deploy(prevInstance, context) {
       // eslint-disable-line
       const AWS = this.provider.getSdk()
@@ -64,6 +53,7 @@ const AwsEventsRule = (SuperClass) =>
 
       await lambda.addPermission(addPermissionParams).promise()
     }
+
     async remove(context) {
       const AWS = this.provider.getSdk()
       const cloudWatchEvents = new AWS.CloudWatchEvents()

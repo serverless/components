@@ -60,6 +60,7 @@ __mocks__
 __snapshots__
 __tests__
 tests
+test
 *.test.js
 
 # lintstaged

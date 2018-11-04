@@ -1,29 +1,21 @@
-import path from 'path'
-import { createContext, resolveComponentEvaluables } from '../../../src/utils'
 import AWS from 'aws-sdk'
-
-const createTestContext = async () =>
-  createContext(
-    {
-      cwd: path.join(__dirname, '..'),
-      overrides: {
-        debug: () => {},
-        log: () => {}
-      }
-    },
-    {
-      app: {
-        id: 'test'
-      }
-    }
-  )
+import path from 'path'
+import { resolveComponentEvaluables } from '../../../src/utils'
+import { createTestContext } from '../../../test'
 
 describe('AwsEventsRule', () => {
-  it('should create schedule', async () => {
-    const context = await createTestContext()
-    const AwsProvider = await context.loadType('AwsProvider')
-    const AwsEventsRule = await context.loadType('./')
+  const cwd = path.join(__dirname, '..')
+  let context
+  let AwsProvider
+  let AwsEventsRule
 
+  beforeEach(async () => {
+    context = await createTestContext({ cwd })
+    AwsProvider = await context.loadType('AwsProvider')
+    AwsEventsRule = await context.loadType('./')
+  })
+
+  it('should create schedule', async () => {
     const putRuleParams = {
       Name: 'hello',
       ScheduleExpression: 'rate(5 minutes)',
@@ -69,10 +61,6 @@ describe('AwsEventsRule', () => {
   })
 
   it('should remove schedule', async () => {
-    const context = await createTestContext()
-    const AwsProvider = await context.loadType('AwsProvider')
-    const AwsEventsRule = await context.loadType('./')
-
     const deleteRuleParams = {
       Name: 'hello'
     }

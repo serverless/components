@@ -83,61 +83,46 @@ const deleteLambda = async (Lambda, name) => {
   await Lambda.deleteFunction(params).promise()
 }
 
+const hashCode = async (code) => {
+  // TODO BRN: Upgrade this to hash all code references in the array. Need to redeploy in the event that the shim changes.
+  const options = {
+    folders: { exclude: ['node_modules'] }
+  }
+  let folderToHash = code
+  if (isArray(code)) {
+    folderToHash = code[0]
+  }
+  const hashObj = await hashElement(folderToHash, options)
+  return hashObj.hash
+}
+
 const AwsLambdaFunction = async (SuperClass, superContext) => {
   const AwsIamRole = await superContext.loadType('AwsIamRole')
 
   return class extends SuperClass {
-    async construct(inputs, context) {
-      await super.construct(inputs, context)
-      const options = {
-        folders: { exclude: ['node_modules'] }
-      }
-
-      this.provider = inputs.provider
-      this.role = inputs.role
-      this.functionName = inputs.functionName
-      this.functionDescription = inputs.functionDescription
-      this.handler = inputs.handler
-      this.code = resolve(inputs.code) // todo use resolvable
-      this.runtime = inputs.runtime
-      this.memorySize = inputs.memorySize
-      this.timeout = inputs.timeout
-      this.environment = inputs.environment
-      this.tags = inputs.tags
-
-      let folderToHash = this.code
-
-      if (isArray(this.code)) {
-        folderToHash = this.code[0]
-      }
-
-      const hashObj = await hashElement(folderToHash, options)
-      this.hash = hashObj.hash
-    }
-
     hydrate(prevInstance) {
       super.hydrate(prevInstance)
       this.arn = get('arn', prevInstance)
     }
 
-    shouldDeploy(prevInstance) {
+    async shouldDeploy(prevInstance) {
+      this.hash = await hashCode(this.code)
+
       const currentConfig = {
-        functionName: resolve(this.functionName),
-        functionDescription: resolve(this.functionDescription),
-        handler: resolve(this.handler),
-        code: resolve(this.code),
-        runtime: resolve(this.runtime),
-        memorySize: resolve(this.memorySize),
-        timeout: resolve(this.timeout),
-        // environment: resolve(this.environment), todo this has a variable value
-        hash: resolve(this.hash),
-        tags: resolve(this.tags)
+        functionName: this.functionName,
+        functionDescription: this.functionDescription,
+        handler: this.handler,
+        code: this.code,
+        runtime: this.runtime,
+        memorySize: this.memorySize,
+        timeout: this.timeout,
+        environment: this.environment,
+        hash: this.hash,
+        tags: this.tags
       }
       const prevConfig = prevInstance ? pick(keys(currentConfig), prevInstance) : {}
       const configChanged = not(equals(currentConfig, prevConfig))
-      const roleChanged = prevInstance
-        ? resolve(this.role).roleName !== prevInstance.role.roleName
-        : true
+      const roleChanged = prevInstance ? this.role.roleName !== prevInstance.role.roleName : true
 
       if (prevInstance && prevInstance.functionName !== currentConfig.functionName) {
         return 'replace'

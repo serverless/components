@@ -1,7 +1,6 @@
 import AWS from 'aws-sdk'
 import readStateFile from './read'
-
-jest.mock('../../../../utils/logging')
+import { createTestContext } from '../../../../../test'
 
 jest.mock('aws-sdk', () => {
   const mocks = {
@@ -96,15 +95,24 @@ describe('#readStateFile()', () => {
     }
   }
 
+  let context
+
+  beforeEach(async () => {
+    context = await createTestContext()
+  })
+
   it('should read the projects state file if present', async () => {
-    const res = await readStateFile({ state: { table: 'my-table', service: 'my-service' } })
+    const res = await readStateFile(
+      { state: { table: 'my-table', service: 'my-service' } },
+      context
+    )
     expect(AWS.mocks.getMock).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.updateMock).toHaveBeenCalledTimes(1)
     expect(res).toEqual(fileContent)
   })
 
   it('should return an empty object if the project does not contain a state file', async () => {
-    const res = await readStateFile({ state: { table: 'my-table', service: 'no-state' } })
+    const res = await readStateFile({ state: { table: 'my-table', service: 'no-state' } }, context)
     expect(AWS.mocks.getMock).toHaveBeenCalledTimes(1)
     expect(AWS.mocks.updateMock).toHaveBeenCalledTimes(1)
     expect(res).toEqual({})
@@ -113,7 +121,7 @@ describe('#readStateFile()', () => {
   it('should throw error if lock exists', async () => {
     let res
     try {
-      res = await readStateFile({ state: { table: 'my-table', service: 'locked-state' } })
+      res = await readStateFile({ state: { table: 'my-table', service: 'locked-state' } }, context)
     } catch (error) {
       expect(error.message).toContain('State is locked')
     }

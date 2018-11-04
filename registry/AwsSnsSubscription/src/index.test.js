@@ -1,31 +1,7 @@
 import AWS from 'aws-sdk'
 import path from 'path'
-import {
-  createContext,
-  deserialize,
-  resolveComponentEvaluables,
-  serialize
-} from '../../../src/utils'
-
-let context
-let provider
-let AwsSnsSubscription
-
-const createTestContext = async () =>
-  createContext(
-    {
-      cwd: path.join(__dirname, '..'),
-      overrides: {
-        debug: () => {},
-        log: () => {}
-      }
-    },
-    {
-      app: {
-        id: 'test'
-      }
-    }
-  )
+import { deserialize, resolveComponentEvaluables, serialize } from '../../../src/utils'
+import { createTestContext } from '../../../test'
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -36,11 +12,16 @@ afterAll(() => {
 })
 
 describe('AwsSnsSubscription', () => {
-  beforeEach(async () => {
-    context = await createTestContext()
-    AwsSnsSubscription = await context.loadType('./')
+  const cwd = path.resolve(__dirname, '..')
+  let context
+  let provider
+  let AwsSnsSubscription
+  let AwsProvider
 
-    const AwsProvider = await context.loadType('AwsProvider')
+  beforeEach(async () => {
+    context = await createTestContext({ cwd })
+    AwsSnsSubscription = await context.loadType('./')
+    AwsProvider = await context.loadType('AwsProvider')
     provider = await context.construct(AwsProvider, {})
   })
 

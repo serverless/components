@@ -1,4 +1,4 @@
-import { get, or, pick, resolve, resolvable } from '@serverless/utils'
+import { get, lowerCase, or, pick, resolvable } from '@serverless/utils'
 import { createBucket, deleteBucket } from './utils'
 
 const DEPLOY = 'deploy'
@@ -8,9 +8,10 @@ const AwsS3Bucket = (SuperClass) =>
   class extends SuperClass {
     async construct(inputs, context) {
       await super.construct(inputs, context)
-      // NOTE: the bucket name needs to be lower case when auto-generating
+
+      // NOTE: the bucket name needs to be lower case
       this.bucketName = resolvable(() =>
-        or(inputs.bucketName, `bucket-${this.instanceId.toLowerCase()}`)
+        lowerCase(or(inputs.bucketName, `bucket-${this.instanceId}`))
       )
       this.provider = resolvable(() => or(inputs.provider, context.get('provider')))
     }
@@ -20,7 +21,7 @@ const AwsS3Bucket = (SuperClass) =>
         return DEPLOY
       }
 
-      if (prevInstance.bucketName !== resolve(this.bucketName)) {
+      if (prevInstance.bucketName !== this.bucketName) {
         return REPLACE
       }
     }

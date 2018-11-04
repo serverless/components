@@ -50,7 +50,7 @@ describe('Integration Test - Library Usage', () => {
             log: () => {}
           }
         })
-        expect(AWS.mocks.createBucketMock).toBeCalledWith({ Bucket: 'mySuperBucket' })
+        expect(AWS.mocks.createBucketMock).toBeCalledWith({ Bucket: 'mysuperbucket' }) // forces bucket to lowercase
         const service = context.instance
         expect(service).not.toBeFalsy()
         expect(service).toMatchObject({
@@ -61,7 +61,7 @@ describe('Integration Test - Library Usage', () => {
         const bucket = service.components.myBucket
         expect(bucket).not.toBeFalsy()
         expect(bucket).toMatchObject({
-          bucketName: 'mySuperBucket',
+          bucketName: 'mysuperbucket',
           instanceId: expect.any(String)
         })
       })
@@ -81,10 +81,10 @@ describe('Integration Test - Library Usage', () => {
             log: () => {}
           }
         })
-        expect(AWS.mocks.deleteBucketMock).toBeCalledWith({ Bucket: 'mySuperBucket' })
-        expect(AWS.mocks.listObjectsV2Mock).toBeCalledWith({ Bucket: 'mySuperBucket' })
+        expect(AWS.mocks.deleteBucketMock).toBeCalledWith({ Bucket: 'mysuperbucket' })
+        expect(AWS.mocks.listObjectsV2Mock).toBeCalledWith({ Bucket: 'mysuperbucket' })
         expect(AWS.mocks.deleteObjectsMock).toBeCalledWith({
-          Bucket: 'mySuperBucket',
+          Bucket: 'mysuperbucket',
           Delete: { Objects: [{ Key: 'abc' }] }
         })
         expect(context.instance).toBeFalsy()

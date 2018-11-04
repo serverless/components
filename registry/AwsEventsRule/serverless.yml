@@ -3,13 +3,18 @@ extends: Component
 main: ./dist/index.js
 version: 0.3.0
 
+enabled: ${inputs.enabled}
+lambda: ${inputs.lambda}
+provider: ${inputs.provider}
+schedule: ${inputs.schedule}
+
 inputTypes:
+  enabled:
+    type: boolean
+  lambda:
+    type: object
   provider:
     type: AwsProvider
     required: true
-  lambda:
-    type: object
   schedule:
     type: string
-  enabled:
-    type: boolean

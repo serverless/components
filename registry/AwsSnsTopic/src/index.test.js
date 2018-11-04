@@ -1,39 +1,7 @@
+import AWS from 'aws-sdk'
 import path from 'path'
-import {
-  createContext,
-  deserialize,
-  resolveComponentEvaluables,
-  serialize
-} from '../../../src/utils'
-
-let context
-let ComponentType
-
-const mocks = {
-  setTopicAttributesMock: jest.fn(),
-  createTopicMock: jest.fn().mockReturnValue({ TopicArn: 'abc:zxc' }),
-  deleteTopicMock: jest.fn()
-}
-
-const provider = {
-  getSdk: () => {
-    return {
-      SNS: function() {
-        return {
-          setTopicAttributes: (obj) => ({
-            promise: () => mocks.setTopicAttributesMock(obj)
-          }),
-          createTopic: (obj) => ({
-            promise: () => mocks.createTopicMock(obj)
-          }),
-          deleteTopic: (obj) => ({
-            promise: () => mocks.deleteTopicMock(obj)
-          })
-        }
-      }
-    }
-  }
-}
+import { deserialize, resolveComponentEvaluables, serialize } from '../../../src/utils'
+import { createTestContext } from '../../../test'
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -44,102 +12,96 @@ afterAll(() => {
 })
 
 describe('AwsSnsTopic', () => {
+  const cwd = path.resolve(__dirname, '..')
+  let context
+  let provider
+  let AwsProvider
+  let AwsSnsTopic
+
   beforeEach(async () => {
-    context = await createContext({ cwd: path.join(__dirname, '..') }, { app: { id: 'test' } })
-    ComponentType = await context.loadType('./')
+    context = await createTestContext({ cwd })
+    context = await context.loadProject()
+    context = await context.loadApp()
+    AwsProvider = await context.loadType('AwsProvider')
+    AwsSnsTopic = await context.loadType('./')
+    provider = await context.construct(AwsProvider, {})
   })
 
   it('should create topic if first deployment', async () => {
-    context = await context.loadProject()
-    context = await context.loadApp()
-
-    const inputs = {
+    let awsSnsTopic = await context.construct(AwsSnsTopic, {
       provider,
       topicName: 'myTopic',
       displayName: 'myTopicDisplayName',
       policy: {},
       deliveryPolicy: {},
       deliveryStatusAttributes: []
-    }
-    const awsSnsTopic = await context.construct(ComponentType, inputs)
+    })
+    awsSnsTopic = await context.defineComponent(awsSnsTopic)
+    awsSnsTopic = resolveComponentEvaluables(awsSnsTopic)
+    await awsSnsTopic.deploy(null, context)
 
-    awsSnsTopic.provider = inputs.provider
-    awsSnsTopic.topicName = inputs.topicName
-    awsSnsTopic.displayName = inputs.displayName
-    awsSnsTopic.policy = inputs.policy
-    awsSnsTopic.deliveryPolicy = inputs.deliveryPolicy
-    awsSnsTopic.deliveryStatusAttributes = inputs.deliveryStatusAttributes
-
-    await awsSnsTopic.deploy(undefined, context)
-
-    expect(mocks.createTopicMock).toHaveBeenCalled()
-    expect(mocks.setTopicAttributesMock).toHaveBeenCalled()
+    expect(AWS.mocks.createTopicMock).toHaveBeenCalled()
+    expect(AWS.mocks.setTopicAttributesMock).toHaveBeenCalled()
   })
 
-  it('should update topic if not first deployment', async () => {
-    context = await context.loadProject()
-    context = await context.loadApp()
-
-    const inputs = {
+  it('should update topic if displayName has changed', async () => {
+    let awsSnsTopic = await context.construct(AwsSnsTopic, {
       provider,
       topicName: 'myTopic',
       displayName: 'myTopicDisplayName',
       policy: {},
       deliveryPolicy: {},
       deliveryStatusAttributes: []
-    }
+    })
 
-    const prevInstance = {
-      provider,
+    awsSnsTopic = await context.defineComponent(awsSnsTopic)
+    awsSnsTopic = resolveComponentEvaluables(awsSnsTopic)
+    await awsSnsTopic.deploy(null, context)
+
+    const prevAwsSnsTopic = await deserialize(serialize(awsSnsTopic, context), context)
+    jest.clearAllMocks()
+
+    // NOTE BRN: To simulate what core does, we create an entirely new instance here but hydrate it with the previous instance
+
+    let nextAwsSnsTopic = await context.construct(AwsSnsTopic, {
+      provider: await context.construct(AwsProvider, {}),
       topicName: 'myTopic',
-      displayName: 'myPrevTopicDisplayName',
+      displayName: 'myNewTopicDisplayName',
       policy: {},
       deliveryPolicy: {},
       deliveryStatusAttributes: []
-    }
-    const awsSnsTopic = await context.construct(ComponentType, inputs)
+    })
+    nextAwsSnsTopic = await context.defineComponent(nextAwsSnsTopic, prevAwsSnsTopic)
+    nextAwsSnsTopic = resolveComponentEvaluables(nextAwsSnsTopic)
 
-    awsSnsTopic.provider = inputs.provider
-    awsSnsTopic.topicName = inputs.topicName
-    awsSnsTopic.displayName = inputs.displayName
-    awsSnsTopic.policy = inputs.policy
-    awsSnsTopic.deliveryPolicy = inputs.deliveryPolicy
-    awsSnsTopic.deliveryStatusAttributes = inputs.deliveryStatusAttributes
+    await nextAwsSnsTopic.deploy(prevAwsSnsTopic, context)
 
-    await awsSnsTopic.deploy(prevInstance, context)
-
-    expect(mocks.createTopicMock).not.toHaveBeenCalled()
-    expect(mocks.setTopicAttributesMock).toHaveBeenCalled()
+    expect(AWS.mocks.createTopicMock).not.toHaveBeenCalled()
+    expect(AWS.mocks.setTopicAttributesMock).toHaveBeenCalled()
   })
 
   it('should remove topic', async () => {
-    context = await context.loadProject()
-    context = await context.loadApp()
-
-    const inputs = {
+    let awsSnsTopic = await context.construct(AwsSnsTopic, {
       provider,
       topicName: 'myTopic',
       displayName: 'myTopicDisplayName',
       policy: {},
       deliveryPolicy: {},
       deliveryStatusAttributes: []
-    }
+    })
 
-    const awsSnsTopic = await context.construct(ComponentType, inputs)
+    awsSnsTopic = await context.defineComponent(awsSnsTopic)
+    awsSnsTopic = resolveComponentEvaluables(awsSnsTopic)
+    await awsSnsTopic.deploy(null, context)
 
-    awsSnsTopic.provider = inputs.provider
-    awsSnsTopic.topicName = inputs.topicName
-    awsSnsTopic.displayName = inputs.displayName
-    awsSnsTopic.policy = inputs.policy
-    awsSnsTopic.deliveryPolicy = inputs.deliveryPolicy
-    awsSnsTopic.deliveryStatusAttributes = inputs.deliveryStatusAttributes
-    awsSnsTopic.topicArn = 'abc:zxc'
+    jest.clearAllMocks()
 
-    await awsSnsTopic.remove(context)
+    const prevAwsSnsTopic = await deserialize(serialize(awsSnsTopic, context), context)
+    await prevAwsSnsTopic.remove(context)
 
-    expect(mocks.createTopicMock).not.toHaveBeenCalled()
-    expect(mocks.setTopicAttributesMock).not.toHaveBeenCalled()
-    expect(mocks.deleteTopicMock).toHaveBeenCalled()
+    expect(AWS.mocks.createTopicMock).not.toHaveBeenCalled()
+    expect(AWS.mocks.setTopicAttributesMock).not.toHaveBeenCalled()
+    expect(AWS.mocks.deleteTopicMock).toHaveBeenCalled()
   })
 
   it('shouldDeploy should return "undefined" if nothing changed', async () => {

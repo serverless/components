@@ -10,7 +10,6 @@ import {
   reduce,
   slice,
   values,
-  resolve,
   resolvable,
   or,
   pick,

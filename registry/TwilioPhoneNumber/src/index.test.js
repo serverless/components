@@ -1,11 +1,11 @@
-import path from 'path'
 import { merge } from '@serverless/utils'
+import path from 'path'
 import {
-  createContext,
   deserialize,
   resolveComponentEvaluables,
   serialize
 } from '../../../src/utils'
+import createTestContext from '../../../test/createTestContext'
 
 const expectedOutputs = {
   accountSid: 'accountSid',
@@ -58,12 +58,12 @@ const twilioMock = {
 twilioMock.incomingPhoneNumbers.create = jest.fn().mockReturnValue(expectedOutputs)
 twilioMock.incomingPhoneNumbers.list = jest.fn().mockReturnValue([])
 
-afterAll(() => {
-  jest.restoreAllMocks()
+beforeEach(async () => {
+  jest.clearAllMocks()
 })
 
-beforeEach(() => {
-  jest.clearAllMocks()
+afterAll(() => {
+  jest.restoreAllMocks()
 })
 
 const provider = {
@@ -71,20 +71,25 @@ const provider = {
 }
 
 describe('TwilioPhoneNumber', () => {
+  const cwd = path.resolve(__dirname, '..')
+  let context
+  let TwilioPhoneNumber
+
   beforeEach(async () => {
-    context = await createContext({ cwd: path.join(__dirname, '..') }, { app: { id: 'test' } })
-    ComponentType = await context.loadType('./')
+    context = await createTestContext({ cwd })
+    context = await context.loadProject()
+    context = await context.loadApp()
+    TwilioPhoneNumber = await context.loadType('./')
   })
 
   it('should create phone number if first deployment', async () => {
-    context = await context.loadProject()
-    context = await context.loadApp()
-
-    const twilioPhoneNumber = await context.construct(ComponentType, {})
-
-    twilioPhoneNumber.provider = provider
-    twilioPhoneNumber.phoneNumber = '+1234567890'
-
+    let twilioPhoneNumber = await context.construct(TwilioPhoneNumber, {
+      provider,
+      phoneNumber: '+1234567890'
+    })
+    twilioPhoneNumber = await context.define(twilioPhoneNumber)
+    twilioPhoneNumber = resolveComponentEvaluables(twilioPhoneNumber)
+    
     await twilioPhoneNumber.deploy(undefined, context)
 
     expect(twilioPhoneNumber.sid).toEqual(expectedOutputs.sid)
@@ -93,25 +98,22 @@ describe('TwilioPhoneNumber', () => {
   })
 
   it('should update phone number if not first deployment', async () => {
-    context = await context.loadProject()
-    context = await context.loadApp()
-
-    const twilioPhoneNumber = await context.construct(ComponentType, {})
-
-    twilioPhoneNumber.provider = provider
-    twilioPhoneNumber.phoneNumber = '+1234567890'
-
+    const twilioPhoneNumber = await context.construct(TwilioPhoneNumber, {
+      provider,
+      phoneNumber: '+1234567890'
+    })
+    twilioPhoneNumber = await context.define(twilioPhoneNumber)
+    twilioPhoneNumber = resolveComponentEvaluables(twilioPhoneNumber)
+    
     await twilioPhoneNumber.deploy({ sid: 'sid' }, context)
 
+    
     expect(twilioPhoneNumber.sid).toEqual(expectedOutputs.sid)
     expect(updateMock).toHaveBeenCalled()
   })
 
   it('should remove phone number', async () => {
-    context = await context.loadProject()
-    context = await context.loadApp()
-
-    const twilioPhoneNumber = await context.construct(ComponentType, {})
+    const twilioPhoneNumber = await context.construct(TwilioPhoneNumber, {})
 
     twilioPhoneNumber.provider = provider
     twilioPhoneNumber.sid = 'sid'

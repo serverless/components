@@ -1,10 +1,10 @@
+import { equals, keys, lowerCase, not, pick, resolve } from '@serverless/utils'
 import fs from 'fs'
 import path from 'path'
 import klawSync from 'klaw-sync'
 import mime from 'mime-types'
 const { execSync } = require('child_process')
 import { hashElement } from 'folder-hash'
-import { resolve, pick, equals, not, keys } from '@serverless/utils'
 
 /*
 * Create Website Bucket
@@ -50,6 +50,7 @@ const createWebsiteBucket = async (s3, bucketName) => {
     MaxAgeSeconds: 0
   }
 
+  // TODO BRN: This set of async calls is a trap for failures. If the bucket gets created but we have a failure immediately after that before the other calls are made, we can no longer reach the code that is responsible for setting up the bucket policy, cors, etc. because the createBucket call will fail since the bucket already exists. Each of these steps should be broken out into a separate component so that the core can manage each call independently and allow for resuming the set of calls from where it left off in the event of failure.
   await s3.createBucket({ Bucket: bucketName }).promise()
 
   await s3
@@ -126,6 +127,15 @@ const deleteWebsiteBucket = async (s3, bucketName) => {
   await s3.deleteBucket({ Bucket: bucketName }).promise()
 }
 
+const hashProjectDir = async (projectDir) => {
+  const options = {
+    folders: { exclude: ['node_modules'] }
+  }
+
+  const hashObj = await hashElement(projectDir, options)
+  return hashObj.hash
+}
+
 /*
 * Component: AWS S3 Website
 */
@@ -135,41 +145,35 @@ const AwsS3Website = (SuperClass) =>
     async construct(inputs, context) {
       await super.construct(inputs, context)
 
+      this.buildCmd = inputs.buildCmd
+      this.env = inputs.env
       this.projectDir = resolve(inputs.projectDir)
-      this.buildCmd = resolve(inputs.buildCmd)
-      this.env = resolve(inputs.env)
 
+      // TODO BRN: Move this to a validate step (maybe on a per property basis that validates when set)
       if (!path.isAbsolute(this.projectDir)) {
         throw new Error('projectDir must be an absolute path. Construct local paths using ${path}.')
       }
 
       this.envFileLocation = path.resolve(this.projectDir, resolve(inputs.envFileLocation))
       this.assets = path.resolve(this.projectDir, resolve(inputs.assets))
-
-      const options = {
-        folders: { exclude: ['node_modules'] }
-      }
-
-      const hashObj = await hashElement(this.projectDir, options)
-      this.hash = hashObj.hash
     }
 
-    shouldDeploy(prevInstance) {
+    async shouldDeploy(prevInstance) {
+      this.bucket = lowerCase(this.bucket)
+      this.hash = await hashProjectDir(this.projectDir)
       const inputs = {
-        bucket: resolve(this.bucket).toLowerCase(),
-        projectDir: resolve(this.projectDir),
-        assets: resolve(this.assets),
-        envFileLocation: resolve(this.envFileLocation),
-        hash: resolve(this.hash),
-        // env: resolve(this.env), the value of this is a variable
-        buildCmd: resolve(this.buildCmd)
+        bucket: this.bucket,
+        projectDir: this.projectDir,
+        assets: this.assets,
+        envFileLocation: this.envFileLocation,
+        hash: this.hash,
+        env: this.env,
+        buildCmd: this.buildCmd
       }
-
-      this.bucket = resolve(this.bucket).toLowerCase() // convert to lowercase
 
       const prevInputs = prevInstance ? pick(keys(inputs), prevInstance) : {}
       const configChanged = not(equals(prevInputs, inputs))
-      if (prevInstance && prevInstance.bucket !== resolve(this.bucket).toLowerCase()) {
+      if (prevInstance && prevInstance.bucket !== this.bucket) {
         return 'replace'
       } else if (!prevInstance || configChanged) {
         return 'deploy'
@@ -212,7 +216,9 @@ const AwsS3Website = (SuperClass) =>
       // Ensure bucket is lowercase
       this.bucket = this.bucket.toLowerCase()
 
-      await createWebsiteBucket(s3, this.bucket)
+      if (!prevInstance || this.bucket !== prevInstance.bucket) {
+        await createWebsiteBucket(s3, this.bucket)
+      }
       // this.assets = assets
       await uploadDir(s3, this.bucket, this.assets)
 
