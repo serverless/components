@@ -25,7 +25,7 @@ inputTypes:
     type: AwsProvider
     required: true
     description: "The AWS provider the holds the AWS credentials and SDK instance"
-  name:
+  apiName:
     type: string
     default: apig-${self.instanceId}
     description: Name of API gateway in AWS console

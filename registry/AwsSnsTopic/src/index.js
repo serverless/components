@@ -13,11 +13,10 @@ const {
   values,
   resolve,
   resolvable,
-  or
+  or,
+  not,
+  pick
 } = require('@serverless/utils')
-
-const DEPLOY = 'deploy'
-const REPLACE = 'replace'
 
 const capitalize = (string) => `${string.charAt(0).toUpperCase()}${string.slice(1)}`
 const resolveInSequence = async (functionsToExecute) =>
@@ -172,11 +171,24 @@ const AwsSnsTopic = (SuperClass) =>
 
     shouldDeploy(prevInstance) {
       if (!prevInstance) {
-        return DEPLOY
+        return 'deploy'
       }
-      if (prevInstance.topicName !== this.topicName || prevInstance.policy !== this.policy) {
-        return REPLACE
+      const inputs = {
+        topicName: resolve(this.topicName),
+        displayName: resolve(this.displayName),
+        policy: resolve(this.policy),
+        deliveryPolicy: resolve(this.deliveryPolicy),
+        deliveryStatusAttributes: resolve(this.deliveryStatusAttributes)
       }
+      const prevInputs = prevInstance ? pick(keys(inputs), prevInstance) : {}
+      const configChanged = not(equals(inputs, prevInputs))
+      if (not(equals(prevInstance.topicName, inputs.topicName))) {
+        return 'replace'
+      } else if (configChanged) {
+        return 'deploy'
+      }
+
+      return undefined
     }
 
     async deploy(prevInstance, context) {

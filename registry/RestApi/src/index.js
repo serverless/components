@@ -5,7 +5,7 @@ const catchallParameterPattern = /{\.{3}([^}]+?)}/g
 
 async function getAwsApiGatewayInputs(inputs) {
   const apiGatewayInputs = {
-    name: inputs.apiName,
+    apiName: inputs.apiName,
     role: inputs.role,
     routes: {}
   }

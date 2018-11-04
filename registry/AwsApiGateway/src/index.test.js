@@ -1,6 +1,10 @@
 import AWS from 'aws-sdk'
 import path from 'path'
-import { resolveComponentEvaluables } from '../../../src/utils'
+import { 
+  deserialize,
+  resolveComponentEvaluables,
+  serialize
+} from '../../../src/utils'
 import { createTestContext } from '../../../test'
 
 // todo mock timers
@@ -61,7 +65,7 @@ describe('AwsApiGateway', () => {
     awsApiGateway = resolveComponentEvaluables(awsApiGateway)
 
     const prevInstance = {
-      name: 'something',
+      apiName: 'something',
       id: 'new-new-id',
       url: 'http://example.com/'
     }
@@ -86,11 +90,98 @@ describe('AwsApiGateway', () => {
       provider: await context.construct(AwsProvider, {}),
       id: 'something'
     }
+
     const awsApiGateway = await context.construct(AwsApiGateway, inputs)
     Object.assign(awsApiGateway, prevInstance)
 
     await awsApiGateway.remove(context)
 
     expect(AWS.mocks.deleteRestApi).toBeCalledWith({ restApiId: prevInstance.id })
+  })
+
+  it('shouldDeploy should return undefined if nothing changed', async () => {
+    const inputs = {
+      provider,
+      apiName: 'somethingNew',
+      role: { arn: 'someArn' },
+      routes: {}
+    }
+    let oldComponent = await context.construct(ComponentType, inputs)
+    oldComponent = await context.defineComponent(oldComponent)
+    oldComponent = resolveComponentEvaluables(oldComponent)
+    await oldComponent.deploy(null, context)
+
+    const prevComponent = await deserialize(serialize(oldComponent, context), context)
+
+    let newComponent = await context.construct(ComponentType, inputs)
+    newComponent = await context.defineComponent(newComponent)
+    newComponent = resolveComponentEvaluables(newComponent)
+
+    const res = newComponent.shouldDeploy(prevComponent)
+    expect(res).toBe(undefined)
+  })
+
+  it('shouldDeploy should return replace if name changed', async () => {
+    const inputs = {
+      provider,
+      apiName: 'somethingOld',
+      role: { arn: 'someArn' },
+      routes: {}
+    }
+    let oldComponent = await context.construct(ComponentType, inputs)
+    oldComponent = await context.defineComponent(oldComponent)
+    oldComponent = resolveComponentEvaluables(oldComponent)
+    await oldComponent.deploy(null, context)
+
+    const prevComponent = await deserialize(serialize(oldComponent, context), context)
+
+    let newComponent = await context.construct(ComponentType, {
+      ...inputs,
+      apiName: 'somethingNew'
+    })
+    newComponent = await context.defineComponent(newComponent)
+    newComponent = resolveComponentEvaluables(newComponent)
+
+    const res = newComponent.shouldDeploy(prevComponent)
+    expect(res).toBe('replace')
+  })
+
+  it('shouldDeploy should return deploy if routes changed', async () => {
+    const inputs = {
+      provider,
+      apiName: 'something',
+      role: { arn: 'someArn' },
+      routes: { '/path': null }
+    }
+    let oldComponent = await context.construct(ComponentType, inputs)
+    oldComponent = await context.defineComponent(oldComponent)
+    oldComponent = resolveComponentEvaluables(oldComponent)
+    await oldComponent.deploy(null, context)
+
+    const prevComponent = await deserialize(serialize(oldComponent, context), context)
+
+    let newComponent = await context.construct(ComponentType, {
+      ...inputs,
+      routes: { '/anotherPath': null }
+    })
+    newComponent = await context.defineComponent(newComponent)
+    newComponent = resolveComponentEvaluables(newComponent)
+
+    const res = newComponent.shouldDeploy(prevComponent)
+    expect(res).toBe('deploy')
+  })
+
+  it('shouldDeploy should return deploy if first deployment', async () => {
+    const inputs = {
+      provider,
+      apiName: 'something',
+      role: { arn: 'someArn' },
+      routes: { '/another': null }
+    }
+    let oldAwsApiGateway = await context.construct(ComponentType, inputs)
+    oldAwsApiGateway = await context.defineComponent(oldAwsApiGateway)
+    oldAwsApiGateway = resolveComponentEvaluables(oldAwsApiGateway)
+    const res = oldAwsApiGateway.shouldDeploy(null, context)
+    expect(res).toBe('deploy')
   })
 })

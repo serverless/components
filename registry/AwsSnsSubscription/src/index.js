@@ -11,11 +11,10 @@ import {
   slice,
   values,
   resolvable,
-  or
+  or,
+  pick,
+  not
 } from '@serverless/utils'
-
-const DEPLOY = 'deploy'
-const REPLACE = 'replace'
 
 const capitalize = (string) => `${head(string).toUpperCase()}${slice(1, Infinity, string)}`
 
@@ -77,11 +76,26 @@ const AwsSnsSubscription = (SuperClass) =>
 
     shouldDeploy(prevInstance) {
       if (!prevInstance) {
-        return DEPLOY
+        return 'deploy'
       }
-      if (prevInstance.protocol !== this.protocol && prevInstance.topic !== this.topic) {
-        return REPLACE
+      const inputs = {
+        topic: resolve(this.topic),
+        protocol: resolve(this.protocol),
+        endpoint: resolve(this.endpoint),
+        subscriptionAttributes: resolve(this.subscriptionAttributes)
       }
+      const prevInputs = prevInstance ? pick(keys(inputs), prevInstance) : {}
+      const configChanged = not(equals(inputs, prevInputs))
+      if (
+        not(equals(prevInstance.protocol, inputs.protocol)) ||
+        not(equals(prevInstance.topic, inputs.topic))
+      ) {
+        return 'replace'
+      } else if (configChanged) {
+        return 'deploy'
+      }
+
+      return undefined
     }
 
     async deploy(prevInstance, context) {

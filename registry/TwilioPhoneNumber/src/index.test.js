@@ -1,4 +1,10 @@
+import { merge } from '@serverless/utils'
 import path from 'path'
+import {
+  deserialize,
+  resolveComponentEvaluables,
+  serialize
+} from '../../../src/utils'
 import createTestContext from '../../../test/createTestContext'
 
 const expectedOutputs = {
@@ -33,6 +39,9 @@ const expectedOutputs = {
   voiceMethod: 'voiceMethod',
   voiceUrl: 'voiceUrl'
 }
+
+let context
+let ComponentType
 
 const updateMock = jest.fn().mockReturnValue(expectedOutputs)
 const removeMock = jest.fn()
@@ -74,11 +83,13 @@ describe('TwilioPhoneNumber', () => {
   })
 
   it('should create phone number if first deployment', async () => {
-    const twilioPhoneNumber = await context.construct(TwilioPhoneNumber, {})
-
-    twilioPhoneNumber.provider = provider
-    twilioPhoneNumber.phoneNumber = '+1234567890'
-
+    let twilioPhoneNumber = await context.construct(TwilioPhoneNumber, {
+      provider,
+      phoneNumber: '+1234567890'
+    })
+    twilioPhoneNumber = await context.define(twilioPhoneNumber)
+    twilioPhoneNumber = resolveComponentEvaluables(twilioPhoneNumber)
+    
     await twilioPhoneNumber.deploy(undefined, context)
 
     expect(twilioPhoneNumber.sid).toEqual(expectedOutputs.sid)
@@ -87,13 +98,16 @@ describe('TwilioPhoneNumber', () => {
   })
 
   it('should update phone number if not first deployment', async () => {
-    const twilioPhoneNumber = await context.construct(TwilioPhoneNumber, {})
-
-    twilioPhoneNumber.provider = provider
-    twilioPhoneNumber.phoneNumber = '+1234567890'
-
+    const twilioPhoneNumber = await context.construct(TwilioPhoneNumber, {
+      provider,
+      phoneNumber: '+1234567890'
+    })
+    twilioPhoneNumber = await context.define(twilioPhoneNumber)
+    twilioPhoneNumber = resolveComponentEvaluables(twilioPhoneNumber)
+    
     await twilioPhoneNumber.deploy({ sid: 'sid' }, context)
 
+    
     expect(twilioPhoneNumber.sid).toEqual(expectedOutputs.sid)
     expect(updateMock).toHaveBeenCalled()
   })
@@ -107,5 +121,58 @@ describe('TwilioPhoneNumber', () => {
     await twilioPhoneNumber.remove(context)
 
     expect(removeMock).toHaveBeenCalled()
+  })
+
+  it('shouldDeploy should return undefined if nothing changed', async () => {
+    let oldComponent = await context.construct(ComponentType, merge(expectedOutputs, { provider }))
+    oldComponent = await context.defineComponent(oldComponent)
+    oldComponent = resolveComponentEvaluables(oldComponent)
+    await oldComponent.deploy(null, context)
+
+    const prevComponent = await deserialize(serialize(oldComponent, context), context)
+
+    let newComponent = await context.construct(ComponentType, merge(expectedOutputs, { provider }))
+    newComponent = await context.defineComponent(newComponent)
+    newComponent = resolveComponentEvaluables(newComponent)
+
+    const res = newComponent.shouldDeploy(prevComponent)
+    expect(res).toBe(undefined)
+  })
+
+  it('shouldDeploy should return "replace" if "topic" changed', async () => {
+    let oldComponent = await context.construct(ComponentType, {
+      provider,
+      phoneNumber: 'phoneNumber',
+      friendlyName: 'friendlyName'
+    })
+    oldComponent = await context.defineComponent(oldComponent)
+    oldComponent = resolveComponentEvaluables(oldComponent)
+    await oldComponent.deploy(null, context)
+
+    const prevComponent = await deserialize(serialize(oldComponent, context), context)
+
+    let newComponent = await context.construct(ComponentType, {
+      provider,
+      phoneNumber: '+1234566890',
+      friendlyName: 'friendlyName'
+    })
+    newComponent = await context.defineComponent(newComponent)
+    newComponent = resolveComponentEvaluables(newComponent)
+
+    const res = newComponent.shouldDeploy(prevComponent)
+    expect(res).toBe('replace')
+  })
+
+  it('shouldDeploy should return deploy if first deployment', async () => {
+    context = await createContext({ cwd: __dirname }, { app: { id: 'test' } })
+    let oldComponent = await context.construct(ComponentType, {
+      provider,
+      phoneNumber: 'phoneNumber',
+      friendlyName: 'friendlyName'
+    })
+    oldComponent = await context.defineComponent(oldComponent)
+    oldComponent = resolveComponentEvaluables(oldComponent)
+    const res = oldComponent.shouldDeploy(null, context)
+    expect(res).toBe('deploy')
   })
 })
