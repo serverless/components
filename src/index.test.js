@@ -9,6 +9,9 @@ describe('index', () => {
     const mod = require('./')
     expect(mod).toEqual({
       createContext: expect.any(Function),
+      walkReduceTypeChain: expect.any(Function),
+      SYMBOL_TYPE: expect.anything(),
+
       run: expect.any(Function),
       start: expect.any(Function),
 

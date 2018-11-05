@@ -1,5 +1,4 @@
-import { createCli } from './utils'
-import createContext from './createContext'
+import { createCli, createContext } from './utils'
 
 const start = async () => {
   const context = await createContext()

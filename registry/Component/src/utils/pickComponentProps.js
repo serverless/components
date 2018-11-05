@@ -1,5 +1,5 @@
 import { keys, omit, or, pick, union } from '@serverless/utils'
-import { walkReduceTypeChain } from '../../../../src/utils'
+import { walkReduceTypeChain } from '../../../..'
 
 const pickComponentProps = (component) => {
   const props = walkReduceTypeChain(

@@ -1,4 +1,4 @@
-import createContext from '../createContext'
+import { createContext } from '../utils'
 import run from '../run'
 
 const info = async (options) => {
