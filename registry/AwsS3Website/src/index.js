@@ -129,7 +129,7 @@ const deleteWebsiteBucket = async (s3, bucketName) => {
 
 const hashProjectDir = async (projectDir) => {
   const options = {
-    folders: { exclude: ['node_modules'] }
+    folders: { exclude: ['node_modules', '.serverless'] }
   }
 
   const hashObj = await hashElement(projectDir, options)
@@ -148,6 +148,7 @@ const AwsS3Website = (SuperClass) =>
       this.buildCmd = inputs.buildCmd
       this.env = inputs.env
       this.projectDir = resolve(inputs.projectDir)
+      this.assets = resolve(inputs.assets) || resolve(inputs.projectDir)
 
       // TODO BRN: Move this to a validate step (maybe on a per property basis that validates when set)
       if (!path.isAbsolute(this.projectDir)) {
@@ -170,6 +171,9 @@ const AwsS3Website = (SuperClass) =>
         env: this.env,
         buildCmd: this.buildCmd
       }
+
+      // set the domain so that it's accessible in the `info` function
+      this.domain = `${this.bucket}.s3-website-${this.provider.region}.amazonaws.com`
 
       const prevInputs = prevInstance ? pick(keys(inputs), prevInstance) : {}
       const configChanged = not(equals(prevInputs, inputs))
@@ -214,7 +218,7 @@ const AwsS3Website = (SuperClass) =>
       const s3 = new AWS.S3()
 
       // Ensure bucket is lowercase
-      this.bucket = this.bucket.toLowerCase()
+      this.bucket = lowerCase(this.bucket)
 
       if (!prevInstance || this.bucket !== prevInstance.bucket) {
         await createWebsiteBucket(s3, this.bucket)

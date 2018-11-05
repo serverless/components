@@ -29,7 +29,7 @@ inputTypes:
     type: string
     displayName: Env File Location
     description: File path where environment script will be saved. Can be absolute or relative to projectDir.
-    default: ${inputs.projectDir}/env.js
+    required: true
   env:
     type: object
     displayName: Environment Variables
