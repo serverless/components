@@ -4,15 +4,6 @@ import cloneGraph from './cloneGraph'
 import detectCircularDeps from './detectCircularDeps'
 
 const deployNode = async (node, context) => {
-  context.debug(
-    `checking node for deploy - operation: ${node.operation} instanceId: ${
-      node.instanceId
-    } nextInstance: ${get('nextInstance.name', node)} prevInstance: ${get(
-      'prevInstance.name',
-      node
-    )}`
-  )
-
   // NOTE BRN: Start by resolving all evaluables on this node. This will enable us to run deploy and shouldDeploy without having to manually resolve evaluables in the method.
   const { prevInstance, instanceId } = node
   let { nextInstance } = node
@@ -31,6 +22,15 @@ const deployNode = async (node, context) => {
   if (!node.operation) {
     node.operation = await nextInstance.shouldDeploy(prevInstance, context)
   }
+
+  context.debug(
+    `checked if node should be deployed - result operation: ${node.operation} instanceId: ${
+      node.instanceId
+    } nextInstance: ${get('nextInstance.name', node)} prevInstance: ${get(
+      'prevInstance.name',
+      node
+    )}`
+  )
 
   if (['deploy', 'replace'].includes(node.operation)) {
     if (!nextInstance) {
