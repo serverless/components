@@ -20,6 +20,7 @@ import saveState from '../state/saveState'
 import loadState from '../state/loadState'
 import construct from '../type/construct'
 import create from '../type/create'
+import defType from '../type/defType'
 import loadType from '../type/loadType'
 
 const newContext = (props) => {
@@ -112,6 +113,7 @@ const newContext = (props) => {
     debug: (...args) => debug(finalContext, ...args),
     defineComponent: (component, state) => defineComponent(component, state, finalContext),
     defineComponentFromState: (component) => defineComponentFromState(component, finalContext),
+    defType: (def) => defType(def, finalContext),
     generateInstanceId: () => {
       const { app } = finalContext
       if (!app) {

@@ -1,6 +1,6 @@
 import utils from '@serverless/utils'
 import path from 'path'
-import { createContext } from '../../../utils/context'
+import { createTestContext } from '../../../../test'
 const packageComponent = require('./packageComponent')
 
 jest.mock('@serverless/utils', () => ({
@@ -24,7 +24,7 @@ describe('#packageComponent()', () => {
   })
 
   it('should package a component based on a serverlessFileObject', async () => {
-    const context = await createContext({ cwd: __dirname })
+    const context = await createTestContext({ cwd: __dirname })
     const options = {
       projectPath: process.cwd(),
       path: './some-path',
@@ -47,7 +47,7 @@ describe('#packageComponent()', () => {
   })
 
   it('should package component at given relative path', async () => {
-    const context = await createContext({ cwd: __dirname })
+    const context = await createTestContext({ cwd: __dirname })
     utils.fileExists.mockReturnValue(Promise.resolve(true))
     utils.readFile.mockReturnValue(Promise.resolve({ type: 'my-project', version: '0.0.1' }))
 
@@ -67,7 +67,7 @@ describe('#packageComponent()', () => {
   })
 
   it('should package component at given absolute path', async () => {
-    const context = await createContext({ cwd: __dirname })
+    const context = await createTestContext({ cwd: __dirname })
     utils.fileExists.mockReturnValue(Promise.resolve(true))
     utils.readFile.mockReturnValue(Promise.resolve({ type: 'my-project', version: '0.0.1' }))
 
@@ -87,7 +87,7 @@ describe('#packageComponent()', () => {
   })
 
   it('validate package path', async () => {
-    const context = await createContext({ cwd: __dirname })
+    const context = await createTestContext({ cwd: __dirname })
     utils.fileExists.mockReturnValue(Promise.resolve(false))
 
     const componentPath = '/home/some-path'

@@ -1,4 +1,5 @@
-import { append, get, or, pick, reduce, shallowEquals } from '@serverless/utils'
+import { append, get, or, pick, reduce, equals } from '@serverless/utils'
+import { pickComponentProps } from './utils'
 
 const DEPLOY = 'deploy'
 
@@ -12,6 +13,10 @@ const Component = (SuperClass) =>
       this.components = or(get('components', inputs), this.components, {})
     }
 
+    equals(value) {
+      return value.instanceId === this.instanceId
+    }
+
     hydrate(previousInstance) {
       this.instanceId = or(get('instanceId', previousInstance), this.instanceId)
     }
@@ -23,7 +28,14 @@ const Component = (SuperClass) =>
     }
 
     shouldDeploy(prevInstance) {
-      if (!prevInstance || !shallowEquals(prevInstance, this)) {
+      if (!prevInstance) {
+        return DEPLOY
+      }
+
+      const prevProps = pickComponentProps(prevInstance)
+      const nextProps = pickComponentProps(this)
+
+      if (!equals(prevProps, nextProps)) {
         return DEPLOY
       }
     }
