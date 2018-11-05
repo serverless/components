@@ -1,16 +1,26 @@
 import path from 'path'
-import { createContext } from '../../../src/utils'
+import { deserialize, resolveComponentEvaluables, serialize } from '../../../src/utils'
+import { createTestContext } from '../../../test'
+
+beforeEach(() => {
+  jest.clearAllMocks()
+})
+
+afterAll(() => {
+  jest.restoreAllMocks()
+})
 
 describe('Component', () => {
+  const cwd = path.resolve(__dirname, '..')
+  let context
+  let Component
+
+  beforeEach(async () => {
+    context = await createTestContext({ cwd })
+    Component = await context.loadType('./')
+  })
+
   it('should return components as children when calling define', async () => {
-    let context = await createContext({
-      cwd: path.join(__dirname, '..')
-    })
-
-    context = await context.loadProject()
-    context = await context.loadApp()
-
-    const Component = await context.loadType('./')
     const component = await context.construct(Component, {})
 
     component.components = {
@@ -24,43 +34,28 @@ describe('Component', () => {
     expect(children).toEqual(component.components)
   })
 
-  it('should deploy', async () => {
-    let context = await createContext({
-      cwd: path.join(__dirname, '..')
-    })
-
-    context = await context.loadProject()
-    context = await context.loadApp()
-
-    const Component = await context.loadType('./')
+  it('shouldDeploy should return deploy when prevInstance is null', async () => {
     const component = await context.construct(Component, {})
 
-    component.components = {
-      myComponent: {
-        name: 'abc'
-      }
-    }
+    expect(component.shouldDeploy(null, context)).toEqual('deploy')
+  })
 
-    expect(component.shouldDeploy(undefined)).toEqual('deploy')
+  it('should generate an instanceId on construct', async () => {
+    const component = await context.construct(Component, {})
+    expect(typeof component.instanceId).toBe('string')
   })
 
   it('should preserve instanceId on hydrate', async () => {
-    let context = await createContext({
-      cwd: path.join(__dirname, '..')
-    })
+    let component = await context.construct(Component, {})
+    component = await context.defineComponent(component)
+    component = resolveComponentEvaluables(component)
+    await component.deploy(null, context)
 
-    context = await context.loadProject()
-    context = await context.loadApp()
+    const prevComponent = await deserialize(serialize(component, context), context)
 
-    const Component = await context.loadType('./')
-    const component = await context.construct(Component, {})
+    const nextComponent = await context.construct(Component, {})
+    nextComponent.hydrate(prevComponent, context)
 
-    component.components = {
-      myComponent: {
-        name: 'abc'
-      }
-    }
-
-    expect(component.shouldDeploy(undefined)).toEqual('deploy')
+    expect(nextComponent.instanceId).toBe(prevComponent.instanceId)
   })
 })
