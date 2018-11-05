@@ -1,4 +1,4 @@
-import { getParent, isString, last, walkReduceDepthFirst } from '@serverless/utils'
+import { getParent, isString, last, omit, walkReduceDepthFirst } from '@serverless/utils'
 import hasVariableString from '../variable/hasVariableString'
 import newVariable from '../variable/newVariable'
 import isTypeConstruct from '../type/isTypeConstruct'
@@ -30,7 +30,7 @@ const interpretProps = async (props, data, context) => {
       return interpretedProps
     },
     props,
-    props
+    omit(['inputTypes'], props)
   )
 }
 

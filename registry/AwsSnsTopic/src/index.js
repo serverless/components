@@ -1,4 +1,4 @@
-const {
+import {
   concat,
   contains,
   equals,
@@ -9,14 +9,13 @@ const {
   keys,
   map,
   merge,
-  reduce,
-  values,
-  resolve,
-  resolvable,
-  or,
   not,
-  pick
-} = require('@serverless/utils')
+  or,
+  pick,
+  reduce,
+  resolvable,
+  values
+} from '@serverless/utils'
 
 const capitalize = (string) => `${string.charAt(0).toUpperCase()}${string.slice(1)}`
 const resolveInSequence = async (functionsToExecute) =>
@@ -174,11 +173,11 @@ const AwsSnsTopic = (SuperClass) =>
         return 'deploy'
       }
       const inputs = {
-        topicName: resolve(this.topicName),
-        displayName: resolve(this.displayName),
-        policy: resolve(this.policy),
-        deliveryPolicy: resolve(this.deliveryPolicy),
-        deliveryStatusAttributes: resolve(this.deliveryStatusAttributes)
+        topicName: this.topicName,
+        displayName: this.displayName,
+        policy: this.policy,
+        deliveryPolicy: this.deliveryPolicy,
+        deliveryStatusAttributes: this.deliveryStatusAttributes
       }
       const prevInputs = prevInstance ? pick(keys(inputs), prevInstance) : {}
       const configChanged = not(equals(inputs, prevInputs))
@@ -196,7 +195,7 @@ const AwsSnsTopic = (SuperClass) =>
       const AWS = provider.getSdk()
       const sns = new AWS.SNS()
 
-      if (prevInstance && prevInstance.topicName === resolve(this.topicName)) {
+      if (prevInstance && prevInstance.topicName === this.topicName) {
         context.log(`Updating SNS topic: '${this.topicName}'...`)
         const props = merge(
           await updateAttributes(
@@ -205,7 +204,7 @@ const AwsSnsTopic = (SuperClass) =>
             prevInstance
           ),
           {
-            name: this.topicName,
+            topicName: this.topicName,
             topicArn: prevInstance.topicArn
           }
         )

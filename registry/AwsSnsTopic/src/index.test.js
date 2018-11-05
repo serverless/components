@@ -1,6 +1,6 @@
 import AWS from 'aws-sdk'
 import path from 'path'
-import { deserialize, resolveComponentEvaluables, serialize } from '../../../src/utils'
+import { deserialize, resolveComponentEvaluables, serialize, SYMBOL_TYPE } from '../../../src/utils'
 import { createTestContext } from '../../../test'
 
 beforeEach(() => {
@@ -28,17 +28,34 @@ describe('AwsSnsTopic', () => {
   })
 
   it('should create topic if first deployment', async () => {
-    let awsSnsTopic = await context.construct(AwsSnsTopic, {
+    const inputs = {
       provider,
       topicName: 'myTopic',
       displayName: 'myTopicDisplayName',
       policy: {},
       deliveryPolicy: {},
       deliveryStatusAttributes: []
-    })
+    }
+    let awsSnsTopic = await context.construct(AwsSnsTopic, inputs)
     awsSnsTopic = await context.defineComponent(awsSnsTopic)
     awsSnsTopic = resolveComponentEvaluables(awsSnsTopic)
     await awsSnsTopic.deploy(null, context)
+
+    expect(awsSnsTopic).toEqual({
+      ...AwsSnsTopic.props,
+      inputs,
+      provider,
+      [SYMBOL_TYPE]: AwsSnsTopic,
+      instanceId: expect.stringMatching(/^AwsSnsTopic-prod-[a-z0-9]+$/),
+      components: {},
+      children: {},
+      topicName: 'myTopic',
+      displayName: 'myTopicDisplayName',
+      policy: {},
+      deliveryPolicy: {},
+      deliveryStatusAttributes: [],
+      topicArn: 'abc:zxc'
+    })
 
     expect(AWS.mocks.createTopicMock).toHaveBeenCalled()
     expect(AWS.mocks.setTopicAttributesMock).toHaveBeenCalled()
@@ -76,8 +93,17 @@ describe('AwsSnsTopic', () => {
 
     await nextAwsSnsTopic.deploy(prevAwsSnsTopic, context)
 
+    expect(nextAwsSnsTopic).toEqual({
+      ...prevAwsSnsTopic,
+      inputs: nextAwsSnsTopic.inputs,
+      displayName: 'myNewTopicDisplayName'
+    })
     expect(AWS.mocks.createTopicMock).not.toHaveBeenCalled()
-    expect(AWS.mocks.setTopicAttributesMock).toHaveBeenCalled()
+    expect(AWS.mocks.setTopicAttributesMock).toBeCalledWith({
+      AttributeName: 'DisplayName',
+      AttributeValue: 'myNewTopicDisplayName',
+      TopicArn: 'abc:zxc'
+    })
   })
 
   it('should remove topic', async () => {
