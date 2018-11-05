@@ -1,7 +1,26 @@
-import { all, get, isEmpty, map } from '@serverless/utils'
+import { all, contains, get, isEmpty, map } from '@serverless/utils'
 import resolveComponentEvaluables from '../component/resolveComponentEvaluables'
 import cloneGraph from './cloneGraph'
 import detectCircularDeps from './detectCircularDeps'
+
+const validateNode = (node, context) => {
+  const { nextInstance, prevInstance, instanceId, operation } = node
+  if (contains(operation, ['deploy', 'replace'])) {
+    if (!nextInstance) {
+      throw new Error(`deployGraph expected nextInstance to be defined for ${operation} operation`)
+    }
+    if (!instanceId) {
+      throw new Error(`deployGraph expected instanceId to be defined for ${operation} operation`)
+    }
+    if (nextInstance.name === undefined) {
+      context.debug(`This instance has an undefined name`)
+      context.debug(nextInstance)
+    }
+    if (operation === 'replace' && !prevInstance) {
+      throw new Error(`deployGraph expected nextInstance to be defined for ${operation} operation`)
+    }
+  }
+}
 
 const deployNode = async (node, context) => {
   // NOTE BRN: Start by resolving all evaluables on this node. This will enable us to run deploy and shouldDeploy without having to manually resolve evaluables in the method.
@@ -32,19 +51,17 @@ const deployNode = async (node, context) => {
     )}`
   )
 
-  if (['deploy', 'replace'].includes(node.operation)) {
-    if (!nextInstance) {
-      throw new Error('deployGraph expected nextInstance to be defined for deploy operation')
-    }
-    if (!instanceId) {
-      throw new Error('deployGraph expected instanceId to be defined for deploy operation')
-    }
+  validateNode(node, context)
+  if (node.operation === 'deploy') {
     context.debug(`deploying node: ${nextInstance.name} { instanceId: ${instanceId} }`)
-    if (nextInstance.name === undefined) {
-      context.debug(`This instance has an undefined name`)
-      context.debug(nextInstance)
-    }
     await nextInstance.deploy(prevInstance, context)
+    context.debug(`node deployment complete: ${nextInstance.name} { instanceId: ${instanceId} }`)
+    // TODO BRN: We should probably save state incrementally as we deploy each node
+  } else if (node.operation === 'replace') {
+    context.debug(`deploying node: ${nextInstance.name} { instanceId: ${instanceId} }`)
+
+    // NOTE BRN: We do not pass the prevInstance on a replacement because it should be the same as deploying a new node
+    await nextInstance.deploy(null, context)
     context.debug(`node deployment complete: ${nextInstance.name} { instanceId: ${instanceId} }`)
     // TODO BRN: We should probably save state incrementally as we deploy each node
   }

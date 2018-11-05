@@ -50,46 +50,50 @@ describe('AwsIamRole', () => {
     provider = await context.construct(AwsProvider, {})
   })
 
-  it('should create role if first deployment', async () => {
-    const inputs = {
-      roleName: 'abc',
-      service: 'lambda.amazonaws.com',
-      provider
-    }
+  it(
+    'should create role if first deployment',
+    async () => {
+      const inputs = {
+        roleName: 'abc',
+        service: 'lambda.amazonaws.com',
+        provider
+      }
 
-    let awsIamRole = await context.construct(AwsIamRole, inputs)
-    awsIamRole = await context.defineComponent(awsIamRole)
-    awsIamRole = resolveComponentEvaluables(awsIamRole)
+      let awsIamRole = await context.construct(AwsIamRole, inputs)
+      awsIamRole = await context.defineComponent(awsIamRole)
+      awsIamRole = resolveComponentEvaluables(awsIamRole)
 
-    await awsIamRole.deploy(undefined, context)
+      await awsIamRole.deploy(undefined, context)
 
-    const createRoleParams = {
-      RoleName: inputs.roleName,
-      Path: '/',
-      AssumeRolePolicyDocument: JSON.stringify({
-        Version: '2012-10-17',
-        Statement: {
-          Effect: 'Allow',
-          Principal: {
-            Service: inputs.service
-          },
-          Action: 'sts:AssumeRole'
-        }
-      })
-    }
+      const createRoleParams = {
+        RoleName: inputs.roleName,
+        Path: '/',
+        AssumeRolePolicyDocument: JSON.stringify({
+          Version: '2012-10-17',
+          Statement: {
+            Effect: 'Allow',
+            Principal: {
+              Service: inputs.service
+            },
+            Action: 'sts:AssumeRole'
+          }
+        })
+      }
 
-    const attachRolePolicyParams = {
-      RoleName: inputs.roleName,
-      PolicyArn: 'arn:aws:iam::aws:policy/AdministratorAccess'
-    }
+      const attachRolePolicyParams = {
+        RoleName: inputs.roleName,
+        PolicyArn: 'arn:aws:iam::aws:policy/AdministratorAccess'
+      }
 
-    expect(AWS.mocks.createRoleMock).toHaveBeenCalledTimes(1)
-    expect(AWS.mocks.createRoleMock).toBeCalledWith(createRoleParams)
-    expect(AWS.mocks.attachRolePolicyMock).toHaveBeenCalledTimes(1)
-    expect(AWS.mocks.attachRolePolicyMock).toBeCalledWith(attachRolePolicyParams)
-    expect(awsIamRole.arn).toEqual('arn:aws:iam::XXXXX:role/test-role')
-    expect(sleep).toBeCalledWith(15000)
-  })
+      expect(AWS.mocks.createRoleMock).toHaveBeenCalledTimes(1)
+      expect(AWS.mocks.createRoleMock).toBeCalledWith(createRoleParams)
+      expect(AWS.mocks.attachRolePolicyMock).toHaveBeenCalledTimes(1)
+      expect(AWS.mocks.attachRolePolicyMock).toBeCalledWith(attachRolePolicyParams)
+      expect(awsIamRole.arn).toEqual('arn:aws:iam::XXXXX:role/test-role')
+      expect(sleep).toBeCalledWith(15000)
+    },
+    10000
+  )
 
   it('should update if role name has changed', async () => {
     let oldAwsIamRole = await context.construct(AwsIamRole, {

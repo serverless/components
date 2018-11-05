@@ -20,13 +20,115 @@ describe('#buildGraph()', () => {
     Component = await context.loadType('Component')
   })
 
-  it('build a simple graph for a single component', async () => {
-    let nextInstance = await context.construct(Component, {})
-    nextInstance = await context.defineComponent(nextInstance)
+  it('build a simple graph from instance when none exists', () => {
+    const nextInstance = {
+      instanceId: 'test',
+      shouldDeploy: jest.fn(),
+      deploy: jest.fn(),
+      define: jest.fn(),
+      remove: jest.fn(),
+      construct: jest.fn()
+    }
 
     const graph = buildGraph(nextInstance, null)
     expect(graph.nodes()).toEqual(expect.arrayContaining([nextInstance.instanceId]))
     expect(graph.edges()).toEqual([])
+    expect(graph.node(nextInstance.instanceId)).toEqual({
+      instanceId: nextInstance.instanceId,
+      nextInstance,
+      prevInstance: null,
+      operation: undefined // NOTE BRN: This gets set later in the deployGraph phase
+    })
+  })
+
+  it('build a simple graph from instance when one ALREADY exists', () => {
+    const nextInstance = {
+      instanceId: 'test',
+      shouldDeploy: jest.fn(),
+      deploy: jest.fn(),
+      define: jest.fn(),
+      remove: jest.fn(),
+      construct: jest.fn()
+    }
+
+    const prevInstance = {
+      instanceId: 'test',
+      shouldDeploy: jest.fn(),
+      deploy: jest.fn(),
+      define: jest.fn(),
+      remove: jest.fn(),
+      construct: jest.fn()
+    }
+
+    const graph = buildGraph(nextInstance, prevInstance)
+    expect(graph.nodes()).toEqual(expect.arrayContaining([nextInstance.instanceId]))
+    expect(graph.edges()).toEqual([])
+    expect(graph.node(nextInstance.instanceId)).toEqual({
+      instanceId: nextInstance.instanceId,
+      nextInstance,
+      prevInstance,
+      operation: undefined // NOTE BRN: This gets set later in the deployGraph phase
+    })
+  })
+
+  it('build a simple graph when only instance has been removed', () => {
+    const prevInstance = {
+      instanceId: 'test',
+      shouldDeploy: jest.fn(() => 'replace'),
+      deploy: jest.fn(),
+      define: jest.fn(),
+      remove: jest.fn(),
+      construct: jest.fn()
+    }
+
+    const graph = buildGraph(null, prevInstance)
+    expect(graph.nodes()).toEqual(expect.arrayContaining([prevInstance.instanceId]))
+    expect(graph.edges()).toEqual([])
+    expect(graph.node(prevInstance.instanceId)).toEqual({
+      instanceId: prevInstance.instanceId,
+      nextInstance: null,
+      prevInstance,
+      operation: 'remove'
+    })
+  })
+
+  it('build a simple graph for a single Component when none exists', async () => {
+    let nextInstance = await context.construct(Component, {})
+    nextInstance = await context.defineComponent(nextInstance, null)
+
+    const graph = buildGraph(nextInstance, null)
+    expect(graph.nodes()).toEqual(expect.arrayContaining([nextInstance.instanceId]))
+    expect(graph.edges()).toEqual([])
+    expect(graph.node(nextInstance.instanceId)).toEqual({
+      instanceId: nextInstance.instanceId,
+      nextInstance,
+      prevInstance: null,
+      operation: undefined // NOTE BRN: This gets set later in the deployGraph phase
+    })
+  })
+
+  it('build a simple graph for a single Component when one ALREADY exists', async () => {
+    let component = await context.construct(Component, {})
+    component = await context.defineComponent(component, null)
+    component = resolveComponentEvaluables(component)
+    await component.deploy(null, context)
+
+    const prevInstance = await deserialize(serialize(component, context), context)
+
+    let nextInstance = await context.construct(Component, {})
+    nextInstance.hydrate(prevInstance)
+    nextInstance = await context.defineComponent(nextInstance, prevInstance)
+    nextInstance = resolveComponentEvaluables(nextInstance)
+
+    const graph = buildGraph(nextInstance, prevInstance)
+    expect(graph.nodes()).toEqual(expect.arrayContaining([nextInstance.instanceId]))
+    expect(graph.edges()).toEqual([])
+    expect(graph.node(nextInstance.instanceId)).toEqual({
+      instanceId: nextInstance.instanceId,
+      nextInstance,
+      prevInstance,
+      operation: undefined // NOTE BRN: This gets set later in the deployGraph phase
+    })
   })
 
   it('build a graph for a component with a child', async () => {
@@ -43,7 +145,7 @@ describe('#buildGraph()', () => {
     )
   })
 
-  it('build a graph for a component with a child', async () => {
+  it('build a graph for a component with a removed child and a new child', async () => {
     let component = await context.construct(Component, {
       components: {
         foo: await context.construct(Component, {})
