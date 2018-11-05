@@ -1,3 +1,5 @@
+import { resolveComponentEvaluables } from '../component'
+import { deserialize, serialize } from '../serialize'
 import { createTestContext } from '../../../test'
 import buildGraph from './buildGraph'
 
@@ -39,5 +41,68 @@ describe('#buildGraph()', () => {
     expect(graph.edges()).toEqual(
       expect.arrayContaining([{ v: nextInstance.instanceId, w: fooComponent.instanceId }])
     )
+  })
+
+  it('build a graph for a component with a child', async () => {
+    let component = await context.construct(Component, {
+      components: {
+        foo: await context.construct(Component, {})
+      }
+    })
+    component = await context.defineComponent(component)
+    component = resolveComponentEvaluables(component)
+    await component.deploy(null, context)
+
+    const prevInstance = await deserialize(serialize(component, context), context)
+
+    let nextInstance = await context.construct(Component, {
+      components: {
+        bar: await context.construct(Component, {})
+      }
+    })
+    nextInstance.hydrate(prevInstance)
+    nextInstance = await context.defineComponent(nextInstance, prevInstance)
+    nextInstance = resolveComponentEvaluables(nextInstance)
+
+    const graph = buildGraph(nextInstance, prevInstance)
+    expect(graph.nodes()).toEqual(
+      expect.arrayContaining([
+        nextInstance.instanceId,
+        nextInstance.components.bar.instanceId,
+        prevInstance.components.foo.instanceId
+      ])
+    )
+    expect(graph.edges()).toEqual(
+      expect.arrayContaining([
+        {
+          v: nextInstance.instanceId,
+          w: nextInstance.components.bar.instanceId
+        },
+        {
+          v: nextInstance.instanceId,
+          w: prevInstance.components.foo.instanceId
+        }
+      ])
+    )
+    expect(graph.node(nextInstance.instanceId)).toEqual({
+      nextInstance,
+      prevInstance,
+      operation: undefined,
+      instanceId: nextInstance.instanceId
+    })
+
+    expect(graph.node(prevInstance.components.foo.instanceId)).toEqual({
+      nextInstance: null,
+      prevInstance: prevInstance.components.foo,
+      operation: 'remove',
+      instanceId: prevInstance.components.foo.instanceId
+    })
+
+    expect(graph.node(nextInstance.components.bar.instanceId)).toEqual({
+      nextInstance: nextInstance.components.bar,
+      prevInstance: null,
+      operation: undefined, // NOTE BRN: This gets set later during the deployGraph phase
+      instanceId: nextInstance.components.bar.instanceId
+    })
   })
 })

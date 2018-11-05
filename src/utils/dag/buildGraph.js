@@ -45,11 +45,13 @@ const buildGraph = (nextInstance, prevInstance) => {
         let node = accum.node(currentInstance.instanceId)
         if (node) {
           node.nextInstance = currentInstance
+          node.operation = undefined
         } else {
           node = {
             instanceId: currentInstance.instanceId,
             nextInstance: currentInstance,
-            prevInstance: null
+            prevInstance: null,
+            operation: undefined
           }
           accum.setNode(currentInstance.instanceId, node)
         }
