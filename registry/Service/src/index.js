@@ -65,7 +65,7 @@ const Service = async (SuperClass, superContext) => {
 
       return {
         title: this.name,
-        type: this.extends,
+        type: 'Service',
         data: {},
         children: [...functions, ...components]
       }

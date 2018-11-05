@@ -52,7 +52,7 @@ const Component = (SuperClass) =>
       )
       return {
         title: this.name,
-        type: this.extends,
+        type: this.name,
         data: pick(['name', 'license', 'version'], this),
         children
       }

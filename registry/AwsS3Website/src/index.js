@@ -246,10 +246,9 @@ const AwsS3Website = (SuperClass) =>
     async info() {
       return {
         title: this.domain,
-        type: this.extends,
+        type: this.name,
         data: {
-          domain: this.domain,
-          projectDir: this.projectDir
+          domain: this.domain
         }
       }
     }

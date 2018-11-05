@@ -334,7 +334,7 @@ const AwsDynamoDB = {
   async info() {
     return {
       title: this.tables[0].name,
-      type: this.extends,
+      type: this.name,
       data: {
         tableName: this.tables[0].name
       }

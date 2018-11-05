@@ -160,7 +160,7 @@ const RestApi = async function(SuperClass, SuperContext) {
 
       return {
         title: this.apiName,
-        type: this.extends,
+        type: this.name,
         data: { routes: flatRoutes, baseUrl: this.baseUrl }
       }
     }

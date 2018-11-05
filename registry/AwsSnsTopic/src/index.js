@@ -234,7 +234,7 @@ const AwsSnsTopic = (SuperClass) =>
     async info() {
       return {
         title: this.topicName,
-        type: this.extends,
+        type: this.name,
         data: {
           topicName: this.topicName,
           arn: this.topicArn

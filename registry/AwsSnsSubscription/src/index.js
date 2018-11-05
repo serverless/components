@@ -110,8 +110,8 @@ const AwsSnsSubscription = (SuperClass) =>
 
     async info() {
       return {
-        title: this.subscriptionArn,
-        type: this.extends,
+        title: this.protocol,
+        type: this.name,
         data: {
           arn: this.subscriptionArn,
           topic: this.topic,

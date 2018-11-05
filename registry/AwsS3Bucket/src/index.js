@@ -40,7 +40,7 @@ const AwsS3Bucket = (SuperClass) =>
     async info() {
       return {
         title: this.name,
-        type: this.extends,
+        type: this.name,
         data: pick(['name', 'license', 'version', 'bucketName'], this)
       }
     }

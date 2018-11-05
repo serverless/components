@@ -12,8 +12,8 @@ const Function = {
 
   async info() {
     return {
-      title: this.name,
-      type: this.extends,
+      title: this.functionName,
+      type: this.name,
       data: pick(
         [
           'environment',

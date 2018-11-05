@@ -88,7 +88,7 @@ const AwsIamPolicy = (SuperClass) =>
     async info() {
       return {
         title: this.policyName,
-        type: this.extends,
+        type: this.name,
         data: {
           arn: this.arn
         }

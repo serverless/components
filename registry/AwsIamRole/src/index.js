@@ -160,7 +160,7 @@ const AwsIamRole = async (SuperClass, superContext) => {
     async info() {
       return {
         title: this.roleName,
-        type: this.extends,
+        type: this.name,
         data: {
           arn: this.arn,
           service: this.service,

@@ -23,7 +23,7 @@ const App = (SuperClass) =>
 
       return {
         title: this.name,
-        type: this.extends,
+        type: this.name,
         data: {},
         children: [...components, ...services]
       }

@@ -130,7 +130,7 @@ const TwilioPhoneNumber = {
   async info() {
     return {
       title: this.friendlyName || this.phoneNumber,
-      type: this.extends,
+      type: this.name,
       data: {
         phoneNumber: this.phoneNumber,
         sid: this.sid
