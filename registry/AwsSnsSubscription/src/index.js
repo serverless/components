@@ -13,7 +13,8 @@ import {
   resolvable,
   or,
   pick,
-  not
+  not,
+  get
 } from '@serverless/utils'
 
 const capitalize = (string) => `${head(string).toUpperCase()}${slice(1, Infinity, string)}`
@@ -100,13 +101,7 @@ const AwsSnsSubscription = (SuperClass) =>
 
     hydrate(prevInstance = {}) {
       super.hydrate(prevInstance)
-      Object.assign(
-        this,
-        pick(
-          ['topic', 'protocol', 'endpoint', 'subscriptionAttributes', 'subscriptionArn'],
-          prevInstance
-        )
-      )
+      this.subscriptionArn = get('subscriptionArn', prevInstance)
     }
 
     async deploy(prevInstance, context) {
