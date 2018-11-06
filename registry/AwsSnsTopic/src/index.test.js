@@ -196,4 +196,28 @@ describe('AwsSnsTopic', () => {
     const res = oldComponent.shouldDeploy(null, context)
     expect(res).toBe('deploy')
   })
+
+  it('should preserve props if nothing changed', async () => {
+    const inputs = {
+      topicName: 'myTopic',
+      displayName: 'My Topic',
+      policy: {},
+      deliveryPolicy: {},
+      deliveryStatusAttributes: [],
+      provider
+    }
+    const ComponentType = await context.loadType('./')
+    let oldComponent = await context.construct(ComponentType, inputs)
+    oldComponent = await context.defineComponent(oldComponent)
+    oldComponent = resolveComponentEvaluables(oldComponent)
+    await oldComponent.deploy(null, context)
+
+    const prevComponent = await deserialize(serialize(oldComponent, context), context)
+
+    let newComponent = await context.construct(ComponentType, inputs)
+    newComponent = await context.defineComponent(newComponent, prevComponent)
+    newComponent = resolveComponentEvaluables(newComponent)
+
+    expect(newComponent).toEqual(prevComponent)
+  })
 })

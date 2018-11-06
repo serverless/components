@@ -14,7 +14,8 @@ import {
   pick,
   reduce,
   resolvable,
-  values
+  values,
+  get
 } from '@serverless/utils'
 
 const capitalize = (string) => `${string.charAt(0).toUpperCase()}${string.slice(1)}`
@@ -188,6 +189,11 @@ const AwsSnsTopic = (SuperClass) =>
       }
 
       return undefined
+    }
+
+    hydrate(prevInstance = {}) {
+      super.hydrate(prevInstance)
+      this.topicArn = get('topicArn', prevInstance)
     }
 
     async deploy(prevInstance, context) {
