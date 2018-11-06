@@ -102,6 +102,8 @@ const AwsSnsSubscription = (SuperClass) =>
     hydrate(prevInstance = {}) {
       super.hydrate(prevInstance)
       this.subscriptionArn = get('subscriptionArn', prevInstance)
+      this.endpoint = get('endpoint', prevInstance)
+      this.statement = get('statement', prevInstance)
     }
 
     async deploy(prevInstance, context) {

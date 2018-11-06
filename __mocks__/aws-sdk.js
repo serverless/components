@@ -24,7 +24,12 @@ const mocks = {
   putTargets: jest.fn(),
   removeTargets: jest.fn(),
   deleteRule: jest.fn(),
-  addPermission: jest.fn(),
+  addPermission: jest.fn(({ FunctionName }) => ({
+    Statement: {
+      Resrouce: FunctionName,
+      Sid: 'sub:def'
+    }
+  })),
   // Lambda
   createFunctionMock: jest.fn().mockReturnValue({ FunctionArn: 'abc:zxc' }),
   updateFunctionCodeMock: jest.fn().mockReturnValue({ FunctionArn: 'abc:zxc' }),
