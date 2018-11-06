@@ -133,6 +133,13 @@ const TwilioPhoneNumber = (SuperClass) =>
     }
 
     async remove(context) {
+      if (this.preserve) {
+        context.log(
+          `Twilio phone number is set to preserve. Skipping removal of "${this.friendlyName ||
+            this.phoneNumber}"`
+        )
+        return
+      }
       context.log(`Removing Twilio Phone Number: "${this.friendlyName || this.phoneNumber}"`)
       return removePhoneNumber(this.provider.getSdk(), this.sid)
     }

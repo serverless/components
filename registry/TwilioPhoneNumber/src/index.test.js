@@ -99,12 +99,39 @@ describe('TwilioPhoneNumber', () => {
 
     await twilioPhoneNumber.deploy(null, context)
 
+    jest.clearAllMocks()
+
     const prevTwilioPhoneNumber = await deserialize(serialize(twilioPhoneNumber, context), context)
 
     await prevTwilioPhoneNumber.remove(context)
 
     expect(twilio.mocks.incomingPhoneNumbers).toBeCalledWith(expectedSid)
     expect(twilio.mocks.incomingPhoneNumbersRemove).toHaveBeenCalled()
+  })
+
+  it('should NOT remove phone number if preserve is true', async () => {
+    let twilioPhoneNumber = await context.construct(TwilioPhoneNumber, {
+      provider: await context.construct(TwilioProvider, {
+        accountSid: 'accountSid',
+        authToken: 'authToken'
+      }),
+      preserve: true,
+      phoneNumber: '+1234567890'
+    })
+
+    twilioPhoneNumber = await context.defineComponent(twilioPhoneNumber)
+    twilioPhoneNumber = resolveComponentEvaluables(twilioPhoneNumber)
+
+    await twilioPhoneNumber.deploy(null, context)
+
+    jest.clearAllMocks()
+
+    const prevTwilioPhoneNumber = await deserialize(serialize(twilioPhoneNumber, context), context)
+
+    await prevTwilioPhoneNumber.remove(context)
+
+    expect(twilio.mocks.incomingPhoneNumbers).not.toHaveBeenCalled()
+    expect(twilio.mocks.incomingPhoneNumbersRemove).not.toHaveBeenCalled()
   })
 
   it('shouldDeploy should return undefined if nothing changed', async () => {

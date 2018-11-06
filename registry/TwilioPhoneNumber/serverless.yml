@@ -13,6 +13,11 @@ inputTypes:
     type: TwilioProvider
     required: true
     description: "The Twilo provider the holds the Twilio credentials"
+  preserve:
+    type: boolean
+    required: false
+    default: true
+    description: If set to true, the phone number will not be released when this component is removed.
   phoneNumber:
     type: string
     required: false
@@ -91,6 +96,7 @@ inputTypes:
     description: "The 34 character sid of the address Twilio should associate with the number."
 
 provider: ${inputs.provider}
+preserve: ${inputs.preserve}
 phoneNumber: ${inputs.phoneNumber}
 areaCode: ${inputs.areaCode}
 friendlyName: ${inputs.friendlyName}
@@ -110,5 +116,3 @@ smsFallbackUrl: ${inputs.smsFallbackUrl}
 smsFallbackMethod: ${inputs.smsFallbackMethod}
 smsApplicationSid: ${inputs.smsApplicationSid}
 addressSid: ${inputs.addressSid}
-
-
