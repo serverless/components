@@ -2,6 +2,11 @@ import { get } from '@serverless/utils'
 
 const AwsEventsRule = (SuperClass) =>
   class extends SuperClass {
+    hydrate(prevInstance) {
+      super.hydrate(prevInstance)
+      this.arn = get('arn', prevInstance)
+    }
+
     shouldDeploy(prevInstance) {
       if (prevInstance && prevInstance.lambda.functionName !== this.lambda.functionName) {
         return 'replace'
@@ -12,11 +17,6 @@ const AwsEventsRule = (SuperClass) =>
       ) {
         return 'deploy'
       }
-    }
-
-    async hydrate(prevInstance) {
-      super.hydrate(prevInstance)
-      this.arn = get('arn', prevInstance)
     }
 
     async deploy(prevInstance, context) {
