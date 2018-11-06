@@ -1,6 +1,6 @@
 import AWS from 'aws-sdk'
 import path from 'path'
-import { resolveComponentEvaluables } from '../../../src/utils'
+import { deserialize, serialize, resolveComponentEvaluables } from '../../../src/utils'
 import { createTestContext } from '../../../test'
 
 describe('AwsEventsRule', () => {
@@ -58,6 +58,40 @@ describe('AwsEventsRule', () => {
     expect(AWS.mocks.putRule).toBeCalledWith(putRuleParams)
     expect(AWS.mocks.putTargets).toBeCalledWith(putTargetsParams)
     expect(AWS.mocks.addPermission).toBeCalledWith(addPermissionParams)
+  })
+
+  it('should preserve props if nothing changed', async () => {
+    let awsEventsRule = await context.construct(AwsEventsRule, {
+      provider: await context.construct(AwsProvider, {}),
+      schedule: 'rate(5 minutes)',
+      lambda: {
+        functionName: 'hello',
+        getId: () => 'arn:aws:lambda:us-east-1:1234567890:function:hello'
+      }
+    })
+
+    awsEventsRule = await context.defineComponent(awsEventsRule)
+    awsEventsRule = resolveComponentEvaluables(awsEventsRule)
+    await awsEventsRule.deploy(null, context)
+
+    const prevAwsEventsRule = await deserialize(serialize(awsEventsRule, context), context)
+
+    expect(prevAwsEventsRule.arn).toBe('abc:zxc')
+
+    let nextAwsEventsRule = await context.construct(AwsEventsRule, {
+      provider: await context.construct(AwsProvider, {}),
+      schedule: 'rate(5 minutes)',
+      lambda: {
+        functionName: 'hello',
+        getId: () => 'arn:aws:lambda:us-east-1:1234567890:function:hello'
+      }
+    })
+    nextAwsEventsRule = await context.defineComponent(nextAwsEventsRule, prevAwsEventsRule)
+    nextAwsEventsRule = resolveComponentEvaluables(nextAwsEventsRule)
+    // remove the getId function to ease equality checks
+    delete nextAwsEventsRule.inputs.lambda.getId
+    delete prevAwsEventsRule.inputs.lambda.getId
+    expect(nextAwsEventsRule).toEqual(prevAwsEventsRule)
   })
 
   it('should remove schedule', async () => {

@@ -1,3 +1,5 @@
+import { get } from '@serverless/utils'
+
 const AwsEventsRule = (SuperClass) =>
   class extends SuperClass {
     shouldDeploy(prevInstance) {
@@ -10,6 +12,11 @@ const AwsEventsRule = (SuperClass) =>
       ) {
         return 'deploy'
       }
+    }
+
+    async hydrate(prevInstance) {
+      super.hydrate(prevInstance)
+      this.arn = get('arn', prevInstance)
     }
 
     async deploy(prevInstance, context) {
