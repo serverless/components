@@ -77,6 +77,11 @@ const TwilioApplication = (SuperClass) =>
       // this.messageStatusCallback = inputs.messageStatusCallback || null
     }
 
+    hydrate(prevInstance) {
+      super.hydrate(prevInstance)
+      Object.assign(this, pick(applicationProps, prevInstance))
+    }
+
     async deploy(prevInstance = {}, context) {
       const inputs = pick(inputsProps, this)
       const prevInputs = pick(inputsProps, prevInstance)
