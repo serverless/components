@@ -98,6 +98,17 @@ const AwsSnsSubscription = (SuperClass) =>
       return undefined
     }
 
+    hydrate(prevInstance = {}) {
+      super.hydrate(prevInstance)
+      Object.assign(
+        this,
+        pick(
+          ['topic', 'protocol', 'endpoint', 'subscriptionAttributes', 'subscriptionArn'],
+          prevInstance
+        )
+      )
+    }
+
     async deploy(prevInstance, context) {
       const outputs = await getProtocol(this.protocol).deploy(this, context)
       await setAllSubscriptionAttributes(outputs.subscriptionArn, this, context)
