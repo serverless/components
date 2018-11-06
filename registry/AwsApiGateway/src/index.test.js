@@ -75,6 +75,27 @@ describe('AwsApiGateway', () => {
     })
   })
 
+  it('should preserve props if nothing changed', async () => {
+    const inputs = {
+      provider: await context.construct(AwsProvider, {}),
+      apiName: 'somethingNew',
+      role: { arn: 'someArn' },
+      routes: {}
+    }
+    let oldComponent = await context.construct(AwsApiGateway, inputs)
+    oldComponent = await context.defineComponent(oldComponent)
+    oldComponent = resolveComponentEvaluables(oldComponent)
+    await oldComponent.deploy(null, context)
+
+    const prevComponent = await deserialize(serialize(oldComponent, context), context)
+
+    let newComponent = await context.construct(AwsApiGateway, inputs)
+    newComponent = await context.defineComponent(newComponent, prevComponent)
+    newComponent = resolveComponentEvaluables(newComponent)
+
+    expect(newComponent).toEqual(prevComponent)
+  })
+
   it('should remove deployment', async () => {
     const inputs = {
       provider: await context.construct(AwsProvider, {}),

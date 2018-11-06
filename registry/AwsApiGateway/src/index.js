@@ -93,6 +93,13 @@ const AwsApiGateway = function(SuperClass) {
       this.routes = inputs.routes
     }
 
+    hydrate(prevInstance) {
+      super.hydrate(prevInstance)
+      this.id = get('id', prevInstance)
+      this.baseUrl = get('baseUrl', prevInstance)
+      this.urls = get('urls', prevInstance)
+    }
+
     shouldDeploy(prevInstance) {
       if (!prevInstance) {
         return 'deploy'

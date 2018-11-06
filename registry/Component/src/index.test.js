@@ -74,7 +74,6 @@ describe('Component', () => {
         bar: 'value'
       }
     })
-    nextComponent.hydrate(prevComponent)
     nextComponent = await context.defineComponent(nextComponent, prevComponent)
     nextComponent = resolveComponentEvaluables(nextComponent)
 
@@ -100,7 +99,6 @@ describe('Component', () => {
         bar: 'new-value'
       }
     })
-    nextComponent.hydrate(prevComponent)
     nextComponent = await context.defineComponent(nextComponent, prevComponent)
     nextComponent = resolveComponentEvaluables(nextComponent)
 
@@ -126,7 +124,6 @@ describe('Component', () => {
         foo: await context.construct(Component, {})
       }
     })
-    nextComponent.hydrate(prevComponent)
     nextComponent = await context.defineComponent(nextComponent, prevComponent)
     nextComponent = resolveComponentEvaluables(nextComponent)
 

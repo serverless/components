@@ -233,6 +233,60 @@ describe('AwsLambdaFunction', () => {
     )
   })
 
+  it('should preserve properties when hydrated', async () => {
+    let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+      provider,
+      code: './code',
+      functionName: 'hello',
+      functionDescription: 'hello description',
+      handler: 'index.handler',
+      zip: 'zipfilecontent',
+      runtime: 'nodejs8.10',
+      memorySize: 512,
+      timeout: 10,
+      environment: {
+        ENV_VAR: 'env value'
+      },
+      tags: 'abc',
+      role: {
+        arn: 'abc:aws'
+      }
+    })
+
+    awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
+    awsLambdaFunction = resolveComponentEvaluables(awsLambdaFunction)
+    await awsLambdaFunction.deploy(null, context)
+
+    const prevAwsLambdaFunction = await deserialize(serialize(awsLambdaFunction, context), context)
+
+    expect(prevAwsLambdaFunction.arn).toBe('abc:zxc')
+
+    let nextAwsLambdaFunction = await context.construct(AwsLambdaFunction, {
+      provider: await context.construct(AwsProvider, {}),
+      code: './code',
+      functionName: 'hello',
+      functionDescription: 'hello description',
+      handler: 'index.handler',
+      zip: 'zipfilecontent',
+      runtime: 'nodejs8.10',
+      memorySize: 512,
+      timeout: 10,
+      environment: {
+        ENV_VAR: 'env value'
+      },
+      tags: 'abc',
+      role: {
+        arn: 'abc:aws'
+      }
+    })
+    nextAwsLambdaFunction = await context.defineComponent(
+      nextAwsLambdaFunction,
+      prevAwsLambdaFunction
+    )
+    nextAwsLambdaFunction = resolveComponentEvaluables(nextAwsLambdaFunction)
+    expect(nextAwsLambdaFunction).toEqual(prevAwsLambdaFunction)
+  })
+
   it('should create lambda if name changed', async () => {
     let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
       provider,
