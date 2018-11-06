@@ -1,4 +1,4 @@
-import { all, sleep, map, or, resolvable, pick, keys, not, equals } from '@serverless/utils'
+import { get, all, sleep, map, or, resolvable, pick, keys, not, equals } from '@serverless/utils'
 
 const createPolicy = async (IAM, { policyName, document }, context) => {
   const policyRes = await IAM.createPolicy({
@@ -39,6 +39,11 @@ const AwsIamPolicy = (SuperClass) =>
       this.provider = inputs.provider
       this.policyName = resolvable(() => or(inputs.policyName, `policy-${this.instanceId}`))
       this.document = inputs.document
+    }
+
+    hydrate(prevInstance) {
+      super.hydrate(prevInstance)
+      this.arn = get('arn', prevInstance)
     }
 
     shouldDeploy(prevInstance) {

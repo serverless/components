@@ -118,6 +118,49 @@ describe('AwsIamPolicy', () => {
     expect(AWS.mocks.detachUserPolicyMock).toBeCalledWith({ UserName: 'user' })
   })
 
+  it('should preserve props if nothing changed', async () => {
+    let awsIamPolicy = await context.construct(AwsIamPolicy, {
+      provider,
+      policyName: 'abc',
+      document: {
+        Version: '2012-10-17',
+        Statement: {
+          Effect: 'Allow',
+          Principal: {
+            Service: 'lambda.amazonaws.com'
+          },
+          Action: 'sts:AssumeRole'
+        }
+      }
+    })
+
+    awsIamPolicy = await context.defineComponent(awsIamPolicy)
+    awsIamPolicy = resolveComponentEvaluables(awsIamPolicy)
+    await awsIamPolicy.deploy(null, context)
+
+    const prevAwsIamPolicy = await deserialize(serialize(awsIamPolicy, context), context)
+
+    expect(prevAwsIamPolicy.arn).toBe('abc:xyz')
+
+    let nextAwsIamPolicy = await context.construct(AwsIamPolicy, {
+      provider,
+      policyName: 'abc',
+      document: {
+        Version: '2012-10-17',
+        Statement: {
+          Effect: 'Allow',
+          Principal: {
+            Service: 'lambda.amazonaws.com'
+          },
+          Action: 'sts:AssumeRole'
+        }
+      }
+    })
+    nextAwsIamPolicy = await context.defineComponent(nextAwsIamPolicy, prevAwsIamPolicy)
+    nextAwsIamPolicy = resolveComponentEvaluables(nextAwsIamPolicy)
+    expect(nextAwsIamPolicy).toEqual(prevAwsIamPolicy)
+  })
+
   it('shouldDeploy should return undefined if nothing changed', async () => {
     const inputs = {
       policyName: 'abc',
