@@ -1,4 +1,5 @@
 import path from 'path'
+import { resolveComponentEvaluables, serialize, deserialize } from '@serverless/utils'
 import { createContext } from '../../../src/utils'
 
 const expectedOutputs = {
@@ -209,5 +210,43 @@ describe.skip('TwilioApplication', () => {
     expect(removeMock).toHaveBeenCalled()
     expect(updateMock).not.toHaveBeenCalled()
     expect(twilioMock.applications.create).not.toHaveBeenCalled()
+  })
+
+  it('should preserve props if nothing changed', async () => {
+    const context = await createContext({
+      cwd: path.join(__dirname, '..')
+    })
+    const inputs = {
+      provider: provider,
+      friendlyName: 'hello',
+      sid: 'sid',
+      apiVersion: 'foo',
+      voiceUrl: 'foo',
+      voiceMethod: 'foo',
+      voiceFallbackUrl: 'foo',
+      voiceFallbackMethod: 'foo',
+      statusCallback: 'foo',
+      statusCallbackMethod: 'foo',
+      voiceCallerIdLookup: 'foo',
+      smsUrl: 'foo',
+      smsMethod: 'foo',
+      smsFallbackUrl: 'foo',
+      smsFallbackMethod: 'foo',
+      smsStatusCallback: 'foo',
+      messageStatusCallback: 'foo'
+    }
+    const ComponentType = await context.loadType('./')
+    let oldComponent = await context.construct(ComponentType, inputs)
+    oldComponent = await context.defineComponent(oldComponent)
+    oldComponent = resolveComponentEvaluables(oldComponent)
+    await oldComponent.deploy(null, context)
+
+    const prevComponent = await deserialize(serialize(oldComponent, context), context)
+
+    let newComponent = await context.construct(ComponentType, inputs)
+    newComponent = await context.defineComponent(newComponent, prevComponent)
+    newComponent = resolveComponentEvaluables(newComponent)
+
+    expect(newComponent).toEqual(prevComponent)
   })
 })

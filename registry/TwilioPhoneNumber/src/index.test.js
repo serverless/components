@@ -179,4 +179,28 @@ describe('TwilioPhoneNumber', () => {
     const res = twilioPhoneNumber.shouldDeploy(null, context)
     expect(res).toBe('deploy')
   })
+
+  it('should preserve props if nothing changed', async () => {
+    const inputs = {
+      provider: await context.construct(TwilioProvider, {
+        accountSid: 'accountSid',
+        authToken: 'authToken'
+      }),
+      phoneNumber: '+1234567890',
+      friendlyName: 'friendlyName'
+    }
+    const ComponentType = await context.loadType('./')
+    let oldComponent = await context.construct(ComponentType, inputs)
+    oldComponent = await context.defineComponent(oldComponent)
+    oldComponent = resolveComponentEvaluables(oldComponent)
+    await oldComponent.deploy(null, context)
+
+    const prevComponent = await deserialize(serialize(oldComponent, context), context)
+
+    let newComponent = await context.construct(ComponentType, inputs)
+    newComponent = await context.defineComponent(newComponent, prevComponent)
+    newComponent = resolveComponentEvaluables(newComponent)
+
+    expect(newComponent).toEqual(prevComponent)
+  })
 })

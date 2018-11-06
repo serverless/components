@@ -83,60 +83,70 @@ const removePhoneNumber = async (twilio, sid) => {
   }
 }
 
-const TwilioPhoneNumber = {
-  shouldDeploy(prevInstance) {
-    if (!prevInstance) {
-      return 'deploy'
-    }
-    const inputs = pick(inputsProps, this)
-    const prevInputs = prevInstance ? pick(inputsProps, prevInstance) : {}
-    const configChanged = not(equals(inputs, prevInputs))
-    if (not(equals(prevInputs.phoneNumber, inputs.phoneNumber))) {
-      return 'replace'
-    } else if (configChanged) {
-      return 'deploy'
+const TwilioPhoneNumber = (SuperClass) =>
+  class extends SuperClass {
+    async construct(inputs, context) {
+      await super.construct(inputs, context)
     }
 
-    return undefined
-  },
-
-  async deploy(prevInstance, context) {
-    const inputs = pick(inputsProps, this)
-    if (!prevInstance) {
-      context.log(`Creating Twilio Phone Number: "${inputs.friendlyName || inputs.phoneNumber}"`)
-      const props = await createPhoneNumber(this.provider.getSdk(), inputs)
-      Object.assign(this, props)
-    } else {
-      const prevInputs = pick(inputsProps, prevInstance)
-      const noChanges = equals(prevInputs, inputs)
-
-      if (noChanges) {
-        return
+    shouldDeploy(prevInstance) {
+      if (!prevInstance) {
+        return 'deploy'
       }
-      context.log(`Updating Twilio Phone Number: "${inputs.friendlyName || inputs.phoneNumber}"`)
-      const props = await updatePhoneNumber(this.provider.getSdk(), {
-        ...inputs,
-        sid: prevInstance.sid
-      })
-      Object.assign(this, props)
+      const inputs = pick(inputsProps, this)
+      const prevInputs = prevInstance ? pick(inputsProps, prevInstance) : {}
+      const configChanged = not(equals(inputs, prevInputs))
+      if (not(equals(prevInputs.phoneNumber, inputs.phoneNumber))) {
+        return 'replace'
+      } else if (configChanged) {
+        return 'deploy'
+      }
+
+      return undefined
     }
-  },
 
-  async remove(context) {
-    context.log(`Removing Twilio Phone Number: "${this.friendlyName || this.phoneNumber}"`)
-    return removePhoneNumber(this.provider.getSdk(), this.sid)
-  },
+    hydrate(prevInstance = {}) {
+      super.hydrate(prevInstance)
+      Object.assign(this, pick(phoneNumberProps, prevInstance))
+    }
 
-  async info() {
-    return {
-      title: this.friendlyName || this.phoneNumber,
-      type: this.name,
-      data: {
-        phoneNumber: this.phoneNumber,
-        sid: this.sid
+    async deploy(prevInstance, context) {
+      const inputs = pick(inputsProps, this)
+      if (!prevInstance) {
+        context.log(`Creating Twilio Phone Number: "${inputs.friendlyName || inputs.phoneNumber}"`)
+        const props = await createPhoneNumber(this.provider.getSdk(), inputs)
+        Object.assign(this, props)
+      } else {
+        const prevInputs = pick(inputsProps, prevInstance)
+        const noChanges = equals(prevInputs, inputs)
+
+        if (noChanges) {
+          return
+        }
+        context.log(`Updating Twilio Phone Number: "${inputs.friendlyName || inputs.phoneNumber}"`)
+        const props = await updatePhoneNumber(this.provider.getSdk(), {
+          ...inputs,
+          sid: prevInstance.sid
+        })
+        Object.assign(this, props)
+      }
+    }
+
+    async remove(context) {
+      context.log(`Removing Twilio Phone Number: "${this.friendlyName || this.phoneNumber}"`)
+      return removePhoneNumber(this.provider.getSdk(), this.sid)
+    }
+
+    async info() {
+      return {
+        title: this.friendlyName || this.phoneNumber,
+        type: this.name,
+        data: {
+          phoneNumber: this.phoneNumber,
+          sid: this.sid
+        }
       }
     }
   }
-}
 
 export default TwilioPhoneNumber
