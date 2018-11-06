@@ -199,6 +199,31 @@ describe('AwsIamRole', () => {
     expect(sleep).toBeCalledWith(15000)
   })
 
+  it('should preserve props if nothing changed', async () => {
+    let awsIamRole = await context.construct(AwsIamRole, {
+      provider,
+      roleName: 'abc',
+      service: 'lambda.amazonaws.com'
+    })
+
+    awsIamRole = await context.defineComponent(awsIamRole)
+    awsIamRole = resolveComponentEvaluables(awsIamRole)
+    await awsIamRole.deploy(null, context)
+
+    const prevAwsIamRole = await deserialize(serialize(awsIamRole, context), context)
+
+    expect(prevAwsIamRole.arn).toBe('arn:aws:iam::XXXXX:role/test-role')
+
+    let nextAwsIamRole = await context.construct(AwsIamRole, {
+      provider,
+      roleName: 'abc',
+      service: 'lambda.amazonaws.com'
+    })
+    nextAwsIamRole = await context.defineComponent(nextAwsIamRole, prevAwsIamRole)
+    nextAwsIamRole = resolveComponentEvaluables(nextAwsIamRole)
+    expect(nextAwsIamRole).toEqual(prevAwsIamRole)
+  })
+
   it('should remove role', async () => {
     let oldAwsIamRole = await context.construct(AwsIamRole, {
       provider,
