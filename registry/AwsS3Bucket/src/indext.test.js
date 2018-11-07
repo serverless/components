@@ -25,22 +25,18 @@ describe('AwsS3Bucket', () => {
     provider = await context.construct(AwsProvider, {})
   })
 
-  it(
-    'should deploy bucket when none exists',
-    async () => {
-      let awsS3Bucket = await context.construct(AwsS3Bucket, {
-        provider,
-        bucketName: 'bucket-abc'
-      })
-      awsS3Bucket = await context.defineComponent(awsS3Bucket)
-      awsS3Bucket = resolveComponentEvaluables(awsS3Bucket)
+  it('should deploy bucket when none exists', async () => {
+    let awsS3Bucket = await context.construct(AwsS3Bucket, {
+      provider,
+      bucketName: 'bucket-abc'
+    })
+    awsS3Bucket = await context.defineComponent(awsS3Bucket)
+    awsS3Bucket = resolveComponentEvaluables(awsS3Bucket)
 
-      await awsS3Bucket.deploy(null, context)
+    await awsS3Bucket.deploy(null, context)
 
-      expect(AWS.mocks.createBucketMock).toBeCalledWith({ Bucket: 'bucket-abc' })
-    },
-    20000
-  )
+    expect(AWS.mocks.createBucketMock).toBeCalledWith({ Bucket: 'bucket-abc' })
+  }, 20000)
 
   it('should update when bucket name has changed', async () => {
     let awsS3Bucket = await context.construct(AwsS3Bucket, {

@@ -7,8 +7,8 @@ const { execSync } = require('child_process')
 import { hashElement } from 'folder-hash'
 
 /*
-* Create Website Bucket
-*/
+ * Create Website Bucket
+ */
 
 const createWebsiteBucket = async (s3, bucketName) => {
   const s3BucketPolicy = {
@@ -73,9 +73,9 @@ const createWebsiteBucket = async (s3, bucketName) => {
 }
 
 /*
-* Upload Directory
-* - Uploads folder to S3 Bucket
-*/
+ * Upload Directory
+ * - Uploads folder to S3 Bucket
+ */
 
 const uploadDir = async (s3, bucketName, assets) => {
   const items = await new Promise((res, rej) => {
@@ -108,8 +108,8 @@ const uploadDir = async (s3, bucketName, assets) => {
 }
 
 /*
-* Delete Website Bucket
-*/
+ * Delete Website Bucket
+ */
 
 const deleteWebsiteBucket = async (s3, bucketName) => {
   const data = await s3.listObjects({ Bucket: bucketName }).promise()
@@ -137,8 +137,8 @@ const hashProjectDir = async (projectDir) => {
 }
 
 /*
-* Component: AWS S3 Website
-*/
+ * Component: AWS S3 Website
+ */
 
 const AwsS3Website = (SuperClass) =>
   class extends SuperClass {
