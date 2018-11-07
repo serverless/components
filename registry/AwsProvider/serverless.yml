@@ -9,7 +9,7 @@ region: ${inputs.region}
 inputTypes:
   credentials:
     type: object
-    require: true
+    require: false
   region:
     type: string
     require: false
