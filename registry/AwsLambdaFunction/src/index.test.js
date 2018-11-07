@@ -366,13 +366,8 @@ describe('AwsLambdaFunction', () => {
   })
 
   it('should create lambda when code is an archive', async () => {
-    const context = await createTestContext()
-
-    const AwsProvider = await context.loadType('AwsProvider')
-    const AwsLambdaFunction = await context.loadType('./')
-
     let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       code: 'codeasarchive.jar',
       functionName: 'hello',
       functionDescription: 'description ok',
