@@ -2,7 +2,17 @@ import path from 'path'
 import { tmpdir } from 'os'
 import { readFileSync } from 'fs'
 import { hashElement } from 'folder-hash'
-import { equals, get, isArray, keys, not, packDir, pick, resolve } from '@serverless/utils'
+import {
+  equals,
+  get,
+  isArray,
+  isArchivePath,
+  keys,
+  not,
+  packDir,
+  pick,
+  resolve
+} from '@serverless/utils'
 
 const createLambda = async (
   Lambda,
@@ -175,7 +185,12 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
       const provider = this.provider
       const AWS = provider.getSdk()
       const Lambda = new AWS.Lambda()
-      await this.pack(context)
+
+      if (isArchivePath(this.code)) {
+        this.zip = readFileSync(this.code)
+      } else {
+        await this.pack(context)
+      }
 
       if (!prevInstance || this.functionName !== prevInstance.functionName) {
         context.log(`Creating Lambda: ${this.functionName}`)

@@ -365,6 +365,61 @@ describe('AwsLambdaFunction', () => {
     expect(AWS.mocks.createFunctionMock).toBeCalledWith(createFunctionParams)
   })
 
+  it('should create lambda when code is an archive', async () => {
+    const context = await createTestContext()
+
+    const AwsProvider = await context.loadType('AwsProvider')
+    const AwsLambdaFunction = await context.loadType('./')
+
+    let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+      provider: await context.construct(AwsProvider, {}),
+      code: 'codeasarchive.jar',
+      functionName: 'hello',
+      functionDescription: 'description ok',
+      handler: 'index.handler',
+      zip: 'zipfilecontent_ok',
+      runtime: 'java8',
+      memorySize: 512,
+      timeout: 10,
+      environment: {
+        ENV_VAR: 'env value'
+      },
+      tags: 'abc',
+      role: {
+        arn: 'abc:aws'
+      }
+    })
+
+    awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
+
+    awsLambdaFunction = resolveComponentEvaluables(awsLambdaFunction)
+
+    awsLambdaFunction.pack = jest.fn()
+
+    await awsLambdaFunction.deploy(null, context)
+
+    const createFunctionParams = {
+      FunctionName: awsLambdaFunction.functionName,
+      Code: {
+        ZipFile: awsLambdaFunction.zip
+      },
+      Description: awsLambdaFunction.functionDescription,
+      Handler: awsLambdaFunction.handler,
+      MemorySize: awsLambdaFunction.memorySize,
+      Publish: true,
+      Role: awsLambdaFunction.role.arn,
+      Runtime: awsLambdaFunction.runtime,
+      Timeout: awsLambdaFunction.timeout,
+      Environment: {
+        Variables: awsLambdaFunction.environment
+      }
+    }
+
+    expect(awsLambdaFunction.pack).not.toHaveBeenCalled()
+    expect(awsLambdaFunction.arn).toEqual('abc:zxc')
+    expect(AWS.mocks.createFunctionMock).toBeCalledWith(createFunctionParams)
+  })
+
   it('should remove lambda', async () => {
     let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
       provider,
