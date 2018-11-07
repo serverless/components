@@ -151,7 +151,7 @@ Also please do join the _Components_ channel on our public [Serverless-Contrib S
   * [Component Docs](#component-docs)
     * [App](./registry/App)
     * [AwsApiGateway](./registry/AwsApiGateway)
-    * [AwsDynamoDB](./registry/AwsDynamoDB)
+    * [AwsDynamoDb](./registry/AwsDynamoDb)
     * [AwsCloudWatchEventsRule](./registry/AwsCloudWatchEventsRule)
     * [AwsIamPolicy](./registry/AwsIamPolicy)
     * [AwsIamRole](./registry/AwsIamRole)
@@ -777,7 +777,7 @@ Options:
 
 * [App](./registry/App)
 * [AwsApiGateway](./registry/AwsApiGateway)
-* [AwsDynamoDB](./registry/AwsDynamoDB)
+* [AwsDynamoDb](./registry/AwsDynamoDb)
 * [AwsCloudWatchEventsRule](./registry/AwsCloudWatchEventsRule)
 * [AwsIamPolicy](./registry/AwsIamPolicy)
 * [AwsIamRole](./registry/AwsIamRole)

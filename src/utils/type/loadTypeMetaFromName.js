@@ -45,7 +45,7 @@ const NATIVE_NAMES = {
   TwilioPhoneNumber: resolve(__dirname, '..', '..', '..', 'registry', 'TwilioPhoneNumber'),
   AwsSnsTopic: resolve(__dirname, '..', '..', '..', 'registry', 'AwsSnsTopic'),
   AwsSnsSubscription: resolve(__dirname, '..', '..', '..', 'registry', 'AwsSnsSubscription'),
-  AwsDynamoDB: resolve(__dirname, '..', '..', '..', 'registry', 'AwsDynamoDB')
+  AwsDynamoDb: resolve(__dirname, '..', '..', '..', 'registry', 'AwsDynamoDb')
 }
 
 /**
