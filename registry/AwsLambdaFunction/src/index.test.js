@@ -454,6 +454,45 @@ describe('AwsLambdaFunction', () => {
     expect(AWS.mocks.deleteFunctionMock).toBeCalledWith(deleteFunctionParams)
   })
 
+  it('should remove lambda even if it does not exist anymore', async () => {
+    let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+      provider,
+      code: './code',
+      functionName: 'already-removed-function',
+      functionDescription: 'hello description',
+      handler: 'index.handler',
+      zip: 'zipfilecontent',
+      runtime: 'nodejs8.10',
+      memorySize: 512,
+      timeout: 10,
+      environment: {
+        ENV_VAR: 'env value'
+      },
+      tags: 'abc',
+      role: {
+        arn: 'abc:aws'
+      }
+    })
+
+    awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
+
+    awsLambdaFunction = resolveComponentEvaluables(awsLambdaFunction)
+
+    awsLambdaFunction.pack = jest.fn()
+
+    await awsLambdaFunction.deploy(null, context)
+
+    const prevAwsLambdaFunction = await deserialize(serialize(awsLambdaFunction, context), context)
+
+    await prevAwsLambdaFunction.remove(context)
+
+    const deleteFunctionParams = {
+      FunctionName: awsLambdaFunction.functionName
+    }
+
+    expect(AWS.mocks.deleteFunctionMock).toBeCalledWith(deleteFunctionParams)
+  })
+
   it('should return lambda arn when calling getId()', async () => {
     const awsLambdaFunction = await context.construct(AwsLambdaFunction, {})
 

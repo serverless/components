@@ -36,7 +36,7 @@ describe('AwsS3Bucket', () => {
     await awsS3Bucket.deploy(null, context)
 
     expect(AWS.mocks.createBucketMock).toBeCalledWith({ Bucket: 'bucket-abc' })
-  }, 20000)
+  })
 
   it('should update when bucket name has changed', async () => {
     let awsS3Bucket = await context.construct(AwsS3Bucket, {
@@ -81,6 +81,23 @@ describe('AwsS3Bucket', () => {
       Bucket: 'bucket-abc',
       Delete: { Objects: [{ Key: 'abc' }] }
     })
+  })
+
+  it('should remove the bucket even if it does not exist anymore', async () => {
+    let awsS3Bucket = await context.construct(AwsS3Bucket, {
+      provider,
+      bucketName: 'already-removed-bucket'
+    })
+    awsS3Bucket = await context.defineComponent(awsS3Bucket)
+    awsS3Bucket = resolveComponentEvaluables(awsS3Bucket)
+    await awsS3Bucket.deploy(null, context)
+
+    const prevAwsS3Bucket = await deserialize(serialize(awsS3Bucket, context), context)
+    await prevAwsS3Bucket.remove(context)
+
+    expect(AWS.mocks.listObjectsV2Mock).toBeCalledWith({ Bucket: 'already-removed-bucket' })
+    expect(AWS.mocks.deleteObjectsMock).not.toBeCalled()
+    expect(AWS.mocks.deleteBucketMock).not.toBeCalled()
   })
 
   it('shouldDeploy should return undefined when no changes have occurred', async () => {

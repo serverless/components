@@ -212,8 +212,8 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
       try {
         await deleteLambda(Lambda, functionName)
       } catch (error) {
-        if (!error.message.includes('Function not found')) {
-          throw new Error(error)
+        if (error.code !== 'ResourceNotFoundException') {
+          throw error
         }
       }
     }

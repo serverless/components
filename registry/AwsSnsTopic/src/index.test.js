@@ -130,6 +130,32 @@ describe('AwsSnsTopic', () => {
     expect(AWS.mocks.deleteTopicMock).toHaveBeenCalled()
   })
 
+  it('should remove the topic even if it does not exist anymore', async () => {
+    let awsSnsTopic = await context.construct(AwsSnsTopic, {
+      provider,
+      topicName: 'myTopic',
+      displayName: 'myTopicDisplayName',
+      policy: {},
+      deliveryPolicy: {},
+      deliveryStatusAttributes: []
+    })
+
+    awsSnsTopic = await context.defineComponent(awsSnsTopic)
+    awsSnsTopic = resolveComponentEvaluables(awsSnsTopic)
+    await awsSnsTopic.deploy(null, context)
+
+    // TODO: copy-and-pasted from above... this looks like a HACK which should be avoided!
+    jest.clearAllMocks()
+
+    const prevAwsSnsTopic = await deserialize(serialize(awsSnsTopic, context), context)
+    prevAwsSnsTopic.topicArn = 'already-removed-topic'
+    await prevAwsSnsTopic.remove(context)
+
+    expect(AWS.mocks.createTopicMock).not.toHaveBeenCalled()
+    expect(AWS.mocks.setTopicAttributesMock).not.toHaveBeenCalled()
+    expect(AWS.mocks.deleteTopicMock).toHaveBeenCalled()
+  })
+
   it('shouldDeploy should return "undefined" if nothing changed', async () => {
     const inputs = {
       topicName: 'myTopic',

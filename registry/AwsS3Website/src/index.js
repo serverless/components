@@ -112,19 +112,25 @@ const uploadDir = async (s3, bucketName, assets) => {
  */
 
 const deleteWebsiteBucket = async (s3, bucketName) => {
-  const data = await s3.listObjects({ Bucket: bucketName }).promise()
+  try {
+    const data = await s3.listObjects({ Bucket: bucketName }).promise()
 
-  const items = data.Contents
-  const promises = []
+    const items = data.Contents
+    const promises = []
 
-  for (var i = 0; i < items.length; i += 1) {
-    var deleteParams = { Bucket: bucketName, Key: items[i].Key }
-    const delObj = s3.deleteObject(deleteParams).promise()
-    promises.push(delObj)
+    for (var i = 0; i < items.length; i += 1) {
+      var deleteParams = { Bucket: bucketName, Key: items[i].Key }
+      const delObj = s3.deleteObject(deleteParams).promise()
+      promises.push(delObj)
+    }
+
+    await Promise.all(promises)
+    await s3.deleteBucket({ Bucket: bucketName }).promise()
+  } catch (error) {
+    if (error.code !== 'NoSuchBucket') {
+      throw error
+    }
   }
-
-  await Promise.all(promises)
-  await s3.deleteBucket({ Bucket: bucketName }).promise()
 }
 
 const hashProjectDir = async (projectDir) => {
@@ -189,8 +195,8 @@ const AwsS3Website = (SuperClass) =>
       let script = 'export const env = {\n'
       if (this.env) {
         for (const e in this.env) {
-        // eslint-disable-line
-        script += `${e}: ${JSON.stringify(resolve(this.env[e]))}\n` // eslint-disable-line
+          // eslint-disable-line
+          script += `${e}: ${JSON.stringify(resolve(this.env[e]))}\n` // eslint-disable-line
         }
       }
       script += '}'

@@ -102,6 +102,29 @@ describe('AwsSnsSubscription', () => {
     })
   })
 
+  it('should remove the subscription even if it does not exist anymore', async () => {
+    let oldAwsSnsSubscription = await context.construct(AwsSnsSubscription, {
+      protocol: 'https',
+      topic: 'some-topic',
+      provider
+    })
+    oldAwsSnsSubscription = await context.defineComponent(oldAwsSnsSubscription)
+    oldAwsSnsSubscription = resolveComponentEvaluables(oldAwsSnsSubscription)
+    await oldAwsSnsSubscription.deploy(null, context)
+
+    const prevAwsSnsSubscription = await deserialize(
+      serialize(oldAwsSnsSubscription, context),
+      context
+    )
+    prevAwsSnsSubscription.subscriptionArn = 'already-removed-subscription'
+    await prevAwsSnsSubscription.remove(context)
+
+    expect(AWS.mocks.unsubscribeMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.unsubscribeMock).toBeCalledWith({
+      SubscriptionArn: 'already-removed-subscription'
+    })
+  })
+
   it('shouldDeploy should return undefined if nothing changed', async () => {
     let oldComponent = await context.construct(AwsSnsSubscription, {
       protocol: 'https',

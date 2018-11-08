@@ -229,11 +229,17 @@ const AwsSnsTopic = (SuperClass) =>
       const AWS = provider.getSdk()
       const sns = new AWS.SNS()
       context.log(`Removing SNS topic: '${this.topicName}'`)
-      await sns
-        .deleteTopic({
-          TopicArn: this.topicArn
-        })
-        .promise()
+      try {
+        await sns
+          .deleteTopic({
+            TopicArn: this.topicArn
+          })
+          .promise()
+      } catch (error) {
+        if (error.code !== 'NotFound') {
+          throw error
+        }
+      }
       context.log(`SNS topic '${this.topicName}' removed.`)
     }
 
