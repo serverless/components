@@ -11,25 +11,26 @@ options:
 ### Using access key & secret and `us-west-2`:
 ```yaml
 type: AwsProvider
-  inputs:
-    credentials:
-      accessKeyId: AAAAA
-      secretAccessKey: BBBBBB
-    region: us-west-2
+inputs:
+  credentials:
+    accessKeyId: AAAAA
+    secretAccessKey: BBBBBB
+  region: us-west-2
 ```
 
 ### Using temporary sessions for MFA
 ```yaml
 type: AwsProvider
-  inputs:
-    credentials:
-      accessKeyId: AAAAA
-      secretAccessKey: BBBBBB
-      securityToken: CCCCCCCC
-      sessionToken: DDDDDDDD
+inputs:
+  credentials:
+    accessKeyId: AAAAA
+    secretAccessKey: BBBBBB
+    securityToken: CCCCCCCC
+    sessionToken: DDDDDDDD
 ```
 
 ### Using `~/.aws/credentials` and default region
 ```yaml
 type: AwsProvider
+inputs: {}
 ```
