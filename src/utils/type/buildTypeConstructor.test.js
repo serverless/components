@@ -77,6 +77,8 @@ describe('#buildTypeConstructor()', () => {
   })
 
   it('constructor supports construct method', async () => {
+    let context = await createContext({})
+    const inputs = { foo: 'bar' }
     const Type = {
       props: {
         name: 'Test'
@@ -94,9 +96,6 @@ describe('#buildTypeConstructor()', () => {
       }
     }
     Type.class = Class
-    let context = await createContext({})
-    const inputs = { foo: 'bar' }
-
     Type.constructor = buildTypeConstructor(Type, context)
     context = context.merge({ Type })
     const instance = await new Type.constructor(inputs, context)

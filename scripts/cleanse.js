@@ -3,8 +3,7 @@
 'use strict'
 
 const fs = require('fs')
-const join = require('path').join
-const resolve = require('path').resolve
+const { join, resolve } = require('path')
 const cp = require('child_process')
 const BbPromise = require('bluebird')
 

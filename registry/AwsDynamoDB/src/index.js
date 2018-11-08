@@ -87,14 +87,14 @@ const convertUserTypeToJoiType = (credentials, userType) => {
 const convertInputSchemaToNativeSchema = (credentials, inputSchema) => {
   const nativeSchema = {}
   let joiType
-  Object.keys(inputSchema).forEach((k) => {
-    if (Object.prototype.toString.apply(inputSchema[k]) === '[object Object]') {
-      joiType = convertUserTypeToJoiType(credentials, inputSchema[k].type)
+  Object.keys(inputSchema).forEach((key) => {
+    if (Object.prototype.toString.apply(inputSchema[key]) === '[object Object]') {
+      joiType = convertUserTypeToJoiType(credentials, inputSchema[key].type)
     } else {
-      joiType = convertUserTypeToJoiType(credentials, inputSchema[k])
+      joiType = convertUserTypeToJoiType(credentials, inputSchema[key])
     }
     if (joiType !== 'badtype') {
-      nativeSchema[k] = joiType
+      nativeSchema[key] = joiType
     }
   })
 

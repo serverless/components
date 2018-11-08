@@ -182,7 +182,7 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
     }
 
     async deploy(prevInstance, context) {
-      const provider = this.provider
+      const { provider } = this
       const AWS = provider.getSdk()
       const Lambda = new AWS.Lambda()
 
@@ -202,10 +202,9 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
     }
 
     async remove(context) {
-      const provider = this.provider
+      const { functionName, provider } = this
       const AWS = provider.getSdk()
       const Lambda = new AWS.Lambda()
-      const functionName = this.functionName
 
       context.log(`Removing Lambda: ${functionName}`)
 

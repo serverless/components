@@ -27,26 +27,6 @@ const resolveInSequence = async (functionsToExecute) =>
     functionsToExecute
   )
 
-const createSNSTopic = async (
-  sns,
-  { topicName, displayName, policy, deliveryPolicy, deliveryStatusAttributes }
-) => {
-  const { TopicArn: topicArn } = await sns.createTopic({ Name: topicName }).promise()
-  // save topic if attribute update fails
-  const topicAttributes = await updateAttributes(
-    sns,
-    {
-      displayName,
-      policy,
-      deliveryPolicy,
-      deliveryStatusAttributes,
-      topicArn
-    },
-    {}
-  )
-  return merge({ topicArn, topicName }, topicAttributes)
-}
-
 const concatInputsAndState = (inputs, state = []) => {
   const attributeKeys = map((item) => head(keys(item)), inputs)
   return filter((item) => isNil(find(equals(item))(state)))(
@@ -67,6 +47,37 @@ const concatInputsAndState = (inputs, state = []) => {
     )
   )
 }
+
+const updateTopicAttributes = async (sns, { topicAttributes, topicArn }) =>
+  Promise.all(
+    map((topicAttribute) => {
+      const value = head(values(topicAttribute))
+      const params = {
+        TopicArn: topicArn,
+        AttributeName: capitalize(head(keys(topicAttribute))),
+        AttributeValue: typeof value !== 'string' ? JSON.stringify(value) : value
+      }
+      return sns.setTopicAttributes(params).promise()
+    }, topicAttributes)
+  )
+
+const updateDeliveryStatusAttributes = async (sns, { deliveryStatusAttributes, topicArn }) =>
+  // run update requests sequentially because setTopicAttributes
+  // fails to update when rate exceeds https://github.com/serverless/components/issues/174#issuecomment-390463523
+  resolveInSequence(
+    map(
+      (topicAttribute) => () => {
+        const value = head(values(topicAttribute))
+        const params = {
+          TopicArn: topicArn,
+          AttributeName: capitalize(head(keys(topicAttribute))),
+          AttributeValue: typeof value !== 'string' ? JSON.stringify(value) : value
+        }
+        return sns.setTopicAttributes(params).promise()
+      },
+      deliveryStatusAttributes
+    )
+  )
 
 const updateAttributes = async (
   sns,
@@ -125,36 +136,25 @@ const updateAttributes = async (
   )
 }
 
-const updateTopicAttributes = async (sns, { topicAttributes, topicArn }) =>
-  Promise.all(
-    map((topicAttribute) => {
-      const value = head(values(topicAttribute))
-      const params = {
-        TopicArn: topicArn,
-        AttributeName: capitalize(head(keys(topicAttribute))),
-        AttributeValue: typeof value !== 'string' ? JSON.stringify(value) : value
-      }
-      return sns.setTopicAttributes(params).promise()
-    }, topicAttributes)
+const createSNSTopic = async (
+  sns,
+  { topicName, displayName, policy, deliveryPolicy, deliveryStatusAttributes }
+) => {
+  const { TopicArn: topicArn } = await sns.createTopic({ Name: topicName }).promise()
+  // save topic if attribute update fails
+  const topicAttributes = await updateAttributes(
+    sns,
+    {
+      displayName,
+      policy,
+      deliveryPolicy,
+      deliveryStatusAttributes,
+      topicArn
+    },
+    {}
   )
-
-const updateDeliveryStatusAttributes = async (sns, { deliveryStatusAttributes, topicArn }) =>
-  // run update requests sequentially because setTopicAttributes
-  // fails to update when rate exceeds https://github.com/serverless/components/issues/174#issuecomment-390463523
-  resolveInSequence(
-    map(
-      (topicAttribute) => () => {
-        const value = head(values(topicAttribute))
-        const params = {
-          TopicArn: topicArn,
-          AttributeName: capitalize(head(keys(topicAttribute))),
-          AttributeValue: typeof value !== 'string' ? JSON.stringify(value) : value
-        }
-        return sns.setTopicAttributes(params).promise()
-      },
-      deliveryStatusAttributes
-    )
-  )
+  return merge({ topicArn, topicName }, topicAttributes)
+}
 
 const AwsSnsTopic = (SuperClass) =>
   class extends SuperClass {
@@ -197,7 +197,7 @@ const AwsSnsTopic = (SuperClass) =>
     }
 
     async deploy(prevInstance, context) {
-      const provider = this.provider
+      const { provider } = this
       const AWS = provider.getSdk()
       const sns = new AWS.SNS()
 
@@ -225,9 +225,10 @@ const AwsSnsTopic = (SuperClass) =>
     }
 
     async remove(context) {
-      const provider = this.provider
+      const { provider } = this
       const AWS = provider.getSdk()
       const sns = new AWS.SNS()
+
       context.log(`Removing SNS topic: '${this.topicName}'`)
       try {
         await sns

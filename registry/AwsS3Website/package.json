@@ -12,6 +12,6 @@
     "@serverless/utils": "0.0.17",
     "klaw-sync": "^4.0.0",
     "mime-types": "^2.1.21",
-    "folder-hash": "^2.1.1"
+    "folder-hash": "^2.1.2"
   }
 }

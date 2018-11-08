@@ -1,10 +1,9 @@
-import { all, contains, get, isEmpty, map } from '@serverless/utils'
+import { contains, get, isEmpty } from '@serverless/utils'
 import resolveComponentEvaluables from '../component/resolveComponentEvaluables'
-import cloneGraph from './cloneGraph'
-import detectCircularDeps from './detectCircularDeps'
+import execGraph from './execGraph'
 
 const validateNode = (node, context) => {
-  const { nextInstance, prevInstance, instanceId, operation } = node
+  const { nextInstance, instanceId, operation } = node
   if (contains(operation, ['deploy', 'replace'])) {
     if (!nextInstance) {
       throw new Error(`deployGraph expected nextInstance to be defined for ${operation} operation`)
@@ -16,16 +15,31 @@ const validateNode = (node, context) => {
       context.debug(`This instance has an undefined name`)
       context.debug(nextInstance)
     }
-    if (operation === 'replace' && !prevInstance) {
+    if (operation === 'replace' && !nextInstance) {
       throw new Error(`deployGraph expected nextInstance to be defined for ${operation} operation`)
     }
   }
 }
 
+const deployInstance = async (nextInstance, prevInstance, context) => {
+  context.debug(
+    `deploying component: ${nextInstance.name} { instanceId: ${nextInstance.instanceId} }`
+  )
+
+  // NOTE BRN: We do not pass the prevInstance on a replacement because it should be the same as deploying a new node
+  await nextInstance.deploy(prevInstance, context)
+  context.debug(
+    `component deployment complete: ${nextInstance.name} { instanceId: ${nextInstance.instanceId} }`
+  )
+  // TODO BRN: We should probably save state incrementally as we deploy each node
+}
+
 const deployNode = async (node, context) => {
   // NOTE BRN: Start by resolving all evaluables on this node. This will enable us to run deploy and shouldDeploy without having to manually resolve evaluables in the method.
-  const { prevInstance, instanceId } = node
-  let { nextInstance } = node
+  let { nextInstance, prevInstance } = node
+  if (!isEmpty(prevInstance)) {
+    prevInstance = resolveComponentEvaluables(prevInstance)
+  }
   if (!isEmpty(nextInstance)) {
     nextInstance = resolveComponentEvaluables(nextInstance)
   }
@@ -43,7 +57,7 @@ const deployNode = async (node, context) => {
   }
 
   context.debug(
-    `checked if node should be deployed - result operation: ${node.operation} instanceId: ${
+    `checked if component should be deployed - result operation: ${node.operation} instanceId: ${
       node.instanceId
     } nextInstance: ${get('nextInstance.name', node)} prevInstance: ${get(
       'prevInstance.name',
@@ -53,57 +67,22 @@ const deployNode = async (node, context) => {
 
   validateNode(node, context)
   if (node.operation === 'deploy') {
-    context.debug(`deploying node: ${nextInstance.name} { instanceId: ${instanceId} }`)
-    await nextInstance.deploy(prevInstance, context)
-    context.debug(`node deployment complete: ${nextInstance.name} { instanceId: ${instanceId} }`)
-    // TODO BRN: We should probably save state incrementally as we deploy each node
+    await deployInstance(nextInstance, prevInstance, context)
   } else if (node.operation === 'replace') {
-    context.debug(`deploying node: ${nextInstance.name} { instanceId: ${instanceId} }`)
-
-    // NOTE BRN: We do not pass the prevInstance on a replacement because it should be the same as deploying a new node
-    await nextInstance.deploy(null, context)
-    context.debug(`node deployment complete: ${nextInstance.name} { instanceId: ${instanceId} }`)
-    // TODO BRN: We should probably save state incrementally as we deploy each node
+    await deployInstance(nextInstance, null, context)
   }
 }
 
-const deployNodeIds = async (nodeIds, graph, context) =>
-  all(
-    map(async (nodeId) => {
-      const node = graph.node(nodeId)
-      if (!node) {
-        throw new Error(`could not find node for nodeId:${nodeId}`)
-      }
-      await deployNode(node, context)
-      graph.removeNode(nodeId)
-    }, nodeIds)
+const nextNodeIds = (graph) => graph.sinks()
+
+const deployGraph = async (graph, context) =>
+  execGraph(
+    {
+      iteratee: deployNode,
+      next: nextNodeIds
+    },
+    graph,
+    context
   )
-
-const deployLeaves = async (graph, context) => {
-  const leaves = graph.sinks()
-  context.debug('checking leaves:', leaves)
-  if (isEmpty(leaves)) {
-    context.debug('leaves empty:', leaves)
-    if (graph.nodeCount() > 0) {
-      detectCircularDeps(graph)
-      throw new Error('Graph deployment did not complete')
-    }
-    return graph
-  }
-
-  await deployNodeIds(leaves, graph, context)
-  return deployLeaves(graph, context)
-  //
-  // // allow all executions to complete without terminating
-  // const suppressErrors = (p) => p.catch(() => {})
-  // await Promise.all(map(suppressErrors, executions))
-  //
-  // // if any executions failed, throw the error
-  // await Promise.all(executions)
-  //
-  // return execute(graph, components, stateFile, archive, command, options, rollback)
-}
-
-const deployGraph = async (graph, context) => deployLeaves(cloneGraph(graph), context)
 
 export default deployGraph

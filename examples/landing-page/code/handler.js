@@ -9,7 +9,7 @@ module.exports.landingPageFunction = (event, context, callback) => {
   // eslint-disable-line
   console.log('Function ran!')
   const formData = JSON.parse(event.body)
-  const email = formData.email
+  const { email } = formData
 
   if (!formData) {
     console.log('No form data supplied')

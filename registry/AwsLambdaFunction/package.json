@@ -10,6 +10,6 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@serverless/utils": "0.0.17",
-    "folder-hash": "^2.1.1"
+    "folder-hash": "^2.1.2"
   }
 }

@@ -2,6 +2,7 @@ import { clone, forEach, isUndefined, map } from '@serverless/utils'
 import { Graph } from 'graphlib'
 
 const cloneNodes = (graph) =>
+  // eslint-disable-next-line id-length
   map((v) => {
     const nodeValue = graph.node(v)
     const parent = graph.parent(v)

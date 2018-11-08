@@ -219,7 +219,7 @@ const AwsS3Website = (SuperClass) =>
         )
       }
 
-      const provider = this.provider
+      const { provider } = this
       const AWS = provider.getSdk()
       const s3 = new AWS.S3()
 
@@ -238,7 +238,7 @@ const AwsS3Website = (SuperClass) =>
     }
 
     async remove(context) {
-      const provider = this.provider
+      const { provider } = this
       const AWS = provider.getSdk()
       const s3 = new AWS.S3()
 

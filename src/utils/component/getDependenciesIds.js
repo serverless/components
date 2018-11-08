@@ -4,7 +4,7 @@ import getComponentReferenceIds from './getComponentReferenceIds'
 import getParentIds from './getParentIds'
 import getVariableInstanceIds from './getVariableInstanceIds'
 
-//union this with component reference ids (the id of any component where a property in this component references that component )
+// union this with component reference ids (the id of any component where a property in this component references that component )
 const getDependenciesIds = (component) =>
   without(
     union(getParentIds(component), [component.instanceId]),

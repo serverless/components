@@ -198,7 +198,7 @@ Checkout the [CLI docs](#cli-usage) for a list of all the available commands and
 
 ## Trying it out
 
-The best way to give components a try is to deploy one of the examples. We recommend checking out our [Serverless web application example]() and to follow along with the instructions there.
+The best way to give components a try is to deploy one of the examples. We recommend checking out our [Serverless web application example](https://github.com/serverless/serverless-web-application) and to follow along with the instructions there.
 
 ## Current Limitations
 

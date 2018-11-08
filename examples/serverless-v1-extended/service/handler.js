@@ -1,5 +1,3 @@
-'use strict'
-
 module.exports.landingPage = (event, context, callback) => {
   let dynamicHtml = '<p>Hey Unknown!</p>'
   // check for GET params and use if available

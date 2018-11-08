@@ -91,7 +91,7 @@ const RestApi = async function(SuperClass, SuperContext) {
     }
 
     async define(context) {
-      const inputs = this.inputs
+      const { inputs } = this
       if (!['AwsApiGateway'].includes(resolve(inputs.gateway))) {
         throw new Error('Specified "gateway" is not supported.')
       }
@@ -134,7 +134,7 @@ const RestApi = async function(SuperClass, SuperContext) {
     }
 
     async info() {
-      const inputs = this.inputs
+      const { inputs } = this
       const flatRoutes = {}
       for (const [path, pathObject] of Object.entries(flattenRoutes(inputs.routes))) {
         const newPathObject = { ...pathObject }

@@ -74,7 +74,7 @@ describe('#buildGraph()', () => {
   it('build a simple graph when only instance has been removed', () => {
     const prevInstance = {
       instanceId: 'test',
-      shouldDeploy: jest.fn(() => 'replace'),
+      shouldDeploy: jest.fn(),
       deploy: jest.fn(),
       define: jest.fn(),
       remove: jest.fn(),
