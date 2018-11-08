@@ -73,6 +73,26 @@ describe('AwsS3Website', () => {
     expect(AWS.mocks.deleteObjectMock).toHaveBeenCalled()
   })
 
+  it('should remove the bucket even if it does not exist anymore', async () => {
+    let oldAwsS3Website = await context.construct(AwsS3Website, {
+      provider,
+      bucket: 'already-removed-bucket',
+      projectDir: path.resolve('./registry'),
+      assets: path.resolve('./registry'),
+      envFileLocation: path.resolve('./src/index.js')
+    })
+    oldAwsS3Website = await context.defineComponent(oldAwsS3Website)
+    oldAwsS3Website = resolveComponentEvaluables(oldAwsS3Website)
+    await oldAwsS3Website.deploy(null, context)
+
+    const prevAwsS3Website = await deserialize(serialize(oldAwsS3Website, context), context)
+    await prevAwsS3Website.remove(context)
+
+    expect(AWS.mocks.listObjectsMock).toBeCalledWith({ Bucket: 'already-removed-bucket' })
+    expect(AWS.mocks.deleteObjectMock).not.toHaveBeenCalled()
+    expect(AWS.mocks.deleteBucketMock).not.toHaveBeenCalled()
+  })
+
   it('shouldDeploy should return undefined if no changes', async () => {
     let oldAwsS3Website = await context.construct(AwsS3Website, {
       provider,

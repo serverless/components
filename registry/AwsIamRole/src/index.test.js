@@ -89,7 +89,7 @@ describe('AwsIamRole', () => {
     expect(AWS.mocks.attachRolePolicyMock).toBeCalledWith(attachRolePolicyParams)
     expect(awsIamRole.arn).toEqual('arn:aws:iam::XXXXX:role/test-role')
     expect(sleep).toBeCalledWith(15000)
-  }, 10000)
+  })
 
   it('should update if role name has changed', async () => {
     let oldAwsIamRole = await context.construct(AwsIamRole, {
@@ -224,6 +224,32 @@ describe('AwsIamRole', () => {
     let oldAwsIamRole = await context.construct(AwsIamRole, {
       provider,
       roleName: 'abc',
+      policy: {
+        arn: 'arn:aws:iam::aws:policy/oldPolicy'
+      }
+    })
+    oldAwsIamRole = await context.defineComponent(oldAwsIamRole)
+    oldAwsIamRole = resolveComponentEvaluables(oldAwsIamRole)
+    await oldAwsIamRole.deploy(null, context)
+
+    const prevAwsIamRole = await deserialize(serialize(oldAwsIamRole, context), context)
+    await prevAwsIamRole.remove(context)
+
+    expect(AWS.mocks.deleteRoleMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.deleteRoleMock).toBeCalledWith({
+      RoleName: prevAwsIamRole.roleName
+    })
+    expect(AWS.mocks.detachRolePolicyMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.detachRolePolicyMock).toBeCalledWith({
+      RoleName: prevAwsIamRole.roleName,
+      PolicyArn: prevAwsIamRole.policy.arn
+    })
+  })
+
+  it('should remove the role even if it does not exist anymore', async () => {
+    let oldAwsIamRole = await context.construct(AwsIamRole, {
+      provider,
+      roleName: 'already-removed-role',
       policy: {
         arn: 'arn:aws:iam::aws:policy/oldPolicy'
       }

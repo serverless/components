@@ -26,7 +26,7 @@ const deleteBucket = async ({ bucketName, provider }) => {
 
     return s3.deleteBucket({ Bucket: bucketName }).promise()
   } catch (error) {
-    if (!error.message.includes('The specified bucket does not exist')) {
+    if (error.code !== 'NoSuchBucket') {
       throw error
     }
   }

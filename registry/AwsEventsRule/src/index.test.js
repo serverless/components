@@ -3,6 +3,14 @@ import path from 'path'
 import { deserialize, serialize, resolveComponentEvaluables } from '../../../src/utils'
 import { createTestContext } from '../../../test'
 
+beforeEach(() => {
+  jest.clearAllMocks()
+})
+
+afterAll(() => {
+  jest.restoreAllMocks()
+})
+
 describe('AwsEventsRule', () => {
   const cwd = path.join(__dirname, '..')
   let context
@@ -116,6 +124,34 @@ describe('AwsEventsRule', () => {
     const removeTargetsParams = {
       Rule: 'hello',
       Ids: ['hello']
+    }
+
+    expect(AWS.mocks.removeTargets).toBeCalledWith(removeTargetsParams)
+    expect(AWS.mocks.deleteRule).toBeCalledWith(deleteRuleParams)
+  })
+
+  it('should remove schedule even if the rule does not exist anymore', async () => {
+    const deleteRuleParams = {
+      Name: 'already-removed-rule'
+    }
+    const inputs = {
+      provider: await context.construct(AwsProvider, {}),
+      enabled: true,
+      schedule: 'rate(5 minutes)',
+      lambda: {
+        functionName: deleteRuleParams.Name,
+        getId: () => 'arn:aws:lambda:us-east-1:1234567890:function:hello'
+      }
+    }
+
+    let awsEventsRule = await context.construct(AwsEventsRule, inputs)
+    awsEventsRule = await context.defineComponent(awsEventsRule)
+    awsEventsRule = resolveComponentEvaluables(awsEventsRule)
+    await awsEventsRule.remove(context)
+
+    const removeTargetsParams = {
+      Rule: 'already-removed-rule',
+      Ids: ['already-removed-rule']
     }
 
     expect(AWS.mocks.removeTargets).toBeCalledWith(removeTargetsParams)

@@ -72,13 +72,25 @@ const AwsEventsRule = (SuperClass) =>
         Ids: [this.lambda.functionName]
       }
 
-      await cloudWatchEvents.removeTargets(removeTargetsParams).promise()
+      try {
+        await cloudWatchEvents.removeTargets(removeTargetsParams).promise()
+      } catch (error) {
+        if (error.code !== 'ResourceNotFoundException') {
+          throw error
+        }
+      }
 
       const deleteRuleParams = {
         Name: this.lambda.functionName
       }
 
-      await cloudWatchEvents.deleteRule(deleteRuleParams).promise()
+      try {
+        await cloudWatchEvents.deleteRule(deleteRuleParams).promise()
+      } catch (error) {
+        if (error.code !== 'InternalException') {
+          throw error
+        }
+      }
     }
   }
 

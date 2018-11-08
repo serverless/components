@@ -112,7 +112,14 @@ const AwsSnsSubscription = (SuperClass) =>
     }
 
     async remove(context) {
-      return getProtocol(this.protocol).remove(this, context)
+      try {
+        const res = await getProtocol(this.protocol).remove(this, context)
+        return res
+      } catch (error) {
+        if (error.code !== 'NotFound') {
+          throw error.message
+        }
+      }
     }
 
     async info() {

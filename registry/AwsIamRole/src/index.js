@@ -155,9 +155,9 @@ const AwsIamRole = async (SuperClass, superContext) => {
       try {
         context.log(`Removing Role: ${this.roleName}`)
         this.arn = await deleteRole(IAM, this)
-      } catch (e) {
-        if (!e.message.includes('Role not found')) {
-          throw e
+      } catch (error) {
+        if (error.code !== 'NoSuchEntity') {
+          throw error
         }
       }
     }

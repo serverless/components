@@ -83,9 +83,9 @@ const AwsIamPolicy = (SuperClass) =>
         context.log(`Removing Policy: ${this.policyName}`)
         await deletePolicy(IAM, this.arn, context)
         context.log(`Policy '${this.policyName}' removed.`)
-      } catch (e) {
-        if (!e.message.includes('does not exist or is not attachable')) {
-          throw new Error(e)
+      } catch (error) {
+        if (error.code !== 'NoSuchEntity') {
+          throw error
         }
       }
     }

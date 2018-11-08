@@ -1,45 +1,97 @@
 const mocks = {
   // S3
   createBucketMock: jest.fn().mockReturnValue('bucket-abc'),
-  deleteBucketMock: jest.fn(),
+  deleteBucketMock: jest.fn().mockImplementation((params) => {
+    if (params.Bucket === 'already-removed-bucket') {
+      const error = new Error()
+      error.code = 'NoSuchBucket'
+      return Promise.reject(error)
+    }
+    return Promise.resolve()
+  }),
   listObjectsMock: jest.fn().mockImplementation((params) => {
-    if (params.Bucket === 'some-already-removed-bucket') {
-      return Promise.reject(new Error('The specified bucket does not exist'))
+    if (params.Bucket === 'already-removed-bucket') {
+      const error = new Error()
+      error.code = 'NoSuchBucket'
+      return Promise.reject(error)
     }
     return Promise.resolve({ Contents: [{ Key: 'abc' }] })
   }),
   listObjectsV2Mock: jest.fn().mockImplementation((params) => {
-    if (params.Bucket === 'some-already-removed-bucket') {
-      return Promise.reject(new Error('The specified bucket does not exist'))
+    if (params.Bucket === 'already-removed-bucket') {
+      const error = new Error()
+      error.code = 'NoSuchBucket'
+      return Promise.reject(error)
     }
     return Promise.resolve({ Contents: [{ Key: 'abc' }] })
   }),
-  deleteObjectMock: jest.fn(),
-  deleteObjectsMock: jest.fn(),
+  deleteObjectMock: jest.fn().mockImplementation((params) => {
+    if (params.Bucket === 'already-removed-bucket') {
+      const error = new Error()
+      error.code = 'NoSuchBucket'
+      return Promise.reject(error)
+    }
+    return Promise.resolve()
+  }),
+  deleteObjectsMock: jest.fn().mockImplementation((params) => {
+    if (params.Bucket === 'already-removed-bucket') {
+      const error = new Error()
+      error.code = 'NoSuchBucket'
+      return Promise.reject(error)
+    }
+    return Promise.resolve()
+  }),
   putBucketWebsiteMock: jest.fn(),
   putBucketPolicyMock: jest.fn(),
   putBucketCorsMock: jest.fn(),
   uploadMock: jest.fn(),
-  putRule: jest.fn().mockReturnValue({ RuleArn: 'abc:zxc' }),
-  putTargets: jest.fn(),
-  removeTargets: jest.fn(),
-  deleteRule: jest.fn(),
   addPermission: jest.fn(({ FunctionName }) => ({
     Statement: {
       Resrouce: FunctionName,
       Sid: 'sub:def'
     }
   })),
+
+  // CloudWatchEvents
+  putRule: jest.fn().mockReturnValue({ RuleArn: 'abc:zxc' }),
+  putTargets: jest.fn(),
+  removeTargets: jest.fn().mockImplementation((params) => {
+    if (params.Rule === 'already-removed-rule') {
+      const error = new Error()
+      error.code = 'ResourceNotFoundException'
+      return Promise.reject(error)
+    }
+    return Promise.resolve()
+  }),
+  deleteRule: jest.fn().mockImplementation((params) => {
+    if (params.Name === 'already-removed-rule') {
+      const error = new Error()
+      error.code = 'InternalException'
+      return Promise.reject(error)
+    }
+    return Promise.resolve()
+  }),
+
   // Lambda
   createFunctionMock: jest.fn().mockReturnValue({ FunctionArn: 'abc:zxc' }),
   updateFunctionCodeMock: jest.fn().mockReturnValue({ FunctionArn: 'abc:zxc' }),
   updateFunctionConfigurationMock: jest.fn().mockReturnValue({ FunctionArn: 'abc:zxc' }),
-  deleteFunctionMock: jest.fn(),
+  deleteFunctionMock: jest.fn().mockImplementation((params) => {
+    if (params.FunctionName === 'already-removed-function') {
+      const error = new Error()
+      error.code = 'ResourceNotFoundException'
+      return Promise.reject(error)
+    }
+    return Promise.resolve()
+  }),
+
   // IAM
   createRoleMock: jest.fn().mockReturnValue({ Role: { Arn: 'arn:aws:iam::XXXXX:role/test-role' } }),
   deleteRoleMock: jest.fn().mockImplementation((params) => {
-    if (params.RoleName === 'some-already-removed-role') {
-      return Promise.reject(new Error('Role not found'))
+    if (params.RoleName === 'already-removed-role') {
+      const error = new Error()
+      error.code = 'NoSuchEntity'
+      return Promise.reject(error)
     }
     return Promise.resolve({ Role: { Arn: null } })
   }),
@@ -47,7 +99,14 @@ const mocks = {
   detachRolePolicyMock: jest.fn(),
   updateAssumeRolePolicyMock: jest.fn(),
   createPolicyMock: jest.fn().mockReturnValue({ Policy: { Arn: 'abc:xyz' } }),
-  deletePolicyMock: jest.fn(),
+  deletePolicyMock: jest.fn().mockImplementation((params) => {
+    if (params.PolicyArn === 'already-removed-policy') {
+      const error = new Error()
+      error.code = 'NoSuchEntity'
+      return Promise.reject(error)
+    }
+    return Promise.resolve()
+  }),
   listEntitiesForPolicyMock: jest.fn().mockReturnValue({
     PolicyGroups: ['group'],
     PolicyRoles: ['role'],
@@ -58,12 +117,26 @@ const mocks = {
 
   // SNS
   createTopicMock: jest.fn().mockReturnValue({ TopicArn: 'abc:zxc' }),
-  deleteTopicMock: jest.fn(),
+  deleteTopicMock: jest.fn().mockImplementation((params) => {
+    if (params.TopicArn === 'already-removed-topic') {
+      const error = new Error()
+      error.code = 'NotFound'
+      return Promise.reject(error)
+    }
+    return Promise.resolve()
+  }),
   setTopicAttributesMock: jest.fn(),
   subscribeMock: jest.fn().mockReturnValue({
     SubscriptionArn: 'arn:aws:sns:region:XXXXX:test-subscription:r4nd0m'
   }),
-  unsubscribeMock: jest.fn(),
+  unsubscribeMock: jest.fn().mockImplementation((params) => {
+    if (params.SubscriptionArn === 'already-removed-subscription') {
+      const error = new Error()
+      error.code = 'NotFound'
+      return Promise.reject(error)
+    }
+    return Promise.resolve()
+  }),
 
   // APIGateway
   importRestApi: jest.fn().mockReturnValue({ id: 'my-new-id' }),
