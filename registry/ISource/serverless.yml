@@ -1,4 +1,0 @@
-interface: ISource
-
-getSourceConfig: function
-deploySource: function

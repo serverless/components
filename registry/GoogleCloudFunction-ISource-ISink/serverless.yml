@@ -1,9 +1,0 @@
-name: GoogleCloudFunction
-extends: Component
-implements:
-  - ISink
-
-version: 1.0.0
-main: ./index.js
-
-functionName: String

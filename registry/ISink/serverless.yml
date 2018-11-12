@@ -1,3 +1,0 @@
-interface: ISink
-
-getSinkConfig: function
