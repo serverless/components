@@ -17,18 +17,19 @@ afterAll(() => {
 describe('AwsApiGateway', () => {
   const cwd = path.resolve(__dirname, '..')
   let context
-  let AwsProvider
+  let provider
   let AwsApiGateway
 
   beforeEach(async () => {
     context = await createTestContext({ cwd })
-    AwsProvider = await context.loadType('AwsProvider')
     AwsApiGateway = await context.loadType('AwsApiGateway')
+    const AwsProvider = await context.loadType('AwsProvider')
+    provider = await context.construct(AwsProvider, {})
   })
 
   it('should create ApiGateway if first deployment', async () => {
     const inputs = {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       name: 'something',
       role: { arn: 'someArn' },
       routes: {}
@@ -44,14 +45,14 @@ describe('AwsApiGateway', () => {
       stageName: 'dev'
     }
 
-    expect(AWS.mocks.importRestApi).toHaveBeenCalledTimes(1)
-    expect(AWS.mocks.createDeployment).toBeCalledWith(createDeploymentParams)
+    expect(AWS.mocks.importRestApiMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.createDeploymentMock).toBeCalledWith(createDeploymentParams)
     expect(awsApiGateway.id).toEqual('my-new-id')
   })
 
   it('should update service if changed', async () => {
     const inputs = {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       name: 'somethingNew',
       role: { arn: 'someArn' },
       routes: {}
@@ -68,8 +69,8 @@ describe('AwsApiGateway', () => {
 
     await awsApiGateway.deploy(prevInstance, context)
 
-    expect(AWS.mocks.putRestApi).toHaveBeenCalledTimes(1)
-    expect(AWS.mocks.createDeployment).toBeCalledWith({
+    expect(AWS.mocks.putRestApiMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.createDeploymentMock).toBeCalledWith({
       restApiId: prevInstance.id,
       stageName: 'dev'
     })
@@ -77,7 +78,7 @@ describe('AwsApiGateway', () => {
 
   it('should preserve props if nothing changed', async () => {
     const inputs = {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       apiName: 'somethingNew',
       role: { arn: 'someArn' },
       routes: {}
@@ -98,13 +99,13 @@ describe('AwsApiGateway', () => {
 
   it('should remove deployment', async () => {
     const inputs = {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       name: 'somethingNew',
       role: { arn: 'someArn' },
       routes: {}
     }
     const prevInstance = {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       id: 'something'
     }
 
@@ -113,12 +114,33 @@ describe('AwsApiGateway', () => {
 
     await awsApiGateway.remove(context)
 
-    expect(AWS.mocks.deleteRestApi).toBeCalledWith({ restApiId: prevInstance.id })
+    expect(AWS.mocks.deleteRestApiMock).toBeCalledWith({ restApiId: prevInstance.id })
+  })
+
+  it('should remove the deployment even if it does not exist anymore', async () => {
+    let oldAwsApiGateway = await context.construct(AwsApiGateway, {
+      provider,
+      name: 'some-api-name',
+      role: { arn: 'arn:aws:iam::XXXXX:role/some-role-name' },
+      routes: {}
+    })
+    oldAwsApiGateway = await context.defineComponent(oldAwsApiGateway)
+    oldAwsApiGateway = resolveComponentEvaluables(oldAwsApiGateway)
+    await oldAwsApiGateway.deploy(null, context)
+
+    const prevAwsApiGateway = await deserialize(serialize(oldAwsApiGateway, context), context)
+    prevAwsApiGateway.id = 'already-removed-rest-api'
+    await prevAwsApiGateway.remove(context)
+
+    expect(AWS.mocks.deleteRestApiMock).toHaveBeenCalledTimes(1)
+    expect(AWS.mocks.deleteRestApiMock).toBeCalledWith({
+      restApiId: prevAwsApiGateway.id
+    })
   })
 
   it('shouldDeploy should return undefined if nothing changed', async () => {
     const inputs = {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       apiName: 'somethingNew',
       role: { arn: 'someArn' },
       routes: {}
@@ -140,7 +162,7 @@ describe('AwsApiGateway', () => {
 
   it('shouldDeploy should return replace if name changed', async () => {
     const inputs = {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       apiName: 'somethingOld',
       role: { arn: 'someArn' },
       routes: {}
@@ -165,7 +187,7 @@ describe('AwsApiGateway', () => {
 
   it('shouldDeploy should return deploy if routes changed', async () => {
     const inputs = {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       apiName: 'something',
       role: { arn: 'someArn' },
       routes: { '/path': null }
@@ -190,7 +212,7 @@ describe('AwsApiGateway', () => {
 
   it('shouldDeploy should return deploy if first deployment', async () => {
     const inputs = {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       apiName: 'something',
       role: { arn: 'someArn' },
       routes: { '/another': null }
