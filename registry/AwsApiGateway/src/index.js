@@ -192,9 +192,9 @@ const AwsApiGateway = function(SuperClass) {
       try {
         context.log(`Removing API Gateway: "${this.apiName}"`)
         await deleteApi(APIGateway, { apiName: this.apiName, id: this.id })
-      } catch (e) {
-        if (!e.message.includes('Invalid REST API identifier specified')) {
-          throw e
+      } catch (error) {
+        if (error.code !== 'NotFoundException') {
+          throw error
         }
       }
     }

@@ -139,25 +139,32 @@ const mocks = {
   }),
 
   // APIGateway
-  importRestApi: jest.fn().mockReturnValue({ id: 'my-new-id' }),
-  createDeployment: jest.fn(),
-  putRestApi: jest.fn(),
-  deleteRestApi: jest.fn()
+  importRestApiMock: jest.fn().mockReturnValue({ id: 'my-new-id' }),
+  createDeploymentMock: jest.fn(),
+  putRestApiMock: jest.fn(),
+  deleteRestApiMock: jest.fn().mockImplementation((params) => {
+    if (params.restApiId === 'already-removed-rest-api') {
+      const error = new Error()
+      error.code = 'NotFoundException'
+      return Promise.reject(error)
+    }
+    return Promise.resolve()
+  })
 }
 
 const APIGateway = function() {
   return {
     importRestApi: (obj) => ({
-      promise: () => mocks.importRestApi(obj)
+      promise: () => mocks.importRestApiMock(obj)
     }),
     createDeployment: (obj) => ({
-      promise: () => mocks.createDeployment(obj)
+      promise: () => mocks.createDeploymentMock(obj)
     }),
     putRestApi: (obj) => ({
-      promise: () => mocks.putRestApi(obj)
+      promise: () => mocks.putRestApiMock(obj)
     }),
     deleteRestApi: (obj) => ({
-      promise: () => mocks.deleteRestApi(obj)
+      promise: () => mocks.deleteRestApiMock(obj)
     })
   }
 }
