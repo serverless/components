@@ -17,6 +17,7 @@ inputTypes:
     default: role-${self.instanceId}
     displayName: IAM role name
     description: The name of the role to create
+    maxLength: 64
   service:
     type: string
     required: true

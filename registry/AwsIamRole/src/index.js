@@ -84,6 +84,16 @@ const AwsIamRole = async (SuperClass, superContext) => {
     async construct(inputs, context) {
       await super.construct(inputs, context)
 
+      // TODO: remove this validation once core supports full RAML spec
+      const roleNameMaxLength = this.inputTypes.roleName.maxLength
+      if (inputs.roleName && inputs.roleName.length > roleNameMaxLength) {
+        throw new Error(
+          `IAM role name "${inputs.roleName}" is ${
+            inputs.roleName.length
+          } characters long (max. allowed length is 64)`
+        )
+      }
+
       // HACK BRN: Temporary workaround until we add property type/default support
       const defaultPolicy = {
         arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
