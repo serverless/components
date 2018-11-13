@@ -1,5 +1,6 @@
 import AWS from 'aws-sdk'
 import path from 'path'
+import crypto from 'crypto'
 import { sleep } from '@serverless/utils'
 import {
   createContext,
@@ -48,6 +49,24 @@ describe('AwsIamRole', () => {
 
     const AwsProvider = await context.loadType('AwsProvider')
     provider = await context.construct(AwsProvider, {})
+  })
+
+  it('should throw if role name is greater than 64 characters', async () => {
+    const roleName = crypto.randomBytes(33).toString('hex')
+
+    const inputs = {
+      roleName,
+      service: 'lambda.amazonaws.com',
+      provider
+    }
+
+    try {
+      const awsIamRole = await context.construct(AwsIamRole, inputs)
+      await context.defineComponent(awsIamRole)
+      resolveComponentEvaluables(awsIamRole)
+    } catch (error) {
+      expect(error.message).toMatch('allowed length is 64')
+    }
   })
 
   it('should create role if first deployment', async () => {
