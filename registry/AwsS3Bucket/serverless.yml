@@ -7,10 +7,10 @@ main: ./dist/index.js
 version: 0.3.0
 core: 0.3.x
 
-description: "Provision AWS s3 buckets with serverless components"
+description: 'Provision AWS s3 buckets with serverless components'
 license: Apache-2.0
-author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
-repository: "github:serverless/components"
+author: 'Serverless, Inc. <hello@serverless.com> (https://serverless.com)'
+repository: 'github:serverless/components'
 
 bucketName: ${inputs.bucketName}
 provider: ${inputs.provider}
@@ -23,6 +23,7 @@ inputTypes:
     displayName: S3 Bucket Name
     description: The name of your S3 bucket. Name must be globally unique in AWS
     example: my-project-bucket-${this.instanceId}
+    pattern: ^[a-z0-9\.\-]{3,63}$
   provider:
     type: AwsProvider
     default: ${context.provider}
