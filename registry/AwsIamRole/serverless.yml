@@ -27,4 +27,4 @@ inputTypes:
   policy:
     type: object
     displayName: IAM Role Policy
-    description: The policy that grants an entity permission to assume the role
+    description: A managed IAM policy or an inline policy document

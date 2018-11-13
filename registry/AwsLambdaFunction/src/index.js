@@ -150,7 +150,26 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
           {
             roleName: `${resolve(this.functionName)}-execution-role`,
             service: 'lambda.amazonaws.com',
-            provider: this.provider
+            provider: this.provider,
+            policy: {
+              Version: '2012-10-17',
+              Statement: [
+                {
+                  Action: ['logs:CreateLogStream'],
+                  Resource: [
+                    `arn:aws:logs:us-east-1:*:log-group:/aws/lambda/${this.functionName}:*`
+                  ],
+                  Effect: 'Allow'
+                },
+                {
+                  Action: ['logs:PutLogEvents'],
+                  Resource: [
+                    `arn:aws:logs:us-east-1:*:log-group:/aws/lambda/${this.functionName}:*:*`
+                  ],
+                  Effect: 'Allow'
+                }
+              ]
+            }
           },
           context
         )

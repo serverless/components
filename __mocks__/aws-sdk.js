@@ -96,7 +96,9 @@ const mocks = {
     return Promise.resolve({ Role: { Arn: null } })
   }),
   attachRolePolicyMock: jest.fn(),
+  putRolePolicyMock: jest.fn(),
   detachRolePolicyMock: jest.fn(),
+  deleteRolePolicyMock: jest.fn(),
   updateAssumeRolePolicyMock: jest.fn(),
   createPolicyMock: jest.fn().mockReturnValue({ Policy: { Arn: 'abc:xyz' } }),
   deletePolicyMock: jest.fn().mockImplementation((params) => {
@@ -197,8 +199,14 @@ const IAM = function() {
     attachRolePolicy: (obj) => ({
       promise: () => mocks.attachRolePolicyMock(obj)
     }),
+    putRolePolicy: (obj) => ({
+      promise: () => mocks.putRolePolicyMock(obj)
+    }),
     detachRolePolicy: (obj) => ({
       promise: () => mocks.detachRolePolicyMock(obj)
+    }),
+    deleteRolePolicy: (obj) => ({
+      promise: () => mocks.deleteRolePolicyMock(obj)
     }),
     updateAssumeRolePolicy: (obj) => ({
       promise: () => mocks.updateAssumeRolePolicyMock(obj)
