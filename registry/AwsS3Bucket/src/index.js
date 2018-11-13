@@ -9,6 +9,12 @@ const AwsS3Bucket = (SuperClass) =>
     async construct(inputs, context) {
       await super.construct(inputs, context)
 
+      // TODO: remove this validation once core supports full RAML spec
+      const bucketNameRegex = new RegExp(this.inputTypes.bucketName.pattern)
+      if (inputs.bucketName && !bucketNameRegex.test(inputs.bucketName)) {
+        throw new Error(`Bucket name does not match regex "${bucketNameRegex.toString()}"`)
+      }
+
       // NOTE: the bucket name needs to be lower case
       this.bucketName = resolvable(() =>
         lowerCase(or(inputs.bucketName, `bucket-${this.instanceId}`))
