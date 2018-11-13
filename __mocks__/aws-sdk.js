@@ -108,9 +108,9 @@ const mocks = {
     return Promise.resolve()
   }),
   listEntitiesForPolicyMock: jest.fn().mockReturnValue({
-    PolicyGroups: ['group'],
-    PolicyRoles: ['role'],
-    PolicyUsers: ['user']
+    PolicyGroups: [{ GroupName: 'group' }],
+    PolicyRoles: [{ RoleName: 'role' }],
+    PolicyUsers: [{ UserName: 'user' }]
   }),
   detachGroupPolicyMock: jest.fn(),
   detachUserPolicyMock: jest.fn(),

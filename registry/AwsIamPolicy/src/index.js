@@ -1,12 +1,11 @@
 import { get, all, sleep, map, or, resolvable, pick, keys, not, equals } from '@serverless/utils'
 
-const createPolicy = async (IAM, { policyName, document }, context) => {
+const createPolicy = async (IAM, { policyName, document }) => {
   const policyRes = await IAM.createPolicy({
     PolicyName: policyName,
     Path: '/',
     PolicyDocument: JSON.stringify(document)
   }).promise()
-  context.log(`Policy '${policyName}' created with arn: '${policyRes.Policy.Arn}'`)
 
   await sleep(15000)
 
@@ -19,11 +18,25 @@ const deletePolicy = async (IAM, arn) => {
   }).promise()
 
   await all([
-    all(map((group) => IAM.detachGroupPolicy({ GroupName: group }).promise(), PolicyGroups)),
-    all(map((role) => IAM.detachRolePolicy({ RoleName: role }).promise(), PolicyRoles)),
-    all(map((user) => IAM.detachUserPolicy({ UserName: user }).promise(), PolicyUsers))
+    all(
+      map(
+        (group) => IAM.detachGroupPolicy({ GroupName: group.GroupName, PolicyArn: arn }).promise(),
+        PolicyGroups
+      )
+    ),
+    all(
+      map(
+        (role) => IAM.detachRolePolicy({ RoleName: role.RoleName, PolicyArn: arn }).promise(),
+        PolicyRoles
+      )
+    ),
+    all(
+      map(
+        (user) => IAM.detachUserPolicy({ UserName: user.UserName, PolicyArn: arn }).promise(),
+        PolicyUsers
+      )
+    )
   ])
-
   await IAM.deletePolicy({
     PolicyArn: arn
   }).promise()
@@ -64,15 +77,26 @@ const AwsIamPolicy = (SuperClass) =>
       const AWS = this.provider.getSdk()
       const IAM = new AWS.IAM()
 
-      context.log(`Creating Policy: ${this.policyName}`)
-      this.arn = await createPolicy(
-        IAM,
-        {
+      if (!prevInstance || prevInstance.policyName !== this.policyName) {
+        context.log(`Creating Policy: ${this.policyName}`)
+        this.arn = await createPolicy(IAM, {
           policyName: this.policyName,
           document: this.document
-        },
-        context
-      )
+        })
+        context.log(`Policy '${this.policyName}' created with arn: '${this.arn}'`)
+      } else {
+        context.log(`Updating Policy: ${this.policyName}`)
+        // aws sdk does not have an api for updating policies
+        // so we need to first remove (to avoid name conflicts)
+        // then create a new one with the new document
+        // console.log(prevInstance)
+        await deletePolicy(IAM, prevInstance.arn)
+        this.arn = await createPolicy(IAM, {
+          policyName: this.policyName,
+          document: this.document
+        })
+        context.log(`Policy '${this.policyName}' updated.`)
+      }
     }
 
     async remove(context) {
@@ -81,7 +105,7 @@ const AwsIamPolicy = (SuperClass) =>
 
       try {
         context.log(`Removing Policy: ${this.policyName}`)
-        await deletePolicy(IAM, this.arn, context)
+        await deletePolicy(IAM, this.arn)
         context.log(`Policy '${this.policyName}' removed.`)
       } catch (error) {
         if (error.code !== 'NoSuchEntity') {

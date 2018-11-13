@@ -83,6 +83,80 @@ describe('AwsIamPolicy', () => {
     expect(sleep).toBeCalledWith(15000)
   })
 
+  it('should update policy if config changed', async () => {
+    const inputs = {
+      policyName: 'abc',
+      document: {
+        Version: '2012-10-17',
+        Statement: {
+          Effect: 'Allow',
+          Principal: {
+            Service: 'lambda.amazonaws.com'
+          },
+          Action: 'sts:AssumeRole'
+        }
+      },
+      provider
+    }
+    let oldAwsIamPolicy = await context.construct(AwsIamPolicy, inputs)
+    oldAwsIamPolicy = await context.defineComponent(oldAwsIamPolicy)
+    oldAwsIamPolicy = resolveComponentEvaluables(oldAwsIamPolicy)
+    await oldAwsIamPolicy.deploy(null, context)
+
+    const prevAwsIamPolicy = await deserialize(serialize(oldAwsIamPolicy, context), context)
+    prevAwsIamPolicy.arn = 'abc:zxc'
+
+    const nextInputs = {
+      policyName: 'abc',
+      document: {
+        Version: '2012-10-17',
+        Statement: {
+          Effect: 'Allow',
+          Principal: {
+            Service: 'apig.amazonaws.com'
+          },
+          Action: 'sts:AssumeRole'
+        }
+      },
+      provider
+    }
+
+    let nextAwsIamPolicy = await context.construct(AwsIamPolicy, nextInputs)
+    nextAwsIamPolicy = await context.defineComponent(nextAwsIamPolicy, prevAwsIamPolicy)
+    nextAwsIamPolicy = resolveComponentEvaluables(nextAwsIamPolicy)
+
+    await nextAwsIamPolicy.deploy(prevAwsIamPolicy, context)
+
+    expect(AWS.mocks.deletePolicyMock).toBeCalledWith({
+      PolicyArn: prevAwsIamPolicy.arn
+    })
+    expect(AWS.mocks.listEntitiesForPolicyMock).toBeCalledWith({
+      PolicyArn: prevAwsIamPolicy.arn
+    })
+    expect(AWS.mocks.detachGroupPolicyMock).toBeCalledWith({
+      GroupName: 'group',
+      PolicyArn: prevAwsIamPolicy.arn
+    })
+    expect(AWS.mocks.detachRolePolicyMock).toBeCalledWith({
+      RoleName: 'role',
+      PolicyArn: prevAwsIamPolicy.arn
+    })
+    expect(AWS.mocks.detachUserPolicyMock).toBeCalledWith({
+      UserName: 'user',
+      PolicyArn: prevAwsIamPolicy.arn
+    })
+
+    const createPolicyParams = {
+      PolicyName: inputs.policyName,
+      Path: '/',
+      PolicyDocument: JSON.stringify(nextInputs.document)
+    }
+
+    expect(AWS.mocks.createPolicyMock).toBeCalledWith(createPolicyParams)
+    expect(nextAwsIamPolicy.arn).toEqual('abc:xyz')
+    expect(sleep).toBeCalledWith(15000)
+  })
+
   it('should remove policy', async () => {
     const inputs = {
       policyName: 'abc',
@@ -103,19 +177,28 @@ describe('AwsIamPolicy', () => {
     oldAwsIamPolicy = resolveComponentEvaluables(oldAwsIamPolicy)
     await oldAwsIamPolicy.deploy(null, context)
 
-    const prevAwsIamRole = await deserialize(serialize(oldAwsIamPolicy, context), context)
-    prevAwsIamRole.arn = 'abc:zxc'
-    await prevAwsIamRole.remove(context)
+    const prevAwsIamPolicy = await deserialize(serialize(oldAwsIamPolicy, context), context)
+    prevAwsIamPolicy.arn = 'abc:zxc'
+    await prevAwsIamPolicy.remove(context)
 
     expect(AWS.mocks.deletePolicyMock).toBeCalledWith({
-      PolicyArn: prevAwsIamRole.arn
+      PolicyArn: prevAwsIamPolicy.arn
     })
     expect(AWS.mocks.listEntitiesForPolicyMock).toBeCalledWith({
-      PolicyArn: prevAwsIamRole.arn
+      PolicyArn: prevAwsIamPolicy.arn
     })
-    expect(AWS.mocks.detachGroupPolicyMock).toBeCalledWith({ GroupName: 'group' })
-    expect(AWS.mocks.detachRolePolicyMock).toBeCalledWith({ RoleName: 'role' })
-    expect(AWS.mocks.detachUserPolicyMock).toBeCalledWith({ UserName: 'user' })
+    expect(AWS.mocks.detachGroupPolicyMock).toBeCalledWith({
+      GroupName: 'group',
+      PolicyArn: prevAwsIamPolicy.arn
+    })
+    expect(AWS.mocks.detachRolePolicyMock).toBeCalledWith({
+      RoleName: 'role',
+      PolicyArn: prevAwsIamPolicy.arn
+    })
+    expect(AWS.mocks.detachUserPolicyMock).toBeCalledWith({
+      UserName: 'user',
+      PolicyArn: prevAwsIamPolicy.arn
+    })
   })
 
   it('should remove policy even if it does not exist anymore', async () => {
@@ -138,19 +221,28 @@ describe('AwsIamPolicy', () => {
     oldAwsIamPolicy = resolveComponentEvaluables(oldAwsIamPolicy)
     await oldAwsIamPolicy.deploy(null, context)
 
-    const prevAwsIamRole = await deserialize(serialize(oldAwsIamPolicy, context), context)
-    prevAwsIamRole.arn = 'already-removed-policy'
-    await prevAwsIamRole.remove(context)
+    const prevAwsIamPolicy = await deserialize(serialize(oldAwsIamPolicy, context), context)
+    prevAwsIamPolicy.arn = 'already-removed-policy'
+    await prevAwsIamPolicy.remove(context)
 
     expect(AWS.mocks.deletePolicyMock).toBeCalledWith({
-      PolicyArn: prevAwsIamRole.arn
+      PolicyArn: prevAwsIamPolicy.arn
     })
     expect(AWS.mocks.listEntitiesForPolicyMock).toBeCalledWith({
-      PolicyArn: prevAwsIamRole.arn
+      PolicyArn: prevAwsIamPolicy.arn
     })
-    expect(AWS.mocks.detachGroupPolicyMock).toBeCalledWith({ GroupName: 'group' })
-    expect(AWS.mocks.detachRolePolicyMock).toBeCalledWith({ RoleName: 'role' })
-    expect(AWS.mocks.detachUserPolicyMock).toBeCalledWith({ UserName: 'user' })
+    expect(AWS.mocks.detachGroupPolicyMock).toBeCalledWith({
+      GroupName: 'group',
+      PolicyArn: prevAwsIamPolicy.arn
+    })
+    expect(AWS.mocks.detachRolePolicyMock).toBeCalledWith({
+      RoleName: 'role',
+      PolicyArn: prevAwsIamPolicy.arn
+    })
+    expect(AWS.mocks.detachUserPolicyMock).toBeCalledWith({
+      UserName: 'user',
+      PolicyArn: prevAwsIamPolicy.arn
+    })
   })
 
   it('should preserve props if nothing changed', async () => {
