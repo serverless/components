@@ -32,7 +32,8 @@ const parseRate = (rate) => {
   return `cron(${rate})`
 }
 const convertRuntime = (runtime) => {
-  if (runtime === 'nodejs') {
+  // default runtime
+  if (runtime === undefined || runtime === 'nodejs') {
     return 'nodejs8.10'
   }
 

@@ -64,6 +64,41 @@ describe('AwsLambdaCompute', () => {
     expect(context.construct).toBeCalledWith(AwsLambdaFunctionType, inputs)
   })
 
+  it('should use nodejs runtime by default', async () => {
+    const scope = {
+      provider: 'aws',
+      memory: 128,
+      timeout: 10
+    }
+    const functionInstance = {
+      code: './code',
+      handler: 'index.hello',
+      functionName: 'abc',
+      functionDescription: 'abc function'
+    }
+
+    const inputs = {
+      provider: 'aws',
+      role: undefined,
+      functionName: 'abc',
+      functionDescription: 'abc function',
+      memorySize: 128,
+      timeout: 10,
+      runtime: 'nodejs8.10',
+      handler: 'index.hello',
+      environment: {},
+      code: './code',
+      tags: {}
+    }
+
+    const awsLambdaCompute = await AwsLambdaCompute({}, SuperContext)
+
+    const children = await awsLambdaCompute.defineFunction.call(scope, functionInstance, context)
+
+    expect(children).toEqual(AwsLambdaFunctionInstance)
+    expect(context.construct).toBeCalledWith(AwsLambdaFunctionType, inputs)
+  })
+
   it('function config should overwrite compute config', async () => {
     const scope = {
       runtime: 'nodejs',
