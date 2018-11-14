@@ -96,7 +96,9 @@ const mocks = {
     return Promise.resolve({ Role: { Arn: null } })
   }),
   attachRolePolicyMock: jest.fn(),
+  putRolePolicyMock: jest.fn(),
   detachRolePolicyMock: jest.fn(),
+  deleteRolePolicyMock: jest.fn(),
   updateAssumeRolePolicyMock: jest.fn(),
   createPolicyMock: jest.fn().mockReturnValue({ Policy: { Arn: 'abc:xyz' } }),
   deletePolicyMock: jest.fn().mockImplementation((params) => {
@@ -149,7 +151,14 @@ const mocks = {
       return Promise.reject(error)
     }
     return Promise.resolve()
-  })
+  }),
+
+  // STS
+  getCallerIdentity: jest.fn().mockReturnValue(
+    Promise.resolve({
+      Account: 'account-id'
+    })
+  )
 }
 
 const APIGateway = function() {
@@ -197,8 +206,14 @@ const IAM = function() {
     attachRolePolicy: (obj) => ({
       promise: () => mocks.attachRolePolicyMock(obj)
     }),
+    putRolePolicy: (obj) => ({
+      promise: () => mocks.putRolePolicyMock(obj)
+    }),
     detachRolePolicy: (obj) => ({
       promise: () => mocks.detachRolePolicyMock(obj)
+    }),
+    deleteRolePolicy: (obj) => ({
+      promise: () => mocks.deleteRolePolicyMock(obj)
     }),
     updateAssumeRolePolicy: (obj) => ({
       promise: () => mocks.updateAssumeRolePolicyMock(obj)
@@ -296,6 +311,14 @@ const SNS = function() {
   }
 }
 
+const STS = function() {
+  return {
+    getCallerIdentity: (obj) => ({
+      promise: () => mocks.getCallerIdentity(obj)
+    })
+  }
+}
+
 export default {
   mocks,
   config: {
@@ -306,5 +329,6 @@ export default {
   IAM,
   Lambda,
   S3,
-  SNS
+  SNS,
+  STS
 }

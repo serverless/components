@@ -20,6 +20,7 @@ matrix:
         - secure: Fzuq8z/p3+vb3DdsQJEPS9SAyGMUZ3hpgFSMUIglSVldgnHBKZ9GARjJvRLsyeBfnDJ1KL3MyMd5xbUK9glk4VyA54xrsuUX4Guuk9U0cueCEgfe2TMC50LTrJIUHREBal9hktyK5m9U5Kof4QeMRzcUN9VuscP2WS0Qt2TJMXbpsrcp++oD6kfZlyrvhQMAcv9ghgtBGeDBG90nJiE6eey5G1PkNECIY1t3raFgZdZnDs0FFLURZI91JvRgUxoN/rm1nRoBIE4yUHnx2ovXfqBps24LnSQVxDU73NJ39mGZhvDjJ3+KdlZwwwsADRhqP2ghUP0SZlEnHH8kcANA6O25ge+M6dGlsQ5uVqGKcuLFH7SoVgeQUWKb2XOdJZcWI/lby/TjWCtAG9AXdlX/42VKT0SR/QfjfG/acuFwFTQdwRx6AnquW+IQ8P5aKWd2re9SGi6FWi33eods0WnDQXN49BabRt8CeXzhF8X7wj1ccTeflsAeRgC1JOiRfKbDCbHzOPe9iLP+ivo8loXbQE0xhc3K2cYvUWHr4Cilkk2LLR/GhWWRwl+yvC/WWGtjGy66ponnYscGcCWEuJSCErfu56Z97r2JuDrKCVoTzcc//5lpkSl06wvlsvzz1Lr8kf6DKekmJbmDLZ394FfSMurZldc+ARHjYoi8TInvUkU=
 install:
 - npm install
+- node --version | grep v6 && npm run prepare || true
 - npm install -g codecov
 - pushd examples/restapi/code && npm install && popd
 script:

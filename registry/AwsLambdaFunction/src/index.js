@@ -145,12 +145,38 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
     async define(context) {
       let role = resolve(this.role)
       if (!role) {
+        const provider = resolve(this.provider)
+        const region = resolve(provider.region)
+        const AWS = provider.getSdk()
+        const STS = new AWS.STS()
+        const { Account } = await STS.getCallerIdentity().promise()
         role = await context.construct(
           AwsIamRole,
           {
             roleName: `${resolve(this.functionName)}-execution-role`,
             service: 'lambda.amazonaws.com',
-            provider: this.provider
+            provider: this.provider,
+            policy: {
+              Version: '2012-10-17',
+              Statement: [
+                {
+                  Action: ['logs:CreateLogStream'],
+                  Resource: [
+                    `arn:aws:logs:${region}:${Account}:log-group:/aws/lambda/${this.functionName}:*`
+                  ],
+                  Effect: 'Allow'
+                },
+                {
+                  Action: ['logs:PutLogEvents'],
+                  Resource: [
+                    `arn:aws:logs:${region}:${Account}:log-group:/aws/lambda/${
+                      this.functionName
+                    }:*:*`
+                  ],
+                  Effect: 'Allow'
+                }
+              ]
+            }
           },
           context
         )

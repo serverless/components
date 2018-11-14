@@ -1,19 +1,47 @@
-import { get, equals, is, resolve, sleep, or, resolvable, not, pick, keys } from '@serverless/utils'
+import {
+  get,
+  equals,
+  is,
+  isEmpty,
+  has,
+  resolve,
+  sleep,
+  or,
+  resolvable,
+  not,
+  pick,
+  keys
+} from '@serverless/utils'
 
-const attachRolePolicy = async (IAM, { roleName, policy }) => {
-  await IAM.attachRolePolicy({
-    RoleName: roleName,
-    PolicyArn: policy.arn
-  }).promise()
+const addRolePolicy = async (IAM, { roleName, policy }) => {
+  if (has('arn', policy)) {
+    await IAM.attachRolePolicy({
+      RoleName: roleName,
+      PolicyArn: policy.arn
+    }).promise()
+  } else if (!isEmpty(policy)) {
+    await IAM.putRolePolicy({
+      RoleName: roleName,
+      PolicyName: `${roleName}-policy`,
+      PolicyDocument: JSON.stringify(policy)
+    }).promise()
+  }
 
   return sleep(15000)
 }
 
-const detachRolePolicy = async (IAM, { roleName, policy }) => {
-  await IAM.detachRolePolicy({
-    RoleName: roleName,
-    PolicyArn: policy.arn
-  }).promise()
+const removeRolePolicy = async (IAM, { roleName, policy }) => {
+  if (has('arn', policy)) {
+    await IAM.detachRolePolicy({
+      RoleName: roleName,
+      PolicyArn: policy.arn
+    }).promise()
+  } else if (!isEmpty(policy)) {
+    await IAM.deleteRolePolicy({
+      RoleName: roleName,
+      PolicyName: `${roleName}-policy`
+    }).promise()
+  }
 }
 
 const createRole = async (IAM, { roleName, service, policy }) => {
@@ -33,7 +61,7 @@ const createRole = async (IAM, { roleName, service, policy }) => {
     AssumeRolePolicyDocument: JSON.stringify(assumeRolePolicyDocument)
   }).promise()
 
-  await attachRolePolicy(IAM, {
+  await addRolePolicy(IAM, {
     roleName,
     policy
   })
@@ -43,7 +71,7 @@ const createRole = async (IAM, { roleName, service, policy }) => {
 
 const deleteRole = async (IAM, { roleName, policy }) => {
   try {
-    await detachRolePolicy(IAM, {
+    await removeRolePolicy(IAM, {
       roleName,
       policy
     })
@@ -94,13 +122,8 @@ const AwsIamRole = async (SuperClass, superContext) => {
         )
       }
 
-      // HACK BRN: Temporary workaround until we add property type/default support
-      const defaultPolicy = {
-        arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
-      }
       this.provider = inputs.provider
       this.service = inputs.service
-      this.policy = resolvable(() => or(inputs.policy, defaultPolicy))
       this.roleName = resolvable(() => or(inputs.roleName, `role-${this.instanceId}`))
     }
 
@@ -151,8 +174,8 @@ const AwsIamRole = async (SuperClass, superContext) => {
           await updateAssumeRolePolicy(IAM, this)
         }
         if (!equals(prevInstance.policy, this.policy)) {
-          await detachRolePolicy(IAM, prevInstance)
-          await attachRolePolicy(IAM, { roleName: this.roleName, policy: this.policy })
+          await removeRolePolicy(IAM, prevInstance)
+          await addRolePolicy(IAM, { roleName: this.roleName, policy: this.policy })
         }
       }
     }
