@@ -14,5 +14,5 @@ components:
   myBucket:
     type: AwsS3Bucket
     inputs:
-      bucketName: mySuperBucket
+      bucketName: mysuperbucket
       provider: ${this.providers.aws}

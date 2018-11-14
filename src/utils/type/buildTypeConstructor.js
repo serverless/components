@@ -1,4 +1,4 @@
-import { assign, clone, defineProperty, get } from '@serverless/utils'
+import { assign, clone, get, objectDefineProperty } from '@serverless/utils'
 import { SYMBOL_TYPE } from '../constants'
 import interpretProps from '../interpreter/interpretProps'
 
@@ -50,7 +50,7 @@ const buildTypeConstructor = (type) => {
   }
 
   // NOTE BRN: This sets the JS name for this constructor method. This will ensure that when this value is logged it will show up as '[name] { ... }'
-  defineProperty(constructor, 'name', { value: type.props.name })
+  objectDefineProperty(constructor, 'name', { value: type.props.name })
 
   return constructor
 }
