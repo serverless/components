@@ -26,5 +26,6 @@ inputTypes:
     example: lambda.amazonaws.com
   policy:
     type: object
+    returied: true
     displayName: IAM Role Policy
     description: A managed IAM policy or an inline policy document

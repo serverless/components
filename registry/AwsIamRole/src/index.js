@@ -122,11 +122,8 @@ const AwsIamRole = async (SuperClass, superContext) => {
         )
       }
 
-      // HACK BRN: Temporary workaround until we add property type/default support
-      const defaultPolicy = {}
       this.provider = inputs.provider
       this.service = inputs.service
-      this.policy = resolvable(() => or(inputs.policy, defaultPolicy))
       this.roleName = resolvable(() => or(inputs.roleName, `role-${this.instanceId}`))
     }
 
