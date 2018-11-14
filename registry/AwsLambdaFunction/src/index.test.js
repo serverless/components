@@ -6,7 +6,7 @@ import { readFileSync } from 'fs'
 import { deserialize, resolveComponentEvaluables, serialize } from '../../../src/utils'
 import { createTestContext } from '../../../test'
 
-jest.setTimeout(10000)
+jest.setTimeout(30000)
 
 jest.mock('@serverless/utils', () => ({
   ...require.requireActual('@serverless/utils'),

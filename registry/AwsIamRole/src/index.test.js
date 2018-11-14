@@ -9,6 +9,8 @@ import {
   serialize
 } from '../../../src/utils'
 
+jest.setTimeout(10000)
+
 let context
 let provider
 let AwsIamRole
