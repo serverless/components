@@ -163,10 +163,10 @@ const AwsSnsTopic = (SuperClass) =>
 
       this.provider = resolvable(() => or(inputs.provider, context.get('provider')))
       this.topicName = resolvable(() => or(inputs.topicName, `sns-${this.instanceId}`))
+      this.deliveryStatusAttributes = resolvable(() => or(inputs.deliveryStatusAttributes, []))
       this.displayName = inputs.displayName
       this.policy = inputs.policy
       this.deliveryPolicy = inputs.deliveryPolicy
-      this.deliveryStatusAttributes = inputs.deliveryStatusAttributes
     }
 
     shouldDeploy(prevInstance) {
