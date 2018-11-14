@@ -61,15 +61,35 @@ const AwsIamPolicy = (SuperClass) =>
 
     shouldDeploy(prevInstance) {
       const inputs = {
-        policyName: this.policyName,
         document: this.document
       }
       const prevInputs = prevInstance ? pick(keys(inputs), prevInstance) : {}
       const configChanged = not(equals(inputs, prevInputs))
-      if (prevInstance && prevInstance.policyName !== inputs.policyName) {
-        return 'replace'
-      } else if (!prevInstance || configChanged) {
+
+      // make sure any added suffix from prevInstance is preserved
+      // otherwise name will always be different
+      if (prevInstance && this.policyName === `policy-${this.instanceId}`) {
+        this.policyName = prevInstance.policyName
+      }
+
+      // if config changed, change the name to trigger replace
+      if (prevInstance && configChanged && this.policyName.includes(`policy-${this.instanceId}`)) {
+        this.policyName = `policy-${this.instanceId}-${Math.random()
+          .toString(36)
+          .substring(7)}`
+      }
+
+      // if the user changed the config without changing the name, error!
+      if (prevInstance && configChanged && prevInstance.policyName === this.policyName) {
+        throw Error(
+          'Deployed policies cannot be updated. Please change the policyName to replace the policy document.'
+        )
+      }
+
+      if (!prevInstance) {
         return 'deploy'
+      } else if (prevInstance.policyName !== this.policyName) {
+        return 'replace'
       }
     }
 
@@ -77,26 +97,12 @@ const AwsIamPolicy = (SuperClass) =>
       const AWS = this.provider.getSdk()
       const IAM = new AWS.IAM()
 
-      if (!prevInstance || prevInstance.policyName !== this.policyName) {
-        context.log(`Creating Policy: ${this.policyName}`)
-        this.arn = await createPolicy(IAM, {
-          policyName: this.policyName,
-          document: this.document
-        })
-        context.log(`Policy '${this.policyName}' created with arn: '${this.arn}'`)
-      } else {
-        context.log(`Updating Policy: ${this.policyName}`)
-        // aws sdk does not have an api for updating policies
-        // so we need to first remove (to avoid name conflicts)
-        // then create a new one with the new document
-        // console.log(prevInstance)
-        await deletePolicy(IAM, prevInstance.arn)
-        this.arn = await createPolicy(IAM, {
-          policyName: this.policyName,
-          document: this.document
-        })
-        context.log(`Policy '${this.policyName}' updated.`)
-      }
+      context.log(`Creating Policy: ${this.policyName}`)
+      this.arn = await createPolicy(IAM, {
+        policyName: this.policyName,
+        document: this.document
+      })
+      context.log(`Policy '${this.policyName}' created with arn: '${this.arn}'`)
     }
 
     async remove(context) {

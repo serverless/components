@@ -83,80 +83,6 @@ describe('AwsIamPolicy', () => {
     expect(sleep).toBeCalledWith(15000)
   })
 
-  it('should update policy if config changed', async () => {
-    const inputs = {
-      policyName: 'abc',
-      document: {
-        Version: '2012-10-17',
-        Statement: {
-          Effect: 'Allow',
-          Principal: {
-            Service: 'lambda.amazonaws.com'
-          },
-          Action: 'sts:AssumeRole'
-        }
-      },
-      provider
-    }
-    let oldAwsIamPolicy = await context.construct(AwsIamPolicy, inputs)
-    oldAwsIamPolicy = await context.defineComponent(oldAwsIamPolicy)
-    oldAwsIamPolicy = resolveComponentEvaluables(oldAwsIamPolicy)
-    await oldAwsIamPolicy.deploy(null, context)
-
-    const prevAwsIamPolicy = await deserialize(serialize(oldAwsIamPolicy, context), context)
-    prevAwsIamPolicy.arn = 'abc:zxc'
-
-    const nextInputs = {
-      policyName: 'abc',
-      document: {
-        Version: '2012-10-17',
-        Statement: {
-          Effect: 'Allow',
-          Principal: {
-            Service: 'apig.amazonaws.com'
-          },
-          Action: 'sts:AssumeRole'
-        }
-      },
-      provider
-    }
-
-    let nextAwsIamPolicy = await context.construct(AwsIamPolicy, nextInputs)
-    nextAwsIamPolicy = await context.defineComponent(nextAwsIamPolicy, prevAwsIamPolicy)
-    nextAwsIamPolicy = resolveComponentEvaluables(nextAwsIamPolicy)
-
-    await nextAwsIamPolicy.deploy(prevAwsIamPolicy, context)
-
-    expect(AWS.mocks.deletePolicyMock).toBeCalledWith({
-      PolicyArn: prevAwsIamPolicy.arn
-    })
-    expect(AWS.mocks.listEntitiesForPolicyMock).toBeCalledWith({
-      PolicyArn: prevAwsIamPolicy.arn
-    })
-    expect(AWS.mocks.detachGroupPolicyMock).toBeCalledWith({
-      GroupName: 'group',
-      PolicyArn: prevAwsIamPolicy.arn
-    })
-    expect(AWS.mocks.detachRolePolicyMock).toBeCalledWith({
-      RoleName: 'role',
-      PolicyArn: prevAwsIamPolicy.arn
-    })
-    expect(AWS.mocks.detachUserPolicyMock).toBeCalledWith({
-      UserName: 'user',
-      PolicyArn: prevAwsIamPolicy.arn
-    })
-
-    const createPolicyParams = {
-      PolicyName: inputs.policyName,
-      Path: '/',
-      PolicyDocument: JSON.stringify(nextInputs.document)
-    }
-
-    expect(AWS.mocks.createPolicyMock).toBeCalledWith(createPolicyParams)
-    expect(nextAwsIamPolicy.arn).toEqual('abc:xyz')
-    expect(sleep).toBeCalledWith(15000)
-  })
-
   it('should remove policy', async () => {
     const inputs = {
       policyName: 'abc',
@@ -360,7 +286,7 @@ describe('AwsIamPolicy', () => {
     expect(res).toBe('replace')
   })
 
-  it('shouldDeploy should return deploy if config changed', async () => {
+  it('shouldDeploy should throw error if config changed but name was not changed', async () => {
     let oldAwsIamPolicy = await context.construct(AwsIamPolicy, {
       policyName: 'abc',
       document: {
@@ -398,8 +324,50 @@ describe('AwsIamPolicy', () => {
     newAwsIamPolicy = await context.defineComponent(newAwsIamPolicy)
     newAwsIamPolicy = resolveComponentEvaluables(newAwsIamPolicy)
 
-    const res = newAwsIamPolicy.shouldDeploy(prevAwsIamPolicy)
-    expect(res).toBe('deploy')
+    expect(() => newAwsIamPolicy.shouldDeploy(prevAwsIamPolicy)).toThrow(
+      'Deployed policies cannot be updated'
+    )
+  })
+
+  it('shouldDeploy should change name if config changed when using default name', async () => {
+    let oldAwsIamPolicy = await context.construct(AwsIamPolicy, {
+      document: {
+        Version: '2012-10-17',
+        Statement: {
+          Effect: 'Allow',
+          Principal: {
+            Service: 'lambda.amazonaws.com'
+          },
+          Action: 'sts:AssumeRole'
+        }
+      },
+      provider
+    })
+    oldAwsIamPolicy = await context.defineComponent(oldAwsIamPolicy)
+    oldAwsIamPolicy = resolveComponentEvaluables(oldAwsIamPolicy)
+    await oldAwsIamPolicy.deploy(null, context)
+
+    const prevAwsIamPolicy = await deserialize(serialize(oldAwsIamPolicy, context), context)
+
+    let newAwsIamPolicy = await context.construct(AwsIamPolicy, {
+      document: {
+        Version: '2012-10-17',
+        Statement: {
+          Effect: 'Allow',
+          Principal: {
+            Service: 'apig.amazonaws.com'
+          },
+          Action: 'sts:AssumeRole'
+        }
+      },
+      provider
+    })
+    newAwsIamPolicy = await context.defineComponent(newAwsIamPolicy, oldAwsIamPolicy)
+    newAwsIamPolicy = resolveComponentEvaluables(newAwsIamPolicy)
+
+    newAwsIamPolicy.shouldDeploy(prevAwsIamPolicy)
+
+    expect(newAwsIamPolicy.policyName).not.toEqual(`policy-${newAwsIamPolicy.instanceId}`)
   })
 
   it('shouldDeploy should return deploy if first deployment', async () => {
