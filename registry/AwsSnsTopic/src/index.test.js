@@ -180,6 +180,26 @@ describe('AwsSnsTopic', () => {
     expect(res).toBe(undefined)
   })
 
+  it('shouldDeploy should return "undefined" if nothing changed and only required inputs are provided', async () => {
+    const inputs = {
+      topicName: 'myTopic',
+      provider
+    }
+    let oldComponent = await context.construct(AwsSnsTopic, inputs)
+    oldComponent = await context.defineComponent(oldComponent)
+    oldComponent = resolveComponentEvaluables(oldComponent)
+    await oldComponent.deploy(null, context)
+
+    const prevComponent = await deserialize(serialize(oldComponent, context), context)
+
+    let newComponent = await context.construct(AwsSnsTopic, inputs)
+    newComponent = await context.defineComponent(newComponent)
+    newComponent = resolveComponentEvaluables(newComponent)
+
+    const res = newComponent.shouldDeploy(prevComponent)
+    expect(res).toBe(undefined)
+  })
+
   it('shouldDeploy should return "replace" if "topic" changed', async () => {
     const inputs = {
       topicName: 'myTopic',
