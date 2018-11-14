@@ -157,14 +157,14 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
                 {
                   Action: ['logs:CreateLogStream'],
                   Resource: [
-                    `arn:aws:logs:us-east-1:*:log-group:/aws/lambda/${this.functionName}:*`
+                    `arn:aws:logs:${this.provider.region}:*:log-group:/aws/lambda/${this.functionName}:*`
                   ],
                   Effect: 'Allow'
                 },
                 {
                   Action: ['logs:PutLogEvents'],
                   Resource: [
-                    `arn:aws:logs:us-east-1:*:log-group:/aws/lambda/${this.functionName}:*:*`
+                    `arn:aws:logs:${this.provider.region}:*:log-group:/aws/lambda/${this.functionName}:*:*`
                   ],
                   Effect: 'Allow'
                 }
