@@ -864,14 +864,18 @@ describe('AwsLambdaFunction', () => {
         {
           Action: ['logs:CreateLogStream'],
           Resource: [
-            `arn:aws:logs:us-east-1:*:log-group:/aws/lambda/${awsLambdaFunction.functionName}:*`
+            `arn:aws:logs:us-east-1:account-id:log-group:/aws/lambda/${
+              awsLambdaFunction.functionName
+            }:*`
           ],
           Effect: 'Allow'
         },
         {
           Action: ['logs:PutLogEvents'],
           Resource: [
-            `arn:aws:logs:us-east-1:*:log-group:/aws/lambda/${awsLambdaFunction.functionName}:*:*`
+            `arn:aws:logs:us-east-1:account-id:log-group:/aws/lambda/${
+              awsLambdaFunction.functionName
+            }:*:*`
           ],
           Effect: 'Allow'
         }

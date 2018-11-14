@@ -151,7 +151,14 @@ const mocks = {
       return Promise.reject(error)
     }
     return Promise.resolve()
-  })
+  }),
+
+  // STS
+  getCallerIdentity: jest.fn().mockReturnValue(
+    Promise.resolve({
+      Account: 'account-id'
+    })
+  )
 }
 
 const APIGateway = function() {
@@ -304,6 +311,14 @@ const SNS = function() {
   }
 }
 
+const STS = function() {
+  return {
+    getCallerIdentity: (obj) => ({
+      promise: () => mocks.getCallerIdentity(obj)
+    })
+  }
+}
+
 export default {
   mocks,
   config: {
@@ -314,5 +329,6 @@ export default {
   IAM,
   Lambda,
   S3,
-  SNS
+  SNS,
+  STS
 }

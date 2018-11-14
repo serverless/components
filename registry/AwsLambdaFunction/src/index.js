@@ -147,7 +147,9 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
       if (!role) {
         const provider = resolve(this.provider)
         const region = resolve(provider.region)
-        const { accountId } = { accountId: '*' } // await provider.getAccountInfo()
+        const AWS = provider.getSdk()
+        const STS = new AWS.STS()
+        const { Account } = await STS.getCallerIdentity().promise()
         role = await context.construct(
           AwsIamRole,
           {
@@ -160,16 +162,14 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
                 {
                   Action: ['logs:CreateLogStream'],
                   Resource: [
-                    `arn:aws:logs:${region}:${accountId}:log-group:/aws/lambda/${
-                      this.functionName
-                    }:*`
+                    `arn:aws:logs:${region}:${Account}:log-group:/aws/lambda/${this.functionName}:*`
                   ],
                   Effect: 'Allow'
                 },
                 {
                   Action: ['logs:PutLogEvents'],
                   Resource: [
-                    `arn:aws:logs:${region}:${accountId}:log-group:/aws/lambda/${
+                    `arn:aws:logs:${region}:${Account}:log-group:/aws/lambda/${
                       this.functionName
                     }:*:*`
                   ],
