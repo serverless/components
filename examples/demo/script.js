@@ -1,4 +1,4 @@
-import { createContext } from '../src'
+import { createContext } from '../../src'
 
 const simpleFunctionScript = async () => {
   const context = await createContext({
