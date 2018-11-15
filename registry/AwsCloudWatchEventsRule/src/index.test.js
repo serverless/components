@@ -14,6 +14,7 @@ afterAll(() => {
 describe('AwsCloudWatchEventsRule', () => {
   const cwd = path.join(__dirname, '..')
   let context
+  let provider
   let AwsProvider
   let AwsCloudWatchEventsRule
 
@@ -21,6 +22,13 @@ describe('AwsCloudWatchEventsRule', () => {
     context = await createTestContext({ cwd })
     AwsProvider = await context.loadType('AwsProvider')
     AwsCloudWatchEventsRule = await context.loadType('./')
+    provider = await context.construct(AwsProvider, {
+      region: 'us-east-1',
+      credentials: {
+        accessKeyId: 'abc',
+        secretAccessKey: 'xyz'
+      }
+    })
   })
 
   it('should create schedule', async () => {
@@ -30,7 +38,7 @@ describe('AwsCloudWatchEventsRule', () => {
       State: 'ENABLED'
     }
     const inputs = {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       enabled: true,
       schedule: 'rate(5 minutes)',
       lambda: {
@@ -70,7 +78,7 @@ describe('AwsCloudWatchEventsRule', () => {
 
   it('should preserve props if nothing changed', async () => {
     let awsCloudWatchEventsRule = await context.construct(AwsCloudWatchEventsRule, {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       schedule: 'rate(5 minutes)',
       lambda: {
         functionName: 'hello',
@@ -90,7 +98,7 @@ describe('AwsCloudWatchEventsRule', () => {
     expect(prevAwsEventsRule.arn).toBe('abc:zxc')
 
     let nextAwsEventsRule = await context.construct(AwsCloudWatchEventsRule, {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       schedule: 'rate(5 minutes)',
       lambda: {
         functionName: 'hello',
@@ -110,7 +118,7 @@ describe('AwsCloudWatchEventsRule', () => {
       Name: 'hello'
     }
     const inputs = {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       enabled: true,
       schedule: 'rate(5 minutes)',
       lambda: {
@@ -138,7 +146,7 @@ describe('AwsCloudWatchEventsRule', () => {
       Name: 'already-removed-rule'
     }
     const inputs = {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       enabled: true,
       schedule: 'rate(5 minutes)',
       lambda: {

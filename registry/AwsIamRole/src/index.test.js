@@ -50,7 +50,13 @@ describe('AwsIamRole', () => {
     AwsIamRole = await context.loadType('./')
 
     const AwsProvider = await context.loadType('AwsProvider')
-    provider = await context.construct(AwsProvider, {})
+    provider = await context.construct(AwsProvider, {
+      region: 'us-east-1',
+      credentials: {
+        accessKeyId: 'abc',
+        secretAccessKey: 'xyz'
+      }
+    })
   })
 
   it('should throw if role name is greater than 64 characters', async () => {
