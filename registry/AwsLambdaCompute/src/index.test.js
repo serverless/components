@@ -188,18 +188,18 @@ describe('AwsLambdaCompute', () => {
     expect(context.construct).toBeCalledWith(AwsLambdaFunctionType, inputs)
   })
 
-  it('should define schedule and return AwsEventsRule as a child', async () => {
-    const AwsEventsRuleType = {
-      name: 'AwsEventsRule',
+  it('should define schedule and return AwsCloudWatchEventsRule as a child', async () => {
+    const AwsCloudWatchEventsRuleType = {
+      name: 'AwsCloudWatchEventsRule',
       class: true
     }
-    const AwsEventsRuleInstance = {
-      name: 'AwsEventsRule',
+    const AwsCloudWatchEventsRuleInstance = {
+      name: 'AwsCloudWatchEventsRule',
       instance: true
     }
     const awsEventsRuleContext = {
-      loadType: async () => AwsEventsRuleType,
-      construct: jest.fn().mockReturnValue(AwsEventsRuleInstance)
+      loadType: async () => AwsCloudWatchEventsRuleType,
+      construct: jest.fn().mockReturnValue(AwsCloudWatchEventsRuleInstance)
     }
 
     const scope = {
@@ -222,22 +222,22 @@ describe('AwsLambdaCompute', () => {
       awsEventsRuleContext
     )
 
-    expect(children).toEqual(AwsEventsRuleInstance)
-    expect(awsEventsRuleContext.construct).toBeCalledWith(AwsEventsRuleType, inputs)
+    expect(children).toEqual(AwsCloudWatchEventsRuleInstance)
+    expect(awsEventsRuleContext.construct).toBeCalledWith(AwsCloudWatchEventsRuleType, inputs)
   })
 
   it('should define schedule and parse singular schedule', async () => {
-    const AwsEventsRuleType = {
-      name: 'AwsEventsRule',
+    const AwsCloudWatchEventsRuleType = {
+      name: 'AwsCloudWatchEventsRule',
       class: true
     }
-    const AwsEventsRuleInstance = {
-      name: 'AwsEventsRule',
+    const AwsCloudWatchEventsRuleInstance = {
+      name: 'AwsCloudWatchEventsRule',
       instance: true
     }
     const awsEventsRuleContext = {
-      loadType: async () => AwsEventsRuleType,
-      construct: jest.fn().mockReturnValue(AwsEventsRuleInstance)
+      loadType: async () => AwsCloudWatchEventsRuleType,
+      construct: jest.fn().mockReturnValue(AwsCloudWatchEventsRuleInstance)
     }
 
     const scope = {
@@ -260,22 +260,22 @@ describe('AwsLambdaCompute', () => {
       awsEventsRuleContext
     )
 
-    expect(children).toEqual(AwsEventsRuleInstance)
-    expect(awsEventsRuleContext.construct).toBeCalledWith(AwsEventsRuleType, inputs)
+    expect(children).toEqual(AwsCloudWatchEventsRuleInstance)
+    expect(awsEventsRuleContext.construct).toBeCalledWith(AwsCloudWatchEventsRuleType, inputs)
   })
 
   it('should define schedule and parse cron schedule', async () => {
-    const AwsEventsRuleType = {
-      name: 'AwsEventsRule',
+    const AwsCloudWatchEventsRuleType = {
+      name: 'AwsCloudWatchEventsRule',
       class: true
     }
-    const AwsEventsRuleInstance = {
-      name: 'AwsEventsRule',
+    const AwsCloudWatchEventsRuleInstance = {
+      name: 'AwsCloudWatchEventsRule',
       instance: true
     }
     const awsEventsRuleContext = {
-      loadType: async () => AwsEventsRuleType,
-      construct: jest.fn().mockReturnValue(AwsEventsRuleInstance)
+      loadType: async () => AwsCloudWatchEventsRuleType,
+      construct: jest.fn().mockReturnValue(AwsCloudWatchEventsRuleInstance)
     }
 
     const scope = {
@@ -298,7 +298,7 @@ describe('AwsLambdaCompute', () => {
       awsEventsRuleContext
     )
 
-    expect(children).toEqual(AwsEventsRuleInstance)
-    expect(awsEventsRuleContext.construct).toBeCalledWith(AwsEventsRuleType, inputs)
+    expect(children).toEqual(AwsCloudWatchEventsRuleInstance)
+    expect(awsEventsRuleContext.construct).toBeCalledWith(AwsCloudWatchEventsRuleType, inputs)
   })
 })

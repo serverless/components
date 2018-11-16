@@ -1,4 +1,4 @@
-name: AwsEventsRule
+name: AwsCloudWatchEventsRule
 extends: Component
 main: ./dist/index.js
 version: 0.3.0

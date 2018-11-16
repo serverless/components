@@ -34,7 +34,14 @@ const NATIVE_NAMES = {
   AwsLambdaFunction: resolve(__dirname, '..', '..', '..', 'registry', 'AwsLambdaFunction'),
   TwilioProvider: resolve(__dirname, '..', '..', '..', 'registry', 'TwilioProvider'),
   TwilioApplication: resolve(__dirname, '..', '..', '..', 'registry', 'TwilioApplication'),
-  AwsEventsRule: resolve(__dirname, '..', '..', '..', 'registry', 'AwsEventsRule'),
+  AwsCloudWatchEventsRule: resolve(
+    __dirname,
+    '..',
+    '..',
+    '..',
+    'registry',
+    'AwsCloudWatchEventsRule'
+  ),
   TwilioPhoneNumber: resolve(__dirname, '..', '..', '..', 'registry', 'TwilioPhoneNumber'),
   AwsSnsTopic: resolve(__dirname, '..', '..', '..', 'registry', 'AwsSnsTopic'),
   AwsSnsSubscription: resolve(__dirname, '..', '..', '..', 'registry', 'AwsSnsSubscription'),

@@ -1,6 +1,6 @@
 import { get } from '@serverless/utils'
 
-const AwsEventsRule = (SuperClass) =>
+const AwsCloudWatchEventsRule = (SuperClass) =>
   class extends SuperClass {
     hydrate(prevInstance) {
       super.hydrate(prevInstance)
@@ -94,4 +94,4 @@ const AwsEventsRule = (SuperClass) =>
     }
   }
 
-export default AwsEventsRule
+export default AwsCloudWatchEventsRule
