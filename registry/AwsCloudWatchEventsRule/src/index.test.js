@@ -11,16 +11,16 @@ afterAll(() => {
   jest.restoreAllMocks()
 })
 
-describe('AwsEventsRule', () => {
+describe('AwsCloudWatchEventsRule', () => {
   const cwd = path.join(__dirname, '..')
   let context
   let AwsProvider
-  let AwsEventsRule
+  let AwsCloudWatchEventsRule
 
   beforeEach(async () => {
     context = await createTestContext({ cwd })
     AwsProvider = await context.loadType('AwsProvider')
-    AwsEventsRule = await context.loadType('./')
+    AwsCloudWatchEventsRule = await context.loadType('./')
   })
 
   it('should create schedule', async () => {
@@ -39,11 +39,11 @@ describe('AwsEventsRule', () => {
       }
     }
 
-    let awsEventsRule = await context.construct(AwsEventsRule, inputs)
-    awsEventsRule = await context.defineComponent(awsEventsRule)
-    awsEventsRule = resolveComponentEvaluables(awsEventsRule)
+    let awsCloudWatchEventsRule = await context.construct(AwsCloudWatchEventsRule, inputs)
+    awsCloudWatchEventsRule = await context.defineComponent(awsCloudWatchEventsRule)
+    awsCloudWatchEventsRule = resolveComponentEvaluables(awsCloudWatchEventsRule)
 
-    await awsEventsRule.deploy(null, context)
+    await awsCloudWatchEventsRule.deploy(null, context)
 
     const putTargetsParams = {
       Rule: 'hello',
@@ -62,14 +62,14 @@ describe('AwsEventsRule', () => {
       Principal: 'events.amazonaws.com'
     }
 
-    expect(awsEventsRule.arn).toEqual('abc:zxc')
+    expect(awsCloudWatchEventsRule.arn).toEqual('abc:zxc')
     expect(AWS.mocks.putRule).toBeCalledWith(putRuleParams)
     expect(AWS.mocks.putTargets).toBeCalledWith(putTargetsParams)
     expect(AWS.mocks.addPermission).toBeCalledWith(addPermissionParams)
   })
 
   it('should preserve props if nothing changed', async () => {
-    let awsEventsRule = await context.construct(AwsEventsRule, {
+    let awsCloudWatchEventsRule = await context.construct(AwsCloudWatchEventsRule, {
       provider: await context.construct(AwsProvider, {}),
       schedule: 'rate(5 minutes)',
       lambda: {
@@ -78,15 +78,18 @@ describe('AwsEventsRule', () => {
       }
     })
 
-    awsEventsRule = await context.defineComponent(awsEventsRule)
-    awsEventsRule = resolveComponentEvaluables(awsEventsRule)
-    await awsEventsRule.deploy(null, context)
+    awsCloudWatchEventsRule = await context.defineComponent(awsCloudWatchEventsRule)
+    awsCloudWatchEventsRule = resolveComponentEvaluables(awsCloudWatchEventsRule)
+    await awsCloudWatchEventsRule.deploy(null, context)
 
-    const prevAwsEventsRule = await deserialize(serialize(awsEventsRule, context), context)
+    const prevAwsEventsRule = await deserialize(
+      serialize(awsCloudWatchEventsRule, context),
+      context
+    )
 
     expect(prevAwsEventsRule.arn).toBe('abc:zxc')
 
-    let nextAwsEventsRule = await context.construct(AwsEventsRule, {
+    let nextAwsEventsRule = await context.construct(AwsCloudWatchEventsRule, {
       provider: await context.construct(AwsProvider, {}),
       schedule: 'rate(5 minutes)',
       lambda: {
@@ -116,10 +119,10 @@ describe('AwsEventsRule', () => {
       }
     }
 
-    let awsEventsRule = await context.construct(AwsEventsRule, inputs)
-    awsEventsRule = await context.defineComponent(awsEventsRule)
-    awsEventsRule = resolveComponentEvaluables(awsEventsRule)
-    await awsEventsRule.remove(context)
+    let awsCloudWatchEventsRule = await context.construct(AwsCloudWatchEventsRule, inputs)
+    awsCloudWatchEventsRule = await context.defineComponent(awsCloudWatchEventsRule)
+    awsCloudWatchEventsRule = resolveComponentEvaluables(awsCloudWatchEventsRule)
+    await awsCloudWatchEventsRule.remove(context)
 
     const removeTargetsParams = {
       Rule: 'hello',
@@ -144,10 +147,10 @@ describe('AwsEventsRule', () => {
       }
     }
 
-    let awsEventsRule = await context.construct(AwsEventsRule, inputs)
-    awsEventsRule = await context.defineComponent(awsEventsRule)
-    awsEventsRule = resolveComponentEvaluables(awsEventsRule)
-    await awsEventsRule.remove(context)
+    let awsCloudWatchEventsRule = await context.construct(AwsCloudWatchEventsRule, inputs)
+    awsCloudWatchEventsRule = await context.defineComponent(awsCloudWatchEventsRule)
+    awsCloudWatchEventsRule = resolveComponentEvaluables(awsCloudWatchEventsRule)
+    await awsCloudWatchEventsRule.remove(context)
 
     const removeTargetsParams = {
       Rule: 'already-removed-rule',
