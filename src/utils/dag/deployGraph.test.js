@@ -15,6 +15,11 @@ describe('#deployGraph()', () => {
 
   beforeEach(async () => {
     context = await createTestContext()
+    // NOTE: we need to replace `log` with `debug` since this is what components get
+    context = {
+      ...context,
+      log: context.debug
+    }
   })
 
   it('calls deploy when shouldDeploy returns "deploy"', async () => {

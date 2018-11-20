@@ -5,12 +5,11 @@ import defineComponentFromState from '../component/defineComponentFromState'
 import generateInstanceId from '../component/generateInstanceId'
 // import setKey from '../component/setKey'
 import { DEFAULT_PLUGINS } from '../constants'
+import { log, debug, warn, error, info } from '../logging'
 import createDeployment from '../deployment/createDeployment'
 import createRemovalDeployment from '../deployment/createRemovalDeployment'
 import loadDeployment from '../deployment/loadDeployment'
 import loadPreviousDeployment from '../deployment/loadPreviousDeployment'
-import debug from '../logging/debug'
-import log from '../logging/log'
 import loadPlugins from '../plugin/loadPlugins'
 import loadProject from '../project/loadProject'
 import deserialize from '../serialize/deserialize'
@@ -49,6 +48,15 @@ const newContext = (props) => {
   const overrides = context.overrides || {}
   const finalContext = {
     ...context,
+    log: (...args) => log(finalContext, ...args),
+    debug: (...args) => debug(finalContext, ...args),
+    console: {
+      log: (...args) => log(finalContext, ...args),
+      debug: (...args) => debug(finalContext, ...args),
+      warn: (...args) => warn(finalContext, ...args),
+      error: (...args) => error(finalContext, ...args),
+      info: (...args) => info(finalContext, ...args)
+    },
     construct: (type, inputs) => construct(type, inputs, finalContext),
     create,
     createDeployment: async () => {
@@ -110,7 +118,6 @@ const newContext = (props) => {
         instance
       })
     },
-    debug: (...args) => debug(finalContext, ...args),
     defineComponent: (component, state) => defineComponent(component, state, finalContext),
     defineComponentFromState: (component) => defineComponentFromState(component, finalContext),
     defType: (def) => defType(def, finalContext),
@@ -244,7 +251,6 @@ const newContext = (props) => {
       })
     },
     loadType: (...args) => loadType(...args, finalContext),
-    log: (...args) => log(finalContext, ...args),
     merge: (value) =>
       newContext({
         ...context,
