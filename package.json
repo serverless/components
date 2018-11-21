@@ -27,7 +27,7 @@
     "components": "./bin/components",
     "lint": "eslint . --fix --cache",
     "lint:staged": "lint-staged",
-    "test": "jest --coverage false",
+    "test": "jest",
     "test:travis": "jest . --runInBand --forceExit",
     "test:appveyor": "jest --testPathPattern=\"bin|examples|registry|src\" --colors --forceExit",
     "docs": "node ./scripts/doc-gen.js",
