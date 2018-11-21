@@ -25,7 +25,7 @@ describe('AwsS3Bucket', () => {
     provider = await context.construct(AwsProvider, {})
   })
 
-  it('should throw if bucket name does not match regex', async () => {
+  it.only('should throw if bucket name does not match regex', async () => {
     const inputs = {
       provider,
       bucketName: 'INVALID::BUCKET::NAME'
@@ -36,7 +36,7 @@ describe('AwsS3Bucket', () => {
       await context.defineComponent(awsS3Bucket)
       resolveComponentEvaluables(awsS3Bucket)
     } catch (error) {
-      expect(error.message).toMatch('does not match regex')
+      expect(error.message).toMatch('Invalid input')
     }
   })
 

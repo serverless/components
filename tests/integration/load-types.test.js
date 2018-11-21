@@ -252,7 +252,7 @@ describe('Integration Test - load types', () => {
       compute: {
         aws: awsLambdaCompute
       },
-      name: 'type-system-demo-11',
+      functionName: 'type-system-demo-11',
       memory: 512,
       timeout: 10,
       runtime: 'nodejs',

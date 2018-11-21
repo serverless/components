@@ -44,7 +44,9 @@ describe('Service', () => {
     const service = await context.construct(Service, {
       functions: {
         hello: {
-          functionName: 'hello'
+          functionName: 'hello',
+          code: './code',
+          handler: 'index.hello'
         }
       }
     })
@@ -61,7 +63,9 @@ describe('Service', () => {
     const service = await context.construct(Service, {
       functions: {
         hello: {
-          functionName: 'hello'
+          functionName: 'hello',
+          code: './code',
+          handler: 'index.hello'
         }
       }
     })

@@ -9,7 +9,7 @@ authToken: ${inputs.authToken}
 inputTypes:
   accountSid:
     type: string
-    require: true
+    required: true
   authToken:
     type: string
-    require: true
+    required: true

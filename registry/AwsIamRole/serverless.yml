@@ -14,6 +14,7 @@ inputTypes:
     default: ${context.provider}
   roleName:
     type: string
+    required: false
     default: role-${self.instanceId}
     displayName: IAM role name
     description: The name of the role to create
@@ -26,6 +27,6 @@ inputTypes:
     example: lambda.amazonaws.com
   policy:
     type: object
-    returied: true
+    required: false
     displayName: IAM Role Policy
     description: A managed IAM policy or an inline policy document
