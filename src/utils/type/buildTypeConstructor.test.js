@@ -131,7 +131,7 @@ describe('#buildTypeConstructor()', () => {
     })
   })
 
-  it.only('instantiates type constructions in props', async () => {
+  it('instantiates type constructions in props', async () => {
     const Test1Type = {
       props: {
         foo1: null

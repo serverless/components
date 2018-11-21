@@ -25,7 +25,7 @@ describe('AwsS3Bucket', () => {
     provider = await context.construct(AwsProvider, {})
   })
 
-  it.only('should throw if bucket name does not match regex', async () => {
+  it('should throw if bucket name does not match regex', async () => {
     const inputs = {
       provider,
       bucketName: 'INVALID::BUCKET::NAME'

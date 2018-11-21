@@ -329,7 +329,7 @@ describe('AwsIamPolicy', () => {
     )
   })
 
-  it.only('shouldDeploy should change name if config changed when using default name', async () => {
+  it('shouldDeploy should change name if config changed when using default name', async () => {
     let oldAwsIamPolicy = await context.construct(AwsIamPolicy, {
       document: {
         Version: '2012-10-17',
