@@ -41,7 +41,13 @@ describe('AwsLambdaFunction', () => {
     context = await createTestContext({ cwd })
     AwsProvider = await context.loadType('AwsProvider')
     AwsLambdaFunction = await context.loadType('./')
-    provider = await context.construct(AwsProvider, {})
+    provider = await context.construct(AwsProvider, {
+      region: 'us-east-1',
+      credentials: {
+        accessKeyId: 'abc',
+        secretAccessKey: 'xyz'
+      }
+    })
   })
 
   it('should pack lambda without shim', async () => {
@@ -181,7 +187,7 @@ describe('AwsLambdaFunction', () => {
     const prevAwsLambdaFunction = await deserialize(serialize(awsLambdaFunction, context), context)
 
     let nextAwsLambdaFunction = await context.construct(AwsLambdaFunction, {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       code: './code',
       functionName: 'hello',
       functionDescription: 'hello description',
@@ -262,7 +268,7 @@ describe('AwsLambdaFunction', () => {
     expect(prevAwsLambdaFunction.arn).toBe('abc:zxc')
 
     let nextAwsLambdaFunction = await context.construct(AwsLambdaFunction, {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       code: './code',
       functionName: 'hello',
       functionDescription: 'hello description',
@@ -318,7 +324,7 @@ describe('AwsLambdaFunction', () => {
     const prevAwsLambdaFunction = await deserialize(serialize(awsLambdaFunction, context), context)
 
     let nextAwsLambdaFunction = await context.construct(AwsLambdaFunction, {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       code: './code',
       functionName: 'world', // changed!
       functionDescription: 'hello description',
@@ -532,7 +538,7 @@ describe('AwsLambdaFunction', () => {
     const prevAwsLambdaFunction = await deserialize(serialize(awsLambdaFunction, context), context)
 
     let nextAwsLambdaFunction = await context.construct(AwsLambdaFunction, {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       code: './code',
       functionName: 'world', // changed!
       functionDescription: 'hello description',
@@ -591,7 +597,7 @@ describe('AwsLambdaFunction', () => {
     const prevAwsLambdaFunction = await deserialize(serialize(awsLambdaFunction, context), context)
 
     let nextAwsLambdaFunction = await context.construct(AwsLambdaFunction, {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       code: './code',
       functionName: 'hello',
       functionDescription: 'hello description',
@@ -652,7 +658,7 @@ describe('AwsLambdaFunction', () => {
     const prevAwsLambdaFunction = await deserialize(serialize(awsLambdaFunction, context), context)
 
     let nextAwsLambdaFunction = await context.construct(AwsLambdaFunction, {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       code: './code',
       functionName: 'hello',
       functionDescription: 'hello description',
@@ -713,7 +719,7 @@ describe('AwsLambdaFunction', () => {
     const prevAwsLambdaFunction = await deserialize(serialize(awsLambdaFunction, context), context)
 
     let nextAwsLambdaFunction = await context.construct(AwsLambdaFunction, {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       code: './code',
       functionName: 'hello',
       functionDescription: 'hello description',
@@ -774,7 +780,7 @@ describe('AwsLambdaFunction', () => {
     const prevAwsLambdaFunction = await deserialize(serialize(awsLambdaFunction, context), context)
 
     let nextAwsLambdaFunction = await context.construct(AwsLambdaFunction, {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       code: './code',
       functionName: 'hello',
       functionDescription: 'hello description',
@@ -836,7 +842,7 @@ describe('AwsLambdaFunction', () => {
 
   it('should load AwsIamRole if role is not provided', async () => {
     let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
-      provider: await context.construct(AwsProvider, { region: 'us-east-1' }),
+      provider,
       code: './code',
       functionName: 'hello',
       functionDescription: 'hello description',

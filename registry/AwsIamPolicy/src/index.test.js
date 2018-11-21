@@ -47,7 +47,13 @@ describe('AwsIamPolicy', () => {
     AwsIamPolicy = await context.loadType('./')
 
     const AwsProvider = await context.loadType('AwsProvider')
-    provider = await context.construct(AwsProvider, {})
+    provider = await context.construct(AwsProvider, {
+      region: 'us-east-1',
+      credentials: {
+        accessKeyId: 'abc',
+        secretAccessKey: 'xyz'
+      }
+    })
   })
 
   it('should deploy policy', async () => {

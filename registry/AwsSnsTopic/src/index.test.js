@@ -24,7 +24,13 @@ describe('AwsSnsTopic', () => {
     context = await context.loadApp()
     AwsProvider = await context.loadType('AwsProvider')
     AwsSnsTopic = await context.loadType('./')
-    provider = await context.construct(AwsProvider, {})
+    provider = await context.construct(AwsProvider, {
+      region: 'us-east-1',
+      credentials: {
+        accessKeyId: 'abc',
+        secretAccessKey: 'xyz'
+      }
+    })
   })
 
   it('should create topic if first deployment', async () => {
@@ -81,7 +87,7 @@ describe('AwsSnsTopic', () => {
     // NOTE BRN: To simulate what core does, we create an entirely new instance here but hydrate it with the previous instance
 
     let nextAwsSnsTopic = await context.construct(AwsSnsTopic, {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       topicName: 'myTopic',
       displayName: 'myNewTopicDisplayName',
       policy: {},
