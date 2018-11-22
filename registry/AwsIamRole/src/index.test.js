@@ -70,7 +70,7 @@ describe('AwsIamRole', () => {
       await context.defineComponent(awsIamRole)
       resolveComponentEvaluables(awsIamRole)
     } catch (error) {
-      expect(error.message).toMatch('Invalid input')
+      expect(error.message).toMatch('has invalid')
     }
   })
 

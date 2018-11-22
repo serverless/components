@@ -1,6 +1,17 @@
 import { pickBy } from 'ramda'
-import { get, keys, resolve, contains, forEach, mapObjIndexed, pick } from '@serverless/utils'
+import {
+  get,
+  keys,
+  resolve,
+  contains,
+  forEach,
+  mapObjIndexed,
+  pick,
+  append,
+  prop
+} from '@serverless/utils'
 import ramlValidate from 'raml-validate'
+import chalk from 'chalk'
 
 const validate = ramlValidate()
 
@@ -35,15 +46,23 @@ const validateInputs = (Type, inputs) => {
   const validation = schema({ ...coreInputs })
 
   if (!validation.valid) {
-    let invalidInputs = ''
-    forEach((obj) => {
-      if (invalidInputs === '') {
-        invalidInputs = `${obj.key}`
-      } else {
-        invalidInputs = `${invalidInputs}, ${obj.key}`
-      }
-    }, validation.errors)
-    throw Error(`Invalid input(s) for the ${Type.props.name} type: ${invalidInputs}`)
+    let errorMessages = []
+    const typeName = chalk.white(`"${Type.props.name}"`)
+    const header = chalk.redBright.bold(`\ninputType error(s) in Type ${typeName}:\n`)
+    errorMessages = append(header, errorMessages)
+
+    forEach((error) => {
+      const value = chalk.cyanBright(`"${error.value}"`)
+      const key = `${chalk.yellowBright(error.key)}`
+      const suppliedInputType = typeof error.value
+      const msg = `  - inputType ${key} has invalid \`${suppliedInputType}\` value of ${value} according to the rule: ${chalk.yellowBright(
+        error.rule
+      )} ${chalk.yellowBright(error.attr)}.\n`
+      errorMessages = append(msg, errorMessages)
+    }, prop('errors', validation))
+
+    const message = errorMessages.join('')
+    throw Error(message)
   }
 
   // set defaults if any... (todo)
