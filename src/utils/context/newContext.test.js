@@ -21,6 +21,13 @@ describe('#newContext()', () => {
     expect(context).toEqual({
       app: {},
       cache: {},
+      console: {
+        log: expect.any(Function),
+        debug: expect.any(Function),
+        info: expect.any(Function),
+        warn: expect.any(Function),
+        error: expect.any(Function)
+      },
       construct: expect.any(Function),
       create: expect.any(Function),
       createDeployment: expect.any(Function),

@@ -87,7 +87,10 @@ describe('index', () => {
     const mod = require('./logging')
     expect(mod).toEqual({
       debug: expect.any(Function),
-      log: expect.any(Function)
+      log: expect.any(Function),
+      info: expect.any(Function),
+      warn: expect.any(Function),
+      error: expect.any(Function)
     })
   })
 
