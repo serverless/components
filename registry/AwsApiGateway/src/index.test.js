@@ -24,7 +24,13 @@ describe('AwsApiGateway', () => {
     context = await createTestContext({ cwd })
     AwsApiGateway = await context.loadType('AwsApiGateway')
     const AwsProvider = await context.loadType('AwsProvider')
-    provider = await context.construct(AwsProvider, {})
+    provider = await context.construct(AwsProvider, {
+      region: 'us-east-1',
+      credentials: {
+        accessKeyId: 'abc',
+        secretAccessKey: 'xyz'
+      }
+    })
   })
 
   it('should create ApiGateway if first deployment', async () => {

@@ -22,7 +22,13 @@ describe('AwsS3Bucket', () => {
     context = await createTestContext({ cwd })
     AwsProvider = await context.loadType('AwsProvider')
     AwsS3Bucket = await context.loadType('./')
-    provider = await context.construct(AwsProvider, {})
+    provider = await context.construct(AwsProvider, {
+      region: 'us-east-1',
+      credentials: {
+        accessKeyId: 'abc',
+        secretAccessKey: 'xyz'
+      }
+    })
   })
 
   it('should throw if bucket name does not match regex', async () => {
@@ -67,7 +73,7 @@ describe('AwsS3Bucket', () => {
     // NOTE BRN: To simulate what core does, we create an entirely new instance here but hydrate it with the previous instance
 
     let nextAwsS3Bucket = await context.construct(AwsS3Bucket, {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       bucketName: 'bucket-123' // changed!
     })
     nextAwsS3Bucket = await context.defineComponent(nextAwsS3Bucket, prevAwsS3Bucket)
@@ -154,7 +160,7 @@ describe('AwsS3Bucket', () => {
     // NOTE BRN: To simulate what core does, we create an entirely new instance here but hydrate it with the previous instance
 
     let nextAwsS3Bucket = await context.construct(AwsS3Bucket, {
-      provider: await context.construct(AwsProvider, {}),
+      provider,
       bucketName: 'bucket-123' // changed!
     })
     nextAwsS3Bucket = await context.defineComponent(nextAwsS3Bucket, prevAwsS3Bucket)

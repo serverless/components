@@ -1,4 +1,4 @@
-import log from './log'
+import info from './info'
 
 jest.spyOn(global.console, 'log')
 
@@ -7,7 +7,7 @@ afterAll(() => {
   delete process.env.CI
 })
 
-describe('#log()', () => {
+describe('#info()', () => {
   const msg = 'Hello World!'
 
   beforeEach(() => {
@@ -16,13 +16,13 @@ describe('#log()', () => {
   })
 
   it('should log message using console.log (node 6 and <= 8.9 support)', () => {
-    log(undefined, msg)
+    info(undefined, msg)
     expect(global.console.log).toHaveBeenCalledWith(msg)
   })
 
   it('should not write message to log if CI env var is set', () => {
     process.env.CI = true
-    log(undefined, msg)
+    info(undefined, msg)
     expect(global.console.log).not.toHaveBeenCalled()
   })
 })

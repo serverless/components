@@ -10,20 +10,25 @@ describe('#execGraph()', () => {
     graph.setNode('testB', testNodeB)
     graph.setEdge('testA', 'testB')
 
-    const testContext = {
-      debug: () => {},
-      log: () => {}
+    const context = {
+      log: () => {},
+      debug: () => {}
     }
     const executor = {
       iteratee: jest.fn(),
       next: jest.fn((grph) => grph.sinks())
     }
-    const result = execGraph(executor, graph, testContext)
+    const result = execGraph(executor, graph, context)
     expect(result).toBeInstanceOf(Promise)
 
     await result
 
-    expect(executor.iteratee).toHaveBeenNthCalledWith(1, testNodeB, testContext)
-    expect(executor.iteratee).toHaveBeenNthCalledWith(2, testNodeA, testContext)
+    const modifiedContext = {
+      log: context.debug,
+      debug: context.debug
+    }
+
+    expect(executor.iteratee).toHaveBeenNthCalledWith(1, testNodeB, modifiedContext)
+    expect(executor.iteratee).toHaveBeenNthCalledWith(2, testNodeA, modifiedContext)
   })
 })
