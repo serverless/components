@@ -10,21 +10,29 @@ describe('validateInputs', () => {
     context = await createTestContext()
     AwsProvider = await context.loadType('AwsProvider')
     AwsLambdaFunction = await context.loadType('AwsLambdaFunction')
-    provider = await context.construct(AwsProvider, {})
+    provider = await context.construct(AwsProvider, {
+      region: 'us-east-1',
+      credentials: {
+        accessKeyId: 'abc',
+        secretAccessKey: 'xyz'
+      }
+    })
   })
   it('should not throw error if Type has no inputTypes', async () => {
     const Plugin = await context.loadType('Plugin')
-    await context.construct(Plugin, {})
+    await expect(context.construct(Plugin, {})).resolves.toBeDefined()
   })
 
   it('should not throw error if inputTypes are valid', async () => {
-    await context.construct(AwsLambdaFunction, {
-      provider,
-      code: './code',
-      functionName: 'hello',
-      handler: 'index.hello',
-      runtime: 'nodejs8.10'
-    })
+    await expect(
+      context.construct(AwsLambdaFunction, {
+        provider,
+        code: './code',
+        functionName: 'hello',
+        handler: 'index.hello',
+        runtime: 'nodejs8.10'
+      })
+    ).resolves.toBeDefined()
   })
 
   it('should throw error if inputTypes are invalid', async () => {
