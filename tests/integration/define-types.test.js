@@ -7,7 +7,7 @@ describe('Integration Test - define types', () => {
     const context = await createContext({
       cwd: __dirname
     })
-    const ObjectType = await context.loadType('Object')
+    const ObjectType = await context.import('Object')
     expect(ObjectType).toEqual({
       class: expect.any(Function),
       constructor: expect.any(Function),

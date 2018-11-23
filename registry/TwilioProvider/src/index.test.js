@@ -26,7 +26,7 @@ describe('TwilioProvider', () => {
       authToken: 'authToken'
     }
 
-    const TwilioProvider = await context.loadType('./')
+    const TwilioProvider = await context.import('./')
     const twilioProvider = await context.construct(TwilioProvider, inputs)
 
     expect(twilioProvider.getCredentials().get()).toEqual(inputs)
@@ -45,7 +45,7 @@ describe('TwilioProvider', () => {
       authToken: 'authToken'
     }
 
-    const TwilioProvider = await context.loadType('./')
+    const TwilioProvider = await context.import('./')
     const twilioProvider = await context.construct(TwilioProvider, inputs)
 
     const sdk = twilioProvider.getSdk()

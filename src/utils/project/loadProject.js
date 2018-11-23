@@ -7,7 +7,7 @@ const loadProject = async (path, context) => {
     )
   }
 
-  const Type = await context.loadType(path)
+  const Type = await context.import(path)
   const { name } = Type.props
   if (!name) {
     throw new Error('Your serverless.yml project must supply a "name" property')

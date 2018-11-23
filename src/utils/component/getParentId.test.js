@@ -11,7 +11,7 @@ describe('#getParentId()', () => {
         }
       }
     )
-    const Component = await context.loadType('Component')
+    const Component = await context.import('Component')
     const parent = await context.construct(Component, {})
     const child = await context.construct(Component, {})
     child.parent = parent
@@ -28,7 +28,7 @@ describe('#getParentId()', () => {
         }
       }
     )
-    const Component = await context.loadType('Component')
+    const Component = await context.import('Component')
     const component = await context.construct(Component, {})
 
     expect(getParentId(component)).toBe(null)

@@ -44,9 +44,9 @@ afterAll(() => {
 describe('AwsIamPolicy', () => {
   beforeEach(async () => {
     context = await createTestContext()
-    AwsIamPolicy = await context.loadType('./')
+    AwsIamPolicy = await context.import('./')
 
-    const AwsProvider = await context.loadType('AwsProvider')
+    const AwsProvider = await context.import('AwsProvider')
     provider = await context.construct(AwsProvider, {
       region: 'us-east-1',
       credentials: {

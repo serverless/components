@@ -11,7 +11,7 @@ describe('#isComponent()', () => {
         }
       }
     )
-    const Component = await context.loadType('Component')
+    const Component = await context.import('Component')
     const component = await context.construct(Component, {})
     expect(isComponent(component)).toBe(true)
   })

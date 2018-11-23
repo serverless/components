@@ -20,7 +20,7 @@ describe('#newVariable()', () => {
         }
       }
     )
-    const Component = await context.loadType('Component')
+    const Component = await context.import('Component')
     const component = await context.construct(Component, {})
     const compA = await context.construct(Component, {})
     const compB = await context.construct(Component, {})
@@ -51,7 +51,7 @@ describe('#newVariable()', () => {
         }
       }
     )
-    const Component = await context.loadType('Component')
+    const Component = await context.import('Component')
     const compA = await context.construct(Component, {})
     const compB = await context.construct(Component, {})
     const compC = await context.construct(Component, {})
@@ -72,7 +72,7 @@ describe('#newVariable()', () => {
 
   it('finds instances in a path that are from variables pointing to anohter variable', async () => {
     const context = await createContext({}, { app: { id: 'test' } })
-    const Component = await context.loadType('Component')
+    const Component = await context.import('Component')
     const compA = await context.construct(Component, {})
     const compB = await context.construct(Component, {})
     compA.foo = newVariable('${compB}', {
@@ -86,7 +86,7 @@ describe('#newVariable()', () => {
 
   it('finds instances across the full path of both variables when a variable points to another variable', async () => {
     const context = await createContext({}, { app: { id: 'test' } })
-    const Component = await context.loadType('Component')
+    const Component = await context.import('Component')
     const compA = await context.construct(Component, {})
     const compB = await context.construct(Component, {})
     compA.foo = newVariable('${compB.bar}', {

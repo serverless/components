@@ -10,7 +10,7 @@ describe('pickComponentProps', () => {
 
   it('picks inputs from an empty component', async () => {
     context = await createTestContext({ cwd })
-    Component = await context.loadType('Component')
+    Component = await context.import('Component')
 
     const inputs = {
       foo: 'bar'

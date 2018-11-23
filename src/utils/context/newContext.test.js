@@ -51,7 +51,7 @@ describe('#newContext()', () => {
       loadPreviousInstance: expect.any(Function),
       loadProject: expect.any(Function),
       loadState: expect.any(Function),
-      loadType: expect.any(Function),
+      import: expect.any(Function),
       log: expect.any(Function),
       merge: expect.any(Function),
       options: {

@@ -17,7 +17,7 @@ describe('Component', () => {
 
   beforeEach(async () => {
     context = await createTestContext({ cwd })
-    Component = await context.loadType('./')
+    Component = await context.import('./')
   })
 
   it('should return components as children when calling define', async () => {

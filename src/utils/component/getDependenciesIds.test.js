@@ -12,7 +12,7 @@ describe('#getDependenciesIds()', () => {
         }
       }
     )
-    const Component = await context.loadType('Component')
+    const Component = await context.import('Component')
     const parentComponent = await context.construct(Component, {})
     const component = await context.construct(Component, {})
     const childComponent = await context.construct(Component, {})

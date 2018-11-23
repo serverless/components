@@ -22,8 +22,8 @@ describe('AwsSnsTopic', () => {
     context = await createTestContext({ cwd })
     context = await context.loadProject()
     context = await context.loadApp()
-    AwsProvider = await context.loadType('AwsProvider')
-    AwsSnsTopic = await context.loadType('./')
+    AwsProvider = await context.import('AwsProvider')
+    AwsSnsTopic = await context.import('./')
     provider = await context.construct(AwsProvider, {
       region: 'us-east-1',
       credentials: {
@@ -258,7 +258,7 @@ describe('AwsSnsTopic', () => {
       deliveryStatusAttributes: [],
       provider
     }
-    const ComponentType = await context.loadType('./')
+    const ComponentType = await context.import('./')
     let oldComponent = await context.construct(ComponentType, inputs)
     oldComponent = await context.defineComponent(oldComponent)
     oldComponent = resolveComponentEvaluables(oldComponent)

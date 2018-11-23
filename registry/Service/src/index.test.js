@@ -32,7 +32,7 @@ describe('Service', () => {
 
   beforeEach(async () => {
     context = await createTestContext()
-    Service = await context.loadType('Service')
+    Service = await context.import('Service')
   })
 
   describe('#construct()', () => {
@@ -44,7 +44,7 @@ describe('Service', () => {
     })
 
     it('should construct function instances', async () => {
-      const Function = await context.loadType('Function')
+      const Function = await context.import('Function')
 
       const service = await context.construct(Service, {
         functions: {
@@ -59,7 +59,7 @@ describe('Service', () => {
     })
 
     it('should creaate component instances', async () => {
-      const Component = await context.loadType('Component')
+      const Component = await context.import('Component')
       const component1 = await context.construct(Component, {})
 
       const service = await context.construct(Service, {
@@ -102,7 +102,7 @@ describe('Service', () => {
 
   describe('#define()', () => {
     it('should define functions as instances', async () => {
-      const Function = await context.loadType('Function')
+      const Function = await context.import('Function')
 
       const service = await context.construct(Service, {
         functions: {
@@ -121,7 +121,7 @@ describe('Service', () => {
 
   describe('#info()', () => {
     it('should return the service info', async () => {
-      const Component = await context.loadType('Component')
+      const Component = await context.import('Component')
       const component = await context.construct(Component, {})
 
       const service = await context.construct(Service, {

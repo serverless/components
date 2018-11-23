@@ -32,7 +32,7 @@ const resolveCodePath = (code, root) => {
 }
 
 const Service = async (SuperClass, superContext) => {
-  const Fn = await superContext.loadType('Function')
+  const Fn = await superContext.import('Function')
 
   return class extends SuperClass {
     async construct(inputs, context) {
@@ -54,7 +54,7 @@ const Service = async (SuperClass, superContext) => {
         } else if (isTypeConstruct(component)) {
           // eslint-disable-next-line no-shadow
           const { type, inputs } = component
-          const Type = await context.loadType(type)
+          const Type = await context.import(type)
           component = await context.construct(Type, inputs)
           if (!isComponent(component)) {
             throw new Error(

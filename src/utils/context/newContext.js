@@ -250,7 +250,7 @@ const newContext = (props) => {
         state
       })
     },
-    loadType: (...args) => loadType(...args, finalContext),
+    import: (...args) => loadType(...args, finalContext),
     merge: (value) =>
       newContext({
         ...context,

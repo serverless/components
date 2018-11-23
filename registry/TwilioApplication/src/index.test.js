@@ -79,7 +79,7 @@ describe.skip('TwilioApplication', () => {
       messageStatusCallback: 'foo'
     }
 
-    const TwilioApplication = await context.loadType('./')
+    const TwilioApplication = await context.import('./')
     const twilioApplication = await context.construct(TwilioApplication, {})
 
     Object.assign(twilioApplication, inputs)
@@ -117,7 +117,7 @@ describe.skip('TwilioApplication', () => {
       messageStatusCallback: 'foo'
     }
 
-    const TwilioApplication = await context.loadType('./')
+    const TwilioApplication = await context.import('./')
     const twilioApplication = await context.construct(TwilioApplication, {})
 
     Object.assign(twilioApplication, inputs)
@@ -158,7 +158,7 @@ describe.skip('TwilioApplication', () => {
       messageStatusCallback: 'foo'
     }
 
-    const TwilioApplication = await context.loadType('./')
+    const TwilioApplication = await context.import('./')
     const twilioApplication = await context.construct(TwilioApplication, {})
 
     Object.assign(twilioApplication, inputs)
@@ -200,7 +200,7 @@ describe.skip('TwilioApplication', () => {
       messageStatusCallback: 'foo'
     }
 
-    const TwilioApplication = await context.loadType('./')
+    const TwilioApplication = await context.import('./')
     const twilioApplication = await context.construct(TwilioApplication, {})
 
     Object.assign(twilioApplication, inputs)
@@ -235,7 +235,7 @@ describe.skip('TwilioApplication', () => {
       smsStatusCallback: 'foo',
       messageStatusCallback: 'foo'
     }
-    const ComponentType = await context.loadType('./')
+    const ComponentType = await context.import('./')
     let oldComponent = await context.construct(ComponentType, inputs)
     oldComponent = await context.defineComponent(oldComponent)
     oldComponent = resolveComponentEvaluables(oldComponent)

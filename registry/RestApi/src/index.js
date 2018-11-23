@@ -36,7 +36,7 @@ async function getAwsApiGatewayInputs(inputs) {
 async function constructApiGateway(inputs, context, provider) {
   const apiInputs = await getAwsApiGatewayInputs(inputs)
 
-  const apiGatewayComponent = await context.loadType('AwsApiGateway')
+  const apiGatewayComponent = await context.import('AwsApiGateway')
   const apiGateway = await context.construct(apiGatewayComponent, {
     ...apiInputs,
     provider: provider
@@ -81,7 +81,7 @@ function flattenRoutes(routes) {
 }
 
 const RestApi = async function(SuperClass, SuperContext) {
-  const iamComponent = await SuperContext.loadType('AwsIamRole')
+  const iamComponent = await SuperContext.import('AwsIamRole')
 
   return class extends SuperClass {
     async construct(inputs, context) {

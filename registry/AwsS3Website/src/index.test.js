@@ -29,9 +29,9 @@ describe('AwsS3Website', () => {
 
   beforeEach(async () => {
     context = await createTestContext({ cwd })
-    AwsS3Website = await context.loadType('./')
+    AwsS3Website = await context.import('./')
 
-    const AwsProvider = await context.loadType('AwsProvider')
+    const AwsProvider = await context.import('AwsProvider')
     provider = await context.construct(AwsProvider, {
       region: 'us-east-1',
       credentials: {
