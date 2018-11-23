@@ -34,4 +34,33 @@ describe('#resolveVariableString()', () => {
       })
     ).toBe('dude, sweet')
   })
+
+  it('should be able to deal with OR (||) usages', () => {
+    expect(resolveVariableString("${abc || 'Hello world'}", { abc: false })).toBe('Hello world')
+    expect(resolveVariableString("${abc || 'Hello world'}", { abc: 'Hello world' })).toBe(
+      'Hello world'
+    )
+    expect(resolveVariableString("Hello ${abc || 'world'}", { abc: false })).toBe('Hello world')
+    expect(resolveVariableString("Hello ${abc || 'world'}", { abc: undefined })).toBe('Hello world')
+    expect(resolveVariableString("Hello ${abc || 'world'}", { abc: null })).toBe('Hello world')
+    expect(resolveVariableString("Hello ${abc || 'world'}", { abc: 'false' })).toBe('Hello false')
+    expect(resolveVariableString("Hello ${abc || 'world'}", { abc: 'undefined' })).toBe(
+      'Hello undefined'
+    )
+    expect(resolveVariableString("Hello ${abc || 'world'}", { abc: 'null' })).toBe('Hello null')
+    expect(resolveVariableString('Hello ${abc || def}', { abc: false, def: 'world' })).toBe(
+      'Hello world'
+    )
+    expect(
+      resolveVariableString("Hello ${this.greeting || 'Default greeting'}", {
+        this: { greeting: 'world' }
+      })
+    ).toBe('Hello world')
+  })
+
+  it('should support multiple OR (||) expressions', () => {
+    expect(
+      resolveVariableString("Hello ${abc || false || undefined || 'world'}", { abc: null })
+    ).toBe('Hello world')
+  })
 })

@@ -1,7 +1,17 @@
-import { append, castPath, concat, get, has, toString, walkReducePath } from '@serverless/utils'
+import {
+  append,
+  uniq,
+  reduce,
+  castPath,
+  concat,
+  get,
+  has,
+  toString,
+  walkReducePath
+} from '@serverless/utils'
 import { SYMBOL_VARIABLE } from '../constants'
+import extractExpressions from '../ast/extractExpressions'
 import isVariable from './isVariable'
-import matchVariable from './matchVariable'
 import resolveVariableString from './resolveVariableString'
 
 const newVariable = (variableString, data) => ({
@@ -9,20 +19,32 @@ const newVariable = (variableString, data) => ({
   data,
   variableString,
   findInstanceIds() {
-    const pathParts = castPath(matchVariable(variableString).expression)
-    return walkReducePath(
-      (instanceIds, value) => {
-        if (isVariable(value)) {
-          return concat(instanceIds, value.findInstanceIds())
-        }
-        if (has('instanceId', value)) {
-          return append(get('instanceId', value), instanceIds)
-        }
-        return instanceIds
-      },
-      pathParts,
-      [],
-      data
+    const body = variableString.slice(2, -1)
+    const expressions = extractExpressions(body)
+
+    return uniq(
+      reduce(
+        (accum, memberExpression) => {
+          const pathParts = castPath(memberExpression)
+          const res = walkReducePath(
+            (instanceIds, value) => {
+              if (isVariable(value)) {
+                return concat(instanceIds, value.findInstanceIds())
+              }
+              if (has('instanceId', value)) {
+                return append(get('instanceId', value), instanceIds)
+              }
+              return instanceIds
+            },
+            pathParts,
+            [],
+            data
+          )
+          return [...res, ...accum]
+        },
+        [],
+        expressions
+      )
     )
   },
   get(path) {

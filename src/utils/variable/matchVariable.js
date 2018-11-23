@@ -17,7 +17,7 @@ const matchVariable = (string) => {
   if (result) {
     expression = result[1]
     match = result[0]
-    exact = result.input === result[0]
+    exact = result.input === result[0] && !result[0].includes('||')
   }
   return {
     expression,

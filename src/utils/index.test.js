@@ -5,6 +5,13 @@ describe('index', () => {
     }).not.toThrow()
   })
 
+  test('has ast methods', () => {
+    const ast = require('./ast')
+    expect(ast).toMatchObject({
+      extractExpressions: expect.any(Function)
+    })
+  })
+
   test('has cli methods', () => {
     const mod = require('./cli')
     expect(mod).toMatchObject({
