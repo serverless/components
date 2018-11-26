@@ -33,6 +33,8 @@ describe('index', () => {
       isComponent: expect.any(Function),
       resolveComponentEvaluables: expect.any(Function),
       setKey: expect.any(Function),
+      walkReduceAllComponents: expect.any(Function),
+      walkReduceAllComponentsDepthFirst: expect.any(Function),
       walkReduceComponentChildren: expect.any(Function),
       walkReduceComponentChildrenDepthFirst: expect.any(Function)
     })

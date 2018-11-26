@@ -16,9 +16,15 @@ describe('#resolveComponentEvaluables()', () => {
     const parentComponent = context.construct(Component, {})
     const componentA = context.construct(Component, {})
     const componentB = context.construct(Component, {})
+    const componentC = context.construct(Component, {})
+    const componentD = context.construct(Component, {})
     parentComponent.children = {
       a: componentA,
-      b: componentB
+      b: componentB,
+      c: [{ componentC }],
+      nested: {
+        d: componentD
+      }
     }
     componentA.parent = parentComponent
     componentB.parent = parentComponent

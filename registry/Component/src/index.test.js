@@ -1,5 +1,6 @@
 import path from 'path'
 import { deserialize, resolveComponentEvaluables, serialize } from '../../../src/utils'
+import newVariable from '../../../src/utils/variable/newVariable.js'
 import { createTestContext } from '../../../test'
 
 beforeEach(() => {
@@ -20,18 +21,119 @@ describe('Component', () => {
     Component = await context.import('./')
   })
 
-  it('should return components as children when calling define', async () => {
-    const component = context.construct(Component, {})
+  describe('#define()', () => {
+    it('should return components as children when calling define', async () => {
+      const component = context.construct(Component, {})
 
-    component.components = {
-      myComponent: {
-        name: 'abc'
+      component.components = {
+        myComponent: {
+          type: './',
+          inputs: {}
+        }
       }
-    }
 
-    const children = await component.define()
+      const children = await component.define()
 
-    expect(children).toEqual(component.components)
+      expect(children).toEqual({ components: component.components })
+    })
+
+    it('should support child components defined at different properties', async () => {
+      const component = context.construct(Component, {})
+      const instance = context.construct(Component, {})
+
+      component.components = {
+        component1: {
+          type: './',
+          inputs: {}
+        }
+      }
+
+      component.component2 = {
+        type: './',
+        inputs: {}
+      }
+
+      component.component3 = instance
+
+      component.objectProp = {
+        component4: {
+          type: './',
+          inputs: {}
+        },
+        component5: {
+          type: './',
+          inputs: {}
+        }
+      }
+
+      component.arrayProp = [
+        { component6: { type: './', inputs: {} } },
+        { component7: { type: './', inputs: {} } }
+      ]
+
+      const children = await component.define()
+
+      expect(children.components.component1).toEqual(component.components.component1)
+      expect(children.component2).toEqual(component.component2)
+      expect(children.component3).toEqual(component.component3)
+      expect(children.objectProp).toEqual(component.objectProp)
+      expect(children.arrayProp).toEqual(component.arrayProp)
+    })
+
+    it('should support child components which are passed in via inputs', async () => {
+      const instance = context.construct(Component, {})
+      let component = context.construct(Component, { childComponent: instance })
+      component.inputTypes.childComponent = { type: 'Component' }
+      component.component1 = newVariable('${inputs.childComponent}', {
+        inputs: { childComponent: instance }
+      })
+
+      component = resolveComponentEvaluables(component)
+
+      const children = await component.define()
+
+      expect(children.component1).toEqual(component.inputs.childComponent)
+    })
+
+    it('should ignore the "parent" property when walking the instance', async () => {
+      const component = context.construct(Component, {})
+
+      component.parent = {
+        type: './',
+        inputs: {}
+      }
+
+      const children = await component.define()
+
+      expect(children.parent).toBeUndefined()
+    })
+  })
+
+  describe('#info()', () => {
+    it('should call "info" on every child and gather the results', async () => {
+      const component = context.construct(Component, {})
+      const instance = context.construct(Component, {})
+
+      jest.spyOn(instance, 'info')
+
+      component.component1 = instance
+      component.components = {
+        component2: instance
+      }
+      component.objectProp = {
+        foo: {
+          bar: instance
+        }
+      }
+
+      const res = await component.info()
+
+      expect(instance.info).toHaveBeenCalledTimes(3)
+      expect(res.children).toHaveLength(3)
+      expect(res.children[0].type).toEqual('Component')
+      expect(res.children[1].type).toEqual('Component')
+      expect(res.children[2].type).toEqual('Component')
+    })
   })
 
   it('shouldDeploy should return deploy when prevInstance is null', async () => {

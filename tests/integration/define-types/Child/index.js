@@ -1,18 +1,20 @@
-import { all, map } from '@serverless/utils'
+// NOTE: commented out since GrandChild is not implemented right no
 
-const Child = async (SuperClass, superContext) => {
-  const GrandChild = await superContext.load('./GrandChild')
-
-  return {
-    async define(context) {
-      return all(
-        map({
-          grandChildA: context.construct(GrandChild, { bar: '' }),
-          grandChildB: context.construct(GrandChild, { bar: '' })
-        })
-      )
-    }
-  }
-}
-
-export default Child
+// import { all, map } from '@serverless/utils'
+//
+// const Child = async (SuperClass, superContext) => {
+//   const GrandChild = await superContext.load('./GrandChild')
+//
+//   return {
+//     async define(context) {
+//       return all(
+//         map({
+//           grandChildA: context.construct(GrandChild, { bar: '' }),
+//           grandChildB: context.construct(GrandChild, { bar: '' })
+//         })
+//       )
+//     }
+//   }
+// }
+//
+// export default Child

@@ -4,14 +4,14 @@ import { SYMBOL_STATE } from '../constants'
 import getChildrenIds from '../component/getChildrenIds'
 import getDependenciesIds from '../component/getDependenciesIds'
 import getParentId from '../component/getParentId'
-import walkReduceComponentChildrenDepthFirst from '../component/walkReduceComponentChildrenDepthFirst'
+import walkReduceAllComponentsDepthFirst from '../component/walkReduceAllComponentsDepthFirst'
 
 const buildGraph = (nextInstance, prevInstance) => {
   let graph = new Graph()
 
   if (prevInstance && prevInstance.instanceId) {
     // prevInstance nodes
-    graph = walkReduceComponentChildrenDepthFirst(
+    graph = walkReduceAllComponentsDepthFirst(
       (accum, currentInstance) => {
         if (!currentInstance.instanceId) {
           throw new Error(
@@ -39,7 +39,7 @@ const buildGraph = (nextInstance, prevInstance) => {
 
   // nextInstance nodes
   if (nextInstance && nextInstance.instanceId) {
-    graph = walkReduceComponentChildrenDepthFirst(
+    graph = walkReduceAllComponentsDepthFirst(
       (accum, currentInstance) => {
         if (!currentInstance.instanceId) {
           throw new Error(
@@ -83,7 +83,7 @@ const buildGraph = (nextInstance, prevInstance) => {
 
   if (prevInstance && prevInstance.instanceId) {
     // prevInstance edges
-    graph = walkReduceComponentChildrenDepthFirst(
+    graph = walkReduceAllComponentsDepthFirst(
       (accum, currentInstance) => {
         // Add the removed node's child edges
         const childrenIds = getChildrenIds(currentInstance)

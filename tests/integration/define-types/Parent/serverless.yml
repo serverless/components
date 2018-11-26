@@ -1,6 +1,5 @@
 extends: Component
 name: Parent
-main: ./index.js
 
 inputTypes:
   bar:
@@ -10,10 +9,30 @@ bar: ${inputs.bar}
 
 components:
   childA:
-    type: ./Child
+    type: ../Child
     inputs:
       foo: abc
   childB:
-    type: ./Child
+    type: ../Child
     inputs:
       foo: def
+
+objectProp:
+  childC:
+    type: ../Child
+    inputs:
+      foo: ghi
+
+arrayProp:
+  - childD:
+      type: ../Child
+      inputs:
+        foo: jkl
+
+deeply:
+  nested:
+    childs:
+      childE:
+        type: ../Child
+        inputs:
+          foo: jkl

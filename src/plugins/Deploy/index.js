@@ -19,8 +19,8 @@ const Deploy = {
     //       operation: string (the operation to perform on the component)
     //    }
     //
-    //  2. add all children in the nextInstance children tree to the graph as nodes. You can do this by using the walkReduceComponentChildrenDepthFirst method and passing the graph along as the accumulator.
-    //    - walkReduceComponentChildrenDepthFirst on nextInstance
+    //  2. add all children in the nextInstance children tree to the graph as nodes. You can do this by using the walkReduceAllComponentsDepthFirst method and passing the graph along as the accumulator.
+    //    - walkReduceAllComponentsDepthFirst on nextInstance
     //    - for each child add the child as the nextInstance and the child's id as the instanceId on the node
     //    - call `shouldDeploy` to retrieve the operation that is meant to be performed on that node, add the operation returned from shouldDeploy to the node. If undefined is returned from shouldDeploy, it means no operation should be performed on that node.
     //    - Note that there is a special "replace" operation returned from shouldDeploy. If "replace" is received it means that the node should be both removed and deployed.
@@ -30,7 +30,7 @@ const Deploy = {
     //
     //    - return the graph as the accumulator
     //
-    //  3. walkReduceComponentChildrenDepthFirst on the prevInstance tree
+    //  3. walkReduceAllComponentsDepthFirst on the prevInstance tree
     //    - as you walk through each instance on the tree, load the corresponding node from the graph and set the prevInstance property on the node.
     //    - If the node does not exist on the graph, it means the node needs to be removed. Add the node to the graph. Set the prevInstance property, the instanceId and the operation to "remove". Also add an edge from the instances parent to the child that will be removed. You can access a child's parent using the `instance.parent` property
     //

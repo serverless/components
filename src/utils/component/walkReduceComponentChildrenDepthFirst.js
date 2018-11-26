@@ -1,15 +1,22 @@
-import { concat, forEach, isObject, resolve, walk } from '@serverless/utils'
+import { concat, forEach, isObjectLike, resolve, walk, isEmpty } from '@serverless/utils'
+import isComponent from './isComponent'
 
-const walkee = (accum, component, keys, iteratee, recur) => {
+const reduceWalkee = (accum, value, keys, iteratee, recur) => {
+  const visited = new Set()
+
   let result = accum
-  const children = resolve(component.children)
-  if (isObject(children)) {
-    forEach((child, childKdx) => {
-      const newKeys = concat(keys, [childKdx])
-      result = recur(result, resolve(child), newKeys, iteratee)
-    }, children)
+  if (isObjectLike(value) && !visited.has(value)) {
+    visited.add(value)
+    if (!isComponent(value) || isEmpty(keys)) {
+      forEach((childValue, childKdx) => {
+        const newKeys = concat(keys, [childKdx])
+        result = recur(result, resolve(childValue), newKeys, iteratee)
+      }, value)
+    } else {
+      result = iteratee(accum, value, keys)
+    }
   }
-  return iteratee(result, component, keys)
+  return result
 }
 
 /**
@@ -22,6 +29,6 @@ const walkee = (accum, component, keys, iteratee, recur) => {
  * @returns {*} The final, accumulated value.
  */
 const walkReduceComponentChildrenDepthFirst = (iteratee, accum, component) =>
-  walk(walkee, iteratee, accum, component, [])
+  walk(reduceWalkee, iteratee, accum, component, [])
 
 export default walkReduceComponentChildrenDepthFirst

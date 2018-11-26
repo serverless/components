@@ -9,6 +9,8 @@ export { default as getVariableInstanceIds } from './getVariableInstanceIds'
 export { default as isComponent } from './isComponent'
 export { default as resolveComponentEvaluables } from './resolveComponentEvaluables'
 export { default as setKey } from './setKey'
+export { default as walkReduceAllComponents } from './walkReduceAllComponents'
+export { default as walkReduceAllComponentsDepthFirst } from './walkReduceAllComponentsDepthFirst'
 export { default as walkReduceComponentChildren } from './walkReduceComponentChildren'
 export {
   default as walkReduceComponentChildrenDepthFirst

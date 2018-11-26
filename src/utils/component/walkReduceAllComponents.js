@@ -1,4 +1,4 @@
-import { concat, forEach, isObjectLike, resolve, walk, isEmpty } from '@serverless/utils'
+import { concat, forEach, isObjectLike, resolve, walk } from '@serverless/utils'
 import isComponent from './isComponent'
 
 const reduceWalkee = (accum, value, keys, iteratee, recur) => {
@@ -7,19 +7,21 @@ const reduceWalkee = (accum, value, keys, iteratee, recur) => {
   let result = accum
   if (isObjectLike(value) && !visited.has(value)) {
     visited.add(value)
-    if (isComponent(value) && !isEmpty(keys)) {
+    if (isComponent(value)) {
       result = iteratee(accum, value, keys)
-    } else {
-      forEach((childValue, childKdx) => {
-        const newKeys = concat(keys, [childKdx])
-        result = recur(result, resolve(childValue), newKeys, iteratee)
-      }, value)
     }
+    forEach((childValue, childKdx) => {
+      const newKeys = concat(keys, [childKdx])
+      result = recur(result, resolve(childValue), newKeys, iteratee)
+    }, value)
   }
   return result
 }
 
 /**
+ * ---------
+ * TODO: update
+ * ---------
  * Walk reduce the component and component's children using the given reducer function
  *
  * @func
@@ -28,7 +30,7 @@ const reduceWalkee = (accum, value, keys, iteratee, recur) => {
  * @param {Component} component The component to walk.
  * @returns {*} The final, accumulated value.
  */
-const walkReduceComponentChildren = (iteratee, accum, component) =>
+const walkReduceAllComponents = (iteratee, accum, component) =>
   walk(reduceWalkee, iteratee, accum, component, [])
 
-export default walkReduceComponentChildren
+export default walkReduceAllComponents

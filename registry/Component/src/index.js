@@ -1,5 +1,9 @@
-import { append, get, or, pick, reduce, equals } from '@serverless/utils'
+import { omit, append, set, get, or, pick, equals, walkReduce } from '@serverless/utils'
 import { pickComponentProps } from './utils'
+
+// TODO: move this into @serverless/utils ?!
+import isTypeConstruct from '../../../dist/utils/type/isTypeConstruct'
+import { isComponent, walkReduceComponentChildren } from '../../../dist/utils/component'
 
 const DEPLOY = 'deploy'
 
@@ -29,9 +33,17 @@ const Component = (SuperClass) =>
     }
 
     async define() {
-      return {
-        ...or(this.components, {})
-      }
+      return walkReduce(
+        (accum, value, pathParts) => {
+          if (isTypeConstruct(value) || isComponent(value)) {
+            return set(pathParts, value, accum)
+          }
+          return accum
+        },
+        {},
+        // `parent` is omitted since this value is already resolved and considering it causes infinite loops
+        omit(['parent'], this)
+      )
     }
 
     shouldDeploy(prevInstance) {
@@ -52,10 +64,16 @@ const Component = (SuperClass) =>
     async remove() {}
 
     async info() {
-      const children = await reduce(
-        async (accum, component) => append(await component.info(), accum),
+      const children = await walkReduceComponentChildren(
+        async (accum, value) => {
+          if (isComponent(value)) {
+            const component = value
+            return append(await component.info(), accum)
+          }
+          return accum
+        },
         [],
-        or(this.components, {})
+        omit(['parent'], this)
       )
       return {
         title: this.name,

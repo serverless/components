@@ -1,10 +1,24 @@
 import isTypeConstruct from './isTypeConstruct'
 
 describe('#isTypeConstruct()', () => {
+  const TypeMock = {
+    class: class {},
+    constructor: class {},
+    main: {},
+    props: {},
+    root: '/foo'
+  }
+
   it('should identify constructs when they have both type and inputs', () => {
     expect(
       isTypeConstruct({
         type: 'Test',
+        inputs: {}
+      })
+    ).toBe(true)
+    expect(
+      isTypeConstruct({
+        type: TypeMock,
         inputs: {}
       })
     ).toBe(true)

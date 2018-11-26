@@ -1,16 +1,7 @@
-import {
-  filter,
-  forEach,
-  get,
-  isFunction,
-  isObject,
-  map,
-  or,
-  resolve,
-  clone
-} from '@serverless/utils'
+import { get, isFunction, or, resolve, clone, set, walkReduce } from '@serverless/utils'
 // import appendKey from './appendKey'
 // import getKey from './getKey'
+import isTypeConstruct from '../type/isTypeConstruct'
 import hydrateComponent from './hydrateComponent'
 import isComponent from './isComponent'
 import { SYMBOL_STATE } from '../constants'
@@ -41,26 +32,46 @@ const defineComponent = async (component, state, context) => {
   }
 
   component = hydrateComponent(component, state, context)
+
   if (isFunction(component.define)) {
     let children = await or(component.define(context), {})
-    children = filter(isComponent, map(resolve, children))
 
-    if (isObject(children)) {
-      forEach((child) => {
-        // TODO BRN: Look for children that already have parents. If this is the case then someone has returned a child from define that was defined by another component (possibly passed along as a variable)
-        child.parent = component
-        // child = setKey(appendKey(getKey(component), kdx), child)
-      }, children)
-    } else {
-      throw new Error(
-        `define() method must return either an object or an array. Instead received ${children} from ${component}.`
-      )
-    }
-    component.children = await map(
-      async (child, key) => defineComponent(child, get(['children', key], state), context),
+    let insideOfComponent = false
+    let depthOfFirstComponent = 0
+    children = await walkReduce(
+      async (accum, value, pathParts) => {
+        if (pathParts.length <= depthOfFirstComponent) {
+          insideOfComponent = false
+        }
+        if (!insideOfComponent) {
+          if (isTypeConstruct(value) || isComponent(value)) {
+            let instance
+            insideOfComponent = true
+            depthOfFirstComponent = pathParts.length
+            if (isTypeConstruct(value)) {
+              const child = await context.import(value.type)
+              instance = context.construct(child, value.inputs)
+            } else if (isComponent(value)) {
+              instance = resolve(value)
+            }
+            // TODO BRN: Look for children that already have parents. If this is the case then someone has returned a child from define that was defined by another component (possibly passed along as a variable)
+            instance.parent = component
+            instance = await defineComponent(
+              instance,
+              get([...pathParts, 'children'], state),
+              context
+            )
+            return set(pathParts, instance, accum)
+          }
+        }
+        return accum
+      },
+      {},
       children
     )
+    component.children = children
   }
+
   return component
 }
 
