@@ -164,7 +164,7 @@ describe('#buildTypeConstructor()', () => {
 
     let context = await createContext({
       overrides: {
-        loadType: async (query) => {
+        import: async (query) => {
           if (query === 'Test1') {
             return Test1Type
           } else if (query === 'Test2') {

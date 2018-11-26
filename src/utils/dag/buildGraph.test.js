@@ -17,7 +17,7 @@ describe('#buildGraph()', () => {
 
   beforeEach(async () => {
     context = await createTestContext()
-    Component = await context.loadType('Component')
+    Component = await context.import('Component')
   })
 
   it('build a simple graph from instance when none exists', () => {

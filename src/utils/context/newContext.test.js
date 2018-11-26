@@ -38,7 +38,7 @@ describe('#newContext()', () => {
       debug: expect.any(Function),
       defineComponent: expect.any(Function),
       defineComponentFromState: expect.any(Function),
-      defType: expect.any(Function),
+      define: expect.any(Function),
       deployment: {},
       generateInstanceId: expect.any(Function),
       get: expect.any(Function),
@@ -51,7 +51,7 @@ describe('#newContext()', () => {
       loadPreviousInstance: expect.any(Function),
       loadProject: expect.any(Function),
       loadState: expect.any(Function),
-      loadType: expect.any(Function),
+      import: expect.any(Function),
       log: expect.any(Function),
       merge: expect.any(Function),
       options: {

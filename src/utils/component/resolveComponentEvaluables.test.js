@@ -12,7 +12,7 @@ describe('#resolveComponentEvaluables()', () => {
         }
       }
     )
-    const Component = await context.loadType('Component')
+    const Component = await context.import('Component')
     const parentComponent = await context.construct(Component, {})
     const componentA = await context.construct(Component, {})
     const componentB = await context.construct(Component, {})

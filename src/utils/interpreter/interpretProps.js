@@ -24,7 +24,7 @@ const interpretProps = async (props, data, context) => {
         const lastPathPart = last(pathParts)
         const parent = getParent(pathParts, interpretedProps)
         const { type, inputs } = value
-        const Type = await context.loadType(type)
+        const Type = await context.import(type)
         parent[lastPathPart] = await context.construct(Type, inputs)
       }
       return interpretedProps

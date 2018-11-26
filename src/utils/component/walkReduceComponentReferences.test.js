@@ -4,7 +4,7 @@ import walkReduceComponentReferences from './walkReduceComponentReferences'
 describe('#walkReduceComponentReferences()', () => {
   it('walk reduce component references', async () => {
     const context = await createTestContext()
-    const Component = await context.loadType('Component')
+    const Component = await context.import('Component')
     const component = await context.construct(Component, {})
     const fooComponent = await context.construct(Component, {})
     const barComponent = await context.construct(Component, {})

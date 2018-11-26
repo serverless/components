@@ -103,23 +103,23 @@ module.exports = {
 
 Types by themselves are not instances, they are more like a reference to a class that has not been instantiated.
 
-To load a type, use the `context.loadType` method . Types are loadable by...
+To load a type, use the `context.import` method . Types are loadable by...
 
 - Name/version from registry
 ```js
-const MyType = await context.loadType('MyType@1.0.0')
+const MyType = await context.import('MyType@1.0.0')
 ```
 - File path
 ```js
-const MyType = await context.loadType('./MyType')
+const MyType = await context.import('./MyType')
 ```
 - Url
 ```js
-const MyType = await context.loadType('https://examples.com/some/path/my-type.zip')
+const MyType = await context.import('https://examples.com/some/path/my-type.zip')
 ```
 - Github org/repo#branch
 ```js
-const MyType = await context.loadType('github:serverless/my-type#branch')
+const MyType = await context.import('github:serverless/my-type#branch')
 ```
 
 When a type is loaded, an object is created that holds the meta data for the type and a JS class is created and available on the type object. The methods declared in the main are applied to the class's prototype.
@@ -167,7 +167,7 @@ export default MyType
 *Example: code that loads a type and constructs an instance of that type*
 ```js
 const myFunction = async (instance, context) => {
-  const MyType = await context.loadType('MyType')
+  const MyType = await context.import('MyType')
   console.log(MyType)
   // => {
   //  constructor: Function,
@@ -237,7 +237,7 @@ export default MyType
 ```
 
 ```js
-const MyType = await context.loadType('./MyType')
+const MyType = await context.import('./MyType')
 const instance = await context.construct(MyType, inputs)
 
 console.log(instance)
@@ -284,7 +284,7 @@ main: ./index.js
 ```js
 // index.js
 const MyChildType = (SuperClass, context) => {
-  const AWSLambdaFunction = await context.loadType('AWSLambdaFunction')
+  const AWSLambdaFunction = await context.import('AWSLambdaFunction')
   ...
 
   return {
@@ -323,7 +323,7 @@ main: ./index.js
 ```js
 // index.js
 const MyChildType = (SuperClass, context) => {
-  const AWSLambdaFunction = await context.loadType('AWSLambdaFunction')
+  const AWSLambdaFunction = await context.import('AWSLambdaFunction')
 
   return class extends SuperClass {
     construct(inputs, context) {
@@ -352,7 +352,7 @@ To convert a type to a component instance, simply use the `context.construct` me
 NOTE: Construction is an async process since we have to load type during the construction.
 
 ```js
-const MyType = await context.loadType('./MyType')
+const MyType = await context.import('./MyType')
 const instance = await context.construct(MyType, inputs)
 ```
 

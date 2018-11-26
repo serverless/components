@@ -1,5 +1,5 @@
 const loadPlugin = async (pluginPath, context) => {
-  const PluginType = await context.loadType(pluginPath)
+  const PluginType = await context.import(pluginPath)
   return context.construct(PluginType, {})
 }
 

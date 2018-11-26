@@ -7,7 +7,7 @@ describe('EnvironmentBasedConfiguration', () => {
       cwd: path.join(__dirname, '..')
     })
 
-    const EnvironmentBasedConfiguration = await context.loadType('./')
+    const EnvironmentBasedConfiguration = await context.import('./')
 
     process.env.TEST_VARIABLE_FOO = 'foo value'
     process.env.TEST_VARIABLE_BAR = 'bar value'

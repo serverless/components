@@ -107,7 +107,7 @@ const hashCode = async (code) => {
 }
 
 const AwsLambdaFunction = async (SuperClass, superContext) => {
-  const AwsIamRole = await superContext.loadType('AwsIamRole')
+  const AwsIamRole = await superContext.import('AwsIamRole')
 
   return class extends SuperClass {
     hydrate(prevInstance) {

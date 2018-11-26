@@ -9,7 +9,7 @@ const deserialize = async (serialized, context) => {
       `type.deserialize expected a serialized type. Instead was given ${serialized}`
     )
   }
-  const Type = await context.loadType(type)
+  const Type = await context.import(type)
   if (!Type) {
     throw new Error(`Could not load type for serialized instance. ${type}`)
   }

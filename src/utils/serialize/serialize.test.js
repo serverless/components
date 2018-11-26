@@ -73,7 +73,7 @@ describe('#serialize()', () => {
 
   it('serialize a simple component', async () => {
     const context = await createContext({}, { app: { id: 'test' } })
-    const Component = await context.loadType('Component')
+    const Component = await context.import('Component')
     const component = await context.construct(Component, {})
     component.instanceId = 'test'
     const result = serialize(component, context)
