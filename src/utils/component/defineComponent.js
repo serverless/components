@@ -3,11 +3,9 @@ import { filter, forEach, get, isFunction, isObject, map, or, resolve } from '@s
 // import getKey from './getKey'
 import hydrateComponent from './hydrateComponent'
 import isComponent from './isComponent'
+import isTypeConstruct from '../type/isTypeConstruct'
 // import setKey from './setKey'
 
-/**
- *
- */
 const defineComponent = async (component, state, context) => {
   // TODO BRN: If we ever need to retrigger define (redefine) hydrating state here may be an issue
   if (!isComponent(component)) {
@@ -18,6 +16,29 @@ const defineComponent = async (component, state, context) => {
   component = hydrateComponent(component, state, context)
   if (isFunction(component.define)) {
     let children = await or(component.define(context), {})
+
+    // throws an error...
+    // children = await interpretProps(
+    //   children,
+    //   {
+    //     // NOTE BRN: Variables are eventually resolved using the current context and current reference to 'this' since all the values in props are references to the execution context of the current instance.
+    //     this: this,
+    //     self: this,
+    //     context,
+    //     root: context.root,
+    //     path: context.root
+    //   },
+    //   context
+    // )
+    let typeQueryChildren = filter(isTypeConstruct, map(resolve, children))
+
+    typeQueryChildren = await map(async (typeQueryChild) => {
+      const child = await context.loadType(typeQueryChild.type)
+      return context.construct(child, typeQueryChild.inputs)
+    }, typeQueryChildren)
+
+    children = { ...children, ...typeQueryChildren }
+
     children = filter(isComponent, map(resolve, children))
 
     if (isObject(children)) {

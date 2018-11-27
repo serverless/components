@@ -90,27 +90,5 @@ describe('AwsProvider', () => {
 
       expect(() => awsProvider.validate()).toThrow('Invalid region')
     })
-
-    it('should throw if credentials are not set', async () => {
-      const inputs = {
-        credentials: null,
-        region: 'us-east-1'
-      }
-
-      const awsProvider = await context.construct(AwsProvider, inputs)
-
-      expect(() => awsProvider.validate()).toThrow('Credentials not set')
-    })
-
-    it('should throw if credentials is an empty object', async () => {
-      const inputs = {
-        credentials: {},
-        region: 'us-east-1'
-      }
-
-      const awsProvider = await context.construct(AwsProvider, inputs)
-
-      expect(() => awsProvider.validate()).toThrow('Credentials not set')
-    })
   })
 })

@@ -1,3 +1,4 @@
+import isType from './isType'
 import defType from './defType'
 import loadTypeMeta from './loadTypeMeta'
 
@@ -22,6 +23,10 @@ import loadTypeMeta from './loadTypeMeta'
  *  const OtherComponent = await loadType('https://example.com/OtherComponent.zip')
  */
 const loadType = async (query, context) => {
+  // type already loaded
+  if (isType(query)) {
+    return query
+  }
   const typeMeta = await loadTypeMeta(query.trim(), context)
   return defType(typeMeta, context)
 }

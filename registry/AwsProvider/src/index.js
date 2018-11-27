@@ -1,4 +1,3 @@
-import { isEmpty } from '@serverless/utils'
 import AWS from 'aws-sdk'
 
 const AwsProvider = (SuperClass) =>
@@ -26,10 +25,6 @@ const AwsProvider = (SuperClass) =>
     validate() {
       if (!/.+-.+.\d+/.test(this.region)) {
         throw new Error(`Invalid region "${this.region}" in your AWS provider setup`)
-      }
-
-      if (!this.credentials || isEmpty(this.credentials)) {
-        throw new Error(`Credentials not set in your AWS provider setup`)
       }
     }
   }
