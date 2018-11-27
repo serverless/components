@@ -1,13 +1,14 @@
 {
   "name": "@serverless-components/aws-dynamo-db",
   "version": "0.3.0",
-  "private": true,
+  "description": "",
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "author": "Serverless, Inc.",
+  "license": "Apache-2.0",
   "dependencies": {
-    "dynamodb": "^1.1.2",
-    "joi": "^13.1.2"
+    "@serverless/utils": "0.0.17"
   }
 }

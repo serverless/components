@@ -158,7 +158,55 @@ const mocks = {
     Promise.resolve({
       Account: 'account-id'
     })
-  )
+  ),
+
+  // DynamoDB
+  createTableMock: jest.fn().mockImplementation((params) => {
+    if (params.TableName === 'already-created-table') {
+      const error = new Error()
+      error.code = 'ResourceInUseException'
+      return Promise.reject(error)
+    }
+    return Promise.resolve({
+      TableDescription: {
+        TableArn: 'arn:aws:dynamodb:region:XXXXX:table/create-table',
+        TableName: 'create-table',
+        TableStatus: 'CREATING'
+      }
+    })
+  }),
+  updateTableMock: jest.fn().mockImplementation((params) => {
+    if (params.TableName === 'non-existent-table') {
+      const error = new Error()
+      error.code = 'ResourceNotFoundException'
+      return Promise.reject(error)
+    }
+    return Promise.resolve({
+      TableDescription: {
+        TableArn: 'arn:aws:dynamodb:region:XXXXX:table/update-table',
+        TableName: 'update-table',
+        TableStatus: 'UPDATING',
+        ProvisionedThroughput: {
+          ReadCapacityUnits: 10,
+          WriteCapacityUnits: 10
+        }
+      }
+    })
+  }),
+  deleteTableMock: jest.fn().mockImplementation((params) => {
+    if (params.TableName === 'already-removed-table') {
+      const error = new Error()
+      error.code = 'ResourceNotFoundException'
+      return Promise.reject(error)
+    }
+    return Promise.resolve({
+      TableDescription: {
+        TableArn: 'arn:aws:dynamodb:region:XXXXX:table/delete-table',
+        TableName: 'delete-table',
+        TableStatus: 'DELETING'
+      }
+    })
+  })
 }
 
 const APIGateway = function() {
@@ -319,6 +367,20 @@ const STS = function() {
   }
 }
 
+const DynamoDB = function() {
+  return {
+    createTable: (obj) => ({
+      promise: () => mocks.createTableMock(obj)
+    }),
+    updateTable: (obj) => ({
+      promise: () => mocks.updateTableMock(obj)
+    }),
+    deleteTable: (obj) => ({
+      promise: () => mocks.deleteTableMock(obj)
+    })
+  }
+}
+
 export default {
   mocks,
   config: {
@@ -330,5 +392,6 @@ export default {
   Lambda,
   S3,
   SNS,
-  STS
+  STS,
+  DynamoDB
 }

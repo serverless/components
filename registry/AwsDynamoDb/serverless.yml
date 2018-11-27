@@ -1,0 +1,64 @@
+name: AwsDynamoDb
+extends: Component
+main: ./dist/index.js
+version: 0.3.0
+
+description: 'Provision AWS DynamoDB tables with the Serverless Framework'
+license: Apache-2.0
+author: 'Serverless, Inc. <hello@serverless.com> (https://serverless.com)'
+repository: 'github:serverless/components'
+
+provider: ${inputs.provider}
+tableName: ${inputs.tableName}
+attributeDefinitions: ${inputs.attributeDefinitions}
+keySchema: ${inputs.keySchema}
+provisionedThroughput: ${inputs.provisionedThroughput}
+globalSecondaryIndexes: ${inputs.globalSecondaryIndexes}
+localSecondaryIndexes: ${inputs.localSecondaryIndexes}
+sseSpecification: ${inputs.sseSpecification}
+streamSpecification: ${inputs.streamSpecification}
+
+inputTypes:
+  provider:
+    type: AwsProvider
+    required: true
+    default: ${context.provider}
+    displayName: AWS Provider
+    description: The AWSProvider instance that contains the credentials for AWS
+  tableName:
+    type: string
+    default: table-${this.instanceId}
+    displayName: Table name
+    description: The name of the DynamoDB table
+    example: acme-users
+  attributeDefinitions:
+    type: array
+    required: true
+    displayName: Attribute definitions
+    description: The tables attribute definitions
+  keySchema:
+    type: array
+    required: true
+    displayName: Key schema
+    description: The tables key schema
+  provisionedThroughput:
+    type: object
+    required: true
+    displayName: Provisioned throughput
+    description: The tables provisioned throughput
+  globalSecondaryIndexes:
+    type: array
+    displayName: Global secondary indexes
+    description: The tables global secondary indexes
+  localSecondaryIndexes:
+    type: array
+    displayName: Local secondary indexes
+    description: The tables local secondary indexes
+  sseSpecification:
+    type: object
+    displayName: SSE specification
+    description: The tables SSE specification
+  streamSpecification:
+    type: object
+    displayName: Stream specification
+    description: The tables stream specification
