@@ -162,6 +162,7 @@ Also please do join the _Components_ channel on our public [Serverless-Contrib S
     * [aws-sns-topic](./registry/aws-sns-topic)
     * [aws-sqs](./registry/aws-sqs)
     * [aws-subnet](./registry/aws-subnet)
+    * [aws-step-functions](./registry/aws-step-functions)
     * [aws-vpc](./registry/aws-vpc)
     * [aws-vpcgatewayattachment](./registry/aws-vpcgatewayattachment)
     * [cloudflare-workers](./registry/cloudflare-workers)
