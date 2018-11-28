@@ -132,17 +132,81 @@ const AwsIamRole = async (SuperClass, superContext) => {
       this.arn = get('arn', prevInstance)
     }
 
-    shouldDeploy(prevInstance) {
-      const inputs = {
+    async shouldDeploy(prevInstance) {
+      // 1. run sls deploy for the first time: Framework creates role
+      // 2. run sls deploy again without changes: Framework does nothing
+      // 3. change service property in serverless.yml and run sls deploy: Framework updates role
+      // 4. change roleName and run sls deploy: Framework removes prev role and create new role
+      // 5. change service property in AWS console and run sls deploy: Framework updates role with service in serverless.yml
+      // 6. delete role in console and run sls deploy: Framework creates role again
+      // 7. create role in aws console and deploy for the first time without updates: Framework does nothing
+      // 8. create role in aws console and deploy for the first time after config changes in serverless.yml: Framework makes an update
+      // NOTE: "resource does not exist" AND "resource already exists" errors should not be thrown.
+
+      const { provider } = this
+      const AWS = provider.getSdk()
+      const IAM = new AWS.IAM()
+
+      // Eslam - Because we don't support create/update methods,
+      // we need a way to communicate with the deploy
+      // method whether we should create or update
+      // so we have to use the context instead,
+      // otherwise the deploy method would have
+      // to check with the provider again...
+      this.newRoleExists = true
+      this.prevRoleExists = false
+
+      const config = {
         roleName: this.roleName,
         service: this.service,
         policy: this.policy
       }
-      const prevInputs = prevInstance ? pick(keys(inputs), prevInstance) : {}
-      const configChanged = not(equals(inputs, prevInputs))
-      if (prevInstance && prevInstance.roleName !== inputs.roleName) {
+
+      this.prevConfig = prevInstance ? pick(keys(config), prevInstance) : {}
+
+      // 1. Check new role
+      try {
+        const res = await IAM.getRole({ RoleName: this.roleName }).promise()
+        this.newRoleExists = true
+        this.prevConfig.roleName = res.Role.RoleName
+        this.prevConfig.service = JSON.parse(
+          decodeURIComponent(res.Role.AssumeRolePolicyDocument)
+        ).Statement[0].Principal.Service
+        this.prevConfig.policy = this.prevConfig.policy
+      } catch (e) {
+        if (e.message.includes('cannot be found')) {
+          this.newRoleExists = false
+        } else {
+          throw e
+        }
+      }
+
+      const configChanged = not(equals(config, this.prevConfig))
+
+      // 2. Check prev role, if any...
+      if (prevInstance) {
+        try {
+          await IAM.getRole({ RoleName: prevInstance.roleName }).promise()
+          this.prevRoleExists = true
+        } catch (e) {
+          if (e.message.includes('cannot be found')) {
+            this.prevRoleExists = false
+          } else {
+            throw e
+          }
+        }
+      }
+
+      if (
+        prevInstance &&
+        prevInstance.roleName !== config.roleName &&
+        this.prevRoleExists &&
+        !this.newRoleExists
+      ) {
         return 'replace'
-      } else if (!prevInstance || configChanged) {
+      }
+
+      if (!this.newRoleExists || configChanged) {
         return 'deploy'
       }
     }
@@ -162,7 +226,7 @@ const AwsIamRole = async (SuperClass, superContext) => {
       const AWS = provider.getSdk()
       const IAM = new AWS.IAM()
 
-      if (!prevInstance || this.roleName !== prevInstance.roleName) {
+      if (!this.newRoleExists) {
         context.log(`Creating Role: ${this.roleName}`)
         this.arn = await createRole(IAM, {
           roleName: this.roleName,
@@ -170,10 +234,10 @@ const AwsIamRole = async (SuperClass, superContext) => {
           policy: this.policy
         })
       } else {
-        if (prevInstance.service !== this.service) {
+        if (this.prevConfig.service !== this.service) {
           await updateAssumeRolePolicy(IAM, this)
         }
-        if (!equals(prevInstance.policy, this.policy)) {
+        if (!equals(this.prevConfig.policy, this.policy)) {
           await removeRolePolicy(IAM, prevInstance)
           await addRolePolicy(IAM, { roleName: this.roleName, policy: this.policy })
         }
