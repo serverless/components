@@ -20,7 +20,7 @@ A Serverless Component for AWS Step Function
 | **stateMachineArn**| `string` | The Amazon Resource Name (ARN) that identifies the created state machine.
 | **creationDate**| `string` | The date the state machine is created.
 
-##Example 
+## Example 
 ```
 type: my-project
 version: 0.0.1
