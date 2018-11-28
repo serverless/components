@@ -222,36 +222,32 @@ describe('Integration Test - Library Usage', () => {
         expect(myRole.instanceId).not.toBeFalsy()
       })
 
-      it(
-        'should package the "iam" component',
-        async () => {
-          await pkg({ serverlessFileObject, path: testServiceDir })
-          const testServiceHasZipFile = await fileExists(testServiceZipFile)
-          expect(testServiceHasZipFile).toEqual(true)
-          // the state should not change
-          const stateFileContent = await fsp.readJsonAsync(testServiceStateFile)
-          const stateFileKeys = Object.keys(stateFileContent)
-          expect(stateFileKeys.length).toEqual(3)
-          expect(stateFileContent).toHaveProperty('$.serviceId')
-          expect(stateFileContent).toHaveProperty('library-usage:myRole')
-          expect(stateFileContent.$.serviceId).not.toBeFalsy()
-          const myRole = stateFileContent['library-usage:myRole']
-          const myRoleObjectKeys = Object.keys(myRole)
-          expect(myRoleObjectKeys.length).toEqual(6)
-          expect(myRole).toHaveProperty('instanceId')
-          expect(myRole).toHaveProperty('type', 'tests-integration-iam-mock')
-          expect(myRole).toHaveProperty('internallyManaged', false)
-          expect(myRole).toHaveProperty('rootPath')
-          expect(myRole).toHaveProperty('state', {
-            id: 'id:iam:role:my-role',
-            name: 'my-role',
-            service: 'my.role.service',
-            deploymentCounter: 2
-          })
-          expect(myRole.instanceId).not.toBeFalsy()
-        },
-        60000
-      )
+      it('should package the "iam" component', async () => {
+        await pkg({ serverlessFileObject, path: testServiceDir })
+        const testServiceHasZipFile = await fileExists(testServiceZipFile)
+        expect(testServiceHasZipFile).toEqual(true)
+        // the state should not change
+        const stateFileContent = await fsp.readJsonAsync(testServiceStateFile)
+        const stateFileKeys = Object.keys(stateFileContent)
+        expect(stateFileKeys.length).toEqual(3)
+        expect(stateFileContent).toHaveProperty('$.serviceId')
+        expect(stateFileContent).toHaveProperty('library-usage:myRole')
+        expect(stateFileContent.$.serviceId).not.toBeFalsy()
+        const myRole = stateFileContent['library-usage:myRole']
+        const myRoleObjectKeys = Object.keys(myRole)
+        expect(myRoleObjectKeys.length).toEqual(6)
+        expect(myRole).toHaveProperty('instanceId')
+        expect(myRole).toHaveProperty('type', 'tests-integration-iam-mock')
+        expect(myRole).toHaveProperty('internallyManaged', false)
+        expect(myRole).toHaveProperty('rootPath')
+        expect(myRole).toHaveProperty('state', {
+          id: 'id:iam:role:my-role',
+          name: 'my-role',
+          service: 'my.role.service',
+          deploymentCounter: 2
+        })
+        expect(myRole.instanceId).not.toBeFalsy()
+      }, 60000)
 
       it('should remove the "iam" and "function" components', async () => {
         await remove({ serverlessFileObject })
