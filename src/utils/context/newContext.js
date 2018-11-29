@@ -21,6 +21,7 @@ import construct from '../type/construct'
 import create from '../type/create'
 import defType from '../type/defType'
 import loadType from '../type/loadType'
+import walkReduceComponentChildrenDepthFirst from '../component/walkReduceComponentChildrenDepthFirst'
 
 const newContext = (props) => {
   const context = pick(
@@ -198,6 +199,23 @@ const newContext = (props) => {
       previousInstance = await deserialize(previousInstance, finalContext)
 
       // TODO BRN: Add hydrate step for previous instance
+
+      // todo call sync
+      // walk depth first children of previousInstance and call sync on all of them
+      // and if one of them returns removed, set the status flag on that child instance
+
+      previousInstance = walkReduceComponentChildrenDepthFirst(
+        (accum, currentInstance) => {
+          const status = await currentInstance.sync(finalContext)
+          if (status === 'removed') {
+            currentInstance.status = 'removed'
+          }
+
+          return accum
+        },
+        previousInstance,
+        previousInstance
+      )
 
       return newContext({
         ...context,

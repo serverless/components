@@ -1,4 +1,14 @@
-import { filter, forEach, get, isFunction, isObject, map, or, resolve } from '@serverless/utils'
+import {
+  filter,
+  forEach,
+  get,
+  isFunction,
+  isObject,
+  map,
+  or,
+  resolve,
+  clone
+} from '@serverless/utils'
 // import appendKey from './appendKey'
 // import getKey from './getKey'
 import hydrateComponent from './hydrateComponent'
@@ -15,6 +25,18 @@ const defineComponent = async (component, state, context) => {
       `defineComponent expected component parameter to be a component. Instead received ${component}`
     )
   }
+
+  // if state is undefined, clone the component, then call sync against it
+  // if it returns removed, move on...
+  // if it doesn't, use the clone of the component as the state
+  const componentClone = clone(component)
+
+  const status = await componentClone.sync(context)
+
+  if (status !== 'removed') {
+    state = componentClone
+  }
+
   component = hydrateComponent(component, state, context)
   if (isFunction(component.define)) {
     let children = await or(component.define(context), {})

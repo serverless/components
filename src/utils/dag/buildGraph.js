@@ -18,13 +18,15 @@ const buildGraph = (nextInstance, prevInstance) => {
           )
         }
 
-        // Default for a node is a removal operation. This will be changed in the next step if it still exists.
-        accum.setNode(currentInstance.instanceId, {
-          instanceId: currentInstance.instanceId,
-          operation: 'remove',
-          nextInstance: null,
-          prevInstance: currentInstance
-        })
+        if (currentInstance.status !== 'removed') {
+          // Default for a node is a removal operation. This will be changed in the next step if it still exists.
+          accum.setNode(currentInstance.instanceId, {
+            instanceId: currentInstance.instanceId,
+            operation: 'remove',
+            nextInstance: null,
+            prevInstance: currentInstance
+          })
+        }
         return accum
       },
       graph,
