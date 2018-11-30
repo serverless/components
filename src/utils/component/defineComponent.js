@@ -13,6 +13,7 @@ import {
 // import getKey from './getKey'
 import hydrateComponent from './hydrateComponent'
 import isComponent from './isComponent'
+import { SYMBOL_STATE } from '../constants'
 // import setKey from './setKey'
 
 /**
@@ -26,15 +27,17 @@ const defineComponent = async (component, state, context) => {
     )
   }
 
-  // if state is undefined, clone the component, then call sync against it
-  // if it returns removed, move on...
-  // if it doesn't, use the clone of the component as the state
-  const componentClone = clone(component)
+  // if this is the first deployment
+  // confirm that the resource does not exist on the provider
+  // otherwise, sync the state
+  if (state === undefined) {
+    const componentClone = clone(component)
+    const status = await componentClone.sync(context)
 
-  const status = await componentClone.sync(context)
-
-  if (status !== 'removed') {
-    state = componentClone
+    if (status !== 'removed' && status !== 'unknown') {
+      state = componentClone
+      component[SYMBOL_STATE] = state
+    }
   }
 
   component = hydrateComponent(component, state, context)

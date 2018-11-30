@@ -27,5 +27,5 @@ components:
     type: AwsIamRole
     inputs:
       provider: ${this.providers.aws}
-      roleName: some-new-role-name
+      roleName: some-new-role-name-3
       service: elasticmapreduce.amazonaws.com

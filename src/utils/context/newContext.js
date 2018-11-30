@@ -111,6 +111,7 @@ const newContext = (props) => {
       // instance = setKey('$', instance)
 
       const stateInstance = await deserialize(state.instance, finalContext)
+
       // NOTE BRN: instance gets defined based on serverless.yml and type code
       instance = await finalContext.defineComponent(instance, stateInstance)
 
@@ -200,23 +201,18 @@ const newContext = (props) => {
 
       // TODO BRN: Add hydrate step for previous instance
 
-      // todo call sync
-      // walk depth first children of previousInstance and call sync on all of them
-      // and if one of them returns removed, set the status flag on that child instance
-
-      previousInstance = walkReduceComponentChildrenDepthFirst(
-        (accum, currentInstance) => {
-          const status = await currentInstance.sync(finalContext)
-          if (status === 'removed') {
-            currentInstance.status = 'removed'
-          }
-
-          return accum
-        },
-        previousInstance,
-        previousInstance
-      )
-
+      // make sure we sync the previous instance (if any)
+      // with the actual state on the provider
+      if (previousInstance) {
+        previousInstance = await walkReduceComponentChildrenDepthFirst(
+          async (accum, currentInstance) => {
+            currentInstance.status = await currentInstance.sync(finalContext)
+            return accum
+          },
+          previousInstance,
+          previousInstance
+        )
+      }
       return newContext({
         ...context,
         previousInstance

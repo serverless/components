@@ -133,35 +133,26 @@ const AwsIamRole = async (SuperClass, superContext) => {
     }
 
     async sync() {
-      // 1. run sls deploy for the first time: Framework creates role
-      // 2. run sls deploy again without changes: Framework does nothing
-      // 3. change service property in serverless.yml and run sls deploy: Framework updates role
-      // 4. change roleName and run sls deploy: Framework removes prev role and create new role
-      // 5. change service property in AWS console and run sls deploy: Framework updates role with service in serverless.yml
-      // 6. delete role in console and run sls deploy: Framework creates role again
-      // 7. create role in aws console and deploy for the first time without updates: Framework does nothing
-      // 8. create role in aws console and deploy for the first time after config changes in serverless.yml: Framework makes an update
-      // NOTE: "resource does not exist" AND "resource already exists" errors should not be thrown.
-      const { provider } = this
+      let { provider } = this
+      provider = resolve(provider)
       const AWS = provider.getSdk()
       const IAM = new AWS.IAM()
 
       try {
-        const res = await IAM.getRole({ RoleName: this.roleName }).promise()
+        const res = await IAM.getRole({ RoleName: resolve(this.roleName) }).promise()
         this.roleName = res.Role.RoleName
         this.service = JSON.parse(
           decodeURIComponent(res.Role.AssumeRolePolicyDocument)
         ).Statement[0].Principal.Service
       } catch (e) {
         if (e.message.includes('cannot be found')) {
-          // this.newRoleExists = false
           return 'removed'
         }
         throw e
       }
     }
 
-    async shouldDeploy(prevInstance) {
+    shouldDeploy(prevInstance) {
       const inputs = {
         roleName: this.roleName,
         service: this.service,
@@ -169,6 +160,7 @@ const AwsIamRole = async (SuperClass, superContext) => {
       }
       const prevInputs = prevInstance ? pick(keys(inputs), prevInstance) : {}
       const configChanged = not(equals(inputs, prevInputs))
+
       if (prevInstance && prevInstance.roleName !== inputs.roleName) {
         return 'replace'
       } else if (!prevInstance || configChanged) {

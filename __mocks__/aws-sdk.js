@@ -87,6 +87,30 @@ const mocks = {
 
   // IAM
   createRoleMock: jest.fn().mockReturnValue({ Role: { Arn: 'arn:aws:iam::XXXXX:role/test-role' } }),
+  getRoleMock: jest.fn().mockImplementation((params) => {
+    if (params.RoleName === 'already-removed-role') {
+      const error = new Error()
+      error.message = 'cannot be found'
+      return Promise.reject(error)
+    }
+
+    const res = {
+      ResponseMetadata: { RequestId: '8e3e8f8c-f491-11e8-90ae-8d96f5df2ad5' },
+      Role: {
+        Path: '/',
+        RoleName: params.RoleName,
+        RoleId: 'AROAJXU5XSYGHT6VNIEMG',
+        Arn: `arn:aws:iam::xxx:role/${params.RoleName}`,
+        CreateDate: 'somedate',
+        AssumeRolePolicyDocument:
+          '%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22lambda.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D',
+        Tags: [],
+        MaxSessionDuration: 3600
+      }
+    }
+
+    return Promise.resolve(res)
+  }),
   deleteRoleMock: jest.fn().mockImplementation((params) => {
     if (params.RoleName === 'already-removed-role') {
       const error = new Error()
@@ -247,6 +271,9 @@ const IAM = function() {
   return {
     createRole: (obj) => ({
       promise: () => mocks.createRoleMock(obj)
+    }),
+    getRole: (obj) => ({
+      promise: () => mocks.getRoleMock(obj)
     }),
     deleteRole: (obj) => ({
       promise: () => mocks.deleteRoleMock(obj)
