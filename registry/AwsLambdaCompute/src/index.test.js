@@ -12,7 +12,7 @@ const AwsLambdaFunctionInstance = {
 }
 
 const SuperContext = {
-  loadType: async () => AwsLambdaFunctionType
+  import: async () => AwsLambdaFunctionType
 }
 
 const context = {
@@ -198,7 +198,7 @@ describe('AwsLambdaCompute', () => {
       instance: true
     }
     const awsEventsRuleContext = {
-      loadType: async () => AwsCloudWatchEventsRuleType,
+      import: async () => AwsCloudWatchEventsRuleType,
       construct: jest.fn().mockReturnValue(AwsCloudWatchEventsRuleInstance)
     }
 
@@ -236,7 +236,7 @@ describe('AwsLambdaCompute', () => {
       instance: true
     }
     const awsEventsRuleContext = {
-      loadType: async () => AwsCloudWatchEventsRuleType,
+      import: async () => AwsCloudWatchEventsRuleType,
       construct: jest.fn().mockReturnValue(AwsCloudWatchEventsRuleInstance)
     }
 
@@ -274,7 +274,7 @@ describe('AwsLambdaCompute', () => {
       instance: true
     }
     const awsEventsRuleContext = {
-      loadType: async () => AwsCloudWatchEventsRuleType,
+      import: async () => AwsCloudWatchEventsRuleType,
       construct: jest.fn().mockReturnValue(AwsCloudWatchEventsRuleInstance)
     }
 

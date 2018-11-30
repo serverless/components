@@ -8,7 +8,7 @@ describe('Integration Test - load types', () => {
     const context = await createContext({
       cwd: __dirname
     })
-    const ObjectType = await context.loadType('Object')
+    const ObjectType = await context.import('Object')
     expect(ObjectType).toEqual({
       class: expect.any(Function),
       constructor: expect.any(Function),
@@ -30,8 +30,8 @@ describe('Integration Test - load types', () => {
     const context = await createContext({
       cwd: __dirname
     })
-    const ObjectType = await context.loadType('Object')
-    const FooType = await context.loadType('./load-types/Foo')
+    const ObjectType = await context.import('Object')
+    const FooType = await context.import('./load-types/Foo')
     expect(FooType).toEqual({
       class: expect.any(Function),
       constructor: expect.any(Function),
@@ -102,9 +102,9 @@ describe('Integration Test - load types', () => {
     const context = await createContext({
       cwd: __dirname
     })
-    const ObjectType = await context.loadType('Object')
-    const FooType = await context.loadType('./load-types/Foo')
-    const BarType = await context.loadType('./load-types/Bar')
+    const ObjectType = await context.import('Object')
+    const FooType = await context.import('./load-types/Foo')
+    const BarType = await context.import('./load-types/Bar')
     expect(BarType).toEqual({
       class: expect.any(Function),
       constructor: expect.any(Function),
@@ -147,9 +147,9 @@ describe('Integration Test - load types', () => {
     const context = await createContext({
       cwd: __dirname
     })
-    const ObjectType = await context.loadType('Object')
-    const FooType = await context.loadType('./load-types/FooClass')
-    const BarType = await context.loadType('./load-types/BarClass')
+    const ObjectType = await context.import('Object')
+    const FooType = await context.import('./load-types/FooClass')
+    const BarType = await context.import('./load-types/BarClass')
     expect(BarType).toEqual({
       class: expect.any(Function),
       constructor: expect.any(Function),
@@ -190,7 +190,7 @@ describe('Integration Test - load types', () => {
     const context = await createContext({
       cwd: __dirname
     })
-    const AwsProvider = await context.loadType('AwsProvider')
+    const AwsProvider = await context.import('AwsProvider')
     const AwsProviderInputs = {
       region: 'us-east-1',
       credentials: {
@@ -200,7 +200,7 @@ describe('Integration Test - load types', () => {
     }
     const awsProvider = await context.construct(AwsProvider, AwsProviderInputs, context)
 
-    const AwsLambdaFunction = await context.loadType('AwsLambdaFunction')
+    const AwsLambdaFunction = await context.import('AwsLambdaFunction')
     const AwsLambdaFunctionInputs = {
       provider: awsProvider,
       name: 'type-system-demo-11',
@@ -225,7 +225,7 @@ describe('Integration Test - load types', () => {
     })
     context = await context.loadProject()
     context = await context.loadApp()
-    const AwsProvider = await context.loadType('AwsProvider')
+    const AwsProvider = await context.import('AwsProvider')
     const AwsProviderInputs = {
       region: 'us-east-1',
       credentials: {
@@ -235,7 +235,7 @@ describe('Integration Test - load types', () => {
     }
     const awsProvider = await context.construct(AwsProvider, AwsProviderInputs, context)
 
-    const AwsLambdaCompute = await context.loadType('AwsLambdaCompute')
+    const AwsLambdaCompute = await context.import('AwsLambdaCompute')
     const AwsLambdaComputeInputs = {
       provider: awsProvider,
       memory: 512,
@@ -247,7 +247,7 @@ describe('Integration Test - load types', () => {
       context
     )
 
-    const Function = await context.loadType('Function')
+    const Function = await context.import('Function')
     const FunctionInputs = {
       compute: {
         aws: awsLambdaCompute

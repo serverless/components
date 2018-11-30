@@ -22,8 +22,8 @@ describe('AwsApiGateway', () => {
 
   beforeEach(async () => {
     context = await createTestContext({ cwd })
-    AwsApiGateway = await context.loadType('AwsApiGateway')
-    const AwsProvider = await context.loadType('AwsProvider')
+    AwsApiGateway = await context.import('AwsApiGateway')
+    const AwsProvider = await context.import('AwsProvider')
     provider = await context.construct(AwsProvider, {
       region: 'us-east-1',
       credentials: {

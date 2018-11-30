@@ -20,8 +20,8 @@ describe('AwsSnsSubscription', () => {
 
   beforeEach(async () => {
     context = await createTestContext({ cwd })
-    AwsSnsSubscription = await context.loadType('./')
-    AwsProvider = await context.loadType('AwsProvider')
+    AwsSnsSubscription = await context.import('./')
+    AwsProvider = await context.import('AwsProvider')
     provider = await context.construct(AwsProvider, {
       region: 'us-east-1',
       credentials: {

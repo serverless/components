@@ -120,7 +120,7 @@ const newContext = (props) => {
     },
     defineComponent: (component, state) => defineComponent(component, state, finalContext),
     defineComponentFromState: (component) => defineComponentFromState(component, finalContext),
-    defType: (def) => defType(def, finalContext),
+    define: (def) => defType(def, finalContext),
     generateInstanceId: () => {
       const { app } = finalContext
       if (!app) {
@@ -250,7 +250,7 @@ const newContext = (props) => {
         state
       })
     },
-    loadType: (...args) => loadType(...args, finalContext),
+    import: (...args) => loadType(...args, finalContext),
     merge: (value) =>
       newContext({
         ...context,

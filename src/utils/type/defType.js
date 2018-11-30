@@ -33,7 +33,7 @@ const loadDef = async ({ root, props, query }, context) => {
     context = context.merge({ root })
 
     // NOTE BRN: Load the parent type using the extends property. This can be any type reference supported by the `loadType` method.
-    parentTypeDef = await context.loadType(typeDef.props.extends)
+    parentTypeDef = await context.import(typeDef.props.extends)
   }
   typeDef = set('parent', parentTypeDef, typeDef)
 

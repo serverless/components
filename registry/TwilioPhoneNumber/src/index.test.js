@@ -20,8 +20,8 @@ describe('TwilioPhoneNumber', () => {
 
   beforeEach(async () => {
     context = await createTestContext({ cwd })
-    TwilioPhoneNumber = await context.loadType('./')
-    TwilioProvider = await context.loadType('TwilioProvider')
+    TwilioPhoneNumber = await context.import('./')
+    TwilioProvider = await context.import('TwilioProvider')
   })
 
   it('should create phone number if first deployment', async () => {
@@ -216,7 +216,7 @@ describe('TwilioPhoneNumber', () => {
       phoneNumber: '+1234567890',
       friendlyName: 'friendlyName'
     }
-    const ComponentType = await context.loadType('./')
+    const ComponentType = await context.import('./')
     let oldComponent = await context.construct(ComponentType, inputs)
     oldComponent = await context.defineComponent(oldComponent)
     oldComponent = resolveComponentEvaluables(oldComponent)

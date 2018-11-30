@@ -22,7 +22,7 @@ describe('AwsProvider', () => {
     context = await createTestContext({ cwd: path.join(__dirname, '..') })
     context = await context.loadProject()
     context = await context.loadApp()
-    AwsProvider = await context.loadType('./')
+    AwsProvider = await context.import('./')
   })
 
   describe('#construct()', async () => {

@@ -11,7 +11,7 @@ describe('#getParentIds()', () => {
         }
       }
     )
-    const Component = await context.loadType('Component')
+    const Component = await context.import('Component')
     const grandparent = await context.construct(Component, {})
     const parent = await context.construct(Component, {})
     const child = await context.construct(Component, {})
@@ -30,7 +30,7 @@ describe('#getParentIds()', () => {
         }
       }
     )
-    const Component = await context.loadType('Component')
+    const Component = await context.import('Component')
     const component = await context.construct(Component, {})
 
     expect(getParentIds(component)).toEqual([])

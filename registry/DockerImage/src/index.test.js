@@ -39,7 +39,7 @@ describe.skip('DockerImage', () => {
     context = await context.loadProject()
     context = await context.loadApp()
 
-    const DockerImage = await context.loadType('./')
+    const DockerImage = await context.import('./')
     const dockerImage = await context.construct(DockerImage, {})
 
     dockerImage.dockerfilePath = 'some/path'
@@ -74,7 +74,7 @@ describe.skip('DockerImage', () => {
     context = await context.loadProject()
     context = await context.loadApp()
 
-    const DockerImage = await context.loadType('./')
+    const DockerImage = await context.import('./')
     const dockerImage = await context.construct(DockerImage, {})
 
     dockerImage.dockerfilePath = 'some/path'
@@ -105,7 +105,7 @@ describe.skip('DockerImage', () => {
     context = await context.loadProject()
     context = await context.loadApp()
 
-    const DockerImage = await context.loadType('./')
+    const DockerImage = await context.import('./')
     const dockerImage = await context.construct(DockerImage, {})
 
     dockerImage.dockerfilePath = 'some/path'

@@ -106,7 +106,7 @@ const updateAssumeRolePolicy = async (IAM, { roleName, service }) => {
 }
 
 const AwsIamRole = async (SuperClass, superContext) => {
-  const AwsIamPolicy = await superContext.loadType('AwsIamPolicy')
+  const AwsIamPolicy = await superContext.import('AwsIamPolicy')
 
   return class extends SuperClass {
     async construct(inputs, context) {

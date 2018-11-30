@@ -20,8 +20,8 @@ describe('AwsCloudWatchEventsRule', () => {
 
   beforeEach(async () => {
     context = await createTestContext({ cwd })
-    AwsProvider = await context.loadType('AwsProvider')
-    AwsCloudWatchEventsRule = await context.loadType('./')
+    AwsProvider = await context.import('AwsProvider')
+    AwsCloudWatchEventsRule = await context.import('./')
     provider = await context.construct(AwsProvider, {
       region: 'us-east-1',
       credentials: {

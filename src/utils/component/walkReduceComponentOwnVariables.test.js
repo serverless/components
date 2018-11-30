@@ -12,7 +12,7 @@ describe('#walkReduceComponentOwnVariables()', () => {
         }
       }
     )
-    const Component = await context.loadType('Component')
+    const Component = await context.import('Component')
     const component = await context.construct(Component, {})
     const fooVariable = newVariable('${foo}', { foo: 'foo' })
     const barVariable = newVariable('${bar}', { bar: 'bar' })

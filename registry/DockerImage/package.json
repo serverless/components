@@ -9,7 +9,7 @@
   "author": "Serverless, Inc.",
   "license": "Apache-2.0",
   "dependencies": {
-    "@serverless/utils": "0.0.18",
+    "@serverless/utils": "0.0.19",
     "bluebird": "^3.5.2",
     "execa": "^1.0.0",
     "which": "^1.3.1"

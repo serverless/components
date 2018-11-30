@@ -34,7 +34,7 @@ describe('RestApi', () => {
       routes: {}
     }
     const context = await createTestContext()
-    const RestApi = await context.loadType('RestApi')
+    const RestApi = await context.import('RestApi')
     let restApi = await context.construct(RestApi, inputs)
     restApi = resolveComponentEvaluables(restApi)
 
