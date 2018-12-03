@@ -57,7 +57,7 @@ const newContext = (props) => {
       error: (...args) => error(finalContext, ...args),
       info: (...args) => info(finalContext, ...args)
     },
-    construct: (type, inputs) => construct(type, inputs, finalContext),
+    construct: (type, inputs = {}) => construct(type, inputs, finalContext),
     create,
     createDeployment: async () => {
       const { app, previousDeployment } = finalContext
@@ -106,7 +106,7 @@ const newContext = (props) => {
           'createInstance method expects context to have a project loaded. You must first call loadProject on context before calling createInstance'
         )
       }
-      let instance = await finalContext.construct(project.Type)
+      let instance = await finalContext.construct(project.Type, {})
       // instance = setKey('$', instance)
 
       const stateInstance = await deserialize(state.instance, finalContext)

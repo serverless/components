@@ -1,4 +1,5 @@
 export * from './app'
+export * from './ast'
 export * from './cli'
 export * from './component'
 export * from './config'

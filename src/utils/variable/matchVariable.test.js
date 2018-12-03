@@ -17,11 +17,35 @@ describe('#matchVariable()', () => {
     })
   })
 
+  it('should return expression with incomplete nested braces when missing outer brace', () => {
+    expect(matchVariable('${{abc}')).toEqual({
+      expression: '{abc',
+      exact: true,
+      match: '${{abc}'
+    })
+  })
+
   it('should match variable with surounding text', () => {
     expect(matchVariable('hello ${abc} dude')).toEqual({
       expression: 'abc',
       exact: false,
       match: '${abc}'
+    })
+  })
+
+  it('should match OR variables without surrounding text', () => {
+    expect(matchVariable("${abc || 'world'}")).toEqual({
+      expression: "abc || 'world'",
+      exact: true,
+      match: "${abc || 'world'}"
+    })
+  })
+
+  it('should match OR variables with surrounding text', () => {
+    expect(matchVariable("hello ${abc || 'world'}")).toEqual({
+      expression: "abc || 'world'",
+      exact: false,
+      match: "${abc || 'world'}"
     })
   })
 })

@@ -1,4 +1,4 @@
-const def = '\\${([a-zA-Z0-9_\\.[\\]]*)}'
+const def = '\\${(.*)}'
 
 const regex = new RegExp(def)
 
