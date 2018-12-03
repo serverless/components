@@ -46,6 +46,7 @@ const createLambda = async (
   }
 
   const res = await Lambda.createFunction(params).promise()
+
   return res.FunctionArn
 }
 
@@ -139,6 +140,35 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
         return 'replace'
       } else if (!prevInstance || configChanged || roleChanged) {
         return 'deploy'
+      }
+    }
+
+    async sync() {
+      let { provider } = this
+      provider = resolve(provider)
+      const AWS = provider.getSdk()
+      const Lambda = new AWS.Lambda()
+
+      try {
+        // todo check and fix function tags
+        const res = await Lambda.getFunctionConfiguration({
+          FunctionName: resolve(this.functionName)
+        }).promise()
+        this.functionName = res.FunctionName
+        this.runtime = res.Runtime
+        this.role = {
+          arn: res.Role
+        }
+        this.handler = res.Handler
+        this.functionDescription = res.Description
+        this.timeout = res.Timeout
+        this.memorySize = res.MemorySize
+        this.environment = res.Environment ? res.Environment.Variables : {}
+      } catch (e) {
+        if (e.code === 'ResourceNotFoundException') {
+          return 'removed'
+        }
+        throw e
       }
     }
 

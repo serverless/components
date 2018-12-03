@@ -537,6 +537,67 @@ describe('AwsLambdaFunction', () => {
     expect(awsLambdaFunction.getId()).toEqual('some:arn')
   })
 
+  it('sync should return "removed" if function does not exist in provider', async () => {
+    let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+      provider,
+      code: './code',
+      functionName: 'already-removed-function',
+      functionDescription: 'hello description',
+      handler: 'index.handler',
+      zip: 'zipfilecontent',
+      runtime: 'nodejs8.10',
+      memorySize: 512,
+      timeout: 10,
+      environment: {
+        ENV_VAR: 'env value'
+      },
+      tags: 'abc',
+      role: {
+        arn: 'abc:aws'
+      }
+    })
+
+    awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
+
+    awsLambdaFunction = resolveComponentEvaluables(awsLambdaFunction)
+
+    const status = await awsLambdaFunction.sync()
+
+    expect(status).toBe('removed')
+  })
+
+  it('sync should update lambda config if lambda config changed in provider', async () => {
+    let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+      provider,
+      code: './code',
+      functionName: 'hello',
+      functionDescription: 'hello description',
+      handler: 'index.handler',
+      zip: 'zipfilecontent',
+      runtime: 'nodejs8.10',
+      memorySize: 512, // changed!
+      timeout: 20, // changed!
+      environment: {
+        ENV_VAR: 'env value'
+      },
+      tags: 'abc',
+      role: {
+        arn: 'abc:aws' // changed!
+      }
+    })
+
+    awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
+
+    awsLambdaFunction = resolveComponentEvaluables(awsLambdaFunction)
+
+    const status = await awsLambdaFunction.sync()
+
+    expect(status).toBe(undefined)
+    expect(awsLambdaFunction.memorySize).toBe(1024)
+    expect(awsLambdaFunction.timeout).toBe(10)
+    expect(awsLambdaFunction.role.arn).toBe('arn:aws:iam::xxx:role/hello-execution-role')
+  })
+
   it('shouldDeploy should return replace if name changed', async () => {
     let awsLambdaFunction = context.construct(AwsLambdaFunction, {
       provider,
