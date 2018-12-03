@@ -150,7 +150,6 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
       const Lambda = new AWS.Lambda()
 
       try {
-        // todo check and fix function tags
         const res = await Lambda.getFunctionConfiguration({
           FunctionName: resolve(this.functionName)
         }).promise()
