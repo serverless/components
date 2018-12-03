@@ -156,7 +156,7 @@ describe('index', () => {
       matchVariable: expect.any(Function),
       newVariable: expect.any(Function),
       regexVariable: expect.any(Object),
-      resolveVariableString: expect.any(Function)
+      evaluateVariableString: expect.any(Function)
     })
   })
 })

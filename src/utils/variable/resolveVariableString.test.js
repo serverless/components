@@ -1,43 +1,43 @@
-import resolveVariableString from './resolveVariableString'
+import evaluateVariableString from './evaluateVariableString'
 
-describe('#resolveVariableString()', () => {
+describe('#evaluateVariableString()', () => {
   it('should resolve exact matches to actual value', () => {
-    expect(resolveVariableString('${abc}', { abc: undefined })).toBe(undefined)
-    expect(resolveVariableString('${abc}', { abc: null })).toBe(null)
-    expect(resolveVariableString('${abc}', { abc: '' })).toBe('')
-    expect(resolveVariableString('${abc}', { abc: 'abc' })).toBe('abc')
-    expect(resolveVariableString('${abc}', { abc: false })).toBe(false)
-    expect(resolveVariableString('${abc}', { abc: true })).toBe(true)
-    expect(resolveVariableString('${abc}', { abc: 0 })).toBe(0)
-    expect(resolveVariableString('${abc}', { abc: -1 })).toBe(-1)
-    expect(resolveVariableString('${abc}', { abc: 1 })).toBe(1)
-    expect(resolveVariableString('${abc}', { abc: NaN })).toBe(NaN)
-    expect(resolveVariableString('${abc}', { abc: Infinity })).toBe(Infinity)
-    expect(resolveVariableString('${abc}', { abc: -Infinity })).toBe(-Infinity)
-    expect(resolveVariableString('${abc}', { abc: [] })).toEqual([])
-    expect(resolveVariableString('${abc}', { abc: {} })).toEqual({})
+    expect(evaluateVariableString('${abc}', { abc: undefined })).toBe(undefined)
+    expect(evaluateVariableString('${abc}', { abc: null })).toBe(null)
+    expect(evaluateVariableString('${abc}', { abc: '' })).toBe('')
+    expect(evaluateVariableString('${abc}', { abc: 'abc' })).toBe('abc')
+    expect(evaluateVariableString('${abc}', { abc: false })).toBe(false)
+    expect(evaluateVariableString('${abc}', { abc: true })).toBe(true)
+    expect(evaluateVariableString('${abc}', { abc: 0 })).toBe(0)
+    expect(evaluateVariableString('${abc}', { abc: -1 })).toBe(-1)
+    expect(evaluateVariableString('${abc}', { abc: 1 })).toBe(1)
+    expect(evaluateVariableString('${abc}', { abc: NaN })).toBe(NaN)
+    expect(evaluateVariableString('${abc}', { abc: Infinity })).toBe(Infinity)
+    expect(evaluateVariableString('${abc}', { abc: -Infinity })).toBe(-Infinity)
+    expect(evaluateVariableString('${abc}', { abc: [] })).toEqual([])
+    expect(evaluateVariableString('${abc}', { abc: {} })).toEqual({})
     // TODO BRN: What to do about functions?
   })
 
   it('should resolve non exact matches to string', () => {
-    expect(resolveVariableString('dude, ${abc}', { abc: undefined })).toBe('dude, undefined')
-    expect(resolveVariableString('dude, ${abc}', { abc: null })).toBe('dude, null')
-    expect(resolveVariableString('dude, ${abc}', { abc: '' })).toBe('dude, ')
-    expect(resolveVariableString('dude, ${abc}', { abc: 'abc' })).toBe('dude, abc')
-    expect(resolveVariableString('dude, ${abc}', { abc: false })).toBe('dude, false')
-    expect(resolveVariableString('dude, ${abc}', { abc: true })).toBe('dude, true')
-    expect(resolveVariableString('dude, ${abc}', { abc: 0 })).toBe('dude, 0')
-    expect(resolveVariableString('dude, ${abc}', { abc: -1 })).toBe('dude, -1')
-    expect(resolveVariableString('dude, ${abc}', { abc: 1 })).toBe('dude, 1')
-    expect(resolveVariableString('dude, ${abc}', { abc: NaN })).toBe('dude, NaN')
-    expect(resolveVariableString('dude, ${abc}', { abc: Infinity })).toBe('dude, Infinity')
-    expect(resolveVariableString('dude, ${abc}', { abc: -Infinity })).toBe('dude, -Infinity')
-    expect(resolveVariableString('dude, ${abc}', { abc: 'sweet' })).toBe('dude, sweet')
-    expect(resolveVariableString('dude, ${abc}', { abc: ['s', 'w', 'e', 'e', 't'] })).toBe(
+    expect(evaluateVariableString('dude, ${abc}', { abc: undefined })).toBe('dude, undefined')
+    expect(evaluateVariableString('dude, ${abc}', { abc: null })).toBe('dude, null')
+    expect(evaluateVariableString('dude, ${abc}', { abc: '' })).toBe('dude, ')
+    expect(evaluateVariableString('dude, ${abc}', { abc: 'abc' })).toBe('dude, abc')
+    expect(evaluateVariableString('dude, ${abc}', { abc: false })).toBe('dude, false')
+    expect(evaluateVariableString('dude, ${abc}', { abc: true })).toBe('dude, true')
+    expect(evaluateVariableString('dude, ${abc}', { abc: 0 })).toBe('dude, 0')
+    expect(evaluateVariableString('dude, ${abc}', { abc: -1 })).toBe('dude, -1')
+    expect(evaluateVariableString('dude, ${abc}', { abc: 1 })).toBe('dude, 1')
+    expect(evaluateVariableString('dude, ${abc}', { abc: NaN })).toBe('dude, NaN')
+    expect(evaluateVariableString('dude, ${abc}', { abc: Infinity })).toBe('dude, Infinity')
+    expect(evaluateVariableString('dude, ${abc}', { abc: -Infinity })).toBe('dude, -Infinity')
+    expect(evaluateVariableString('dude, ${abc}', { abc: 'sweet' })).toBe('dude, sweet')
+    expect(evaluateVariableString('dude, ${abc}', { abc: ['s', 'w', 'e', 'e', 't'] })).toBe(
       'dude, s,w,e,e,t'
     )
     expect(
-      resolveVariableString('dude, ${abc}', {
+      evaluateVariableString('dude, ${abc}', {
         abc: {
           toString() {
             return 'sweet'
@@ -49,7 +49,7 @@ describe('#resolveVariableString()', () => {
 
   it('supports nested variables', () => {
     expect(
-      resolveVariableString('${abc${def}}', {
+      evaluateVariableString('${abc${def}}', {
         abcghi: true,
         def: 'ghi'
       })
@@ -57,39 +57,39 @@ describe('#resolveVariableString()', () => {
   })
 
   it('should be able to deal with OR (||) usages', () => {
-    expect(resolveVariableString("${abc || 'Hello world'}", { abc: false })).toBe('Hello world')
-    expect(resolveVariableString("${abc || 'Hello world'}", { abc: true })).toBe(true)
-    expect(resolveVariableString('${abc || false}', { abc: null })).toBe(false)
+    expect(evaluateVariableString("${abc || 'Hello world'}", { abc: false })).toBe('Hello world')
+    expect(evaluateVariableString("${abc || 'Hello world'}", { abc: true })).toBe(true)
+    expect(evaluateVariableString('${abc || false}', { abc: null })).toBe(false)
     expect(
-      resolveVariableString("${this.greeting || 'Default greeting'}", {
+      evaluateVariableString("${this.greeting || 'Default greeting'}", {
         this: { greeting: 'Hello world' }
       })
     ).toBe('Hello world')
   })
 
   it('should be able to deal with OR (||) usages in exact matches', () => {
-    expect(resolveVariableString("${abc || 'Hello world'}", { abc: false })).toBe('Hello world')
-    expect(resolveVariableString("${abc || 'Hello world'}", { abc: true })).toBe(true)
-    expect(resolveVariableString("${abc || 'Hello world'}", { abc: 1 })).toBe(1)
-    expect(resolveVariableString("${abc || 'Hello world'}", { abc: 'abc' })).toBe('abc')
-    expect(resolveVariableString("${abc || 'Hello world'}", { abc: {} })).toEqual({})
-    expect(resolveVariableString("${abc || 'Hello world'}", { abc: [] })).toEqual([])
+    expect(evaluateVariableString("${abc || 'Hello world'}", { abc: false })).toBe('Hello world')
+    expect(evaluateVariableString("${abc || 'Hello world'}", { abc: true })).toBe(true)
+    expect(evaluateVariableString("${abc || 'Hello world'}", { abc: 1 })).toBe(1)
+    expect(evaluateVariableString("${abc || 'Hello world'}", { abc: 'abc' })).toBe('abc')
+    expect(evaluateVariableString("${abc || 'Hello world'}", { abc: {} })).toEqual({})
+    expect(evaluateVariableString("${abc || 'Hello world'}", { abc: [] })).toEqual([])
   })
 
   it('should be able to deal with OR (||) usages in non-exact matches', () => {
-    expect(resolveVariableString("Hello ${abc || 'world'}", { abc: false })).toBe('Hello world')
-    expect(resolveVariableString("Hello ${abc || 'world'}", { abc: undefined })).toBe('Hello world')
-    expect(resolveVariableString("Hello ${abc || 'world'}", { abc: null })).toBe('Hello world')
-    expect(resolveVariableString("Hello ${abc || 'world'}", { abc: 'false' })).toBe('Hello false')
-    expect(resolveVariableString("Hello ${abc || 'world'}", { abc: 'undefined' })).toBe(
+    expect(evaluateVariableString("Hello ${abc || 'world'}", { abc: false })).toBe('Hello world')
+    expect(evaluateVariableString("Hello ${abc || 'world'}", { abc: undefined })).toBe('Hello world')
+    expect(evaluateVariableString("Hello ${abc || 'world'}", { abc: null })).toBe('Hello world')
+    expect(evaluateVariableString("Hello ${abc || 'world'}", { abc: 'false' })).toBe('Hello false')
+    expect(evaluateVariableString("Hello ${abc || 'world'}", { abc: 'undefined' })).toBe(
       'Hello undefined'
     )
-    expect(resolveVariableString("Hello ${abc || 'world'}", { abc: 'null' })).toBe('Hello null')
-    expect(resolveVariableString('Hello ${abc || def}', { abc: false, def: 'world' })).toBe(
+    expect(evaluateVariableString("Hello ${abc || 'world'}", { abc: 'null' })).toBe('Hello null')
+    expect(evaluateVariableString('Hello ${abc || def}', { abc: false, def: 'world' })).toBe(
       'Hello world'
     )
     expect(
-      resolveVariableString("Hello ${this.greeting || 'Default greeting'}", {
+      evaluateVariableString("Hello ${this.greeting || 'Default greeting'}", {
         this: { greeting: 'world' }
       })
     ).toBe('Hello world')
@@ -97,7 +97,7 @@ describe('#resolveVariableString()', () => {
 
   it('should support multiple OR (||) expressions', () => {
     expect(
-      resolveVariableString("Hello ${abc || false || undefined || 'world'}", { abc: null })
+      evaluateVariableString("Hello ${abc || false || undefined || 'world'}", { abc: null })
     ).toBe('Hello world')
   })
 })

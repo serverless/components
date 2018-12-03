@@ -1,14 +1,14 @@
 import { get, keys, omit, values } from '@serverless/utils'
 import matchVariable from './matchVariable'
 
-const resolveVariableString = (variableString, data) => {
+const evaluateVariableString = (variableString, data) => {
   const { exact, match, expression } = matchVariable(variableString)
 
   if (!match) {
     return variableString
   }
 
-  const resolvedExpression = resolveVariableString(expression, data)
+  const resolvedExpression = evaluateVariableString(expression, data)
 
   const self = get('this', data)
   data = omit(['this'], data)
@@ -24,4 +24,4 @@ const resolveVariableString = (variableString, data) => {
   return value
 }
 
-export default resolveVariableString
+export default evaluateVariableString

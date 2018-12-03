@@ -13,7 +13,7 @@ import { SYMBOL_VARIABLE } from '../constants'
 import errorBadVariableEvaluation from './errors/errorBadVariableEvaluation'
 import extractExpressions from '../ast/extractExpressions'
 import isVariable from './isVariable'
-import resolveVariableString from './resolveVariableString'
+import evaluateVariableString from './evaluateVariableString'
 
 const newVariable = (variableString, data) => {
   const variable = {
@@ -54,7 +54,7 @@ const newVariable = (variableString, data) => {
     },
     evaluate() {
       try {
-        return resolveVariableString(variableString, data)
+        return evaluateVariableString(variableString, data)
       } catch (error) {
         throw errorBadVariableEvaluation(variable, error)
       }
