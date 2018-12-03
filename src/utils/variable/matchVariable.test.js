@@ -17,6 +17,14 @@ describe('#matchVariable()', () => {
     })
   })
 
+  it('should return expression with incomplete nested braces when missing outer brace', () => {
+    expect(matchVariable('${{abc}')).toEqual({
+      expression: '{abc',
+      exact: true,
+      match: '${{abc}'
+    })
+  })
+
   it('should match variable with surounding text', () => {
     expect(matchVariable('hello ${abc} dude')).toEqual({
       expression: 'abc',

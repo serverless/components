@@ -3,7 +3,7 @@ import * as walk from 'acorn-walk'
 
 function extractExpressions(code) {
   const expressions = []
-  let expression = 0
+  let expressionStart = 0
   let expressionEnd = 0
   let trackingExpression = false
   walk.full(acorn.parse(code), (node, state, type) => {
@@ -12,11 +12,11 @@ function extractExpressions(code) {
       (type === 'ExpressionStatement' && node.expression.type === 'Identifier')
     ) {
       trackingExpression = true
-      expression = node.start
+      expressionStart = node.start
       expressionEnd = node.end
     }
-    if ((trackingExpression && expression !== node.start) || type === 'Program') {
-      expressions.push(code.slice(expression, expressionEnd))
+    if ((trackingExpression && expressionStart !== node.start) || type === 'Program') {
+      expressions.push(code.slice(expressionStart, expressionEnd))
       trackingExpression = false
     }
   })
