@@ -23,21 +23,9 @@ providers:
 #    ufs: true
 
 components:
-  policy:
-    type: AwsIamPolicy
+  role:
+    type: AwsIamRole
     inputs:
-      # Provider is required for each AWS resource.
       provider: ${this.providers.aws}
-      policyName: some-new-policy-name
-      document:
-        Version: '2012-10-17'
-        Statement:
-          # This statement grants access to the users table.
-          - Resource:
-              - arn:aws:dynamodb:us-east-1:552750238299:table/ServerlessWebappUser-ServerlessWebApp-prod-hbrizf9b
-            Effect: Allow
-            Action:
-              - dynamodb:GetItem
-              - dynamodb:PutItem
-#              - dynamodb:UpdateItem
-#              - dynamodb:DeleteItem
+      roleName: some-new-role-name-3
+      service: elasticmapreduce.amazonaws.com

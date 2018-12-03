@@ -132,6 +132,26 @@ const AwsIamRole = async (SuperClass, superContext) => {
       this.arn = get('arn', prevInstance)
     }
 
+    async sync() {
+      let { provider } = this
+      provider = resolve(provider)
+      const AWS = provider.getSdk()
+      const IAM = new AWS.IAM()
+
+      try {
+        const res = await IAM.getRole({ RoleName: resolve(this.roleName) }).promise()
+        this.roleName = res.Role.RoleName
+        this.service = JSON.parse(
+          decodeURIComponent(res.Role.AssumeRolePolicyDocument)
+        ).Statement[0].Principal.Service
+      } catch (e) {
+        if (e.message.includes('cannot be found')) {
+          return 'removed'
+        }
+        throw e
+      }
+    }
+
     shouldDeploy(prevInstance) {
       const inputs = {
         roleName: this.roleName,
@@ -140,6 +160,7 @@ const AwsIamRole = async (SuperClass, superContext) => {
       }
       const prevInputs = prevInstance ? pick(keys(inputs), prevInstance) : {}
       const configChanged = not(equals(inputs, prevInputs))
+
       if (prevInstance && prevInstance.roleName !== inputs.roleName) {
         return 'replace'
       } else if (!prevInstance || configChanged) {
