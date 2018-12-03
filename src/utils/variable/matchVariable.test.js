@@ -28,7 +28,7 @@ describe('#matchVariable()', () => {
   it('should match OR variables without surrounding text', () => {
     expect(matchVariable("${abc || 'world'}")).toEqual({
       expression: "abc || 'world'",
-      exact: false,
+      exact: true,
       match: "${abc || 'world'}"
     })
   })
