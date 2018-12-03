@@ -78,7 +78,9 @@ describe('#evaluateVariableString()', () => {
 
   it('should be able to deal with OR (||) usages in non-exact matches', () => {
     expect(evaluateVariableString("Hello ${abc || 'world'}", { abc: false })).toBe('Hello world')
-    expect(evaluateVariableString("Hello ${abc || 'world'}", { abc: undefined })).toBe('Hello world')
+    expect(evaluateVariableString("Hello ${abc || 'world'}", { abc: undefined })).toBe(
+      'Hello world'
+    )
     expect(evaluateVariableString("Hello ${abc || 'world'}", { abc: null })).toBe('Hello world')
     expect(evaluateVariableString("Hello ${abc || 'world'}", { abc: 'false' })).toBe('Hello false')
     expect(evaluateVariableString("Hello ${abc || 'world'}", { abc: 'undefined' })).toBe(
