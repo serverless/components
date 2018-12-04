@@ -29,7 +29,7 @@ describe('TwilioProvider', () => {
     const TwilioProvider = await context.import('./')
     const twilioProvider = await context.construct(TwilioProvider, inputs)
 
-    expect(twilioProvider.getCredentials().get()).toEqual(inputs)
+    expect(twilioProvider.getCredentials()).toEqual(inputs)
   })
 
   it('should getSdk', async () => {

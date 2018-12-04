@@ -5,6 +5,12 @@ version: 0.3.0
 
 provider: ${inputs.provider}
 bucket: ${inputs.bucket}
+buildCmd: ${inputs.buildCmd}
+env: ${inputs.env}
+projectDir: ${inputs.projectDir}
+envFileLocation: ${pathResolve(this.projectDir, inputs.envFileLocation)}
+assets: ${pathResolve(this.projectDir, inputs.assets)}
+
 
 inputTypes:
   provider:

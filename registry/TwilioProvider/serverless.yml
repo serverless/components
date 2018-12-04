@@ -5,6 +5,9 @@ main: ./dist/index.js
 
 accountSid: ${inputs.accountSid}
 authToken: ${inputs.authToken}
+credentials:
+  accountSid: ${inputs.accountSid}
+  authToken: ${inputs.authToken}
 
 inputTypes:
   accountSid:

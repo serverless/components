@@ -10,14 +10,13 @@ import {
   map,
   merge,
   not,
-  or,
   pick,
   reduce,
-  resolvable,
   values,
   get
 } from '@serverless/utils'
 
+// TODO BRN: Replace this with upperFirst method from utils
 const capitalize = (string) => `${string.charAt(0).toUpperCase()}${string.slice(1)}`
 const resolveInSequence = async (functionsToExecute) =>
   reduce(
@@ -158,15 +157,9 @@ const createSNSTopic = async (
 
 const AwsSnsTopic = (SuperClass) =>
   class extends SuperClass {
-    async construct(inputs, context) {
-      await super.construct(inputs, context)
-
-      this.provider = resolvable(() => or(inputs.provider, context.get('provider')))
-      this.topicName = resolvable(() => or(inputs.topicName, `sns-${this.instanceId}`))
-      this.deliveryStatusAttributes = resolvable(() => or(inputs.deliveryStatusAttributes, []))
-      this.displayName = inputs.displayName
-      this.policy = inputs.policy
-      this.deliveryPolicy = inputs.deliveryPolicy
+    hydrate(prevInstance = {}) {
+      super.hydrate(prevInstance)
+      this.topicArn = get('topicArn', prevInstance)
     }
 
     shouldDeploy(prevInstance) {
@@ -189,11 +182,6 @@ const AwsSnsTopic = (SuperClass) =>
       }
 
       return undefined
-    }
-
-    hydrate(prevInstance = {}) {
-      super.hydrate(prevInstance)
-      this.topicArn = get('topicArn', prevInstance)
     }
 
     async deploy(prevInstance, context) {

@@ -1,4 +1,4 @@
-import { get, lowerCase, or, pick, resolvable } from '@serverless/utils'
+import { get, pick } from '@serverless/utils'
 import { createBucket, deleteBucket } from './utils'
 
 const DEPLOY = 'deploy'
@@ -14,12 +14,6 @@ const AwsS3Bucket = (SuperClass) =>
       if (inputs.bucketName && !bucketNameRegex.test(inputs.bucketName)) {
         throw new Error(`Bucket name does not match regex "${bucketNameRegex.toString()}"`)
       }
-
-      // NOTE: the bucket name needs to be lower case
-      this.bucketName = resolvable(() =>
-        lowerCase(or(inputs.bucketName, `bucket-${this.instanceId}`))
-      )
-      this.provider = resolvable(() => or(inputs.provider, context.get('provider')))
     }
 
     shouldDeploy(prevInstance) {

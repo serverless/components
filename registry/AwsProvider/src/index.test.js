@@ -37,7 +37,13 @@ describe('AwsProvider', () => {
 
       const awsProvider = await context.construct(AwsProvider, inputs)
 
-      expect(awsProvider.region).toEqual('us-east-1')
+      expect(awsProvider.getCredentials()).toEqual({
+        credentials: {
+          accessKeyId: 'abc',
+          secretAccessKey: 'xyz'
+        },
+        region: 'us-east-1'
+      })
     })
   })
 

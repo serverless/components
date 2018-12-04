@@ -1,17 +1,4 @@
-import {
-  get,
-  equals,
-  is,
-  isEmpty,
-  has,
-  resolve,
-  sleep,
-  or,
-  resolvable,
-  not,
-  pick,
-  keys
-} from '@serverless/utils'
+import { get, equals, is, isEmpty, has, resolve, sleep, not, pick, keys } from '@serverless/utils'
 
 const addRolePolicy = async (IAM, { roleName, policy }) => {
   if (has('arn', policy)) {
@@ -121,10 +108,6 @@ const AwsIamRole = async (SuperClass, superContext) => {
           } characters long (max. allowed length is 64)`
         )
       }
-
-      this.provider = inputs.provider
-      this.service = inputs.service
-      this.roleName = resolvable(() => or(inputs.roleName, `role-${this.instanceId}`))
     }
 
     hydrate(prevInstance) {

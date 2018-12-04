@@ -84,12 +84,6 @@ const RestApi = async function(SuperClass, SuperContext) {
   const iamComponent = await SuperContext.import('AwsIamRole')
 
   return class extends SuperClass {
-    async construct(inputs, context) {
-      await super.construct(inputs, context)
-      this.inputs = inputs
-      this.apiName = inputs.apiName
-    }
-
     async define(context) {
       const { inputs } = this
       if (!['AwsApiGateway'].includes(resolve(inputs.gateway))) {

@@ -8,8 +8,8 @@ license: Apache-2.0
 author: 'Serverless, Inc. <hello@serverless.com> (https://serverless.com)'
 repository: 'github:serverless/components'
 
-provider: ${inputs.provider}
-tableName: ${inputs.tableName}
+provider: ${inputs.provider || context.get('provider')}
+tableName: ${inputs.tableName || 'table-${this.instanceId}'}
 attributeDefinitions: ${inputs.attributeDefinitions}
 keySchema: ${inputs.keySchema}
 provisionedThroughput: ${inputs.provisionedThroughput}

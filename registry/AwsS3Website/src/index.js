@@ -151,18 +151,10 @@ const AwsS3Website = (SuperClass) =>
     async construct(inputs, context) {
       await super.construct(inputs, context)
 
-      this.buildCmd = inputs.buildCmd
-      this.env = inputs.env
-      this.projectDir = resolve(inputs.projectDir)
-      this.assets = resolve(inputs.assets) || resolve(inputs.projectDir)
-
       // TODO BRN: Move this to a validate step (maybe on a per property basis that validates when set)
-      if (!path.isAbsolute(this.projectDir)) {
+      if (!path.isAbsolute(resolve(this.projectDir))) {
         throw new Error('projectDir must be an absolute path. Construct local paths using ${path}.')
       }
-
-      this.envFileLocation = path.resolve(this.projectDir, resolve(inputs.envFileLocation))
-      this.assets = path.resolve(this.projectDir, resolve(inputs.assets))
     }
 
     async shouldDeploy(prevInstance) {

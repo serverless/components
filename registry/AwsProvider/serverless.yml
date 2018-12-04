@@ -4,7 +4,7 @@ version: 0.3.0
 main: ./dist/index.js
 
 credentials: ${inputs.credentials}
-region: ${inputs.region}
+region: ${inputs.region || 'us-east-1'}
 
 inputTypes:
   credentials:
