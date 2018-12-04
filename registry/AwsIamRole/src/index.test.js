@@ -470,7 +470,7 @@ describe('AwsIamRole', () => {
   it('shouldDeploy should return deploy if first deployment', async () => {
     let oldAwsIamRole = await context.construct(AwsIamRole, {
       provider,
-      roleName: 'abc',
+      roleName: 'already-removed-role',
       service: 'lambda.amazonaws.com',
       policy: {
         arn: 'arn:aws:iam::aws:policy/oldPolicy'
@@ -480,5 +480,41 @@ describe('AwsIamRole', () => {
     oldAwsIamRole = resolveComponentEvaluables(oldAwsIamRole)
     const res = oldAwsIamRole.shouldDeploy(null, context)
     expect(res).toBe('deploy')
+  })
+
+  it('sync should return "removed" if role removed from provider', async () => {
+    let oldAwsIamRole = await context.construct(AwsIamRole, {
+      provider,
+      roleName: 'already-removed-role',
+      policy: {
+        arn: 'arn:aws:iam::aws:policy/oldPolicy'
+      }
+    })
+    oldAwsIamRole = await context.defineComponent(oldAwsIamRole)
+    oldAwsIamRole = resolveComponentEvaluables(oldAwsIamRole)
+    const res = await oldAwsIamRole.sync(context)
+    expect(res).toBe('removed')
+  })
+
+  it('sync should update role config if role config changed in provider', async () => {
+    let oldAwsIamRole = await context.construct(AwsIamRole, {
+      provider,
+      roleName: 'somerole',
+      service: 'elasticmapreduce.amazonaws.com', // this is outdated!
+      policy: {
+        arn: 'arn:aws:iam::aws:policy/oldPolicy'
+      }
+    })
+
+    oldAwsIamRole = await context.defineComponent(oldAwsIamRole)
+    oldAwsIamRole = resolveComponentEvaluables(oldAwsIamRole)
+    const res = await oldAwsIamRole.sync(context)
+
+    expect(res).toBe(undefined)
+    expect(oldAwsIamRole.roleName).toBe('somerole')
+    expect(oldAwsIamRole.service).toBe('lambda.amazonaws.com')
+    expect(oldAwsIamRole.policy).toEqual({
+      arn: 'arn:aws:iam::aws:policy/oldPolicy'
+    })
   })
 })
