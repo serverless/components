@@ -28,13 +28,11 @@ tags: ${inputs.tags}
 inputTypes:
   provider:
     type: AwsProvider
-    default: ${context.provider}
     displayName: AWS Provider
     description: The AWSProvider instance that contains the credentials for AWS
   functionName:
     type: string
     required: false
-    default: func-${this.instanceId}
     displayName: Lambda function name
     description: The Lambda function name
     example: myProject-functionName-${self.instanceId}

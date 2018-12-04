@@ -9,9 +9,7 @@ services: ${inputs.services}
 inputTypes:
   providers:
     type: object
-    default: ${context.providers}
     required: false
   services:
     type: object
-    default: ${context.services}
     required: false

@@ -24,7 +24,6 @@ inputTypes:
   policyName:
     type: string
     required: false
-#    default: policy-${this.instanceId}
     displayName: IAM Policy Name
     description: The friendly name of the policy
 

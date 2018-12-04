@@ -24,7 +24,6 @@ inputTypes:
   compute:
     type: Compute
     required: true
-    default: ${context.compute}
   code:
     type: string
     required: true
@@ -40,7 +39,7 @@ inputTypes:
   memory:
     type: integer
     required: false
-    default: 128
+    default: 1024
   timeout:
     type: integer
     required: false

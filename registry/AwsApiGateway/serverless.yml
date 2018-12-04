@@ -36,5 +36,4 @@ inputTypes:
   apiName:
     type: string
     required: false
-    default: apig-${self.instanceId}
     description: Name of API gateway in AWS console

@@ -6,6 +6,8 @@ import {
   contains,
   forEach,
   mapObjIndexed,
+  forEachObjIndexed,
+  merge,
   pick,
   append,
   prop
@@ -64,15 +66,13 @@ const validateInputs = (Type, inputs) => {
     const message = errorMessages.join('')
     throw Error(message)
   }
-
-  // set defaults if any... (todo)
-  // forEachObjIndexed((coreInputType, key) => {
-  //   if (!coreInputs[key] && !coreInputType.required && coreInputType.default) {
-  //     coreInputs[key] = coreInputType.default
-  //   }
-  // }, coreInputTypes)
-  //
-  // return merge(inputs, coreInputs)
+  // set defaults if any...
+  forEachObjIndexed((coreInputType, key) => {
+    if (!coreInputs[key] && !coreInputType.required && coreInputType.default !== undefined) {
+      coreInputs[key] = coreInputType.default
+    }
+  }, coreInputTypes)
+  return merge(inputs, coreInputs)
 }
 
 export default validateInputs

@@ -11,11 +11,9 @@ policy: ${inputs.policy}
 inputTypes:
   provider:
     type: AwsProvider
-    default: ${context.provider}
   roleName:
     type: string
     required: false
-    default: role-${self.instanceId}
     displayName: IAM role name
     description: The name of the role to create
     maxLength: 64

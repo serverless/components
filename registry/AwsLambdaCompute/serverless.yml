@@ -21,7 +21,6 @@ ufs: ${inputs.ufs}
 inputTypes:
   provider:
     type: Provider
-    default: ${context.provider}
   runtime:
     type: string
     required: false

@@ -486,6 +486,7 @@ describe('AwsIamRole', () => {
     let oldAwsIamRole = await context.construct(AwsIamRole, {
       provider,
       roleName: 'already-removed-role',
+      service: 'lambda.amazonaws.com',
       policy: {
         arn: 'arn:aws:iam::aws:policy/oldPolicy'
       }

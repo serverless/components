@@ -8,8 +8,8 @@ describe('validateInputs', () => {
 
   beforeEach(async () => {
     context = await createTestContext()
-    AwsProvider = await context.loadType('AwsProvider')
-    AwsLambdaFunction = await context.loadType('AwsLambdaFunction')
+    AwsProvider = await context.import('AwsProvider')
+    AwsLambdaFunction = await context.import('AwsLambdaFunction')
     provider = await context.construct(AwsProvider, {
       region: 'us-east-1',
       credentials: {
@@ -19,7 +19,7 @@ describe('validateInputs', () => {
     })
   })
   it('should not throw error if Type has no inputTypes', async () => {
-    const Plugin = await context.loadType('Plugin')
+    const Plugin = await context.import('Plugin')
     await expect(context.construct(Plugin, {})).resolves.toBeDefined()
   })
 

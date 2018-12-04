@@ -22,12 +22,10 @@ inputTypes:
   provider:
     type: AwsProvider
     required: true
-    default: ${context.provider}
     displayName: AWS Provider
     description: The AWSProvider instance that contains the credentials for AWS
   tableName:
     type: string
-    default: table-${this.instanceId}
     displayName: Table name
     description: The name of the DynamoDB table
     example: acme-users
