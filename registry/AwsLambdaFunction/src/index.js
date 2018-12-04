@@ -94,6 +94,11 @@ const deleteLambda = async (Lambda, name) => {
   await Lambda.deleteFunction(params).promise()
 }
 
+/*
+ * zip the folder and stream it
+ * from that stream we create sha
+ * compare that sha with AWS
+ */
 const hashCode = async (code) => {
   // TODO BRN: Upgrade this to hash all code references in the array. Need to redeploy in the event that the shim changes.
   const options = {
@@ -118,6 +123,11 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
     }
 
     async shouldDeploy(prevInstance) {
+      /*
+       * hash code
+       * sha
+       * move packing here
+       */
       this.hash = await hashCode(this.code)
 
       const currentConfig = {
