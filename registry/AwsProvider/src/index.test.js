@@ -106,7 +106,6 @@ describe('AwsProvider', () => {
       const awsProvider = await context.construct(AwsProvider, inputs)
 
       expect(() => awsProvider.validate()).not.toThrow()
-      delete process.env.AWS_REGION
     })
 
     it('should use region from AWS_DEFAULT_REGION', async () => {
@@ -121,23 +120,11 @@ describe('AwsProvider', () => {
       const awsProvider = await context.construct(AwsProvider, inputs)
 
       expect(() => awsProvider.validate()).not.toThrow()
-      delete process.env.AWS_DEFAULT_REGION
     })
 
     it('should throw if credentials are not set', async () => {
       const inputs = {
         credentials: null,
-        region: 'us-east-1'
-      }
-
-      const awsProvider = await context.construct(AwsProvider, inputs)
-
-      expect(() => awsProvider.validate()).toThrow('Credentials not set')
-    })
-
-    it('should throw if credentials is an empty object', async () => {
-      const inputs = {
-        credentials: {},
         region: 'us-east-1'
       }
 
@@ -157,8 +144,17 @@ describe('AwsProvider', () => {
       const awsProvider = await context.construct(AwsProvider, inputs)
 
       expect(() => awsProvider.validate()).not.toThrow()
-      delete process.env.AWS_ACCESS_KEY_ID
-      delete process.env.AWS_SECRET_ACCESS_KEY
+    })
+
+    it('should throw if credentials is an empty object', async () => {
+      const inputs = {
+        credentials: {},
+        region: 'us-east-1'
+      }
+
+      const awsProvider = await context.construct(AwsProvider, inputs)
+
+      expect(() => awsProvider.validate()).toThrow('Credentials not set')
     })
   })
 })
