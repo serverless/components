@@ -14,17 +14,10 @@ compute:
     runtime: nodejs
 
 functions:
-  IdempotentCron10:
+  idempotentLambdaConfig:
     compute: ${this.compute}
     handler: index.hello
     code: ./code
     memory: 512
     timeout: 20
     ufs: true
-
-components:
-  cron:
-    type: Cron
-    inputs:
-      function: ${this.functions.IdempotentCron10}
-      rate: 7m

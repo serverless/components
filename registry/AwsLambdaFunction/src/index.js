@@ -1,4 +1,5 @@
 import path from 'path'
+import crypto from 'crypto'
 import { tmpdir } from 'os'
 import { readFileSync } from 'fs'
 import { hashElement } from 'folder-hash'
@@ -122,13 +123,29 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
       this.zip = get('zip', prevInstance)
     }
 
-    async shouldDeploy(prevInstance) {
+    async shouldDeploy(prevInstance, context) {
       /*
        * hash code
        * sha
        * move packing here
        */
       this.hash = await hashCode(this.code)
+
+      if (isArchivePath(this.code)) {
+        this.zip = readFileSync(this.code)
+      } else {
+        await this.pack(context)
+      }
+
+      this.sha256 = crypto
+        .createHash('sha256')
+        .update(this.zip)
+        .digest('base64')
+      // console.log('new sha')
+      // console.log(this.sha256)
+
+      // because undefined description on Aws console is converted to empty string...
+      this.functionDescription = this.functionDescription || ''
 
       const currentConfig = {
         functionName: this.functionName,
@@ -140,13 +157,19 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
         timeout: this.timeout,
         environment: this.environment,
         hash: this.hash,
-        tags: this.tags
+        tags: this.tags,
+        sha256: this.sha256
       }
       const prevConfig = prevInstance ? pick(keys(currentConfig), prevInstance) : {}
       const configChanged = not(equals(currentConfig, prevConfig))
-      const roleChanged = prevInstance ? this.role.roleName !== prevInstance.role.roleName : true
+      const roleChanged = prevInstance ? this.role.arn !== prevInstance.role.arn : true
+
+      // console.log('prevConfig sha')
+      // console.log(currentConfig.sha256)
+      // console.log(prevConfig.sha256)
 
       if (prevInstance && prevInstance.functionName !== currentConfig.functionName) {
+        // console.log('lambda replace')
         return 'replace'
       } else if (!prevInstance || configChanged || roleChanged) {
         return 'deploy'
@@ -172,6 +195,9 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
         this.functionDescription = res.Description
         this.timeout = res.Timeout
         this.memorySize = res.MemorySize
+        this.sha256 = res.CodeSha256
+        // console.log('aws sha')
+        // console.log(this.sha256)
         this.environment = res.Environment ? res.Environment.Variables : {}
       } catch (e) {
         if (e.code === 'ResourceNotFoundException') {
@@ -247,15 +273,16 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
     }
 
     async deploy(prevInstance, context) {
+      // console.log('deploy lambda')
       const { provider } = this
       const AWS = provider.getSdk()
       const Lambda = new AWS.Lambda()
 
-      if (isArchivePath(this.code)) {
-        this.zip = readFileSync(this.code)
-      } else {
-        await this.pack(context)
-      }
+      // if (isArchivePath(this.code)) {
+      //   this.zip = readFileSync(this.code)
+      // } else {
+      //   await this.pack(context)
+      // }
 
       if (!prevInstance || this.functionName !== prevInstance.functionName) {
         context.log(`Creating Lambda: ${this.functionName}`)
@@ -267,6 +294,7 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
     }
 
     async remove(context) {
+      // console.log('remove lambda')
       const { functionName, provider } = this
       const AWS = provider.getSdk()
       const Lambda = new AWS.Lambda()

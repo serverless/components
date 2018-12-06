@@ -50,7 +50,7 @@ const getShimFile = (runtime) => {
   if (runtime === 'nodejs8.10') {
     shimFile = 'shim.js'
   } // todo other runtimes
-  return path.join(__dirname, 'shims', shimFile)
+  return path.join(__dirname, '..', 'shims', shimFile)
 }
 
 const AwsLambdaCompute = async (SuperClass, superContext) => {

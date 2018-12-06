@@ -162,6 +162,7 @@ const AwsIamRole = async (SuperClass, superContext) => {
     }
 
     async deploy(prevInstance, context) {
+      // console.log('deploy role')
       const { provider } = this
       const AWS = provider.getSdk()
       const IAM = new AWS.IAM()
@@ -185,6 +186,7 @@ const AwsIamRole = async (SuperClass, superContext) => {
     }
 
     async remove(context) {
+      // console.log('remove role')
       const { provider } = this
       const AWS = provider.getSdk()
       const IAM = new AWS.IAM()
