@@ -19,6 +19,9 @@ describe('AwsProvider', () => {
   let AwsProvider
 
   beforeEach(async () => {
+    delete process.env.AWS_REGION
+    delete process.env.AWS_ACCESS_KEY_ID
+    delete process.env.AWS_SECRET_ACCESS_KEY
     context = await createTestContext({ cwd: path.join(__dirname, '..') })
     context = await context.loadProject()
     context = await context.loadApp()
@@ -91,6 +94,34 @@ describe('AwsProvider', () => {
       expect(() => awsProvider.validate()).toThrow('Invalid region')
     })
 
+    it('should use region from environment variables', async () => {
+      process.env.AWS_REGION = 'us-east-1'
+      const inputs = {
+        credentials: {
+          accessKeyId: 'abc',
+          secretAccessKey: 'xyz'
+        }
+      }
+
+      const awsProvider = await context.construct(AwsProvider, inputs)
+
+      expect(() => awsProvider.validate()).not.toThrow()
+    })
+
+    it('should use region from AWS_DEFAULT_REGION', async () => {
+      process.env.AWS_DEFAULT_REGION = 'us-east-1'
+      const inputs = {
+        credentials: {
+          accessKeyId: 'abc',
+          secretAccessKey: 'xyz'
+        }
+      }
+
+      const awsProvider = await context.construct(AwsProvider, inputs)
+
+      expect(() => awsProvider.validate()).not.toThrow()
+    })
+
     it('should throw if credentials are not set', async () => {
       const inputs = {
         credentials: null,
@@ -100,6 +131,19 @@ describe('AwsProvider', () => {
       const awsProvider = await context.construct(AwsProvider, inputs)
 
       expect(() => awsProvider.validate()).toThrow('Credentials not set')
+    })
+
+    it('should not throw if credentials is set in environment variables', async () => {
+      process.env.AWS_ACCESS_KEY_ID = 'xxx'
+      process.env.AWS_SECRET_ACCESS_KEY = 'xxx'
+
+      const inputs = {
+        region: 'us-east-1'
+      }
+
+      const awsProvider = await context.construct(AwsProvider, inputs)
+
+      expect(() => awsProvider.validate()).not.toThrow()
     })
 
     it('should throw if credentials is an empty object', async () => {
