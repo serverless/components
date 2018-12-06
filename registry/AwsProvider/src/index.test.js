@@ -109,6 +109,21 @@ describe('AwsProvider', () => {
       delete process.env.AWS_REGION
     })
 
+    it('should use region from AWS_DEFAULT_REGION', async () => {
+      process.env.AWS_DEFAULT_REGION = 'us-east-1'
+      const inputs = {
+        credentials: {
+          accessKeyId: 'abc',
+          secretAccessKey: 'xyz'
+        }
+      }
+
+      const awsProvider = await context.construct(AwsProvider, inputs)
+
+      expect(() => awsProvider.validate()).not.toThrow()
+      delete process.env.AWS_DEFAULT_REGION
+    })
+
     it('should throw if credentials are not set', async () => {
       const inputs = {
         credentials: null,

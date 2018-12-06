@@ -24,7 +24,7 @@ const AwsProvider = (SuperClass) =>
     }
 
     validate() {
-      const region = this.region || process.env.AWS_REGION
+      const region = this.region || process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION
       const envCredSet = process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY
 
       if (!/.+-.+.\d+/.test(region)) {
