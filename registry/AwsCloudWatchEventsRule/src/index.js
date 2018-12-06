@@ -1,10 +1,34 @@
-import { get } from '@serverless/utils'
+import { get, resolve } from '@serverless/utils'
 
 const AwsCloudWatchEventsRule = (SuperClass) =>
   class extends SuperClass {
     hydrate(prevInstance) {
       super.hydrate(prevInstance)
       this.arn = get('arn', prevInstance)
+    }
+
+    async sync() {
+      console.log('cron sync')
+      // console.log(resolve(this.lambda))
+      // console.log(resolve(this.lambda.functionName))
+      let { provider } = this
+      provider = resolve(provider)
+      const AWS = provider.getSdk()
+      const CloudWatchEvents = new AWS.CloudWatchEvents()
+
+      try {
+        const res = await CloudWatchEvents.describeRule({
+          // variables issue?
+          Name: resolve(this.lambda.functionName)
+        }).promise()
+        this.schedule = res.ScheduleExpression
+        this.enabled = res.State === 'ENABLED' ? true : false
+      } catch (e) {
+        if (e.code === 'ResourceNotFoundException') {
+          return 'removed'
+        }
+        throw e
+      }
     }
 
     shouldDeploy(prevInstance) {
@@ -20,6 +44,7 @@ const AwsCloudWatchEventsRule = (SuperClass) =>
     }
 
     async deploy(prevInstance, context) {
+      console.log('cron deploy')
       // eslint-disable-line
       const AWS = this.provider.getSdk()
       const cloudWatchEvents = new AWS.CloudWatchEvents()

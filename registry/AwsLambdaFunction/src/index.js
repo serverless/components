@@ -208,6 +208,7 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
     }
 
     async deploy(prevInstance, context) {
+      console.log('lambda deploy')
       const { provider } = this
       const AWS = provider.getSdk()
       const Lambda = new AWS.Lambda()

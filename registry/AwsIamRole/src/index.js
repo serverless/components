@@ -133,6 +133,7 @@ const AwsIamRole = async (SuperClass, superContext) => {
     }
 
     async sync() {
+      console.log('role sync')
       let { provider } = this
       provider = resolve(provider)
       const AWS = provider.getSdk()
@@ -179,6 +180,7 @@ const AwsIamRole = async (SuperClass, superContext) => {
     }
 
     async deploy(prevInstance, context) {
+      console.log('role deploy')
       const { provider } = this
       const AWS = provider.getSdk()
       const IAM = new AWS.IAM()
