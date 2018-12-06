@@ -47,8 +47,10 @@ inputTypes:
     displayName: Username
     description: The username used when logging in to the Docker registry
     example: jdoe
+    required: true
   password:
     type: string
     displayName: Password
     description: The password used when logging in to the Docker registry
     example: s0m3p455w0rd
+    required: true

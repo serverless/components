@@ -42,7 +42,7 @@ describe('AwsS3Bucket', () => {
       await context.defineComponent(awsS3Bucket)
       resolveComponentEvaluables(awsS3Bucket)
     } catch (error) {
-      expect(error.message).toMatch('does not match regex')
+      expect(error.message).toMatch('has invalid')
     }
   })
 

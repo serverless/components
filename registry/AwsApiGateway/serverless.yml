@@ -25,15 +25,15 @@ inputTypes:
     type: AwsProvider
     required: true
     description: "The AWS provider the holds the AWS credentials and SDK instance"
-  apiName:
-    type: string
-    default: apig-${self.instanceId}
-    description: Name of API gateway in AWS console
-  role:
-    type: AwsIamRole
-    required: true
-    description: AWS Arn role for API gateway to assume
   routes:
     type: object
     required: true
     description: Declaration of routes
+  role:
+    type: AwsIamRole
+    required: true
+    description: AWS Arn role for API gateway to assume
+  apiName:
+    type: string
+    required: false
+    description: Name of API gateway in AWS console

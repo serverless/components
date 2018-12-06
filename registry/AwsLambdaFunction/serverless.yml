@@ -28,17 +28,17 @@ tags: ${inputs.tags}
 inputTypes:
   provider:
     type: AwsProvider
-    default: ${context.provider}
     displayName: AWS Provider
     description: The AWSProvider instance that contains the credentials for AWS
   functionName:
     type: string
-    default: func-${this.instanceId}
+    required: false
     displayName: Lambda function name
     description: The Lambda function name
     example: myProject-functionName-${self.instanceId}
   functionDescription:
     type: string
+    required: false
     displayName: Lambda function description
     description: |
       A short, user-defined function description.
@@ -58,25 +58,28 @@ inputTypes:
     example: ${this.path}/code
   runtime:
     type: string
-    required: true
+    required: false
     default: nodejs8.10
     displayName: Function runtime
     description: Runtime for the function. Possible values are java8, nodejs6.10, nodejs8.10, python2.7, python3.6 and dotnetcore1.0
     example: nodejs8.10
   memorySize:
     type: integer
+    required: false
     default: 1024
     displayName: Memory size
     description: The functions memory size in Megabyte
     example: 512
   timeout:
     type: integer
+    required: false
     default: 10
     displayName: Function timeout
     description: The function execution time at which Lambda should terminate the function
     example: 3
   environment:
     type: object
+    required: false
     displayName: Environment variables
     description: Lambda functions environment's configuration settings
     example:
@@ -84,6 +87,7 @@ inputTypes:
       tableName: products-${this.appId}
   tags:
     type: object
+    required: false
     displayName: Tags
     description: AWS tags to apply to the function
     example:
@@ -91,5 +95,6 @@ inputTypes:
       service: some-service
   role:
     type: AwsIamRole | string
+    required: false
     displayName: Lambda IAM role
     description: The Amazon Resource Name (ARN) of the IAM role that Lambda assumes when it executes your function to access any other Amazon Web Services (AWS) resources

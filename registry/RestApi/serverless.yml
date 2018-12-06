@@ -30,7 +30,6 @@ inputTypes:
   apiName:
     type: string
     required: false
-    default: api-${self.instanceId}
   routes:
     type: object
     required: true
