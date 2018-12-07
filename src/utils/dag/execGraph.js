@@ -1,13 +1,16 @@
 import { all, append, isEmpty, reduce } from '@serverless/utils'
 import cloneGraph from './cloneGraph'
 import detectCircularDeps from './detectCircularDeps'
+import logStatus from './logStatus'
 
-const execNode = (iteratee, node, context) =>
-  iteratee(node, {
+const execNode = (iteratee, node, context) => {
+  logStatus(iteratee, node, context)
+  return iteratee(node, {
     ...context,
     // replace `log` with `debug` so that component logs are hidden by default
     log: context.debug
   })
+}
 
 const execNodeIds = async (iteratee, nodeIds, graph, context) =>
   all(
