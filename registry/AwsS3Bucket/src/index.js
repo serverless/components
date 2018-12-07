@@ -32,7 +32,6 @@ const AwsS3Bucket = (SuperClass) =>
         await S3.getBucketLocation({ Bucket: resolve(this.bucketName) }).promise()
       } catch (e) {
         if (e.code === 'NoSuchBucket') {
-          console.log('dude')
           return 'removed'
         }
         throw e

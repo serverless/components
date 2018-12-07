@@ -3,7 +3,7 @@ const mocks = {
   createBucketMock: jest.fn().mockReturnValue('bucket-abc'),
   getBucketLocationMock: jest.fn().mockImplementation((params) => {
     // also covers integration tests bucket...
-    if (params.Bucket === 'already-removed-bucket' || params.Bucket === 'mysuperbucket') {
+    if (params.Bucket === 'already-removed-bucket' || params.Bucket === 'deploy-bucket') {
       const error = new Error()
       error.code = 'NoSuchBucket'
       return Promise.reject(error)
