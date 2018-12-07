@@ -55,6 +55,14 @@ const mocks = {
   // CloudWatchEvents
   putRule: jest.fn().mockReturnValue({ RuleArn: 'abc:zxc' }),
   putTargets: jest.fn(),
+  describeRule: jest.fn().mockImplementation((params) => {
+    if (params.Name === 'already-removed-rule') {
+      const error = new Error()
+      error.code = 'ResourceNotFoundException'
+      return Promise.reject(error)
+    }
+    return Promise.resolve({ ScheduleExpression: 'rate(6 minutes)', State: 'DISABLED' })
+  }),
   removeTargets: jest.fn().mockImplementation((params) => {
     if (params.Rule === 'already-removed-rule') {
       const error = new Error()
@@ -254,6 +262,9 @@ const CloudWatchEvents = function() {
   return {
     putRule: (obj) => ({
       promise: () => mocks.putRule(obj)
+    }),
+    describeRule: (obj) => ({
+      promise: () => mocks.describeRule(obj)
     }),
     putTargets: (obj) => ({
       promise: () => mocks.putTargets(obj)
