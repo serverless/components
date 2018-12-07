@@ -28,7 +28,7 @@ describe('Integration Test - Library Usage', () => {
     })
   })
 
-  describe.only('when using a path to a project', () => {
+  describe('when using a path to a project', () => {
     const testServiceDir = path.join(__dirname, 'library-usage')
     const testServiceDirDeploy = path.join(__dirname, 'library-usage', 'deploy')
     const testServiceDirRemove = path.join(__dirname, 'library-usage', 'remove')
