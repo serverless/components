@@ -1,6 +1,15 @@
 const mocks = {
   // S3
   createBucketMock: jest.fn().mockReturnValue('bucket-abc'),
+  getBucketLocationMock: jest.fn().mockImplementation((params) => {
+    // also covers integration tests bucket...
+    if (params.Bucket === 'already-removed-bucket' || params.Bucket === 'deploy-bucket') {
+      const error = new Error()
+      error.code = 'NoSuchBucket'
+      return Promise.reject(error)
+    }
+    return Promise.resolve()
+  }),
   deleteBucketMock: jest.fn().mockImplementation((params) => {
     if (params.Bucket === 'already-removed-bucket') {
       const error = new Error()
@@ -346,6 +355,9 @@ const S3 = function() {
   return {
     createBucket: (obj) => ({
       promise: () => mocks.createBucketMock(obj)
+    }),
+    getBucketLocation: (obj) => ({
+      promise: () => mocks.getBucketLocationMock(obj)
     }),
     listObjectsV2: (obj) => ({
       promise: () => mocks.listObjectsV2Mock(obj)

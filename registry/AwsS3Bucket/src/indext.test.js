@@ -121,6 +121,28 @@ describe('AwsS3Bucket', () => {
     expect(AWS.mocks.deleteBucketMock).not.toBeCalled()
   })
 
+  it('sync should return removed if bucket removed from provider', async () => {
+    let awsS3Bucket = await context.construct(AwsS3Bucket, {
+      provider,
+      bucketName: 'already-removed-bucket'
+    })
+    awsS3Bucket = await context.defineComponent(awsS3Bucket)
+    awsS3Bucket = resolveComponentEvaluables(awsS3Bucket)
+    const res = await awsS3Bucket.sync(context)
+    expect(res).toBe('removed')
+  })
+
+  it('sync should NOT return removed if bucket not removed from provider', async () => {
+    let awsS3Bucket = await context.construct(AwsS3Bucket, {
+      provider,
+      bucketName: 'existing-bucket'
+    })
+    awsS3Bucket = await context.defineComponent(awsS3Bucket)
+    awsS3Bucket = resolveComponentEvaluables(awsS3Bucket)
+    await awsS3Bucket.sync(context)
+    expect(awsS3Bucket.bucketName).toBe('existing-bucket')
+  })
+
   it('shouldDeploy should return undefined when no changes have occurred', async () => {
     let awsS3Bucket = await context.construct(AwsS3Bucket, {
       provider,

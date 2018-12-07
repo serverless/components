@@ -1,4 +1,4 @@
-import { get, lowerCase, or, pick, resolvable } from '@serverless/utils'
+import { get, lowerCase, or, pick, resolvable, resolve } from '@serverless/utils'
 import { createBucket, deleteBucket } from './utils'
 
 const DEPLOY = 'deploy'
@@ -20,6 +20,22 @@ const AwsS3Bucket = (SuperClass) =>
         lowerCase(or(inputs.bucketName, `bucket-${this.instanceId}`))
       )
       this.provider = resolvable(() => or(inputs.provider, context.get('provider')))
+    }
+
+    async sync() {
+      let { provider } = this
+      provider = resolve(provider)
+      const AWS = provider.getSdk()
+      const S3 = new AWS.S3()
+
+      try {
+        await S3.getBucketLocation({ Bucket: resolve(this.bucketName) }).promise()
+      } catch (e) {
+        if (e.code === 'NoSuchBucket') {
+          return 'removed'
+        }
+        throw e
+      }
     }
 
     shouldDeploy(prevInstance) {
