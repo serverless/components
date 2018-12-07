@@ -8,9 +8,6 @@ const AwsCloudWatchEventsRule = (SuperClass) =>
     }
 
     async sync() {
-      console.log('cron sync')
-      // console.log(resolve(this.lambda))
-      // console.log(resolve(this.lambda.functionName))
       let { provider } = this
       provider = resolve(provider)
       const AWS = provider.getSdk()
@@ -18,8 +15,7 @@ const AwsCloudWatchEventsRule = (SuperClass) =>
 
       try {
         const res = await CloudWatchEvents.describeRule({
-          // variables issue?
-          Name: resolve(this.lambda.functionName)
+          Name: get('functionName', get('lambda', this))
         }).promise()
         this.schedule = res.ScheduleExpression
         this.enabled = res.State === 'ENABLED' ? true : false
@@ -44,7 +40,6 @@ const AwsCloudWatchEventsRule = (SuperClass) =>
     }
 
     async deploy(prevInstance, context) {
-      console.log('cron deploy')
       // eslint-disable-line
       const AWS = this.provider.getSdk()
       const cloudWatchEvents = new AWS.CloudWatchEvents()
@@ -79,11 +74,18 @@ const AwsCloudWatchEventsRule = (SuperClass) =>
       const addPermissionParams = {
         Action: 'lambda:InvokeFunction',
         FunctionName: this.lambda.functionName,
-        StatementId: `${this.lambda.functionName}`,
+        StatementId: `${this.lambda.functionName}-cron`,
         Principal: 'events.amazonaws.com'
       }
 
-      await lambda.addPermission(addPermissionParams).promise()
+      try {
+        await lambda.addPermission(addPermissionParams).promise()
+      } catch (e) {
+        // if we are making an update, permissions are already added...
+        if (e.code !== 'ResourceConflictException') {
+          throw e
+        }
+      }
     }
 
     async remove(context) {

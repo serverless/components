@@ -14,7 +14,7 @@ compute:
     runtime: nodejs
 
 functions:
-  IdempotentCron2:
+  IdempotentCron10:
     compute: ${this.compute}
     handler: index.hello
     code: ./code
@@ -26,5 +26,5 @@ components:
   cron:
     type: Cron
     inputs:
-      function: ${this.functions.IdempotentCron2}
-      rate: 5m
+      function: ${this.functions.IdempotentCron10}
+      rate: 7m
