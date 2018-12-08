@@ -188,6 +188,76 @@ describe('AwsDynamoDb', () => {
     expect(nextAwsDynamoDb).toEqual(prevAwsDynamoDb)
   })
 
+  it('should enable a time to live attribute of a table', async () => {
+    let awsDynamoDb = await context.construct(AwsDynamoDb, {
+      provider,
+      tableName: 'non-existent-table'
+    })
+    awsDynamoDb = await context.defineComponent(awsDynamoDb)
+    awsDynamoDb = resolveComponentEvaluables(awsDynamoDb)
+    await awsDynamoDb.deploy(null, context)
+
+    const prevAwsDynamoDb = await deserialize(serialize(awsDynamoDb, context), context)
+
+    let nextAwsDynamoDb = await context.construct(AwsDynamoDb, {
+      provider,
+      tableName: 'update-ttl-table',
+      timeToLiveSpecification: {
+        AttributeName: 'ttl',
+        Enabled: true
+      }
+    })
+    nextAwsDynamoDb = await context.defineComponent(nextAwsDynamoDb, prevAwsDynamoDb)
+    nextAwsDynamoDb = resolveComponentEvaluables(nextAwsDynamoDb)
+
+    await nextAwsDynamoDb.deploy(prevAwsDynamoDb, context)
+
+    expect(AWS.mocks.updateTimeToLiveMock).toBeCalledWith({
+      TableName: 'update-ttl-table',
+      TimeToLiveSpecification: {
+        AttributeName: 'ttl',
+        Enabled: true
+      }
+    })
+  })
+
+  it('should update a time to live attribute of the table', async () => {
+    let awsDynamoDb = await context.construct(AwsDynamoDb, {
+      provider,
+      tableName: 'update-ttl-table',
+      timeToLiveSpecification: {
+        AttributeName: 'ttl',
+        Enabled: false
+      }
+    })
+    awsDynamoDb = await context.defineComponent(awsDynamoDb)
+    awsDynamoDb = resolveComponentEvaluables(awsDynamoDb)
+    await awsDynamoDb.deploy(null, context)
+
+    const prevAwsDynamoDb = await deserialize(serialize(awsDynamoDb, context), context)
+
+    let nextAwsDynamoDb = await context.construct(AwsDynamoDb, {
+      provider,
+      tableName: 'update-ttl-table',
+      timeToLiveSpecification: {
+        AttributeName: 'ttl',
+        Enabled: true
+      }
+    })
+    nextAwsDynamoDb = await context.defineComponent(nextAwsDynamoDb, prevAwsDynamoDb)
+    nextAwsDynamoDb = resolveComponentEvaluables(nextAwsDynamoDb)
+
+    await nextAwsDynamoDb.deploy(prevAwsDynamoDb, context)
+
+    expect(AWS.mocks.updateTimeToLiveMock).toBeCalledWith({
+      TableName: 'update-ttl-table',
+      TimeToLiveSpecification: {
+        AttributeName: 'ttl',
+        Enabled: true
+      }
+    })
+  })
+
   it('should remove the table', async () => {
     let awsDynamoDb = await context.construct(AwsDynamoDb, {
       provider,

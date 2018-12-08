@@ -1,5 +1,5 @@
 import { get, keys, or, pick, resolvable, equals, not } from '@serverless/utils'
-import { createTable, updateTable, deleteTable, ensureTable } from './utils'
+import { createTable, updateTable, deleteTable, ensureTable, updateTimeToLive } from './utils'
 
 const AwsDynamoDb = (SuperClass) =>
   class extends SuperClass {
@@ -16,7 +16,8 @@ const AwsDynamoDb = (SuperClass) =>
         provisionedThroughput: this.provisionedThroughput,
         globalSecondaryIndexes: this.globalSecondaryIndexes,
         sseSpecification: this.sseSpecification,
-        streamSpecification: this.streamSpecification
+        streamSpecification: this.streamSpecification,
+        timeToLiveSpecification: this.timeToLiveSpecification
       }
       const prevInputs = prevInstance ? pick(keys(inputs), prevInstance) : {}
       const configChanged = not(equals(inputs, prevInputs))
@@ -33,6 +34,7 @@ const AwsDynamoDb = (SuperClass) =>
 
     async deploy(prevInstance, context) {
       const tableName = get('tableName', this)
+
       if (
         prevInstance &&
         (not(equals(prevInstance.attributeDefinitions, this.attributeDefinitions)) ||
@@ -47,12 +49,26 @@ const AwsDynamoDb = (SuperClass) =>
             `Skipping GlobalSecondaryIndex updates for table '${tableName}' (currently not supported)`
           )
         }
+
         await ensureTable(updateTable, this)
         context.log(`Table updated: '${tableName}'`)
+      } else if (
+        prevInstance &&
+        not(equals(prevInstance.timeToLiveSpecification, this.timeToLiveSpecification))
+      ) {
+        context.log(`Updating time to live of the table: '${tableName}'`)
+        await updateTimeToLive(this)
+        context.log(`Time to live of the table updated: '${tableName}'`)
       } else {
         context.log(`Creating table: '${tableName}'`)
         await ensureTable(createTable, this)
         context.log(`Table created: '${tableName}'`)
+
+        if (this.timeToLiveSpecification) {
+          context.log(`Updating time to live of the table: '${tableName}'`)
+          await updateTimeToLive(this)
+          context.log(`Time to live of the table updated: '${tableName}'`)
+        }
       }
     }
 

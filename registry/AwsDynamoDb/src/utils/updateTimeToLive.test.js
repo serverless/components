@@ -1,5 +1,5 @@
 import path from 'path'
-import createTable from './createTable'
+import updateTimeToLive from './updateTimeToLive'
 import { createTestContext } from '../../../../test'
 
 beforeEach(() => {
@@ -10,7 +10,7 @@ afterAll(() => {
   jest.restoreAllMocks()
 })
 
-describe('#createTable()', () => {
+describe('#updateTimeToLive()', () => {
   const cwd = path.resolve(__dirname, '..', '..')
   let context
   let provider
@@ -27,39 +27,22 @@ describe('#createTable()', () => {
     })
   })
 
-  it('should create the table', async () => {
+  it('should update a time to live attribute of a table', async () => {
     const properties = {
       provider,
-      tableName: 'create-table',
-      attributeDefinitions: [
-        {
-          AttributeName: 'id',
-          AttributeType: 'S'
-        }
-      ],
-      keySchema: [
-        {
-          AttributeName: 'id',
-          KeyType: 'HASH'
-        }
-      ],
-      provisionedThroughput: {
-        ReadCapacityUnits: 1,
-        WriteCapacityUnits: 1
-      },
+      tableName: 'update-ttl-table',
       timeToLiveSpecification: {
         AttributeName: 'ttl',
         Enabled: true
       }
     }
 
-    const res = await createTable(properties)
+    const res = await updateTimeToLive(properties)
 
     expect(res).toEqual({
-      TableDescription: {
-        TableArn: 'arn:aws:dynamodb:region:XXXXX:table/create-table',
-        TableName: 'create-table',
-        TableStatus: 'CREATING'
+      TimeToLiveDescription: {
+        AttributeName: 'ttl',
+        Enabled: true
       }
     })
   })

@@ -206,6 +206,33 @@ const mocks = {
         TableStatus: 'DELETING'
       }
     })
+  }),
+  waitForMock: jest.fn().mockImplementation((params) => {
+    if (params.TableName === 'non-existent-table') {
+      const error = new Error()
+      error.code = 'ResourceNotFoundException'
+      return Promise.reject(error)
+    }
+    return Promise.resolve({
+      TableDescription: {
+        TableArn: 'arn:aws:dynamodb:region:XXXXX:table/active-table',
+        TableName: 'active-table',
+        TableStatus: 'ACTIVE'
+      }
+    })
+  }),
+  updateTimeToLiveMock: jest.fn().mockImplementation((params) => {
+    if (params.TableName === 'non-existent-table') {
+      const error = new Error()
+      error.code = 'ResourceNotFoundException'
+      return Promise.reject(error)
+    }
+    return Promise.resolve({
+      TimeToLiveDescription: {
+        AttributeName: 'ttl',
+        Enabled: true
+      }
+    })
   })
 }
 
@@ -377,6 +404,12 @@ const DynamoDB = function() {
     }),
     deleteTable: (obj) => ({
       promise: () => mocks.deleteTableMock(obj)
+    }),
+    waitFor: (cmd, obj) => ({
+      promise: () => mocks.waitForMock(cmd, obj)
+    }),
+    updateTimeToLive: (obj) => ({
+      promise: () => mocks.updateTimeToLiveMock(obj)
     })
   }
 }

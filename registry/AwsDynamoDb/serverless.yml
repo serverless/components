@@ -17,6 +17,7 @@ globalSecondaryIndexes: ${inputs.globalSecondaryIndexes}
 localSecondaryIndexes: ${inputs.localSecondaryIndexes}
 sseSpecification: ${inputs.sseSpecification}
 streamSpecification: ${inputs.streamSpecification}
+timeToLiveSpecification: ${inputs.timeToLiveSpecification}
 
 inputTypes:
   provider:
@@ -62,3 +63,7 @@ inputTypes:
     type: object
     displayName: Stream specification
     description: The tables stream specification
+  timeToLiveSpecification:
+    type: object
+    displayName: Time to live specification
+    description: The tables time to live specification
