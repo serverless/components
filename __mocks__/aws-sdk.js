@@ -304,6 +304,70 @@ const mocks = {
         TableStatus: 'DELETING'
       }
     })
+  }),
+  describeTableMock: jest.fn().mockImplementation((params) => {
+    if (params.TableName === 'already-removed-table') {
+      const error = new Error()
+      error.code = 'ResourceNotFoundException'
+      return Promise.reject(error)
+    }
+    return Promise.resolve({
+      Table: {
+        AttributeDefinitions: [
+          {
+            AttributeName: 'id',
+            AttributeType: 'S'
+          }
+        ],
+        TableName: 'describe-table',
+        KeySchema: [
+          {
+            AttributeName: 'id',
+            KeyType: 'HASH'
+          }
+        ],
+        TableStatus: 'ACTIVE',
+        ProvisionedThroughput: {
+          ReadCapacityUnits: 5,
+          WriteCapacityUnits: 5
+        },
+        TableArn: 'arn:aws:dynamodb:region:XXXXX:table/describe-table',
+        LocalSecondaryIndexes: [
+          {
+            IndexName: 'local-index',
+            KeySchema: [
+              {
+                AttributeName: 'id',
+                KeyType: 'HASH'
+              }
+            ],
+            Projection: {
+              ProjectionType: 'ALL'
+            }
+          }
+        ],
+        GlobalSecondaryIndexes: [
+          {
+            IndexName: 'global-index',
+            KeySchema: [{ AttributeName: 'id', KeyType: 'HASH' }],
+            Projection: { ProjectionType: 'ALL' },
+            ProvisionedThroughput: {
+              ReadCapacityUnits: 5,
+              WriteCapacityUnits: 5
+            }
+          }
+        ],
+        StreamSpecification: {
+          StreamEnabled: true,
+          StreamViewType: 'NEW_AND_OLD_IMAGES'
+        },
+        SSEDescription: {
+          Status: 'ENABLED',
+          SSEType: 'AES256',
+          KMSMasterKeyArn: 'arn:aws:kms:region:XXXXX:master-key/key-id'
+        }
+      }
+    })
   })
 }
 
@@ -488,6 +552,9 @@ const DynamoDB = function() {
     }),
     deleteTable: (obj) => ({
       promise: () => mocks.deleteTableMock(obj)
+    }),
+    describeTable: (obj) => ({
+      promise: () => mocks.describeTableMock(obj)
     })
   }
 }
