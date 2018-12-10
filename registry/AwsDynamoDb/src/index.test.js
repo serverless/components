@@ -191,7 +191,11 @@ describe('AwsDynamoDb', () => {
   it('should enable a time to live attribute of a table', async () => {
     let awsDynamoDb = await context.construct(AwsDynamoDb, {
       provider,
-      tableName: 'non-existent-table'
+      tableName: 'non-existent-table',
+      provisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+      }
     })
     awsDynamoDb = await context.defineComponent(awsDynamoDb)
     awsDynamoDb = resolveComponentEvaluables(awsDynamoDb)
@@ -202,6 +206,10 @@ describe('AwsDynamoDb', () => {
     let nextAwsDynamoDb = await context.construct(AwsDynamoDb, {
       provider,
       tableName: 'update-ttl-table',
+      provisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+      },
       timeToLiveSpecification: {
         AttributeName: 'ttl',
         Enabled: true
@@ -225,6 +233,10 @@ describe('AwsDynamoDb', () => {
     let awsDynamoDb = await context.construct(AwsDynamoDb, {
       provider,
       tableName: 'update-ttl-table',
+      provisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+      },
       timeToLiveSpecification: {
         AttributeName: 'ttl',
         Enabled: false
@@ -239,6 +251,10 @@ describe('AwsDynamoDb', () => {
     let nextAwsDynamoDb = await context.construct(AwsDynamoDb, {
       provider,
       tableName: 'update-ttl-table',
+      provisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+      },
       timeToLiveSpecification: {
         AttributeName: 'ttl',
         Enabled: true
