@@ -35,6 +35,13 @@ const AwsProvider = (SuperClass) =>
         throw new Error(`Credentials not set in your AWS provider setup`)
       }
     }
+
+    async getAccountId() {
+      const Aws = this.getSdk()
+      const STS = new Aws.STS()
+      const res = await STS.getCallerIdentity({}).promise()
+      return res.Account
+    }
   }
 
 export default AwsProvider

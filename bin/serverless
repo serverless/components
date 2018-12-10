@@ -3,13 +3,17 @@
 // makes it more convenient to develop when using ESNext features
 if (process.env.USE_ESNEXT) {
   require('@babel/register')
-  require('../src').start().catch(function(error) {
-    console.log('UNEXPECTED DEVELOPMENT ERROR')
-    console.log(error)
-  })
+  require('../src')
+    .start()
+    .catch(function(error) {
+      console.log('UNEXPECTED DEVELOPMENT ERROR')
+      console.log(error)
+    })
 } else {
-  require('../dist').start().catch(function(error) {
-    console.log('UNEXPECTED DEVELOPMENT ERROR')
-    console.log(error)
-  })
+  require('../dist')
+    .start()
+    .catch(function(error) {
+      console.log('UNEXPECTED DEVELOPMENT ERROR')
+      console.log(error)
+    })
 }

@@ -1,4 +1,12 @@
 const mocks = {
+  // STS
+  getCallerIdentityMock: jest.fn().mockReturnValue({
+    ResponseMetadata: { RequestId: 'a86b5dcc-fs72-11e8-8543-f1d7b3effb31' },
+    UserId: '558750028299',
+    Account: '558750028299',
+    Arn: 'arn:aws:iam::558750028299:root'
+  }),
+
   // S3
   createBucketMock: jest.fn().mockReturnValue('bucket-abc'),
   getBucketLocationMock: jest.fn().mockImplementation((params) => {
@@ -193,13 +201,6 @@ const mocks = {
     }
     return Promise.resolve()
   }),
-
-  // STS
-  getCallerIdentity: jest.fn().mockReturnValue(
-    Promise.resolve({
-      Account: 'account-id'
-    })
-  ),
 
   // DynamoDB
   createTableMock: jest.fn().mockImplementation((params) => {
@@ -409,14 +410,6 @@ const SNS = function() {
   }
 }
 
-const STS = function() {
-  return {
-    getCallerIdentity: (obj) => ({
-      promise: () => mocks.getCallerIdentity(obj)
-    })
-  }
-}
-
 const DynamoDB = function() {
   return {
     createTable: (obj) => ({
@@ -427,6 +420,14 @@ const DynamoDB = function() {
     }),
     deleteTable: (obj) => ({
       promise: () => mocks.deleteTableMock(obj)
+    })
+  }
+}
+
+const STS = function() {
+  return {
+    getCallerIdentity: (obj) => ({
+      promise: () => mocks.getCallerIdentityMock(obj)
     })
   }
 }
@@ -442,6 +443,6 @@ export default {
   Lambda,
   S3,
   SNS,
-  STS,
-  DynamoDB
+  DynamoDB,
+  STS
 }
