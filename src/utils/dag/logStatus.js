@@ -1,16 +1,25 @@
-import { filter, mapObjIndexed, resolve, not, isEmpty } from '@serverless/utils'
+import { filter, assoc, reduce, resolve, not, isEmpty } from '@serverless/utils'
 
 function getParameters(instance) {
   if (instance.inputs && instance.inputTypes) {
     const requiredParams = filter((inputType) => !!inputType.required, instance.inputTypes)
-    const paramsAsObject = mapObjIndexed(
-      (num, key) => resolve(instance.inputs[key]),
+    const paramsAsObject = reduce(
+      (accum, _, key) => {
+        const value = resolve(instance.inputs[key])
+        // TODO: replace with a universal util function which checks whether we're
+        // dealing with a Component, Object, Provider, etc. instance here
+        // omitting own Types due to circular structure / verbosity here
+        if (!(value.name && value.version)) {
+          return assoc(key, value, accum)
+        }
+        return accum
+      },
+      {},
       requiredParams
     )
+
     if (not(isEmpty(paramsAsObject))) {
       return JSON.stringify(paramsAsObject, null, 2)
-        .replace(/[\{\}]/g, '')
-        .slice(0, -1)
     }
     return paramsAsObject
   }
