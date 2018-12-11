@@ -114,6 +114,7 @@ const AwsIamPolicy = (SuperClass) =>
           VersionId: getPolicyRes.Policy.DefaultVersionId
         }
         const getPolicyVersionRes = await IAM.getPolicyVersion(getPolicyVersionParams).promise()
+
         this.document = JSON.parse(decodeURIComponent(getPolicyVersionRes.PolicyVersion.Document))
       } catch (e) {
         if (e.code === 'NoSuchEntity') {

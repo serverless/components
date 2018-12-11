@@ -112,6 +112,62 @@ const mocks = {
 
   // IAM
   createRoleMock: jest.fn().mockReturnValue({ Role: { Arn: 'arn:aws:iam::XXXXX:role/test-role' } }),
+  getPolicyMock: jest.fn().mockImplementation((params) => {
+    if (params.PolicyArn === 'arn:aws:iam::558750028299:policy/already-removed-policy') {
+      const error = new Error()
+      error.code = 'NoSuchEntity'
+      return Promise.reject(error)
+    }
+
+    const res = {
+      ResponseMetadata: { RequestId: '65e4b4a8-fd48-11y8-819e-a96de5c76b01' },
+      Policy: {
+        PolicyName: params.PolicyName,
+        PolicyId: 'ANPAJNETMGAOTZZAKLZQM',
+        Arn: `arn:aws:iam::558750028299:policy/some-policy-name`,
+        Path: '/',
+        DefaultVersionId: 'v1',
+        AttachmentCount: 0,
+        PermissionsBoundaryUsageCount: 0,
+        IsAttachable: true
+      }
+    }
+
+    return Promise.resolve(res)
+  }),
+  getPolicyVersionMock: jest.fn().mockImplementation((params) => {
+    if (params.PolicyArn === 'arn:aws:iam::558750028299:policy/already-removed-policy') {
+      const error = new Error()
+      error.code = 'NoSuchEntity'
+      return Promise.reject(error)
+    }
+
+    const res = {
+      ResponseMetadata: { RequestId: '6661381d-fd48-11e8-9fad-b76520f2a049' },
+      PolicyVersion: {
+        Document:
+          '%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Resource%22%3A%5B%22arn%3Aaws%3Adynamodb%3Aus-east-1%3A558750028299%3Atable%2FServerlessWebappUser-ServerlessWebApp-prod-hbrizf9d%22%5D%2C%22Effect%22%3A%22Allow%22%2C%22Action%22%3A%5B%22dynamodb%3AGetItem%22%2C%22dynamodb%3APutItem%22%2C%22dynamodb%3AUpdateItem%22%2C%22dynamodb%3ADeleteItem%22%5D%7D%5D%7D',
+        VersionId: 'v1',
+        IsDefaultVersion: true
+      }
+    }
+
+    return Promise.resolve(res)
+  }),
+  listPolicyVersionsMock: jest.fn().mockImplementation(() => {
+    const res = {
+      ResponseMetadata: { RequestId: '3a16c546-fd8d-11e8-819e-a96de5c76b01' },
+      Versions: [
+        { VersionId: 'v3', IsDefaultVersion: true },
+        { VersionId: 'v2', IsDefaultVersion: false },
+        { VersionId: 'v1', IsDefaultVersion: false }
+      ],
+      IsTruncated: false
+    }
+
+    return Promise.resolve(res)
+  }),
+  deletePolicyVersionMock: jest.fn(),
   getRoleMock: jest.fn().mockImplementation((params) => {
     if (params.RoleName === 'already-removed-role') {
       const error = new Error()
@@ -295,6 +351,18 @@ const IAM = function() {
     }),
     getRole: (obj) => ({
       promise: () => mocks.getRoleMock(obj)
+    }),
+    getPolicy: (obj) => ({
+      promise: () => mocks.getPolicyMock(obj)
+    }),
+    getPolicyVersion: (obj) => ({
+      promise: () => mocks.getPolicyVersionMock(obj)
+    }),
+    listPolicyVersions: (obj) => ({
+      promise: () => mocks.listPolicyVersionsMock(obj)
+    }),
+    deletePolicyVersion: (obj) => ({
+      promise: () => mocks.deletePolicyVersionMock(obj)
     }),
     deleteRole: (obj) => ({
       promise: () => mocks.deleteRoleMock(obj)
