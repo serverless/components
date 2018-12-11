@@ -109,6 +109,23 @@ const mocks = {
     }
     return Promise.resolve()
   }),
+  publishLayerVersionMock: jest.fn().mockReturnValue({ LayerArn: 'abc:zxc' }),
+  deleteLayerVersionMock: jest.fn().mockImplementation((params) => {
+    if (params.FunctionName === 'already-removed-layer') {
+      const error = new Error()
+      error.code = 'ResourceNotFoundException'
+      return Promise.reject(error)
+    }
+    return Promise.resolve()
+  }),
+  listLayerVersionsMock: jest.fn().mockImplementation((params) => {
+    if (params.FunctionName === 'already-removed-layer') {
+      const error = new Error()
+      error.code = 'ResourceNotFoundException'
+      return Promise.reject(error)
+    }
+    return Promise.resolve({ LayerVersions: [] })
+  }),
 
   // IAM
   createRoleMock: jest.fn().mockReturnValue({ Role: { Arn: 'arn:aws:iam::XXXXX:role/test-role' } }),
@@ -416,6 +433,15 @@ const Lambda = function() {
     }),
     deleteFunction: (obj) => ({
       promise: () => mocks.deleteFunctionMock(obj)
+    }),
+    publishLayerVersion: (obj) => ({
+      promise: () => mocks.publishLayerVersionMock(obj)
+    }),
+    deleteLayerVersion: (obj) => ({
+      promise: () => mocks.deleteLayerVersionMock(obj)
+    }),
+    listLayerVersions: (obj) => ({
+      promise: () => mocks.listLayerVersionsMock(obj)
     })
   }
 }

@@ -40,7 +40,8 @@ export const NATIVE_NAMES = componentsFromRegistryByName([
   'TwilioPhoneNumber',
   'AwsSnsTopic',
   'AwsSnsSubscription',
-  'AwsDynamoDb'
+  'AwsDynamoDb',
+  'AwsLambdaLayerVersion'
 ])
 
 /**
