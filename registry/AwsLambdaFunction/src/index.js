@@ -137,12 +137,13 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
         await this.pack(context)
       }
 
-      this.sha256 = crypto
+      const newSha256 = crypto
         .createHash('sha256')
         .update(this.zip)
         .digest('base64')
-      // console.log('new sha')
-      // console.log(this.sha256)
+
+      console.log(newSha256)
+      console.log(this.sha256)
 
       // because undefined description on Aws console is converted to empty string...
       this.functionDescription = this.functionDescription || ''
