@@ -14,7 +14,7 @@ compute:
     runtime: nodejs
 
 functions:
-  idempotentLambdaConfig:
+  idempotentLambdaConfig1:
     compute: ${this.compute}
     handler: index.hello
     code: ./code
