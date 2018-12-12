@@ -343,4 +343,64 @@ describe('AwsDynamoDb', () => {
 
     expect(result).toBe('replace')
   })
+
+  it('sync should return "removed" if the table was removed from the provider', async () => {
+    let awsDynamoDb = await context.construct(AwsDynamoDb, {
+      provider,
+      tableName: 'already-removed-table',
+      provisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+      }
+    })
+    awsDynamoDb = await context.defineComponent(awsDynamoDb)
+    awsDynamoDb = resolveComponentEvaluables(awsDynamoDb)
+
+    const result = await awsDynamoDb.sync(context)
+
+    expect(result).toBe('removed')
+  })
+
+  it('sync should sync remote and local props if the table was not removed from the provider', async () => {
+    let awsDynamoDb = await context.construct(AwsDynamoDb, {
+      provider,
+      tableName: 'describe-table',
+      provisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+      }
+    })
+    awsDynamoDb = await context.defineComponent(awsDynamoDb)
+    awsDynamoDb = resolveComponentEvaluables(awsDynamoDb)
+
+    await awsDynamoDb.sync(context)
+
+    expect(awsDynamoDb.tableName).toBe('describe-table')
+    expect(awsDynamoDb.attributeDefinitions).toEqual([{ AttributeName: 'id', AttributeType: 'S' }])
+    expect(awsDynamoDb.keySchema).toEqual([{ AttributeName: 'id', KeyType: 'HASH' }])
+    expect(awsDynamoDb.provisionedThroughput).toEqual({
+      ReadCapacityUnits: 5,
+      WriteCapacityUnits: 5
+    })
+    expect(awsDynamoDb.globalSecondaryIndexes).toEqual([
+      {
+        IndexName: 'global-index',
+        KeySchema: [{ AttributeName: 'id', KeyType: 'HASH' }],
+        Projection: { ProjectionType: 'ALL' },
+        ProvisionedThroughput: { ReadCapacityUnits: 5, WriteCapacityUnits: 5 }
+      }
+    ])
+    expect(awsDynamoDb.localSecondaryIndexes).toEqual([
+      {
+        IndexName: 'local-index',
+        KeySchema: [{ AttributeName: 'id', KeyType: 'HASH' }],
+        Projection: { ProjectionType: 'ALL' }
+      }
+    ])
+    expect(awsDynamoDb.sseSpecification).toEqual({
+      Enabled: true,
+      KMSMasterKeyId: 'arn:aws:kms:region:XXXXX:master-key/key-id',
+      SSEType: 'AES256'
+    })
+  })
 })
