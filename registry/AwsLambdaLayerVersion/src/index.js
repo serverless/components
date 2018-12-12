@@ -1,7 +1,7 @@
+import crypto from 'crypto'
 import path from 'path'
 import { tmpdir } from 'os'
 import { readFileSync } from 'fs'
-import { hashElement } from 'folder-hash'
 import {
   equals,
   get,
@@ -37,19 +37,6 @@ const deleteLayerVersion = async (Lambda, layerName, version) => {
   await Lambda.deleteLayerVersion(params).promise()
 }
 
-const hashContents = async (content) => {
-  // TODO BRN: Upgrade this to hash all content references in the array. Need to redeploy in the event that the shim changes.
-  const options = {
-    folders: { exclude: ['node_modules'] }
-  }
-  let folderToHash = content
-  if (isArray(content)) {
-    folderToHash = content[0]
-  }
-  const hashObj = await hashElement(folderToHash, options)
-  return hashObj.hash
-}
-
 const AwsLambdaLayerVersion = async (SuperClass) => {
   return class extends SuperClass {
     hydrate(prevInstance) {
@@ -60,8 +47,16 @@ const AwsLambdaLayerVersion = async (SuperClass) => {
       this.versions = get('versions', prevInstance)
     }
 
-    async shouldDeploy(prevInstance) {
-      this.hash = await hashContents(this.content)
+    async shouldDeploy(prevInstance, context) {
+      if (isArchivePath(this.content)) {
+        this.zip = readFileSync(this.content)
+      } else {
+        await this.pack(context)
+      }
+
+      const hash = crypto.createHash('sha256')
+      hash.update(this.zip)
+      this.hash = hash.digest('base64')
 
       const currentConfig = pick(
         ['layerName', 'layerDescription', 'content', 'compatibleRuntimes', 'licenseInfo', 'hash'],
@@ -117,18 +112,18 @@ const AwsLambdaLayerVersion = async (SuperClass) => {
       this.arn = LayerVersions.filter(
         ({ Version }) => Version === this.layerVersion
       )[0].LayerVersionArn
+
+      const layerVersionInfo = await Lambda.getLayerVersion({
+        LayerName: resolve(this.layerName),
+        VersionNumber: this.layerVersion
+      }).promise()
+      this.hash = layerVersionInfo.Content.CodeSha256
     }
 
     async deploy(prevInstance, context) {
       const { provider } = this
       const AWS = provider.getSdk()
       const Lambda = new AWS.Lambda()
-
-      if (isArchivePath(this.content)) {
-        this.zip = readFileSync(this.content)
-      } else {
-        await this.pack(context)
-      }
 
       context.log(`Publishing Lambda Layer Version: ${this.layerName}`)
       const newLayerVersion = await publishLayerVersion(Lambda, this)

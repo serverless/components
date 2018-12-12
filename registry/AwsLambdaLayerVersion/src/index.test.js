@@ -92,8 +92,6 @@ describe('AwsLambdaLayerVersion', () => {
 
     awsLambdaLayerVersion = resolveComponentEvaluables(awsLambdaLayerVersion)
 
-    awsLambdaLayerVersion.pack = jest.fn()
-
     await awsLambdaLayerVersion.deploy(null, context)
 
     const publishLayerVersionParams = {
@@ -103,7 +101,6 @@ describe('AwsLambdaLayerVersion', () => {
       },
       Description: awsLambdaLayerVersion.layerDescription
     }
-    expect(awsLambdaLayerVersion.pack).toHaveBeenCalled()
     expect(awsLambdaLayerVersion.arn).toEqual('abc:zxc')
     expect(AWS.mocks.publishLayerVersionMock).toBeCalledWith(publishLayerVersionParams)
   })
@@ -120,8 +117,6 @@ describe('AwsLambdaLayerVersion', () => {
     awsLambdaLayerVersion = await context.defineComponent(awsLambdaLayerVersion)
 
     awsLambdaLayerVersion = resolveComponentEvaluables(awsLambdaLayerVersion)
-
-    awsLambdaLayerVersion.pack = jest.fn()
 
     await awsLambdaLayerVersion.deploy(null, context)
 
@@ -153,7 +148,6 @@ describe('AwsLambdaLayerVersion', () => {
       Description: nextAwsLambdaLayerVersion.layerDescription
     }
 
-    expect(awsLambdaLayerVersion.pack).toHaveBeenCalled()
     expect(awsLambdaLayerVersion.arn).toEqual('abc:zxc')
     expect(AWS.mocks.publishLayerVersionMock).toBeCalledWith(publishLayerVersionParams)
   })
@@ -206,8 +200,6 @@ describe('AwsLambdaLayerVersion', () => {
 
     awsLambdaLayerVersion = resolveComponentEvaluables(awsLambdaLayerVersion)
 
-    awsLambdaLayerVersion.pack = jest.fn()
-
     await awsLambdaLayerVersion.deploy(null, context)
 
     const prevAwsLambdaLayerVersion = await deserialize(
@@ -238,7 +230,6 @@ describe('AwsLambdaLayerVersion', () => {
       Description: nextAwsLambdaLayerVersion.layerDescription
     }
 
-    expect(awsLambdaLayerVersion.pack).toHaveBeenCalled()
     expect(awsLambdaLayerVersion.arn).toEqual('abc:zxc')
     expect(AWS.mocks.publishLayerVersionMock).toBeCalledWith(publishLayerVersionParams)
   })
@@ -256,8 +247,6 @@ describe('AwsLambdaLayerVersion', () => {
 
     awsLambdaLayerVersion = resolveComponentEvaluables(awsLambdaLayerVersion)
 
-    awsLambdaLayerVersion.pack = jest.fn()
-
     await awsLambdaLayerVersion.deploy(null, context)
 
     const publishLayerVersionParams = {
@@ -268,7 +257,6 @@ describe('AwsLambdaLayerVersion', () => {
       Description: awsLambdaLayerVersion.layerDescription
     }
 
-    expect(awsLambdaLayerVersion.pack).not.toHaveBeenCalled()
     expect(awsLambdaLayerVersion.arn).toEqual('abc:zxc')
     expect(AWS.mocks.publishLayerVersionMock).toBeCalledWith(publishLayerVersionParams)
   })
@@ -285,8 +273,6 @@ describe('AwsLambdaLayerVersion', () => {
     awsLambdaLayerVersion = await context.defineComponent(awsLambdaLayerVersion)
 
     awsLambdaLayerVersion = resolveComponentEvaluables(awsLambdaLayerVersion)
-
-    awsLambdaLayerVersion.pack = jest.fn()
 
     await awsLambdaLayerVersion.deploy(null, context)
 
@@ -316,8 +302,6 @@ describe('AwsLambdaLayerVersion', () => {
     awsLambdaLayerVersion = await context.defineComponent(awsLambdaLayerVersion)
 
     awsLambdaLayerVersion = resolveComponentEvaluables(awsLambdaLayerVersion)
-
-    awsLambdaLayerVersion.pack = jest.fn()
 
     await awsLambdaLayerVersion.deploy(null, context)
 
@@ -488,6 +472,7 @@ describe('AwsLambdaLayerVersion', () => {
     awsLambdaLayerVersion = resolveComponentEvaluables(awsLambdaLayerVersion)
 
     awsLambdaLayerVersion.pack = jest.fn()
+    awsLambdaLayerVersion.zip = 'zipfilecontent'
 
     await awsLambdaLayerVersion.shouldDeploy(null, context)
     await awsLambdaLayerVersion.deploy(null, context)
@@ -511,9 +496,14 @@ describe('AwsLambdaLayerVersion', () => {
     )
     nextAwsLambdaLayerVersion = resolveComponentEvaluables(nextAwsLambdaLayerVersion)
 
+    nextAwsLambdaLayerVersion.pack = jest.fn()
+    awsLambdaLayerVersion.zip = 'zipfilecontent'
+
     const result = await nextAwsLambdaLayerVersion.shouldDeploy(prevAwsLambdaLayerVersion, context)
 
     expect(result).toBe(undefined)
+    expect(awsLambdaLayerVersion.pack).toBeCalledWith(expect.anything())
+    expect(nextAwsLambdaLayerVersion.pack).toBeCalledWith(expect.anything())
   })
 
   it('shouldDeploy should return undefined if nothing changed if retain=false', async () => {
@@ -531,6 +521,7 @@ describe('AwsLambdaLayerVersion', () => {
     awsLambdaLayerVersion = resolveComponentEvaluables(awsLambdaLayerVersion)
 
     awsLambdaLayerVersion.pack = jest.fn()
+    awsLambdaLayerVersion.zip = 'zipfilecontent'
 
     await awsLambdaLayerVersion.shouldDeploy(null, context)
     await awsLambdaLayerVersion.deploy(null, context)
@@ -554,9 +545,14 @@ describe('AwsLambdaLayerVersion', () => {
     )
     nextAwsLambdaLayerVersion = resolveComponentEvaluables(nextAwsLambdaLayerVersion)
 
+    nextAwsLambdaLayerVersion.pack = jest.fn()
+    nextAwsLambdaLayerVersion.zip = 'zipfilecontent'
+
     const result = await nextAwsLambdaLayerVersion.shouldDeploy(prevAwsLambdaLayerVersion, context)
 
     expect(result).toBe(undefined)
+    expect(awsLambdaLayerVersion.pack).toBeCalledWith(expect.anything())
+    expect(nextAwsLambdaLayerVersion.pack).toBeCalledWith(expect.anything())
   })
 
   it('shouldDeploy should return undefined if nothing changed retain=previous-version', async () => {
@@ -574,6 +570,7 @@ describe('AwsLambdaLayerVersion', () => {
     awsLambdaLayerVersion = resolveComponentEvaluables(awsLambdaLayerVersion)
 
     awsLambdaLayerVersion.pack = jest.fn()
+    awsLambdaLayerVersion.zip = 'zipfilecontent'
 
     await awsLambdaLayerVersion.shouldDeploy(null, context)
     await awsLambdaLayerVersion.deploy(null, context)
@@ -597,9 +594,14 @@ describe('AwsLambdaLayerVersion', () => {
     )
     nextAwsLambdaLayerVersion = resolveComponentEvaluables(nextAwsLambdaLayerVersion)
 
+    nextAwsLambdaLayerVersion.pack = jest.fn()
+    nextAwsLambdaLayerVersion.zip = 'zipfilecontent'
+
     const result = await nextAwsLambdaLayerVersion.shouldDeploy(prevAwsLambdaLayerVersion, context)
 
     expect(result).toBe(undefined)
+    expect(awsLambdaLayerVersion.pack).toBeCalledWith(expect.anything())
+    expect(nextAwsLambdaLayerVersion.pack).toBeCalledWith(expect.anything())
   })
 
   it('shouldDeploy should return deploy if config changed and retain=previous-versions', async () => {
