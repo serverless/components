@@ -1,5 +1,9 @@
-import { isEmpty } from '@serverless/utils'
+import { assoc, isEmpty, reduce, resolve } from '@serverless/utils'
 import AWS from 'aws-sdk'
+
+function resolveCredentials(credentials) {
+  return reduce((accum, value, key) => assoc(key, resolve(value), accum), {}, credentials)
+}
 
 const AwsProvider = (SuperClass) =>
   class extends SuperClass {
@@ -14,13 +18,13 @@ const AwsProvider = (SuperClass) =>
     getSdk() {
       this.validate()
       // TODO BRN: This won't work for multi provider/region
-      AWS.config.update({ region: this.region, credentials: this.credentials })
+      AWS.config.update({ region: this.region, credentials: resolveCredentials(this.credentials) })
       return AWS
     }
 
     getCredentials() {
       this.validate()
-      return { region: this.region, credentials: this.credentials }
+      return { region: this.region, credentials: resolveCredentials(this.credentials) }
     }
 
     validate() {
