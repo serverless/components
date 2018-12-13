@@ -117,6 +117,9 @@ const AwsLambdaLayerVersion = async (SuperClass) => {
         VersionNumber: this.layerVersion
       }).promise()
       this.hash = layerVersionInfo.Content.CodeSha256
+      this.licenseInfo = layerVersionInfo.LicenseInfo
+      this.compatibleRuntimes = layerVersionInfo.CompatibleRuntimes
+      this.layerDescription = layerVersionInfo.Description
     }
 
     async deploy(prevInstance, context) {

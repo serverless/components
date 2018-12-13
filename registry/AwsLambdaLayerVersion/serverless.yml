@@ -13,10 +13,10 @@ repository: "github:serverless/components"
 
 provider: ${inputs.provider}
 layerName: ${inputs.layerName}
-layerDescription: ${inputs.layerDescription}
+layerDescription: ${inputs.layerDescription || ''}
 content: ${inputs.content}
-compatibleRuntimes: ${inputs.compatibleRuntimes}
-licenseInfo: ${inputs.licenseInfo}
+compatibleRuntimes: ${inputs.compatibleRuntimes || []}
+licenseInfo: ${inputs.licenseInfo || ''}
 retain: ${inputs.retain || false}
 
 inputTypes:
