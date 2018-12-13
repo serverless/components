@@ -9,8 +9,8 @@ region: ${inputs.region}
 inputTypes:
   credentials:
     type: object
-    require: false
+    required: false
   region:
     type: string
-    require: false
+    required: false
     default: us-east-1

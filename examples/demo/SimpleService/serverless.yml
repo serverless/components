@@ -6,38 +6,25 @@ providers:
     type: AwsProvider
     inputs:
       region: us-east-1
-#
-#compute:
-#  type: AwsLambdaCompute
-#  inputs:
-#    provider: ${this.providers.aws}
-#    runtime: nodejs
-#
-#functions:
-#  hello:
-#    compute: ${this.compute}
-#    handler: index.hello
-#    code: ./code
-#    memory: 1024
-#    timeout: 20
-#    ufs: true
+
+compute:
+  type: AwsLambdaCompute
+  inputs:
+    provider: ${this.providers.aws}
+    runtime: nodejs
+
+functions:
+  IdempotentCron10:
+    compute: ${this.compute}
+    handler: index.hello
+    code: ./code
+    memory: 512
+    timeout: 20
+    ufs: true
 
 components:
-  policy:
-    type: AwsIamPolicy
+  cron:
+    type: Cron
     inputs:
-      # Provider is required for each AWS resource.
-      provider: ${this.providers.aws}
-      policyName: some-new-policy-name
-      document:
-        Version: '2012-10-17'
-        Statement:
-          # This statement grants access to the users table.
-          - Resource:
-              - arn:aws:dynamodb:us-east-1:552750238299:table/ServerlessWebappUser-ServerlessWebApp-prod-hbrizf9b
-            Effect: Allow
-            Action:
-              - dynamodb:GetItem
-              - dynamodb:PutItem
-#              - dynamodb:UpdateItem
-#              - dynamodb:DeleteItem
+      function: ${this.functions.IdempotentCron10}
+      rate: 7m

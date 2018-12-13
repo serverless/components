@@ -9,5 +9,7 @@ rate: ${inputs.rate}
 inputTypes:
   function:
     type: Function
+    required: true
   rate:
     type: string
+    required: true

@@ -1,10 +1,30 @@
-import { get } from '@serverless/utils'
+import { get, resolve } from '@serverless/utils'
 
 const AwsCloudWatchEventsRule = (SuperClass) =>
   class extends SuperClass {
     hydrate(prevInstance) {
       super.hydrate(prevInstance)
       this.arn = get('arn', prevInstance)
+    }
+
+    async sync() {
+      let { provider } = this
+      provider = resolve(provider)
+      const AWS = provider.getSdk()
+      const CloudWatchEvents = new AWS.CloudWatchEvents()
+
+      try {
+        const res = await CloudWatchEvents.describeRule({
+          Name: get('functionName', get('lambda', this))
+        }).promise()
+        this.schedule = res.ScheduleExpression
+        this.enabled = res.State === 'ENABLED' ? true : false
+      } catch (e) {
+        if (e.code === 'ResourceNotFoundException') {
+          return 'removed'
+        }
+        throw e
+      }
     }
 
     shouldDeploy(prevInstance) {
@@ -54,11 +74,18 @@ const AwsCloudWatchEventsRule = (SuperClass) =>
       const addPermissionParams = {
         Action: 'lambda:InvokeFunction',
         FunctionName: this.lambda.functionName,
-        StatementId: `${this.lambda.functionName}`,
+        StatementId: `${this.lambda.functionName}-cron`,
         Principal: 'events.amazonaws.com'
       }
 
-      await lambda.addPermission(addPermissionParams).promise()
+      try {
+        await lambda.addPermission(addPermissionParams).promise()
+      } catch (e) {
+        // if we are making an update, permissions are already added...
+        if (e.code !== 'ResourceConflictException') {
+          throw e
+        }
+      }
     }
 
     async remove(context) {

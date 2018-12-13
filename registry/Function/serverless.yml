@@ -20,28 +20,41 @@ ufs: ${inputs.ufs}
 inputTypes:
   functionName:
     type: string
-  description:
-    type: string
+    required: true
   compute:
     type: Compute
-    default: ${context.compute}
-  memory:
-    type: integer
-  timeout:
-    type: integer
-  runtime:
-    type: string
-    description: common format across providers that is converted by provider code
+    required: true
   code:
     type: string
+    required: true
     description: path to folder for code
   handler:
     type: string
+    required: true
     description: property path for function
+  description:
+    type: string
+    required: false
+    default: Serverless Universal Function
+  memory:
+    type: integer
+    required: false
+    default: 1024
+  timeout:
+    type: integer
+    required: false
+    default: 10
+  runtime:
+    type: string
+    description: common format across providers that is converted by provider code
   environment:
     type: Object
+    required: false
   tags:
     type: Object
+    required: false
   ufs:
     type: boolean
     description: opt in for universal function signature
+    required: false
+    default: false

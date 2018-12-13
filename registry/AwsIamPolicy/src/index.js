@@ -1,4 +1,16 @@
-import { get, all, sleep, map, or, resolvable, pick, keys, not, equals } from '@serverless/utils'
+import {
+  get,
+  all,
+  sleep,
+  map,
+  or,
+  resolvable,
+  resolve,
+  pick,
+  keys,
+  not,
+  equals
+} from '@serverless/utils'
 
 const createPolicy = async (IAM, { policyName, document }) => {
   const policyRes = await IAM.createPolicy({
@@ -37,6 +49,28 @@ const deletePolicy = async (IAM, arn) => {
       )
     )
   ])
+
+  // delete non default versions...
+  const listPolicyVersionRes = await IAM.listPolicyVersions({
+    PolicyArn: arn
+  }).promise()
+
+  const nonDefaultVersions = listPolicyVersionRes.Versions.filter(
+    (version) => !version.IsDefaultVersion
+  )
+
+  await all(
+    map(
+      (version) =>
+        IAM.deletePolicyVersion({
+          PolicyArn: arn,
+          VersionId: version.VersionId
+        }).promise(),
+      nonDefaultVersions
+    )
+  )
+
+  // then delete the policy with its default version...
   await IAM.deletePolicy({
     PolicyArn: arn
   }).promise()
@@ -51,12 +85,43 @@ const AwsIamPolicy = (SuperClass) =>
 
       this.provider = inputs.provider
       this.policyName = resolvable(() => or(inputs.policyName, `policy-${this.instanceId}`))
+
       this.document = inputs.document
     }
 
     hydrate(prevInstance) {
       super.hydrate(prevInstance)
       this.arn = get('arn', prevInstance)
+    }
+
+    async sync() {
+      let { provider } = this
+      provider = resolve(provider)
+      const accountId = await provider.getAccountId()
+      const AWS = provider.getSdk()
+      const IAM = new AWS.IAM()
+
+      try {
+        // first, we get the policy to know the latest version...
+        const getPolicyParams = {
+          PolicyArn: `arn:aws:iam::${accountId}:policy/${resolve(this.policyName)}`
+        }
+        const getPolicyRes = await IAM.getPolicy(getPolicyParams).promise()
+
+        // second, we fetch that latest version
+        const getPolicyVersionParams = {
+          PolicyArn: `arn:aws:iam::${accountId}:policy/${resolve(this.policyName)}`,
+          VersionId: getPolicyRes.Policy.DefaultVersionId
+        }
+        const getPolicyVersionRes = await IAM.getPolicyVersion(getPolicyVersionParams).promise()
+
+        this.document = JSON.parse(decodeURIComponent(getPolicyVersionRes.PolicyVersion.Document))
+      } catch (e) {
+        if (e.code === 'NoSuchEntity') {
+          return 'removed'
+        }
+        throw e
+      }
     }
 
     shouldDeploy(prevInstance) {
@@ -68,10 +133,13 @@ const AwsIamPolicy = (SuperClass) =>
 
       // make sure any added suffix from prevInstance is preserved
       // otherwise name will always be different
-      if (prevInstance && this.policyName === `policy-${this.instanceId}`) {
+      if (
+        prevInstance &&
+        this.policyName === `policy-${this.instanceId}` &&
+        prevInstance.policyName.includes(`policy-${this.instanceId}`)
+      ) {
         this.policyName = prevInstance.policyName
       }
-
       // if config changed, change the name to trigger replace
       if (prevInstance && configChanged && this.policyName.includes(`policy-${this.instanceId}`)) {
         this.policyName = `policy-${this.instanceId}-${Math.random()

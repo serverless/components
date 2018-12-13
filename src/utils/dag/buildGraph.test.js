@@ -2,6 +2,7 @@ import { resolveComponentEvaluables } from '../component'
 import { deserialize, serialize } from '../serialize'
 import { createTestContext } from '../../../test'
 import buildGraph from './buildGraph'
+import { SYMBOL_STATE } from '../constants'
 
 beforeEach(async () => {
   jest.clearAllMocks()
@@ -69,6 +70,60 @@ describe('#buildGraph()', () => {
       prevInstance,
       operation: undefined // NOTE BRN: This gets set later in the deployGraph phase
     })
+  })
+
+  it('build a simple graph and not include instances removed from provider', () => {
+    const nextInstance = {
+      instanceId: 'test',
+      shouldDeploy: jest.fn(),
+      deploy: jest.fn(),
+      define: jest.fn(),
+      remove: jest.fn(),
+      construct: jest.fn()
+    }
+
+    const prevInstance = {
+      instanceId: 'test',
+      shouldDeploy: jest.fn(),
+      status: 'removed',
+      deploy: jest.fn(),
+      define: jest.fn(),
+      remove: jest.fn(),
+      construct: jest.fn()
+    }
+
+    const graph = buildGraph(nextInstance, prevInstance)
+    expect(graph.nodes()).toEqual(expect.arrayContaining([nextInstance.instanceId]))
+    expect(graph.edges()).toEqual([])
+    expect(graph.node('test').prevInstance).toEqual(null)
+  })
+
+  it('build a simple graph and add provider state if available', () => {
+    const nextInstance = {
+      instanceId: 'test',
+      shouldDeploy: jest.fn(),
+      deploy: jest.fn(),
+      define: jest.fn(),
+      remove: jest.fn(),
+      construct: jest.fn()
+    }
+
+    nextInstance[SYMBOL_STATE] = { foo: 'bar' }
+
+    const prevInstance = {
+      instanceId: 'test',
+      shouldDeploy: jest.fn(),
+      status: 'removed',
+      deploy: jest.fn(),
+      define: jest.fn(),
+      remove: jest.fn(),
+      construct: jest.fn()
+    }
+
+    const graph = buildGraph(nextInstance, prevInstance)
+    expect(graph.nodes()).toEqual(expect.arrayContaining([nextInstance.instanceId]))
+    expect(graph.edges()).toEqual([])
+    expect(graph.node('test').prevInstance).toEqual({ foo: 'bar' })
   })
 
   it('build a simple graph when only instance has been removed', () => {

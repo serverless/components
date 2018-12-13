@@ -35,11 +35,44 @@ describe('#newVariable()', () => {
       this: component
     }
     const variable = newVariable(variableString, data)
-    expect(variable.findInstanceIds()).toEqual([
-      component.instanceId,
-      compA.instanceId,
-      compB.instanceId
-    ])
+    expect(variable.findInstanceIds()).toEqual(
+      expect.arrayContaining([component.instanceId, compA.instanceId, compB.instanceId])
+    )
+  })
+
+  it('should find instances in a path that uses OR (||) definitions', async () => {
+    const context = await createContext(
+      {},
+      {
+        app: {
+          id: 'test'
+        }
+      }
+    )
+    const Component = await context.import('Component')
+    const component = await context.construct(Component, {})
+    const compA = await context.construct(Component, {})
+    const compB = await context.construct(Component, {})
+    const compC = await context.construct(Component, {})
+    component.foo = {
+      compA
+    }
+    compA.bar = 'baz'
+    const variableString = '${this.foo.compA.bar || compB.dne || compC.baz || true}'
+    const data = {
+      this: component,
+      compB,
+      compC
+    }
+    const variable = newVariable(variableString, data)
+    expect(variable.findInstanceIds()).toEqual(
+      expect.arrayContaining([
+        component.instanceId,
+        compA.instanceId,
+        compB.instanceId,
+        compC.instanceId
+      ])
+    )
   })
 
   it('finds instances in a path that includes variables in the path', async () => {
@@ -63,14 +96,12 @@ describe('#newVariable()', () => {
     compA.foo = newVariable('${compB}', data)
     compB.bar = newVariable('${compC}', data)
     const variable = newVariable('${compA.foo.bar}', data)
-    expect(variable.findInstanceIds()).toEqual([
-      compA.instanceId,
-      compB.instanceId,
-      compC.instanceId
-    ])
+    expect(variable.findInstanceIds()).toEqual(
+      expect.arrayContaining([compA.instanceId, compB.instanceId, compC.instanceId])
+    )
   })
 
-  it('finds instances in a path that are from variables pointing to anohter variable', async () => {
+  it('finds instances in a path that are from variables pointing to another variable', async () => {
     const context = await createContext({}, { app: { id: 'test' } })
     const Component = await context.import('Component')
     const compA = await context.construct(Component, {})
@@ -81,7 +112,9 @@ describe('#newVariable()', () => {
     const variable = newVariable('${compA.foo}', {
       compA
     })
-    expect(variable.findInstanceIds()).toEqual([compA.instanceId, compB.instanceId])
+    expect(variable.findInstanceIds()).toEqual(
+      expect.arrayContaining([compA.instanceId, compB.instanceId])
+    )
   })
 
   it('finds instances across the full path of both variables when a variable points to another variable', async () => {
@@ -96,6 +129,8 @@ describe('#newVariable()', () => {
     const variable = newVariable('${compA.foo}', {
       compA
     })
-    expect(variable.findInstanceIds()).toEqual([compA.instanceId, compB.instanceId])
+    expect(variable.findInstanceIds()).toEqual(
+      expect.arrayContaining([compA.instanceId, compB.instanceId])
+    )
   })
 })

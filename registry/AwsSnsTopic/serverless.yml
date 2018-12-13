@@ -19,13 +19,11 @@ inputTypes:
   provider:
     type: AwsProvider
     required: true
-    default: ${context.provider}
     displayName: AWS Provider
     description: The AWSProvider instance that contains the credentials for AWS
   topicName:
     type: string
     required: false
-    default: sns-${self.instanceId}
     description: The name of your SNS topic
     displayName: SNS Topic Name
     example: my-project-sns-${self.instanceId}

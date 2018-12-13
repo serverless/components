@@ -13,6 +13,7 @@ describe('Integration Test - define types', () => {
       constructor: expect.any(Function),
       main: {
         construct: expect.any(Function),
+        clone: expect.any(Function),
         getType: expect.any(Function)
       },
       parent: undefined,

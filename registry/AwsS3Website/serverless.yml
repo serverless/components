@@ -24,6 +24,7 @@ inputTypes:
     type: string
     displayName: Assets
     description: Path to static website assets. Can be absolute or relative to projectDir.
+    required: false
     default: .
   envFileLocation:
     type: string

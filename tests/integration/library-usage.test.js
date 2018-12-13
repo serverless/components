@@ -30,6 +30,8 @@ describe('Integration Test - Library Usage', () => {
 
   describe('when using a path to a project', () => {
     const testServiceDir = path.join(__dirname, 'library-usage')
+    const testServiceDirDeploy = path.join(__dirname, 'library-usage', 'deploy')
+    const testServiceDirRemove = path.join(__dirname, 'library-usage', 'remove')
     testServiceStateDirectory = path.join(testServiceDir, '.serverless')
     testServiceZipFile = path.join(testServiceDir, 'library-usage@0.0.1.zip')
 
@@ -44,13 +46,13 @@ describe('Integration Test - Library Usage', () => {
     describe('when running through a typical component usage lifecycle', () => {
       it('should deploy the "AwsS3Bucket" component', async () => {
         const context = await deploy({
-          cwd: testServiceDir,
+          cwd: testServiceDirDeploy,
           overrides: {
             debug: () => {},
             log: () => {}
           }
         })
-        expect(AWS.mocks.createBucketMock).toBeCalledWith({ Bucket: 'mysuperbucket' }) // forces bucket to lowercase
+        expect(AWS.mocks.createBucketMock).toBeCalledWith({ Bucket: 'deploy-bucket' }) // forces bucket to lowercase
         const service = context.instance
         expect(service).not.toBeFalsy()
         expect(service).toMatchObject({
@@ -61,30 +63,30 @@ describe('Integration Test - Library Usage', () => {
         const bucket = service.components.myBucket
         expect(bucket).not.toBeFalsy()
         expect(bucket).toMatchObject({
-          bucketName: 'mysuperbucket',
+          bucketName: 'deploy-bucket',
           instanceId: expect.any(String)
         })
       })
 
       it('should remove the "AwsS3Bucket" components', async () => {
         let context = await deploy({
-          cwd: testServiceDir,
+          cwd: testServiceDirRemove,
           overrides: {
             debug: () => {},
             log: () => {}
           }
         })
         context = await remove({
-          cwd: testServiceDir,
+          cwd: testServiceDirRemove,
           overrides: {
             debug: () => {},
             log: () => {}
           }
         })
-        expect(AWS.mocks.deleteBucketMock).toBeCalledWith({ Bucket: 'mysuperbucket' })
-        expect(AWS.mocks.listObjectsV2Mock).toBeCalledWith({ Bucket: 'mysuperbucket' })
+        expect(AWS.mocks.deleteBucketMock).toBeCalledWith({ Bucket: 'remove-bucket' })
+        expect(AWS.mocks.listObjectsV2Mock).toBeCalledWith({ Bucket: 'remove-bucket' })
         expect(AWS.mocks.deleteObjectsMock).toBeCalledWith({
-          Bucket: 'mysuperbucket',
+          Bucket: 'remove-bucket',
           Delete: { Objects: [{ Key: 'abc' }] }
         })
         expect(context.instance).toBeFalsy()

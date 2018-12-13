@@ -1,5 +1,5 @@
-import { get, keys, or, pick, resolvable, equals, not } from '@serverless/utils'
-import { createTable, updateTable, deleteTable, ensureTable, updateTimeToLive } from './utils'
+import { get, keys, or, pick, resolve, resolvable, equals, not } from '@serverless/utils'
+import { createTable, updateTable, deleteTable, describeTable, ensureTable, updateTimeToLive } from './utils'
 
 const AwsDynamoDb = (SuperClass) =>
   class extends SuperClass {
@@ -32,16 +32,48 @@ const AwsDynamoDb = (SuperClass) =>
       }
     }
 
+    async sync() {
+      let { provider, tableName } = this
+      provider = resolve(provider)
+      tableName = resolve(tableName)
+
+      try {
+        const res = await describeTable({ provider, tableName })
+        this.tableName = res.Table.TableName
+        this.attributeDefinitions = res.Table.AttributeDefinitions
+        this.keySchema = res.Table.KeySchema
+        this.provisionedThroughput = {}
+        this.provisionedThroughput.ReadCapacityUnits =
+          res.Table.ProvisionedThroughput.ReadCapacityUnits
+        this.provisionedThroughput.WriteCapacityUnits =
+          res.Table.ProvisionedThroughput.WriteCapacityUnits
+        this.globalSecondaryIndexes = res.Table.GlobalSecondaryIndexes
+        this.localSecondaryIndexes = res.Table.LocalSecondaryIndexes
+        if (res.Table.SSEDescription) {
+          this.sseSpecification = {}
+          this.sseSpecification.Enabled = res.Table.SSEDescription.Status === 'ENABLED'
+          this.sseSpecification.SSEType = res.Table.SSEDescription.SSEType
+          this.sseSpecification.KMSMasterKeyId = res.Table.SSEDescription.KMSMasterKeyArn
+        }
+      } catch (error) {
+        if (error.code === 'ResourceNotFoundException') {
+          return 'removed'
+        }
+        throw error
+      }
+    }
+
     async deploy(prevInstance, context) {
       const tableName = get('tableName', this)
 
       if (
-        prevInstance &&
-        (not(equals(prevInstance.attributeDefinitions, this.attributeDefinitions)) ||
-          not(equals(prevInstance.provisionedThroughput, this.provisionedThroughput)) ||
-          not(equals(prevInstance.globalSecondaryIndexes, this.globalSecondaryIndexes)) ||
-          not(equals(prevInstance.sseSpecification, this.sseSpecification)) ||
-          not(equals(prevInstance.streamSpecification, this.streamSpecification)))
+        (prevInstance &&
+          not(equals(prevInstance.provisionedThroughput, this.provisionedThroughput))) ||
+        (prevInstance &&
+          (not(equals(prevInstance.attributeDefinitions, this.attributeDefinitions)) ||
+            not(equals(prevInstance.globalSecondaryIndexes, this.globalSecondaryIndexes)) ||
+            not(equals(prevInstance.sseSpecification, this.sseSpecification)) ||
+            not(equals(prevInstance.streamSpecification, this.streamSpecification))))
       ) {
         context.log(`Updating table: '${tableName}'`)
         if (not(equals(prevInstance.globalSecondaryIndexes, this.globalSecondaryIndexes))) {

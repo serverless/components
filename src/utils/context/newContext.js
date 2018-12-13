@@ -21,6 +21,7 @@ import construct from '../type/construct'
 import create from '../type/create'
 import defType from '../type/defType'
 import loadType from '../type/loadType'
+import walkReduceComponentChildrenDepthFirst from '../component/walkReduceComponentChildrenDepthFirst'
 
 const newContext = (props) => {
   const context = pick(
@@ -57,7 +58,7 @@ const newContext = (props) => {
       error: (...args) => error(finalContext, ...args),
       info: (...args) => info(finalContext, ...args)
     },
-    construct: (type, inputs) => construct(type, inputs, finalContext),
+    construct: (type, inputs = {}) => construct(type, inputs, finalContext),
     create,
     createDeployment: async () => {
       const { app, previousDeployment } = finalContext
@@ -106,10 +107,11 @@ const newContext = (props) => {
           'createInstance method expects context to have a project loaded. You must first call loadProject on context before calling createInstance'
         )
       }
-      let instance = await finalContext.construct(project.Type)
+      let instance = await finalContext.construct(project.Type, {})
       // instance = setKey('$', instance)
 
       const stateInstance = await deserialize(state.instance, finalContext)
+
       // NOTE BRN: instance gets defined based on serverless.yml and type code
       instance = await finalContext.defineComponent(instance, stateInstance)
 
@@ -199,6 +201,18 @@ const newContext = (props) => {
 
       // TODO BRN: Add hydrate step for previous instance
 
+      // make sure we sync the previous instance (if any)
+      // with the actual state on the provider
+      if (previousInstance) {
+        previousInstance = await walkReduceComponentChildrenDepthFirst(
+          async (accum, currentInstance) => {
+            currentInstance.status = await currentInstance.sync(finalContext)
+            return accum
+          },
+          previousInstance,
+          previousInstance
+        )
+      }
       return newContext({
         ...context,
         previousInstance

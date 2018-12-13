@@ -1,5 +1,6 @@
 import { forEach } from '@serverless/utils'
 import { Graph } from 'graphlib'
+import { SYMBOL_STATE } from '../constants'
 import getChildrenIds from '../component/getChildrenIds'
 import getDependenciesIds from '../component/getDependenciesIds'
 import getParentId from '../component/getParentId'
@@ -18,13 +19,17 @@ const buildGraph = (nextInstance, prevInstance) => {
           )
         }
 
-        // Default for a node is a removal operation. This will be changed in the next step if it still exists.
-        accum.setNode(currentInstance.instanceId, {
-          instanceId: currentInstance.instanceId,
-          operation: 'remove',
-          nextInstance: null,
-          prevInstance: currentInstance
-        })
+        // if the resource has been removed from thhe provider
+        // don't add it to the graph
+        if (currentInstance.status !== 'removed') {
+          // Default for a node is a removal operation. This will be changed in the next step if it still exists.
+          accum.setNode(currentInstance.instanceId, {
+            instanceId: currentInstance.instanceId,
+            operation: 'remove',
+            nextInstance: null,
+            prevInstance: currentInstance
+          })
+        }
         return accum
       },
       graph,
@@ -52,6 +57,11 @@ const buildGraph = (nextInstance, prevInstance) => {
             nextInstance: currentInstance,
             prevInstance: null,
             operation: undefined
+          }
+
+          // preserve state if it exists in the provider
+          if (currentInstance[SYMBOL_STATE]) {
+            node.prevInstance = currentInstance[SYMBOL_STATE]
           }
           accum.setNode(currentInstance.instanceId, node)
         }

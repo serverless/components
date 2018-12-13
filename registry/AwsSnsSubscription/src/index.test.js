@@ -33,7 +33,7 @@ describe('AwsSnsSubscription', () => {
 
   it('should create the subscription if it is the first deployment', async () => {
     const inputs = {
-      topicName: 'myTopic',
+      topic: 'myTopic',
       displayName: 'myTopicDisplayName',
       policy: {},
       deliveryPolicy: {},
@@ -51,7 +51,7 @@ describe('AwsSnsSubscription', () => {
     expect(AWS.mocks.subscribeMock).toBeCalledWith({
       Endpoint: undefined,
       Protocol: 'https',
-      TopicArn: undefined
+      TopicArn: 'myTopic'
     })
   })
 

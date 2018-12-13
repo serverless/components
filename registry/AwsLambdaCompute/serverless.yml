@@ -21,18 +21,18 @@ ufs: ${inputs.ufs}
 inputTypes:
   provider:
     type: Provider
-    default: ${context.provider}
   runtime:
     type: string
     required: false
+    default: nodejs
   memory:
-    type: string
+    type: integer
+    required: false
     default: 1024
-    required: false
   timeout:
-    type: string
-    default: 10
+    type: integer
     required: false
+    default: 10
   environment:
     type: object
     required: false
@@ -44,4 +44,4 @@ inputTypes:
     required: false
   ufs:
     type: boolean
-    required: true
+    required: false

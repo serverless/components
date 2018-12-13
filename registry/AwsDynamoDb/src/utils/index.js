@@ -1,5 +1,6 @@
 export { default as createTable } from './createTable'
 export { default as updateTable } from './updateTable'
 export { default as deleteTable } from './deleteTable'
+export { default as describeTable } from './describeTable'
 export { default as ensureTable } from './ensureTable'
 export { default as updateTimeToLive } from './updateTimeToLive'

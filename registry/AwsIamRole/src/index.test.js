@@ -65,7 +65,10 @@ describe('AwsIamRole', () => {
     const inputs = {
       roleName,
       service: 'lambda.amazonaws.com',
-      provider
+      provider,
+      policy: {
+        arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
+      }
     }
 
     try {
@@ -73,7 +76,7 @@ describe('AwsIamRole', () => {
       await context.defineComponent(awsIamRole)
       resolveComponentEvaluables(awsIamRole)
     } catch (error) {
-      expect(error.message).toMatch('allowed length is 64')
+      expect(error.message).toMatch('has invalid')
     }
   })
 
@@ -174,6 +177,10 @@ describe('AwsIamRole', () => {
   it('should update if role name has changed', async () => {
     let oldAwsIamRole = await context.construct(AwsIamRole, {
       roleName: 'old-role-name',
+      service: 'lambda.amazonaws.com',
+      policy: {
+        arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
+      },
       provider
     })
     oldAwsIamRole = await context.defineComponent(oldAwsIamRole)
@@ -184,6 +191,10 @@ describe('AwsIamRole', () => {
 
     let newAwsIamRole = await context.construct(AwsIamRole, {
       roleName: 'new-role-name',
+      service: 'lambda.amazonaws.com',
+      policy: {
+        arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
+      },
       provider
     })
     newAwsIamRole = await context.defineComponent(newAwsIamRole)
@@ -192,7 +203,7 @@ describe('AwsIamRole', () => {
 
     expect(AWS.mocks.createRoleMock).toBeCalledWith({
       AssumeRolePolicyDocument:
-        '{"Version":"2012-10-17","Statement":{"Effect":"Allow","Principal":{},"Action":"sts:AssumeRole"}}',
+        '{"Version":"2012-10-17","Statement":{"Effect":"Allow","Principal":{"Service":"lambda.amazonaws.com"},"Action":"sts:AssumeRole"}}',
       Path: '/',
       RoleName: 'new-role-name'
     })
@@ -285,7 +296,10 @@ describe('AwsIamRole', () => {
     let awsIamRole = await context.construct(AwsIamRole, {
       provider,
       roleName: 'abc',
-      service: 'lambda.amazonaws.com'
+      service: 'lambda.amazonaws.com',
+      policy: {
+        arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
+      }
     })
 
     awsIamRole = await context.defineComponent(awsIamRole)
@@ -299,7 +313,10 @@ describe('AwsIamRole', () => {
     let nextAwsIamRole = await context.construct(AwsIamRole, {
       provider,
       roleName: 'abc',
-      service: 'lambda.amazonaws.com'
+      service: 'lambda.amazonaws.com',
+      policy: {
+        arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
+      }
     })
     nextAwsIamRole = await context.defineComponent(nextAwsIamRole, prevAwsIamRole)
     nextAwsIamRole = resolveComponentEvaluables(nextAwsIamRole)
@@ -310,6 +327,7 @@ describe('AwsIamRole', () => {
     let oldAwsIamRole = await context.construct(AwsIamRole, {
       provider,
       roleName: 'abc',
+      service: 'lambda.amazonaws.com',
       policy: {
         arn: 'arn:aws:iam::aws:policy/oldPolicy'
       }
@@ -336,6 +354,7 @@ describe('AwsIamRole', () => {
     let oldAwsIamRole = await context.construct(AwsIamRole, {
       provider,
       roleName: 'already-removed-role',
+      service: 'lambda.amazonaws.com',
       policy: {
         arn: 'arn:aws:iam::aws:policy/oldPolicy'
       }
@@ -362,6 +381,7 @@ describe('AwsIamRole', () => {
     let oldAwsIamRole = await context.construct(AwsIamRole, {
       provider,
       roleName: 'abc',
+      service: 'lambda.amazonaws.com',
       policy: {
         arn: 'arn:aws:iam::aws:policy/oldPolicy'
       }
@@ -375,6 +395,7 @@ describe('AwsIamRole', () => {
     let newAwsIamRole = await context.construct(AwsIamRole, {
       provider,
       roleName: 'abc',
+      service: 'lambda.amazonaws.com',
       policy: {
         arn: 'arn:aws:iam::aws:policy/oldPolicy'
       }
@@ -390,6 +411,7 @@ describe('AwsIamRole', () => {
     let oldAwsIamRole = await context.construct(AwsIamRole, {
       provider,
       roleName: 'abc',
+      service: 'lambda.amazonaws.com',
       policy: {
         arn: 'arn:aws:iam::aws:policy/oldPolicy'
       }
@@ -403,6 +425,7 @@ describe('AwsIamRole', () => {
     let newAwsIamRole = await context.construct(AwsIamRole, {
       provider,
       roleName: 'zxc', // changed
+      service: 'lambda.amazonaws.com',
       policy: {
         arn: 'arn:aws:iam::aws:policy/oldPolicy'
       }
@@ -418,6 +441,7 @@ describe('AwsIamRole', () => {
     let oldAwsIamRole = await context.construct(AwsIamRole, {
       provider,
       roleName: 'abc',
+      service: 'lambda.amazonaws.com',
       policy: {
         arn: 'arn:aws:iam::aws:policy/oldPolicy'
       }
@@ -431,6 +455,7 @@ describe('AwsIamRole', () => {
     let newAwsIamRole = await context.construct(AwsIamRole, {
       provider,
       roleName: 'abc',
+      service: 'lambda.amazonaws.com',
       policy: {
         arn: 'arn:aws:iam::aws:policy/newPolicy' // changed
       }
@@ -445,7 +470,8 @@ describe('AwsIamRole', () => {
   it('shouldDeploy should return deploy if first deployment', async () => {
     let oldAwsIamRole = await context.construct(AwsIamRole, {
       provider,
-      roleName: 'abc',
+      roleName: 'already-removed-role',
+      service: 'lambda.amazonaws.com',
       policy: {
         arn: 'arn:aws:iam::aws:policy/oldPolicy'
       }
@@ -454,5 +480,42 @@ describe('AwsIamRole', () => {
     oldAwsIamRole = resolveComponentEvaluables(oldAwsIamRole)
     const res = oldAwsIamRole.shouldDeploy(null, context)
     expect(res).toBe('deploy')
+  })
+
+  it('sync should return "removed" if role removed from provider', async () => {
+    let oldAwsIamRole = await context.construct(AwsIamRole, {
+      provider,
+      roleName: 'already-removed-role',
+      service: 'lambda.amazonaws.com',
+      policy: {
+        arn: 'arn:aws:iam::aws:policy/oldPolicy'
+      }
+    })
+    oldAwsIamRole = await context.defineComponent(oldAwsIamRole)
+    oldAwsIamRole = resolveComponentEvaluables(oldAwsIamRole)
+    const res = await oldAwsIamRole.sync(context)
+    expect(res).toBe('removed')
+  })
+
+  it('sync should update role config if role config changed in provider', async () => {
+    let oldAwsIamRole = await context.construct(AwsIamRole, {
+      provider,
+      roleName: 'somerole',
+      service: 'elasticmapreduce.amazonaws.com', // this is outdated!
+      policy: {
+        arn: 'arn:aws:iam::aws:policy/oldPolicy'
+      }
+    })
+
+    oldAwsIamRole = await context.defineComponent(oldAwsIamRole)
+    oldAwsIamRole = resolveComponentEvaluables(oldAwsIamRole)
+    const res = await oldAwsIamRole.sync(context)
+
+    expect(res).toBe(undefined)
+    expect(oldAwsIamRole.roleName).toBe('somerole')
+    expect(oldAwsIamRole.service).toBe('lambda.amazonaws.com')
+    expect(oldAwsIamRole.policy).toEqual({
+      arn: 'arn:aws:iam::aws:policy/oldPolicy'
+    })
   })
 })

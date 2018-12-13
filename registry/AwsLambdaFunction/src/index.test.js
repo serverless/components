@@ -56,7 +56,9 @@ describe('AwsLambdaFunction', () => {
     let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
       provider,
       code: './code',
-      functionName: 'hello'
+      functionName: 'hello',
+      handler: 'index.hello',
+      runtime: 'nodejs8.10'
     })
 
     awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
@@ -84,7 +86,9 @@ describe('AwsLambdaFunction', () => {
     let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
       provider,
       code: ['./code', './shim/path.js'],
-      functionName: 'hello'
+      functionName: 'hello',
+      handler: 'index.hello',
+      runtime: 'nodejs8.10'
     })
 
     awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
@@ -121,7 +125,9 @@ describe('AwsLambdaFunction', () => {
       environment: {
         ENV_VAR: 'env value'
       },
-      tags: 'abc',
+      tags: {
+        foo: 'bar'
+      },
       role: {
         arn: 'abc:aws'
       }
@@ -170,7 +176,9 @@ describe('AwsLambdaFunction', () => {
       environment: {
         ENV_VAR: 'env value'
       },
-      tags: 'abc',
+      tags: {
+        foo: 'bar'
+      },
       role: {
         arn: 'abc:aws'
       }
@@ -199,7 +207,9 @@ describe('AwsLambdaFunction', () => {
       environment: {
         ENV_VAR: 'env value'
       },
-      tags: 'abc',
+      tags: {
+        foo: 'bar'
+      },
       role: {
         arn: 'abc:aws'
       }
@@ -253,7 +263,9 @@ describe('AwsLambdaFunction', () => {
       environment: {
         ENV_VAR: 'env value'
       },
-      tags: 'abc',
+      tags: {
+        foo: 'bar'
+      },
       role: {
         arn: 'abc:aws'
       }
@@ -280,7 +292,9 @@ describe('AwsLambdaFunction', () => {
       environment: {
         ENV_VAR: 'env value'
       },
-      tags: 'abc',
+      tags: {
+        foo: 'bar'
+      },
       role: {
         arn: 'abc:aws'
       }
@@ -307,7 +321,9 @@ describe('AwsLambdaFunction', () => {
       environment: {
         ENV_VAR: 'env value'
       },
-      tags: 'abc',
+      tags: {
+        foo: 'bar'
+      },
       role: {
         arn: 'abc:aws'
       }
@@ -336,7 +352,9 @@ describe('AwsLambdaFunction', () => {
       environment: {
         ENV_VAR: 'env value'
       },
-      tags: 'abc',
+      tags: {
+        foo: 'bar'
+      },
       role: {
         arn: 'abc:aws'
       }
@@ -385,7 +403,9 @@ describe('AwsLambdaFunction', () => {
       environment: {
         ENV_VAR: 'env value'
       },
-      tags: 'abc',
+      tags: {
+        foo: 'bar'
+      },
       role: {
         arn: 'abc:aws'
       }
@@ -435,7 +455,9 @@ describe('AwsLambdaFunction', () => {
       environment: {
         ENV_VAR: 'env value'
       },
-      tags: 'abc',
+      tags: {
+        foo: 'bar'
+      },
       role: {
         arn: 'abc:aws'
       }
@@ -474,7 +496,9 @@ describe('AwsLambdaFunction', () => {
       environment: {
         ENV_VAR: 'env value'
       },
-      tags: 'abc',
+      tags: {
+        foo: 'bar'
+      },
       role: {
         arn: 'abc:aws'
       }
@@ -500,7 +524,13 @@ describe('AwsLambdaFunction', () => {
   })
 
   it('should return lambda arn when calling getId()', async () => {
-    const awsLambdaFunction = await context.construct(AwsLambdaFunction, {})
+    const awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+      provider,
+      code: './code',
+      functionName: 'hello',
+      handler: 'index.handler',
+      runtime: 'nodejs8.10'
+    })
 
     awsLambdaFunction.arn = 'some:arn'
 
@@ -521,7 +551,9 @@ describe('AwsLambdaFunction', () => {
       environment: {
         ENV_VAR: 'env value'
       },
-      tags: 'abc',
+      tags: {
+        foo: 'bar'
+      },
       role: {
         arn: 'abc:aws'
       }
@@ -550,7 +582,9 @@ describe('AwsLambdaFunction', () => {
       environment: {
         ENV_VAR: 'env value'
       },
-      tags: 'abc',
+      tags: {
+        foo: 'bar'
+      },
       role: {
         arn: 'abc:aws'
       }
@@ -580,7 +614,9 @@ describe('AwsLambdaFunction', () => {
       environment: {
         ENV_VAR: 'env value'
       },
-      tags: 'abc',
+      tags: {
+        foo: 'bar'
+      },
       role: {
         arn: 'abc:aws'
       }
@@ -609,7 +645,9 @@ describe('AwsLambdaFunction', () => {
       environment: {
         ENV_VAR: 'env value'
       },
-      tags: 'abc',
+      tags: {
+        foo: 'bar'
+      },
       role: {
         arn: 'abc:aws'
       }
@@ -639,7 +677,9 @@ describe('AwsLambdaFunction', () => {
       environment: {
         ENV_VAR: 'env value'
       },
-      tags: 'abc',
+      tags: {
+        foo: 'bar'
+      },
       role: {
         roleName: 'roleName',
         arn: 'abc:aws'
@@ -670,7 +710,9 @@ describe('AwsLambdaFunction', () => {
       environment: {
         ENV_VAR: 'env value'
       },
-      tags: 'abc',
+      tags: {
+        foo: 'bar'
+      },
       role: {
         roleName: 'roleName',
         arn: 'abc:aws'
@@ -701,7 +743,9 @@ describe('AwsLambdaFunction', () => {
       environment: {
         ENV_VAR: 'env value'
       },
-      tags: 'abc',
+      tags: {
+        foo: 'bar'
+      },
       role: {
         roleName: 'roleName',
         arn: 'abc:aws'
@@ -731,7 +775,9 @@ describe('AwsLambdaFunction', () => {
       environment: {
         ENV_VAR: 'env value'
       },
-      tags: 'abc',
+      tags: {
+        foo: 'bar'
+      },
       role: {
         roleName: 'newRoleName', // changed
         arn: 'abc:aws:new' // changed
@@ -762,7 +808,9 @@ describe('AwsLambdaFunction', () => {
       environment: {
         ENV_VAR: 'env value'
       },
-      tags: 'abc',
+      tags: {
+        foo: 'bar'
+      },
       role: {
         roleName: 'roleName',
         arn: 'abc:aws'
@@ -792,7 +840,9 @@ describe('AwsLambdaFunction', () => {
       environment: {
         ENV_VAR: 'env value'
       },
-      tags: 'abc',
+      tags: {
+        foo: 'bar'
+      },
       role: {
         roleName: 'roleName',
         arn: 'abc:aws'
@@ -824,7 +874,9 @@ describe('AwsLambdaFunction', () => {
       environment: {
         ENV_VAR: 'env value'
       },
-      tags: 'abc',
+      tags: {
+        foo: 'bar'
+      },
       role: {
         roleName: 'roleName',
         arn: 'abc:aws'
@@ -854,7 +906,9 @@ describe('AwsLambdaFunction', () => {
       environment: {
         ENV_VAR: 'env value'
       },
-      tags: 'abc'
+      tags: {
+        foo: 'bar'
+      }
     })
 
     awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
@@ -870,7 +924,7 @@ describe('AwsLambdaFunction', () => {
         {
           Action: ['logs:CreateLogStream'],
           Resource: [
-            `arn:aws:logs:us-east-1:account-id:log-group:/aws/lambda/${
+            `arn:aws:logs:us-east-1:558750028299:log-group:/aws/lambda/${
               awsLambdaFunction.functionName
             }:*`
           ],
@@ -879,7 +933,7 @@ describe('AwsLambdaFunction', () => {
         {
           Action: ['logs:PutLogEvents'],
           Resource: [
-            `arn:aws:logs:us-east-1:account-id:log-group:/aws/lambda/${
+            `arn:aws:logs:us-east-1:558750028299:log-group:/aws/lambda/${
               awsLambdaFunction.functionName
             }:*:*`
           ],

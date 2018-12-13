@@ -11,10 +11,9 @@ policy: ${inputs.policy}
 inputTypes:
   provider:
     type: AwsProvider
-    default: ${context.provider}
   roleName:
     type: string
-    default: role-${self.instanceId}
+    required: false
     displayName: IAM role name
     description: The name of the role to create
     maxLength: 64
@@ -26,6 +25,6 @@ inputTypes:
     example: lambda.amazonaws.com
   policy:
     type: object
-    returied: true
+    required: false
     displayName: IAM Role Policy
     description: A managed IAM policy or an inline policy document

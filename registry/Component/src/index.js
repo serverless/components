@@ -17,6 +17,13 @@ const Component = (SuperClass) =>
       return value.instanceId === this.instanceId
     }
 
+    // sync method is optional
+    // the default is that we never check the provider
+    // so we return 'unknown' as the status
+    sync() {
+      return 'unknown'
+    }
+
     hydrate(previousInstance) {
       this.instanceId = or(get('instanceId', previousInstance), this.instanceId)
     }

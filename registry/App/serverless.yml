@@ -8,10 +8,8 @@ services: ${inputs.services}
 
 inputTypes:
   providers:
-    type: Object
-    default: ${context.providers}
+    type: object
     required: false
   services:
-    type: Object
-    default: ${context.services}
+    type: object
     required: false
