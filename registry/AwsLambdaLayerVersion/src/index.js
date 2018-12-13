@@ -147,15 +147,7 @@ const AwsLambdaLayerVersion = async (SuperClass) => {
 
       context.log(`Removing Lambda Layer Versions: ${layerName}`)
 
-      for (const version of versions) {
-        try {
-          await deleteLayerVersion(Lambda, layerName, version)
-        } catch (error) {
-          if (error.content !== 'ResourceNotFoundException') {
-            throw error
-          }
-        }
-      }
+      await Promise.all(versions.map((version) => deleteLayerVersion(Lambda, layerName, version)))
     }
 
     async info() {
