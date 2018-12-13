@@ -24,6 +24,7 @@ inputTypes:
     type: AwsProvider
     displayName: AWS Provider
     description: The AWSProvider instance that contains the credentials for AWS
+    required: true
   layerName:
     type: string
     required: true
