@@ -497,7 +497,7 @@ describe('AwsLambdaLayerVersion', () => {
     nextAwsLambdaLayerVersion = resolveComponentEvaluables(nextAwsLambdaLayerVersion)
 
     nextAwsLambdaLayerVersion.pack = jest.fn()
-    awsLambdaLayerVersion.zip = 'zipfilecontent'
+    nextAwsLambdaLayerVersion.zip = 'zipfilecontent'
 
     const result = await nextAwsLambdaLayerVersion.shouldDeploy(prevAwsLambdaLayerVersion, context)
 

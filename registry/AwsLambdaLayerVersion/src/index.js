@@ -42,7 +42,6 @@ const AwsLambdaLayerVersion = async (SuperClass) => {
     hydrate(prevInstance) {
       super.hydrate(prevInstance)
       this.arn = get('arn', prevInstance)
-      this.zip = get('zip', prevInstance)
       this.layerVersion = get('layerVersion', prevInstance)
       this.versions = get('versions', prevInstance)
     }
