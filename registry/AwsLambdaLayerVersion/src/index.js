@@ -1,7 +1,7 @@
 import crypto from 'crypto'
 import path from 'path'
 import { tmpdir } from 'os'
-import { readFileSync } from 'fs'
+import { readFile } from 'fs-extra'
 import {
   equals,
   get,
@@ -49,7 +49,7 @@ const AwsLambdaLayerVersion = async (SuperClass) => {
 
     async shouldDeploy(prevInstance, context) {
       if (isArchivePath(this.content)) {
-        this.zip = readFileSync(this.content)
+        this.zip = await readFile(this.content)
       } else {
         await this.pack(context)
       }
@@ -91,7 +91,7 @@ const AwsLambdaLayerVersion = async (SuperClass) => {
       const outputFilePath = path.join(tmpdir(), outputFileName)
 
       await packDir(inputDirPath, outputFilePath)
-      this.zip = readFileSync(outputFilePath)
+      this.zip = await readFile(outputFilePath)
       return this.zip
     }
 

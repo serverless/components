@@ -2,7 +2,7 @@ import AWS from 'aws-sdk'
 import path from 'path'
 import { tmpdir } from 'os'
 import { packDir } from '@serverless/utils'
-import { readFileSync } from 'fs'
+import { readFile } from 'fs-extra'
 import { deserialize, resolveComponentEvaluables, serialize } from '../../../src/utils'
 import { createTestContext } from '../../../test'
 
@@ -13,9 +13,9 @@ jest.mock('@serverless/utils', () => ({
   packDir: jest.fn()
 }))
 
-jest.mock('fs', () => ({
-  ...require.requireActual('fs'),
-  readFileSync: jest.fn().mockReturnValue('zipfilecontent')
+jest.mock('fs-extra', () => ({
+  ...require.requireActual('fs-extra'),
+  readFile: jest.fn().mockReturnValue(Promise.resolve('zipfilecontent'))
 }))
 
 jest.mock('folder-hash', () => ({
@@ -71,7 +71,7 @@ describe('AwsLambdaLayerVersion', () => {
     const outputFilePath = path.join(tmpdir(), outputFileName)
 
     expect(packDir).toBeCalledWith('./content', outputFilePath)
-    expect(readFileSync).toBeCalledWith(outputFilePath)
+    expect(readFile).toBeCalledWith(outputFilePath)
     expect(awsLambdaLayerVersion.zip).toEqual('zipfilecontent')
     expect(awsLambdaLayerVersion.content).toEqual('./content')
     expect(file).toEqual('zipfilecontent')
