@@ -23,7 +23,7 @@ inputTypes:
   provider:
     type: AwsProvider
     displayName: AWS Provider
-    description: The AWSProvider instance that contains the credentials for AWS
+    description: The AwsProvider instance that contains the credentials for AWS
     required: true
   layerName:
     type: string
@@ -49,7 +49,7 @@ inputTypes:
     type: array
     required: false
     displayName: Layer runtimes
-    description: Runtimei the layer is compatible with.
+    description: Runtime the layer is compatible with.
     example: [nodejs8.10]
   licenseInfo:
     type: string
