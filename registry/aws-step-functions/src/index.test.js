@@ -38,9 +38,7 @@ jest.mock('aws-sdk', () => {
 })
 
 afterEach(() => {
-  AWS.mocks.createStateMachineMock.mockClear()
-  AWS.mocks.updateStateMachineMock.mockClear()
-  AWS.mocks.deleteStateMachineMock.mockClear()
+  jest.clearAllMocks()
 })
 
 afterAll(() => {

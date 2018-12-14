@@ -32,7 +32,7 @@ const createStateMachine = async (inputs) => {
     definition: JSON.stringify(inputs.definition, null, 2),
     roleArn: inputs.roleArn
   }
-  return await stepfunctions.createStateMachine(params).promise()
+  return stepfunctions.createStateMachine(params).promise()
 }
 
 const createComponent = async (inputs, context) => {
@@ -49,11 +49,11 @@ const deploy = async (inputs, context) => {
   const isNewComponent = (!state.name && inputs.name) || state.name !== inputs.name
   const isTheSameName = state.name && inputs.name && inputs.name === state.name
   if (isNewComponent) {
-    return await createComponent(inputs, context)
+    return createComponent(inputs, context)
   }
   if (isTheSameName) {
     //if input and state name is the same - update only state machine
-    return await updateComponent(inputs, context)
+    return updateComponent(inputs, context)
   }
 }
 
