@@ -99,7 +99,9 @@ describe('AwsLambdaLayerVersion', () => {
       Content: {
         ZipFile: awsLambdaLayerVersion.zip
       },
-      Description: awsLambdaLayerVersion.layerDescription
+      Description: awsLambdaLayerVersion.layerDescription,
+      CompatibleRuntimes: [],
+      LicenseInfo: ''
     }
     expect(awsLambdaLayerVersion.arn).toEqual('abc:zxc')
     expect(AWS.mocks.publishLayerVersionMock).toBeCalledWith(publishLayerVersionParams)
@@ -145,7 +147,9 @@ describe('AwsLambdaLayerVersion', () => {
       Content: {
         ZipFile: nextAwsLambdaLayerVersion.zip
       },
-      Description: nextAwsLambdaLayerVersion.layerDescription
+      Description: nextAwsLambdaLayerVersion.layerDescription,
+      CompatibleRuntimes: [],
+      LicenseInfo: ''
     }
 
     expect(awsLambdaLayerVersion.arn).toEqual('abc:zxc')
@@ -227,7 +231,9 @@ describe('AwsLambdaLayerVersion', () => {
       Content: {
         ZipFile: nextAwsLambdaLayerVersion.zip
       },
-      Description: nextAwsLambdaLayerVersion.layerDescription
+      Description: nextAwsLambdaLayerVersion.layerDescription,
+      CompatibleRuntimes: [],
+      LicenseInfo: ''
     }
 
     expect(awsLambdaLayerVersion.arn).toEqual('abc:zxc')
@@ -254,7 +260,9 @@ describe('AwsLambdaLayerVersion', () => {
       Content: {
         ZipFile: awsLambdaLayerVersion.zip
       },
-      Description: awsLambdaLayerVersion.layerDescription
+      Description: awsLambdaLayerVersion.layerDescription,
+      CompatibleRuntimes: [],
+      LicenseInfo: ''
     }
 
     expect(awsLambdaLayerVersion.arn).toEqual('abc:zxc')
