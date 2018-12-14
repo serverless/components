@@ -21,7 +21,7 @@ inputTypes:
     description: "The AWS provider the holds the AWS credentials and SDK instance"
   swaggerTemplate:
     type: object
-    required: false # setting this to false otherwise the core will print the entire template on every deployment
+    required: true
     description: The full swagger template for your API
   stage:
     type: string
