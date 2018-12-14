@@ -40,7 +40,7 @@ inputTypes:
       Lambda does not use this value. Assign a meaningful description as you see fit
     example: The layer that does XYZ to ABC
   content:
-    type: string || array || buffer
+    type: string | array | buffer
     required: true
     displayName: Path to content
     description: Path to the folder or the archive file that contains the content for the layer
@@ -58,7 +58,7 @@ inputTypes:
     description: License Information for the layer
     example: Apache-2.0
   retain:
-    type: boolean || string
+    type: boolean | string
     required: false
     displayName: Retention Policy
     description: Retention Policy, options are true, false(default), and 'previous-versions'
