@@ -10,6 +10,7 @@ import {
   isArchivePath,
   keys,
   not,
+  map,
   packDir,
   pick,
   resolve
@@ -34,7 +35,7 @@ const publishLayerVersion = async (
 
 const deleteLayerVersion = async (Lambda, layerName, version) => {
   const params = { LayerName: layerName, VersionNumber: version }
-  await Lambda.deleteLayerVersion(params).promise()
+  return Lambda.deleteLayerVersion(params).promise()
 }
 
 const AwsLambdaLayerVersion = async (SuperClass) => {
@@ -149,7 +150,7 @@ const AwsLambdaLayerVersion = async (SuperClass) => {
 
       context.log(`Removing Lambda Layer Versions: ${layerName}`)
 
-      await Promise.all(versions.map((version) => deleteLayerVersion(Lambda, layerName, version)))
+      return map((version) => deleteLayerVersion(Lambda, layerName, version), versions)
     }
 
     async info() {
