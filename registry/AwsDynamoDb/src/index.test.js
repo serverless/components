@@ -36,34 +36,64 @@ describe('AwsDynamoDb', () => {
   it('should deploy the table when none exists', async () => {
     let awsDynamoDb = context.construct(AwsDynamoDb, {
       provider,
-      tableName: 'test-table'
+      tableName: 'test-table',
+      provisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+      }
     })
     awsDynamoDb = await context.defineComponent(awsDynamoDb)
     awsDynamoDb = resolveComponentEvaluables(awsDynamoDb)
 
     await awsDynamoDb.deploy(null, context)
 
-    expect(AWS.mocks.createTableMock).toBeCalledWith({ TableName: 'test-table' })
+    expect(AWS.mocks.createTableMock).toBeCalledWith({
+      TableName: 'test-table',
+      ProvisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+      }
+    })
   })
 
   it('should update the table if we try to create it and it already exists', async () => {
     let awsDynamoDb = context.construct(AwsDynamoDb, {
       provider,
-      tableName: 'already-created-table'
+      tableName: 'already-created-table',
+      provisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+      }
     })
     awsDynamoDb = await context.defineComponent(awsDynamoDb)
     awsDynamoDb = resolveComponentEvaluables(awsDynamoDb)
 
     await awsDynamoDb.deploy(null, context)
 
-    expect(AWS.mocks.createTableMock).toBeCalledWith({ TableName: 'already-created-table' })
-    expect(AWS.mocks.updateTableMock).toBeCalledWith({ TableName: 'already-created-table' })
+    expect(AWS.mocks.createTableMock).toBeCalledWith({
+      TableName: 'already-created-table',
+      ProvisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+      }
+    })
+    expect(AWS.mocks.updateTableMock).toBeCalledWith({
+      TableName: 'already-created-table',
+      ProvisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+      }
+    })
   })
 
   it('should create the table if we try to update but it does not exist', async () => {
     let awsDynamoDb = context.construct(AwsDynamoDb, {
       provider,
-      tableName: 'non-existent-table'
+      tableName: 'non-existent-table',
+      provisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+      }
     })
     awsDynamoDb = await context.defineComponent(awsDynamoDb)
     awsDynamoDb = resolveComponentEvaluables(awsDynamoDb)
@@ -91,13 +121,23 @@ describe('AwsDynamoDb', () => {
         WriteCapacityUnits: 10
       }
     })
-    expect(AWS.mocks.createTableMock).toBeCalledWith({ TableName: 'non-existent-table' })
+    expect(AWS.mocks.createTableMock).toBeCalledWith({
+      TableName: 'non-existent-table',
+      ProvisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+      }
+    })
   })
 
   it('should replace the table when the table name has changed', async () => {
     let awsDynamoDb = context.construct(AwsDynamoDb, {
       provider,
-      tableName: 'test-table'
+      tableName: 'test-table',
+      provisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+      }
     })
     awsDynamoDb = await context.defineComponent(awsDynamoDb)
     awsDynamoDb = resolveComponentEvaluables(awsDynamoDb)
@@ -107,20 +147,28 @@ describe('AwsDynamoDb', () => {
 
     let nextAwsDynamoDb = context.construct(AwsDynamoDb, {
       provider,
-      tableName: 'updated-test-table'
+      tableName: 'updated-test-table',
+      provisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+      }
     })
     nextAwsDynamoDb = await context.defineComponent(nextAwsDynamoDb, prevAwsDynamoDb)
     nextAwsDynamoDb = resolveComponentEvaluables(nextAwsDynamoDb)
 
     await nextAwsDynamoDb.deploy(prevAwsDynamoDb, context)
 
-    expect(AWS.mocks.createTableMock).toBeCalledWith({ TableName: 'updated-test-table' })
+    expect(AWS.mocks.createTableMock).toHaveBeenCalled()
   })
 
   it('should update the table when table attributes are changed', async () => {
     let awsDynamoDb = context.construct(AwsDynamoDb, {
       provider,
-      tableName: 'test-table'
+      tableName: 'test-table',
+      provisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+      }
     })
     awsDynamoDb = await context.defineComponent(awsDynamoDb)
     awsDynamoDb = resolveComponentEvaluables(awsDynamoDb)
@@ -170,7 +218,11 @@ describe('AwsDynamoDb', () => {
   it('should preserve props if nothing changed', async () => {
     let awsDynamoDb = context.construct(AwsDynamoDb, {
       provider,
-      tableName: 'test-table'
+      tableName: 'test-table',
+      provisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+      }
     })
 
     awsDynamoDb = await context.defineComponent(awsDynamoDb)
@@ -181,7 +233,11 @@ describe('AwsDynamoDb', () => {
 
     let nextAwsDynamoDb = context.construct(AwsDynamoDb, {
       provider,
-      tableName: 'test-table'
+      tableName: 'test-table',
+      provisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+      }
     })
     nextAwsDynamoDb = await context.defineComponent(nextAwsDynamoDb, prevAwsDynamoDb)
     nextAwsDynamoDb = resolveComponentEvaluables(nextAwsDynamoDb)
@@ -191,7 +247,11 @@ describe('AwsDynamoDb', () => {
   it('should remove the table', async () => {
     let awsDynamoDb = context.construct(AwsDynamoDb, {
       provider,
-      tableName: 'test-table'
+      tableName: 'test-table',
+      provisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+      }
     })
     awsDynamoDb = await context.defineComponent(awsDynamoDb)
     awsDynamoDb = resolveComponentEvaluables(awsDynamoDb)
@@ -206,7 +266,11 @@ describe('AwsDynamoDb', () => {
   it('should remove the table even if it does not exist anymore', async () => {
     let awsDynamoDb = context.construct(AwsDynamoDb, {
       provider,
-      tableName: 'already-removed-table'
+      tableName: 'already-removed-table',
+      provisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+      }
     })
     awsDynamoDb = await context.defineComponent(awsDynamoDb)
     awsDynamoDb = resolveComponentEvaluables(awsDynamoDb)
@@ -221,7 +285,11 @@ describe('AwsDynamoDb', () => {
   it('shouldDeploy should return undefined when no changes have occurred', async () => {
     let awsDynamoDb = context.construct(AwsDynamoDb, {
       provider,
-      tableName: 'test-table'
+      tableName: 'test-table',
+      provisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+      }
     })
     awsDynamoDb = await context.defineComponent(awsDynamoDb)
     awsDynamoDb = resolveComponentEvaluables(awsDynamoDb)
@@ -231,7 +299,11 @@ describe('AwsDynamoDb', () => {
 
     let nextAwsDynamoDb = context.construct(AwsDynamoDb, {
       provider: context.construct(AwsProvider, {}),
-      tableName: 'test-table'
+      tableName: 'test-table',
+      provisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+      }
     })
     nextAwsDynamoDb = await context.defineComponent(nextAwsDynamoDb, prevAwsDynamoDb)
     nextAwsDynamoDb = resolveComponentEvaluables(awsDynamoDb)
@@ -244,7 +316,11 @@ describe('AwsDynamoDb', () => {
   it('shouldDeploy should returns "replace" when table name has changed', async () => {
     let awsDynamoDb = context.construct(AwsDynamoDb, {
       provider,
-      tableName: 'test-table'
+      tableName: 'test-table',
+      provisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+      }
     })
     awsDynamoDb = await context.defineComponent(awsDynamoDb)
     awsDynamoDb = resolveComponentEvaluables(awsDynamoDb)
@@ -254,7 +330,11 @@ describe('AwsDynamoDb', () => {
 
     let nextAwsDynamoDb = context.construct(AwsDynamoDb, {
       provider,
-      tableName: 'updated-test-table'
+      tableName: 'updated-test-table',
+      provisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+      }
     })
     nextAwsDynamoDb = await context.defineComponent(nextAwsDynamoDb, prevAwsDynamoDb)
     nextAwsDynamoDb = resolveComponentEvaluables(nextAwsDynamoDb)
@@ -262,5 +342,65 @@ describe('AwsDynamoDb', () => {
     const result = nextAwsDynamoDb.shouldDeploy(prevAwsDynamoDb, context)
 
     expect(result).toBe('replace')
+  })
+
+  it('sync should return "removed" if the table was removed from the provider', async () => {
+    let awsDynamoDb = context.construct(AwsDynamoDb, {
+      provider,
+      tableName: 'already-removed-table',
+      provisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+      }
+    })
+    awsDynamoDb = await context.defineComponent(awsDynamoDb)
+    awsDynamoDb = resolveComponentEvaluables(awsDynamoDb)
+
+    const result = await awsDynamoDb.sync(context)
+
+    expect(result).toBe('removed')
+  })
+
+  it('sync should sync remote and local props if the table was not removed from the provider', async () => {
+    let awsDynamoDb = context.construct(AwsDynamoDb, {
+      provider,
+      tableName: 'describe-table',
+      provisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+      }
+    })
+    awsDynamoDb = await context.defineComponent(awsDynamoDb)
+    awsDynamoDb = resolveComponentEvaluables(awsDynamoDb)
+
+    await awsDynamoDb.sync(context)
+
+    expect(awsDynamoDb.tableName).toBe('describe-table')
+    expect(awsDynamoDb.attributeDefinitions).toEqual([{ AttributeName: 'id', AttributeType: 'S' }])
+    expect(awsDynamoDb.keySchema).toEqual([{ AttributeName: 'id', KeyType: 'HASH' }])
+    expect(awsDynamoDb.provisionedThroughput).toEqual({
+      ReadCapacityUnits: 5,
+      WriteCapacityUnits: 5
+    })
+    expect(awsDynamoDb.globalSecondaryIndexes).toEqual([
+      {
+        IndexName: 'global-index',
+        KeySchema: [{ AttributeName: 'id', KeyType: 'HASH' }],
+        Projection: { ProjectionType: 'ALL' },
+        ProvisionedThroughput: { ReadCapacityUnits: 5, WriteCapacityUnits: 5 }
+      }
+    ])
+    expect(awsDynamoDb.localSecondaryIndexes).toEqual([
+      {
+        IndexName: 'local-index',
+        KeySchema: [{ AttributeName: 'id', KeyType: 'HASH' }],
+        Projection: { ProjectionType: 'ALL' }
+      }
+    ])
+    expect(awsDynamoDb.sseSpecification).toEqual({
+      Enabled: true,
+      KMSMasterKeyId: 'arn:aws:kms:region:XXXXX:master-key/key-id',
+      SSEType: 'AES256'
+    })
   })
 })

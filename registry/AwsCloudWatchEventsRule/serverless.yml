@@ -9,12 +9,16 @@ provider: ${inputs.provider}
 schedule: ${inputs.schedule}
 
 inputTypes:
-  enabled:
-    type: boolean
-  lambda:
-    type: object
   provider:
     type: AwsProvider
     required: true
+  enabled:
+    type: boolean
+    required: false
+    default: true
+  lambda:
+    type: AwsLambdaFunction
+    required: true
   schedule:
     type: string
+    required: true

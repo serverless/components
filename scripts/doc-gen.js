@@ -114,7 +114,7 @@ const config = {
       let contents
       try {
         contents = yaml.safeDump(yml)
-      } catch(error) {
+      } catch (error) {
         throw new Error(`error in example generation for ${JSON.stringify(json, null, 2)}`)
       }
       const header = '## Example\n'

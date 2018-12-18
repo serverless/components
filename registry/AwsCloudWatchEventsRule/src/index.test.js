@@ -66,7 +66,7 @@ describe('AwsCloudWatchEventsRule', () => {
     const addPermissionParams = {
       Action: 'lambda:InvokeFunction',
       FunctionName: 'hello',
-      StatementId: 'hello',
+      StatementId: 'hello-cron',
       Principal: 'events.amazonaws.com'
     }
 
@@ -167,5 +167,38 @@ describe('AwsCloudWatchEventsRule', () => {
 
     expect(AWS.mocks.removeTargets).toBeCalledWith(removeTargetsParams)
     expect(AWS.mocks.deleteRule).toBeCalledWith(deleteRuleParams)
+  })
+
+  it('sync should return "removed" if rule removed from provider', async () => {
+    let awsCloudWatchEventsRule = await context.construct(AwsCloudWatchEventsRule, {
+      provider,
+      enabled: true,
+      schedule: 'rate(5 minutes)',
+      lambda: {
+        functionName: 'already-removed-rule',
+        getId: () => 'arn:aws:lambda:us-east-1:1234567890:function:already-removed-rule'
+      }
+    })
+    awsCloudWatchEventsRule = await context.defineComponent(awsCloudWatchEventsRule)
+    awsCloudWatchEventsRule = resolveComponentEvaluables(awsCloudWatchEventsRule)
+    const res = await awsCloudWatchEventsRule.sync(context)
+    expect(res).toBe('removed')
+  })
+
+  it('sync should update rule config if rule config changed in provider', async () => {
+    let awsCloudWatchEventsRule = await context.construct(AwsCloudWatchEventsRule, {
+      provider,
+      enabled: true,
+      schedule: 'rate(5 minutes)',
+      lambda: {
+        functionName: 'some-rule-name',
+        getId: () => 'arn:aws:lambda:us-east-1:1234567890:function:hello'
+      }
+    })
+    awsCloudWatchEventsRule = await context.defineComponent(awsCloudWatchEventsRule)
+    awsCloudWatchEventsRule = resolveComponentEvaluables(awsCloudWatchEventsRule)
+    await awsCloudWatchEventsRule.sync(context)
+    expect(awsCloudWatchEventsRule.enabled).toBe(false)
+    expect(awsCloudWatchEventsRule.schedule).toBe('rate(6 minutes)')
   })
 })

@@ -16,13 +16,14 @@ inputTypes:
   provider:
     type: AwsProvider
     required: true
-  policyName:
-    type: string
-    default: policy-${this.instanceId}
-    displayName: IAM Policy Name
-    description: The friendly name of the policy
   document:
     type: object
     required: true
     displayName: IAM Policy Document
     description: The JSON policy document that you want to use as the content for the new policy
+  policyName:
+    type: string
+    required: false
+    displayName: IAM Policy Name
+    description: The friendly name of the policy
+

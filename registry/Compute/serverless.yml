@@ -13,7 +13,6 @@ tags: ${inputs.tags}
 inputTypes:
   provider:
     type: Provider
-    default: ${context.provider}
   runtime:
     type: string
     required: false

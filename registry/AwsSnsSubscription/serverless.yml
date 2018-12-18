@@ -26,7 +26,7 @@ inputTypes:
     example: arn:aws:sns:us-east-1:123456789012:my_topic
   protocol:
     type: string
-    required: true
+    required: false
     default: https
     displayName: Protocol
     description: The protocol of the subscription, possible values are http, https, email, email-json, sms, sqs, application, and lambda

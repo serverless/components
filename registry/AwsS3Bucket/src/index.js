@@ -1,4 +1,4 @@
-import { get, pick } from '@serverless/utils'
+import { get, pick, resolve } from '@serverless/utils'
 import { createBucket, deleteBucket } from './utils'
 
 const DEPLOY = 'deploy'
@@ -13,6 +13,22 @@ const AwsS3Bucket = (SuperClass) =>
       const bucketNameRegex = new RegExp(this.inputTypes.bucketName.pattern)
       if (inputs.bucketName && !bucketNameRegex.test(inputs.bucketName)) {
         throw new Error(`Bucket name does not match regex "${bucketNameRegex.toString()}"`)
+      }
+    }
+
+    async sync() {
+      let { provider } = this
+      provider = resolve(provider)
+      const AWS = provider.getSdk()
+      const S3 = new AWS.S3()
+
+      try {
+        await S3.getBucketLocation({ Bucket: resolve(this.bucketName) }).promise()
+      } catch (e) {
+        if (e.code === 'NoSuchBucket') {
+          return 'removed'
+        }
+        throw e
       }
     }
 

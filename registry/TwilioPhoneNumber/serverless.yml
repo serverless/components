@@ -16,7 +16,7 @@ inputTypes:
   preserve:
     type: boolean
     required: false
-    default: true
+    default: false
     description: If set to true, the phone number will not be released when this component is removed.
   phoneNumber:
     type: string

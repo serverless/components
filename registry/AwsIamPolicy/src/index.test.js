@@ -113,9 +113,6 @@ describe('AwsIamPolicy', () => {
     prevAwsIamPolicy.arn = 'abc:zxc'
     await prevAwsIamPolicy.remove(context)
 
-    expect(AWS.mocks.deletePolicyMock).toBeCalledWith({
-      PolicyArn: prevAwsIamPolicy.arn
-    })
     expect(AWS.mocks.listEntitiesForPolicyMock).toBeCalledWith({
       PolicyArn: prevAwsIamPolicy.arn
     })
@@ -129,6 +126,14 @@ describe('AwsIamPolicy', () => {
     })
     expect(AWS.mocks.detachUserPolicyMock).toBeCalledWith({
       UserName: 'user',
+      PolicyArn: prevAwsIamPolicy.arn
+    })
+    expect(AWS.mocks.listPolicyVersionsMock).toBeCalledWith({
+      PolicyArn: prevAwsIamPolicy.arn
+    })
+    // because the mocks return 2 none default versions...
+    expect(AWS.mocks.deletePolicyVersionMock).toHaveBeenCalledTimes(2)
+    expect(AWS.mocks.deletePolicyMock).toBeCalledWith({
       PolicyArn: prevAwsIamPolicy.arn
     })
   })
@@ -395,5 +400,72 @@ describe('AwsIamPolicy', () => {
     oldAwsIamPolicy = resolveComponentEvaluables(oldAwsIamPolicy)
     const res = oldAwsIamPolicy.shouldDeploy(null, context)
     expect(res).toBe('deploy')
+  })
+
+  it('sync should return removed if policy does not exist in provider', async () => {
+    let oldAwsIamPolicy = await context.construct(AwsIamPolicy, {
+      policyName: 'already-removed-policy',
+      document: {
+        Version: '2012-10-17',
+        Statement: {
+          Effect: 'Allow',
+          Principal: {
+            Service: 'lambda.amazonaws.com'
+          },
+          Action: 'sts:AssumeRole'
+        }
+      },
+      provider
+    })
+    oldAwsIamPolicy = await context.defineComponent(oldAwsIamPolicy)
+    oldAwsIamPolicy = resolveComponentEvaluables(oldAwsIamPolicy)
+    const res = await oldAwsIamPolicy.sync(context)
+    expect(res).toBe('removed')
+  })
+
+  it('sync should update properties if policy changed in provider', async () => {
+    let oldAwsIamPolicy = await context.construct(AwsIamPolicy, {
+      policyName: 'some-policy-name',
+      document: {
+        Version: '2012-10-17',
+        Statement: [
+          {
+            Resource: [
+              'arn:aws:dynamodb:us-east-1:558750028299:table/ServerlessWebappUser-ServerlessWebApp-prod-hbrizf9d'
+            ],
+            Effect: 'Allow',
+            Action: [
+              // 'dynamodb:GetItem', this has changed in provider
+              'dynamodb:PutItem',
+              'dynamodb:UpdateItem',
+              'dynamodb:DeleteItem'
+            ]
+          }
+        ]
+      },
+      provider
+    })
+    oldAwsIamPolicy = await context.defineComponent(oldAwsIamPolicy)
+    oldAwsIamPolicy = resolveComponentEvaluables(oldAwsIamPolicy)
+    await oldAwsIamPolicy.sync(context)
+
+    const expectedDocument = {
+      Version: '2012-10-17',
+      Statement: [
+        {
+          Resource: [
+            'arn:aws:dynamodb:us-east-1:558750028299:table/ServerlessWebappUser-ServerlessWebApp-prod-hbrizf9d'
+          ],
+          Effect: 'Allow',
+          Action: [
+            'dynamodb:GetItem', // it's back here from the provider
+            'dynamodb:PutItem',
+            'dynamodb:UpdateItem',
+            'dynamodb:DeleteItem'
+          ]
+        }
+      ]
+    }
+    expect(oldAwsIamPolicy.document).toEqual(expectedDocument)
   })
 })

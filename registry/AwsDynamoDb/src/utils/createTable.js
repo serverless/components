@@ -1,4 +1,4 @@
-const createTable = async (properties) => {
+async function createTable(properties) {
   const {
     provider,
     tableName,

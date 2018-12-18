@@ -19,13 +19,11 @@ inputTypes:
   bucketName:
     type: string
     required: false
-    default: bucket-${this.instanceId}
     displayName: S3 Bucket Name
     description: The name of your S3 bucket. Name must be globally unique in AWS
     example: my-project-bucket-${this.instanceId}
     pattern: ^[a-z0-9\.\-]{3,63}$
   provider:
     type: AwsProvider
-    default: ${context.provider}
     displayName: AWS Provider
     description: The AWSProvider instance that contains the credentials for AWS

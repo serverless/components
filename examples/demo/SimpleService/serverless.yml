@@ -6,26 +6,25 @@ providers:
     type: AwsProvider
     inputs:
       region: us-east-1
-#
-#compute:
-#  type: AwsLambdaCompute
-#  inputs:
-#    provider: ${this.providers.aws}
-#    runtime: nodejs
-#
-#functions:
-#  hello:
-#    compute: ${this.compute}
-#    handler: index.hello
-#    code: ./code
-#    memory: 1024
-#    timeout: 20
-#    ufs: true
+
+compute:
+  type: AwsLambdaCompute
+  inputs:
+    provider: ${this.providers.aws}
+    runtime: nodejs
+
+functions:
+  IdempotentCron10:
+    compute: ${this.compute}
+    handler: index.hello
+    code: ./code
+    memory: 512
+    timeout: 20
+    ufs: true
 
 components:
-  role:
-    type: AwsIamRole
+  cron:
+    type: Cron
     inputs:
-      provider: ${this.providers.aws}
-      roleName: some-new-role-name-3
-      service: elasticmapreduce.amazonaws.com
+      function: ${this.functions.IdempotentCron10}
+      rate: 7m
