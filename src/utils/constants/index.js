@@ -1,4 +1,6 @@
+export { default as DEFAULT_LOADERS } from './DEFAULT_LOADERS'
 export { default as DEFAULT_PLUGINS } from './DEFAULT_PLUGINS'
+export { default as NATIVE_TYPES } from './NATIVE_TYPES'
 export { default as PLUGINS_DIR } from './PLUGINS_DIR'
 export { default as SYMBOL_KEY } from './SYMBOL_KEY'
 export { default as SYMBOL_TYPE } from './SYMBOL_TYPE'

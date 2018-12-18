@@ -10,6 +10,7 @@ import * as object from './object'
 import * as string from './string'
 import * as _undefined from './undefined'
 
+// TODO BRN: Serializers should be supplied by types so that types can introduce new low level primitives that are serializable
 export {
   array,
   boolean,

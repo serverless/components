@@ -35,7 +35,7 @@ describe('AwsProvider', () => {
         region: null
       }
 
-      const awsProvider = await context.construct(AwsProvider, inputs)
+      const awsProvider = context.construct(AwsProvider, inputs)
 
       expect(awsProvider.getCredentials()).toEqual({
         credentials: {
@@ -57,7 +57,7 @@ describe('AwsProvider', () => {
         region: 'us-east-1'
       }
 
-      const awsProvider = await context.construct(AwsProvider, inputs)
+      const awsProvider = context.construct(AwsProvider, inputs)
       const AwsSdk = awsProvider.getSdk()
 
       expect(AwsSdk).toEqual(AWS)
@@ -75,7 +75,7 @@ describe('AwsProvider', () => {
         region: 'us-east-1'
       }
 
-      const awsProvider = await context.construct(AwsProvider, inputs)
+      const awsProvider = context.construct(AwsProvider, inputs)
       const credentials = awsProvider.getCredentials()
 
       expect(credentials).toEqual(inputs)
@@ -92,7 +92,7 @@ describe('AwsProvider', () => {
         region: 'us-east' // correct would be 'us-east-1'
       }
 
-      const awsProvider = await context.construct(AwsProvider, inputs)
+      const awsProvider = context.construct(AwsProvider, inputs)
 
       expect(() => awsProvider.validate()).toThrow('Invalid region')
     })
@@ -103,7 +103,7 @@ describe('AwsProvider', () => {
         region: 'us-east-1'
       }
 
-      const awsProvider = await context.construct(AwsProvider, inputs)
+      const awsProvider = context.construct(AwsProvider, inputs)
 
       expect(() => awsProvider.validate()).toThrow('Credentials not set')
     })
@@ -114,7 +114,7 @@ describe('AwsProvider', () => {
         region: 'us-east-1'
       }
 
-      const awsProvider = await context.construct(AwsProvider, inputs)
+      const awsProvider = context.construct(AwsProvider, inputs)
 
       expect(() => awsProvider.validate()).toThrow('Credentials not set')
     })

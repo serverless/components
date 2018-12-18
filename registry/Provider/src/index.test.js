@@ -27,7 +27,7 @@ describe('Provider', () => {
       }
     }
 
-    const provider = await context.construct(Provider, inputs)
+    const provider = context.construct(Provider, inputs)
 
     expect(provider.getCredentials()).toEqual({
       test: 'bar'
@@ -41,7 +41,7 @@ describe('Provider', () => {
       }
     }
 
-    const provider = await context.construct(Provider, inputs)
+    const provider = context.construct(Provider, inputs)
 
     expect(() => {
       provider.getSdk()

@@ -148,8 +148,8 @@ const hashProjectDir = async (projectDir) => {
 
 const AwsS3Website = (SuperClass) =>
   class extends SuperClass {
-    async construct(inputs, context) {
-      await super.construct(inputs, context)
+    construct(inputs, context) {
+      super.construct(inputs, context)
 
       // TODO BRN: Move this to a validate step (maybe on a per property basis that validates when set)
       if (!path.isAbsolute(resolve(this.projectDir))) {

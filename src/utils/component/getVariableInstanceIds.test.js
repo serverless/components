@@ -13,10 +13,10 @@ describe('#getVariableInstanceIds()', () => {
       }
     )
     const Component = await context.import('Component')
-    const component = await context.construct(Component, {})
-    const fooComponent = await context.construct(Component, {})
-    const barComponent = await context.construct(Component, {})
-    const bazComponent = await context.construct(Component, {})
+    const component = context.construct(Component, {})
+    const fooComponent = context.construct(Component, {})
+    const barComponent = context.construct(Component, {})
+    const bazComponent = context.construct(Component, {})
 
     const data = {
       foo: fooComponent,

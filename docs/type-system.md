@@ -178,7 +178,7 @@ const myFunction = async (instance, context) => {
   //  root: '/absolute/path/to/type/folder'
   //}
 
-  const myInstance = await context.construct(MyType, {})
+  const myInstance = context.construct(MyType, {})
   console.log(myInstance)
   //=> {
   //  name: 'MyType',
@@ -238,7 +238,7 @@ export default MyType
 
 ```js
 const MyType = await context.import('./MyType')
-const instance = await context.construct(MyType, inputs)
+const instance = context.construct(MyType, inputs)
 
 console.log(instance)
 // {
@@ -296,10 +296,10 @@ const MyChildType = (SuperClass, context) => {
     foo(arg1, arg2, context) {
       // prototype super call
       SuperClass.prototype.foo.call(this, arg1, arg2, context)
-      const instance = await context.construct(AWSLambdaFunction, {})
+      const instance = context.construct(AWSLambdaFunction, {})
     },
     bar(arg2, arg3, context) {
-      const instance = await context.construct(AWSLambdaFunction, {})
+      const instance = context.construct(AWSLambdaFunction, {})
     }
   }
 }
@@ -333,11 +333,11 @@ const MyChildType = (SuperClass, context) => {
     foo(arg1, arg2, context) {
       // super call
       super.foo(arg1, arg2, context)
-      const instance = await context.construct(AWSLambdaFunction, {})
+      const instance = context.construct(AWSLambdaFunction, {})
     }
 
     bar(arg2, arg3, context) {
-      const instance = await context.construct(AWSLambdaFunction, {})
+      const instance = context.construct(AWSLambdaFunction, {})
     }
   }
 }
@@ -349,11 +349,11 @@ export default MyChildType
 
 To convert a type to a component instance, simply use the `context.construct` method and supply the method with the type and inputs.
 
-NOTE: Construction is an async process since we have to load type during the construction.
+NOTE: Construction is an sync process. All necessary subtypes needed by the given type are loaded during the call to `import`.
 
 ```js
 const MyType = await context.import('./MyType')
-const instance = await context.construct(MyType, inputs)
+const instance = context.construct(MyType, inputs)
 ```
 
 Variables are replace with dynamic getters that resolve the variable when the value is accessed. They resolve the value every time the property is accessed so you can get different values at different times depending upon when the value was accessed.

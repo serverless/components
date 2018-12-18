@@ -158,7 +158,7 @@ class AWSLambdaCompute extends Compute {
     tags
   }, context) {
     // programmatically deploy AWSLambdaFunction
-    const AWSLambdaFunction = context.loadType('AWSLambdaFunction')
+    const AWSLambdaFunction = context.import('AWSLambdaFunction')
     const awsLambdaFunction = context.construct(AWSLambdaFunction, {
       name: uniquelyGeneratedNameBasedOnFunctionInstanceId,
       code: codeStream,
@@ -315,9 +315,150 @@ components:
 
 
 
+Single service that processes an image when added to a bucket
 
 ```yaml
-name: MyService
+name: ImageProcessor
 extends: Service
 
-provider
+providers:
+  aws:
+    type: AWSProvider
+    inputs:
+      credentials:
+        accessKey: ...
+        secretAccessKey: ...
+
+compute:
+  lambda:
+    type: AWSLambdaCompute
+    inputs:
+      runtime: node@8.11
+      provider: ${this.providers.aws}
+
+functions:
+  resizeImage:
+    compute: ${this.compute.lambda}
+    handler: index.resizeImage
+    code: ./resizer
+    events:
+      - source: ${this.components.bucket}
+        config:
+          event: s3:ObjectCreated:*
+
+components:
+  bucket:
+    type: AwsS3Bucket
+    inputs:
+      name: my-images-{$this.instanceId}
+```
+
+
+Single service that connects to a RestApi
+
+```yaml
+name: UsersService
+extends: Service
+
+providers:
+  aws:
+    type: AWSProvider
+    inputs:
+      credentials:
+        accessKey: ...
+        secretAccessKey: ...
+
+compute:
+  type: AWSLambdaCompute
+  inputs:
+    runtime: node@8.11
+    provider: ${this.providers.aws}
+
+functions:
+  createUser:
+    compute: ${this.compute.lambda}
+    handler: index.createUser
+    code: ./crud
+    events:
+      - source: ${this.components.restApi}
+        config:
+          path: users/create
+          method: post
+          cors: true
+  getUser:
+    compute: ${this.compute.lambda}
+    handler: index.getUser
+    code: ./crud
+    events:
+      - source: ${this.components.restApi}
+        config:
+          path: users/{id}
+          method: get
+          cors: true
+  updateUser:
+    compute: ${this.compute.lambda}
+    handler: index.updateUser
+    code: ./crud
+    events:
+      - source: ${this.components.restApi}
+        config:
+          path: users/{id}
+          method: put
+          cors: true
+  deleteUser:
+    compute: ${this.compute.lambda}
+    handler: index.deleteUser
+    code: ./crud
+    events:
+      - source: ${this.components.restApi}
+        config:
+          path: users/{id}
+          method: post
+          cors: true
+
+components:
+  restApi:
+    type: RestApi
+    inputs:
+      provider: ${this.providers.aws}
+      apiName: users-api-${this.instanceId}
+```
+
+
+
+Single service that runs a task on cron
+
+```yaml
+name: ScheduledLogCleanup
+extends: Service
+
+providers:
+  aws:
+    type: AWSProvider
+    inputs:
+      credentials:
+        accessKey: ...
+        secretAccessKey: ...
+
+compute:
+  type: AWSLambdaCompute
+  inputs:
+    runtime: node@8.11
+    provider: ${this.providers.aws}
+
+functions:
+  resizeImage:
+    compute: ${this.compute.lambda}
+    handler: index.cleanupLogs
+    code: ./cleanup
+    events:
+      - source: ${this.components.cron}
+        config:
+          schedule: rate(1 minute)
+
+components:
+  cron:
+    type: Cron
+    inputs:
+      provider: ${this.providers.aws}
+```

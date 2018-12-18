@@ -37,7 +37,7 @@ describe('Service', () => {
 
   describe('#construct()', () => {
     it('should default components and functions to empty objects', async () => {
-      const service = await context.construct(Service, {})
+      const service = context.construct(Service, {})
 
       expect(resolve(service.components)).toEqual({})
       expect(resolve(service.functions)).toEqual({})
@@ -46,7 +46,7 @@ describe('Service', () => {
     it('should construct function instances', async () => {
       const Function = await context.import('Function')
 
-      const service = await context.construct(Service, {
+      const service = context.construct(Service, {
         functions: {
           hello: {
             functionName: 'hello'
@@ -60,9 +60,9 @@ describe('Service', () => {
 
     it('should creaate component instances', async () => {
       const Component = await context.import('Component')
-      const component1 = await context.construct(Component, {})
+      const component1 = context.construct(Component, {})
 
-      const service = await context.construct(Service, {
+      const service = context.construct(Service, {
         components: {
           component1,
           component2: {
@@ -77,7 +77,7 @@ describe('Service', () => {
     })
 
     it('should throw if type is not a component', async () => {
-      await expect(
+      expect(() =>
         context.construct(Service, {
           components: {
             component: {
@@ -86,17 +86,17 @@ describe('Service', () => {
             }
           }
         })
-      ).rejects.toThrow('is not of type Component')
+      ).toThrow('is not of type Component')
     })
 
     it('should throw if component definition is invalid', async () => {
-      await expect(
+      expect(() =>
         context.construct(Service, {
           components: {
             component: {}
           }
         })
-      ).rejects.toThrow('is invalid')
+      ).toThrow('is invalid')
     })
   })
 
@@ -104,7 +104,7 @@ describe('Service', () => {
     it('should define functions as instances', async () => {
       const Function = await context.import('Function')
 
-      const service = await context.construct(Service, {
+      const service = context.construct(Service, {
         functions: {
           hello: {
             functionName: 'hello'
@@ -122,9 +122,9 @@ describe('Service', () => {
   describe('#info()', () => {
     it('should return the service info', async () => {
       const Component = await context.import('Component')
-      const component = await context.construct(Component, {})
+      const component = context.construct(Component, {})
 
-      const service = await context.construct(Service, {
+      const service = context.construct(Service, {
         functions: {
           hello: {
             functionName: 'hello'

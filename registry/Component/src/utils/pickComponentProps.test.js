@@ -15,7 +15,7 @@ describe('pickComponentProps', () => {
     const inputs = {
       foo: 'bar'
     }
-    const component = await context.construct(Component, inputs)
+    const component = context.construct(Component, inputs)
 
     expect(pickComponentProps(component)).toEqual(
       omit(['components', 'inputTypes'], {

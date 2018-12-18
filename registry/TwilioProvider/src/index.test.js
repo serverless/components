@@ -27,7 +27,7 @@ describe('TwilioProvider', () => {
     }
 
     const TwilioProvider = await context.import('./')
-    const twilioProvider = await context.construct(TwilioProvider, inputs)
+    const twilioProvider = context.construct(TwilioProvider, inputs)
 
     expect(twilioProvider.getCredentials()).toEqual(inputs)
   })
@@ -46,7 +46,7 @@ describe('TwilioProvider', () => {
     }
 
     const TwilioProvider = await context.import('./')
-    const twilioProvider = await context.construct(TwilioProvider, inputs)
+    const twilioProvider = context.construct(TwilioProvider, inputs)
 
     const sdk = twilioProvider.getSdk()
 

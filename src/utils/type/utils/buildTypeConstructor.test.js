@@ -1,5 +1,5 @@
-import { SYMBOL_TYPE, SYMBOL_VARIABLE } from '../constants'
-import createContext from '../context/createContext'
+import { SYMBOL_TYPE, SYMBOL_VARIABLE } from '../../constants'
+import createContext from '../../context/createContext'
 import buildTypeConstructor from './buildTypeConstructor'
 
 describe('#buildTypeConstructor()', () => {
@@ -85,7 +85,7 @@ describe('#buildTypeConstructor()', () => {
       }
     }
     const Class = class {
-      async construct(inpt, ctx) {
+      construct(inpt, ctx) {
         expect(inpt).toBe(inputs)
         expect(ctx).toBe(context)
         expect(this).toEqual({
@@ -98,7 +98,7 @@ describe('#buildTypeConstructor()', () => {
     Type.class = Class
     Type.constructor = buildTypeConstructor(Type, context)
     context = context.merge({ Type })
-    const instance = await new Type.constructor(inputs, context)
+    const instance = new Type.constructor(inputs, context)
 
     expect(instance).toEqual({
       name: 'Test',
@@ -120,7 +120,7 @@ describe('#buildTypeConstructor()', () => {
     }
     Type.constructor = buildTypeConstructor(Type, context)
     context = context.merge({ Type })
-    const instance = await new Type.constructor(inputs, context)
+    const instance = new Type.constructor(inputs, context)
 
     expect(instance).toEqual({
       name: 'Test',
@@ -137,7 +137,7 @@ describe('#buildTypeConstructor()', () => {
         foo1: null
       },
       class: class {
-        async construct(inputs) {
+        construct(inputs) {
           expect(inputs).toEqual({
             foo1: 'bar1'
           })
@@ -152,7 +152,7 @@ describe('#buildTypeConstructor()', () => {
         foo2: null
       },
       class: class {
-        async construct(inputs) {
+        construct(inputs) {
           expect(inputs).toEqual({
             foo2: 'bar2'
           })
@@ -164,7 +164,7 @@ describe('#buildTypeConstructor()', () => {
 
     let context = await createContext({
       overrides: {
-        import: async (query) => {
+        require: (query) => {
           if (query === 'Test1') {
             return Test1Type
           } else if (query === 'Test2') {
@@ -196,7 +196,7 @@ describe('#buildTypeConstructor()', () => {
     }
     MainType.constructor = buildTypeConstructor(MainType, context)
     context = context.merge({ Type: MainType })
-    const instance = await new MainType.constructor({}, context)
+    const instance = new MainType.constructor({}, context)
 
     expect(instance).toEqual({
       testArray: [

@@ -80,7 +80,7 @@ describe.skip('TwilioApplication', () => {
     }
 
     const TwilioApplication = await context.import('./')
-    const twilioApplication = await context.construct(TwilioApplication, {})
+    const twilioApplication = context.construct(TwilioApplication, {})
 
     Object.assign(twilioApplication, inputs)
 
@@ -118,7 +118,7 @@ describe.skip('TwilioApplication', () => {
     }
 
     const TwilioApplication = await context.import('./')
-    const twilioApplication = await context.construct(TwilioApplication, {})
+    const twilioApplication = context.construct(TwilioApplication, {})
 
     Object.assign(twilioApplication, inputs)
 
@@ -159,7 +159,7 @@ describe.skip('TwilioApplication', () => {
     }
 
     const TwilioApplication = await context.import('./')
-    const twilioApplication = await context.construct(TwilioApplication, {})
+    const twilioApplication = context.construct(TwilioApplication, {})
 
     Object.assign(twilioApplication, inputs)
 
@@ -201,7 +201,7 @@ describe.skip('TwilioApplication', () => {
     }
 
     const TwilioApplication = await context.import('./')
-    const twilioApplication = await context.construct(TwilioApplication, {})
+    const twilioApplication = context.construct(TwilioApplication, {})
 
     Object.assign(twilioApplication, inputs)
 
@@ -236,14 +236,14 @@ describe.skip('TwilioApplication', () => {
       messageStatusCallback: 'foo'
     }
     const ComponentType = await context.import('./')
-    let oldComponent = await context.construct(ComponentType, inputs)
+    let oldComponent = context.construct(ComponentType, inputs)
     oldComponent = await context.defineComponent(oldComponent)
     oldComponent = resolveComponentEvaluables(oldComponent)
     await oldComponent.deploy(null, context)
 
     const prevComponent = await deserialize(serialize(oldComponent, context), context)
 
-    let newComponent = await context.construct(ComponentType, inputs)
+    let newComponent = context.construct(ComponentType, inputs)
     newComponent = await context.defineComponent(newComponent, prevComponent)
     newComponent = resolveComponentEvaluables(newComponent)
 

@@ -4,7 +4,7 @@ const simpleFunctionScript = async () => {
   const context = await createContext({
     cwd: __dirname
   })
-  const AwsProvider = await context.loadType('AwsProvider')
+  const AwsProvider = await context.import('AwsProvider')
   const AwsProviderInputs = {
     region: 'us-east-1',
     credentials: {
@@ -12,21 +12,17 @@ const simpleFunctionScript = async () => {
       secretAccessKey: 'xxx'
     }
   }
-  const awsProvider = await context.construct(AwsProvider, AwsProviderInputs, context)
+  const awsProvider = context.construct(AwsProvider, AwsProviderInputs, context)
 
-  const AwsLambdaCompute = await context.loadType('AwsLambdaCompute')
+  const AwsLambdaCompute = await context.import('AwsLambdaCompute')
   const AwsLambdaComputeInputs = {
     provider: awsProvider,
     memory: 512,
     runtime: 'nodejs'
   }
-  const awsLambdaCompute = await context.construct(
-    AwsLambdaCompute,
-    AwsLambdaComputeInputs,
-    context
-  )
+  const awsLambdaCompute = context.construct(AwsLambdaCompute, AwsLambdaComputeInputs, context)
 
-  const Function = await context.loadType('Function')
+  const Function = await context.import('Function')
   const FunctionInputs = {
     compute: {
       aws: awsLambdaCompute
@@ -38,7 +34,7 @@ const simpleFunctionScript = async () => {
     code: './SimpleFunction',
     handler: 'index.hello'
   }
-  const fn = await context.construct(Function, FunctionInputs, context)
+  const fn = context.construct(Function, FunctionInputs, context)
 
   await fn.deploy(context)
 }
@@ -48,8 +44,8 @@ const simpleFunctionScript = async () => {
 //     cwd: __dirname
 // })
 //
-//   const SimpleService = await context.loadType('./SimpleService')
-//   const simpleService = await context.construct(SimpleService, {}, context)
+//   const SimpleService = await context.import('./SimpleService')
+//   const simpleService = context.construct(SimpleService, {}, context)
 //
 //   simpleService.deploy(context)
 // }

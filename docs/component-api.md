@@ -7,7 +7,7 @@ This document outlines the component methods that are available and gives a deta
 
 Similar to a class constructor, this method can be used to assign properties to your component instance. You can also define any data for you instance as well like default values or instantiation of more complex data types.  (see note)
 
-*NOTE:* This method is async and **must** be declared as async and **must** call and await the `super.construct` method. This will likely be changed in the near future to be sync to prevent confusion associated with writing this method.
+*NOTE:* This method is optional. If you do implement this method, it is sync and **must** call the `super.construct` method.
 <br />
 <br />
 
@@ -29,8 +29,8 @@ Similar to a class constructor, this method can be used to assign properties to 
 const AwsIamRole = async (SuperClass, superContext) => {
   ...
   return class extends SuperClass {
-    async construct(inputs, context) {
-      await super.construct(inputs, context)
+    construct(inputs, context) {
+      super.construct(inputs, context)
       const defaultPolicy = {
         arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
       }
@@ -52,7 +52,7 @@ This method can be used to programmatically define your component's children. Us
 
 To define a component, simply construct any number of components and return them in either an object or an array.
 
-NOTE: This method is optional to define. If you don't define this method, it will default to defining all components declared in `serverless.yml` as your component's children. If you DO define this method, you will also need to return any components declared in the components property in order for core to know about them.
+*NOTE:* This method is optional to define. If you don't define this method, it will default to defining all components declared in `serverless.yml` as your component's children. If you DO define this method, you will also need to return any components declared in the components property in order for core to know about them.
 
 This method optionally can be `async`.
 
@@ -74,14 +74,14 @@ This method optionally can be `async`.
 import { resolve } from '@serverless/utils'
 
 const AwsLambdaFunction = async (SuperClass, superContext) => {
-  const AwsIamRole = await superContext.loadType('AwsIamRole')
+  const AwsIamRole = await superContext.import('AwsIamRole')
 
   return class extends SuperClass {
     ...
     async define(context) {
       let role = resolve(this.role)
       if (!role) {
-        role = await context.construct(
+        role = context.construct(
           AwsIamRole,
           {
             roleName: `${resolve(this.functionName)}-execution-role`,

@@ -5,8 +5,8 @@ const DEPLOY = 'deploy'
 
 const Component = (SuperClass) =>
   class extends SuperClass {
-    async construct(inputs, context) {
-      await super.construct(inputs, context)
+    construct(inputs, context) {
+      super.construct(inputs, context)
 
       // TODO BRN: this is not the best solution, this is causing problems
       this.instanceId = context.generateInstanceId()

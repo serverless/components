@@ -8,6 +8,7 @@ describe('#newContext()', () => {
       cwd: '/test/dir',
       data: {},
       deployment: {},
+      loaders: {},
       options: {
         project: '/project/path'
       },
@@ -16,6 +17,7 @@ describe('#newContext()', () => {
       registry: 'https://registry.com',
       root: '/test/root',
       state: {},
+      types: {},
       Type: { foo: 'bar' }
     })
     expect(context).toEqual({
@@ -37,7 +39,6 @@ describe('#newContext()', () => {
       data: {},
       debug: expect.any(Function),
       defineComponent: expect.any(Function),
-      defineComponentFromState: expect.any(Function),
       define: expect.any(Function),
       deployment: {},
       generateInstanceId: expect.any(Function),
@@ -51,6 +52,7 @@ describe('#newContext()', () => {
       loadPreviousInstance: expect.any(Function),
       loadProject: expect.any(Function),
       loadState: expect.any(Function),
+      loaders: {},
       import: expect.any(Function),
       log: expect.any(Function),
       merge: expect.any(Function),
@@ -60,10 +62,12 @@ describe('#newContext()', () => {
       plugins: {},
       project: {},
       registry: 'https://registry.com',
+      require: expect.any(Function),
       root: '/test/root',
       saveState: expect.any(Function),
       set: expect.any(Function),
       state: {},
+      types: {},
       Type: { foo: 'bar' }
     })
   })

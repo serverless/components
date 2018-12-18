@@ -6,8 +6,8 @@ const REPLACE = 'replace'
 
 const AwsS3Bucket = (SuperClass) =>
   class extends SuperClass {
-    async construct(inputs, context) {
-      await super.construct(inputs, context)
+    construct(inputs, context) {
+      super.construct(inputs, context)
 
       // TODO: remove this validation once core supports full RAML spec
       const bucketNameRegex = new RegExp(this.inputTypes.bucketName.pattern)
