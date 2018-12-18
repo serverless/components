@@ -19,7 +19,6 @@ const AwsProvider = {
       credentials: all(this.credentials)
     }
   },
-
   validate() {
     const region = resolve(this.region) || process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION
     const envCredSet = process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY
@@ -31,6 +30,12 @@ const AwsProvider = {
     if ((!resolve(this.credentials) || isEmpty(this.credentials)) && !envCredSet) {
       throw new Error(`Credentials not set in your AWS provider setup`)
     }
+  },
+  getSdk() {
+    this.validate()
+    // TODO BRN: This won't work for multi provider/region
+    AWS.config.update({ region: this.region })
+    return AWS
   },
 
   async getAccountId() {
