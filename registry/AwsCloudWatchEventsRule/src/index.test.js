@@ -170,7 +170,7 @@ describe('AwsCloudWatchEventsRule', () => {
   })
 
   it('sync should return "removed" if rule removed from provider', async () => {
-    let awsCloudWatchEventsRule = await context.construct(AwsCloudWatchEventsRule, {
+    let awsCloudWatchEventsRule = context.construct(AwsCloudWatchEventsRule, {
       provider,
       enabled: true,
       schedule: 'rate(5 minutes)',
@@ -186,7 +186,7 @@ describe('AwsCloudWatchEventsRule', () => {
   })
 
   it('sync should update rule config if rule config changed in provider', async () => {
-    let awsCloudWatchEventsRule = await context.construct(AwsCloudWatchEventsRule, {
+    let awsCloudWatchEventsRule = context.construct(AwsCloudWatchEventsRule, {
       provider,
       enabled: true,
       schedule: 'rate(5 minutes)',

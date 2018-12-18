@@ -67,7 +67,7 @@ describe('AwsProvider', () => {
         region: 'us-east-1'
       }
 
-      const awsProvider = await context.construct(AwsProvider, inputs)
+      const awsProvider = context.construct(AwsProvider, inputs)
       const AwsSdk = awsProvider.getSdk()
 
       expect(AwsSdk).toEqual(AWS)
@@ -106,7 +106,7 @@ describe('AwsProvider', () => {
         region: 'us-east-1'
       }
 
-      const awsProvider = await context.construct(AwsProvider, inputs)
+      const awsProvider = context.construct(AwsProvider, inputs)
       const credentials = awsProvider.getCredentials()
 
       expect(credentials).toEqual({
@@ -143,7 +143,7 @@ describe('AwsProvider', () => {
         }
       }
 
-      const awsProvider = await context.construct(AwsProvider, inputs)
+      const awsProvider = context.construct(AwsProvider, inputs)
 
       expect(() => awsProvider.validate()).not.toThrow()
     })
@@ -157,7 +157,7 @@ describe('AwsProvider', () => {
         }
       }
 
-      const awsProvider = await context.construct(AwsProvider, inputs)
+      const awsProvider = context.construct(AwsProvider, inputs)
 
       expect(() => awsProvider.validate()).not.toThrow()
     })
@@ -181,7 +181,7 @@ describe('AwsProvider', () => {
         region: 'us-east-1'
       }
 
-      const awsProvider = await context.construct(AwsProvider, inputs)
+      const awsProvider = context.construct(AwsProvider, inputs)
 
       expect(() => awsProvider.validate()).not.toThrow()
     })
@@ -206,7 +206,7 @@ describe('AwsProvider', () => {
         region: 'us-east-1'
       }
 
-      const awsProvider = await context.construct(AwsProvider, inputs)
+      const awsProvider = context.construct(AwsProvider, inputs)
       const accountId = await awsProvider.getAccountId()
       expect(accountId).toBe('558750028299')
     })

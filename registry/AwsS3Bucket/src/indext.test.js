@@ -122,7 +122,7 @@ describe('AwsS3Bucket', () => {
   })
 
   it('sync should return removed if bucket removed from provider', async () => {
-    let awsS3Bucket = await context.construct(AwsS3Bucket, {
+    let awsS3Bucket = context.construct(AwsS3Bucket, {
       provider,
       bucketName: 'already-removed-bucket'
     })
@@ -133,7 +133,7 @@ describe('AwsS3Bucket', () => {
   })
 
   it('sync should NOT return removed if bucket not removed from provider', async () => {
-    let awsS3Bucket = await context.construct(AwsS3Bucket, {
+    let awsS3Bucket = context.construct(AwsS3Bucket, {
       provider,
       bucketName: 'existing-bucket'
     })

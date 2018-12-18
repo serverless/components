@@ -10,7 +10,7 @@ describe('validateInputs', () => {
     context = await createTestContext()
     AwsProvider = await context.import('AwsProvider')
     AwsLambdaFunction = await context.import('AwsLambdaFunction')
-    provider = await context.construct(AwsProvider, {
+    provider = context.construct(AwsProvider, {
       region: 'us-east-1',
       credentials: {
         accessKeyId: 'abc',
@@ -18,25 +18,26 @@ describe('validateInputs', () => {
       }
     })
   })
+
   it('should not throw error if Type has no inputTypes', async () => {
     const Plugin = await context.import('Plugin')
-    await expect(context.construct(Plugin, {})).resolves.toBeDefined()
+    const result = context.construct(Plugin, {})
+    expect(result).toBeDefined()
   })
 
   it('should not throw error if inputTypes are valid', async () => {
-    await expect(
-      context.construct(AwsLambdaFunction, {
-        provider,
-        code: './code',
-        functionName: 'hello',
-        handler: 'index.hello',
-        runtime: 'nodejs8.10'
-      })
-    ).resolves.toBeDefined()
+    const result = context.construct(AwsLambdaFunction, {
+      provider,
+      code: './code',
+      functionName: 'hello',
+      handler: 'index.hello',
+      runtime: 'nodejs8.10'
+    })
+    expect(result).toBeDefined()
   })
 
   it('should throw error if inputTypes are invalid', async () => {
-    await expect(
+    expect(() =>
       context.construct(AwsLambdaFunction, {
         provider,
         code: './code',
@@ -44,6 +45,6 @@ describe('validateInputs', () => {
         // handler: 'index.hello', required, but missing!
         runtime: 'nodejs8.10'
       })
-    ).rejects.toThrow('has invalid')
+    ).toThrow('has invalid')
   })
 })

@@ -403,7 +403,7 @@ describe('AwsIamPolicy', () => {
   })
 
   it('sync should return removed if policy does not exist in provider', async () => {
-    let oldAwsIamPolicy = await context.construct(AwsIamPolicy, {
+    let oldAwsIamPolicy = context.construct(AwsIamPolicy, {
       policyName: 'already-removed-policy',
       document: {
         Version: '2012-10-17',
@@ -424,7 +424,7 @@ describe('AwsIamPolicy', () => {
   })
 
   it('sync should update properties if policy changed in provider', async () => {
-    let oldAwsIamPolicy = await context.construct(AwsIamPolicy, {
+    let oldAwsIamPolicy = context.construct(AwsIamPolicy, {
       policyName: 'some-policy-name',
       document: {
         Version: '2012-10-17',
