@@ -13,11 +13,70 @@ import {
   or,
   pick,
   reduce,
+  resolve,
   resolvable,
   values,
+  isEmpty,
   get
 } from '@serverless/utils'
 
+const isNotDefaultDeliveryPolicy = (deliveryPolicy) => {
+  const defaultDeliveryPolicy = {
+    http: {
+      defaultHealthyRetryPolicy: {
+        minDelayTarget: 20,
+        maxDelayTarget: 20,
+        numRetries: 3,
+        numMaxDelayRetries: 0,
+        numNoDelayRetries: 0,
+        numMinDelayRetries: 0,
+        backoffFunction: 'linear'
+      },
+      disableSubscriptionOverrides: false
+    }
+  }
+
+  return not(equals(deliveryPolicy, defaultDeliveryPolicy))
+}
+
+const pickDeliveryStatusAttributes = (attributes) => {
+  const lambdaDelieryStatusAttributes = pick(
+    [
+      'LambdaSuccessFeedbackRoleArn',
+      'LambdaSuccessFeedbackSampleRate',
+      'LambdaFailureFeedbackRoleArn'
+    ],
+    attributes
+  )
+
+  const httpDelieryStatusAttributes = pick(
+    ['HTTPSuccessFeedbackSampleRate', 'HTTPFailureFeedbackRoleArn', 'HTTPSuccessFeedbackRoleArn'],
+    attributes
+  )
+
+  const sqsDelieryStatusAttributes = pick(
+    ['SQSSuccessFeedbackRoleArn', 'SQSSuccessFeedbackSampleRate', 'SQSFailureFeedbackRoleArn'],
+    attributes
+  )
+
+  const applicationDelieryStatusAttributes = pick(
+    [
+      'ApplicationFailureFeedbackRoleArn',
+      'ApplicationSuccessFeedbackRoleArn',
+      'ApplicationSuccessFeedbackSampleRate'
+    ],
+    attributes
+  )
+
+  const deliveryStatusAttributes = [
+    lambdaDelieryStatusAttributes,
+    httpDelieryStatusAttributes,
+    sqsDelieryStatusAttributes,
+    applicationDelieryStatusAttributes
+  ].filter((obj) => !isEmpty(obj))
+
+  return deliveryStatusAttributes
+}
 const capitalize = (string) => `${string.charAt(0).toUpperCase()}${string.slice(1)}`
 const resolveInSequence = async (functionsToExecute) =>
   reduce(
@@ -169,6 +228,49 @@ const AwsSnsTopic = (SuperClass) =>
       this.deliveryPolicy = inputs.deliveryPolicy
     }
 
+    hydrate(prevInstance = {}) {
+      super.hydrate(prevInstance)
+      this.topicArn = get('topicArn', prevInstance)
+    }
+
+    async sync() {
+      let { provider } = this
+      provider = resolve(provider)
+      const accountId = await provider.getAccountId()
+      const AWS = provider.getSdk()
+      const SNS = new AWS.SNS()
+
+      try {
+        const getPolicyParams = {
+          TopicArn: `arn:aws:sns:${provider.region}:${accountId}:${resolve(this.topicName)}`
+        }
+        const getTopicAttributesRes = await SNS.getTopicAttributes(getPolicyParams).promise()
+
+        this.displayName = getTopicAttributesRes.Attributes.DisplayName || undefined
+
+        const policy = JSON.parse(getTopicAttributesRes.Attributes.Policy)
+        const deliveryPolicy = JSON.parse(getTopicAttributesRes.Attributes.EffectiveDeliveryPolicy)
+
+        // if AWS auto-applied the default policy, don't set it on the instance,
+        // so that we don't trigger an unnecessary update...
+        this.policy = policy.Id !== '__default_policy_ID' ? policy : undefined
+
+        // ...and the same goes for the delivery policy...
+        this.deliveryPolicy = isNotDefaultDeliveryPolicy(deliveryPolicy)
+          ? deliveryPolicy
+          : undefined
+
+        this.deliveryStatusAttributes = pickDeliveryStatusAttributes(
+          getTopicAttributesRes.Attributes
+        )
+      } catch (e) {
+        if (e.code === 'NotFound') {
+          return 'removed'
+        }
+        throw e
+      }
+    }
+
     shouldDeploy(prevInstance) {
       if (!prevInstance) {
         return 'deploy'
@@ -182,6 +284,7 @@ const AwsSnsTopic = (SuperClass) =>
       }
       const prevInputs = prevInstance ? pick(keys(inputs), prevInstance) : {}
       const configChanged = not(equals(inputs, prevInputs))
+
       if (not(equals(prevInstance.topicName, inputs.topicName))) {
         return 'replace'
       } else if (configChanged) {
@@ -189,11 +292,6 @@ const AwsSnsTopic = (SuperClass) =>
       }
 
       return undefined
-    }
-
-    hydrate(prevInstance = {}) {
-      super.hydrate(prevInstance)
-      this.topicArn = get('topicArn', prevInstance)
     }
 
     async deploy(prevInstance, context) {

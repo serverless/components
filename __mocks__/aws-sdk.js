@@ -224,6 +224,30 @@ const mocks = {
 
   // SNS
   createTopicMock: jest.fn().mockReturnValue({ TopicArn: 'abc:zxc' }),
+  getTopicAttributesMock: jest.fn().mockImplementation((params) => {
+    if (params.TopicArn === 'arn:aws:sns:us-east-1:558750028299:already-removed-topic') {
+      const error = new Error()
+      error.code = 'NotFound'
+      return Promise.reject(error)
+    }
+
+    const getTopicAttributesRes = {
+      ResponseMetadata: { RequestId: 'd6429325-39cc-55ee-a407-47b798e3b7f1' },
+      Attributes: {
+        Policy:
+          '{"Version":"2008-10-17","Id":"__default_policy_ID","Statement":[{"Sid":"__default_statement_ID","Effect":"Allow","Principal":{"AWS":"*"},"Action":["SNS:GetTopicAttributes","SNS:SetTopicAttributes","SNS:AddPermission","SNS:RemovePermission","SNS:DeleteTopic","SNS:Subscribe","SNS:ListSubscriptionsByTopic","SNS:Publish","SNS:Receive"],"Resource":"arn:aws:sns:us-east-1:552750238291:some-topic","Condition":{"StringEquals":{"AWS:SourceOwner":"552750238291"}}}]}',
+        Owner: '552750238299',
+        SubscriptionsPending: '0',
+        TopicArn: 'arn:aws:sns:us-east-1:552750238291:some-topic',
+        EffectiveDeliveryPolicy:
+          '{"http":{"defaultHealthyRetryPolicy":{"minDelayTarget":20,"maxDelayTarget":20,"numRetries":3,"numMaxDelayRetries":0,"numNoDelayRetries":0,"numMinDelayRetries":0,"backoffFunction":"linear"},"disableSubscriptionOverrides":false}}',
+        SubscriptionsConfirmed: '0',
+        DisplayName: 'some-display-name',
+        SubscriptionsDeleted: '0'
+      }
+    }
+    return Promise.resolve(getTopicAttributesRes)
+  }),
   deleteTopicMock: jest.fn().mockImplementation((params) => {
     if (params.TopicArn === 'already-removed-topic') {
       const error = new Error()
@@ -526,6 +550,9 @@ const SNS = function() {
   return {
     createTopic: (obj) => ({
       promise: () => mocks.createTopicMock(obj)
+    }),
+    getTopicAttributes: (obj) => ({
+      promise: () => mocks.getTopicAttributesMock(obj)
     }),
     deleteTopic: (obj) => ({
       promise: () => mocks.deleteTopicMock(obj)

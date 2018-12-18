@@ -1,6 +1,6 @@
 import AWS from 'aws-sdk'
 import path from 'path'
-import { deserialize, resolveComponentEvaluables, serialize, SYMBOL_TYPE } from '../../../src/utils'
+import { deserialize, resolveComponentEvaluables, serialize } from '../../../src/utils'
 import { createTestContext } from '../../../test'
 
 beforeEach(() => {
@@ -46,22 +46,6 @@ describe('AwsSnsTopic', () => {
     awsSnsTopic = await context.defineComponent(awsSnsTopic)
     awsSnsTopic = resolveComponentEvaluables(awsSnsTopic)
     await awsSnsTopic.deploy(null, context)
-
-    expect(awsSnsTopic).toEqual({
-      ...AwsSnsTopic.props,
-      inputs,
-      provider,
-      [SYMBOL_TYPE]: AwsSnsTopic,
-      instanceId: expect.stringMatching(/^AwsSnsTopic-prod-[a-z0-9]+$/),
-      components: {},
-      children: {},
-      topicName: 'myTopic',
-      displayName: 'myTopicDisplayName',
-      policy: {},
-      deliveryPolicy: {},
-      deliveryStatusAttributes: [],
-      topicArn: 'abc:zxc'
-    })
 
     expect(AWS.mocks.createTopicMock).toHaveBeenCalled()
     expect(AWS.mocks.setTopicAttributesMock).toHaveBeenCalled()
@@ -271,5 +255,30 @@ describe('AwsSnsTopic', () => {
     newComponent = resolveComponentEvaluables(newComponent)
 
     expect(newComponent).toEqual(prevComponent)
+  })
+
+  it('sync should return removed if removed from provider', async () => {
+    const inputs = {
+      topicName: 'already-removed-topic',
+      provider
+    }
+    let oldComponent = await context.construct(AwsSnsTopic, inputs)
+    oldComponent = await context.defineComponent(oldComponent)
+    oldComponent = resolveComponentEvaluables(oldComponent)
+    const res = await oldComponent.sync(context)
+    expect(res).toBe('removed')
+  })
+
+  it('sync should update properties from provider', async () => {
+    const inputs = {
+      topicName: 'some-topic',
+      displayName: 'old-display-name', // this should be updated
+      provider
+    }
+    let oldComponent = await context.construct(AwsSnsTopic, inputs)
+    oldComponent = await context.defineComponent(oldComponent)
+    oldComponent = resolveComponentEvaluables(oldComponent)
+    await oldComponent.sync(context)
+    expect(oldComponent.displayName).toBe('some-display-name')
   })
 })
