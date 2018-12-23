@@ -56,27 +56,6 @@ const updateTwilioApplication = async (twilio, params) => {
 
 const TwilioApplication = (SuperClass) =>
   class extends SuperClass {
-    async construct(inputs, context) {
-      await super.construct(inputs, context)
-      // this does not work with twilio
-      // this.provider = inputs.provider
-      // this.friendlyName = inputs.friendlyName
-      // this.apiVersion = inputs.apiVersion || '2010-04-01'
-      // this.voiceUrl = inputs.voiceUrl || null
-      // this.voiceMethod = inputs.voiceMethod || 'POST'
-      // this.voiceFallbackUrl = inputs.voiceFallbackUrl || null
-      // this.voiceFallbackMethod = inputs.voiceFallbackMethod || 'POST'
-      // this.statusCallback = inputs.statusCallback || null
-      // this.statusCallbackMethod = inputs.statusCallbackMethod || 'POST'
-      // this.voiceCallerIdLookup = inputs.voiceCallerIdLookup || false
-      // this.smsUrl = inputs.smsUrl || null
-      // this.smsMethod = inputs.smsMethod || 'POST'
-      // this.smsFallbackUrl = inputs.smsFallbackUrl || null
-      // this.smsFallbackMethod = inputs.smsFallbackMethod || 'POST'
-      // this.smsStatusCallback = inputs.smsStatusCallback || null
-      // this.messageStatusCallback = inputs.messageStatusCallback || null
-    }
-
     hydrate(prevInstance) {
       super.hydrate(prevInstance)
       Object.assign(this, pick(applicationProps, prevInstance))

@@ -12,7 +12,7 @@ describe('#isComponent()', () => {
       }
     )
     const Component = await context.import('Component')
-    const component = await context.construct(Component, {})
+    const component = context.construct(Component, {})
     expect(isComponent(component)).toBe(true)
   })
 

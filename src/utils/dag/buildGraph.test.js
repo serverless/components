@@ -148,7 +148,7 @@ describe('#buildGraph()', () => {
   })
 
   it('build a simple graph for a single Component when none exists', async () => {
-    let nextInstance = await context.construct(Component, {})
+    let nextInstance = context.construct(Component, {})
     nextInstance = await context.defineComponent(nextInstance, null)
 
     const graph = buildGraph(nextInstance, null)
@@ -163,14 +163,14 @@ describe('#buildGraph()', () => {
   })
 
   it('build a simple graph for a single Component when one ALREADY exists', async () => {
-    let component = await context.construct(Component, {})
+    let component = context.construct(Component, {})
     component = await context.defineComponent(component, null)
     component = resolveComponentEvaluables(component)
     await component.deploy(null, context)
 
     const prevInstance = await deserialize(serialize(component, context), context)
 
-    let nextInstance = await context.construct(Component, {})
+    let nextInstance = context.construct(Component, {})
     nextInstance.hydrate(prevInstance)
     nextInstance = await context.defineComponent(nextInstance, prevInstance)
     nextInstance = resolveComponentEvaluables(nextInstance)
@@ -187,8 +187,8 @@ describe('#buildGraph()', () => {
   })
 
   it('build a graph for a component with a child', async () => {
-    const nextInstance = await context.construct(Component, {})
-    const fooComponent = await context.construct(Component, {})
+    const nextInstance = context.construct(Component, {})
+    const fooComponent = context.construct(Component, {})
     nextInstance.foo = fooComponent
 
     const graph = buildGraph(nextInstance, null)
@@ -201,9 +201,9 @@ describe('#buildGraph()', () => {
   })
 
   it('build a graph for a component with a removed child and a new child', async () => {
-    let component = await context.construct(Component, {
+    let component = context.construct(Component, {
       components: {
-        foo: await context.construct(Component, {})
+        foo: context.construct(Component, {})
       }
     })
     component = await context.defineComponent(component)
@@ -212,9 +212,9 @@ describe('#buildGraph()', () => {
 
     const prevInstance = await deserialize(serialize(component, context), context)
 
-    let nextInstance = await context.construct(Component, {
+    let nextInstance = context.construct(Component, {
       components: {
-        bar: await context.construct(Component, {})
+        bar: context.construct(Component, {})
       }
     })
     nextInstance.hydrate(prevInstance)

@@ -85,8 +85,9 @@ const removePhoneNumber = async (twilio, sid) => {
 
 const TwilioPhoneNumber = (SuperClass) =>
   class extends SuperClass {
-    async construct(inputs, context) {
-      await super.construct(inputs, context)
+    hydrate(prevInstance = {}) {
+      super.hydrate(prevInstance)
+      Object.assign(this, pick(phoneNumberProps, prevInstance))
     }
 
     shouldDeploy(prevInstance) {
@@ -103,11 +104,6 @@ const TwilioPhoneNumber = (SuperClass) =>
       }
 
       return undefined
-    }
-
-    hydrate(prevInstance = {}) {
-      super.hydrate(prevInstance)
-      Object.assign(this, pick(phoneNumberProps, prevInstance))
     }
 
     async deploy(prevInstance, context) {

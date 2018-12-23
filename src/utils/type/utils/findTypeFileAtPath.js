@@ -1,6 +1,6 @@
 import { fileExists, find, map } from '@serverless/utils'
 import { join } from 'path'
-import { TYPE_FILE_NAMES } from '../constants'
+import { TYPE_FILE_NAMES } from '../../constants'
 
 const findTypeFileAtPath = async (absoluteTypePath) =>
   find(

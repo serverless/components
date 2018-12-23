@@ -13,13 +13,13 @@ describe('#getDependenciesIds()', () => {
       }
     )
     const Component = await context.import('Component')
-    const parentComponent = await context.construct(Component, {})
-    const component = await context.construct(Component, {})
-    const childComponent = await context.construct(Component, {})
-    const fooComponent = await context.construct(Component, {})
-    const barComponent = await context.construct(Component, {})
-    const bazComponent = await context.construct(Component, {})
-    const bimComponent = await context.construct(Component, {})
+    const parentComponent = context.construct(Component, {})
+    const component = context.construct(Component, {})
+    const childComponent = context.construct(Component, {})
+    const fooComponent = context.construct(Component, {})
+    const barComponent = context.construct(Component, {})
+    const bazComponent = context.construct(Component, {})
+    const bimComponent = context.construct(Component, {})
 
     parentComponent.children = {
       child: component

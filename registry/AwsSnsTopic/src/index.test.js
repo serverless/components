@@ -24,7 +24,7 @@ describe('AwsSnsTopic', () => {
     context = await context.loadApp()
     AwsProvider = await context.import('AwsProvider')
     AwsSnsTopic = await context.import('./')
-    provider = await context.construct(AwsProvider, {
+    provider = context.construct(AwsProvider, {
       region: 'us-east-1',
       credentials: {
         accessKeyId: 'abc',
@@ -42,7 +42,7 @@ describe('AwsSnsTopic', () => {
       deliveryPolicy: {},
       deliveryStatusAttributes: []
     }
-    let awsSnsTopic = await context.construct(AwsSnsTopic, inputs)
+    let awsSnsTopic = context.construct(AwsSnsTopic, inputs)
     awsSnsTopic = await context.defineComponent(awsSnsTopic)
     awsSnsTopic = resolveComponentEvaluables(awsSnsTopic)
     await awsSnsTopic.deploy(null, context)
@@ -68,7 +68,7 @@ describe('AwsSnsTopic', () => {
   })
 
   it('should update topic if displayName has changed', async () => {
-    let awsSnsTopic = await context.construct(AwsSnsTopic, {
+    let awsSnsTopic = context.construct(AwsSnsTopic, {
       provider,
       topicName: 'myTopic',
       displayName: 'myTopicDisplayName',
@@ -86,7 +86,7 @@ describe('AwsSnsTopic', () => {
 
     // NOTE BRN: To simulate what core does, we create an entirely new instance here but hydrate it with the previous instance
 
-    let nextAwsSnsTopic = await context.construct(AwsSnsTopic, {
+    let nextAwsSnsTopic = context.construct(AwsSnsTopic, {
       provider,
       topicName: 'myTopic',
       displayName: 'myNewTopicDisplayName',
@@ -113,7 +113,7 @@ describe('AwsSnsTopic', () => {
   })
 
   it('should remove topic', async () => {
-    let awsSnsTopic = await context.construct(AwsSnsTopic, {
+    let awsSnsTopic = context.construct(AwsSnsTopic, {
       provider,
       topicName: 'myTopic',
       displayName: 'myTopicDisplayName',
@@ -137,7 +137,7 @@ describe('AwsSnsTopic', () => {
   })
 
   it('should remove the topic even if it does not exist anymore', async () => {
-    let awsSnsTopic = await context.construct(AwsSnsTopic, {
+    let awsSnsTopic = context.construct(AwsSnsTopic, {
       provider,
       topicName: 'myTopic',
       displayName: 'myTopicDisplayName',
@@ -171,14 +171,14 @@ describe('AwsSnsTopic', () => {
       deliveryStatusAttributes: [],
       provider
     }
-    let oldComponent = await context.construct(AwsSnsTopic, inputs)
+    let oldComponent = context.construct(AwsSnsTopic, inputs)
     oldComponent = await context.defineComponent(oldComponent)
     oldComponent = resolveComponentEvaluables(oldComponent)
     await oldComponent.deploy(null, context)
 
     const prevComponent = await deserialize(serialize(oldComponent, context), context)
 
-    let newComponent = await context.construct(AwsSnsTopic, inputs)
+    let newComponent = context.construct(AwsSnsTopic, inputs)
     newComponent = await context.defineComponent(newComponent)
     newComponent = resolveComponentEvaluables(newComponent)
 
@@ -191,14 +191,14 @@ describe('AwsSnsTopic', () => {
       topicName: 'myTopic',
       provider
     }
-    let oldComponent = await context.construct(AwsSnsTopic, inputs)
+    let oldComponent = context.construct(AwsSnsTopic, inputs)
     oldComponent = await context.defineComponent(oldComponent)
     oldComponent = resolveComponentEvaluables(oldComponent)
     await oldComponent.deploy(null, context)
 
     const prevComponent = await deserialize(serialize(oldComponent, context), context)
 
-    let newComponent = await context.construct(AwsSnsTopic, inputs)
+    let newComponent = context.construct(AwsSnsTopic, inputs)
     newComponent = await context.defineComponent(newComponent)
     newComponent = resolveComponentEvaluables(newComponent)
 
@@ -215,14 +215,14 @@ describe('AwsSnsTopic', () => {
       deliveryStatusAttributes: [],
       provider
     }
-    let oldComponent = await context.construct(AwsSnsTopic, inputs)
+    let oldComponent = context.construct(AwsSnsTopic, inputs)
     oldComponent = await context.defineComponent(oldComponent)
     oldComponent = resolveComponentEvaluables(oldComponent)
     await oldComponent.deploy(null, context)
 
     const prevComponent = await deserialize(serialize(oldComponent, context), context)
 
-    let newComponent = await context.construct(AwsSnsTopic, {
+    let newComponent = context.construct(AwsSnsTopic, {
       ...inputs,
       topicName: 'myOtherTopic'
     })
@@ -242,7 +242,7 @@ describe('AwsSnsTopic', () => {
       deliveryStatusAttributes: [],
       provider
     }
-    let oldComponent = await context.construct(AwsSnsTopic, inputs)
+    let oldComponent = context.construct(AwsSnsTopic, inputs)
     oldComponent = await context.defineComponent(oldComponent)
     oldComponent = resolveComponentEvaluables(oldComponent)
     const res = oldComponent.shouldDeploy(null, context)
@@ -259,14 +259,14 @@ describe('AwsSnsTopic', () => {
       provider
     }
     const ComponentType = await context.import('./')
-    let oldComponent = await context.construct(ComponentType, inputs)
+    let oldComponent = context.construct(ComponentType, inputs)
     oldComponent = await context.defineComponent(oldComponent)
     oldComponent = resolveComponentEvaluables(oldComponent)
     await oldComponent.deploy(null, context)
 
     const prevComponent = await deserialize(serialize(oldComponent, context), context)
 
-    let newComponent = await context.construct(ComponentType, inputs)
+    let newComponent = context.construct(ComponentType, inputs)
     newComponent = await context.defineComponent(newComponent, prevComponent)
     newComponent = resolveComponentEvaluables(newComponent)
 

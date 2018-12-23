@@ -1,4 +1,4 @@
-import createContext from '../context/createContext'
+import createContext from '../../context/createContext'
 import Base from './Base'
 import buildTypeClass from './buildTypeClass'
 

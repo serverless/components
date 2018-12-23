@@ -1,4 +1,4 @@
-import errorReentrantTypeLoad from './errorReentrantTypeLoad'
+import errorReentrantTypeLoad from '../errors/errorReentrantTypeLoad'
 
 const LOADING_TYPE_MAINS = new Set()
 

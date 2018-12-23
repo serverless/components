@@ -1,7 +1,7 @@
 const EnvironmentBasedConfiguration = (SuperClass) =>
   class extends SuperClass {
-    async construct(inputs, context) {
-      await super.construct(inputs, context)
+    construct(inputs, context) {
+      super.construct(inputs, context)
 
       const variableNames = inputs.variables
       const variableValues = {}

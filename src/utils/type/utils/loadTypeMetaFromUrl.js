@@ -1,20 +1,11 @@
-import crypto from 'crypto'
-import path from 'path'
 import fse from 'fs-extra'
-
 import downloadType from './downloadType'
-import anyTypeFileExistsAtPath from './anyTypeFileExistsAtPath'
+import anyTypeFileExistsAtPath from '../anyTypeFileExistsAtPath'
 import loadTypeMetaFromPath from './loadTypeMetaFromPath'
-import getDownloadedTypesCachePath from './getDownloadedTypesCachePath'
+import resolveDownloadedTypePath from './resolveDownloadedTypePath'
 
 const loadTypeMetaFromUrl = async (url, context) => {
-  const downloadedTypesCachePath = await getDownloadedTypesCachePath()
-  const urlHash = crypto
-    .createHash('sha256')
-    .update(url)
-    .digest('hex')
-
-  const downloadedTypePath = path.join(downloadedTypesCachePath, urlHash)
+  const downloadedTypePath = resolveDownloadedTypePath(url)
   const isDownloaded = await anyTypeFileExistsAtPath(downloadedTypePath)
 
   if (!isDownloaded) {

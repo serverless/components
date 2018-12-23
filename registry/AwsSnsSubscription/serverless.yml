@@ -8,9 +8,9 @@ license: Apache-2.0
 author: 'Serverless, Inc. <hello@serverless.com> (https://serverless.com)'
 repository: 'github:serverless/components'
 
-provider: ${inputs.provider}
+provider: ${inputs.provider || context.get('provider')}
 topic: ${inputs.topic}
-protocol: ${inputs.protocol}
+protocol: ${inputs.protocol || 'https'}
 endpoint: ${inputs.endpoint}
 subscriptionAttributes: ${inputs.subscriptionAttributes}
 

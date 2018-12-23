@@ -35,7 +35,7 @@ describe('RestApi', () => {
     }
     const context = await createTestContext()
     const RestApi = await context.import('RestApi')
-    let restApi = await context.construct(RestApi, inputs)
+    let restApi = context.construct(RestApi, inputs)
     restApi = resolveComponentEvaluables(restApi)
 
     const children = await restApi.define(context)

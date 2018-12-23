@@ -50,7 +50,7 @@ describe('Integration Test - load types', () => {
     })
 
     const inputs = {}
-    const instance = await context.construct(FooType, inputs)
+    const instance = context.construct(FooType, inputs)
     expect(instance).toEqual({
       baz: 'abc',
       extends: 'Object',
@@ -123,7 +123,7 @@ describe('Integration Test - load types', () => {
     })
 
     const inputs = {}
-    const instance = await context.construct(BarType, inputs)
+    const instance = context.construct(BarType, inputs)
     expect(instance).toEqual({
       bar: 'def',
       baz: 'def',
@@ -166,7 +166,7 @@ describe('Integration Test - load types', () => {
     })
 
     const inputs = {}
-    const instance = await context.construct(BarType, inputs)
+    const instance = context.construct(BarType, inputs)
     expect(instance).toEqual({
       bar: 'def',
       baz: 'def',
@@ -198,7 +198,7 @@ describe('Integration Test - load types', () => {
         secretAccessKey: 'Ap7+qEs7YHJUaQKEMul29PzvVPokt3m2Qwp3L5Ok'
       }
     }
-    const awsProvider = await context.construct(AwsProvider, AwsProviderInputs, context)
+    const awsProvider = context.construct(AwsProvider, AwsProviderInputs, context)
 
     const AwsLambdaFunction = await context.import('AwsLambdaFunction')
     const AwsLambdaFunctionInputs = {
@@ -210,11 +210,7 @@ describe('Integration Test - load types', () => {
       code: './load-types/SimpleLambda',
       handler: 'index.handler'
     }
-    const awsLambdaFunction = await context.construct(
-      AwsLambdaFunction,
-      AwsLambdaFunctionInputs,
-      context
-    )
+    const awsLambdaFunction = context.construct(AwsLambdaFunction, AwsLambdaFunctionInputs, context)
 
     await awsLambdaFunction.deploy(context)
   })
@@ -233,7 +229,7 @@ describe('Integration Test - load types', () => {
         secretAccessKey: 'xxx'
       }
     }
-    const awsProvider = await context.construct(AwsProvider, AwsProviderInputs, context)
+    const awsProvider = context.construct(AwsProvider, AwsProviderInputs, context)
 
     const AwsLambdaCompute = await context.import('AwsLambdaCompute')
     const AwsLambdaComputeInputs = {
@@ -241,11 +237,7 @@ describe('Integration Test - load types', () => {
       memory: 512,
       runtime: 'nodejs'
     }
-    const awsLambdaCompute = await context.construct(
-      AwsLambdaCompute,
-      AwsLambdaComputeInputs,
-      context
-    )
+    const awsLambdaCompute = context.construct(AwsLambdaCompute, AwsLambdaComputeInputs, context)
 
     const Function = await context.import('Function')
     const FunctionInputs = {
@@ -259,7 +251,7 @@ describe('Integration Test - load types', () => {
       code: './load-types/SimpleFunction',
       handler: 'index.hello'
     }
-    const fn = await context.construct(Function, FunctionInputs, context)
+    const fn = context.construct(Function, FunctionInputs, context)
     expect(fn).toBeInstanceOf(Function.class)
     expect(fn).toMatchObject({
       instanceId: expect.any(String)

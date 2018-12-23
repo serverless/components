@@ -1,5 +1,5 @@
 import defType from './defType'
-import loadTypeMeta from './loadTypeMeta'
+import loadTypeMeta from './utils/loadTypeMeta'
 
 /**
  * Loads a type from any of the following sources

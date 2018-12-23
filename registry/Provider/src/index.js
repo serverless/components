@@ -1,6 +1,8 @@
+import { all } from '@serverless/utils'
+
 const Provider = {
   getCredentials() {
-    return this.credentials
+    return all(this.credentials)
   },
 
   getSdk() {

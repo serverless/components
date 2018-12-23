@@ -1,6 +1,5 @@
 export { default as appendKey } from './appendKey'
 export { default as defineComponent } from './defineComponent'
-export { default as defineComponentFromState } from './defineComponentFromState'
 export { default as getChildrenIds } from './getChildrenIds'
 export { default as getDependenciesIds } from './getDependenciesIds'
 export { default as getKey } from './getKey'

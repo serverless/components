@@ -103,7 +103,7 @@ describe('#logStatus()', () => {
 
   it('should not log deeply nested / circular structured objects', async () => {
     const Provider = await context.import('Provider')
-    const provider = await context.construct(Provider, state, context)
+    const provider = context.construct(Provider, state, context)
 
     iteratee.name = 'deployNode'
     const node = {

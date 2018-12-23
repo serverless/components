@@ -8,8 +8,8 @@ describe('#interpretProps()', () => {
     context = await createTestContext()
   })
 
-  it('should not interpret inputTypes', async () => {
-    const interpretedProps = await interpretProps(
+  it('should not interpret inputTypes', () => {
+    const interpretedProps = interpretProps(
       {
         inputTypes: {
           prop: '${test}'
@@ -26,9 +26,9 @@ describe('#interpretProps()', () => {
     })
   })
 
-  it('should interpret variables', async () => {
+  it('should interpret variables', () => {
     const data = { test: 'foo' }
-    const interpretedProps = await interpretProps(
+    const interpretedProps = interpretProps(
       {
         foo: {
           prop: '${test}'

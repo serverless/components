@@ -29,8 +29,8 @@ describe('TwilioPhoneNumber', () => {
       .createHash('md5')
       .update('+1234567890')
       .digest('hex')
-    let twilioPhoneNumber = await context.construct(TwilioPhoneNumber, {
-      provider: await context.construct(TwilioProvider, {
+    let twilioPhoneNumber = context.construct(TwilioPhoneNumber, {
+      provider: context.construct(TwilioProvider, {
         accountSid: 'accountSid',
         authToken: 'authToken'
       }),
@@ -47,8 +47,8 @@ describe('TwilioPhoneNumber', () => {
   })
 
   it('should update phone number if friendlyName changes', async () => {
-    let twilioPhoneNumber = await context.construct(TwilioPhoneNumber, {
-      provider: await context.construct(TwilioProvider, {
+    let twilioPhoneNumber = context.construct(TwilioPhoneNumber, {
+      provider: context.construct(TwilioProvider, {
         accountSid: 'accountSid',
         authToken: 'authToken'
       }),
@@ -62,8 +62,8 @@ describe('TwilioPhoneNumber', () => {
 
     const prevTwilioPhoneNumber = await deserialize(serialize(twilioPhoneNumber, context), context)
 
-    let nextTwilioPhoneNumber = await context.construct(TwilioPhoneNumber, {
-      provider: await context.construct(TwilioProvider, {
+    let nextTwilioPhoneNumber = context.construct(TwilioPhoneNumber, {
+      provider: context.construct(TwilioProvider, {
         accountSid: 'accountSid',
         authToken: 'authToken'
       }),
@@ -86,8 +86,8 @@ describe('TwilioPhoneNumber', () => {
       .createHash('md5')
       .update('+1234567890')
       .digest('hex')
-    let twilioPhoneNumber = await context.construct(TwilioPhoneNumber, {
-      provider: await context.construct(TwilioProvider, {
+    let twilioPhoneNumber = context.construct(TwilioPhoneNumber, {
+      provider: context.construct(TwilioProvider, {
         accountSid: 'accountSid',
         authToken: 'authToken'
       }),
@@ -110,8 +110,8 @@ describe('TwilioPhoneNumber', () => {
   })
 
   it('should NOT remove phone number if preserve is true', async () => {
-    let twilioPhoneNumber = await context.construct(TwilioPhoneNumber, {
-      provider: await context.construct(TwilioProvider, {
+    let twilioPhoneNumber = context.construct(TwilioPhoneNumber, {
+      provider: context.construct(TwilioProvider, {
         accountSid: 'accountSid',
         authToken: 'authToken'
       }),
@@ -135,8 +135,8 @@ describe('TwilioPhoneNumber', () => {
   })
 
   it('shouldDeploy should return undefined if nothing changed', async () => {
-    let oldComponent = await context.construct(TwilioPhoneNumber, {
-      provider: await context.construct(TwilioProvider, {
+    let oldComponent = context.construct(TwilioPhoneNumber, {
+      provider: context.construct(TwilioProvider, {
         accountSid: 'accountSid',
         authToken: 'authToken'
       }),
@@ -148,8 +148,8 @@ describe('TwilioPhoneNumber', () => {
 
     const prevComponent = await deserialize(serialize(oldComponent, context), context)
 
-    let newComponent = await context.construct(TwilioPhoneNumber, {
-      provider: await context.construct(TwilioProvider, {
+    let newComponent = context.construct(TwilioPhoneNumber, {
+      provider: context.construct(TwilioProvider, {
         accountSid: 'accountSid',
         authToken: 'authToken'
       }),
@@ -163,8 +163,8 @@ describe('TwilioPhoneNumber', () => {
   })
 
   it('shouldDeploy should return "replace" if "phoneNumber" changed', async () => {
-    let oldComponent = await context.construct(TwilioPhoneNumber, {
-      provider: await context.construct(TwilioProvider, {
+    let oldComponent = context.construct(TwilioPhoneNumber, {
+      provider: context.construct(TwilioProvider, {
         accountSid: 'accountSid',
         authToken: 'authToken'
       }),
@@ -177,8 +177,8 @@ describe('TwilioPhoneNumber', () => {
 
     const prevComponent = await deserialize(serialize(oldComponent, context), context)
 
-    let newComponent = await context.construct(TwilioPhoneNumber, {
-      provider: await context.construct(TwilioProvider, {
+    let newComponent = context.construct(TwilioPhoneNumber, {
+      provider: context.construct(TwilioProvider, {
         accountSid: 'accountSid',
         authToken: 'authToken'
       }),
@@ -193,8 +193,8 @@ describe('TwilioPhoneNumber', () => {
   })
 
   it('shouldDeploy should return deploy if first deployment', async () => {
-    let twilioPhoneNumber = await context.construct(TwilioPhoneNumber, {
-      provider: await context.construct(TwilioProvider, {
+    let twilioPhoneNumber = context.construct(TwilioPhoneNumber, {
+      provider: context.construct(TwilioProvider, {
         accountSid: 'accountSid',
         authToken: 'authToken'
       }),
@@ -209,7 +209,7 @@ describe('TwilioPhoneNumber', () => {
 
   it('should preserve props if nothing changed', async () => {
     const inputs = {
-      provider: await context.construct(TwilioProvider, {
+      provider: context.construct(TwilioProvider, {
         accountSid: 'accountSid',
         authToken: 'authToken'
       }),
@@ -217,14 +217,14 @@ describe('TwilioPhoneNumber', () => {
       friendlyName: 'friendlyName'
     }
     const ComponentType = await context.import('./')
-    let oldComponent = await context.construct(ComponentType, inputs)
+    let oldComponent = context.construct(ComponentType, inputs)
     oldComponent = await context.defineComponent(oldComponent)
     oldComponent = resolveComponentEvaluables(oldComponent)
     await oldComponent.deploy(null, context)
 
     const prevComponent = await deserialize(serialize(oldComponent, context), context)
 
-    let newComponent = await context.construct(ComponentType, inputs)
+    let newComponent = context.construct(ComponentType, inputs)
     newComponent = await context.defineComponent(newComponent, prevComponent)
     newComponent = resolveComponentEvaluables(newComponent)
 

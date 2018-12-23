@@ -71,7 +71,7 @@ describe('getType', () => {
   it('returns component query as type', async () => {
     const context = await createContext({}, { app: { id: 'test' } })
     const Component = await context.import('Component')
-    const component = await context.construct(Component, {})
+    const component = context.construct(Component, {})
     expect(getType(component)).toBe('Component')
   })
 

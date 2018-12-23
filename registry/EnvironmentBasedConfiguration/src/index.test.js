@@ -12,7 +12,7 @@ describe('EnvironmentBasedConfiguration', () => {
     process.env.TEST_VARIABLE_FOO = 'foo value'
     process.env.TEST_VARIABLE_BAR = 'bar value'
     process.env.TEST_VARIABLE_BAZ = 'baz value'
-    const instance = await context.construct(EnvironmentBasedConfiguration, {
+    const instance = context.construct(EnvironmentBasedConfiguration, {
       variables: ['TEST_VARIABLE_FOO', 'TEST_VARIABLE_BAR']
     })
 
