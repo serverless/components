@@ -22,7 +22,7 @@ describe('AwsS3Bucket', () => {
     context = await createTestContext({ cwd })
     AwsProvider = await context.import('AwsProvider')
     AwsS3Bucket = await context.import('./')
-    provider = await context.construct(AwsProvider, {
+    provider = context.construct(AwsProvider, {
       region: 'us-east-1',
       credentials: {
         accessKeyId: 'abc',
@@ -38,7 +38,7 @@ describe('AwsS3Bucket', () => {
     }
 
     try {
-      const awsS3Bucket = await context.construct(AwsS3Bucket, inputs)
+      const awsS3Bucket = context.construct(AwsS3Bucket, inputs)
       await context.defineComponent(awsS3Bucket)
       resolveComponentEvaluables(awsS3Bucket)
     } catch (error) {
@@ -47,7 +47,7 @@ describe('AwsS3Bucket', () => {
   })
 
   it('should deploy bucket when none exists', async () => {
-    let awsS3Bucket = await context.construct(AwsS3Bucket, {
+    let awsS3Bucket = context.construct(AwsS3Bucket, {
       provider,
       bucketName: 'bucket-abc'
     })
@@ -60,7 +60,7 @@ describe('AwsS3Bucket', () => {
   })
 
   it('should update when bucket name has changed', async () => {
-    let awsS3Bucket = await context.construct(AwsS3Bucket, {
+    let awsS3Bucket = context.construct(AwsS3Bucket, {
       provider,
       bucketName: 'bucket-abc'
     })
@@ -72,7 +72,7 @@ describe('AwsS3Bucket', () => {
 
     // NOTE BRN: To simulate what core does, we create an entirely new instance here but hydrate it with the previous instance
 
-    let nextAwsS3Bucket = await context.construct(AwsS3Bucket, {
+    let nextAwsS3Bucket = context.construct(AwsS3Bucket, {
       provider,
       bucketName: 'bucket-123' // changed!
     })
@@ -85,7 +85,7 @@ describe('AwsS3Bucket', () => {
   })
 
   it('should remove bucket', async () => {
-    let awsS3Bucket = await context.construct(AwsS3Bucket, {
+    let awsS3Bucket = context.construct(AwsS3Bucket, {
       provider,
       bucketName: 'bucket-abc'
     })
@@ -105,7 +105,7 @@ describe('AwsS3Bucket', () => {
   })
 
   it('should remove the bucket even if it does not exist anymore', async () => {
-    let awsS3Bucket = await context.construct(AwsS3Bucket, {
+    let awsS3Bucket = context.construct(AwsS3Bucket, {
       provider,
       bucketName: 'already-removed-bucket'
     })
@@ -122,7 +122,7 @@ describe('AwsS3Bucket', () => {
   })
 
   it('sync should return removed if bucket removed from provider', async () => {
-    let awsS3Bucket = await context.construct(AwsS3Bucket, {
+    let awsS3Bucket = context.construct(AwsS3Bucket, {
       provider,
       bucketName: 'already-removed-bucket'
     })
@@ -133,7 +133,7 @@ describe('AwsS3Bucket', () => {
   })
 
   it('sync should NOT return removed if bucket not removed from provider', async () => {
-    let awsS3Bucket = await context.construct(AwsS3Bucket, {
+    let awsS3Bucket = context.construct(AwsS3Bucket, {
       provider,
       bucketName: 'existing-bucket'
     })
@@ -144,7 +144,7 @@ describe('AwsS3Bucket', () => {
   })
 
   it('shouldDeploy should return undefined when no changes have occurred', async () => {
-    let awsS3Bucket = await context.construct(AwsS3Bucket, {
+    let awsS3Bucket = context.construct(AwsS3Bucket, {
       provider,
       bucketName: 'bucket-abc'
     })
@@ -156,8 +156,8 @@ describe('AwsS3Bucket', () => {
 
     // NOTE BRN: To simulate what core does, we create an entirely new instance here but hydrate it with the previous instance
 
-    let nextAwsS3Bucket = await context.construct(AwsS3Bucket, {
-      provider: await context.construct(AwsProvider, {}),
+    let nextAwsS3Bucket = context.construct(AwsS3Bucket, {
+      provider: context.construct(AwsProvider, {}),
       bucketName: 'bucket-abc'
     })
     nextAwsS3Bucket = await context.defineComponent(nextAwsS3Bucket, prevAwsS3Bucket)
@@ -169,7 +169,7 @@ describe('AwsS3Bucket', () => {
   })
 
   it('shouldDeploy should returns "replace" when bucket name has changed', async () => {
-    let awsS3Bucket = await context.construct(AwsS3Bucket, {
+    let awsS3Bucket = context.construct(AwsS3Bucket, {
       provider,
       bucketName: 'bucket-abc'
     })
@@ -181,7 +181,7 @@ describe('AwsS3Bucket', () => {
 
     // NOTE BRN: To simulate what core does, we create an entirely new instance here but hydrate it with the previous instance
 
-    let nextAwsS3Bucket = await context.construct(AwsS3Bucket, {
+    let nextAwsS3Bucket = context.construct(AwsS3Bucket, {
       provider,
       bucketName: 'bucket-123' // changed!
     })

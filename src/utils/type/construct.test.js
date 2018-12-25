@@ -1,5 +1,5 @@
 import createContext from '../context/createContext'
-import buildTypeConstructor from './buildTypeConstructor'
+import buildTypeConstructor from './utils/buildTypeConstructor'
 import construct from './construct'
 
 describe('#construct()', () => {
@@ -18,7 +18,7 @@ describe('#construct()', () => {
     }
     Type.constructor = buildTypeConstructor(Type, context)
     const inputs = {}
-    const result = await construct(Type, inputs, context)
+    const result = construct(Type, inputs, context)
     expect(result).toBeInstanceOf(Type.constructor)
     expect(result.inputs).toBe(inputs)
     expect(result.context).toMatchObject({

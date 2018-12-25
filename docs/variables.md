@@ -34,7 +34,7 @@ inputTypes:
 
 ```js
 // AwsS3Buckdet/index.js
-async construct(inputs) {
+construct(inputs) {
   inputs.bucketName // is variable object that will resolve to "foo"
   resolve(inputs.bucketName) // is "foo"
 }
@@ -95,7 +95,7 @@ inputTypes:
 
 ```js
 // AwsS3Buckdet/index.js
-async construct(inputs) {
+construct(inputs) {
   inputs.bucketName // is this value ready to be resolved?
 }
 
@@ -148,7 +148,7 @@ inputTypes:
 
 ```js
 // AwsS3Buckdet/index.js
-async construct(inputs) {
+construct(inputs) {
   inputs.bucketName // is this value ready to be resolved?
 }
 
@@ -176,7 +176,7 @@ inputTypes:
 
 ```js
 // AwsS3Buckdet/index.js
-async construct(inputs) {
+construct(inputs) {
   this.bucketName = inputs.bucketName // could be a variable...
 }
 ```

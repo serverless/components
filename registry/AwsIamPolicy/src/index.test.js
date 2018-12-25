@@ -47,7 +47,7 @@ describe('AwsIamPolicy', () => {
     AwsIamPolicy = await context.import('./')
 
     const AwsProvider = await context.import('AwsProvider')
-    provider = await context.construct(AwsProvider, {
+    provider = context.construct(AwsProvider, {
       region: 'us-east-1',
       credentials: {
         accessKeyId: 'abc',
@@ -72,7 +72,7 @@ describe('AwsIamPolicy', () => {
       provider
     }
 
-    let awsIamPolicy = await context.construct(AwsIamPolicy, inputs)
+    let awsIamPolicy = context.construct(AwsIamPolicy, inputs)
     awsIamPolicy = await context.defineComponent(awsIamPolicy)
     awsIamPolicy = resolveComponentEvaluables(awsIamPolicy)
 
@@ -104,7 +104,7 @@ describe('AwsIamPolicy', () => {
       },
       provider
     }
-    let oldAwsIamPolicy = await context.construct(AwsIamPolicy, inputs)
+    let oldAwsIamPolicy = context.construct(AwsIamPolicy, inputs)
     oldAwsIamPolicy = await context.defineComponent(oldAwsIamPolicy)
     oldAwsIamPolicy = resolveComponentEvaluables(oldAwsIamPolicy)
     await oldAwsIamPolicy.deploy(null, context)
@@ -153,7 +153,7 @@ describe('AwsIamPolicy', () => {
       },
       provider
     }
-    let oldAwsIamPolicy = await context.construct(AwsIamPolicy, inputs)
+    let oldAwsIamPolicy = context.construct(AwsIamPolicy, inputs)
     oldAwsIamPolicy = await context.defineComponent(oldAwsIamPolicy)
     oldAwsIamPolicy = resolveComponentEvaluables(oldAwsIamPolicy)
     await oldAwsIamPolicy.deploy(null, context)
@@ -183,7 +183,7 @@ describe('AwsIamPolicy', () => {
   })
 
   it('should preserve props if nothing changed', async () => {
-    let awsIamPolicy = await context.construct(AwsIamPolicy, {
+    let awsIamPolicy = context.construct(AwsIamPolicy, {
       provider,
       policyName: 'abc',
       document: {
@@ -206,7 +206,7 @@ describe('AwsIamPolicy', () => {
 
     expect(prevAwsIamPolicy.arn).toBe('abc:xyz')
 
-    let nextAwsIamPolicy = await context.construct(AwsIamPolicy, {
+    let nextAwsIamPolicy = context.construct(AwsIamPolicy, {
       provider,
       policyName: 'abc',
       document: {
@@ -240,14 +240,14 @@ describe('AwsIamPolicy', () => {
       },
       provider
     }
-    let oldAwsIamPolicy = await context.construct(AwsIamPolicy, inputs)
+    let oldAwsIamPolicy = context.construct(AwsIamPolicy, inputs)
     oldAwsIamPolicy = await context.defineComponent(oldAwsIamPolicy)
     oldAwsIamPolicy = resolveComponentEvaluables(oldAwsIamPolicy)
     await oldAwsIamPolicy.deploy(null, context)
 
     const prevAwsIamPolicy = await deserialize(serialize(oldAwsIamPolicy, context), context)
 
-    let newAwsIamPolicy = await context.construct(AwsIamPolicy, inputs)
+    let newAwsIamPolicy = context.construct(AwsIamPolicy, inputs)
     newAwsIamPolicy = await context.defineComponent(newAwsIamPolicy)
     newAwsIamPolicy = resolveComponentEvaluables(newAwsIamPolicy)
 
@@ -256,7 +256,7 @@ describe('AwsIamPolicy', () => {
   })
 
   it('shouldDeploy should return replace if policyName changed', async () => {
-    let oldAwsIamPolicy = await context.construct(AwsIamPolicy, {
+    let oldAwsIamPolicy = context.construct(AwsIamPolicy, {
       policyName: 'abc',
       document: {
         Version: '2012-10-17',
@@ -276,7 +276,7 @@ describe('AwsIamPolicy', () => {
 
     const prevAwsIamPolicy = await deserialize(serialize(oldAwsIamPolicy, context), context)
 
-    let newAwsIamPolicy = await context.construct(AwsIamPolicy, {
+    let newAwsIamPolicy = context.construct(AwsIamPolicy, {
       policyName: 'zxc', // changed
       document: {
         Version: '2012-10-17',
@@ -298,7 +298,7 @@ describe('AwsIamPolicy', () => {
   })
 
   it('shouldDeploy should throw error if config changed but name was not changed', async () => {
-    let oldAwsIamPolicy = await context.construct(AwsIamPolicy, {
+    let oldAwsIamPolicy = context.construct(AwsIamPolicy, {
       policyName: 'abc',
       document: {
         Version: '2012-10-17',
@@ -318,7 +318,7 @@ describe('AwsIamPolicy', () => {
 
     const prevAwsIamPolicy = await deserialize(serialize(oldAwsIamPolicy, context), context)
 
-    let newAwsIamPolicy = await context.construct(AwsIamPolicy, {
+    let newAwsIamPolicy = context.construct(AwsIamPolicy, {
       policyName: 'abc',
       document: {
         Version: '2012-10-17',
@@ -341,7 +341,7 @@ describe('AwsIamPolicy', () => {
   })
 
   it('shouldDeploy should change name if config changed when using default name', async () => {
-    let oldAwsIamPolicy = await context.construct(AwsIamPolicy, {
+    let oldAwsIamPolicy = context.construct(AwsIamPolicy, {
       document: {
         Version: '2012-10-17',
         Statement: {
@@ -360,7 +360,7 @@ describe('AwsIamPolicy', () => {
 
     const prevAwsIamPolicy = await deserialize(serialize(oldAwsIamPolicy, context), context)
 
-    let newAwsIamPolicy = await context.construct(AwsIamPolicy, {
+    let newAwsIamPolicy = context.construct(AwsIamPolicy, {
       document: {
         Version: '2012-10-17',
         Statement: {
@@ -382,7 +382,7 @@ describe('AwsIamPolicy', () => {
   })
 
   it('shouldDeploy should return deploy if first deployment', async () => {
-    let oldAwsIamPolicy = await context.construct(AwsIamPolicy, {
+    let oldAwsIamPolicy = context.construct(AwsIamPolicy, {
       policyName: 'abc',
       document: {
         Version: '2012-10-17',
@@ -403,7 +403,7 @@ describe('AwsIamPolicy', () => {
   })
 
   it('sync should return removed if policy does not exist in provider', async () => {
-    let oldAwsIamPolicy = await context.construct(AwsIamPolicy, {
+    let oldAwsIamPolicy = context.construct(AwsIamPolicy, {
       policyName: 'already-removed-policy',
       document: {
         Version: '2012-10-17',
@@ -424,7 +424,7 @@ describe('AwsIamPolicy', () => {
   })
 
   it('sync should update properties if policy changed in provider', async () => {
-    let oldAwsIamPolicy = await context.construct(AwsIamPolicy, {
+    let oldAwsIamPolicy = context.construct(AwsIamPolicy, {
       policyName: 'some-policy-name',
       document: {
         Version: '2012-10-17',

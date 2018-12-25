@@ -50,7 +50,7 @@ describe('AwsIamRole', () => {
     AwsIamRole = await context.import('./')
 
     const AwsProvider = await context.import('AwsProvider')
-    provider = await context.construct(AwsProvider, {
+    provider = context.construct(AwsProvider, {
       region: 'us-east-1',
       credentials: {
         accessKeyId: 'abc',
@@ -72,7 +72,7 @@ describe('AwsIamRole', () => {
     }
 
     try {
-      const awsIamRole = await context.construct(AwsIamRole, inputs)
+      const awsIamRole = context.construct(AwsIamRole, inputs)
       await context.defineComponent(awsIamRole)
       resolveComponentEvaluables(awsIamRole)
     } catch (error) {
@@ -90,7 +90,7 @@ describe('AwsIamRole', () => {
       }
     }
 
-    let awsIamRole = await context.construct(AwsIamRole, inputs)
+    let awsIamRole = context.construct(AwsIamRole, inputs)
     awsIamRole = await context.defineComponent(awsIamRole)
     awsIamRole = resolveComponentEvaluables(awsIamRole)
 
@@ -139,7 +139,7 @@ describe('AwsIamRole', () => {
       }
     }
 
-    let awsIamRole = await context.construct(AwsIamRole, inputs)
+    let awsIamRole = context.construct(AwsIamRole, inputs)
     awsIamRole = await context.defineComponent(awsIamRole)
     awsIamRole = resolveComponentEvaluables(awsIamRole)
 
@@ -175,7 +175,7 @@ describe('AwsIamRole', () => {
   })
 
   it('should update if role name has changed', async () => {
-    let oldAwsIamRole = await context.construct(AwsIamRole, {
+    let oldAwsIamRole = context.construct(AwsIamRole, {
       roleName: 'old-role-name',
       service: 'lambda.amazonaws.com',
       policy: {
@@ -189,7 +189,7 @@ describe('AwsIamRole', () => {
 
     const prevAwsIamRole = await deserialize(serialize(oldAwsIamRole, context), context)
 
-    let newAwsIamRole = await context.construct(AwsIamRole, {
+    let newAwsIamRole = context.construct(AwsIamRole, {
       roleName: 'new-role-name',
       service: 'lambda.amazonaws.com',
       policy: {
@@ -219,7 +219,7 @@ describe('AwsIamRole', () => {
       }
     }
 
-    let awsIamRole = await context.construct(AwsIamRole, inputs)
+    let awsIamRole = context.construct(AwsIamRole, inputs)
     awsIamRole = await context.defineComponent(awsIamRole)
     awsIamRole = resolveComponentEvaluables(awsIamRole)
 
@@ -261,7 +261,7 @@ describe('AwsIamRole', () => {
       }
     }
 
-    let awsIamRole = await context.construct(AwsIamRole, inputs)
+    let awsIamRole = context.construct(AwsIamRole, inputs)
     awsIamRole = await context.defineComponent(awsIamRole)
     awsIamRole = resolveComponentEvaluables(awsIamRole)
 
@@ -293,7 +293,7 @@ describe('AwsIamRole', () => {
   })
 
   it('should preserve props if nothing changed', async () => {
-    let awsIamRole = await context.construct(AwsIamRole, {
+    let awsIamRole = context.construct(AwsIamRole, {
       provider,
       roleName: 'abc',
       service: 'lambda.amazonaws.com',
@@ -310,7 +310,7 @@ describe('AwsIamRole', () => {
 
     expect(prevAwsIamRole.arn).toBe('arn:aws:iam::XXXXX:role/test-role')
 
-    let nextAwsIamRole = await context.construct(AwsIamRole, {
+    let nextAwsIamRole = context.construct(AwsIamRole, {
       provider,
       roleName: 'abc',
       service: 'lambda.amazonaws.com',
@@ -324,7 +324,7 @@ describe('AwsIamRole', () => {
   })
 
   it('should remove role', async () => {
-    let oldAwsIamRole = await context.construct(AwsIamRole, {
+    let oldAwsIamRole = context.construct(AwsIamRole, {
       provider,
       roleName: 'abc',
       service: 'lambda.amazonaws.com',
@@ -351,7 +351,7 @@ describe('AwsIamRole', () => {
   })
 
   it('should remove the role even if it does not exist anymore', async () => {
-    let oldAwsIamRole = await context.construct(AwsIamRole, {
+    let oldAwsIamRole = context.construct(AwsIamRole, {
       provider,
       roleName: 'already-removed-role',
       service: 'lambda.amazonaws.com',
@@ -378,7 +378,7 @@ describe('AwsIamRole', () => {
   })
 
   it('shouldDeploy should return undefined if nothing changed', async () => {
-    let oldAwsIamRole = await context.construct(AwsIamRole, {
+    let oldAwsIamRole = context.construct(AwsIamRole, {
       provider,
       roleName: 'abc',
       service: 'lambda.amazonaws.com',
@@ -392,7 +392,7 @@ describe('AwsIamRole', () => {
 
     const prevAwsIamRole = await deserialize(serialize(oldAwsIamRole, context), context)
 
-    let newAwsIamRole = await context.construct(AwsIamRole, {
+    let newAwsIamRole = context.construct(AwsIamRole, {
       provider,
       roleName: 'abc',
       service: 'lambda.amazonaws.com',
@@ -408,7 +408,7 @@ describe('AwsIamRole', () => {
   })
 
   it('shouldDeploy should return replace if roleName changed', async () => {
-    let oldAwsIamRole = await context.construct(AwsIamRole, {
+    let oldAwsIamRole = context.construct(AwsIamRole, {
       provider,
       roleName: 'abc',
       service: 'lambda.amazonaws.com',
@@ -422,7 +422,7 @@ describe('AwsIamRole', () => {
 
     const prevAwsIamRole = await deserialize(serialize(oldAwsIamRole, context), context)
 
-    let newAwsIamRole = await context.construct(AwsIamRole, {
+    let newAwsIamRole = context.construct(AwsIamRole, {
       provider,
       roleName: 'zxc', // changed
       service: 'lambda.amazonaws.com',
@@ -438,7 +438,7 @@ describe('AwsIamRole', () => {
   })
 
   it('shouldDeploy should return deploy if config changed', async () => {
-    let oldAwsIamRole = await context.construct(AwsIamRole, {
+    let oldAwsIamRole = context.construct(AwsIamRole, {
       provider,
       roleName: 'abc',
       service: 'lambda.amazonaws.com',
@@ -452,7 +452,7 @@ describe('AwsIamRole', () => {
 
     const prevAwsIamRole = await deserialize(serialize(oldAwsIamRole, context), context)
 
-    let newAwsIamRole = await context.construct(AwsIamRole, {
+    let newAwsIamRole = context.construct(AwsIamRole, {
       provider,
       roleName: 'abc',
       service: 'lambda.amazonaws.com',
@@ -468,7 +468,7 @@ describe('AwsIamRole', () => {
   })
 
   it('shouldDeploy should return deploy if first deployment', async () => {
-    let oldAwsIamRole = await context.construct(AwsIamRole, {
+    let oldAwsIamRole = context.construct(AwsIamRole, {
       provider,
       roleName: 'already-removed-role',
       service: 'lambda.amazonaws.com',
@@ -483,7 +483,7 @@ describe('AwsIamRole', () => {
   })
 
   it('sync should return "removed" if role removed from provider', async () => {
-    let oldAwsIamRole = await context.construct(AwsIamRole, {
+    let oldAwsIamRole = context.construct(AwsIamRole, {
       provider,
       roleName: 'already-removed-role',
       service: 'lambda.amazonaws.com',
@@ -498,7 +498,7 @@ describe('AwsIamRole', () => {
   })
 
   it('sync should update role config if role config changed in provider', async () => {
-    let oldAwsIamRole = await context.construct(AwsIamRole, {
+    let oldAwsIamRole = context.construct(AwsIamRole, {
       provider,
       roleName: 'somerole',
       service: 'elasticmapreduce.amazonaws.com', // this is outdated!

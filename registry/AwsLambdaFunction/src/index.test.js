@@ -41,7 +41,7 @@ describe('AwsLambdaFunction', () => {
     context = await createTestContext({ cwd })
     AwsProvider = await context.import('AwsProvider')
     AwsLambdaFunction = await context.import('./')
-    provider = await context.construct(AwsProvider, {
+    provider = context.construct(AwsProvider, {
       region: 'us-east-1',
       credentials: {
         accessKeyId: 'abc',
@@ -53,7 +53,7 @@ describe('AwsLambdaFunction', () => {
   it('should pack lambda without shim', async () => {
     Date.now = jest.fn(() => '1')
 
-    let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+    let awsLambdaFunction = context.construct(AwsLambdaFunction, {
       provider,
       code: './code',
       functionName: 'hello',
@@ -83,7 +83,7 @@ describe('AwsLambdaFunction', () => {
 
   it('should pack lambda with shim', async () => {
     Date.now = jest.fn(() => '1')
-    let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+    let awsLambdaFunction = context.construct(AwsLambdaFunction, {
       provider,
       code: ['./code', './shim/path.js'],
       functionName: 'hello',
@@ -112,7 +112,7 @@ describe('AwsLambdaFunction', () => {
   })
 
   it('should create lambda when non exists', async () => {
-    let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+    let awsLambdaFunction = context.construct(AwsLambdaFunction, {
       provider,
       code: './code',
       functionName: 'hello',
@@ -163,7 +163,7 @@ describe('AwsLambdaFunction', () => {
   })
 
   it('should update lambda config', async () => {
-    let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+    let awsLambdaFunction = context.construct(AwsLambdaFunction, {
       provider,
       code: './code',
       functionName: 'hello',
@@ -194,7 +194,7 @@ describe('AwsLambdaFunction', () => {
 
     const prevAwsLambdaFunction = await deserialize(serialize(awsLambdaFunction, context), context)
 
-    let nextAwsLambdaFunction = await context.construct(AwsLambdaFunction, {
+    let nextAwsLambdaFunction = context.construct(AwsLambdaFunction, {
       provider,
       code: './code',
       functionName: 'hello',
@@ -250,7 +250,7 @@ describe('AwsLambdaFunction', () => {
   })
 
   it('should preserve properties when hydrated', async () => {
-    let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+    let awsLambdaFunction = context.construct(AwsLambdaFunction, {
       provider,
       code: './code',
       functionName: 'hello',
@@ -279,7 +279,7 @@ describe('AwsLambdaFunction', () => {
 
     expect(prevAwsLambdaFunction.arn).toBe('abc:zxc')
 
-    let nextAwsLambdaFunction = await context.construct(AwsLambdaFunction, {
+    let nextAwsLambdaFunction = context.construct(AwsLambdaFunction, {
       provider,
       code: './code',
       functionName: 'hello',
@@ -308,7 +308,7 @@ describe('AwsLambdaFunction', () => {
   })
 
   it('should create lambda if name changed', async () => {
-    let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+    let awsLambdaFunction = context.construct(AwsLambdaFunction, {
       provider,
       code: './code',
       functionName: 'hello',
@@ -339,7 +339,7 @@ describe('AwsLambdaFunction', () => {
 
     const prevAwsLambdaFunction = await deserialize(serialize(awsLambdaFunction, context), context)
 
-    let nextAwsLambdaFunction = await context.construct(AwsLambdaFunction, {
+    let nextAwsLambdaFunction = context.construct(AwsLambdaFunction, {
       provider,
       code: './code',
       functionName: 'world', // changed!
@@ -390,7 +390,7 @@ describe('AwsLambdaFunction', () => {
   })
 
   it('should create lambda when code is an archive', async () => {
-    let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+    let awsLambdaFunction = context.construct(AwsLambdaFunction, {
       provider,
       code: 'codeasarchive.jar',
       functionName: 'hello',
@@ -442,7 +442,7 @@ describe('AwsLambdaFunction', () => {
   })
 
   it('should remove lambda', async () => {
-    let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+    let awsLambdaFunction = context.construct(AwsLambdaFunction, {
       provider,
       code: './code',
       functionName: 'hello',
@@ -483,7 +483,7 @@ describe('AwsLambdaFunction', () => {
   })
 
   it('should remove lambda even if it does not exist anymore', async () => {
-    let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+    let awsLambdaFunction = context.construct(AwsLambdaFunction, {
       provider,
       code: './code',
       functionName: 'already-removed-function',
@@ -524,7 +524,7 @@ describe('AwsLambdaFunction', () => {
   })
 
   it('should return lambda arn when calling getId()', async () => {
-    const awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+    const awsLambdaFunction = context.construct(AwsLambdaFunction, {
       provider,
       code: './code',
       functionName: 'hello',
@@ -538,7 +538,7 @@ describe('AwsLambdaFunction', () => {
   })
 
   it('shouldDeploy should return replace if name changed', async () => {
-    let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+    let awsLambdaFunction = context.construct(AwsLambdaFunction, {
       provider,
       code: './code',
       functionName: 'hello',
@@ -569,7 +569,7 @@ describe('AwsLambdaFunction', () => {
 
     const prevAwsLambdaFunction = await deserialize(serialize(awsLambdaFunction, context), context)
 
-    let nextAwsLambdaFunction = await context.construct(AwsLambdaFunction, {
+    let nextAwsLambdaFunction = context.construct(AwsLambdaFunction, {
       provider,
       code: './code',
       functionName: 'world', // changed!
@@ -601,7 +601,7 @@ describe('AwsLambdaFunction', () => {
   })
 
   it('shouldDeploy should return deploy if config changed', async () => {
-    let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+    let awsLambdaFunction = context.construct(AwsLambdaFunction, {
       provider,
       code: './code',
       functionName: 'hello',
@@ -632,7 +632,7 @@ describe('AwsLambdaFunction', () => {
 
     const prevAwsLambdaFunction = await deserialize(serialize(awsLambdaFunction, context), context)
 
-    let nextAwsLambdaFunction = await context.construct(AwsLambdaFunction, {
+    let nextAwsLambdaFunction = context.construct(AwsLambdaFunction, {
       provider,
       code: './code',
       functionName: 'hello',
@@ -664,7 +664,7 @@ describe('AwsLambdaFunction', () => {
   })
 
   it('shouldDeploy should return undefined if nothing changed', async () => {
-    let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+    let awsLambdaFunction = context.construct(AwsLambdaFunction, {
       provider,
       code: './code',
       functionName: 'hello',
@@ -697,7 +697,7 @@ describe('AwsLambdaFunction', () => {
 
     const prevAwsLambdaFunction = await deserialize(serialize(awsLambdaFunction, context), context)
 
-    let nextAwsLambdaFunction = await context.construct(AwsLambdaFunction, {
+    let nextAwsLambdaFunction = context.construct(AwsLambdaFunction, {
       provider,
       code: './code',
       functionName: 'hello',
@@ -730,7 +730,7 @@ describe('AwsLambdaFunction', () => {
   })
 
   it('shouldDeploy should return deploy if role changed', async () => {
-    let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+    let awsLambdaFunction = context.construct(AwsLambdaFunction, {
       provider,
       code: './code',
       functionName: 'hello',
@@ -762,7 +762,7 @@ describe('AwsLambdaFunction', () => {
 
     const prevAwsLambdaFunction = await deserialize(serialize(awsLambdaFunction, context), context)
 
-    let nextAwsLambdaFunction = await context.construct(AwsLambdaFunction, {
+    let nextAwsLambdaFunction = context.construct(AwsLambdaFunction, {
       provider,
       code: './code',
       functionName: 'hello',
@@ -795,7 +795,7 @@ describe('AwsLambdaFunction', () => {
   })
 
   it('shouldDeploy should return deploy if code changed', async () => {
-    let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+    let awsLambdaFunction = context.construct(AwsLambdaFunction, {
       provider,
       code: './code',
       functionName: 'hello',
@@ -827,7 +827,7 @@ describe('AwsLambdaFunction', () => {
 
     const prevAwsLambdaFunction = await deserialize(serialize(awsLambdaFunction, context), context)
 
-    let nextAwsLambdaFunction = await context.construct(AwsLambdaFunction, {
+    let nextAwsLambdaFunction = context.construct(AwsLambdaFunction, {
       provider,
       code: './code',
       functionName: 'hello',
@@ -861,7 +861,7 @@ describe('AwsLambdaFunction', () => {
   })
 
   it('should not load AwsIamRole if role is provided', async () => {
-    let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+    let awsLambdaFunction = context.construct(AwsLambdaFunction, {
       provider,
       code: './code',
       functionName: 'hello',
@@ -893,7 +893,7 @@ describe('AwsLambdaFunction', () => {
   })
 
   it('should load AwsIamRole if role is not provided', async () => {
-    let awsLambdaFunction = await context.construct(AwsLambdaFunction, {
+    let awsLambdaFunction = context.construct(AwsLambdaFunction, {
       provider,
       code: './code',
       functionName: 'hello',

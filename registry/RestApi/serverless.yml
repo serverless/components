@@ -15,10 +15,11 @@ paths:
   description: An array of registered URL's with relevant information.
 baseUrl:
   type: string
-apiName:
-  type: string
 gateway:
   type: object
+
+apiName: ${inputs.apiName}
+  # type: string
 
 inputTypes:
   provider:

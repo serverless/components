@@ -12,8 +12,8 @@ describe('#getParentId()', () => {
       }
     )
     const Component = await context.import('Component')
-    const parent = await context.construct(Component, {})
-    const child = await context.construct(Component, {})
+    const parent = context.construct(Component, {})
+    const child = context.construct(Component, {})
     child.parent = parent
 
     expect(getParentId(child)).toBe(parent.instanceId)
@@ -29,7 +29,7 @@ describe('#getParentId()', () => {
       }
     )
     const Component = await context.import('Component')
-    const component = await context.construct(Component, {})
+    const component = context.construct(Component, {})
 
     expect(getParentId(component)).toBe(null)
   })

@@ -183,8 +183,8 @@ const AwsLambdaCompute = {
       provider
     }
     // create the AwsLambdaFunction and deploy
-    const AwsLambdaFunction = await context.loadType('AwsLambdaFunction')
-    const awsLambdaFunction = await context.construct(AwsLambdaFunction, inputs)
+    const AwsLambdaFunction = await context.import('AwsLambdaFunction')
+    const awsLambdaFunction = context.construct(AwsLambdaFunction, inputs)
     awsLambdaFunction.deploy(context)
   }
 }

@@ -1,10 +1,6 @@
-import { getProp } from '@serverless/utils'
 import { resolve } from 'path'
-import errorUnknownTypeName from './errorUnknownTypeName'
-import loadTypeMetaFromPath from './loadTypeMetaFromPath'
 
-// TODO BRN: Replace this with something more configurable
-const NATIVE_NAMES = {
+const NATIVE_TYPES = {
   App: resolve(__dirname, '..', '..', '..', 'registry', 'App'),
   Function: resolve(__dirname, '..', '..', '..', 'registry', 'Function'),
   Service: resolve(__dirname, '..', '..', '..', 'registry', 'Service'),
@@ -48,24 +44,4 @@ const NATIVE_NAMES = {
   AwsDynamoDb: resolve(__dirname, '..', '..', '..', 'registry', 'AwsDynamoDb')
 }
 
-/**
- * @param {string} typeName the name to use to load a type
- * @param {*} context
- * @returns {{
- *   root: string,
- *   props: string
- * }}
- */
-const loadTypeMetaFromName = async (typeName, context) => {
-  const absoluteTypePath = getProp(typeName, NATIVE_NAMES)
-  if (!absoluteTypePath) {
-    throw errorUnknownTypeName(typeName)
-  }
-  const typeMeta = await loadTypeMetaFromPath(absoluteTypePath, context)
-  return {
-    ...typeMeta,
-    query: typeName
-  }
-}
-
-export default loadTypeMetaFromName
+export default NATIVE_TYPES
