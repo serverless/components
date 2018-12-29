@@ -1,5 +1,12 @@
 import { get, keys, pick, resolve, equals, not } from '@serverless/utils'
-import { createTable, updateTable, deleteTable, describeTable, ensureTable, updateTimeToLive  } from './utils'
+import {
+  createTable,
+  updateTable,
+  deleteTable,
+  describeTable,
+  ensureTable,
+  updateTimeToLive
+} from './utils'
 
 const AwsDynamoDb = {
   shouldDeploy(prevInstance) {
@@ -13,7 +20,7 @@ const AwsDynamoDb = {
     }
     const prevInputs = prevInstance ? pick(keys(inputs), prevInstance) : {}
     const configChanged = not(equals(inputs, prevInputs))
-    
+
     if (!prevInstance || configChanged) {
       return 'deploy'
     } else if (
@@ -75,22 +82,23 @@ const AwsDynamoDb = {
       await ensureTable(updateTable, this)
       context.log(`Table updated: '${tableName}'`)
     } else if (
-        prevInstance &&
-        not(equals(prevInstance.timeToLiveSpecification, this.timeToLiveSpecification))
-      ) {
+      prevInstance &&
+      not(equals(prevInstance.timeToLiveSpecification, this.timeToLiveSpecification))
+    ) {
+      context.log(`Updating time to live of the table: '${tableName}'`)
+      await updateTimeToLive(this)
+      context.log(`Time to live of the table updated: '${tableName}'`)
+    } else {
+      context.log(`Creating table: '${tableName}'`)
+      await ensureTable(createTable, this)
+      context.log(`Table created: '${tableName}'`)
+
+      if (this.timeToLiveSpecification) {
         context.log(`Updating time to live of the table: '${tableName}'`)
         await updateTimeToLive(this)
         context.log(`Time to live of the table updated: '${tableName}'`)
-      } else {
-        context.log(`Creating table: '${tableName}'`)
-        await ensureTable(createTable, this)
-        context.log(`Table created: '${tableName}'`)
-
-        if (this.timeToLiveSpecification) {
-          context.log(`Updating time to live of the table: '${tableName}'`)
-          await updateTimeToLive(this)
-          context.log(`Time to live of the table updated: '${tableName}'`)
-        }
+      }
+    }
   },
 
   async remove(context) {
