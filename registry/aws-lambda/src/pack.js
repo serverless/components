@@ -12,9 +12,9 @@ module.exports = async (packagePath, tempPath) => {
   tempPath = tempPath || os.tmpdir()
 
   /*
-  * Ensure id includes datetime and unique string,
-  * since packaging can happen in parallel
-  */
+   * Ensure id includes datetime and unique string,
+   * since packaging can happen in parallel
+   */
 
   let outputFileName = crypto.randomBytes(3).toString('hex')
   outputFileName = `${String(Date.now())}-${outputFileName}.zip`
