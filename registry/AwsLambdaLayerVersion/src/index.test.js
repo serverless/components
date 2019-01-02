@@ -18,16 +18,16 @@ jest.mock('fs-extra', () => ({
   readFile: jest.fn().mockReturnValue(Promise.resolve('zipfilecontent'))
 }))
 
-jest.mock('folder-hash', () => ({
-  hashElement: jest.fn().mockReturnValue({ hash: 'abc' })
-}))
+let dateNowSpy
 
 beforeEach(() => {
   jest.clearAllMocks()
+  dateNowSpy = jest.spyOn(Date, 'now').mockImplementation(() => 1)
 })
 
 afterAll(() => {
   jest.restoreAllMocks()
+  dateNowSpy.mockRestore()
 })
 
 describe('AwsLambdaLayerVersion', () => {
@@ -51,8 +51,6 @@ describe('AwsLambdaLayerVersion', () => {
   })
 
   it('should pack lambda layer', async () => {
-    Date.now = jest.fn(() => '1')
-
     let awsLambdaLayerVersion = await context.construct(AwsLambdaLayerVersion, {
       provider,
       content: './content',
@@ -75,8 +73,6 @@ describe('AwsLambdaLayerVersion', () => {
     expect(awsLambdaLayerVersion.zip).toEqual('zipfilecontent')
     expect(awsLambdaLayerVersion.content).toEqual('./content')
     expect(file).toEqual('zipfilecontent')
-
-    Date.now.mockRestore()
   })
 
   it('should create lambda layer when none exists', async () => {
@@ -298,7 +294,7 @@ describe('AwsLambdaLayerVersion', () => {
     expect(AWS.mocks.deleteLayerVersionMock).toBeCalledWith(deleteLayerVersionParams)
   })
 
-  it('should remove lambda even if it does not exist anymore', async () => {
+  it('should remove lambda layer verison even if it does not exist anymore', async () => {
     let awsLambdaLayerVersion = await context.construct(AwsLambdaLayerVersion, {
       provider,
       content: './content',
@@ -327,7 +323,7 @@ describe('AwsLambdaLayerVersion', () => {
     expect(AWS.mocks.deleteLayerVersionMock).toBeCalledWith(deleteLayerVersionParams)
   })
 
-  it('should return lambda arn when calling getId()', async () => {
+  it('should return lambda layer version id when calling getId()', async () => {
     const awsLambdaLayerVersion = await context.construct(AwsLambdaLayerVersion, {
       provider,
       content: './content',
