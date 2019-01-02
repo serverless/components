@@ -22,7 +22,7 @@ describe('AwsCloudWatchEventsRule', () => {
     context = await createTestContext({ cwd })
     AwsProvider = await context.import('AwsProvider')
     AwsCloudWatchEventsRule = await context.import('./')
-    provider = await context.construct(AwsProvider, {
+    provider = context.construct(AwsProvider, {
       region: 'us-east-1',
       credentials: {
         accessKeyId: 'abc',
@@ -47,7 +47,7 @@ describe('AwsCloudWatchEventsRule', () => {
       }
     }
 
-    let awsCloudWatchEventsRule = await context.construct(AwsCloudWatchEventsRule, inputs)
+    let awsCloudWatchEventsRule = context.construct(AwsCloudWatchEventsRule, inputs)
     awsCloudWatchEventsRule = await context.defineComponent(awsCloudWatchEventsRule)
     awsCloudWatchEventsRule = resolveComponentEvaluables(awsCloudWatchEventsRule)
 
@@ -77,7 +77,7 @@ describe('AwsCloudWatchEventsRule', () => {
   })
 
   it('should preserve props if nothing changed', async () => {
-    let awsCloudWatchEventsRule = await context.construct(AwsCloudWatchEventsRule, {
+    let awsCloudWatchEventsRule = context.construct(AwsCloudWatchEventsRule, {
       provider,
       schedule: 'rate(5 minutes)',
       lambda: {
@@ -97,7 +97,7 @@ describe('AwsCloudWatchEventsRule', () => {
 
     expect(prevAwsEventsRule.arn).toBe('abc:zxc')
 
-    let nextAwsEventsRule = await context.construct(AwsCloudWatchEventsRule, {
+    let nextAwsEventsRule = context.construct(AwsCloudWatchEventsRule, {
       provider,
       schedule: 'rate(5 minutes)',
       lambda: {
@@ -127,7 +127,7 @@ describe('AwsCloudWatchEventsRule', () => {
       }
     }
 
-    let awsCloudWatchEventsRule = await context.construct(AwsCloudWatchEventsRule, inputs)
+    let awsCloudWatchEventsRule = context.construct(AwsCloudWatchEventsRule, inputs)
     awsCloudWatchEventsRule = await context.defineComponent(awsCloudWatchEventsRule)
     awsCloudWatchEventsRule = resolveComponentEvaluables(awsCloudWatchEventsRule)
     await awsCloudWatchEventsRule.remove(context)
@@ -155,7 +155,7 @@ describe('AwsCloudWatchEventsRule', () => {
       }
     }
 
-    let awsCloudWatchEventsRule = await context.construct(AwsCloudWatchEventsRule, inputs)
+    let awsCloudWatchEventsRule = context.construct(AwsCloudWatchEventsRule, inputs)
     awsCloudWatchEventsRule = await context.defineComponent(awsCloudWatchEventsRule)
     awsCloudWatchEventsRule = resolveComponentEvaluables(awsCloudWatchEventsRule)
     await awsCloudWatchEventsRule.remove(context)
@@ -170,7 +170,7 @@ describe('AwsCloudWatchEventsRule', () => {
   })
 
   it('sync should return "removed" if rule removed from provider', async () => {
-    let awsCloudWatchEventsRule = await context.construct(AwsCloudWatchEventsRule, {
+    let awsCloudWatchEventsRule = context.construct(AwsCloudWatchEventsRule, {
       provider,
       enabled: true,
       schedule: 'rate(5 minutes)',
@@ -186,7 +186,7 @@ describe('AwsCloudWatchEventsRule', () => {
   })
 
   it('sync should update rule config if rule config changed in provider', async () => {
-    let awsCloudWatchEventsRule = await context.construct(AwsCloudWatchEventsRule, {
+    let awsCloudWatchEventsRule = context.construct(AwsCloudWatchEventsRule, {
       provider,
       enabled: true,
       schedule: 'rate(5 minutes)',

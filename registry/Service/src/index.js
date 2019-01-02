@@ -35,11 +35,11 @@ const Service = async (SuperClass, superContext) => {
   const Fn = await superContext.import('Function')
 
   return class extends SuperClass {
-    async construct(inputs, context) {
-      await super.construct(inputs, context)
+    construct(inputs, context) {
+      super.construct(inputs, context)
       // construct function instances
-      this.functions = await map(
-        async (func, alias) =>
+      this.functions = map(
+        (func, alias) =>
           context.construct(Fn, {
             ...func,
             functionName: resolvable(() => or(func.functionName, alias)),
@@ -48,14 +48,14 @@ const Service = async (SuperClass, superContext) => {
         or(this.functions, {})
       )
       // construct component instances
-      this.components = await map(async (component, key) => {
+      this.components = map((component, key) => {
         if (isComponent(component)) {
           return component
         } else if (isTypeConstruct(component)) {
           // eslint-disable-next-line no-shadow
           const { type, inputs } = component
-          const Type = await context.import(type)
-          component = await context.construct(Type, inputs)
+          const Type = context.require(type)
+          component = context.construct(Type, inputs)
           if (!isComponent(component)) {
             throw new Error(
               `The component "${key}" is not of type Component (it's of type ${component.name})`

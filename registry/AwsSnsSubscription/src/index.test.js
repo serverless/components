@@ -22,7 +22,7 @@ describe('AwsSnsSubscription', () => {
     context = await createTestContext({ cwd })
     AwsSnsSubscription = await context.import('./')
     AwsProvider = await context.import('AwsProvider')
-    provider = await context.construct(AwsProvider, {
+    provider = context.construct(AwsProvider, {
       region: 'us-east-1',
       credentials: {
         accessKeyId: 'abc',
@@ -41,7 +41,7 @@ describe('AwsSnsSubscription', () => {
       provider
     }
 
-    let awsSnsSubscription = await context.construct(AwsSnsSubscription, inputs)
+    let awsSnsSubscription = context.construct(AwsSnsSubscription, inputs)
     awsSnsSubscription = await context.defineComponent(awsSnsSubscription)
     awsSnsSubscription = resolveComponentEvaluables(awsSnsSubscription)
 
@@ -56,7 +56,7 @@ describe('AwsSnsSubscription', () => {
   })
 
   it('should update if subscription has changed', async () => {
-    let oldAwsSnsSubscription = await context.construct(AwsSnsSubscription, {
+    let oldAwsSnsSubscription = context.construct(AwsSnsSubscription, {
       protocol: 'https',
       topic: 'some-old-topic',
       provider
@@ -70,7 +70,7 @@ describe('AwsSnsSubscription', () => {
       context
     )
 
-    let newAwsSnsSubscription = await context.construct(AwsSnsSubscription, {
+    let newAwsSnsSubscription = context.construct(AwsSnsSubscription, {
       protocol: 'email',
       topic: 'some-new-topic',
       provider
@@ -87,7 +87,7 @@ describe('AwsSnsSubscription', () => {
   })
 
   it('should remove the subscription', async () => {
-    let oldAwsSnsSubscription = await context.construct(AwsSnsSubscription, {
+    let oldAwsSnsSubscription = context.construct(AwsSnsSubscription, {
       protocol: 'https',
       topic: 'some-topic',
       provider
@@ -109,7 +109,7 @@ describe('AwsSnsSubscription', () => {
   })
 
   it('should remove the subscription even if it does not exist anymore', async () => {
-    let oldAwsSnsSubscription = await context.construct(AwsSnsSubscription, {
+    let oldAwsSnsSubscription = context.construct(AwsSnsSubscription, {
       protocol: 'https',
       topic: 'some-topic',
       provider
@@ -132,7 +132,7 @@ describe('AwsSnsSubscription', () => {
   })
 
   it('shouldDeploy should return undefined if nothing changed', async () => {
-    let oldComponent = await context.construct(AwsSnsSubscription, {
+    let oldComponent = context.construct(AwsSnsSubscription, {
       protocol: 'https',
       topic: 'some-topic',
       provider
@@ -143,7 +143,7 @@ describe('AwsSnsSubscription', () => {
 
     const prevComponent = await deserialize(serialize(oldComponent, context), context)
 
-    let newComponent = await context.construct(AwsSnsSubscription, {
+    let newComponent = context.construct(AwsSnsSubscription, {
       protocol: 'https',
       topic: 'some-topic',
       provider
@@ -156,7 +156,7 @@ describe('AwsSnsSubscription', () => {
   })
 
   it('shouldDeploy should return "replace" if "topic" changed', async () => {
-    let oldComponent = await context.construct(AwsSnsSubscription, {
+    let oldComponent = context.construct(AwsSnsSubscription, {
       protocol: 'https',
       topic: 'some-topic',
       provider
@@ -167,7 +167,7 @@ describe('AwsSnsSubscription', () => {
 
     const prevComponent = await deserialize(serialize(oldComponent, context), context)
 
-    let newComponent = await context.construct(AwsSnsSubscription, {
+    let newComponent = context.construct(AwsSnsSubscription, {
       protocol: 'https',
       topic: 'some-another-topic',
       provider
@@ -180,7 +180,7 @@ describe('AwsSnsSubscription', () => {
   })
 
   it('shouldDeploy should return "replace" if "protocol" changed', async () => {
-    let oldComponent = await context.construct(AwsSnsSubscription, {
+    let oldComponent = context.construct(AwsSnsSubscription, {
       protocol: 'https',
       topic: 'some-topic',
       provider
@@ -191,7 +191,7 @@ describe('AwsSnsSubscription', () => {
 
     const prevComponent = await deserialize(serialize(oldComponent, context), context)
 
-    let newComponent = await context.construct(AwsSnsSubscription, {
+    let newComponent = context.construct(AwsSnsSubscription, {
       protocol: 'http',
       topic: 'some-topic',
       provider
@@ -204,7 +204,7 @@ describe('AwsSnsSubscription', () => {
   })
 
   it('shouldDeploy should return deploy if first deployment', async () => {
-    let oldComponent = await context.construct(AwsSnsSubscription, {
+    let oldComponent = context.construct(AwsSnsSubscription, {
       protocol: 'https',
       topic: 'some-topic',
       provider
@@ -221,14 +221,14 @@ describe('AwsSnsSubscription', () => {
       topic: 'some-topic',
       provider
     }
-    let oldComponent = await context.construct(AwsSnsSubscription, inputs)
+    let oldComponent = context.construct(AwsSnsSubscription, inputs)
     oldComponent = await context.defineComponent(oldComponent)
     oldComponent = resolveComponentEvaluables(oldComponent)
     await oldComponent.deploy(null, context)
 
     const prevComponent = await deserialize(serialize(oldComponent, context), context)
 
-    let newComponent = await context.construct(AwsSnsSubscription, inputs)
+    let newComponent = context.construct(AwsSnsSubscription, inputs)
     newComponent = await context.defineComponent(newComponent, prevComponent)
     newComponent = resolveComponentEvaluables(newComponent)
 
@@ -242,14 +242,14 @@ describe('AwsSnsSubscription', () => {
       endpoint: 'test-function-name',
       provider
     }
-    let oldComponent = await context.construct(AwsSnsSubscription, inputs)
+    let oldComponent = context.construct(AwsSnsSubscription, inputs)
     oldComponent = await context.defineComponent(oldComponent)
     oldComponent = resolveComponentEvaluables(oldComponent)
     await oldComponent.deploy(null, context)
 
     const prevComponent = await deserialize(serialize(oldComponent, context), context)
 
-    let newComponent = await context.construct(AwsSnsSubscription, inputs)
+    let newComponent = context.construct(AwsSnsSubscription, inputs)
     newComponent = await context.defineComponent(newComponent, prevComponent)
     newComponent = resolveComponentEvaluables(newComponent)
 

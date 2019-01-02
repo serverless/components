@@ -1,4 +1,4 @@
-const deleteTable = async (properties) => {
+async function deleteTable(properties) {
   const { provider, tableName } = properties
 
   const SDK = provider.getSdk()

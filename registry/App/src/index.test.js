@@ -40,7 +40,7 @@ describe('App', () => {
     }
 
     const App = await context.import('./')
-    const app = await context.construct(App, inputs)
+    const app = context.construct(App, inputs)
 
     const children = await app.define()
 

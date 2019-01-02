@@ -24,7 +24,6 @@ describe('index', () => {
     expect(mod).toMatchObject({
       appendKey: expect.any(Function),
       defineComponent: expect.any(Function),
-      defineComponentFromState: expect.any(Function),
       getChildrenIds: expect.any(Function),
       getDependenciesIds: expect.any(Function),
       getKey: expect.any(Function),
@@ -128,7 +127,7 @@ describe('index', () => {
 
   test('has serialize methods', () => {
     const mod = require('./serialize')
-    expect(mod).toMatchObject({
+    expect(mod).toEqual({
       deserialize: expect.any(Function),
       serialize: expect.any(Function)
     })
@@ -136,14 +135,17 @@ describe('index', () => {
 
   test('has type methods', () => {
     const mod = require('./type')
-    expect(mod).toMatchObject({
+    expect(mod).toEqual({
       anyTypeFileExistsAtPath: expect.any(Function),
       construct: expect.any(Function),
+      create: expect.any(Function),
       defType: expect.any(Function),
+      hasType: expect.any(Function),
       isType: expect.any(Function),
-      isTypeName: expect.any(Function),
+      isTypeConstruct: expect.any(Function),
       loadType: expect.any(Function),
-      loadTypes: expect.any(Function)
+      requireType: expect.any(Function),
+      walkReduceTypeChain: expect.any(Function)
     })
   })
 

@@ -2,6 +2,9 @@ import AWS from 'aws-sdk'
 import path from 'path'
 import { createTestContext } from '../../../test'
 
+// TODO: move this into @serverless/utils ?!
+import newVariable from '../../../dist/utils/variable/newVariable'
+
 describe('AwsProvider', () => {
   let context
   let AwsProvider
@@ -26,9 +29,15 @@ describe('AwsProvider', () => {
         region: null
       }
 
-      const awsProvider = await context.construct(AwsProvider, inputs)
+      const awsProvider = context.construct(AwsProvider, inputs)
 
-      expect(awsProvider.region).toEqual('us-east-1')
+      expect(awsProvider.getCredentials()).toEqual({
+        credentials: {
+          accessKeyId: 'abc',
+          secretAccessKey: 'xyz'
+        },
+        region: 'us-east-1'
+      })
     })
   })
 
@@ -42,11 +51,33 @@ describe('AwsProvider', () => {
         region: 'us-east-1'
       }
 
-      const awsProvider = await context.construct(AwsProvider, inputs)
+      const awsProvider = context.construct(AwsProvider, inputs)
       const AwsSdk = awsProvider.getSdk()
 
       expect(AwsSdk).toEqual(AWS)
       expect(AWS.config.update).toBeCalledWith(inputs)
+    })
+
+    it('should auto-resolve variables in credentials', async () => {
+      const inputs = {
+        credentials: {
+          accessKeyId: newVariable("${false || 'abc'}", {}),
+          secretAccessKey: newVariable("${false || 'zxc'}", {})
+        },
+        region: 'us-east-1'
+      }
+
+      const awsProvider = context.construct(AwsProvider, inputs)
+      const AwsSdk = awsProvider.getSdk()
+
+      expect(AwsSdk).toEqual(AWS)
+      expect(AWS.config.update).toBeCalledWith({
+        credentials: {
+          accessKeyId: 'abc',
+          secretAccessKey: 'zxc'
+        },
+        region: 'us-east-1'
+      })
     })
   })
 
@@ -60,10 +91,31 @@ describe('AwsProvider', () => {
         region: 'us-east-1'
       }
 
-      const awsProvider = await context.construct(AwsProvider, inputs)
+      const awsProvider = context.construct(AwsProvider, inputs)
       const credentials = awsProvider.getCredentials()
 
       expect(credentials).toEqual(inputs)
+    })
+
+    it('should auto-resolve variables in credentials', async () => {
+      const inputs = {
+        credentials: {
+          accessKeyId: newVariable("${false || 'abc'}", {}),
+          secretAccessKey: newVariable("${false || 'zxc'}", {})
+        },
+        region: 'us-east-1'
+      }
+
+      const awsProvider = context.construct(AwsProvider, inputs)
+      const credentials = awsProvider.getCredentials()
+
+      expect(credentials).toEqual({
+        credentials: {
+          accessKeyId: 'abc',
+          secretAccessKey: 'zxc'
+        },
+        region: 'us-east-1'
+      })
     })
   })
 
@@ -77,7 +129,7 @@ describe('AwsProvider', () => {
         region: 'us-east' // correct would be 'us-east-1'
       }
 
-      const awsProvider = await context.construct(AwsProvider, inputs)
+      const awsProvider = context.construct(AwsProvider, inputs)
 
       expect(() => awsProvider.validate()).toThrow('Invalid region')
     })
@@ -91,7 +143,7 @@ describe('AwsProvider', () => {
         }
       }
 
-      const awsProvider = await context.construct(AwsProvider, inputs)
+      const awsProvider = context.construct(AwsProvider, inputs)
 
       expect(() => awsProvider.validate()).not.toThrow()
     })
@@ -105,7 +157,7 @@ describe('AwsProvider', () => {
         }
       }
 
-      const awsProvider = await context.construct(AwsProvider, inputs)
+      const awsProvider = context.construct(AwsProvider, inputs)
 
       expect(() => awsProvider.validate()).not.toThrow()
     })
@@ -116,7 +168,7 @@ describe('AwsProvider', () => {
         region: 'us-east-1'
       }
 
-      const awsProvider = await context.construct(AwsProvider, inputs)
+      const awsProvider = context.construct(AwsProvider, inputs)
 
       expect(() => awsProvider.validate()).toThrow('Credentials not set')
     })
@@ -129,7 +181,7 @@ describe('AwsProvider', () => {
         region: 'us-east-1'
       }
 
-      const awsProvider = await context.construct(AwsProvider, inputs)
+      const awsProvider = context.construct(AwsProvider, inputs)
 
       expect(() => awsProvider.validate()).not.toThrow()
     })
@@ -140,7 +192,7 @@ describe('AwsProvider', () => {
         region: 'us-east-1'
       }
 
-      const awsProvider = await context.construct(AwsProvider, inputs)
+      const awsProvider = context.construct(AwsProvider, inputs)
 
       expect(() => awsProvider.validate()).toThrow('Credentials not set')
     })
@@ -154,7 +206,7 @@ describe('AwsProvider', () => {
         region: 'us-east-1'
       }
 
-      const awsProvider = await context.construct(AwsProvider, inputs)
+      const awsProvider = context.construct(AwsProvider, inputs)
       const accountId = await awsProvider.getAccountId()
       expect(accountId).toBe('558750028299')
     })

@@ -150,7 +150,7 @@ const AwsLambdaFunction = async (SuperClass, superContext) => {
         const AWS = provider.getSdk()
         const STS = new AWS.STS()
         const { Account } = await STS.getCallerIdentity().promise()
-        role = await context.construct(
+        role = context.construct(
           AwsIamRole,
           {
             roleName: `${resolve(this.functionName)}-execution-role`,

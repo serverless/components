@@ -20,6 +20,11 @@ urls:
   type: array
   description: All the generated API Gateway URLs
 
+provider: ${inputs.provider || context.provider}
+apiName: ${inputs.apiName || 'apig-${this.instanceId}'}
+role: ${inputs.role}
+routes: ${inputs.routes}
+
 inputTypes:
   provider:
     type: AwsProvider

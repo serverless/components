@@ -1,16 +1,17 @@
 import logStatus from './logStatus'
+import { createTestContext } from '../../../test'
 
 describe('#logStatus()', () => {
   let iteratee
   let mockLog
   let context
+  const state = {}
 
-  beforeEach(() => {
+  beforeEach(async () => {
     iteratee = {}
     mockLog = jest.fn()
-    context = {
-      log: mockLog
-    }
+    context = await createTestContext({ cwd: __dirname })
+    context.log = mockLog
   })
 
   it('should log the current status when deploying', () => {
@@ -98,5 +99,32 @@ describe('#logStatus()', () => {
     logStatus(iteratee, node, context)
 
     expect(mockLog).toHaveBeenCalledTimes(0)
+  })
+
+  it('should not log deeply nested / circular structured objects', async () => {
+    const Provider = await context.import('Provider')
+    const provider = context.construct(Provider, state, context)
+
+    iteratee.name = 'deployNode'
+    const node = {
+      nextInstance: {
+        constructor: {
+          name: 'SomeService'
+        },
+        inputs: {
+          provider: provider
+        },
+        inputTypes: {
+          provider: {
+            type: 'Provider',
+            required: true
+          }
+        }
+      }
+    }
+    logStatus(iteratee, node, context)
+
+    expect(mockLog).toHaveBeenCalledTimes(1)
+    expect(mockLog.mock.calls[0][0]).toMatch('Deploying "SomeService" ')
   })
 })

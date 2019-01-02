@@ -4,7 +4,7 @@ main: ./dist/index.js
 version: 0.3.0
 
 provider: ${inputs.provider}
-roleName: ${inputs.roleName}
+roleName: ${inputs.roleName || 'role-${this.instanceId}'}
 service: ${inputs.service}
 policy: ${inputs.policy}
 

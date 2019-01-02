@@ -20,7 +20,28 @@ describe('#isTypeConstruct()', () => {
         inputs: {}
       })
     ).toBe(false)
+  })
+
+  it('should not identify an object with a type only as a construct', () => {
+    // A construct without inputs is not a construct
+    expect(
+      isTypeConstruct({
+        type: 'Test'
+      })
+    ).toBe(false)
+
+    // A construct without type is not a construct
+    expect(
+      isTypeConstruct({
+        inputs: {}
+      })
+    ).toBe(false)
+  })
+
+  it('should return false for everything else', () => {
     expect(isTypeConstruct({})).toBe(false)
+    expect(isTypeConstruct([])).toBe(false)
     expect(isTypeConstruct(null)).toBe(false)
+    expect(isTypeConstruct(true)).toBe(false)
   })
 })

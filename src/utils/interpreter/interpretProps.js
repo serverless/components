@@ -3,7 +3,7 @@ import hasVariableString from '../variable/hasVariableString'
 import newVariable from '../variable/newVariable'
 import isTypeConstruct from '../type/isTypeConstruct'
 
-const interpretProps = async (props, data, context) => {
+const interpretProps = (props, data, context) => {
   // NOTE BRN: This step walks depth first through the properties and creates instances for any property that has both a 'type' and 'inputs' combo. Lower level instances are created first so in case we have nested constructions the higher construction will receive an instance as an input instead of the { type, inputs }.
 
   // NOTE BRN: This step also converts variable strings into variable objects.
@@ -12,9 +12,7 @@ const interpretProps = async (props, data, context) => {
 
   // NOTE BRN: The props object should not have any cicular references so this should be safe to walk without infinite loops.
   return walkReduceDepthFirst(
-    async (accum, value, pathParts) => {
-      const interpretedProps = await accum
-
+    (interpretedProps, value, pathParts) => {
       // TODO BRN: Break this up into something that is pluggable by core so that anyone can introduce new interpretable values.
       if (isString(value) && hasVariableString(value)) {
         const lastPathPart = last(pathParts)
@@ -24,8 +22,8 @@ const interpretProps = async (props, data, context) => {
         const lastPathPart = last(pathParts)
         const parent = getParent(pathParts, interpretedProps)
         const { type, inputs } = value
-        const Type = await context.import(type)
-        parent[lastPathPart] = await context.construct(Type, inputs)
+        const Type = context.require(type)
+        parent[lastPathPart] = context.construct(Type, inputs)
       }
       return interpretedProps
     },

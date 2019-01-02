@@ -24,7 +24,7 @@ describe('AwsDynamoDb', () => {
     logSpy = jest.spyOn(context, 'log')
     AwsProvider = await context.import('AwsProvider')
     AwsDynamoDb = await context.import('./')
-    provider = await context.construct(AwsProvider, {
+    provider = context.construct(AwsProvider, {
       region: 'us-east-1',
       credentials: {
         accessKeyId: 'abc',
@@ -34,7 +34,7 @@ describe('AwsDynamoDb', () => {
   })
 
   it('should deploy the table when none exists', async () => {
-    let awsDynamoDb = await context.construct(AwsDynamoDb, {
+    let awsDynamoDb = context.construct(AwsDynamoDb, {
       provider,
       tableName: 'test-table',
       provisionedThroughput: {
@@ -57,7 +57,7 @@ describe('AwsDynamoDb', () => {
   })
 
   it('should update the table if we try to create it and it already exists', async () => {
-    let awsDynamoDb = await context.construct(AwsDynamoDb, {
+    let awsDynamoDb = context.construct(AwsDynamoDb, {
       provider,
       tableName: 'already-created-table',
       provisionedThroughput: {
@@ -87,7 +87,7 @@ describe('AwsDynamoDb', () => {
   })
 
   it('should create the table if we try to update but it does not exist', async () => {
-    let awsDynamoDb = await context.construct(AwsDynamoDb, {
+    let awsDynamoDb = context.construct(AwsDynamoDb, {
       provider,
       tableName: 'non-existent-table',
       provisionedThroughput: {
@@ -101,7 +101,7 @@ describe('AwsDynamoDb', () => {
 
     const prevAwsDynamoDb = await deserialize(serialize(awsDynamoDb, context), context)
 
-    let nextAwsDynamoDb = await context.construct(AwsDynamoDb, {
+    let nextAwsDynamoDb = context.construct(AwsDynamoDb, {
       provider,
       tableName: 'non-existent-table',
       provisionedThroughput: {
@@ -131,7 +131,7 @@ describe('AwsDynamoDb', () => {
   })
 
   it('should replace the table when the table name has changed', async () => {
-    let awsDynamoDb = await context.construct(AwsDynamoDb, {
+    let awsDynamoDb = context.construct(AwsDynamoDb, {
       provider,
       tableName: 'test-table',
       provisionedThroughput: {
@@ -145,7 +145,7 @@ describe('AwsDynamoDb', () => {
 
     const prevAwsDynamoDb = await deserialize(serialize(awsDynamoDb, context), context)
 
-    let nextAwsDynamoDb = await context.construct(AwsDynamoDb, {
+    let nextAwsDynamoDb = context.construct(AwsDynamoDb, {
       provider,
       tableName: 'updated-test-table',
       provisionedThroughput: {
@@ -162,7 +162,7 @@ describe('AwsDynamoDb', () => {
   })
 
   it('should update the table when table attributes are changed', async () => {
-    let awsDynamoDb = await context.construct(AwsDynamoDb, {
+    let awsDynamoDb = context.construct(AwsDynamoDb, {
       provider,
       tableName: 'test-table',
       provisionedThroughput: {
@@ -176,7 +176,7 @@ describe('AwsDynamoDb', () => {
 
     const prevAwsDynamoDb = await deserialize(serialize(awsDynamoDb, context), context)
 
-    let nextAwsDynamoDb = await context.construct(AwsDynamoDb, {
+    let nextAwsDynamoDb = context.construct(AwsDynamoDb, {
       provider,
       tableName: 'test-table',
       provisionedThroughput: {
@@ -216,7 +216,7 @@ describe('AwsDynamoDb', () => {
   })
 
   it('should preserve props if nothing changed', async () => {
-    let awsDynamoDb = await context.construct(AwsDynamoDb, {
+    let awsDynamoDb = context.construct(AwsDynamoDb, {
       provider,
       tableName: 'test-table',
       provisionedThroughput: {
@@ -231,7 +231,7 @@ describe('AwsDynamoDb', () => {
 
     const prevAwsDynamoDb = await deserialize(serialize(awsDynamoDb, context), context)
 
-    let nextAwsDynamoDb = await context.construct(AwsDynamoDb, {
+    let nextAwsDynamoDb = context.construct(AwsDynamoDb, {
       provider,
       tableName: 'test-table',
       provisionedThroughput: {
@@ -245,7 +245,7 @@ describe('AwsDynamoDb', () => {
   })
 
   it('should remove the table', async () => {
-    let awsDynamoDb = await context.construct(AwsDynamoDb, {
+    let awsDynamoDb = context.construct(AwsDynamoDb, {
       provider,
       tableName: 'test-table',
       provisionedThroughput: {
@@ -264,7 +264,7 @@ describe('AwsDynamoDb', () => {
   })
 
   it('should remove the table even if it does not exist anymore', async () => {
-    let awsDynamoDb = await context.construct(AwsDynamoDb, {
+    let awsDynamoDb = context.construct(AwsDynamoDb, {
       provider,
       tableName: 'already-removed-table',
       provisionedThroughput: {
@@ -283,7 +283,7 @@ describe('AwsDynamoDb', () => {
   })
 
   it('shouldDeploy should return undefined when no changes have occurred', async () => {
-    let awsDynamoDb = await context.construct(AwsDynamoDb, {
+    let awsDynamoDb = context.construct(AwsDynamoDb, {
       provider,
       tableName: 'test-table',
       provisionedThroughput: {
@@ -297,8 +297,8 @@ describe('AwsDynamoDb', () => {
 
     const prevAwsDynamoDb = await deserialize(serialize(awsDynamoDb, context), context)
 
-    let nextAwsDynamoDb = await context.construct(AwsDynamoDb, {
-      provider: await context.construct(AwsProvider, {}),
+    let nextAwsDynamoDb = context.construct(AwsDynamoDb, {
+      provider: context.construct(AwsProvider, {}),
       tableName: 'test-table',
       provisionedThroughput: {
         ReadCapacityUnits: 5,
@@ -314,7 +314,7 @@ describe('AwsDynamoDb', () => {
   })
 
   it('shouldDeploy should returns "replace" when table name has changed', async () => {
-    let awsDynamoDb = await context.construct(AwsDynamoDb, {
+    let awsDynamoDb = context.construct(AwsDynamoDb, {
       provider,
       tableName: 'test-table',
       provisionedThroughput: {
@@ -328,7 +328,7 @@ describe('AwsDynamoDb', () => {
 
     const prevAwsDynamoDb = await deserialize(serialize(awsDynamoDb, context), context)
 
-    let nextAwsDynamoDb = await context.construct(AwsDynamoDb, {
+    let nextAwsDynamoDb = context.construct(AwsDynamoDb, {
       provider,
       tableName: 'updated-test-table',
       provisionedThroughput: {
@@ -342,5 +342,65 @@ describe('AwsDynamoDb', () => {
     const result = nextAwsDynamoDb.shouldDeploy(prevAwsDynamoDb, context)
 
     expect(result).toBe('replace')
+  })
+
+  it('sync should return "removed" if the table was removed from the provider', async () => {
+    let awsDynamoDb = context.construct(AwsDynamoDb, {
+      provider,
+      tableName: 'already-removed-table',
+      provisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+      }
+    })
+    awsDynamoDb = await context.defineComponent(awsDynamoDb)
+    awsDynamoDb = resolveComponentEvaluables(awsDynamoDb)
+
+    const result = await awsDynamoDb.sync(context)
+
+    expect(result).toBe('removed')
+  })
+
+  it('sync should sync remote and local props if the table was not removed from the provider', async () => {
+    let awsDynamoDb = context.construct(AwsDynamoDb, {
+      provider,
+      tableName: 'describe-table',
+      provisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+      }
+    })
+    awsDynamoDb = await context.defineComponent(awsDynamoDb)
+    awsDynamoDb = resolveComponentEvaluables(awsDynamoDb)
+
+    await awsDynamoDb.sync(context)
+
+    expect(awsDynamoDb.tableName).toBe('describe-table')
+    expect(awsDynamoDb.attributeDefinitions).toEqual([{ AttributeName: 'id', AttributeType: 'S' }])
+    expect(awsDynamoDb.keySchema).toEqual([{ AttributeName: 'id', KeyType: 'HASH' }])
+    expect(awsDynamoDb.provisionedThroughput).toEqual({
+      ReadCapacityUnits: 5,
+      WriteCapacityUnits: 5
+    })
+    expect(awsDynamoDb.globalSecondaryIndexes).toEqual([
+      {
+        IndexName: 'global-index',
+        KeySchema: [{ AttributeName: 'id', KeyType: 'HASH' }],
+        Projection: { ProjectionType: 'ALL' },
+        ProvisionedThroughput: { ReadCapacityUnits: 5, WriteCapacityUnits: 5 }
+      }
+    ])
+    expect(awsDynamoDb.localSecondaryIndexes).toEqual([
+      {
+        IndexName: 'local-index',
+        KeySchema: [{ AttributeName: 'id', KeyType: 'HASH' }],
+        Projection: { ProjectionType: 'ALL' }
+      }
+    ])
+    expect(awsDynamoDb.sseSpecification).toEqual({
+      Enabled: true,
+      KMSMasterKeyId: 'arn:aws:kms:region:XXXXX:master-key/key-id',
+      SSEType: 'AES256'
+    })
   })
 })

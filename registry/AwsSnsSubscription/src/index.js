@@ -10,13 +10,12 @@ import {
   reduce,
   slice,
   values,
-  resolvable,
-  or,
   pick,
   not,
   get
 } from '@serverless/utils'
 
+// TODO BRN: Replace this with upperFirst method from utils
 const capitalize = (string) => `${head(string).toUpperCase()}${slice(1, Infinity, string)}`
 
 const concatSubscriptionAttributes = (inputs, state = {}) =>
@@ -65,14 +64,10 @@ const setAllSubscriptionAttributes = async (subscriptionArn, inputs, context) =>
 
 const AwsSnsSubscription = (SuperClass) =>
   class extends SuperClass {
-    async construct(inputs, context) {
-      await super.construct(inputs, context)
-
-      this.provider = resolvable(() => or(inputs.provider, context.get('provider')))
-      this.topic = inputs.topic
-      this.protocol = resolvable(() => or(inputs.protocol, 'https'))
-      this.endpoint = inputs.endpoint
-      this.subscriptionAttributes = inputs.subscriptionAttributes
+    hydrate(prevInstance = {}) {
+      super.hydrate(prevInstance)
+      this.subscriptionArn = get('subscriptionArn', prevInstance)
+      this.statement = get('statement', prevInstance)
     }
 
     shouldDeploy(prevInstance) {
@@ -97,12 +92,6 @@ const AwsSnsSubscription = (SuperClass) =>
       }
 
       return undefined
-    }
-
-    hydrate(prevInstance = {}) {
-      super.hydrate(prevInstance)
-      this.subscriptionArn = get('subscriptionArn', prevInstance)
-      this.statement = get('statement', prevInstance)
     }
 
     async deploy(prevInstance, context) {

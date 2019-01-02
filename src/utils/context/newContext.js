@@ -1,7 +1,6 @@
 import { get, isUndefined, pick, propOr, set } from '@serverless/utils'
 import loadApp from '../app/loadApp'
 import defineComponent from '../component/defineComponent'
-import defineComponentFromState from '../component/defineComponentFromState'
 import generateInstanceId from '../component/generateInstanceId'
 // import setKey from '../component/setKey'
 import { DEFAULT_PLUGINS } from '../constants'
@@ -21,6 +20,7 @@ import construct from '../type/construct'
 import create from '../type/create'
 import defType from '../type/defType'
 import loadType from '../type/loadType'
+import requireType from '../type/requireType'
 import walkReduceComponentChildrenDepthFirst from '../component/walkReduceComponentChildrenDepthFirst'
 
 const newContext = (props) => {
@@ -32,6 +32,7 @@ const newContext = (props) => {
       'data',
       'deployment',
       'instance',
+      'loaders',
       'options',
       'overrides',
       'plugins',
@@ -42,6 +43,7 @@ const newContext = (props) => {
       'root',
       'state',
       'symbolMap',
+      'types',
       'Type'
     ],
     props
@@ -121,7 +123,6 @@ const newContext = (props) => {
       })
     },
     defineComponent: (component, state) => defineComponent(component, state, finalContext),
-    defineComponentFromState: (component) => defineComponentFromState(component, finalContext),
     define: (def) => defType(def, finalContext),
     generateInstanceId: () => {
       const { app } = finalContext
@@ -264,12 +265,13 @@ const newContext = (props) => {
         state
       })
     },
-    import: (...args) => loadType(...args, finalContext),
+    import: async (query) => loadType(query, finalContext),
     merge: (value) =>
       newContext({
         ...context,
         ...value
       }),
+    require: (query) => requireType(query, finalContext),
     saveState: async () => {
       const { deployment, instance, previousInstance } = finalContext
       if (!deployment) {

@@ -37,7 +37,7 @@ async function constructApiGateway(inputs, context, provider) {
   const apiInputs = await getAwsApiGatewayInputs(inputs)
 
   const apiGatewayComponent = await context.import('AwsApiGateway')
-  const apiGateway = await context.construct(apiGatewayComponent, {
+  const apiGateway = context.construct(apiGatewayComponent, {
     ...apiInputs,
     provider: provider
   })
@@ -84,12 +84,6 @@ const RestApi = async function(SuperClass, SuperContext) {
   const iamComponent = await SuperContext.import('AwsIamRole')
 
   return class extends SuperClass {
-    async construct(inputs, context) {
-      await super.construct(inputs, context)
-      this.inputs = inputs
-      this.apiName = inputs.apiName
-    }
-
     async define(context) {
       const { inputs } = this
       if (!['AwsApiGateway'].includes(resolve(inputs.gateway))) {
@@ -101,7 +95,7 @@ const RestApi = async function(SuperClass, SuperContext) {
       const childComponents = []
       const name = `${resolve(inputs.apiName)}-iam-role`
       const service = 'apigateway.amazonaws.com'
-      this.role = await context.construct(iamComponent, {
+      this.role = context.construct(iamComponent, {
         roleName: name,
         service,
         provider

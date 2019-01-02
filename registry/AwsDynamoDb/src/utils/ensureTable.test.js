@@ -21,7 +21,7 @@ describe('#ensureTable()', () => {
   beforeEach(async () => {
     context = await createTestContext({ cwd })
     const AwsProvider = await context.import('AwsProvider')
-    provider = await context.construct(AwsProvider, {
+    provider = context.construct(AwsProvider, {
       region: 'us-east-1',
       credentials: {
         accessKeyId: 'abc',

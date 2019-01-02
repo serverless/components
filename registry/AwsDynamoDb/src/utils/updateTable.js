@@ -1,4 +1,4 @@
-const updateTable = async (properties) => {
+async function updateTable(properties) {
   const {
     provider,
     tableName,
