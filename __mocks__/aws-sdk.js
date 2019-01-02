@@ -390,7 +390,7 @@ const mocks = {
       return Promise.reject(error)
     }
     return Promise.resolve({
-      TimeToLiveDescription: {
+      TimeToLiveSpecification: {
         AttributeName: 'ttl',
         Enabled: true
       }

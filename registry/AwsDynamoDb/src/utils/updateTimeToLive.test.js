@@ -40,7 +40,7 @@ describe('#updateTimeToLive()', () => {
     const res = await updateTimeToLive(properties)
 
     expect(res).toEqual({
-      TimeToLiveDescription: {
+      TimeToLiveSpecification: {
         AttributeName: 'ttl',
         Enabled: true
       }
