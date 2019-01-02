@@ -4,6 +4,7 @@ import { tmpdir } from 'os'
 import { readFile } from 'fs-extra'
 import {
   equals,
+  find,
   get,
   isArray,
   isEmpty,
@@ -109,9 +110,7 @@ const AwsLambdaLayerVersion = async (SuperClass) => {
       }
       this.versions = LayerVersions.map(({ Version }) => Version)
       this.layerVersion = Math.max(...this.versions)
-      this.arn = LayerVersions.filter(
-        ({ Version }) => Version === this.layerVersion
-      )[0].LayerVersionArn
+      this.arn = find(({ Version }) => Version === this.layerVersion, LayerVersions).LayerVersionArn
 
       const layerVersionInfo = await Lambda.getLayerVersion({
         LayerName: resolve(this.layerName),
