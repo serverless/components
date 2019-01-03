@@ -109,6 +109,9 @@ const mocks = {
     }
     return Promise.resolve()
   }),
+  publishLayerVersionMock: jest.fn().mockReturnValue({ LayerArn: 'abc:zxc' }),
+  deleteLayerVersionMock: jest.fn().mockReturnValue(Promise.resolve({})),
+  listLayerVersionsMock: jest.fn().mockReturnValue(Promise.resolve({ LayerVersions: [] })),
 
   // IAM
   createRoleMock: jest.fn().mockReturnValue({ Role: { Arn: 'arn:aws:iam::XXXXX:role/test-role' } }),
@@ -480,6 +483,15 @@ const Lambda = function() {
     }),
     deleteFunction: (obj) => ({
       promise: () => mocks.deleteFunctionMock(obj)
+    }),
+    publishLayerVersion: (obj) => ({
+      promise: () => mocks.publishLayerVersionMock(obj)
+    }),
+    deleteLayerVersion: (obj) => ({
+      promise: () => mocks.deleteLayerVersionMock(obj)
+    }),
+    listLayerVersions: (obj) => ({
+      promise: () => mocks.listLayerVersionsMock(obj)
     })
   }
 }

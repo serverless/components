@@ -1,0 +1,65 @@
+name: AwsLambdaLayerVersion
+extends: Component
+
+version: 0.3.0
+core: 0.3.x
+main: ./dist/index.js
+
+description: "AWS Lambda Layer Version Serverless Component"
+license: Apache-2.0
+author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
+repository: "github:serverless/components"
+
+
+provider: ${inputs.provider}
+layerName: ${inputs.layerName}
+layerDescription: ${inputs.layerDescription || ''}
+content: ${inputs.content}
+compatibleRuntimes: ${inputs.compatibleRuntimes || []}
+licenseInfo: ${inputs.licenseInfo || ''}
+retain: ${inputs.retain || false}
+
+inputTypes:
+  provider:
+    type: AwsProvider
+    displayName: AWS Provider
+    description: The AwsProvider instance that contains the credentials for AWS
+    required: true
+  layerName:
+    type: string
+    required: true
+    displayName: Lambda layer name
+    description: The Lambda layer name
+    example: myProject-layerName-${self.instanceId}
+  layerDescription:
+    type: string
+    required: false
+    displayName: Lambda layer description
+    description: |
+      A short, user-defined layer description.
+      Lambda does not use this value. Assign a meaningful description as you see fit
+    example: The layer that does XYZ to ABC
+  content:
+    type: string | array | buffer
+    required: true
+    displayName: Path to content
+    description: Path to the folder or the archive file that contains the content for the layer
+    example: ${this.path}/content
+  compatibleRuntimes:
+    type: array
+    required: false
+    displayName: Layer runtimes
+    description: Runtime the layer is compatible with.
+    example: [nodejs8.10]
+  licenseInfo:
+    type: string
+    required: false
+    displayName: License Info
+    description: License Information for the layer
+    example: Apache-2.0
+  retain:
+    type: boolean | string
+    required: false
+    displayName: Retention Policy
+    description: Retention Policy, options are true, false(default), and 'previous-versions'
+    example: true
