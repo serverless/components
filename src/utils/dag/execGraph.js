@@ -1,10 +1,10 @@
 import { all, append, isEmpty, reduce } from '@serverless/utils'
 import cloneGraph from './cloneGraph'
 import detectCircularDeps from './detectCircularDeps'
-import logStatus from './logStatus'
+// import logStatus from './logStatus'
 
 const execNode = (iteratee, node, context) => {
-  logStatus(iteratee, node, context)
+  // logStatus(iteratee, node, context)
   return iteratee(node, {
     ...context,
     // replace `log` with `debug` so that component logs are hidden by default

@@ -14,17 +14,23 @@ compute:
     runtime: nodejs
 
 functions:
-  IdempotentCron10:
+  websocketscomponent5:
     compute: ${this.compute}
     handler: index.hello
     code: ./code
-    memory: 512
+    memory: 1024
     timeout: 20
     ufs: true
 
 components:
-  cron:
-    type: Cron
+  socks:
+    type: AwsWebSockets
     inputs:
-      function: ${this.functions.IdempotentCron10}
-      rate: 7m
+      provider: ${this.providers.aws}
+      apiName: websocketscomponent5
+      routeSelectionExpression: $request.body.action
+      routes:
+        $connect: ${this.functions.websocketscomponent5}
+        $disconnect: ${this.functions.websocketscomponent5}
+        $default: ${this.functions.websocketscomponent5}
+#        message: ${this.functions.websocketscomponent5}

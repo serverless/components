@@ -38,7 +38,8 @@ export const NATIVE_TYPES = componentsFromRegistryByName([
   'AwsSnsTopic',
   'AwsSnsSubscription',
   'AwsDynamoDb',
-  'AwsLambdaLayerVersion'
+  'AwsLambdaLayerVersion',
+  'AwsWebSockets'
 ])
 
 export default NATIVE_TYPES

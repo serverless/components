@@ -1,0 +1,28 @@
+name: AwsWebSockets
+extends: Component
+version: 0.3.0
+main: ./dist/index.js
+
+provider: ${inputs.provider}
+apiName: ${inputs.apiName}
+stage: ${inputs.stage}
+routeSelectionExpression: ${inputs.routeSelectionExpression}
+routes: ${inputs.routes}
+
+inputTypes:
+  provider:
+    type: AwsProvider
+  apiName:
+    type: string
+    required: false
+  stage:
+    type: object
+    required: false
+    default: dev
+  routeSelectionExpression:
+    type: string
+    required: false
+    default: "$request.body.action"
+  routes:
+    type: object
+    required: true
