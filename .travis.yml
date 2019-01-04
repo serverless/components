@@ -19,14 +19,13 @@ matrix:
         - secure: jOdWpV+d3k2UszLpfytNIpEb4km3PA0RGR5M2y+LhvzGcC20jEarfgiVfzJp18rU5CzGyCe0fEghBo/NpDBz/9bw4+8zOYzrUnnKXUQgPyujMrJXTZDOo8THaU3buWJdSjwFf29wBjd/bH5AI7Lap/c92qudUPGQ4DIDzBg4/XwXEHWB6VE7GVeK7hd1khh31+YFEq3BKW41u/t6F7LV705vsHGCkqS7GhQs0Ni+vEiWCbqAnC8XzJbJLRe5YQidVoiGLzdjFevWtcMtI3Ro0JL0AwuuOFwxU5GSlTnJ4D6a8ki1Bwf4CKXZHdNF56eYqSqWIzKILsW51LczjVXNZKKH8ZlrDJo6d0xsfhVlvE2n6PvCPajog9HavNqsbYdOV0Vu6K7GsWw0iPFB/w5mHh+moybANLf+xY1Uo4d47rtUjeYS4JH9X5qy64cDlRjT6WHTvm0GUZvH5E3IotRpotY5ZrKL6v9hD5mljoeW7ot1T0eNqqNlEeypaSDYsL5xcgp/3WVoat7rnix5qvPxDZrFUSvQfKQ4AE3ezGAPeSblE373/r1dFqhmyOH47YW1CGpfJNmDlzovIUj+leEZvZmB9Rfhpl6iY+aDfGc6xpfxsk89OQFwTgMUjhrOglPOra2u9mmSn3Vw87k/bdWDTM7bHR1HmSSm3o0PDgnHbq0=
         - secure: Fzuq8z/p3+vb3DdsQJEPS9SAyGMUZ3hpgFSMUIglSVldgnHBKZ9GARjJvRLsyeBfnDJ1KL3MyMd5xbUK9glk4VyA54xrsuUX4Guuk9U0cueCEgfe2TMC50LTrJIUHREBal9hktyK5m9U5Kof4QeMRzcUN9VuscP2WS0Qt2TJMXbpsrcp++oD6kfZlyrvhQMAcv9ghgtBGeDBG90nJiE6eey5G1PkNECIY1t3raFgZdZnDs0FFLURZI91JvRgUxoN/rm1nRoBIE4yUHnx2ovXfqBps24LnSQVxDU73NJ39mGZhvDjJ3+KdlZwwwsADRhqP2ghUP0SZlEnHH8kcANA6O25ge+M6dGlsQ5uVqGKcuLFH7SoVgeQUWKb2XOdJZcWI/lby/TjWCtAG9AXdlX/42VKT0SR/QfjfG/acuFwFTQdwRx6AnquW+IQ8P5aKWd2re9SGi6FWi33eods0WnDQXN49BabRt8CeXzhF8X7wj1ccTeflsAeRgC1JOiRfKbDCbHzOPe9iLP+ivo8loXbQE0xhc3K2cYvUWHr4Cilkk2LLR/GhWWRwl+yvC/WWGtjGy66ponnYscGcCWEuJSCErfu56Z97r2JuDrKCVoTzcc//5lpkSl06wvlsvzz1Lr8kf6DKekmJbmDLZ394FfSMurZldc+ARHjYoi8TInvUkU=
 install:
-- npm install
-- node --version | grep v6 && npm run prepare || true
-- npm install -g codecov
-- pushd examples/restapi/code && npm install && popd
+  - npm install
+  - node --version | grep v6 && npm run prepare || true
+  - npm install -g codecov
 script:
-- npm run lint
-- npm run test:travis
-- codecov
+  - npm run lint
+  - npm run test:travis
+  - codecov
 
 deploy:
   provider: npm
