@@ -131,8 +131,6 @@ const AwsWebSockets = (SuperClass) =>
         keys(routes)
       )
 
-      // data['Base Url'] = getWebsocketUrl({ apiId, region: provider.region, stage })
-
       return {
         title: apiName,
         type: this.name,
