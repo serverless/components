@@ -244,7 +244,7 @@ describe('AwsDynamoDb', () => {
     expect(nextAwsDynamoDb).toEqual(prevAwsDynamoDb)
   })
 
-  it('should enable a time to live attribute of a table', async () => {
+  it('should enable a TTL attribute on a non-existent table', async () => {
     let awsDynamoDb = await context.construct(AwsDynamoDb, {
       provider,
       tableName: 'non-existent-table',
@@ -261,7 +261,7 @@ describe('AwsDynamoDb', () => {
 
     let nextAwsDynamoDb = await context.construct(AwsDynamoDb, {
       provider,
-      tableName: 'update-ttl-table',
+      tableName: 'test-table',
       provisionedThroughput: {
         ReadCapacityUnits: 5,
         WriteCapacityUnits: 5
@@ -277,7 +277,7 @@ describe('AwsDynamoDb', () => {
     await nextAwsDynamoDb.deploy(prevAwsDynamoDb, context)
 
     expect(AWS.mocks.updateTimeToLiveMock).toBeCalledWith({
-      TableName: 'update-ttl-table',
+      TableName: 'test-table',
       TimeToLiveSpecification: {
         AttributeName: 'ttl',
         Enabled: true
@@ -285,10 +285,10 @@ describe('AwsDynamoDb', () => {
     })
   })
 
-  it('should update a time to live attribute of the table', async () => {
+  it('should update a TTL attribute of an existing table', async () => {
     let awsDynamoDb = await context.construct(AwsDynamoDb, {
       provider,
-      tableName: 'update-ttl-table',
+      tableName: 'test-table',
       provisionedThroughput: {
         ReadCapacityUnits: 5,
         WriteCapacityUnits: 5
@@ -306,7 +306,7 @@ describe('AwsDynamoDb', () => {
 
     let nextAwsDynamoDb = await context.construct(AwsDynamoDb, {
       provider,
-      tableName: 'update-ttl-table',
+      tableName: 'test-table',
       provisionedThroughput: {
         ReadCapacityUnits: 5,
         WriteCapacityUnits: 5
@@ -322,7 +322,7 @@ describe('AwsDynamoDb', () => {
     await nextAwsDynamoDb.deploy(prevAwsDynamoDb, context)
 
     expect(AWS.mocks.updateTimeToLiveMock).toBeCalledWith({
-      TableName: 'update-ttl-table',
+      TableName: 'test-table',
       TimeToLiveSpecification: {
         AttributeName: 'ttl',
         Enabled: true
@@ -399,6 +399,41 @@ describe('AwsDynamoDb', () => {
     expect(result).toBe(undefined)
   })
 
+  it('shouldDeploy should ignore TTL inputs', async () => {
+    let awsDynamoDb = context.construct(AwsDynamoDb, {
+      provider,
+      tableName: 'test-table',
+      provisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+      }
+    })
+    awsDynamoDb = await context.defineComponent(awsDynamoDb)
+    awsDynamoDb = resolveComponentEvaluables(awsDynamoDb)
+    await awsDynamoDb.deploy(null, context)
+
+    const prevAwsDynamoDb = await deserialize(serialize(awsDynamoDb, context), context)
+
+    let nextAwsDynamoDb = context.construct(AwsDynamoDb, {
+      provider: context.construct(AwsProvider, {}),
+      tableName: 'test-table',
+      provisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+      },
+      timeToLiveSpecification: {
+        AttributeName: 'ttl',
+        Enabled: true
+      }
+    })
+    nextAwsDynamoDb = await context.defineComponent(nextAwsDynamoDb, prevAwsDynamoDb)
+    nextAwsDynamoDb = resolveComponentEvaluables(awsDynamoDb)
+
+    const result = nextAwsDynamoDb.shouldDeploy(prevAwsDynamoDb, context)
+
+    expect(result).toBe(undefined)
+  })
+
   it('shouldDeploy should returns "replace" when table name has changed', async () => {
     let awsDynamoDb = context.construct(AwsDynamoDb, {
       provider,
@@ -447,7 +482,7 @@ describe('AwsDynamoDb', () => {
     expect(result).toBe('removed')
   })
 
-  it('sync should sync remote and local props if the table was not removed from the provider', async () => {
+  it('sync should sync remote and local core table props if the table was not removed from the provider', async () => {
     let awsDynamoDb = context.construct(AwsDynamoDb, {
       provider,
       tableName: 'describe-table',
@@ -487,6 +522,27 @@ describe('AwsDynamoDb', () => {
       Enabled: true,
       KMSMasterKeyId: 'arn:aws:kms:region:XXXXX:master-key/key-id',
       SSEType: 'AES256'
+    })
+  })
+
+  it('sync should sync remote and local TTL props if the table was not removed from the provider', async () => {
+    let awsDynamoDb = context.construct(AwsDynamoDb, {
+      provider,
+      tableName: 'describe-ttl-table',
+      provisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+      }
+    })
+    awsDynamoDb = await context.defineComponent(awsDynamoDb)
+    awsDynamoDb = resolveComponentEvaluables(awsDynamoDb)
+
+    await awsDynamoDb.sync(context)
+
+    expect(awsDynamoDb.tableName).toBe('describe-table')
+    expect(awsDynamoDb.timeToLiveSpecification).toEqual({
+      AttributeName: 'ttl',
+      Enabled: true
     })
   })
 })

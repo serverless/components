@@ -376,10 +376,26 @@ const mocks = {
       return Promise.reject(error)
     }
     return Promise.resolve({
-      TableDescription: {
-        TableArn: 'arn:aws:dynamodb:region:XXXXX:table/active-table',
-        TableName: 'active-table',
-        TableStatus: 'ACTIVE'
+      Table: {
+        AttributeDefinitions: [
+          {
+            AttributeName: 'id',
+            AttributeType: 'S'
+          }
+        ],
+        TableName: 'wait-for-table',
+        KeySchema: [
+          {
+            AttributeName: 'id',
+            KeyType: 'HASH'
+          }
+        ],
+        TableStatus: 'ACTIVE',
+        ProvisionedThroughput: {
+          ReadCapacityUnits: 5,
+          WriteCapacityUnits: 5
+        },
+        TableArn: 'arn:aws:dynamodb:region:XXXXX:table/wait-for-table'
       }
     })
   }),
@@ -393,6 +409,19 @@ const mocks = {
       TimeToLiveSpecification: {
         AttributeName: 'ttl',
         Enabled: true
+      }
+    })
+  }),
+  describeTimeToLiveMock: jest.fn().mockImplementation((params) => {
+    if (params.TableName === 'non-existent-table') {
+      const error = new Error()
+      error.code = 'ResourceNotFoundException'
+      return Promise.reject(error)
+    }
+    return Promise.resolve({
+      TimeToLiveDescription: {
+        TimeToLiveStatus: 'ENABLED',
+        AttributeName: 'ttl'
       }
     })
   })
@@ -588,6 +617,9 @@ const DynamoDB = function() {
     }),
     updateTimeToLive: (obj) => ({
       promise: () => mocks.updateTimeToLiveMock(obj)
+    }),
+    describeTimeToLive: (obj) => ({
+      promise: () => mocks.describeTimeToLiveMock(obj)
     })
   }
 }
