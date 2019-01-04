@@ -3,7 +3,7 @@ import { filter, assoc, reduce, resolve, not, isEmpty } from '@serverless/utils'
 function getParameters(instance) {
   if (instance.inputs && instance.inputTypes) {
     const requiredParams = filter((inputType) => !!inputType.required, instance.inputTypes)
-    const paramsAsObject = reduce(
+    let paramsAsObject = reduce(
       (accum, _, key) => {
         const value = resolve(instance.inputs[key])
         // TODO: replace with a universal util function which checks whether we're
@@ -19,7 +19,14 @@ function getParameters(instance) {
     )
 
     if (not(isEmpty(paramsAsObject))) {
-      return JSON.stringify(paramsAsObject, null, 2)
+      try {
+        paramsAsObject = JSON.stringify(paramsAsObject, null, 2)
+      } catch (error) {
+        // simply reassign to an empty object
+        paramsAsObject = {}
+      } finally {
+        return paramsAsObject
+      }
     }
     return paramsAsObject
   }
