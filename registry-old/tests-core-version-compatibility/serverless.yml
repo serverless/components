@@ -1,8 +1,0 @@
-type: my-project
-version: 0.0.1
-core: 0.0.1
-
-inputTypes:
-  name:
-    type: string
-    default: my-function

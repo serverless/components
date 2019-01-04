@@ -1,9 +1,0 @@
-{
-  "name": "@serverless-components/tests-integration-function-mock",
-  "version": "0.0.1",
-  "private": true,
-  "main": "dist/index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  }
-}
