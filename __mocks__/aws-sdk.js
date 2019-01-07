@@ -120,7 +120,7 @@ const mocks = {
     }
     const res = {
       FunctionName: params.FunctionName,
-      FunctionArn: `rn:aws:lambda:us-east-1:xxx:function:${params.FunctionName}`,
+      FunctionArn: `arn:aws:lambda:us-east-1:xxx:function:${params.FunctionName}`,
       Runtime: 'nodejs8.10',
       Role: `arn:aws:iam::xxx:role/${params.FunctionName}-execution-role`,
       Handler: 'shim.handler',
