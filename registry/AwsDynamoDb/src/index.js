@@ -1,5 +1,13 @@
-import { get, keys, pick, resolve, equals, not } from '@serverless/utils'
-import { createTable, updateTable, deleteTable, describeTable, ensureTable } from './utils'
+import { get, keys, pick, omit, resolve, equals, not } from '@serverless/utils'
+import {
+  createTable,
+  updateTable,
+  deleteTable,
+  describeTable,
+  describeTimeToLive,
+  ensureTable,
+  updateTimeToLive
+} from './utils'
 
 const AwsDynamoDb = {
   shouldDeploy(prevInstance) {
@@ -8,9 +16,16 @@ const AwsDynamoDb = {
       provisionedThroughput: this.provisionedThroughput,
       globalSecondaryIndexes: this.globalSecondaryIndexes,
       sseSpecification: this.sseSpecification,
-      streamSpecification: this.streamSpecification
+      streamSpecification: this.streamSpecification,
+      timeToLiveSpecification: this.timeToLiveSpecification
     }
-    const prevInputs = prevInstance ? pick(keys(inputs), prevInstance) : {}
+    let prevInputs = prevInstance ? pick(keys(inputs), prevInstance) : {}
+
+    // remove the TTL inputs since TTL is managed via separate AWS SDK calls
+    if (prevInputs.timeToLiveSpecification) {
+      prevInputs = omit(['timeToLiveSpecification'], prevInputs)
+    }
+
     const configChanged = not(equals(inputs, prevInputs))
 
     if (!prevInstance || configChanged) {
@@ -29,22 +44,32 @@ const AwsDynamoDb = {
     tableName = resolve(tableName)
 
     try {
-      const res = await describeTable({ provider, tableName })
-      this.tableName = res.Table.TableName
-      this.attributeDefinitions = res.Table.AttributeDefinitions
-      this.keySchema = res.Table.KeySchema
+      // sync the main table properties
+      const describeTableRes = await describeTable({ provider, tableName })
+      this.tableName = describeTableRes.Table.TableName
+      this.attributeDefinitions = describeTableRes.Table.AttributeDefinitions
+      this.keySchema = describeTableRes.Table.KeySchema
       this.provisionedThroughput = {}
       this.provisionedThroughput.ReadCapacityUnits =
-        res.Table.ProvisionedThroughput.ReadCapacityUnits
+        describeTableRes.Table.ProvisionedThroughput.ReadCapacityUnits
       this.provisionedThroughput.WriteCapacityUnits =
-        res.Table.ProvisionedThroughput.WriteCapacityUnits
-      this.globalSecondaryIndexes = res.Table.GlobalSecondaryIndexes
-      this.localSecondaryIndexes = res.Table.LocalSecondaryIndexes
-      if (res.Table.SSEDescription) {
+        describeTableRes.Table.ProvisionedThroughput.WriteCapacityUnits
+      this.globalSecondaryIndexes = describeTableRes.Table.GlobalSecondaryIndexes
+      this.localSecondaryIndexes = describeTableRes.Table.LocalSecondaryIndexes
+      if (describeTableRes.Table.SSEDescription) {
         this.sseSpecification = {}
-        this.sseSpecification.Enabled = res.Table.SSEDescription.Status === 'ENABLED'
-        this.sseSpecification.SSEType = res.Table.SSEDescription.SSEType
-        this.sseSpecification.KMSMasterKeyId = res.Table.SSEDescription.KMSMasterKeyArn
+        this.sseSpecification.Enabled = describeTableRes.Table.SSEDescription.Status === 'ENABLED'
+        this.sseSpecification.SSEType = describeTableRes.Table.SSEDescription.SSEType
+        this.sseSpecification.KMSMasterKeyId = describeTableRes.Table.SSEDescription.KMSMasterKeyArn
+      }
+      // sync the TTL properties
+      const describeTimeToLiveRes = await describeTimeToLive({ provider, tableName })
+      if (describeTimeToLiveRes.TimeToLiveDescription) {
+        this.timeToLiveSpecification = {}
+        this.timeToLiveSpecification.AttributeName =
+          describeTimeToLiveRes.TimeToLiveDescription.AttributeName
+        this.timeToLiveSpecification.Enabled =
+          describeTimeToLiveRes.TimeToLiveDescription.TimeToLiveStatus === 'ENABLED'
       }
     } catch (error) {
       if (error.code === 'ResourceNotFoundException') {
@@ -73,10 +98,23 @@ const AwsDynamoDb = {
       }
       await ensureTable(updateTable, this)
       context.log(`Table updated: '${tableName}'`)
+    } else if (
+      prevInstance &&
+      not(equals(prevInstance.timeToLiveSpecification, this.timeToLiveSpecification))
+    ) {
+      context.log(`Updating time to live of the table: '${tableName}'`)
+      await updateTimeToLive(this)
+      context.log(`Time to live of the table updated: '${tableName}'`)
     } else {
       context.log(`Creating table: '${tableName}'`)
       await ensureTable(createTable, this)
       context.log(`Table created: '${tableName}'`)
+
+      if (this.timeToLiveSpecification) {
+        context.log(`Updating time to live of the table: '${tableName}'`)
+        await updateTimeToLive(this)
+        context.log(`Time to live of the table updated: '${tableName}'`)
+      }
     }
   },
 

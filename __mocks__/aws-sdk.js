@@ -371,6 +371,62 @@ const mocks = {
         }
       }
     })
+  }),
+  waitForMock: jest.fn().mockImplementation((params) => {
+    if (params.TableName === 'non-existent-table') {
+      const error = new Error()
+      error.code = 'ResourceNotFoundException'
+      return Promise.reject(error)
+    }
+    return Promise.resolve({
+      Table: {
+        AttributeDefinitions: [
+          {
+            AttributeName: 'id',
+            AttributeType: 'S'
+          }
+        ],
+        TableName: 'wait-for-table',
+        KeySchema: [
+          {
+            AttributeName: 'id',
+            KeyType: 'HASH'
+          }
+        ],
+        TableStatus: 'ACTIVE',
+        ProvisionedThroughput: {
+          ReadCapacityUnits: 5,
+          WriteCapacityUnits: 5
+        },
+        TableArn: 'arn:aws:dynamodb:region:XXXXX:table/wait-for-table'
+      }
+    })
+  }),
+  updateTimeToLiveMock: jest.fn().mockImplementation((params) => {
+    if (params.TableName === 'non-existent-table') {
+      const error = new Error()
+      error.code = 'ResourceNotFoundException'
+      return Promise.reject(error)
+    }
+    return Promise.resolve({
+      TimeToLiveSpecification: {
+        AttributeName: 'ttl',
+        Enabled: true
+      }
+    })
+  }),
+  describeTimeToLiveMock: jest.fn().mockImplementation((params) => {
+    if (params.TableName === 'non-existent-table') {
+      const error = new Error()
+      error.code = 'ResourceNotFoundException'
+      return Promise.reject(error)
+    }
+    return Promise.resolve({
+      TimeToLiveDescription: {
+        TimeToLiveStatus: 'ENABLED',
+        AttributeName: 'ttl'
+      }
+    })
   })
 }
 
@@ -567,6 +623,15 @@ const DynamoDB = function() {
     }),
     describeTable: (obj) => ({
       promise: () => mocks.describeTableMock(obj)
+    }),
+    waitFor: (cmd, obj) => ({
+      promise: () => mocks.waitForMock(cmd, obj)
+    }),
+    updateTimeToLive: (obj) => ({
+      promise: () => mocks.updateTimeToLiveMock(obj)
+    }),
+    describeTimeToLive: (obj) => ({
+      promise: () => mocks.describeTimeToLiveMock(obj)
     })
   }
 }

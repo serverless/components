@@ -46,6 +46,10 @@ describe('#createTable()', () => {
       provisionedThroughput: {
         ReadCapacityUnits: 1,
         WriteCapacityUnits: 1
+      },
+      timeToLiveSpecification: {
+        AttributeName: 'ttl',
+        Enabled: true
       }
     }
 
