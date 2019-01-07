@@ -162,7 +162,6 @@ const AwsIamRole = async (SuperClass, superContext) => {
     }
 
     async deploy(prevInstance, context) {
-      // console.log('deploy role')
       const { provider } = this
       const AWS = provider.getSdk()
       const IAM = new AWS.IAM()

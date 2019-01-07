@@ -141,7 +141,6 @@ const AwsIamPolicy = (SuperClass) =>
     }
 
     async deploy(prevInstance, context) {
-      console.log('policy deploy')
       const AWS = this.provider.getSdk()
       const IAM = new AWS.IAM()
 

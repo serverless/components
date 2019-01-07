@@ -137,8 +137,6 @@ describe('AwsLambdaFunction', () => {
 
     awsLambdaFunction = resolveComponentEvaluables(awsLambdaFunction)
 
-    awsLambdaFunction.pack = jest.fn()
-
     await awsLambdaFunction.deploy(null, context)
 
     const createFunctionParams = {
@@ -157,7 +155,6 @@ describe('AwsLambdaFunction', () => {
         Variables: awsLambdaFunction.environment
       }
     }
-    expect(awsLambdaFunction.pack).toHaveBeenCalled()
     expect(awsLambdaFunction.arn).toEqual('abc:zxc')
     expect(AWS.mocks.createFunctionMock).toBeCalledWith(createFunctionParams)
   })
@@ -187,8 +184,6 @@ describe('AwsLambdaFunction', () => {
     awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
 
     awsLambdaFunction = resolveComponentEvaluables(awsLambdaFunction)
-
-    awsLambdaFunction.pack = jest.fn()
 
     await awsLambdaFunction.deploy(null, context)
 
@@ -241,7 +236,6 @@ describe('AwsLambdaFunction', () => {
       Publish: true
     }
 
-    expect(awsLambdaFunction.pack).toHaveBeenCalled()
     expect(awsLambdaFunction.arn).toEqual('abc:zxc')
     expect(AWS.mocks.updateFunctionCodeMock).toBeCalledWith(updateFunctionCodeParams)
     expect(AWS.mocks.updateFunctionConfigurationMock).toBeCalledWith(
@@ -333,8 +327,6 @@ describe('AwsLambdaFunction', () => {
 
     awsLambdaFunction = resolveComponentEvaluables(awsLambdaFunction)
 
-    awsLambdaFunction.pack = jest.fn()
-
     await awsLambdaFunction.deploy(null, context)
 
     const prevAwsLambdaFunction = await deserialize(serialize(awsLambdaFunction, context), context)
@@ -384,7 +376,6 @@ describe('AwsLambdaFunction', () => {
       }
     }
 
-    expect(awsLambdaFunction.pack).toHaveBeenCalled()
     expect(awsLambdaFunction.arn).toEqual('abc:zxc')
     expect(AWS.mocks.createFunctionMock).toBeCalledWith(createFunctionParams)
   })
@@ -551,7 +542,9 @@ describe('AwsLambdaFunction', () => {
       environment: {
         ENV_VAR: 'env value'
       },
-      tags: 'abc',
+      tags: {
+        foo: 'bar'
+      },
       role: {
         arn: 'abc:aws'
       }
@@ -580,7 +573,9 @@ describe('AwsLambdaFunction', () => {
       environment: {
         ENV_VAR: 'env value'
       },
-      tags: 'abc',
+      tags: {
+        foo: 'bar'
+      },
       role: {
         arn: 'abc:aws' // changed!
       }
@@ -731,7 +726,6 @@ describe('AwsLambdaFunction', () => {
       functionName: 'hello',
       functionDescription: 'hello description',
       handler: 'index.handler',
-      zip: 'zipfilecontent',
       runtime: 'nodejs8.10',
       memorySize: 512,
       timeout: 10,
@@ -747,11 +741,12 @@ describe('AwsLambdaFunction', () => {
       }
     })
 
+    awsLambdaFunction.zip = 'zipfilecontent'
+    awsLambdaFunction.pack = jest.fn()
+
     awsLambdaFunction = await context.defineComponent(awsLambdaFunction)
 
     awsLambdaFunction = resolveComponentEvaluables(awsLambdaFunction)
-
-    awsLambdaFunction.pack = jest.fn()
 
     await awsLambdaFunction.shouldDeploy(null, context)
     await awsLambdaFunction.deploy(null, context)
@@ -764,7 +759,6 @@ describe('AwsLambdaFunction', () => {
       functionName: 'hello',
       functionDescription: 'hello description',
       handler: 'index.handler',
-      zip: 'zipfilecontent',
       runtime: 'nodejs8.10',
       memorySize: 512,
       timeout: 10,
@@ -779,6 +773,10 @@ describe('AwsLambdaFunction', () => {
         arn: 'abc:aws'
       }
     })
+
+    awsLambdaFunction.zip = 'zipfilecontent'
+    nextAwsLambdaFunction.pack = jest.fn()
+
     nextAwsLambdaFunction = await context.defineComponent(
       nextAwsLambdaFunction,
       prevAwsLambdaFunction
@@ -787,6 +785,8 @@ describe('AwsLambdaFunction', () => {
 
     const result = await nextAwsLambdaFunction.shouldDeploy(prevAwsLambdaFunction, context)
 
+    expect(awsLambdaFunction.pack).toHaveBeenCalled()
+    expect(nextAwsLambdaFunction.pack).toHaveBeenCalled()
     expect(result).toBe(undefined)
   })
 
