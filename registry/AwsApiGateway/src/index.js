@@ -61,9 +61,6 @@ const AwsApiGateway = function(SuperClass) {
         swaggerTemplate: this.swaggerTemplate
       }
 
-      // console.log(JSON.stringify(this.swaggerTemplate))
-      // console.log(JSON.stringify(prevInstance.swaggerTemplate))
-
       const prevInputs = prevInstance ? pick(keys(inputs), prevInstance) : {}
       const configChanged = not(equals(inputs, prevInputs))
 
@@ -77,7 +74,6 @@ const AwsApiGateway = function(SuperClass) {
     }
 
     async deploy(prevInstance, context) {
-      console.log('apig deploy')
       const aws = this.provider.getSdk()
       const APIGateway = new aws.APIGateway()
 
