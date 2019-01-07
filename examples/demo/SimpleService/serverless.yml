@@ -14,28 +14,9 @@ compute:
     runtime: nodejs
 
 functions:
-  decemberdemo:
+  hello:
     compute: ${this.compute}
     handler: index.hello
     code: ./code
     memory: 1024
     timeout: 20
-
-components:
-  bucket:
-    type: AwsS3Bucket
-    inputs:
-      provider: ${this.providers.aws}
-  policy:
-    type: AwsIamPolicy
-    inputs:
-      provider: ${this.providers.aws}
-      document:
-        Version: '2012-10-17'
-        Statement:
-          - Resource:
-              - arn:aws:dynamodb:us-east-1:552750238299:table/idempotent-policy
-            Effect: Allow
-            Action:
-              - dynamodb:UpdateItem
-              - dynamodb:DeleteItem
