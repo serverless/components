@@ -150,7 +150,7 @@ function getSecurityDefinition(authorizerObj, name, region = 'us-east-1' /* , pa
 }
 
 // "public" function
-function getSwaggerDefinition(name, roleArn, routes, region = 'us-east-1') {
+function getSwaggerDefinition(name, roleArn, routes, accountId, region = 'us-east-1') {
   let paths = {}
   const securityDefinitions = {}
 
@@ -161,10 +161,10 @@ function getSwaggerDefinition(name, roleArn, routes, region = 'us-east-1') {
     let enableCorsOnPath = false
 
     forEachObjIndexed((methodObject, method) => {
+      const func = resolve(methodObject.function)
+      const funcArn = `arn:aws:lambda:${region}:${accountId}:function:${func.functionName}`
       const normalizedMethod = getNormalizedMethod(method)
-      const uri = `arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/${
-        methodObject.function.children.fn.arn
-      }/invocations`
+      const uri = `arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/${funcArn}/invocations`
 
       let isCorsEnabled
       if (methodObject.cors) {
