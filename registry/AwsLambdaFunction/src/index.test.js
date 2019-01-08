@@ -18,10 +18,6 @@ jest.mock('fs', () => ({
   readFileSync: jest.fn().mockReturnValue('zipfilecontent')
 }))
 
-jest.mock('folder-hash', () => ({
-  hashElement: jest.fn().mockReturnValue({ hash: 'abc' })
-}))
-
 beforeEach(() => {
   jest.clearAllMocks()
 })
