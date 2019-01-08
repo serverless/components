@@ -219,7 +219,7 @@ function getSwaggerDefinition(name, roleArn, routes, accountId, region = 'us-eas
   return definition
 }
 
-const normalizeRoutes = (flatRoutes) => {
+function normalizeRoutes(flatRoutes) {
   const catchallParameterPattern = /{\.{3}([^}]+?)}/g
   return reduce(
     (pathAcc, methods, path) => {
