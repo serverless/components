@@ -4,7 +4,9 @@ import detectCircularDeps from './detectCircularDeps'
 import logStatus from './logStatus'
 
 const execNode = (iteratee, node, context) => {
+  // log status message about the current operation
   logStatus(iteratee, node, context)
+
   return iteratee(node, {
     ...context,
     // replace `log` with `debug` so that component logs are hidden by default

@@ -18,8 +18,9 @@ describe('#logStatus()', () => {
     iteratee.name = 'deployNode'
     const node = {
       nextInstance: {
+        extends: 'Component',
         constructor: {
-          name: 'SomeService'
+          name: 'SomeComponent'
         },
         inputs: {
           name: 'some-name'
@@ -42,8 +43,9 @@ describe('#logStatus()', () => {
     iteratee.name = 'removeNode'
     const node = {
       prevInstance: {
+        extends: 'Component',
         constructor: {
-          name: 'SomeService'
+          name: 'SomeComponent'
         },
         inputs: {
           name: 'some-name'
@@ -66,33 +68,64 @@ describe('#logStatus()', () => {
     iteratee.name = 'deployNode'
     const node = {
       nextInstance: {
+        extends: 'Component',
         constructor: {
-          name: 'SomeService'
+          name: 'SomeComponent'
         }
       },
       prevInstance: {
+        extends: 'Component',
         constructor: {
-          name: 'SomeService'
+          name: 'SomeComponent'
         }
       }
     }
     logStatus(iteratee, node, context)
 
     expect(mockLog).toHaveBeenCalledTimes(1)
-    expect(mockLog.mock.calls[0][0]).toEqual('Deploying "SomeService" ')
+    expect(mockLog.mock.calls[0][0]).toEqual('Deploying "SomeComponent" ')
+  })
+
+  it('should not log if the component extends a root component', async () => {
+    const Provider = await context.import('Provider')
+    const provider = context.construct(Provider, state, context)
+
+    iteratee.name = 'deployNode'
+    const node = {
+      nextInstance: {
+        extends: 'App', // "App" is one of the root components
+        constructor: {
+          name: 'SomeComponent'
+        },
+        inputs: {
+          provider: provider
+        },
+        inputTypes: {
+          provider: {
+            type: 'Provider',
+            required: true
+          }
+        }
+      }
+    }
+    logStatus(iteratee, node, context)
+
+    expect(mockLog).not.toHaveBeenCalled()
   })
 
   it('should not log any status if the operation is unknown', () => {
     iteratee.name = 'UNKNOWN_OPERATION'
     const node = {
       nextInstance: {
+        extends: 'Component',
         constructor: {
-          name: 'SomeService'
+          name: 'SomeComponent'
         }
       },
       prevInstance: {
+        extends: 'Component',
         constructor: {
-          name: 'SomeService'
+          name: 'SomeComponent'
         }
       }
     }
@@ -108,8 +141,9 @@ describe('#logStatus()', () => {
     iteratee.name = 'deployNode'
     const node = {
       nextInstance: {
+        extends: 'Component',
         constructor: {
-          name: 'SomeService'
+          name: 'SomeComponent'
         },
         inputs: {
           provider: provider
@@ -125,6 +159,6 @@ describe('#logStatus()', () => {
     logStatus(iteratee, node, context)
 
     expect(mockLog).toHaveBeenCalledTimes(1)
-    expect(mockLog.mock.calls[0][0]).toMatch('Deploying "SomeService" ')
+    expect(mockLog.mock.calls[0][0]).toMatch('Deploying "SomeComponent" ')
   })
 })

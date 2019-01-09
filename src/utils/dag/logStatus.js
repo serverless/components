@@ -32,26 +32,29 @@ function getParameters(instance) {
   }
 }
 
-function logCurrentStatus(iteratee, node, context) {
+function logStatus(iteratee, node, context) {
   const { prevInstance, nextInstance } = node
 
-  const componentName =
-    (nextInstance && nextInstance.constructor.name) ||
-    (prevInstance && prevInstance.constructor.name)
+  const component = nextInstance ? nextInstance : prevInstance
+  const componentName = component.constructor.name
 
-  if (iteratee.name === 'deployNode') {
-    const params = getParameters(nextInstance)
-    context.log(
-      `Deploying "${componentName}" ${not(isEmpty(params)) ? `with parameters: ${params}` : ''}`
-    )
-  } else if (iteratee.name === 'removeNode') {
-    if (prevInstance) {
-      const params = getParameters(prevInstance)
+  const rootComponents = ['App', 'Compute', 'Cron', 'Function', 'Plugin', 'Service']
+
+  if (!rootComponents.includes(component.extends)) {
+    if (iteratee.name === 'deployNode') {
+      const params = getParameters(nextInstance)
       context.log(
-        `Removing "${componentName}" ${not(isEmpty(params)) ? `with parameters: ${params}` : ''}`
+        `Deploying "${componentName}" ${not(isEmpty(params)) ? `with parameters: ${params}` : ''}`
       )
+    } else if (iteratee.name === 'removeNode') {
+      if (prevInstance) {
+        const params = getParameters(prevInstance)
+        context.log(
+          `Removing "${componentName}" ${not(isEmpty(params)) ? `with parameters: ${params}` : ''}`
+        )
+      }
     }
   }
 }
 
-export default logCurrentStatus
+export default logStatus
