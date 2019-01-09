@@ -27,7 +27,6 @@ const AwsApiGateway = function(SuperClass) {
 
       const params = {
         exportType: 'swagger',
-
         restApiId: resolve(this.id),
         stageName: resolve(this.stage),
         parameters: {
@@ -55,7 +54,7 @@ const AwsApiGateway = function(SuperClass) {
       }
     }
 
-    async shouldDeploy(prevInstance) {
+    shouldDeploy(prevInstance) {
       const inputs = {
         stage: this.stage,
         swaggerTemplate: this.swaggerTemplate
