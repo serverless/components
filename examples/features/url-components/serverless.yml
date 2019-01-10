@@ -1,8 +1,0 @@
-type: url-components
-version: 0.0.1
-
-components:
-  myCustomComponent:
-    type: https://github.com/eahefnawy/component-url-test/archive/master.zip
-    inputs:
-      test: abc

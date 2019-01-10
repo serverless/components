@@ -1,0 +1,38 @@
+name: SimpleService
+extends: Service
+
+credentials:
+  type: EnvironmentBasedConfiguration
+  inputs:
+    variables:
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - AWS_SECURITY_TOKEN
+      - AWS_SESSION_TOKEN
+
+providers:
+  aws:
+    type: AwsProvider
+    inputs:
+      credentials:
+        accessKeyId: ${this.credentials.values.AWS_ACCESS_KEY_ID}
+        secretAccessKey: ${this.credentials.values.AWS_SECRET_ACCESS_KEY}
+        securityToken: ${this.credentials.values.AWS_SECURITY_TOKEN}
+        sessionToken: ${this.credentials.values.AWS_SESSION_TOKEN}
+        region: us-east-1
+
+compute:
+  type: AwsLambdaCompute
+  inputs:
+    provider: ${this.providers.aws}
+    runtime: nodejs
+
+functions:
+  myFunction:
+    functionName: func-${self.instanceId}
+    compute: ${this.compute}
+    handler: index.handler
+    code: ./code
+    memory: 512
+    timeout: 20
+    ufs: true
