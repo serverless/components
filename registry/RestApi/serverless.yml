@@ -10,16 +10,10 @@ license: Apache-2.0
 author: "Serverless, Inc. <hello@serverless.com> (https://serverless.com)"
 repository: "github:serverless/components"
 
-paths:
-  type: array
-  description: An array of registered URL's with relevant information.
-baseUrl:
-  type: string
-gateway:
-  type: object
-
+provider: ${inputs.provider}
+gateway: ${inputs.gateway}
 apiName: ${inputs.apiName}
-  # type: string
+routes: ${inputs.routes}
 
 inputTypes:
   provider:

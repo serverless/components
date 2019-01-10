@@ -1,21 +1,6 @@
 import path from 'path'
-import { createContext, resolveComponentEvaluables } from '../../../src/utils'
-
-const createTestContext = async () =>
-  createContext(
-    {
-      cwd: path.join(__dirname, '..'),
-      overrides: {
-        debug: () => {},
-        log: () => {}
-      }
-    },
-    {
-      app: {
-        id: 'test'
-      }
-    }
-  )
+import { resolveComponentEvaluables } from '../../../src/utils'
+import { createTestContext } from '../../../test'
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -26,35 +11,46 @@ afterAll(() => {
 })
 
 describe('RestApi', () => {
-  it('should set IamRole and AwsRestApi children', async () => {
+  const cwd = path.resolve(__dirname, '..')
+  let context
+  let AwsProvider
+  let AwsIamRole
+  let AwsApiGateway
+  let RestApi
+  let provider
+
+  beforeEach(async () => {
+    context = await createTestContext({ cwd })
+    AwsProvider = await context.import('AwsProvider')
+    AwsIamRole = await context.import('AwsIamRole')
+    AwsApiGateway = await context.import('AwsApiGateway')
+    RestApi = await context.import('./')
+    provider = context.construct(AwsProvider, {
+      region: 'us-east-1',
+      credentials: {
+        accessKeyId: 'abc',
+        secretAccessKey: 'xyz'
+      }
+    })
+  })
+
+  it('should set AwsIamRole and AwsRestApi children', async () => {
     const inputs = {
-      provider: {},
+      provider,
       apiName: 'something',
       gateway: 'AwsApiGateway',
       routes: {}
     }
-    const context = await createTestContext()
-    const RestApi = await context.import('RestApi')
     let restApi = context.construct(RestApi, inputs)
     restApi = resolveComponentEvaluables(restApi)
 
     const children = await restApi.define(context)
 
-    expect(children).toHaveLength(2)
-    const role = resolveComponentEvaluables(children.shift())
-    expect(role).toMatchObject({
-      name: 'AwsIamRole',
-      inputs: expect.any(Object),
-      roleName: `${inputs.apiName}-iam-role`
-    })
-    const gateway = resolveComponentEvaluables(children.shift())
-    expect(gateway).toMatchObject({
-      apiName: inputs.apiName,
-      inputs: expect.any(Object)
-    })
-    expect(gateway.inputs).toMatchObject({
-      apiName: inputs.apiName,
-      routes: expect.any(Object)
-    })
-  }, 10000)
+    const role = resolveComponentEvaluables(children.role)
+    const gateway = resolveComponentEvaluables(children.gateway)
+
+    expect(Object.keys(children)).toHaveLength(2)
+    expect(role).toBeInstanceOf(AwsIamRole.class)
+    expect(gateway).toBeInstanceOf(AwsApiGateway.class)
+  })
 })
