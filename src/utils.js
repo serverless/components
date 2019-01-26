@@ -1,9 +1,10 @@
 const path = require('path')
+const fs = require('fs')
 const chalk = require('chalk')
 const logUpdate = require('log-update')
 const argv = require('minimist')(process.argv.slice(2))
 const utils = require('@serverless/utils')
-const { fileExists, readFile, writeFile } = utils
+const { fileExists, readFileSync, writeFile } = utils
 
 const getCli = (id) => {
   const cli = {
@@ -23,10 +24,12 @@ const getCli = (id) => {
   return cli
 }
 
-const readState = async (id) => {
+// this needs to be a sync function
+// because it's called in the Component constructor
+const readState = (id) => {
   const stateFilePath = path.join(process.cwd(), '.serverless', `${id}.json`)
-  if (await fileExists(stateFilePath)) {
-    return readFile(stateFilePath)
+  if (fs.existsSync(stateFilePath)) {
+    return JSON.parse(fs.readFileSync(stateFilePath, 'utf8'))
   }
   return {}
 }
