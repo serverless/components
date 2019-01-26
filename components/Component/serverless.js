@@ -40,8 +40,12 @@ class Component {
     return writeState(this.id, this.state)
   }
 
-  serverless() {
-    // todo the main "sync" method
+  async serverless() {
+    // todo Philipp magic!!
+    // await this.create()
+    // await this.read()
+    // await this.update()
+    // await this.delete()
   }
 }
 

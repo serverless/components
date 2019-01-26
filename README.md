@@ -1,24 +1,23 @@
-# Install
+# Clone
 
 ```
-npm i -g @serverless/v2
+git clone https://github.com/serverless/v2.git
+cd v2
 ```
 
-# Usage
+# Run Demo
 
-### Run a serverless.js in cwd
+Run the Parent component from components directory to see everything happening in action.
+```
+Parent (master)$ cd components/Parent
+Parent (master)$ node ../../bin/v2 
 
-```js
-class Componetn {
-  constructor() {
-    return 'hi'
-  }
-}
+   Status:  Parent Deployment Succeeded
+   
+   Arn: parent:arn
 
-exports = Component
+Parent (master)$
 
 ```
 
-```
-v2
-```
+**Note:** Checkout the Parent & Child Components code to understand how everything fits together. Lot's of helpful comments there. Also checkout the Component class to see how the magic happens!
