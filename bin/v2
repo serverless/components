@@ -1,0 +1,4 @@
+#!/usr/bin/env node
+const { run } = require('../src/utils')
+
+;(async () => run())().catch((e) => console.log(e))
