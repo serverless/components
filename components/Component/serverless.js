@@ -15,7 +15,7 @@ class Component {
     }
 
     // add Component class methods
-    // like save() and build in serverless() method
+    // like save() and built-in serverless() method
     const classMethods = Object.getOwnPropertyNames(Component.prototype)
     forEach((classMethod) => {
       defaultFunction[classMethod] = (classMethodInputs) =>
