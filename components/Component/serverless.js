@@ -15,8 +15,7 @@ class Component {
     }
 
     // add Component class methods
-    // we can remove this section if we don't want to expose
-    // Component class methods like save() to parents
+    // like save() and build in serverless() method
     const classMethods = Object.getOwnPropertyNames(Component.prototype)
     forEach((classMethod) => {
       defaultFunction[classMethod] = (classMethodInputs) =>
