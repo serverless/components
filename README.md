@@ -8,7 +8,7 @@ git clone https://github.com/serverless/v2.git
 cd v2
 ```
 
-### Example
+### Demo
 
 Run the Parent component from components directory to see everything happening in action.
 
