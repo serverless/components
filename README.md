@@ -1,14 +1,14 @@
 # Serverless Framework V.2
 
 
-## Set-Up
+### Set-Up
 
 ```bash
 git clone https://github.com/serverless/v2.git
 cd v2
 ```
 
-## Demo
+### Demo
 
 Run the Parent component from components directory to see everything happening in action.
 
@@ -25,7 +25,7 @@ Parent (master)$
 
 **Note:** Checkout the Parent & Child Components code to understand how everything fits together. Lot's of helpful comments there. Also checkout the Component class to see how the magic happens!
 
-## How To Use A Serverless Component Programmatically
+### How To Use A Serverless Component Programmatically
 
 ```javascript
 
@@ -39,7 +39,7 @@ await realtimeApp()
 await myComponent.loadTest()
 ```
 
-## How To Use A Serverless Component Declaratively
+### How To Use A Serverless Component Declaratively
 
 ```yaml
 
@@ -67,7 +67,7 @@ $ serverless myRealtimeApp loadTest
 
 ```
 
-## How To Write A Serverless Component
+### How To Write A Serverless Component
 
 ```javascript
 
