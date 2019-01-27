@@ -36,14 +36,14 @@ const realtimeApp = new RealtimeApp('instanceId', { /* inputs */ })
 await realtimeApp()
 
 // To run extra functionality, use custom methods that come w/ the Component...
-await myComponent.loadTest()
+await realtimeApp.loadTest()
 ```
 
 ### How To Use A Serverless Component Declaratively
 
 ```yaml
 
-name: myRealtimeApp
+name: realtimeApp
 stage: dev
 
 providers:
@@ -52,8 +52,8 @@ providers:
     secretAccessKey: ${secrets:secret_access_key}
 
 components:
-  RealtimeApp::myRealtimeApp:
-    name: ${name}-${stage}-api
+  RealtimeApp::realtimeApp:
+    name: ${name}-${stage}
     code: ./src/backend
 
 ```
