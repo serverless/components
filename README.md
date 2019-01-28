@@ -1,6 +1,5 @@
 # Serverless Framework V.2
 
-
 ### Set-Up
 
 ```bash
@@ -55,16 +54,14 @@ components:
   RealtimeApp::realtimeApp:
     name: ${name}-${stage}
     code: ./src/backend
-
 ```
 
 ```bash
-# To run/deploy/update the Component, call 'serverless'...
+# To run/deploy/update all Components, call 'serverless'...
 $ serverless
 
 # To run extra functionality that comes with the a component, call this...
-$ serverless myRealtimeApp loadTest
-
+$ serverless loadTest myRealtimeApp
 ```
 
 ### How To Write A Serverless Component
@@ -73,14 +70,8 @@ $ serverless myRealtimeApp loadTest
 
 class MyComponent extends Component {
 
-  // Serverless: Required – The Default command to run the Component
-  async serverless() { }
-
-  // Deploy: Optional - Provisions infrastructure
-  async deploy() { }
-
-  // Read: Optional - Returns state information
-  async read() { }
+  // Default: Required – The Default command to run the Component
+  async default() { }
 
   // Remove: Optional - Removes infrastructure
   async remove() { }
