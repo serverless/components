@@ -1,43 +1,6 @@
 const path = require('path')
-const fs = require('fs')
-const chalk = require('chalk')
-const logUpdate = require('log-update')
 const argv = require('minimist')(process.argv.slice(2))
-const utils = require('@serverless/utils')
-const { fileExists, readFileSync, writeFile } = utils
-
-const getCli = (id) => {
-  const cli = {
-    status: (msg, color = 'yellow') =>
-      logUpdate(`  ${chalk.gray('Status:')}  ${chalk[color](msg)}`),
-    success: (msg) => cli.status(msg, 'green'),
-    fail: (msg) => cli.status(msg, 'red'),
-    log: (msg) => (id.includes('.') ? {} : console.log(`   ${msg}`)),
-    output: (name, value) => (id.includes('.') ? {} : cli.log(`${chalk.grey(`${name}: `)}${value}`))
-  }
-  if (process.env.SERVERLESS_SILENT) {
-    return Object.keys(cli).reduce((accum, method) => {
-      accum[method] = () => {} // silent all functions
-    }, {})
-  }
-
-  return cli
-}
-
-// this needs to be a sync function
-// because it's called in the Component constructor
-const readState = (id) => {
-  const stateFilePath = path.join(process.cwd(), '.serverless', `${id}.json`)
-  if (fs.existsSync(stateFilePath)) {
-    return JSON.parse(fs.readFileSync(stateFilePath, 'utf8'))
-  }
-  return {}
-}
-
-const writeState = async (id, state = {}) => {
-  const stateFilePath = path.join(process.cwd(), '.serverless', `${id}.json`)
-  return writeFile(stateFilePath, state)
-}
+const { fileExists } = require('@serverless/utils')
 
 const run = async () => {
   if (argv.silent) {
@@ -78,4 +41,4 @@ const run = async () => {
   console.log('')
 }
 
-module.exports = { ...utils, getCli, readState, writeState, run, chalk }
+module.exports = run
