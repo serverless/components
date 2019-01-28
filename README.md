@@ -1,6 +1,5 @@
 # Serverless Framework V.2
 
-
 ### Set-Up
 
 ```bash
@@ -14,7 +13,7 @@ Run the Parent component from components directory to see everything happening i
 
 ```bash
 Parent (master)$ cd components/Parent
-Parent (master)$ node ../../bin/v2
+Parent (master)$ ../../bin/v2
 
    Status:  Parent Deployment Succeeded
 
@@ -28,9 +27,10 @@ Parent (master)$
 ### How To Use A Serverless Component Programmatically
 
 ```javascript
-
 // To load a Component, instantiate it's class...
-const realtimeApp = new RealtimeApp('instanceId', { /* inputs */ })
+const realtimeApp = new RealtimeApp('instanceId', {
+  /* inputs */
+})
 
 // To run/deploy/update a Component, call it's default function...
 await realtimeApp()
@@ -42,7 +42,6 @@ await realtimeApp.loadTest()
 ### How To Use A Serverless Component Declaratively
 
 ```yaml
-
 name: realtimeApp
 stage: dev
 
@@ -55,7 +54,6 @@ components:
   RealtimeApp::realtimeApp:
     name: ${name}-${stage}
     code: ./src/backend
-
 ```
 
 ```bash
@@ -70,19 +68,17 @@ $ serverless myRealtimeApp loadTest
 ### How To Write A Serverless Component
 
 ```javascript
-
 class MyComponent extends Component {
-
   // Serverless: Required – The Default command to run the Component
-  async serverless() { }
+  async serverless() {}
 
   // Deploy: Optional - Provisions infrastructure
-  async deploy() { }
+  async deploy() {}
 
   // Read: Optional - Returns state information
-  async read() { }
+  async read() {}
 
   // Remove: Optional - Removes infrastructure
-  async remove() { }
+  async remove() {}
 }
 ```
