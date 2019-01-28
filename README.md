@@ -70,10 +70,18 @@ $ serverless loadTest myRealtimeApp
 
 class MyComponent extends Component {
 
-  // Default: Required – The Default command to run the Component
+  /*
+  * Default (Required)
+  * - The default functionality to run/provision/update your Component
+  */
+
   async default() { }
 
-  // Remove: Optional - Removes infrastructure
+  /*
+  * Remove (Optional)
+  * - If your Component removes infrastructure, this is recommended.
+  */
+
   async remove() { }
 }
 
