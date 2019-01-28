@@ -38,14 +38,6 @@ class Component {
   save() {
     return writeState(this.id, this.state)
   }
-
-  async serverless() {
-    // todo Philipp magic!!
-    // await this.create()
-    // await this.read()
-    // await this.update()
-    // await this.delete()
-  }
 }
 
 module.exports = Component

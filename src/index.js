@@ -1,5 +1,5 @@
 const utils = require('./utils')
-const components = require('./components')
+const components = require('../components')
 
 module.exports = {
   ...utils,

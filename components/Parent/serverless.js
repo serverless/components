@@ -3,9 +3,7 @@ const Component = require('../Component/serverless')
 const Child = require('../Child/serverless')
 
 class Parent extends Component {
-
   async serverless() {
-
     this.cli.status('Deploying Parent')
     await sleep(2000)
 
