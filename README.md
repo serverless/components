@@ -26,7 +26,7 @@ Parent (master)$
 
 ### How To Use A Serverless Component Programmatically
 
-Use a `serverless.js` file, like this:
+Create a new javascript file, and load/use Components like this:
 
 ```javascript
 
