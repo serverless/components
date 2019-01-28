@@ -76,4 +76,5 @@ class MyComponent extends Component {
   // Remove: Optional - Removes infrastructure
   async remove() { }
 }
+
 ```
