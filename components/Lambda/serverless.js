@@ -27,7 +27,7 @@ const outputProps = [
 ]
 
 class Lambda extends Component {
-  async serverless() {
+  async default() {
     this.defaults = {
       name: 'serverless',
       description: 'Serverless Lambda Component',

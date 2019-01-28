@@ -16,7 +16,7 @@ const Component = require('../Component/serverless')
 const outputProps = ['name', 'service', 'policy', 'arn']
 
 class Role extends Component {
-  async serverless() {
+  async default() {
     this.defaults = {
       name: 'serverless',
       service: 'lambda.amazonaws.com',

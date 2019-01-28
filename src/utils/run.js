@@ -39,7 +39,7 @@ const run = async () => {
         // todo. maybe it should?
         await component[command]()
       } else {
-        // run the main function in cwd. eg. "serverless"
+        // run the default function in cwd. eg. "serverless"
         await component()
       }
     } else if (argv['_'].length === 1 && typeof components[argv['_'][0]] !== 'undefined') {

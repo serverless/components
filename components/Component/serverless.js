@@ -9,13 +9,13 @@ class Component {
 
     // defines the default function that would be returned below
     // and adds the instance context to it
+    // todo validate that component author has defined a default() method
     const that = this
     const defaultFunction = function() {
-      return that.serverless.call(that)
+      return that.default.call(that)
     }
 
-    // add Component class methods
-    // like save() and built-in serverless() method
+    // add Component class methods like the save() method
     const classMethods = Object.getOwnPropertyNames(Component.prototype)
     forEach((classMethod) => {
       defaultFunction[classMethod] = (classMethodInputs) =>
