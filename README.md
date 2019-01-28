@@ -26,6 +26,8 @@ Parent (master)$
 
 ### How To Use A Serverless Component Programmatically
 
+Use a `serverless.js` file, like this:
+
 ```javascript
 
 // To load a Component, instantiate it's class...
@@ -39,6 +41,8 @@ await realtimeApp.loadTest()
 ```
 
 ### How To Use A Serverless Component Declaratively
+
+Use a `serverless.yaml` file, like this:
 
 ```yaml
 
@@ -56,15 +60,22 @@ components:
     code: ./src/backend
 ```
 
+Then use your CLI, like this:
+
 ```bash
 # To run/deploy/update all Components, call 'serverless'...
 $ serverless
 
 # To run extra functionality that comes with the a component, call this...
 $ serverless loadTest myRealtimeApp
+
+# To remove Components in YAML, call this...
+$ serverless remove
 ```
 
 ### How To Write A Serverless Component
+
+Use a `serverless.js` file, like this:
 
 ```javascript
 
