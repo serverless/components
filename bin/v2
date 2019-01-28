@@ -1,4 +1,4 @@
 #!/usr/bin/env node
-const { run } = require('../src/utils')
+const run = require('../src/utils/run')
 
-;(async () => run())().catch((e) => console.log(e))
+;(async () => run())().catch((e) => console.log(e)) // eslint-disable-line

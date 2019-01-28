@@ -1,4 +1,4 @@
-const { getCli, readState, writeState, forEach } = require('../../src/utils')
+const { getCli, readState, writeState, forEach } = require('../../src/utils/')
 
 class Component {
   constructor(id = this.constructor.name, inputs) {

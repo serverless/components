@@ -13,6 +13,8 @@ const {
 
 const Component = require('../Component/serverless')
 
+const outputProps = ['name', 'service', 'policy', 'arn']
+
 class Role extends Component {
   async serverless() {
     this.defaults = {
@@ -22,7 +24,7 @@ class Role extends Component {
         arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
       }
     }
-    const outputProps = ['name', 'service', 'policy', 'arn']
+
     const config = mergeDeep(this.defaults, this.inputs)
     const iam = new aws.IAM()
 
