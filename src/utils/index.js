@@ -1,7 +1,7 @@
 const chalk = require('chalk')
 const utils = require('@serverless/utils')
 
-// we don't export run.js because it has a dependency
+// we don't export run.js here because it has a dependency
 // on the components directory, which has dependency on
 // this utils directory...causing circular dependency
 const getCli = require('./getCli')
