@@ -2,7 +2,7 @@ const { sleep } = require('../../src/utils')
 const Component = require('../Component/serverless')
 
 class Child extends Component {
-  async default() {
+  async default(inputs = {}) {
     this.cli.status('Deploying Child')
 
     await sleep(2000)
@@ -13,7 +13,7 @@ class Child extends Component {
 
     this.state.arn = 'child:arn'
 
-    this.cli.success(`Child Deployment Succeeded with memory ${this.inputs.memory}`)
+    this.cli.success(`Child Deployment Succeeded with memory ${inputs.memory}`)
 
     // this section will ignored by the CLI
     // because this component is used as child
@@ -25,7 +25,7 @@ class Child extends Component {
     this.save()
   }
 
-  async connect(inputs) {
+  async connect(inputs = {}) {
     this.cli.success(`Connected to ${inputs.url}`)
   }
 }

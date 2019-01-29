@@ -13,19 +13,19 @@ const {
 
 const Component = require('../Component/serverless')
 
-const outputProps = ['name', 'service', 'policy', 'arn']
+const outputs = ['name', 'service', 'policy', 'arn']
+
+const defaults = {
+  name: 'serverless',
+  service: 'lambda.amazonaws.com',
+  policy: {
+    arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
+  }
+}
 
 class Role extends Component {
-  async default() {
-    this.defaults = {
-      name: 'serverless',
-      service: 'lambda.amazonaws.com',
-      policy: {
-        arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
-      }
-    }
-
-    const config = mergeDeep(this.defaults, this.inputs)
+  async default(inputs = {}) {
+    const config = mergeDeep(defaults, inputs)
     const iam = new aws.IAM()
 
     const prevRole = await getRole({ iam, ...config })
@@ -48,6 +48,10 @@ class Role extends Component {
       }
     }
 
+    this.state.arn = config.arn
+    this.state.name = config.name
+    this.save()
+
     this.cli.success(`Role Deployed`)
 
     this.cli.log('')
@@ -55,9 +59,24 @@ class Role extends Component {
     this.cli.output('Service', `${config.service}`)
     this.cli.output('ARN', `    ${config.arn}`)
 
-    this.outputs = pick(outputProps, config)
+    return pick(outputs, config)
+  }
 
-    return this.outputs
+  async remove(inputs = {}) {
+    const config = mergeDeep(defaults, inputs)
+    config.name = inputs.name || this.state.name || defaults.name
+
+    const iam = new aws.IAM()
+    this.cli.status(`Removing Role`)
+    await deleteRole({ iam, ...config })
+
+    this.state = {}
+    this.save()
+
+    this.cli.success(`Role Removed`)
+    this.cli.output('Name', `   ${config.name}`)
+
+    return pick(outputs, config)
   }
 }
 

@@ -12,7 +12,7 @@ const {
   hash
 } = require('./utils')
 
-const outputProps = [
+const outputs = [
   'name',
   'description',
   'memory',
@@ -26,26 +26,26 @@ const outputProps = [
   'arn'
 ]
 
-class Lambda extends Component {
-  async default() {
-    this.defaults = {
-      name: 'serverless',
-      description: 'Serverless Lambda Component',
-      memory: 128,
-      timeout: 10,
-      code: process.cwd(),
-      shim: null,
-      handler: 'handler.hello',
-      runtime: 'nodejs8.10',
-      env: {}
-    }
+const defaults = {
+  name: 'serverless',
+  description: 'Serverless Lambda Component',
+  memory: 128,
+  timeout: 10,
+  code: process.cwd(),
+  shim: null,
+  handler: 'handler.hello',
+  runtime: 'nodejs8.10',
+  env: {}
+}
 
-    const config = mergeDeep(this.defaults, this.inputs)
+class Lambda extends Component {
+  async default(inputs = {}) {
+    const config = mergeDeep(defaults, inputs)
 
     const lambda = new aws.Lambda()
-    const role = new Role(`${this.id}.lambdaRole`, config)
+    const role = new Role(`${this.id}.lambdaRole`)
 
-    config.role = config.role || (await role())
+    config.role = config.role || (await role(config))
 
     this.cli.status(`Packaging Lambda`)
 
@@ -65,6 +65,10 @@ class Lambda extends Component {
       }
     }
 
+    this.state.name = config.name
+    this.state.arn = config.arn
+    this.save()
+
     this.cli.success(`Lambda Deployed`)
 
     this.cli.log('')
@@ -75,7 +79,31 @@ class Lambda extends Component {
     this.cli.output('Handler', ` ${config.handler}`)
     this.cli.output('ARN', `     ${config.arn}`)
 
-    return pick(outputProps, config)
+    return pick(outputs, config)
+  }
+
+  async remove(inputs = {}) {
+    const config = mergeDeep(defaults, inputs)
+    config.name = inputs.name || this.state.name || defaults.name
+    const lambda = new aws.Lambda()
+
+    this.cli.status(`Removing Lambda`)
+
+    const role = new Role(`${this.id}.lambdaRole`)
+
+    // there's no need to pass role name as input
+    // since it's saved in the Role component state
+    await role.remove()
+
+    await deleteLambda({ lambda, name: config.name })
+
+    this.state = {}
+    this.save()
+
+    this.cli.success(`Lambda Removed`)
+    this.cli.output('Name', `   ${config.name}`)
+
+    return pick(outputs, config)
   }
 }
 

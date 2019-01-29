@@ -9,8 +9,8 @@ class Parent extends Component {
 
     // construct a child component by passing a unique id, and some inputs.
     // to ensure id is unique within your app tree, prefix with "this.id"
-    const childComponent = new Child(`${this.id}.myChild`, { memory: 512 })
-    await childComponent() // this would call the main default() method of the child
+    const childComponent = new Child(`${this.id}.myChild`)
+    await childComponent({ memory: 512 }) // this would call the main default() method of the child
 
     await sleep(2000)
 

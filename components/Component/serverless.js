@@ -1,18 +1,17 @@
 const { getCli, readState, writeState, forEach } = require('../../src/utils/')
 
 class Component {
-  constructor(id = this.constructor.name, inputs) {
+  constructor(id = this.constructor.name, cli = getCli()) {
     this.id = id
-    this.inputs = inputs
-    this.cli = getCli(id)
+    this.cli = cli
     this.state = readState(id)
 
     // defines the default function that would be returned below
     // and adds the instance context to it
     // todo validate that component author has defined a default() method
     const that = this
-    const defaultFunction = function() {
-      return that.default.call(that)
+    const defaultFunction = function(inputs) {
+      return that.default.call(that, inputs)
     }
 
     // add Component class methods like the save() method
