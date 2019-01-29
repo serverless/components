@@ -4,6 +4,7 @@ const Child = require('./Child/serverless')
 const Role = require('./Role/serverless')
 const Lambda = require('./Lambda/serverless')
 const Website = require('./Website/serverless')
+const DynamoDB = require('./DynamoDB/serverless')
 
 module.exports = {
   Component,
@@ -11,5 +12,6 @@ module.exports = {
   Child,
   Role,
   Lambda,
-  Website
+  Website,
+  DynamoDB
 }
