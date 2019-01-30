@@ -5,6 +5,8 @@ const Role = require('./Role/serverless')
 const Lambda = require('./Lambda/serverless')
 const Website = require('./Website/serverless')
 const DynamoDB = require('./DynamoDB/serverless')
+const WebSockets = require('./WebSockets/serverless')
+const Socket = require('./Socket/serverless')
 
 module.exports = {
   Component,
@@ -13,5 +15,7 @@ module.exports = {
   Role,
   Lambda,
   Website,
-  DynamoDB
+  DynamoDB,
+  WebSockets,
+  Socket
 }
