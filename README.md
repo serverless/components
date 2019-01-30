@@ -97,3 +97,8 @@ class MyComponent extends Component {
 }
 
 ```
+
+*Created By*
+
+* Eslam Hefnawy
+* Philipp Muens
