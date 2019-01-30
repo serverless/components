@@ -31,6 +31,8 @@ class Website extends Component {
     const config = mergeDeep(defaults, inputs)
     const s3 = new aws.S3()
 
+    const originalName = config.name // we need to save it to state later
+
     // get a globally unique bucket name
     // based on the passed in name
     config.name = getBucketName(config.name)
@@ -76,9 +78,14 @@ class Website extends Component {
     this.cli.status('Uploading Files')
     await uploadDir({ s3, ...config })
 
-    config.url = `${config.name}.s3-website-${config.region}.amazonaws.com`
+    config.url = `http://${config.name}.s3-website-${config.region}.amazonaws.com`
 
-    this.state.name = config.name
+    if (this.state.name && this.state.name !== config.name) {
+      this.cli.status(`Removing Previous Website`)
+      await deleteWebsiteBucket({ s3, name: this.state.name })
+    }
+
+    this.state.name = originalName
     this.state.url = config.url
     this.save()
 
@@ -91,6 +98,9 @@ class Website extends Component {
   async remove(inputs = {}) {
     const config = mergeDeep(defaults, inputs)
     config.name = inputs.name || this.state.name || defaults.name
+
+    config.name = getBucketName(config.name)
+
     const s3 = new aws.S3()
 
     this.cli.status(`Removing Website`)

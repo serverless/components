@@ -45,24 +45,24 @@ class Socket extends Component {
     this.cli.success(`Socket Deployed`)
     this.cli.output('URL', `    ${websocketsOutputs.url}`)
 
-    return { lambdaOutputs, websocketsOutputs }
+    return { lambda: lambdaOutputs, websockets: websocketsOutputs }
   }
 
   async remove(inputs = {}) {
     this.cli.status(`Removing Socket`)
 
     const lambda = new Lambda(`${this.id}.lambda`)
-    const websockets = new Lambda(`${this.id}.websockets`)
+    const websockets = new WebSockets(`${this.id}.websockets`)
 
-    const lambdaOutputs = await lambda.remove(inputs)
-    const websocketsOutputs = await websockets.remove(inputs)
+    const lambdaOutputs = await lambda.remove()
+    const websocketsOutputs = await websockets.remove()
 
     this.state = {}
     this.save()
 
     this.cli.success(`Socket Removed`)
 
-    return { lambdaOutputs, websocketsOutputs }
+    return { lambda: lambdaOutputs, websockets: websocketsOutputs }
   }
 
   /*    /\

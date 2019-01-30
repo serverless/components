@@ -1,8 +1,5 @@
 const aws = require('aws-sdk')
 const { pick, mergeDeep, filter, keys, not, map, all } = require('../../src/utils')
-
-const Component = require('../Component/serverless')
-
 const {
   getApiId,
   createApi,
@@ -16,6 +13,8 @@ const {
   getWebsocketUrl
 } = require('./utils')
 
+const Component = require('../Component/serverless')
+
 const outputs = ['name', 'stage', 'description', 'routeSelectionExpression', 'routes', 'id', 'url']
 
 const defaults = {
@@ -23,12 +22,7 @@ const defaults = {
   stage: 'dev',
   description: 'Serverless WebSockets',
   routeSelectionExpression: '$request.body.action',
-  routes: {
-    // todo validation?
-    $connect: '',
-    $disconnect: '',
-    $default: ''
-  },
+  routes: {}, // key (route): value (lambda arn)
   region: 'us-east-1'
 }
 
@@ -38,33 +32,23 @@ class WebSockets extends Component {
     const apig2 = new aws.ApiGatewayV2()
     const lambda = new aws.Lambda()
 
-    config.id = await getApiId({ apig2, name: config.name })
+    config.id = await getApiId({ apig2, id: config.id || this.state.id }) // validate with provider
 
     const definedRoutes = keys(config.routes || {})
     const providerRoutes = await getRoutes({ apig2, id: config.id })
 
     if (!config.id) {
       this.cli.status(`Creating WebSockets`)
-
-      config.id = await createApi({
-        apig2,
-        name: config.name,
-        description: config.description,
-        routeSelectionExpression: config.routeSelectionExpression
-      })
+      config.id = await createApi({ apig2, ...config })
     } else {
       this.cli.status(`Updating WebSockets`)
-
-      await updateApi({
-        apig2,
-        id: config.id,
-        description: config.description,
-        routeSelectionExpression: config.routeSelectionExpression
-      })
+      await updateApi({ apig2, ...config })
     }
 
     const routesToDeploy = filter((route) => not(providerRoutes.includes(route)), definedRoutes)
     const routesToRemove = filter((route) => not(definedRoutes.includes(route)), providerRoutes)
+
+    this.cli.status(`Updating Routes`)
 
     // deploy defined routes that does not exist in provider
     await all(
@@ -83,7 +67,13 @@ class WebSockets extends Component {
 
     config.url = getWebsocketUrl({ id: config.id, region: config.region, stage: config.stage })
 
-    this.state.name = config.name
+    // if the user has changed the id,
+    // remove the previous API
+    if (this.state.id && this.state.id !== config.id) {
+      this.cli.status(`Removing Previous WebSockets`)
+      await removeApi({ apig2, id: config.id })
+    }
+
     this.state.id = config.id
     this.state.url = config.url
     this.save()
@@ -103,12 +93,9 @@ class WebSockets extends Component {
   }
 
   async remove(inputs = {}) {
-    // todo remove by id from state
     const config = { ...defaults, ...inputs }
-    config.name = inputs.name || this.state.name
+    config.id = config.id || this.state.id
     const apig2 = new aws.ApiGatewayV2()
-
-    config.id = await getApiId({ apig2, name: config.name })
 
     if (config.id) {
       this.cli.status(`Removing WebSockets`)

@@ -14,6 +14,7 @@ const getCli = (enableLogs = false) => {
   if (process.env.SERVERLESS_SILENT) {
     return Object.keys(cli).reduce((accum, method) => {
       accum[method] = () => {} // silent all functions
+      return accum
     }, {})
   }
 

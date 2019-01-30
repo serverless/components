@@ -7,22 +7,23 @@ git clone https://github.com/serverless/v2.git
 cd v2
 ```
 
-### Demo
+### Run Example
 
-Run the Parent component from components directory to see everything happening in action.
+Run the `app` example to see how everything fits together.
 
 ```bash
-Parent (master)$ cd components/Parent
-Parent (master)$ node ../../bin/v2
+app (master)$ cd examples/app
+app (master)$ node ../../bin/v2
 
-   Status:  Parent Deployment Succeeded
+   Status:  My App Deployed
+   
+   Socket URL:  wss://98531tq37e.execute-api.us-east-1.amazonaws.com/dev/
+   Website URL: http://my-app-dev-pqso3.s3-website-us-east-1.amazonaws.com
 
-   Arn: parent:arn
-
-Parent (master)$
+app (master)$
 ```
 
-**Note:** Checkout the Parent & Child Components code to understand how everything fits together. Lot's of helpful comments there. Also checkout the Component class to see how the magic happens!
+**Note:** Checkout the `app` example code to see how components are consumed via a `serverless.js` file. Also checkout real-world component code in the components directory.
 
 ### How To Use A Serverless Component Programmatically
 

@@ -26,7 +26,7 @@ const defaults = {
 class Role extends Component {
   async default(inputs = {}) {
     const config = mergeDeep(defaults, inputs)
-    const iam = new aws.IAM()
+    const iam = new aws.IAM(inputs)
 
     const prevRole = await getRole({ iam, ...config })
 
@@ -48,6 +48,11 @@ class Role extends Component {
       }
     }
 
+    if (this.state.name && this.state.name !== config.name) {
+      this.cli.status(`Removing Previous Role`)
+      await deleteRole({ iam, name: this.state.name, policy: config.policy })
+    }
+
     this.state.arn = config.arn
     this.state.name = config.name
     this.save()
@@ -66,7 +71,7 @@ class Role extends Component {
     const config = mergeDeep(defaults, inputs)
     config.name = inputs.name || this.state.name || defaults.name
 
-    const iam = new aws.IAM()
+    const iam = new aws.IAM(inputs)
     this.cli.status(`Removing Role`)
     await deleteRole({ iam, ...config })
 

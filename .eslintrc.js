@@ -15,6 +15,9 @@ module.exports = {
       jsx: true
     }
   },
+  globals: {
+    on: true // for the Socket file
+  },
   rules: {
     'array-bracket-spacing': [
       'error',

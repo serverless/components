@@ -1,10 +1,19 @@
 const { map, all, filter } = require('../../src/utils')
 
-const getApiId = async ({ apig2, name }) => {
-  const apis = await apig2.getApis({}).promise()
-  const websocketApi = apis.Items.find((api) => api.Name === name)
-  const apiId = websocketApi ? websocketApi.ApiId : null
-  return apiId
+const getApiId = async ({ apig2, id }) => {
+  if (!id) {
+    return null
+  }
+  // validate provided id still exists in provider...
+  try {
+    await apig2.getApi({ ApiId: id }).promise()
+  } catch (e) {
+    if (e.code !== 'NotFoundException') {
+      throw e
+    }
+    return null
+  }
+  return id
 }
 
 const createApi = async ({ apig2, name, description, routeSelectionExpression }) => {
@@ -19,9 +28,10 @@ const createApi = async ({ apig2, name, description, routeSelectionExpression })
   return api.ApiId
 }
 
-const updateApi = async ({ apig2, id, description, routeSelectionExpression }) => {
+const updateApi = async ({ apig2, id, name, description, routeSelectionExpression }) => {
   const params = {
     ApiId: id,
+    Name: name,
     Description: description,
     RouteSelectionExpression: routeSelectionExpression
   }

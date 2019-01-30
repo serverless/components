@@ -43,7 +43,7 @@ class Lambda extends Component {
     const config = mergeDeep(defaults, inputs)
 
     const lambda = new aws.Lambda()
-    const role = new Role(`${this.id}.lambdaRole`)
+    const role = new Role(`${this.id}.role`)
 
     config.role = config.role || (await role(config))
 
@@ -63,6 +63,11 @@ class Lambda extends Component {
         this.cli.status(`Updating Lambda`)
         await updateLambda({ lambda, ...config })
       }
+    }
+
+    if (this.state.name && this.state.name !== config.name) {
+      this.cli.status(`Removing Previous Lambda`)
+      await deleteLambda({ lambda, name: this.state.name })
     }
 
     this.state.name = config.name
@@ -89,7 +94,7 @@ class Lambda extends Component {
 
     this.cli.status(`Removing Lambda`)
 
-    const role = new Role(`${this.id}.lambdaRole`)
+    const role = new Role(`${this.id}.role`)
 
     // there's no need to pass role name as input
     // since it's saved in the Role component state
