@@ -98,7 +98,7 @@ class MyComponent extends Component {
 
 ```
 
-*Created By*
+**Created By**
 
-* Eslam Hefnawy
-* Philipp Muens
+* Eslam Hefnawy - @eahefnawy
+* Philipp Muens - @pmmuens
