@@ -49,7 +49,11 @@ const run = async () => {
       (await fileExists(serverlessYamlFilePath))
     ) {
       const component = new components['Components'](undefined, getCli(true))
-      await component(argv || {})
+      if (argv['_'].length === 0) {
+        await component(argv || {})
+      } else if (argv['_'].length === 1 && argv['_'][0] === 'remove') {
+        await component['remove'](argv || {})
+      }
     } else if (argv['_'].length === 1 && typeof components[argv['_'][0]] !== 'undefined') {
       // serverless.js does not exist in cwd & component exists in registry
       // eg. running "serverless socket" in directory that does not have serverless.js
