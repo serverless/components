@@ -1,4 +1,5 @@
 const Component = require('./Component/serverless')
+const Components = require('./Components/serverless')
 const Role = require('./Role/serverless')
 const Lambda = require('./Lambda/serverless')
 const Website = require('./Website/serverless')
@@ -9,6 +10,7 @@ const RealtimeApp = require('./RealtimeApp/serverless')
 
 module.exports = {
   Component,
+  Components,
   Role,
   Lambda,
   Website,

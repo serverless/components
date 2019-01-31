@@ -22,11 +22,17 @@ const run = async () => {
   console.log('') // eslint-disable-line
   if (argv['_'].length < 2) {
     // eg. "serverless connect" or "serverless socket"
-    const serverlessFilePath = path.join(process.cwd(), 'serverless.js')
+    // when using it programmatically
+    const serverlessJsFilePath = path.join(process.cwd(), 'serverless.js')
 
-    if (await fileExists(serverlessFilePath)) {
+    // when using it declarative via a config file
+    const serverlessYmlFilePath = path.join(process.cwd(), 'serverless.yml')
+    const serverlessYamlFilePath = path.join(process.cwd(), 'serverless.yaml')
+    const serverlessJsonFilePath = path.join(process.cwd(), 'serverless.json')
+
+    if (await fileExists(serverlessJsFilePath)) {
       // serverless.js exists in cwd
-      const Component = require(serverlessFilePath)
+      const Component = require(serverlessJsFilePath)
       const component = new Component(undefined, getCli(true))
 
       if (argv['_'].length === 1) {
@@ -37,6 +43,13 @@ const run = async () => {
         // run the default function in cwd. eg. "serverless"
         await component(argv || {})
       }
+    } else if (
+      (await fileExists(serverlessYmlFilePath)) ||
+      (await fileExists(serverlessJsonFilePath)) ||
+      (await fileExists(serverlessYamlFilePath))
+    ) {
+      const component = new components['Components'](undefined, getCli(true))
+      await component(argv || {})
     } else if (argv['_'].length === 1 && typeof components[argv['_'][0]] !== 'undefined') {
       // serverless.js does not exist in cwd & component exists in registry
       // eg. running "serverless socket" in directory that does not have serverless.js
