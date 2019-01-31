@@ -6,6 +6,7 @@ const utils = require('@serverless/utils')
 // this utils directory...causing circular dependency
 const getCli = require('./getCli')
 const readState = require('./readState')
+const titelize = require('./titelize')
 const writeState = require('./writeState')
 
 module.exports = {
@@ -13,5 +14,6 @@ module.exports = {
   getCli,
   readState,
   writeState,
+  titelize,
   chalk
 }

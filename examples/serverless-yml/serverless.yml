@@ -1,0 +1,10 @@
+name: v2-test-application
+stage: dev
+
+components:
+  DynamoDB::v2TestTable:
+    name: v2-test-table
+    # NOTE: uncomment and re-run to update the component
+    # provisionedThroughput:
+    #   ReadCapacityUnits: 2
+    #   WriteCapacityUnits: 2
