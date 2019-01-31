@@ -33,10 +33,10 @@ class Website extends Component {
     config.assets = path.resolve(config.code, config.assets)
 
     this.cli.status(`Deploying Website`)
+
     // if bucket already exists in my account, this call still succeeds!
     // if bucket name is unavailable, an error is thrown
     await s3.createBucket({ Bucket: config.name }).promise()
-    // await sleep(1000) // give aws a chance to sync before putting policy and setting up website
 
     // Include Environment Variables if they exist
     const envFileLocation = path.resolve(config.code, config.envFileLocation)
