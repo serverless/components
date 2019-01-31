@@ -4,13 +4,7 @@ const path = require('path')
 const { execSync } = require('child_process')
 const { pick, isEmpty, mergeDeep } = require('../../src/utils')
 
-const {
-  getBucketName,
-  createWebsiteBucket,
-  uploadDir,
-  deleteWebsiteBucket,
-  bucketExists
-} = require('./utils')
+const { getBucketName, uploadDir, deleteWebsiteBucket } = require('./utils')
 
 const Component = require('../Component/serverless')
 
@@ -39,11 +33,10 @@ class Website extends Component {
     config.assets = path.resolve(config.code, config.assets)
 
     this.cli.status(`Deploying Website`)
-
-    if (!(await bucketExists({ s3, ...config }))) {
-      this.cli.status(`Creating Bucket`)
-      await createWebsiteBucket({ s3, ...config })
-    }
+    // if bucket already exists in my account, this call still succeeds!
+    // if bucket name is unavailable, an error is thrown
+    await s3.createBucket({ Bucket: config.name }).promise()
+    // await sleep(1000) // give aws a chance to sync before putting policy and setting up website
 
     // Include Environment Variables if they exist
     const envFileLocation = path.resolve(config.code, config.envFileLocation)
@@ -80,7 +73,7 @@ class Website extends Component {
 
     config.url = `http://${config.name}.s3-website-${config.region}.amazonaws.com`
 
-    if (this.state.name && this.state.name !== config.name) {
+    if (this.state.name && this.state.name !== originalName) {
       this.cli.status(`Removing Previous Website`)
       await deleteWebsiteBucket({ s3, name: this.state.name })
     }

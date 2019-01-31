@@ -23,7 +23,7 @@ const bucketExists = async ({ s3, name }) => {
   return true
 }
 
-const createWebsiteBucket = async ({ s3, name }) => {
+const updateBucket = async ({ s3, name }) => {
   const s3BucketPolicy = {
     Version: '2012-10-17',
     Statement: [
@@ -62,8 +62,6 @@ const createWebsiteBucket = async ({ s3, name }) => {
     AllowedHeaders: ['*'],
     MaxAgeSeconds: 0
   }
-
-  await s3.createBucket({ Bucket: name }).promise()
 
   await s3
     .putBucketPolicy({
@@ -143,7 +141,7 @@ const deleteWebsiteBucket = async ({ s3, name }) => {
 module.exports = {
   getBucketName,
   bucketExists,
-  createWebsiteBucket,
+  updateBucket,
   uploadDir,
   deleteWebsiteBucket
 }
