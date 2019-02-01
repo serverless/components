@@ -161,7 +161,7 @@ class Socket extends Component {
       ws.close()
     })
 
-    if (inputs.cli !== 'false') {
+    if (inputs.cli !== 'false' && inputs.cli !== false) {
       ws.on('close', () => {
         this.cli.log('')
       })
