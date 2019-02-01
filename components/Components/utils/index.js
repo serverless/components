@@ -4,6 +4,7 @@ const logOutputs = require('./logOutputs')
 const parseJson = require('./parseJson')
 const parseYaml = require('./parseYaml')
 const prepareComponents = require('./prepareComponents')
+const resolveVariables = require('./resolveVariables')
 
 module.exports = {
   loadComponent,
@@ -11,5 +12,6 @@ module.exports = {
   logOutputs,
   parseJson,
   parseYaml,
-  prepareComponents
+  prepareComponents,
+  resolveVariables
 }

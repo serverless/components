@@ -1,10 +1,15 @@
-name: v2-test-application
+name: v2-test
 stage: dev
+tableName: ${name}-table-${stage}
 
 components:
   DynamoDB::v2TestTable:
-    name: v2-test-table
+    name: ${tableName}
     # NOTE: uncomment and re-run to update the component
     # provisionedThroughput:
     #   ReadCapacityUnits: 2
     #   WriteCapacityUnits: 2
+  Lambda::v2testLambda:
+    name: ${name}-lambda-${stage}
+    env:
+      DDB_TABLE: ${tableName}

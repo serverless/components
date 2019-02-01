@@ -1,7 +1,7 @@
 const { mergeDeep, append, reduce } = require('@serverless/utils')
 const Component = require('../Component/serverless')
 
-const { loadServerlessFile, prepareComponents, logOutputs } = require('./utils')
+const { loadServerlessFile, resolveVariables, prepareComponents, logOutputs } = require('./utils')
 
 const defaults = {
   path: process.cwd()
@@ -11,7 +11,9 @@ class Components extends Component {
   async default(inputs = {}) {
     const config = mergeDeep(defaults, inputs)
 
-    const fileContent = await loadServerlessFile(config.path)
+    let fileContent
+    fileContent = await loadServerlessFile(config.path)
+    fileContent = resolveVariables(fileContent)
     const preparedComponents = prepareComponents(fileContent.components)
 
     const numComponents = Object.keys(preparedComponents).length
@@ -40,7 +42,9 @@ class Components extends Component {
   async remove(inputs = {}) {
     const config = mergeDeep(defaults, inputs)
 
-    const fileContent = await loadServerlessFile(config.path)
+    let fileContent
+    fileContent = await loadServerlessFile(config.path)
+    fileContent = resolveVariables(fileContent)
     const preparedComponents = prepareComponents(fileContent.components)
 
     const numComponents = Object.keys(preparedComponents).length
