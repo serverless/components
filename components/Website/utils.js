@@ -11,9 +11,9 @@ const getBucketName = (websiteName) => {
   return websiteName
 }
 
-const bucketExists = async ({ s3, name }) => {
+const bucketExists = async ({ s3, bucketName }) => {
   try {
-    await s3.getBucketLocation({ Bucket: name }).promise()
+    await s3.getBucketLocation({ Bucket: bucketName }).promise()
   } catch (e) {
     if (e.code === 'NoSuchBucket') {
       return false
@@ -23,7 +23,7 @@ const bucketExists = async ({ s3, name }) => {
   return true
 }
 
-const configureWebsite = async ({ s3, name }) => {
+const configureWebsite = async ({ s3, bucketName }) => {
   const s3BucketPolicy = {
     Version: '2012-10-17',
     Statement: [
@@ -34,12 +34,12 @@ const configureWebsite = async ({ s3, name }) => {
           AWS: '*'
         },
         Action: ['s3:GetObject'],
-        Resource: [`arn:aws:s3:::${name}/*`]
+        Resource: [`arn:aws:s3:::${bucketName}/*`]
       }
     ]
   }
   const staticHostParams = {
-    Bucket: name,
+    Bucket: bucketName,
     WebsiteConfiguration: {
       ErrorDocument: {
         Key: 'error.html'
@@ -65,14 +65,14 @@ const configureWebsite = async ({ s3, name }) => {
 
   await s3
     .putBucketPolicy({
-      Bucket: name,
+      Bucket: bucketName,
       Policy: JSON.stringify(s3BucketPolicy)
     })
     .promise()
 
   await s3
     .putBucketCors({
-      Bucket: name,
+      Bucket: bucketName,
       CORSConfiguration: {
         CORSRules: [putPostDeleteHeadRule, getRule]
       }
@@ -82,7 +82,7 @@ const configureWebsite = async ({ s3, name }) => {
   await s3.putBucketWebsite(staticHostParams).promise()
 }
 
-const uploadDir = async ({ s3, name, assets }) => {
+const uploadDir = async ({ s3, bucketName, assets }) => {
   const items = await new Promise((resolve, reject) => {
     try {
       resolve(klawSync(assets))
@@ -98,7 +98,7 @@ const uploadDir = async ({ s3, name, assets }) => {
     }
 
     const itemParams = {
-      Bucket: name,
+      Bucket: bucketName,
       Key: path.relative(assets, item.path),
       Body: fs.readFileSync(item.path)
     }
@@ -116,21 +116,21 @@ const uploadDir = async ({ s3, name, assets }) => {
  * Delete Website Bucket
  */
 
-const deleteWebsiteBucket = async ({ s3, name }) => {
+const deleteWebsiteBucket = async ({ s3, bucketName }) => {
   try {
-    const data = await s3.listObjects({ Bucket: name }).promise()
+    const data = await s3.listObjects({ Bucket: bucketName }).promise()
 
     const items = data.Contents
     const promises = []
 
     for (var i = 0; i < items.length; i += 1) {
-      var deleteParams = { Bucket: name, Key: items[i].Key }
+      var deleteParams = { Bucket: bucketName, Key: items[i].Key }
       const delObj = s3.deleteObject(deleteParams).promise()
       promises.push(delObj)
     }
 
     await Promise.all(promises)
-    await s3.deleteBucket({ Bucket: name }).promise()
+    await s3.deleteBucket({ Bucket: bucketName }).promise()
   } catch (error) {
     if (error.code !== 'NoSuchBucket') {
       throw error

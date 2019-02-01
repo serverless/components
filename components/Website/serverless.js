@@ -25,18 +25,21 @@ class Website extends Component {
     const config = mergeDeep(defaults, inputs)
     const s3 = new aws.S3()
 
+    const nameChanged = this.state.name && this.state.name !== config.name
+
     // get a globally unique bucket name
     // based on the passed in name
-    config.name = this.state.name || getBucketName(config.name)
+    config.bucketName =
+      this.state.bucketName && !nameChanged ? this.state.bucketName : getBucketName(config.name)
     config.assets = path.resolve(config.code, config.assets)
 
     this.cli.status(`Deploying Website`)
 
     // if bucket already exists in my account, this call still succeeds!
     // if bucket name is unavailable, an error is thrown
-    await s3.createBucket({ Bucket: config.name }).promise()
+    await s3.createBucket({ Bucket: config.bucketName }).promise()
 
-    await configureWebsite({ s3, name: config.name }) // put policies
+    await configureWebsite({ s3, ...config }) // put policies
 
     // Include Environment Variables if they exist
     const envFileLocation = path.resolve(config.code, config.envFileLocation)
@@ -71,15 +74,15 @@ class Website extends Component {
     this.cli.status('Uploading Files')
     await uploadDir({ s3, ...config })
 
-    config.url = `http://${config.name}.s3-website-${config.region}.amazonaws.com`
+    config.url = `http://${config.bucketName}.s3-website-${config.region}.amazonaws.com`
 
-    // todo replace
-    // if (this.state.name && this.state.name !== originalName) {
-    //   this.cli.status(`Removing Previous Website`)
-    //   await deleteWebsiteBucket({ s3, name: this.state.name })
-    // }
+    if (nameChanged) {
+      this.cli.status(`Removing Previous Website`)
+      await deleteWebsiteBucket({ s3, ...config })
+    }
 
     this.state.name = config.name
+    this.state.bucketName = config.bucketName
     this.state.url = config.url
     this.save()
 
@@ -90,7 +93,7 @@ class Website extends Component {
   }
 
   async remove() {
-    if (!this.state.name) {
+    if (!this.state.bucketName) {
       this.cli.log('no website bucket name found in state.')
       return
     }
@@ -99,14 +102,12 @@ class Website extends Component {
 
     this.cli.status(`Removing Website`)
 
-    await deleteWebsiteBucket({ s3, name: this.state.name })
+    await deleteWebsiteBucket({ s3, ...this.state })
 
     this.state = {}
     this.save()
 
     this.cli.success(`Website Removed`)
-
-    return { name: this.state.name }
   }
 }
 

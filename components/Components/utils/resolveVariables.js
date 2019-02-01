@@ -13,7 +13,8 @@ function resolveVariables(content) {
   }
 
   let populated = stringified
-  forEach((match) => { // eslint-disable-line
+  forEach((match) => {
+    // eslint-disable-line
     const parts = match.split('.')
     const resolvedValue = reduce((accum, key) => accum[key], content, parts)
     const variableRegex = new RegExp('\\${' + match + '}', 'g')
