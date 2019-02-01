@@ -24,7 +24,7 @@
     "log-update": "^2.3.0",
     "mime-types": "^2.1.21",
     "minimist": "^1.2.0",
-    "shorthash": "0.0.2",
+    "shortid": "^2.2.14",
     "ws": "^6.1.2"
   },
   "devDependencies": {

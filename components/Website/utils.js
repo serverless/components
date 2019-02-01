@@ -2,11 +2,11 @@ const fs = require('fs')
 const path = require('path')
 const klawSync = require('klaw-sync')
 const mime = require('mime-types')
-const shorthash = require('shorthash')
+const shortid = require('shortid')
 
 const getBucketName = (websiteName) => {
   websiteName = websiteName.toLowerCase()
-  const bucketId = shorthash.unique(websiteName).toLowerCase()
+  const bucketId = shortid.generate().toLowerCase()
   websiteName = `${websiteName}-${bucketId}`
   return websiteName
 }
@@ -23,7 +23,7 @@ const bucketExists = async ({ s3, name }) => {
   return true
 }
 
-const updateBucket = async ({ s3, name }) => {
+const configureWebsite = async ({ s3, name }) => {
   const s3BucketPolicy = {
     Version: '2012-10-17',
     Statement: [
@@ -141,7 +141,7 @@ const deleteWebsiteBucket = async ({ s3, name }) => {
 module.exports = {
   getBucketName,
   bucketExists,
-  updateBucket,
+  configureWebsite,
   uploadDir,
   deleteWebsiteBucket
 }

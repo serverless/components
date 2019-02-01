@@ -114,6 +114,7 @@ module.exports.socket = (e, ctx, cb) => {
     id: connectionId,
     domain: domainName,
     stage,
+    log: (msg) => console.log(msg),
     send: (data, id = connectionId) => {
       const client = new AWS.ApiGatewayManagementApi({
         apiVersion: '2018-11-29',

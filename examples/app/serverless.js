@@ -51,9 +51,9 @@ class App extends Component {
     return outputs
   }
 
-  async connect() {
+  async connect(inputs = {}) {
     const realtimeApp = new RealtimeApp(`${this.id}.realtimeApp`)
-    await realtimeApp.connect()
+    return realtimeApp.connect(inputs)
   }
 }
 

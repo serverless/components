@@ -1,4 +1,4 @@
-const { mergeDeep, all } = require('../../src/utils')
+const { mergeDeep, all, getCli } = require('../../src/utils')
 
 const Component = require('../Component/serverless')
 const Socket = require('../Socket/serverless')
@@ -79,6 +79,11 @@ class RealtimeApp extends Component {
     this.cli.success('Realtime App Removed')
 
     return { website: websiteOutputs, socket: socketOutputs }
+  }
+
+  connect(inputs = {}) {
+    const socket = new Socket(`${this.id}.socket`, getCli(true)) // todo find a better way to config the cli
+    return socket.connect(inputs)
   }
 }
 

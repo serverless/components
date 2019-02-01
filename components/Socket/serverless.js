@@ -1,16 +1,24 @@
-const { resolve, join } = require('path')
+const { resolve } = require('path')
 const { prompt } = require('enquirer')
 const WebSocket = require('ws')
 const { chalk, sleep, fileExists } = require('../../src/utils')
 
 const Lambda = require('../Lambda/serverless')
 const WebSockets = require('../WebSockets/serverless')
-
 const Component = require('../Component/serverless')
+
+const isJson = (body) => {
+  try {
+    JSON.parse(body)
+  } catch (e) {
+    return false
+  }
+  return true
+}
 
 class Socket extends Component {
   async default(inputs = {}) {
-    const socketFilePath = join(inputs.code || process.cwd(), 'socket.js')
+    const socketFilePath = resolve(inputs.code || process.cwd(), 'socket.js')
     if (!(await fileExists(socketFilePath))) {
       this.cli.log('no socket.js file found in your codebase')
       return null
@@ -40,6 +48,7 @@ class Socket extends Component {
     const websocketsOutputs = await websockets(inputs)
 
     this.state.url = websocketsOutputs.url
+    this.state.socketFilePath = socketFilePath
     this.save()
 
     this.cli.success(`Socket Deployed`)
@@ -48,7 +57,7 @@ class Socket extends Component {
     return { lambda: lambdaOutputs, websockets: websocketsOutputs }
   }
 
-  async remove(inputs = {}) {
+  async remove() {
     this.cli.status(`Removing Socket`)
 
     const lambda = new Lambda(`${this.id}.lambda`)
@@ -69,20 +78,10 @@ class Socket extends Component {
    *   /!!\ CAUTION: Shitty code ahead :)
    *  /_!!_\
    */
-  async connect(inputs = {}) {
+  connect(inputs = {}) {
     // todo clean this up!
-    const isJson = (body) => {
-      try {
-        JSON.parse(body)
-      } catch (e) {
-        return false
-      }
-      return true
-    }
     const url = inputs.local ? 'ws://localhost:8080' : this.state.url || 'ws://localhost:8080'
     const prefix = inputs.route ? ` ${inputs.route}` : ` default`
-
-    let wss
 
     // START LOCAL SERVER
     const wss = new WebSocket.Server({ port: 8080 })
@@ -107,7 +106,8 @@ class Socket extends Component {
         }
       }
 
-      const socketFilePath = resolve(join(inputs.code || process.cwd(), 'socket.js'))
+      const socketFilePath =
+        this.state.socketFilePath || resolve(inputs.code || process.cwd(), 'socket.js')
 
       // we need to collect all defined routes in socket.js
       // first before running their functions to check defined routes
@@ -151,6 +151,9 @@ class Socket extends Component {
 
     const ws = new WebSocket(url)
 
+    this.cli.success('Connected')
+    this.cli.output('URL', `    ${url}`)
+
     // todo there's def a better way to handle this!
     process.on('unhandledRejection', (e) => {
       console.log(e)
@@ -158,64 +161,65 @@ class Socket extends Component {
       ws.close()
     })
 
-    ws.on('close', () => {
-      this.cli.log('')
-    })
-
-    ws.on('error', (e) => {
-      this.cli.status(e, 'red')
-      this.cli.log('')
-      ws.close()
-      wss.close()
-    })
-
-    ws.on('open', async () => {
-      this.cli.success('Connected')
-      this.cli.output('URL', `    ${url}`)
-
-      // for some weird reason, there's an extra upper
-      // space when connecting remotely!
-      if (url !== 'ws://localhost:8080') {
+    if (inputs.cli !== 'false') {
+      ws.on('close', () => {
         this.cli.log('')
-        this.cli.log('')
-      }
-
-      await sleep(10) // I need to do this to refresh prompt
-      const response = await prompt({
-        type: 'input',
-        name: 'data',
-        message: prefix
       })
-      if (response.data === 'exit') {
+
+      ws.on('error', (e) => {
+        this.cli.status(e, 'red')
+        this.cli.log('')
         ws.close()
         wss.close()
-      } else {
-        let body = response.data
-        if (inputs.route) {
-          body = JSON.stringify({ route: inputs.route, data: response.data })
-        }
-        ws.send(body)
-      }
-    })
-
-    ws.on('message', async (data) => {
-      this.cli.log(`${data}`)
-      const response = await prompt({
-        type: 'input',
-        name: 'data',
-        message: prefix
       })
-      if (response.data === 'exit') {
-        ws.close()
-        wss.close()
-      } else {
-        let body = response.data
-        if (inputs.route) {
-          body = JSON.stringify({ route: inputs.route, data: response.data })
+
+      ws.on('open', async () => {
+        // for some weird reason, there's an extra upper
+        // space when connecting remotely!
+        if (url !== 'ws://localhost:8080') {
+          // this.cli.log('')
+          // this.cli.log('')
         }
-        ws.send(body)
-      }
-    })
+
+        await sleep(10) // I need to do this to refresh prompt
+        const response = await prompt({
+          type: 'input',
+          name: 'data',
+          message: prefix
+        })
+        if (response.data === 'exit') {
+          ws.close()
+          wss.close()
+        } else {
+          let body = response.data
+          if (inputs.route) {
+            body = JSON.stringify({ route: inputs.route, data: response.data })
+          }
+          ws.send(body)
+        }
+      })
+
+      ws.on('message', async (data) => {
+        this.cli.log(`${data}`)
+        const response = await prompt({
+          type: 'input',
+          name: 'data',
+          message: prefix
+        })
+        if (response.data === 'exit') {
+          ws.close()
+          wss.close()
+        } else {
+          let body = response.data
+          if (inputs.route) {
+            body = JSON.stringify({ route: inputs.route, data: response.data })
+          }
+          ws.send(body)
+        }
+      })
+    }
+
+    return ws
   }
 }
 

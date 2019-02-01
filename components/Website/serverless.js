@@ -4,7 +4,7 @@ const path = require('path')
 const { execSync } = require('child_process')
 const { pick, isEmpty, mergeDeep } = require('../../src/utils')
 
-const { getBucketName, uploadDir, deleteWebsiteBucket } = require('./utils')
+const { getBucketName, uploadDir, deleteWebsiteBucket, configureWebsite } = require('./utils')
 
 const Component = require('../Component/serverless')
 
@@ -25,11 +25,9 @@ class Website extends Component {
     const config = mergeDeep(defaults, inputs)
     const s3 = new aws.S3()
 
-    const originalName = config.name // we need to save it to state later
-
     // get a globally unique bucket name
     // based on the passed in name
-    config.name = getBucketName(config.name)
+    config.name = this.state.name || getBucketName(config.name)
     config.assets = path.resolve(config.code, config.assets)
 
     this.cli.status(`Deploying Website`)
@@ -37,6 +35,8 @@ class Website extends Component {
     // if bucket already exists in my account, this call still succeeds!
     // if bucket name is unavailable, an error is thrown
     await s3.createBucket({ Bucket: config.name }).promise()
+
+    await configureWebsite({ s3, name: config.name }) // put policies
 
     // Include Environment Variables if they exist
     const envFileLocation = path.resolve(config.code, config.envFileLocation)
@@ -73,12 +73,13 @@ class Website extends Component {
 
     config.url = `http://${config.name}.s3-website-${config.region}.amazonaws.com`
 
-    if (this.state.name && this.state.name !== originalName) {
-      this.cli.status(`Removing Previous Website`)
-      await deleteWebsiteBucket({ s3, name: this.state.name })
-    }
+    // todo replace
+    // if (this.state.name && this.state.name !== originalName) {
+    //   this.cli.status(`Removing Previous Website`)
+    //   await deleteWebsiteBucket({ s3, name: this.state.name })
+    // }
 
-    this.state.name = originalName
+    this.state.name = config.name
     this.state.url = config.url
     this.save()
 
@@ -88,24 +89,24 @@ class Website extends Component {
     return pick(outputs, config)
   }
 
-  async remove(inputs = {}) {
-    const config = mergeDeep(defaults, inputs)
-    config.name = inputs.name || this.state.name || defaults.name
-
-    config.name = getBucketName(config.name)
+  async remove() {
+    if (!this.state.name) {
+      this.cli.log('no website bucket name found in state.')
+      return
+    }
 
     const s3 = new aws.S3()
 
     this.cli.status(`Removing Website`)
 
-    await deleteWebsiteBucket({ s3, ...config })
+    await deleteWebsiteBucket({ s3, name: this.state.name })
 
     this.state = {}
     this.save()
 
     this.cli.success(`Website Removed`)
 
-    return pick(outputs, config)
+    return { name: this.state.name }
   }
 }
 
