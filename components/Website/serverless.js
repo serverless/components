@@ -78,7 +78,7 @@ class Website extends Component {
 
     if (nameChanged) {
       this.cli.status(`Removing Previous Website`)
-      await deleteWebsiteBucket({ s3, ...config })
+      await deleteWebsiteBucket({ s3, ...this.state })
     }
 
     this.state.name = config.name
