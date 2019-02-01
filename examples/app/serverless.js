@@ -53,7 +53,7 @@ class App extends Component {
 
   async connect(inputs = {}) {
     const realtimeApp = new RealtimeApp(`${this.id}.realtimeApp`)
-    return realtimeApp.connect(inputs)
+    return realtimeApp.connect({ code: './backend', ...inputs })
   }
 }
 
