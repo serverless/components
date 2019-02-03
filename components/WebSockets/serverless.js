@@ -29,8 +29,8 @@ const defaults = {
 class WebSockets extends Component {
   async default(inputs = {}) {
     const config = mergeDeep(defaults, inputs)
-    const apig2 = new aws.ApiGatewayV2()
-    const lambda = new aws.Lambda()
+    const apig2 = new aws.ApiGatewayV2(config)
+    const lambda = new aws.Lambda(config)
 
     config.id = await getApiId({ apig2, id: config.id || this.state.id }) // validate with provider
 
@@ -95,7 +95,7 @@ class WebSockets extends Component {
   async remove(inputs = {}) {
     const config = { ...defaults, ...inputs }
     config.id = config.id || this.state.id
-    const apig2 = new aws.ApiGatewayV2()
+    const apig2 = new aws.ApiGatewayV2(config)
 
     if (config.id) {
       this.cli.status(`Removing WebSockets`)

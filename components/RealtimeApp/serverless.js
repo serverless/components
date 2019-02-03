@@ -48,17 +48,16 @@ class RealtimeApp extends Component {
     const website = new Website(`${this.id}.website`)
     const socket = new Socket(`${this.id}.socket`)
 
-    // deploy in parallel like a boss!
-    const outputs = await all([website(config.frontend), socket(config.backend)])
-    const websiteOutputs = outputs[0]
-    const socketOutputs = outputs[1]
+    const socketOutputs = await socket(config.backend)
+    config.frontend.env.api_url = socketOutputs.websockets.url // pass backend url to frontend
+    const websiteOutputs = await website(config.frontend)
+
+    // this high level component doesn't need to save any state!
 
     this.cli.success('Realtime App Deployed')
     this.cli.log('')
     this.cli.output('Socket URL', ` ${socketOutputs.websockets.url}`)
     this.cli.output('Website URL', `${websiteOutputs.url}`)
-
-    // this high level component doesn't need to save any state!
 
     return { website: websiteOutputs, socket: socketOutputs }
   }

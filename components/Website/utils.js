@@ -2,11 +2,12 @@ const fs = require('fs')
 const path = require('path')
 const klawSync = require('klaw-sync')
 const mime = require('mime-types')
-const shortid = require('shortid')
 
 const getBucketName = (websiteName) => {
   websiteName = websiteName.toLowerCase()
-  const bucketId = shortid.generate().toLowerCase()
+  const bucketId = Math.random()
+    .toString(36)
+    .substring(6)
   websiteName = `${websiteName}-${bucketId}`
   return websiteName
 }

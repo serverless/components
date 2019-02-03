@@ -26,7 +26,7 @@ const defaults = {
 class Role extends Component {
   async default(inputs = {}) {
     const config = mergeDeep(defaults, inputs)
-    const iam = new aws.IAM(inputs)
+    const iam = new aws.IAM(config)
 
     const prevRole = await getRole({ iam, ...config })
 
@@ -71,7 +71,7 @@ class Role extends Component {
     const config = mergeDeep(defaults, inputs)
     config.name = inputs.name || this.state.name || defaults.name
 
-    const iam = new aws.IAM(inputs)
+    const iam = new aws.IAM(config)
     this.cli.status(`Removing Role`)
     await deleteRole({ iam, ...config })
 

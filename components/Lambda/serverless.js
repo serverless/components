@@ -42,7 +42,7 @@ class Lambda extends Component {
   async default(inputs = {}) {
     const config = mergeDeep(defaults, inputs)
 
-    const lambda = new aws.Lambda()
+    const lambda = new aws.Lambda(config)
     const role = new Role(`${this.id}.role`)
 
     config.role = config.role || (await role(config))
@@ -90,7 +90,7 @@ class Lambda extends Component {
   async remove(inputs = {}) {
     const config = mergeDeep(defaults, inputs)
     config.name = inputs.name || this.state.name || defaults.name
-    const lambda = new aws.Lambda()
+    const lambda = new aws.Lambda(config)
 
     this.cli.status(`Removing Lambda`)
 

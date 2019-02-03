@@ -1,8 +1,7 @@
 const aws = require('aws-sdk')
-const fs = require('fs')
 const path = require('path')
 const { execSync } = require('child_process')
-const { pick, isEmpty, mergeDeep } = require('../../src/utils')
+const { pick, isEmpty, mergeDeep, writeFile } = require('../../src/utils')
 
 const { getBucketName, uploadDir, deleteWebsiteBucket, configureWebsite } = require('./utils')
 
@@ -23,7 +22,7 @@ const defaults = {
 class Website extends Component {
   async default(inputs = {}) {
     const config = mergeDeep(defaults, inputs)
-    const s3 = new aws.S3()
+    const s3 = new aws.S3(config)
 
     const nameChanged = this.state.name && this.state.name !== config.name
 
@@ -44,7 +43,7 @@ class Website extends Component {
     // Include Environment Variables if they exist
     const envFileLocation = path.resolve(config.code, config.envFileLocation)
 
-    if (!isEmpty(config.env)) {
+    if (!isEmpty(config.env) && config.buildCmd) {
       let script = 'export const env = {\n'
       for (const e in config.env) {
         // eslint-disable-line
@@ -52,7 +51,7 @@ class Website extends Component {
       }
       script += '}'
 
-      fs.writeFileSync(envFileLocation, script)
+      await writeFile(envFileLocation, script)
     }
 
     if (config.buildCmd) {
@@ -92,13 +91,13 @@ class Website extends Component {
     return pick(outputs, config)
   }
 
-  async remove() {
+  async remove(inputs) {
     if (!this.state.bucketName) {
       this.cli.log('no website bucket name found in state.')
       return
     }
 
-    const s3 = new aws.S3()
+    const s3 = new aws.S3(inputs)
 
     this.cli.status(`Removing Website`)
 
