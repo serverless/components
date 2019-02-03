@@ -1,5 +1,5 @@
 const aws = require('aws-sdk')
-const { mergeDeep, pick } = require('../../src/utils')
+const { mergeDeepRight, pick } = require('../../src/utils')
 const Component = require('../Component/serverless')
 const Role = require('../Role/serverless')
 const {
@@ -40,7 +40,7 @@ const defaults = {
 
 class Lambda extends Component {
   async default(inputs = {}) {
-    const config = mergeDeep(defaults, inputs)
+    const config = mergeDeepRight(defaults, inputs)
 
     const lambda = new aws.Lambda(config)
     const role = new Role(`${this.id}.role`)
@@ -88,7 +88,7 @@ class Lambda extends Component {
   }
 
   async remove(inputs = {}) {
-    const config = mergeDeep(defaults, inputs)
+    const config = mergeDeepRight(defaults, inputs)
     config.name = inputs.name || this.state.name || defaults.name
     const lambda = new aws.Lambda(config)
 

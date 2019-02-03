@@ -1,5 +1,3 @@
-const { map, all, filter } = require('../../src/utils')
-
 const getApiId = async ({ apig2, id }) => {
   if (!id) {
     return null
@@ -101,12 +99,11 @@ const createRoute = async ({ apig2, id, integrationId, route }) => {
 const removeRoutes = async ({ apig2, id, routes }) => {
   const res = await apig2.getRoutes({ ApiId: id }).promise()
 
-  const routeIds = filter((route) => routes.includes(route.RouteKey), res.Items).map(
+  const routeIds = res.Items.filter((route) => routes.includes(route.RouteKey)).map(
     (route) => route.RouteId
   )
-
-  return all(
-    map((routeId) => apig2.deleteRoute({ ApiId: id, RouteId: routeId }).promise(), routeIds)
+  return Promise.all(
+    routeIds.map((routeId) => apig2.deleteRoute({ ApiId: id, RouteId: routeId }).promise())
   )
 }
 

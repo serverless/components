@@ -2,7 +2,23 @@ const { tmpdir } = require('os')
 const crypto = require('crypto')
 const path = require('path')
 const { readFileSync } = require('fs')
-const { equals, isArchivePath, not, packDir, pick } = require('../../src/utils')
+const { equals, not, packDir, pick, is, endsWith } = require('../../src/utils')
+
+const isArchivePath = (filePath) => {
+  if (!is(String, filePath)) {
+    return false
+  }
+
+  return (
+    endsWith('.zip', filePath) ||
+    endsWith('.jar', filePath) ||
+    endsWith('.tar', filePath) ||
+    endsWith('.rar', filePath) ||
+    endsWith('.gz', filePath) ||
+    endsWith('.bz2', filePath) ||
+    endsWith('.7z', filePath)
+  )
+}
 
 const getAccountId = async (aws) => {
   const STS = new aws.STS()

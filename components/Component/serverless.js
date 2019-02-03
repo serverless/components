@@ -1,4 +1,4 @@
-const { getCli, readState, writeState, forEach } = require('../../src/utils/')
+const { getCli, readState, writeState } = require('../../src/utils/')
 
 class Component {
   constructor(id = this.constructor.name, cli = getCli()) {
@@ -16,20 +16,21 @@ class Component {
 
     // add Component class methods like the save() method
     const classMethods = Object.getOwnPropertyNames(Component.prototype)
-    forEach((classMethod) => {
+
+    classMethods.forEach((classMethod) => {
       defaultFunction[classMethod] = (classMethodInputs) =>
         this[classMethod].call(that, classMethodInputs) // apply instance context
-    }, classMethods)
+    })
 
     // add instance methods
     // those are the methods of the class that extends Component
     // if user added his own save() method for example,
     // this would overwrite the Component class save() method
     const instanceMethods = Object.getOwnPropertyNames(Object.getPrototypeOf(this))
-    forEach((instanceMethod) => {
+    instanceMethods.forEach((instanceMethod) => {
       defaultFunction[instanceMethod] = (instanceMethodInputs) =>
         this[instanceMethod].call(that, instanceMethodInputs) // apply instance context
-    }, instanceMethods)
+    })
 
     return defaultFunction
   }

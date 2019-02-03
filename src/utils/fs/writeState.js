@@ -1,5 +1,5 @@
 const path = require('path')
-const { writeFile } = require('@serverless/utils')
+const writeFile = require('./writeFile')
 
 const writeState = async (id, state = {}) => {
   const stateFilePath = path.join(process.cwd(), '.serverless', `${id}.json`)

@@ -1,5 +1,5 @@
 const aws = require('aws-sdk')
-const { pick, mergeDeep, filter, keys, not, map, all } = require('../../src/utils')
+const { pick, mergeDeepRight, not } = require('../../src/utils')
 const {
   getApiId,
   createApi,
@@ -28,13 +28,13 @@ const defaults = {
 
 class WebSockets extends Component {
   async default(inputs = {}) {
-    const config = mergeDeep(defaults, inputs)
+    const config = mergeDeepRight(defaults, inputs)
     const apig2 = new aws.ApiGatewayV2(config)
     const lambda = new aws.Lambda(config)
 
     config.id = await getApiId({ apig2, id: config.id || this.state.id }) // validate with provider
 
-    const definedRoutes = keys(config.routes || {})
+    const definedRoutes = Object.keys(config.routes || {})
     const providerRoutes = await getRoutes({ apig2, id: config.id })
 
     if (!config.id) {
@@ -45,18 +45,17 @@ class WebSockets extends Component {
       await updateApi({ apig2, ...config })
     }
 
-    const routesToDeploy = filter((route) => not(providerRoutes.includes(route)), definedRoutes)
-    const routesToRemove = filter((route) => not(definedRoutes.includes(route)), providerRoutes)
+    const routesToDeploy = definedRoutes.filter((route) => not(providerRoutes.includes(route)))
+    const routesToRemove = providerRoutes.filter((route) => not(definedRoutes.includes(route)))
 
     this.cli.status(`Updating Routes`)
 
-    // deploy defined routes that does not exist in provider
-    await all(
-      map(async (route) => {
+    await Promise.all(
+      routesToDeploy.map(async (route) => {
         const arn = config.routes[route]
         const integrationId = await createIntegration({ apig2, lambda, id: config.id, arn })
         await createRoute({ apig2, id: config.id, integrationId, route })
-      }, routesToDeploy)
+      })
     )
 
     // remove routes that don't exist in inputs
@@ -87,7 +86,8 @@ class WebSockets extends Component {
     this.cli.output('Expression', ` ${config.routeSelectionExpression}`)
     this.cli.output('URL', `        ${config.url}`)
     this.cli.output('Routes', '')
-    keys(config.routes).forEach((route) => this.cli.log(`  - ${route}`))
+
+    Object.keys(config.routes).forEach((route) => this.cli.log(`  - ${route}`))
 
     return pick(outputs, config)
   }

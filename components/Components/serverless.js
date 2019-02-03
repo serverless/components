@@ -1,4 +1,4 @@
-const { mergeDeep, append, reduce } = require('@serverless/utils')
+const { mergeDeepRight, append, reduce } = require('../../src/utils')
 const Component = require('../Component/serverless')
 
 const { loadServerlessFile, resolveVariables, prepareComponents, logOutputs } = require('./utils')
@@ -9,7 +9,7 @@ const defaults = {
 
 class Components extends Component {
   async default(inputs = {}) {
-    const config = mergeDeep(defaults, inputs)
+    const config = mergeDeepRight(defaults, inputs)
 
     let fileContent
     fileContent = await loadServerlessFile(config.path)
@@ -40,7 +40,7 @@ class Components extends Component {
   }
 
   async remove(inputs = {}) {
-    const config = mergeDeep(defaults, inputs)
+    const config = mergeDeepRight(defaults, inputs)
 
     let fileContent
     fileContent = await loadServerlessFile(config.path)

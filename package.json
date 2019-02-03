@@ -16,18 +16,22 @@
   "author": "Serverless, Inc.",
   "license": "MIT",
   "dependencies": {
-    "@serverless/utils": "0.0.20",
     "ansi-escapes": "^3.2.0",
+    "archiver": "^3.0.0",
     "aws-sdk": "^2.387.0",
     "chalk": "^2.4.2",
     "enquirer": "^2.3.0",
+    "fs-extra": "^7.0.1",
+    "js-yaml": "^3.12.1",
     "klaw-sync": "^6.0.0",
     "log-update": "^2.3.0",
     "mime-types": "^2.1.21",
     "minimist": "^1.2.0",
+    "ramda": "^0.26.1",
     "ws": "^6.1.2"
   },
   "devDependencies": {
+    "babel-eslint": "^10.0.1",
     "eslint": "^5.12.1",
     "eslint-config-prettier": "^3.6.0",
     "eslint-plugin-import": "^2.14.0",

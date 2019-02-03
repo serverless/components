@@ -1,6 +1,6 @@
 const path = require('path')
 const argv = require('minimist')(process.argv.slice(2))
-const { fileExists } = require('@serverless/utils')
+const fileExists = require('./fs/fileExists')
 const getCli = require('./getCli')
 const components = require('../../components')
 

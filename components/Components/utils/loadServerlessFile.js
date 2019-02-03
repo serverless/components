@@ -1,5 +1,5 @@
 const { join } = require('path')
-const { fileExists } = require('@serverless/utils')
+const { fileExists } = require('../../../src/utils')
 const parseYaml = require('./parseYaml')
 const parseJson = require('./parseJson')
 

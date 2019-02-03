@@ -1,4 +1,4 @@
-const { readFile } = require('@serverless/utils')
+const { readFile } = require('../../../src/utils')
 
 async function parseJson(filePath) {
   // TODO: replace with plain logic when @serverless/utils is removed

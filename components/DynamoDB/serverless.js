@@ -1,4 +1,4 @@
-const { mergeDeep, pick, equals } = require('../../src/utils')
+const { mergeDeepRight, pick, equals } = require('../../src/utils')
 const AWS = require('aws-sdk')
 
 const { createTable, deleteTable, describeTable, updateTable, configChanged } = require('./utils')
@@ -29,7 +29,7 @@ const defaults = {
 
 class DynamoDB extends Component {
   async default(inputs = {}) {
-    const config = mergeDeep(defaults, inputs)
+    const config = mergeDeepRight(defaults, inputs)
     const dynamodb = new AWS.DynamoDB()
 
     const prevTable = await describeTable({ dynamodb, name: this.state.name || null })
@@ -65,7 +65,7 @@ class DynamoDB extends Component {
   }
 
   async remove(inputs = {}) {
-    const config = mergeDeep(defaults, inputs)
+    const config = mergeDeepRight(defaults, inputs)
     config.name = inputs.name || this.state.name || defaults.name
 
     const dynamodb = new AWS.DynamoDB()

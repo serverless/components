@@ -1,4 +1,4 @@
-const { assoc, reduce, addIndex } = require('@serverless/utils')
+const { assoc, reduce, addIndex } = require('../../../src/utils')
 const loadComponent = require('./loadComponent')
 
 const reduceIndexed = addIndex(reduce)

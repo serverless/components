@@ -1,4 +1,4 @@
-const { forEach, reduce, union } = require('@serverless/utils')
+const { forEach, reduce, union } = require('../../../src/utils')
 
 function resolveVariables(content) {
   const stringified = JSON.stringify(content)

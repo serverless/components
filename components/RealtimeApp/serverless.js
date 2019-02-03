@@ -1,4 +1,4 @@
-const { mergeDeep, all, getCli } = require('../../src/utils')
+const { mergeDeepRight, getCli } = require('../../src/utils')
 
 const Component = require('../Component/serverless')
 const Socket = require('../Socket/serverless')
@@ -26,7 +26,7 @@ const getConfig = (inputs) => {
     }
   }
 
-  const config = mergeDeep(defaults, inputs)
+  const config = mergeDeepRight(defaults, inputs)
 
   config.backend.name = `${config.name}-${config.stage}`
   config.backend.description = config.description
@@ -70,7 +70,7 @@ class RealtimeApp extends Component {
     const website = new Website(`${this.id}.website`)
     const socket = new Socket(`${this.id}.socket`)
 
-    const outputs = await all([website.remove(), socket.remove()])
+    const outputs = await Promise.all([website.remove(), socket.remove()])
 
     const websiteOutputs = outputs[0]
     const socketOutputs = outputs[1]

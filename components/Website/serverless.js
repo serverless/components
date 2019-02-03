@@ -1,7 +1,7 @@
 const aws = require('aws-sdk')
 const path = require('path')
 const { execSync } = require('child_process')
-const { pick, isEmpty, mergeDeep, writeFile } = require('../../src/utils')
+const { pick, isEmpty, mergeDeepRight, writeFile } = require('../../src/utils')
 
 const { getBucketName, uploadDir, deleteWebsiteBucket, configureWebsite } = require('./utils')
 
@@ -21,7 +21,7 @@ const defaults = {
 
 class Website extends Component {
   async default(inputs = {}) {
-    const config = mergeDeep(defaults, inputs)
+    const config = mergeDeepRight(defaults, inputs)
     const s3 = new aws.S3(config)
 
     const nameChanged = this.state.name && this.state.name !== config.name

@@ -1,19 +1,19 @@
 const chalk = require('chalk')
-const utils = require('@serverless/utils')
+const ramda = require('ramda')
 
 // we don't export run.js here because it has a dependency
 // on the components directory, which has dependency on
 // this utils directory...causing circular dependency
+const fs = require('./fs')
+const sleep = require('./sleep')
 const getCli = require('./getCli')
-const readState = require('./readState')
 const titelize = require('./titelize')
-const writeState = require('./writeState')
 
 module.exports = {
-  ...utils,
+  ...ramda,
+  ...fs,
+  sleep,
   getCli,
-  readState,
-  writeState,
   titelize,
   chalk
 }

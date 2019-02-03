@@ -1,5 +1,4 @@
-const { forEach } = require('@serverless/utils')
-const { titelize } = require('../../../src/utils')
+const { titelize, forEach } = require('../../../src/utils')
 
 function logOutputs(cli, outputs) {
   if (outputs && outputs[0]) {

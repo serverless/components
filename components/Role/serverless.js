@@ -1,4 +1,4 @@
-const { equals, pick, mergeDeep } = require('../../src/utils')
+const { equals, pick, mergeDeepRight } = require('../../src/utils')
 const aws = require('aws-sdk')
 
 const {
@@ -25,7 +25,7 @@ const defaults = {
 
 class Role extends Component {
   async default(inputs = {}) {
-    const config = mergeDeep(defaults, inputs)
+    const config = mergeDeepRight(defaults, inputs)
     const iam = new aws.IAM(config)
 
     const prevRole = await getRole({ iam, ...config })
@@ -68,7 +68,7 @@ class Role extends Component {
   }
 
   async remove(inputs = {}) {
-    const config = mergeDeep(defaults, inputs)
+    const config = mergeDeepRight(defaults, inputs)
     config.name = inputs.name || this.state.name || defaults.name
 
     const iam = new aws.IAM(config)
