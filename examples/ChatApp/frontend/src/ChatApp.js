@@ -38,7 +38,7 @@ class ChatApp extends Component {
 
     // Establish WebSocket Connection
     // TODO: Replace WSS URL with ENV Var
-    this.wsClient = new WebSocket('wss://81x4hwe5m6.execute-api.us-east-1.amazonaws.com/dev/')
+    this.wsClient = new WebSocket('wss://55oun37rai.execute-api.us-east-1.amazonaws.com/dev/')
 
     // On Connection Established...
     this.wsClient.addEventListener('open', function (event) {
