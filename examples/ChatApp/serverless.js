@@ -43,8 +43,8 @@ class ChatApp extends Component {
     // 4. Customize your CLI experience
     this.cli.success('ChatApp Deployed')
     this.cli.log('')
-    this.cli.output('Socket URL', ` ${outputs.socket.websockets.url}`)
-    this.cli.output('Website URL', `${outputs.website.url}`)
+    this.cli.output('URL', `${outputs.website.url}`)
+    this.cli.output('Websocket URL', ` ${outputs.socket.websockets.url}`)
 
     return outputs
   }
