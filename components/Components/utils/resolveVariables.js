@@ -1,27 +1,32 @@
-const { forEach, reduce, union } = require('../../../src/utils')
+const { forEach, reduce, uniq } = require('../../../src/utils')
 
-function resolveVariables(content) {
-  const stringified = JSON.stringify(content)
+function getMatches(string) {
   const variablesRegex = /\${([\w\d.]+)}/g
 
-  let match
-  let matches = []
-  while ((match = variablesRegex.exec(stringified))) {
-    const variableValue = match[1]
-    // using `union` here to filter out duplicates
-    matches = union([variableValue], matches)
+  let matches = string.match(variablesRegex)
+  if (matches) {
+    matches = uniq(matches)
+  }
+  return matches
+}
+
+function resolveVariables(content) {
+  let stringified = JSON.stringify(content)
+  let matches = getMatches(stringified)
+
+  while (matches) {
+    // eslint-disable-next-line
+    forEach((match) => {
+      match = match.slice(2, -1) // remove `${` and `}` from matches to get the variables value
+      const parts = match.split('.')
+      const resolvedValue = reduce((accum, key) => accum[key], content, parts)
+      const variableRegex = new RegExp('\\${' + match + '}', 'g')
+      stringified = stringified.replace(variableRegex, resolvedValue)
+    }, matches)
+    matches = getMatches(stringified)
   }
 
-  let populated = stringified
-  // eslint-disable-next-line
-  forEach((match) => {
-    const parts = match.split('.')
-    const resolvedValue = reduce((accum, key) => accum[key], content, parts)
-    const variableRegex = new RegExp('\\${' + match + '}', 'g')
-    populated = populated.replace(variableRegex, resolvedValue)
-  }, matches)
-
-  return JSON.parse(populated)
+  return JSON.parse(stringified)
 }
 
 module.exports = resolveVariables
