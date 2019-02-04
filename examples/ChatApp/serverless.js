@@ -1,9 +1,20 @@
+/*
+* Component – ChatApp
+*/
+
+const { execSync } = require('child_process')
 const Component = require('../../components/Component/serverless')
 const RealtimeApp = require('../../components/RealtimeApp/serverless')
 
-class App extends Component {
+class ChatApp extends Component {
+
+  /*
+  * Default
+  */
+
   async default() {
-    this.cli.status('Deploying My App')
+
+    this.cli.status(`Deploying ChatApp`)
 
     // 1. define your inputs
     const inputs = {
@@ -11,11 +22,12 @@ class App extends Component {
       stage: 'dev',
       description: 'My App',
       frontend: {
-        code: './frontend',
+        code: './frontend/build',
         assets: '.',
         envFileLocation: './src/env.js',
         env: {},
-        buildCmd: null
+        buildCmd: 'npm run build',
+        localCmd: 'npm run start',
       },
       backend: {
         code: './backend',
@@ -25,14 +37,11 @@ class App extends Component {
       }
     }
 
-    // 2. Init the component(s)
     const realtimeApp = new RealtimeApp(`${this.id}.realtimeApp`)
-
-    // 3. Run the component(s)
     const outputs = await realtimeApp(inputs)
 
     // 4. Customize your CLI experience
-    this.cli.success('My App Deployed')
+    this.cli.success('ChatApp Deployed')
     this.cli.log('')
     this.cli.output('Socket URL', ` ${outputs.socket.websockets.url}`)
     this.cli.output('Website URL', `${outputs.website.url}`)
@@ -40,13 +49,17 @@ class App extends Component {
     return outputs
   }
 
+  /*
+  * Remove
+  */
+
   async remove() {
-    this.cli.status('Removing My App')
+    this.cli.status('Removing ChatApp')
 
     const realtimeApp = new RealtimeApp(`${this.id}.realtimeApp`)
     const outputs = await realtimeApp.remove()
 
-    this.cli.success('My App Removed')
+    this.cli.success('ChatApp Removed')
 
     return outputs
   }
@@ -55,6 +68,19 @@ class App extends Component {
     const realtimeApp = new RealtimeApp(`${this.id}.realtimeApp`)
     return realtimeApp.connect({ code: './backend', ...inputs })
   }
+
+  /*
+  * Local
+  * TODO: Finish
+  */
+
+  async local(inputs = {}) {
+    const realtimeApp = new RealtimeApp(`${this.id}.realtimeApp`)
+    return realtimeApp.local({
+      assets: './frontend',
+      cmdLocal: 'npm run start',
+    })
+  }
 }
 
-module.exports = App
+module.exports = ChatApp

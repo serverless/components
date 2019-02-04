@@ -1,10 +1,18 @@
-const { mergeDeepRight, getCli } = require('../../src/utils')
+/*
+* Component – RealtimeApp
+*/
 
+const { mergeDeepRight, getCli } = require('../../src/utils')
+const { execSync } = require('child_process')
 const Component = require('../Component/serverless')
 const Socket = require('../Socket/serverless')
 const Website = require('../Website/serverless')
 
-// private helper functionn
+/*
+* Get Config
+* - Merges configuration with defaults
+*/
+
 const getConfig = (inputs) => {
   const defaults = {
     name: 'realtimeApp',
@@ -16,7 +24,8 @@ const getConfig = (inputs) => {
       assets: '.',
       envFileLocation: './src/env.js',
       env: {},
-      buildCmd: null
+      buildCmd: null,
+      localCmd: null,
     },
     backend: {
       code: './backend',
@@ -41,6 +50,11 @@ const getConfig = (inputs) => {
 }
 
 class RealtimeApp extends Component {
+
+  /*
+  * Default
+  */
+
   async default(inputs = {}) {
     this.cli.status('Deploying Realtime App')
     const config = getConfig(inputs)
@@ -62,6 +76,10 @@ class RealtimeApp extends Component {
     return { website: websiteOutputs, socket: socketOutputs }
   }
 
+  /*
+  * Remove
+  */
+
   async remove() {
     // this remove function just calls remove on the child components
     // it doesn't even need any inputs at all since all is available in children state!
@@ -80,9 +98,34 @@ class RealtimeApp extends Component {
     return { website: websiteOutputs, socket: socketOutputs }
   }
 
+  /*
+  * Connect
+  */
+
   connect(inputs = {}) {
     const socket = new Socket(`${this.id}.socket`, getCli(true)) // todo find a better way to config the cli
     return socket.connect(inputs)
+  }
+
+  /*
+  * Local
+  */
+
+  local(inputs) {
+    console.log(inputs)
+    this.cli.status('Starting App Locally...')
+    execSync(
+      inputs.localCmd,
+      {
+        cwd: inputs.assets,
+      },
+      (error, stdErr) => {
+        if (error) {
+          console.error(stdErr) // eslint-disable-line no-console
+          throw new Error(error)
+        }
+      }
+    )
   }
 }
 
