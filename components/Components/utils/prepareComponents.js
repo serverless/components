@@ -17,8 +17,9 @@ function mockCli() {
 }
 
 function prepareComponents(components) {
+  const keys = Object.keys(components)
   return reduceIndexed(
-    (accum, value, key, idx) => {
+    (accum, key, idx) => {
       // figure out the Component class and instance names
       const splittedKey = key.split('::')
       const componentName = splittedKey[0] || key
@@ -26,7 +27,7 @@ function prepareComponents(components) {
       // load the component class
       const Component = loadComponent(componentName)
       const instance = new Component(instanceName, mockCli())
-      const inputs = value
+      const inputs = components[key]
       return assoc(
         instanceName,
         {
@@ -38,7 +39,7 @@ function prepareComponents(components) {
       )
     },
     {},
-    components
+    keys
   )
 }
 

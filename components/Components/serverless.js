@@ -16,21 +16,23 @@ class Components extends Component {
     fileContent = resolveVariables(fileContent)
     const preparedComponents = prepareComponents(fileContent.components)
 
-    const numComponents = Object.keys(preparedComponents).length
+    const componentNames = Object.keys(preparedComponents)
+    const numComponents = componentNames.length
 
     this.cli.status(`${numComponents} Components Loaded`)
 
     // run `default` command in parallel for now...
     const outputs = await Promise.all(
       reduce(
-        (accum, value, key) => {
+        (accum, key) => {
+          const value = preparedComponents[key]
           const { component, inputs, instance } = value // eslint-disable-line
           this.cli.status(`Running ${component} "${key}"`)
           const promise = instance.default(inputs)
           return append(promise, accum)
         },
         [],
-        preparedComponents
+        componentNames
       )
     )
 
@@ -47,21 +49,23 @@ class Components extends Component {
     fileContent = resolveVariables(fileContent)
     const preparedComponents = prepareComponents(fileContent.components)
 
-    const numComponents = Object.keys(preparedComponents).length
+    const componentNames = Object.keys(preparedComponents)
+    const numComponents = componentNames.length
 
     this.cli.status(`${numComponents} Components Loaded`)
 
     // run `remove` command in parallel for now...
     const outputs = await Promise.all(
       reduce(
-        (accum, value, key) => {
+        (accum, key) => {
+          const value = preparedComponents[key]
           const { component, inputs, instance } = value // eslint-disable-line
           this.cli.status(`Running ${component} "${key}"`)
           const promise = instance.remove(inputs)
           return append(promise, accum)
         },
         [],
-        preparedComponents
+        componentNames
       )
     )
 
