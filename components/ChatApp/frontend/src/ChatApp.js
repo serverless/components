@@ -7,6 +7,10 @@ import moment from 'moment'
 import logo from './images/logo.png'
 import './ChatApp.css'
 
+/*
+* Class – ChatApp
+*/
+
 class ChatApp extends Component {
 
   /*
@@ -37,13 +41,10 @@ class ChatApp extends Component {
     const self = this
 
     // Establish WebSocket Connection
-    // TODO: Replace WSS URL with ENV Var
-    this.wsClient = new WebSocket('wss://55oun37rai.execute-api.us-east-1.amazonaws.com/dev/')
+    this.wsClient = new WebSocket(window.env.urlWebsocketApi)
 
     // On Connection Established...
-    this.wsClient.addEventListener('open', function (event) {
-
-    })
+    this.wsClient.addEventListener('open', function (event) {})
 
     // On Event Received...
     this.wsClient.addEventListener('message', function (event) {
@@ -99,6 +100,7 @@ class ChatApp extends Component {
   */
 
   render() {
+
     return (
       <div className="ChatApp">
 
@@ -109,10 +111,14 @@ class ChatApp extends Component {
         }
 
         <nav
-        className="ChatApp-navigation">
+        className="ChatApp-navigation"
+        style={{
+          backgroundColor: window.env.colorBackground,
+          color: window.env.colorInputText
+        }}>
 
           <div className="ChatApp-navigation-column-left">
-            <img src={logo} className="ChatApp-logo" alt="logo" />
+            <img src={window.env.logoUrl || logo} className="ChatApp-logo" alt="logo" />
           </div>
 
           <div className="ChatApp-navigation-column-right">
@@ -122,7 +128,10 @@ class ChatApp extends Component {
             placeholder='enter a username...'
             value={this.state.username}
             onChange={this.changeUsername}
-            ref={el => this.inputUsername = el}/>
+            ref={el => this.inputUsername = el}
+            style={{
+              color: window.env.colorInputText
+            }}/>
           </div>
         </nav>
 
@@ -165,13 +174,22 @@ class ChatApp extends Component {
           */
         }
 
-        <section className="ChatApp-input">
+        <section
+        className="ChatApp-input"
+        style={{
+          backgroundColor: window.env.colorBackground,
+          color: window.env.colorInputText
+        }}>
           <form
           className="ChatApp-input-form"
           onSubmit={this.postMessage}>
 
             <input
             type='text'
+            style={{
+              backgroundColor: window.env.colorBackground,
+              color: window.env.colorInputText
+            }}
             className='ChatApp-input-text'
             placeholder='enter a message...'
             ref={el => this.inputMessage = el}/>

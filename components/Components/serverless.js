@@ -19,15 +19,12 @@ class Components extends Component {
     const componentNames = Object.keys(preparedComponents)
     const numComponents = componentNames.length
 
-    this.cli.status(`${numComponents} Components Loaded`)
-
     // run `default` command in parallel for now...
     const outputs = await Promise.all(
       reduce(
         (accum, key) => {
           const value = preparedComponents[key]
           const { component, inputs, instance } = value // eslint-disable-line
-          this.cli.status(`Running ${component} "${key}"`)
           const promise = instance.default(inputs)
           return append(promise, accum)
         },
@@ -35,8 +32,6 @@ class Components extends Component {
         componentNames
       )
     )
-
-    this.cli.success(`Successfully Ran ${numComponents} Components`)
 
     logOutputs(this.cli, outputs)
   }

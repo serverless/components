@@ -1,17 +1,16 @@
 /*
-* Component – RealtimeApp
-*/
+ * Component – RealtimeApp
+ */
 
 const { mergeDeepRight, getCli } = require('../../src/utils')
-const { execSync } = require('child_process')
 const Component = require('../Component/serverless')
 const Socket = require('../Socket/serverless')
 const Website = require('../Website/serverless')
 
 /*
-* Get Config
-* - Merges configuration with defaults
-*/
+ * Get Config
+ * - Merges configuration with defaults
+ */
 
 const getConfig = (inputs) => {
   const defaults = {
@@ -20,12 +19,12 @@ const getConfig = (inputs) => {
     description: 'Realtime App',
     region: 'us-east-1',
     frontend: {
-      code: './frontend',
-      assets: '.',
-      envFileLocation: './src/env.js',
+      path: './frontend',
+      assets: './frontend/build',
+      envFile: './frontend/src/env.js',
       env: {},
       buildCmd: null,
-      localCmd: null,
+      localCmd: null
     },
     backend: {
       code: './backend',
@@ -49,21 +48,27 @@ const getConfig = (inputs) => {
   return config
 }
 
-class RealtimeApp extends Component {
+/*
+ * Class – RealtimeApp
+ */
 
+class RealtimeApp extends Component {
   /*
-  * Default
-  */
+   * Default
+   */
 
   async default(inputs = {}) {
     this.cli.status('Deploying Realtime App')
+
+    // Get config from inputs and defaults
+    if (!inputs.name) inputs.name = this.id
     const config = getConfig(inputs)
 
     const website = new Website(`${this.id}.website`)
     const socket = new Socket(`${this.id}.socket`)
 
     const socketOutputs = await socket(config.backend)
-    config.frontend.env.api_url = socketOutputs.websockets.url // pass backend url to frontend
+    config.frontend.env.urlWebsocketApi = socketOutputs.websockets.url // pass backend url to frontend
     const websiteOutputs = await website(config.frontend)
 
     // this high level component doesn't need to save any state!
@@ -77,8 +82,8 @@ class RealtimeApp extends Component {
   }
 
   /*
-  * Remove
-  */
+   * Remove
+   */
 
   async remove() {
     // this remove function just calls remove on the child components
@@ -99,33 +104,12 @@ class RealtimeApp extends Component {
   }
 
   /*
-  * Connect
-  */
+   * Connect
+   */
 
   connect(inputs = {}) {
     const socket = new Socket(`${this.id}.socket`, getCli(true)) // todo find a better way to config the cli
     return socket.connect(inputs)
-  }
-
-  /*
-  * Local
-  */
-
-  local(inputs) {
-    console.log(inputs)
-    this.cli.status('Starting App Locally...')
-    execSync(
-      inputs.localCmd,
-      {
-        cwd: inputs.assets,
-      },
-      (error, stdErr) => {
-        if (error) {
-          console.error(stdErr) // eslint-disable-line no-console
-          throw new Error(error)
-        }
-      }
-    )
   }
 }
 
