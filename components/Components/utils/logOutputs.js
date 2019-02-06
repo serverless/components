@@ -1,11 +1,11 @@
-const { titelize, forEach } = require('../../../src/utils')
+const { titelize, forEach, forEachObjIndexed } = require('../../../src/utils')
 
 function logOutputs(cli, outputs) {
-  if (outputs && outputs[0]) {
+  if (outputs.length) {
     // TODO: update so that only the most important outputs are shown
     forEach((output) => {
       cli.log('')
-      forEach((value, key) => {
+      forEachObjIndexed((value, key) => {
         const name = titelize(key)
         cli.output(name, value)
       }, output)
