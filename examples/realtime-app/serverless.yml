@@ -1,0 +1,5 @@
+name: realtime-app
+stage: dev
+
+components:
+  RealtimeApp::realtime-app:

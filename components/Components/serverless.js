@@ -24,7 +24,8 @@ class Components extends Component {
       reduce(
         (accum, key) => {
           const value = preparedComponents[key]
-          const { component, inputs, instance } = value // eslint-disable-line
+          let { component, inputs, instance } = value // eslint-disable-line
+          inputs = inputs || {}
           const promise = instance.default(inputs)
           return append(promise, accum)
         },

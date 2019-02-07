@@ -21,8 +21,10 @@ class Socket extends Component {
     const socketFilePath = resolve(inputs.code || process.cwd(), 'socket.js')
     if (!(await fileExists(socketFilePath))) {
       this.cli.log('no socket.js file found in your codebase')
+      throw new Error(`No "socket.js" file found in the current directory.`)
       return null
     }
+
     // make sure user does not overwrite the following
     inputs.runtime = 'nodejs8.10'
     inputs.handler = 'shim.socket'

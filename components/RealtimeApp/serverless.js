@@ -20,7 +20,7 @@ const getConfig = (inputs) => {
     region: 'us-east-1',
     frontend: {
       path: './frontend',
-      assets: './frontend/build',
+      assets: './frontend/',
       envFile: './frontend/src/env.js',
       env: {},
       buildCmd: null,
