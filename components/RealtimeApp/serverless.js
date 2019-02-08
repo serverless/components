@@ -58,10 +58,12 @@ class RealtimeApp extends Component {
    */
 
   async default(inputs = {}) {
-    this.cli.status('Deploying Realtime App')
+    this.cli.status('Deploying')
 
     // Get config from inputs and defaults
-    if (!inputs.name) inputs.name = this.id
+    if (!inputs.name) {
+      inputs.name = this.id
+    }
     const config = getConfig(inputs)
 
     const website = new Website(`${this.id}.website`)
@@ -73,8 +75,6 @@ class RealtimeApp extends Component {
 
     // this high level component doesn't need to save any state!
 
-    this.cli.success('Realtime App Deployed')
-    this.cli.log('')
     this.cli.output('Socket URL', ` ${socketOutputs.websockets.url}`)
     this.cli.output('Website URL', `${websiteOutputs.url}`)
 
@@ -88,7 +88,7 @@ class RealtimeApp extends Component {
   async remove() {
     // this remove function just calls remove on the child components
     // it doesn't even need any inputs at all since all is available in children state!
-    this.cli.status('Removing Realtime App')
+    this.cli.status('Removing')
 
     const website = new Website(`${this.id}.website`)
     const socket = new Socket(`${this.id}.socket`)
@@ -97,8 +97,6 @@ class RealtimeApp extends Component {
 
     const websiteOutputs = outputs[0]
     const socketOutputs = outputs[1]
-
-    this.cli.success('Realtime App Removed')
 
     return { website: websiteOutputs, socket: socketOutputs }
   }

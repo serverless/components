@@ -68,7 +68,7 @@ class Website extends Component {
       try {
         result = await exec(config.buildCmd, options)
       } catch (err) {
-        console.error(err.stdout)
+        console.error(err.stderr)
         throw new Error(
           `Failed building website via "${
             config.buildCmd

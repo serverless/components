@@ -16,7 +16,7 @@ class ChatApp extends Component {
    */
 
   async default(inputs = {}) {
-    this.cli.status(`Deploying ChatApp`)
+    this.cli.status(`Deploying`)
 
     // Merge inputs with defaults
     const defaults = {
@@ -52,11 +52,9 @@ class ChatApp extends Component {
     })
 
     outputs = {
-      URL: outputs.website.url
+      url: outputs.website.url
     }
 
-    this.cli.success('ChatApp Deployed')
-    this.cli.log('')
     this.cli.output('URL', `${outputs.url}`)
 
     return outputs
@@ -67,12 +65,10 @@ class ChatApp extends Component {
    */
 
   async remove() {
-    this.cli.status('Removing ChatApp')
+    this.cli.status('Removing')
 
     const realtimeApp = new RealtimeApp(`${this.id}.realtime_app`)
     const outputs = await realtimeApp.remove()
-
-    this.cli.success('ChatApp Removed')
 
     return outputs
   }
