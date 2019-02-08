@@ -32,7 +32,7 @@ class Website extends Component {
       this.state.bucketName && !nameChanged ? this.state.bucketName : getBucketName(config.name)
     config.assets = path.resolve(config.code, config.assets)
 
-    this.cli.status(`Deploying Website`)
+    this.cli.status(`Deploying`)
 
     // if bucket already exists in my account, this call still succeeds!
     // if bucket name is unavailable, an error is thrown
@@ -55,7 +55,7 @@ class Website extends Component {
     }
 
     if (config.buildCmd) {
-      this.cli.status('Building Website')
+      this.cli.status('Building')
       execSync(
         config.buildCmd,
         {
@@ -70,13 +70,13 @@ class Website extends Component {
       )
     }
 
-    this.cli.status('Uploading Files')
+    this.cli.status('Uploading')
     await uploadDir({ s3, ...config })
 
     config.url = `http://${config.bucketName}.s3-website-${config.region}.amazonaws.com`
 
     if (nameChanged) {
-      this.cli.status(`Removing Previous Website`)
+      this.cli.status(`Replacing`)
       await deleteWebsiteBucket({ s3, ...this.state })
     }
 
@@ -85,8 +85,7 @@ class Website extends Component {
     this.state.url = config.url
     this.save()
 
-    this.cli.success(`Website Deployed`)
-    this.cli.output('URL', `    ${config.url}`)
+    this.cli.output('URL', ` ${config.url}`)
 
     return pick(outputs, config)
   }
@@ -99,14 +98,12 @@ class Website extends Component {
 
     const s3 = new aws.S3(inputs)
 
-    this.cli.status(`Removing Website`)
+    this.cli.status(`Removing`)
 
     await deleteWebsiteBucket({ s3, ...this.state })
 
     this.state = {}
     this.save()
-
-    this.cli.success(`Website Removed`)
   }
 }
 

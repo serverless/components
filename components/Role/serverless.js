@@ -28,16 +28,18 @@ class Role extends Component {
     const config = mergeDeepRight(defaults, inputs)
     const iam = new aws.IAM(config)
 
+    this.cli.status(`Deploying`)
+
     const prevRole = await getRole({ iam, ...config })
 
     if (!prevRole) {
-      this.cli.status(`Creating Role`)
+      this.cli.status(`Creating`)
       config.arn = await createRole({ iam, ...config })
     } else {
       config.arn = prevRole.arn
 
       if (configChanged(prevRole, config)) {
-        this.cli.status(`Updating Role`)
+        this.cli.status(`Updating`)
         if (prevRole.service !== config.service) {
           await updateAssumeRolePolicy({ iam, ...config })
         }
@@ -49,7 +51,7 @@ class Role extends Component {
     }
 
     if (this.state.name && this.state.name !== config.name) {
-      this.cli.status(`Removing Previous Role`)
+      this.cli.status(`Replacing`)
       await deleteRole({ iam, name: this.state.name, policy: config.policy })
     }
 
@@ -57,12 +59,9 @@ class Role extends Component {
     this.state.name = config.name
     this.save()
 
-    this.cli.success(`Role Deployed`)
-
-    this.cli.log('')
-    this.cli.output('Name', `   ${config.name}`)
-    this.cli.output('Service', `${config.service}`)
-    this.cli.output('ARN', `    ${config.arn}`)
+    this.cli.output('Name', `    ${config.name}`)
+    this.cli.output('Service', ` ${config.service}`)
+    this.cli.output('ARN', `     ${config.arn}`)
 
     return pick(outputs, config)
   }
@@ -72,14 +71,13 @@ class Role extends Component {
     config.name = inputs.name || this.state.name || defaults.name
 
     const iam = new aws.IAM(config)
-    this.cli.status(`Removing Role`)
+    this.cli.status(`Removing`)
     await deleteRole({ iam, ...config })
 
     this.state = {}
     this.save()
 
-    this.cli.success(`Role Removed`)
-    this.cli.output('Name', `   ${config.name}`)
+    this.cli.output('Name', ` ${config.name}`)
 
     return pick(outputs, config)
   }

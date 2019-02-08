@@ -32,23 +32,23 @@ class WebSockets extends Component {
     const apig2 = new aws.ApiGatewayV2(config)
     const lambda = new aws.Lambda(config)
 
+    this.cli.status(`Deploying`)
+
     config.id = await getApiId({ apig2, id: config.id || this.state.id }) // validate with provider
 
     const definedRoutes = Object.keys(config.routes || {})
     const providerRoutes = await getRoutes({ apig2, id: config.id })
 
     if (!config.id) {
-      this.cli.status(`Creating WebSockets`)
+      this.cli.status(`Creating`)
       config.id = await createApi({ apig2, ...config })
     } else {
-      this.cli.status(`Updating WebSockets`)
+      this.cli.status(`Updating`)
       await updateApi({ apig2, ...config })
     }
 
     const routesToDeploy = definedRoutes.filter((route) => not(providerRoutes.includes(route)))
     const routesToRemove = providerRoutes.filter((route) => not(definedRoutes.includes(route)))
-
-    this.cli.status(`Updating Routes`)
 
     await Promise.all(
       routesToDeploy.map(async (route) => {
@@ -69,7 +69,7 @@ class WebSockets extends Component {
     // if the user has changed the id,
     // remove the previous API
     if (this.state.id && this.state.id !== config.id) {
-      this.cli.status(`Removing Previous WebSockets`)
+      this.cli.status(`Replacing`)
       await removeApi({ apig2, id: config.id })
     }
 
@@ -77,9 +77,6 @@ class WebSockets extends Component {
     this.state.url = config.url
     this.save()
 
-    this.cli.success(`WebSockets Deployed`)
-
-    this.cli.log('')
     this.cli.output('Name', `       ${config.name}`)
     this.cli.output('ID', `         ${config.id}`)
     this.cli.output('Stage', `      ${config.stage}`)
@@ -97,15 +94,14 @@ class WebSockets extends Component {
     config.id = config.id || this.state.id
     const apig2 = new aws.ApiGatewayV2(config)
 
+    this.cli.status(`Removing`)
+
     if (config.id) {
-      this.cli.status(`Removing WebSockets`)
       await removeApi({ apig2, id: config.id })
     }
 
     this.state = {}
     this.save()
-
-    this.cli.success(`WebSockets Removed`)
 
     return pick(outputs, config)
   }

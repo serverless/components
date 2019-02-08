@@ -42,12 +42,14 @@ class Lambda extends Component {
   async default(inputs = {}) {
     const config = mergeDeepRight(defaults, inputs)
 
+    this.cli.status(`Deploying`)
+
     const lambda = new aws.Lambda(config)
     const role = new Role(`${this.id}.role`)
 
     config.role = config.role || (await role(config))
 
-    this.cli.status(`Packaging Lambda`)
+    this.cli.status(`Packaging`)
 
     config.zip = await pack({ code: config.code, shim: config.shim })
     config.hash = hash(config.zip)
@@ -55,18 +57,18 @@ class Lambda extends Component {
     const prevLambda = await getLambda({ lambda, ...config })
 
     if (!prevLambda) {
-      this.cli.status(`Creating Lambda`)
+      this.cli.status(`Creating`)
       config.arn = await createLambda({ lambda, ...config })
     } else {
       config.arn = prevLambda.arn
       if (configChanged(prevLambda, config)) {
-        this.cli.status(`Updating Lambda`)
+        this.cli.status(`Updating`)
         await updateLambda({ lambda, ...config })
       }
     }
 
     if (this.state.name && this.state.name !== config.name) {
-      this.cli.status(`Removing Previous Lambda`)
+      this.cli.status(`Replacing`)
       await deleteLambda({ lambda, name: this.state.name })
     }
 
@@ -74,9 +76,6 @@ class Lambda extends Component {
     this.state.arn = config.arn
     this.save()
 
-    this.cli.success(`Lambda Deployed`)
-
-    this.cli.log('')
     this.cli.output('Name', `    ${config.name}`)
     this.cli.output('Memory', `  ${config.memory}`)
     this.cli.output('Timeout', ` ${config.timeout}`)
@@ -92,7 +91,7 @@ class Lambda extends Component {
     config.name = inputs.name || this.state.name || defaults.name
     const lambda = new aws.Lambda(config)
 
-    this.cli.status(`Removing Lambda`)
+    this.cli.status(`Removing`)
 
     const role = new Role(`${this.id}.role`)
 
@@ -105,8 +104,7 @@ class Lambda extends Component {
     this.state = {}
     this.save()
 
-    this.cli.success(`Lambda Removed`)
-    this.cli.output('Name', `   ${config.name}`)
+    this.cli.output('Name', ` ${config.name}`)
 
     return pick(outputs, config)
   }

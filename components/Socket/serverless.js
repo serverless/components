@@ -33,7 +33,7 @@ class Socket extends Component {
     inputs.name = inputs.name || 'serverless'
     inputs.description = inputs.description || 'Serverless Socket'
 
-    this.cli.status(`Deploying Socket`)
+    this.cli.status(`Deploying Lambda`)
 
     const lambda = new Lambda(`${this.id}.lambda`)
     const lambdaOutputs = await lambda(inputs)
@@ -44,6 +44,8 @@ class Socket extends Component {
       $default: lambdaOutputs.arn
     }
 
+    this.cli.status(`Deploying WebSockets`)
+
     const websockets = new WebSockets(`${this.id}.websockets`)
     const websocketsOutputs = await websockets(inputs)
 
@@ -51,14 +53,13 @@ class Socket extends Component {
     this.state.socketFilePath = socketFilePath
     this.save()
 
-    this.cli.success(`Socket Deployed`)
-    this.cli.output('URL', `    ${websocketsOutputs.url}`)
+    this.cli.output('URL', ` ${websocketsOutputs.url}`)
 
     return { lambda: lambdaOutputs, websockets: websocketsOutputs }
   }
 
   async remove() {
-    this.cli.status(`Removing Socket`)
+    this.cli.status(`Removing`)
 
     const lambda = new Lambda(`${this.id}.lambda`)
     const websockets = new WebSockets(`${this.id}.websockets`)
@@ -68,8 +69,6 @@ class Socket extends Component {
 
     this.state = {}
     this.save()
-
-    this.cli.success(`Socket Removed`)
 
     return { lambda: lambdaOutputs, websockets: websocketsOutputs }
   }

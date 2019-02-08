@@ -1,7 +1,6 @@
 const path = require('path')
 const argv = require('minimist')(process.argv.slice(2))
 const fileExists = require('./fs/fileExists')
-const getCli = require('./getCli')
 const components = require('../../components')
 
 // it's helpful to completely silent the cli
@@ -19,7 +18,6 @@ if (argv.silent) {
  *                        if not and "socket" component exists, run the default function in socket component
  */
 const run = async () => {
-  console.log('') // eslint-disable-line
   if (argv['_'].length < 2) {
     // eg. "serverless connect" or "serverless socket"
     // when using it programmatically
@@ -33,34 +31,51 @@ const run = async () => {
     if (await fileExists(serverlessJsFilePath)) {
       // serverless.js exists in cwd
       const Component = require(serverlessJsFilePath)
-      const component = new Component(undefined, getCli(true))
+      const component = new Component(undefined, true)
 
       if (argv['_'].length === 1) {
         // run the specified function from cwd Component. eg. "serverless connect"
         const command = argv['_'].shift()
+
+        if (!component[command]) {
+          console.log(`  Component in cwd does not have a "${command}" method`) // eslint-disable-line
+          return
+        }
         await component[command](argv || {})
       } else {
         // run the default function in cwd. eg. "serverless"
         await component(argv || {})
+      }
+
+      if (component.cli.running) {
+        component.cli.done()
       }
     } else if (
       (await fileExists(serverlessYmlFilePath)) ||
       (await fileExists(serverlessJsonFilePath)) ||
       (await fileExists(serverlessYamlFilePath))
     ) {
-      const component = new components['Components'](undefined, getCli(true))
+      const component = new components['Components'](undefined, true)
       if (argv['_'].length === 0) {
         await component(argv || {})
       } else if (argv['_'].length === 1 && argv['_'][0] === 'remove') {
         await component['remove'](argv || {})
+      }
+
+      if (component.cli.running) {
+        component.cli.done()
       }
     } else if (argv['_'].length === 1 && typeof components[argv['_'][0]] !== 'undefined') {
       // serverless.js does not exist in cwd & component exists in registry
       // eg. running "serverless socket" in directory that does not have serverless.js
       // in that case, run the default function in the socket component
 
-      const component = new components[argv['_'][0]](undefined, getCli(true))
+      const component = new components[argv['_'][0]](undefined, true)
       await component(argv || {})
+
+      if (component.cli.running) {
+        component.cli.done()
+      }
     } else {
       console.log('  no serverless.js found in cwd.') // eslint-disable-line
     }
@@ -71,13 +86,16 @@ const run = async () => {
 
     if (typeof components[componentName] !== 'undefined') {
       // component exists in registry
-      const component = new components[componentName](undefined, getCli(true))
+      const component = new components[componentName](undefined, true)
       await component[command](argv || {})
+
+      if (component.cli.running) {
+        component.cli.done()
+      }
     } else {
       console.log(`  Component ${componentName} does not exist`) // eslint-disable-line
     }
   }
-  console.log('') // eslint-disable-line
 }
 
 module.exports = run

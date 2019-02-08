@@ -1,9 +1,9 @@
 const { getCli, readState, writeState } = require('../../src/utils/')
 
 class Component {
-  constructor(id = this.constructor.name, cli = getCli()) {
+  constructor(id = this.constructor.name, parent = false) {
     this.id = id
-    this.cli = cli
+    this.cli = getCli(this.constructor.name, parent)
     this.state = readState(id)
 
     // defines the default function that would be returned below
@@ -13,6 +13,11 @@ class Component {
     const defaultFunction = function(inputs) {
       return that.default.call(that, inputs)
     }
+
+    // add Component class properties like cli and state
+    Object.keys(this).forEach((prop) => {
+      defaultFunction[prop] = this[prop]
+    })
 
     // add Component class methods like the save() method
     const classMethods = Object.getOwnPropertyNames(Component.prototype)

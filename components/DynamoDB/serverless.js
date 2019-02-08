@@ -35,13 +35,13 @@ class DynamoDB extends Component {
     const prevTable = await describeTable({ dynamodb, name: this.state.name || null })
 
     if (!prevTable) {
-      this.cli.status('Creating Table')
+      this.cli.status('Creating')
       config.arn = await createTable({ dynamodb, ...config })
     } else {
       config.arn = prevTable.arn
 
       if (configChanged(prevTable, config)) {
-        this.cli.status('Updating Table')
+        this.cli.status('Updating')
         if (!equals(prevTable.name, config.name)) {
           await deleteTable({ dynamodb, name: prevTable.name })
           config.arn = await createTable({ dynamodb, ...config })
@@ -55,11 +55,8 @@ class DynamoDB extends Component {
     this.state.name = config.name
     this.save()
 
-    this.cli.success('Table Deployed')
-
-    this.cli.log('')
-    this.cli.output('Name', `${config.name}`)
-    this.cli.output('ARN', ` ${config.arn}`)
+    this.cli.output('Name', ` ${config.name}`)
+    this.cli.output('ARN', `  ${config.arn}`)
 
     return pick(outputs, config)
   }
@@ -69,14 +66,13 @@ class DynamoDB extends Component {
     config.name = inputs.name || this.state.name || defaults.name
 
     const dynamodb = new AWS.DynamoDB()
-    this.cli.status('Removing Table')
+    this.cli.status('Removing')
     await deleteTable({ dynamodb, ...config })
 
     this.state = {}
     this.save()
 
-    this.cli.success('Table Removed')
-    this.cli.output('Name', `   ${config.name}`)
+    this.cli.output('Name', ` ${config.name}`)
 
     return pick(outputs, config)
   }
