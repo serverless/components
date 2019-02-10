@@ -1,7 +1,6 @@
 const aws = require('aws-sdk')
 const { mergeDeepRight, pick } = require('../../src/utils')
 const Component = require('../Component/serverless')
-const Role = require('../Role/serverless')
 const {
   createLambda,
   updateLambda,
@@ -35,7 +34,8 @@ const defaults = {
   shim: null,
   handler: 'handler.hello',
   runtime: 'nodejs8.10',
-  env: {}
+  env: {},
+  region: 'us-east-1'
 }
 
 class Lambda extends Component {
@@ -44,8 +44,9 @@ class Lambda extends Component {
 
     this.cli.status(`Deploying`)
 
-    const lambda = new aws.Lambda(config)
-    const role = new Role(`${this.id}.role`)
+    const lambda = new aws.Lambda({ region: config.region, credentials: this.credentials.aws })
+
+    const role = this.load('Role')
 
     config.role = config.role || (await role(config))
 
@@ -89,11 +90,11 @@ class Lambda extends Component {
   async remove(inputs = {}) {
     const config = mergeDeepRight(defaults, inputs)
     config.name = inputs.name || this.state.name || defaults.name
-    const lambda = new aws.Lambda(config)
+    const lambda = new aws.Lambda({ region: config.region, credentials: this.credentials.aws })
 
     this.cli.status(`Removing`)
 
-    const role = new Role(`${this.id}.role`)
+    const role = this.load('Role')
 
     // there's no need to pass role name as input
     // since it's saved in the Role component state

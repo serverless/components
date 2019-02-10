@@ -7,8 +7,8 @@ function logOutputs(cli, outputs) {
       cli.log('')
       forEachObjIndexed((value, key) => {
         const name = titelize(key)
-        cli.output(name, value)
-      }, output)
+        cli.output(name, output[key])
+      })
     }, outputs)
   }
 }

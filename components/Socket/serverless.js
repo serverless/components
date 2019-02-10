@@ -3,8 +3,6 @@ const { prompt } = require('enquirer')
 const WebSocket = require('ws')
 const { chalk, sleep, fileExists } = require('../../src/utils')
 
-const Lambda = require('../Lambda/serverless')
-const WebSockets = require('../WebSockets/serverless')
 const Component = require('../Component/serverless')
 
 const isJson = (body) => {
@@ -21,8 +19,10 @@ class Socket extends Component {
     const socketFilePath = resolve(inputs.code || process.cwd(), 'socket.js')
     if (!(await fileExists(socketFilePath))) {
       this.cli.log('no socket.js file found in your codebase')
+      throw new Error(`No "socket.js" file found in the current directory.`)
       return null
     }
+
     // make sure user does not overwrite the following
     inputs.runtime = 'nodejs8.10'
     inputs.handler = 'shim.socket'
@@ -32,10 +32,11 @@ class Socket extends Component {
 
     inputs.name = inputs.name || 'serverless'
     inputs.description = inputs.description || 'Serverless Socket'
+    inputs.stage = this.stage
 
     this.cli.status(`Deploying Lambda`)
 
-    const lambda = new Lambda(`${this.id}.lambda`)
+    const lambda = this.load('Lambda')
     const lambdaOutputs = await lambda(inputs)
 
     inputs.routes = {
@@ -46,7 +47,7 @@ class Socket extends Component {
 
     this.cli.status(`Deploying WebSockets`)
 
-    const websockets = new WebSockets(`${this.id}.websockets`)
+    const websockets = this.load('WebSockets')
     const websocketsOutputs = await websockets(inputs)
 
     this.state.url = websocketsOutputs.url
@@ -61,8 +62,8 @@ class Socket extends Component {
   async remove() {
     this.cli.status(`Removing`)
 
-    const lambda = new Lambda(`${this.id}.lambda`)
-    const websockets = new WebSockets(`${this.id}.websockets`)
+    const lambda = this.load('Lambda')
+    const websockets = this.load('WebSockets')
 
     const lambdaOutputs = await lambda.remove()
     const websocketsOutputs = await websockets.remove()

@@ -1,0 +1,214 @@
+* {
+  box-sizing: border-box;
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-weight: 300;
+}
+
+html, body {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  height: 100%;
+  width: 100%;
+  background: #000000;
+}
+
+.ChatApp {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Navigation */
+
+.ChatApp-navigation {
+  z-index: 10;
+  position: fixed;
+  display: flex;
+  flex-direction: row;
+  box-sizing: border-box;
+  height: 80px;
+  width: 100%;
+  padding: 0 2em;
+  background: #000000;
+  font-size: calc(10px + 2vmin);
+  color: white;
+  box-shadow: 0 3px 0px 0 rgba(0,0,0,0.08);
+}
+
+.ChatApp-navigation-column-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 100%;
+  width: 50%;
+}
+
+.ChatApp-navigation-column-right {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  height: 100%;
+  width: 50%;
+}
+
+.ChatApp-logo {
+  display: flex;
+  align-self: flex-start;
+  height: 40%;
+  width: auto;
+}
+
+.ChatApp-input-username {
+  display: flex;
+  align-self: flex-end;
+  align-items: center;
+  justify-content: center;
+  text-align: right;
+  box-sizing: border-box;
+  padding: 0;
+  width: 200px;
+  height: 100%;
+  border: none;
+  font-size: 24px;
+  font-weight: 300;
+  color: #FFFFFF;
+  line-height: normal;
+  outline: none;
+  background: transparent;
+}
+
+.ChatApp-input-username::placeholder {
+  color: rgba(255,255,255,0.5);
+}
+
+/* Message Thread */
+
+.ChatApp-messages-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+  background: #EAEAEA;
+  overflow-y: scroll;
+  padding: 120px 2em 230px 2em;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.ChatApp-messages {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0;
+}
+
+.ChatApp-message-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  min-height: 120px;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0.5em 0 0 0;
+  font-size: calc(10px + 2vmin);
+  color: #000000;
+}
+
+.ChatApp-message-meta {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  box-sizing: border-box;
+  height: auto;
+  width: auto;
+  background: transparent;
+  margin-bottom: 0.25em;
+}
+
+.ChatApp-message-meta-username {
+  color: #999999;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.ChatApp-message-meta-time {
+  color: #BBBBBB;
+  font-size: 16px;
+  font-weight: 600;
+  margin-left: 0.75em;
+}
+
+.ChatApp-message-content {
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  width: auto;
+  box-sizing: border-box;
+  padding: 1em;
+  background: #FFFFFF;
+  border: 1px solid rgba(0,0,0,0.2);
+  box-shadow: 0 2px 0px 0 rgba(0,0,0,0.06);
+  font-size: 22px;
+  color: #000000;
+}
+
+/* Message Input */
+
+.ChatApp-input {
+  z-index: 10;
+  position: fixed;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 175px;
+  width: 100%;
+  background: #000000;
+  font-size: calc(10px + 2vmin);
+  color: #ffffff;
+  box-shadow: 0 -3px 0px 0 rgba(0,0,0,0.08);
+}
+
+.ChatApp-input-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 100%;
+  width: 100%;
+}
+
+.ChatApp-input-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-sizing: border-box;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  font-size: 52px;
+  font-weight: 300;
+  line-height: normal;
+  outline: none;
+  background: #000000;
+  color: #ffffff;
+}
+
+.ChatApp-input-text::placeholder {
+  color: #666666;
+  font-weight: 300;
+}

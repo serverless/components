@@ -15,3 +15,5 @@ node_modules
 .eslintcache
 dist
 .idea
+build/
+.env*

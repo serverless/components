@@ -1,28 +1,39 @@
 const aws = require('aws-sdk')
 const path = require('path')
-const { execSync } = require('child_process')
+const util = require('util')
+const exec = util.promisify(require('child_process').exec)
 const { pick, isEmpty, mergeDeepRight, writeFile } = require('../../src/utils')
-
 const { getBucketName, uploadDir, deleteWebsiteBucket, configureWebsite } = require('./utils')
-
 const Component = require('../Component/serverless')
 
 const outputs = ['name', 'url']
-
 const defaults = {
   name: 'serverless',
-  code: process.cwd(),
-  assets: '.',
-  envFileLocation: './src/env.js',
+  path: process.cwd(),
+  assets: path.join(process.cwd(), 'build'),
+  envFile: path.join(process.cwd(), 'src', 'env.js'),
   env: {},
   buildCmd: null,
   region: 'us-east-1'
 }
 
+/*
+ * Website
+ */
+
 class Website extends Component {
+  /*
+   * Default
+   */
+
   async default(inputs = {}) {
     const config = mergeDeepRight(defaults, inputs)
-    const s3 = new aws.S3(config)
+    const s3 = new aws.S3({ region: config.region, credentials: this.credentials.aws })
+
+    // Ensure paths are resolved
+    config.path = path.resolve(config.path)
+    config.assets = path.resolve(config.assets)
+    config.envFile = path.resolve(config.envFile)
 
     const nameChanged = this.state.name && this.state.name !== config.name
 
@@ -30,7 +41,6 @@ class Website extends Component {
     // based on the passed in name
     config.bucketName =
       this.state.bucketName && !nameChanged ? this.state.bucketName : getBucketName(config.name)
-    config.assets = path.resolve(config.code, config.assets)
 
     this.cli.status(`Deploying`)
 
@@ -40,34 +50,31 @@ class Website extends Component {
 
     await configureWebsite({ s3, ...config }) // put policies
 
-    // Include Environment Variables if they exist
-    const envFileLocation = path.resolve(config.code, config.envFileLocation)
-
     if (!isEmpty(config.env) && config.buildCmd) {
-      let script = 'export const env = {\n'
+      let script = 'window.env = {};\n'
       for (const e in config.env) {
         // eslint-disable-line
-        script += `${e}: ${JSON.stringify(config.env[e])}\n` // eslint-disable-line
+        script += `window.env.${e} = ${JSON.stringify(config.env[e])};\n` // eslint-disable-line
       }
-      script += '}'
-
-      await writeFile(envFileLocation, script)
+      await writeFile(config.envFile, script)
     }
 
+    // If a build command is provided, build the website...
     if (config.buildCmd) {
       this.cli.status('Building')
-      execSync(
-        config.buildCmd,
-        {
-          cwd: config.code
-        },
-        (error, stdErr) => {
-          if (error) {
-            console.error(stdErr) // eslint-disable-line no-console
-            throw new Error(error)
-          }
-        }
-      )
+
+      let result
+      let options = { cwd: config.path }
+      try {
+        result = await exec(config.buildCmd, options)
+      } catch (err) {
+        console.error(err.stderr)
+        throw new Error(
+          `Failed building website via "${
+            config.buildCmd
+          }".  View the output above for more information.`
+        )
+      }
     }
 
     this.cli.status('Uploading')
@@ -90,13 +97,14 @@ class Website extends Component {
     return pick(outputs, config)
   }
 
-  async remove(inputs) {
+  async remove(inputs = {}) {
+    const config = mergeDeepRight(defaults, inputs)
     if (!this.state.bucketName) {
       this.cli.log('no website bucket name found in state.')
       return
     }
 
-    const s3 = new aws.S3(inputs)
+    const s3 = new aws.S3({ region: config.region, credentials: this.credentials.aws })
 
     this.cli.status(`Removing`)
 

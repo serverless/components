@@ -4,12 +4,12 @@ const figures = require('figures')
 const sleep = require('./sleep')
 const { isEmpty } = require('ramda')
 
-const getCli = (componentName, parent = false) => {
+const getCli = (stage, componentName, silent = true) => {
   if (process.env.SERVERLESS_SILENT) {
-    parent = false
+    silent = true
   }
   let cli
-  if (parent) {
+  if (!silent) {
     cli = {
       running: false,
       msg: chalk.yellow('Running'),
@@ -33,13 +33,6 @@ const getCli = (componentName, parent = false) => {
           process.exit(0)
         })
 
-        // handle errors
-        process.on('unhandledRejection', async function(error) {
-          cli.error(error)
-          await sleep(100)
-          process.exit(1)
-        })
-
         cli.running = true
         return cli.render()
       },
@@ -48,9 +41,11 @@ const getCli = (componentName, parent = false) => {
         cli.running = false
       },
       done: (msg = 'Done') => cli.stop(msg, 'green'),
-      error: (err) => {
+      error: async (err) => {
         cli.log(`\n  ${err.stack}`)
-        return cli.stop(err.message, 'red')
+        cli.stop(err.message, 'red')
+        await sleep(100)
+        process.exit(1)
       },
       output: (label, value) => {
         if (isEmpty(cli.outputs)) {
@@ -65,15 +60,29 @@ const getCli = (componentName, parent = false) => {
       render: async (frame = 0) => {
         const nextFrame = ++frame
         const second = String(Math.floor(nextFrame / 10) + 1) // cause we're running at 10 frames per second
+        let coloredStage
+
+        if (['dev', 'development'].includes(stage)) {
+          coloredStage = chalk.green(stage)
+        } else if (['prod', 'production'].includes(stage)) {
+          coloredStage = chalk.red(stage)
+        } else {
+          coloredStage = chalk.yellow(stage)
+        }
+
         cli.write(
-          `${ansiEscapes.cursorLeft + ansiEscapes.eraseDown}\n  ${chalk.grey(
+          `${ansiEscapes.cursorHide +
+            ansiEscapes.cursorLeft +
+            ansiEscapes.eraseDown}\n  ${chalk.grey(
             `${second}s ${figures.pointerSmall}`
-          )} ${componentName} ${chalk.grey(figures.pointerSmall)} ${chalk.yellow(
-            cli.msg
-          )}\n${ansiEscapes.cursorLeft + ansiEscapes.cursorUp(2)}`
+          )} ${coloredStage} ${chalk.grey(figures.pointerSmall)} ${componentName} ${chalk.grey(
+            figures.pointerSmall
+          )} ${chalk.yellow(cli.msg)}\n${ansiEscapes.cursorLeft + ansiEscapes.cursorUp(2)}`
         )
         if (!cli.running) {
-          cli.write(`${ansiEscapes.cursorLeft + ansiEscapes.cursorDown(2)}\n`)
+          cli.write(
+            `${ansiEscapes.cursorShow + ansiEscapes.cursorLeft + ansiEscapes.cursorDown(2)}\n`
+          )
           return
         }
         await sleep(100)
