@@ -1,4 +1,4 @@
 #!/usr/bin/env node
 const run = require('../src/utils/run')
 
-;(async () => run())() // eslint-disable-line
+;(async () => run())().catch((e) => console.log(e.stack)) // eslint-disable-line

@@ -24,13 +24,14 @@ const defaults = {
   provisionedThroughput: {
     ReadCapacityUnits: 1,
     WriteCapacityUnits: 1
-  }
+  },
+  region: 'us-east-1'
 }
 
 class DynamoDB extends Component {
   async default(inputs = {}) {
     const config = mergeDeepRight(defaults, inputs)
-    const dynamodb = new AWS.DynamoDB()
+    const dynamodb = new AWS.DynamoDB({ region: config.region, credentials: this.credentials.aws })
 
     const prevTable = await describeTable({ dynamodb, name: this.state.name || null })
 
@@ -65,7 +66,8 @@ class DynamoDB extends Component {
     const config = mergeDeepRight(defaults, inputs)
     config.name = inputs.name || this.state.name || defaults.name
 
-    const dynamodb = new AWS.DynamoDB()
+    const dynamodb = new AWS.DynamoDB({ region: config.region, credentials: this.credentials.aws })
+
     this.cli.status('Removing')
     await deleteTable({ dynamodb, ...config })
 

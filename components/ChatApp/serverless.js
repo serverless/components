@@ -4,7 +4,6 @@
 
 const path = require('path')
 const Component = require('../../components/Component/serverless')
-const RealtimeApp = require('../../components/RealtimeApp/serverless')
 
 /*
  * Class – ChatApp
@@ -27,12 +26,12 @@ class ChatApp extends Component {
     inputs = Object.assign(defaults, inputs)
 
     // Deploy the DynamoDB table...
-    // const dynamoDb = new DynamoDb(`${this.id}.realtimeApp`)
+    // const dynamoDb = this.load('DynamoDb')
 
     // Deploy the RealtimeApp...
-    const realtimeApp = new RealtimeApp(`${this.id}.realtime_app`)
+    const realtimeApp = this.load('RealtimeApp')
     let outputs = await realtimeApp({
-      name: this.id,
+      name: this.constructor.name,
       description: 'A real-time chat application.',
       frontend: {
         path: path.join(__dirname, 'frontend'),
@@ -67,14 +66,14 @@ class ChatApp extends Component {
   async remove() {
     this.cli.status('Removing')
 
-    const realtimeApp = new RealtimeApp(`${this.id}.realtime_app`)
+    const realtimeApp = this.load('RealtimeApp')
     const outputs = await realtimeApp.remove()
 
     return outputs
   }
 
   async connect(inputs = {}) {
-    const realtimeApp = new RealtimeApp(`${this.id}.realtime_app`)
+    const realtimeApp = this.load('RealtimeApp')
     return realtimeApp.connect({ code: './backend', ...inputs })
   }
 }

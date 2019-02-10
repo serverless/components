@@ -20,13 +20,14 @@ const defaults = {
   service: 'lambda.amazonaws.com',
   policy: {
     arn: 'arn:aws:iam::aws:policy/AdministratorAccess'
-  }
+  },
+  region: 'us-east-1'
 }
 
 class Role extends Component {
   async default(inputs = {}) {
     const config = mergeDeepRight(defaults, inputs)
-    const iam = new aws.IAM(config)
+    const iam = new aws.IAM({ region: config.region, credentials: this.credentials.aws })
 
     this.cli.status(`Deploying`)
 
@@ -70,7 +71,7 @@ class Role extends Component {
     const config = mergeDeepRight(defaults, inputs)
     config.name = inputs.name || this.state.name || defaults.name
 
-    const iam = new aws.IAM(config)
+    const iam = new aws.IAM({ region: config.region, credentials: this.credentials.aws })
     this.cli.status(`Removing`)
     await deleteRole({ iam, ...config })
 

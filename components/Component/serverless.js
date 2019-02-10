@@ -1,10 +1,20 @@
-const { getCli, readState, writeState } = require('../../src/utils/')
+const path = require('path')
+const { getCli, getCredentials, readState, writeState } = require('../../src/utils/')
 
 class Component {
-  constructor(id = this.constructor.name, parent = false) {
-    this.id = id
-    this.cli = getCli(this.constructor.name, parent)
-    this.state = readState(id)
+  constructor(config) {
+    if (!config || typeof config === 'string') {
+      this.stage = 'dev'
+      this.id = config || `${this.stage}.${this.constructor.name}`
+      this.credentials = getCredentials(this.stage)
+      this.cli = getCli(this.stage, this.constructor.name, true)
+    } else {
+      this.stage = config.stage || 'dev'
+      this.id = config.id || `${this.stage}.${this.constructor.name}`
+      this.credentials = config.credentials || getCredentials(this.stage)
+      this.cli = getCli(this.stage, this.constructor.name, config.silent)
+    }
+    this.state = readState(this.id)
 
     // defines the default function that would be returned below
     // and adds the instance context to it
@@ -42,6 +52,21 @@ class Component {
 
   save() {
     return writeState(this.id, this.state)
+  }
+
+  load(componentName, componentAlias, silent = true) {
+    try {
+      const childComponent = require(path.join('..', componentName, 'serverless'))
+
+      return new childComponent({
+        id: `${this.id}.${componentAlias || childComponent.name}`,
+        stage: this.stage,
+        credentials: this.credentials,
+        silent
+      })
+    } catch (e) {
+      throw Error(`Component "${componentName}" does not exist`)
+    }
   }
 }
 

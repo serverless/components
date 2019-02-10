@@ -28,7 +28,7 @@ class Website extends Component {
 
   async default(inputs = {}) {
     const config = mergeDeepRight(defaults, inputs)
-    const s3 = new aws.S3(config)
+    const s3 = new aws.S3({ region: config.region, credentials: this.credentials.aws })
 
     // Ensure paths are resolved
     config.path = path.resolve(config.path)
@@ -97,13 +97,14 @@ class Website extends Component {
     return pick(outputs, config)
   }
 
-  async remove(inputs) {
+  async remove(inputs = {}) {
+    const config = mergeDeepRight(defaults, inputs)
     if (!this.state.bucketName) {
       this.cli.log('no website bucket name found in state.')
       return
     }
 
-    const s3 = new aws.S3(inputs)
+    const s3 = new aws.S3({ region: config.region, credentials: this.credentials.aws })
 
     this.cli.status(`Removing`)
 

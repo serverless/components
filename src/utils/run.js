@@ -10,6 +10,41 @@ if (argv.silent) {
   delete argv.silent // so that it's not passed to components
 }
 
+let stage = 'dev'
+if (argv.stage) {
+  stage = argv.stage // eslint-disable-line
+  delete argv.stage
+}
+
+const runComponent = async (Component, inputs = {}, method) => {
+  const component = new Component({
+    stage,
+    silent: false
+  })
+  try {
+    if (method && !component[method]) {
+      throw Error(`Component "${Component.name}" does not have a "${method}" method`)
+    }
+
+    if (!method) {
+      await component(inputs)
+    } else {
+      await component[method](inputs)
+    }
+
+    if (component.cli.running) {
+      component.cli.done() // mark the cli as done if the component author hasn't done that
+    }
+  } catch (e) {
+    if (component.cli.running) {
+      component.cli.error(e) // mark the cli as error if it's running
+    } else {
+      // otherwise, just output the error
+      console.log(e.stack) // eslint-disable-line
+    }
+  }
+}
+
 /*
  * "serverless" -> run default function in cwd
  * "serverless connect socket" -> run connect function in socket component, even if there's serverless.js in cwd
@@ -31,51 +66,34 @@ const run = async () => {
     if (await fileExists(serverlessJsFilePath)) {
       // serverless.js exists in cwd
       const Component = require(serverlessJsFilePath)
-      const component = new Component(undefined, true)
 
       if (argv['_'].length === 1) {
         // run the specified function from cwd Component. eg. "serverless connect"
         const command = argv['_'].shift()
-
-        if (!component[command]) {
-          console.log(`  Component in cwd does not have a "${command}" method`) // eslint-disable-line
-          return
-        }
-        await component[command](argv || {})
+        await runComponent(Component, argv, command)
       } else {
         // run the default function in cwd. eg. "serverless"
-        await component(argv || {})
-      }
-
-      if (component.cli.running) {
-        component.cli.done()
+        await runComponent(Component, argv)
       }
     } else if (
       (await fileExists(serverlessYmlFilePath)) ||
       (await fileExists(serverlessJsonFilePath)) ||
       (await fileExists(serverlessYamlFilePath))
     ) {
-      const component = new components['Components'](undefined, true)
+      // run the Components component
       if (argv['_'].length === 0) {
-        await component(argv || {})
+        // run the default function of the Components component
+        await runComponent(components['Components'], argv)
       } else if (argv['_'].length === 1 && argv['_'][0] === 'remove') {
-        await component['remove'](argv || {})
-      }
-
-      if (component.cli.running) {
-        component.cli.done()
+        // run the remove function of the Components component
+        await runComponent(components['Components'], argv, 'remove')
       }
     } else if (argv['_'].length === 1 && typeof components[argv['_'][0]] !== 'undefined') {
       // serverless.js does not exist in cwd & component exists in registry
       // eg. running "serverless socket" in directory that does not have serverless.js
       // in that case, run the default function in the socket component
 
-      const component = new components[argv['_'][0]](undefined, true)
-      await component(argv || {})
-
-      if (component.cli.running) {
-        component.cli.done()
-      }
+      await runComponent(components[argv['_'][0]], argv)
     } else {
       console.log('  no serverless.js found in cwd.') // eslint-disable-line
     }
@@ -86,12 +104,7 @@ const run = async () => {
 
     if (typeof components[componentName] !== 'undefined') {
       // component exists in registry
-      const component = new components[componentName](undefined, true)
-      await component[command](argv || {})
-
-      if (component.cli.running) {
-        component.cli.done()
-      }
+      await runComponent(components[componentName], argv, command)
     } else {
       console.log(`  Component ${componentName} does not exist`) // eslint-disable-line
     }
