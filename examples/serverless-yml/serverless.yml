@@ -1,6 +1,5 @@
 name: v2-test
-stage: dev
-tableName: ${name}-table-${stage}
+tableName: ${name}-table
 
 components:
   DynamoDB::v2TestTable:
@@ -10,6 +9,6 @@ components:
     #   ReadCapacityUnits: 2
     #   WriteCapacityUnits: 2
   Lambda::v2testLambda:
-    name: ${name}-lambda-${stage}
+    name: ${name}-lambda
     env:
       DDB_TABLE: ${tableName}
