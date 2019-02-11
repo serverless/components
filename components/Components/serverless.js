@@ -1,7 +1,13 @@
 const { mergeDeepRight } = require('../../src/utils')
 const Component = require('../Component/serverless')
 
-const { loadServerlessFile, prepareComponents, createGraph, logOutputs } = require('./utils')
+const {
+  loadServerlessFile,
+  prepareComponents,
+  createGraph,
+  loadState,
+  logOutputs
+} = require('./utils')
 const variables = require('./utils/variables')
 
 const defaults = {
@@ -55,19 +61,22 @@ class Components extends Component {
     // TODO: refactor so that we don't need to pass `this` into it
     const preparedComponents = prepareComponents(fileContent.components, this)
 
+    // TODO: refactor so that we don't need to manually create the ids
+    const ids = Object.keys(preparedComponents).map((componentId) => `${this.id}.${componentId}`)
+    const state = loadState(ids)
+
     const graph = createGraph(preparedComponents, vars)
 
     // TODO: update to process nodes in parallel
     const results = {}
     const outputs = {}
-    // TODO: we need to run removal in reverse order...
-    const instancesToProcess = graph.overallOrder()
+    const instancesToProcess = graph.overallOrder().reverse()
     for (let i = 0; i < instancesToProcess.length; i++) {
       const instanceId = instancesToProcess[i]
       const value = preparedComponents[instanceId]
       let inputs = value.inputs // eslint-disable-line
       const { instance } = value
-      inputs = variables.resolveComponentVariables(vars, results, value)
+      inputs = variables.resolveComponentVariables(vars, state, value)
       const result = await instance.remove(inputs)
       results[instanceId] = result
       outputs[instanceId] = instance.cli.outputs
