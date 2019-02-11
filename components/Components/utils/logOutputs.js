@@ -1,15 +1,19 @@
 const { titelize, forEach, forEachObjIndexed } = require('../../../src/utils')
 
 function logOutputs(cli, outputs) {
-  if (outputs.length) {
-    // TODO: update so that only the most important outputs are shown
-    forEach((output) => {
+  const instanceIds = Object.keys(outputs)
+  if (instanceIds.length) {
+    forEach((instanceId) => {
       cli.log('')
+      cli.log(instanceId)
       forEachObjIndexed((value, key) => {
         const name = titelize(key)
-        cli.output(name, output[key])
-      })
-    }, outputs)
+        // only log non-object values for now
+        if (typeof value !== 'object') {
+          cli.output(`  ${name}`, value)
+        }
+      }, outputs[instanceId])
+    }, instanceIds)
   }
 }
 

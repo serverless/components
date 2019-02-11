@@ -21,6 +21,7 @@
     "aws-sdk": "^2.387.0",
     "chalk": "^2.4.2",
     "dotenv": "^6.2.0",
+    "dependency-graph": "^0.8.0",
     "enquirer": "^2.3.0",
     "figures": "^2.0.0",
     "fs-extra": "^7.0.1",
@@ -29,6 +30,7 @@
     "mime-types": "^2.1.21",
     "minimist": "^1.2.0",
     "ramda": "^0.26.1",
+    "traverse": "^0.6.6",
     "ws": "^6.1.2"
   },
   "devDependencies": {

@@ -1,17 +1,17 @@
-const loadComponent = require('./loadComponent')
+const variables = require('./variables')
+const createGraph = require('./createGraph')
 const loadServerlessFile = require('./loadServerlessFile')
 const logOutputs = require('./logOutputs')
 const parseJson = require('./parseJson')
 const parseYaml = require('./parseYaml')
 const prepareComponents = require('./prepareComponents')
-const resolveVariables = require('./resolveVariables')
 
 module.exports = {
-  loadComponent,
+  ...variables,
+  createGraph,
   loadServerlessFile,
   logOutputs,
   parseJson,
   parseYaml,
-  prepareComponents,
-  resolveVariables
+  prepareComponents
 }
