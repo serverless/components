@@ -1,19 +1,25 @@
-const { titelize, forEach, forEachObjIndexed } = require('../../../src/utils')
+const chalk = require('chalk')
+const figures = require('figures')
+const { titelize, forEachObjIndexed } = require('../../../src/utils')
 
 function logOutputs(cli, outputs) {
   const instanceIds = Object.keys(outputs)
   if (instanceIds.length) {
-    forEach((instanceId) => {
-      cli.log('')
-      cli.log(instanceId)
+    cli.log('')
+    instanceIds.forEach((instanceId, idx) => {
+      cli.log(`${chalk.green(figures.tick)} ${instanceId} deployed`)
       forEachObjIndexed((value, key) => {
         const name = titelize(key)
         // only log non-object values for now
         if (typeof value !== 'object') {
-          cli.output(`  ${name}`, value)
+          cli.output(`    ${name}`, value)
         }
       }, outputs[instanceId])
-    }, instanceIds)
+      // determine if a newline needs to be logged
+      if ((idx += 1) !== instanceIds.length) {
+        cli.log('')
+      }
+    })
   }
 }
 
