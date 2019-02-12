@@ -30,6 +30,8 @@ class Components extends Component {
 
     const graph = createGraph(preparedComponents, vars)
 
+    this.cli.status(`${Object.keys(preparedComponents).length} Components Loaded`)
+
     // TODO: update to process nodes in parallel
     const results = {}
     const outputs = {}
@@ -38,8 +40,9 @@ class Components extends Component {
       const instanceId = instancesToProcess[i]
       const value = preparedComponents[instanceId]
       let inputs = value.inputs // eslint-disable-line
-      const { instance } = value
+      const { component, instance } = value
       inputs = variables.resolveComponentVariables(vars, results, value)
+      this.cli.status(`Running ${component} "${instanceId}"`)
       const result = await instance.default(inputs)
       results[instanceId] = result
       outputs[instanceId] = instance.cli.outputs
@@ -67,6 +70,8 @@ class Components extends Component {
 
     const graph = createGraph(preparedComponents, vars)
 
+    this.cli.status(`${Object.keys(preparedComponents).length} Components Loaded`)
+
     // TODO: update to process nodes in parallel
     const results = {}
     const outputs = {}
@@ -75,8 +80,9 @@ class Components extends Component {
       const instanceId = instancesToProcess[i]
       const value = preparedComponents[instanceId]
       let inputs = value.inputs // eslint-disable-line
-      const { instance } = value
+      const { component, instance } = value
       inputs = variables.resolveComponentVariables(vars, state, value)
+      this.cli.status(`Running ${component} "${instanceId}"`)
       const result = await instance.remove(inputs)
       results[instanceId] = result
       outputs[instanceId] = instance.cli.outputs
