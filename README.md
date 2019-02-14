@@ -7,7 +7,11 @@
 &nbsp;
 
 
-[AWS Lambda Function](./examples/aws-lambda) - [Websockets Backend](./examples/socket) - [Website](./examples/website) -  [Realtime App](./examples/realtime-app) - [Chat App](./examples/chat-app)
+* [AWS Lambda Function](./examples/aws-lambda)
+* [Websockets Backend](./examples/socket)
+* [Website](./examples/website)
+* [Realtime App](./examples/realtime-app)
+* [Chat App](./examples/chat-app)
 
 &nbsp;
 
