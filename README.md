@@ -6,7 +6,6 @@
 
 &nbsp;
 
-
 * [AWS Lambda Function](./examples/aws-lambda)
 * [Website](./examples/website)
 * [Websockets Backend](./examples/socket)
@@ -16,6 +15,8 @@
 &nbsp;
 
 ## Get Started
+
+&nbsp;
 
 Clone the repo.
 
