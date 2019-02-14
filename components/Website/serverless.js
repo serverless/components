@@ -27,7 +27,6 @@ class Website extends Component {
    */
 
   async default(inputs = {}) {
-    inputs = inputs || {}
     const config = mergeDeepRight(defaults, inputs)
     const s3 = new aws.S3({ region: config.region, credentials: this.credentials.aws })
 

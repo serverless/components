@@ -3,4 +3,3 @@ stage: dev
 
 components:
   Website::my-site:
-    assets: ./build
