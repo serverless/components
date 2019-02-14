@@ -2,7 +2,7 @@
 
 &nbsp;
 
-> _**"The future of cloud is outcomes, not infrastructure."**_
+> _"The future of cloud is outcomes, not infrastructure."_
 
 &nbsp;
 
