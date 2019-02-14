@@ -1,9 +1,10 @@
 # Serverless Framework V.2
 
-
+&nbsp;
 
 > _"The future of cloud is outcomes, not infrastructure."_
 
+&nbsp;
 
 |   |   |   |   |   |
 |---|---|---|---|---|
