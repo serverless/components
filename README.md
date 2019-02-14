@@ -52,7 +52,7 @@ $ website: v2
 You can leverage different environment variables for different stages by using this naming convention:
 
 ```
-.env // Default
+.env # Default
 .env.dev
 .env.prod
 ```
