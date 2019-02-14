@@ -12,9 +12,13 @@ const getCli = (stage, componentName, silent = true) => {
   if (!silent) {
     cli = {
       running: false,
-      msg: chalk.yellow('Running'),
+      // Entity - Sets the entity that is reporting
+      entity: (entity) => {
+        componentName = entity
+      },
+      msg: chalk.yellow('Running...'),
       outputs: {},
-      status: (msg = 'Running') => {
+      status: (msg = 'Running...') => {
         cli.msg = chalk.yellow(msg)
         if (cli.running) {
           return
@@ -54,7 +58,7 @@ const getCli = (stage, componentName, silent = true) => {
         cli.outputs[label] = value
         process.stdout.write(`  ${chalk.grey(`${label}`)} ${value}\n`)
       },
-      log: (msg) => {
+      log: (msg = '') => {
         process.stdout.write(`  ${msg}\n`)
       },
       render: async (frame = 0) => {

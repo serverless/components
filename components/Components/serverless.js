@@ -15,6 +15,12 @@ const defaults = {
 }
 
 class Components extends Component {
+
+  /*
+  * Default
+  * - Loads serverless.yml and deploys all Components in it
+  */
+
   async default(inputs = {}) {
     const config = mergeDeepRight(defaults, inputs)
 
@@ -40,16 +46,23 @@ class Components extends Component {
       const { component, instance } = value
       inputs = variables.resolveComponentVariables(vars, results, value)
 
-      this.cli.status(`Running ${component} "${instanceId}"`, component)
-
-      // this.cli.status(`Running ${component} "${instanceId}"`)
+      // Update the CLI entity to the current component
+      this.cli.entity(component)
+      this.cli.status('Running...')
       const result = await instance.default(inputs)
       results[instanceId] = result
       outputs[instanceId] = instance.cli.outputs
     }
 
+    // Update CLI entity to be the name of the YAML Component
+    this.cli.entity(fileContent.name)
     logOutputs(this.cli, outputs)
   }
+
+  /*
+  * Remove
+  * - Removes all Components in serverless.yml
+  */
 
   async remove(inputs = {}) {
     const config = mergeDeepRight(defaults, inputs)
@@ -67,10 +80,7 @@ class Components extends Component {
     // TODO: refactor so that we don't need to manually create the ids
     const ids = Object.keys(preparedComponents).map((componentId) => `${this.id}.${componentId}`)
     const state = loadState(ids)
-
     const graph = createGraph(preparedComponents, vars)
-
-    this.cli.status(`${Object.keys(preparedComponents).length} Components Loaded`)
 
     // TODO: update to process nodes in parallel
     const results = {}
@@ -82,7 +92,11 @@ class Components extends Component {
       let inputs = value.inputs // eslint-disable-line
       const { component, instance } = value
       inputs = variables.resolveComponentVariables(vars, state, value)
-      this.cli.status(`Running ${component} "${instanceId}"`)
+
+      // Update the CLI entity to the current component
+      this.cli.entity(component)
+      this.cli.status('Removing...')
+
       const result = await instance.remove(inputs)
       results[instanceId] = result
       outputs[instanceId] = instance.cli.outputs
