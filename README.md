@@ -25,11 +25,7 @@ Install its dependencies.
 cd v2 && npm i -g
 ```
 
-You will now have the `$ v2` command available in your terminal.
-
-Pick an [example](./example).
-
-Each example requires credentials for Amazon Web Services set as environment variables.
+Pick an [example](./example). Each example requires credentials for Amazon Web Services set as environment variables.
 
 Serverless Framework V.2 supports `.env` files in the same folder as `serverless.yml` or `serverless.js`.  Create one that looks like this:
 
@@ -38,7 +34,7 @@ AWS_ACCESS_KEY_ID=123456789
 AWS_SECRET_ACCESS_KEY=987654321
 ```
 
-Then run `$ v2 in 
+Then run `$ v2`
 
 ```bash
 $ website: v2
