@@ -7,7 +7,7 @@
 &nbsp;
 
 * [Chat App](./examples/chat-app)
-* [Realtime Fullstack App](./examples/realtime-app)
+* [Realtime App](./examples/realtime-app)
 * [Websockets Backend](./examples/socket)
 * [Website](./examples/website)
 * [AWS Lambda Function](./examples/aws-lambda)
