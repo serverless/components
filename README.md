@@ -16,8 +16,6 @@
 
 ## Get Started
 
-&nbsp;
-
 Clone the repo.
 
 ```bash
