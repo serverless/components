@@ -27,10 +27,7 @@ class Components extends Component {
 
     // TODO: refactor so that we don't need to pass `this` into it
     const preparedComponents = prepareComponents(fileContent.components, this)
-
     const graph = createGraph(preparedComponents, vars)
-
-    this.cli.status(`${Object.keys(preparedComponents).length} Components Loaded`)
 
     // TODO: update to process nodes in parallel
     const results = {}
