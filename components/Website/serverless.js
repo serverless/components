@@ -10,7 +10,7 @@ const outputs = ['name', 'url']
 const defaults = {
   name: 'serverless',
   path: process.cwd(),
-  assets: path.join(process.cwd(), 'build'),
+  assets: process.cwd(),
   envFile: path.join(process.cwd(), 'src', 'env.js'),
   env: {},
   buildCmd: null,

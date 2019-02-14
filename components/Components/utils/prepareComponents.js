@@ -13,7 +13,7 @@ function prepareComponents(components, that) {
       const instanceId = splittedKey[1] || `${componentName.toLowerCase()}${idx}`
       // load the component class
       const instance = that.load(componentName, instanceId)
-      const inputs = components[key]
+      const inputs = components[key] || {} // Don't let inputs be null
       return assoc(
         instanceId,
         {

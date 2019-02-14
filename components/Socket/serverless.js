@@ -16,6 +16,7 @@ const isJson = (body) => {
 
 class Socket extends Component {
   async default(inputs = {}) {
+    inputs = inputs || {}
     const socketFilePath = resolve(inputs.code || process.cwd(), 'socket.js')
     if (!(await fileExists(socketFilePath))) {
       this.cli.log('no socket.js file found in your codebase')

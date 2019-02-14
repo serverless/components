@@ -17,7 +17,7 @@ const getConfig = (inputs) => {
     region: 'us-east-1',
     frontend: {
       path: './frontend',
-      assets: './frontend/',
+      assets: './frontend',
       envFile: './frontend/src/env.js',
       env: {},
       buildCmd: null,
@@ -56,7 +56,7 @@ class RealtimeApp extends Component {
 
   async default(inputs = {}) {
     this.cli.status('Deploying')
-
+    inputs = inputs || {}
     // Get config from inputs and defaults
     if (!inputs.name) {
       inputs.name = this.constructor.name
