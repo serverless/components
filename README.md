@@ -2,8 +2,12 @@
 
 
 
-> The future of cloud is outcomes, not infrastructure.
+> _"The future of cloud is outcomes, not infrastructure."_
 
+
+|   |   |   |   |   |
+|---|---|---|---|---|
+|[AWS Lambda Function](./examples/aws-lambda)|[Websockets Backend](./examples/socket)|[Website](./examples/website)|[Realtime App](./examples/realtime-app)|[Chat App](./examples/chat-app)|
 
 
 ## Get Started
