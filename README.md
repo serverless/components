@@ -22,7 +22,7 @@ Clone the repo.
 $ git clone https://github.com/serverless/v2.git
 ```
 
-Install its dependencies.
+Install dependencies.
 
 ```
 cd v2 && npm i -g
