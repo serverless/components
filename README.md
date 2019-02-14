@@ -6,13 +6,10 @@
 
 &nbsp;
 
-*Outcomes:*
 * [Chat App](./examples/chat-app)
 * [Realtime Fullstack App](./examples/realtime-app)
 * [Websockets Backend](./examples/socket)
 * [Website](./examples/website)
-
-*Infra:*
 * [AWS Lambda Function](./examples/aws-lambda)
 
 &nbsp;
