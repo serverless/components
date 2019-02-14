@@ -3,3 +3,6 @@ stage: dev
 
 components:
   ChatApp::my-chat-app:
+    # colorBackground: black
+    # colorInputText: white
+    # logoUrl:

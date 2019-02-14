@@ -3,3 +3,7 @@ stage: dev
 
 components:
   RealtimeApp::realtime-app:
+    frontend:
+      assets: ./frontend/build
+    backend:
+      assets: ./backend

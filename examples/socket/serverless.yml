@@ -1,0 +1,6 @@
+name: my-websockets-backend
+stage: dev
+
+components:
+  Socket::my-websockets:
+    code: ./code

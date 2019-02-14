@@ -1,0 +1,6 @@
+name: my-site
+stage: dev
+
+components:
+  Website::my-site:
+    assets: ./build

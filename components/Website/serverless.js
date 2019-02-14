@@ -10,7 +10,7 @@ const outputs = ['name', 'url']
 const defaults = {
   name: 'serverless',
   path: process.cwd(),
-  assets: path.join(process.cwd(), 'build'),
+  assets: process.cwd(),
   envFile: path.join(process.cwd(), 'src', 'env.js'),
   env: {},
   buildCmd: null,
@@ -27,6 +27,7 @@ class Website extends Component {
    */
 
   async default(inputs = {}) {
+    inputs = inputs || {}
     const config = mergeDeepRight(defaults, inputs)
     const s3 = new aws.S3({ region: config.region, credentials: this.credentials.aws })
 
