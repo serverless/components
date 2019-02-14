@@ -1,7 +1,0 @@
-name: realtime-app-2
-stage: dev
-
-components:
-  Website::website:
-  Website::website-2:
-  Socket::socket:
