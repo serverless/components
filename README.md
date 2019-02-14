@@ -28,7 +28,7 @@ Install dependencies.
 cd v2 && npm i -g
 ```
 
-Pick an [example](./example). Each example requires credentials for Amazon Web Services set as environment variables.
+Pick an [example](./examples). Each example requires credentials for Amazon Web Services set as environment variables.
 
 Serverless Framework V.2 supports `.env` files in the same folder as `serverless.yml` or `serverless.js`.  Create one that looks like this:
 
