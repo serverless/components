@@ -6,21 +6,25 @@
 
 
 
-### Set-Up
+## Get Started
+
+Clone the repo.
 
 ```bash
-git clone https://github.com/serverless/v2.git
+$ git clone https://github.com/serverless/v2.git
+```
 
-cd v2
+Install its dependencies.
 
-npm i -g
+```
+cd v2 && npm i -g
 ```
 
 You will now have the `$ v2` command available in your terminal.
 
-### Deploy
+Pick an [example](./example).
 
-The examples require credentials for Amazon Web Services set as environment variables.
+Each example requires credentials for Amazon Web Services set as environment variables.
 
 Serverless Framework V.2 supports `.env` files in the same folder as `serverless.yml` or `serverless.js`.  Create one that looks like this:
 
@@ -29,19 +33,25 @@ AWS_ACCESS_KEY_ID=123456789
 AWS_SECRET_ACCESS_KEY=987654321
 ```
 
+Then run `$ v2 in 
+
 ```bash
-app (master)$ cd examples/app
-app (master)$ node ../../bin/v2
+$ website: v2
+  
+  ✔  my-site
 
-   Status:  My App Deployed
+     URL  http://serverless-6vql3jp9.s3-website-us-east-1.amazonaws.com
 
-   Socket URL:  wss://98531tq37e.execute-api.us-east-1.amazonaws.com/dev/
-   Website URL: http://my-app-dev-pqso3.s3-website-us-east-1.amazonaws.com
-
-app (master)$
+  3s › dev › my-site › Done
 ```
 
-**Note:** Checkout the `app` example code to see how components are consumed via a `serverless.js` file. Also checkout real-world component code in the components directory.
+You can leverage different environment variables for different stages by using this naming convention:
+
+```
+.env // Default
+.env.dev
+.env.prod
+```
 
 ### How To Use A Serverless Component Programmatically
 
