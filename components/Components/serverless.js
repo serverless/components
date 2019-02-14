@@ -39,7 +39,10 @@ class Components extends Component {
       let inputs = value.inputs // eslint-disable-line
       const { component, instance } = value
       inputs = variables.resolveComponentVariables(vars, results, value)
-      this.cli.status(`Running ${component} "${instanceId}"`)
+
+      this.cli.status(`Running ${component} "${instanceId}"`, component)
+
+      // this.cli.status(`Running ${component} "${instanceId}"`)
       const result = await instance.default(inputs)
       results[instanceId] = result
       outputs[instanceId] = instance.cli.outputs
