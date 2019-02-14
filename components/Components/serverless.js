@@ -47,8 +47,9 @@ class Components extends Component {
       inputs = variables.resolveComponentVariables(vars, results, value)
 
       // Update the CLI entity to the current component
-      this.cli.entity(component)
-      this.cli.status('Running...')
+      this.cli.entity(`${instanceId}`)
+      this.cli.status('running...')
+
       const result = await instance.default(inputs)
       results[instanceId] = result
       outputs[instanceId] = instance.cli.outputs
@@ -95,7 +96,7 @@ class Components extends Component {
 
       // Update the CLI entity to the current component
       this.cli.entity(component)
-      this.cli.status('Removing...')
+      this.cli.status('removing...')
 
       const result = await instance.remove(inputs)
       results[instanceId] = result
