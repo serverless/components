@@ -16,7 +16,7 @@
 
 ## Get Started
 
-Clone the repo.
+Clone repo.
 
 ```bash
 $ git clone https://github.com/serverless/v2.git
@@ -37,7 +37,7 @@ AWS_ACCESS_KEY_ID=123456789
 AWS_SECRET_ACCESS_KEY=987654321
 ```
 
-Then run `$ v2`
+Run `$ v2`.
 
 ```bash
 $ website: v2
