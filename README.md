@@ -75,7 +75,7 @@ await realtimeApp.loadTest()
 
 ### How To Use A Serverless Component Declaratively
 
-Use a `serverless.yaml` file, like this:
+Use a `serverless.yml` file, like this:
 
 ```yaml
 
