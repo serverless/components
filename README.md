@@ -6,11 +6,11 @@
 
 &nbsp;
 
-* [AWS Lambda Function](./examples/aws-lambda)
-* [Website](./examples/website)
-* [Websockets Backend](./examples/socket)
-* [Realtime Fullstack App](./examples/realtime-app)
 * [Chat App](./examples/chat-app)
+* [Realtime Fullstack App](./examples/realtime-app)
+* [Websockets Backend](./examples/socket)
+* [Website](./examples/website)
+* [AWS Lambda Function](./examples/aws-lambda)
 
 &nbsp;
 
