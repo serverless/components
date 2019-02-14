@@ -1,22 +1,40 @@
 # Serverless Framework V.2
 
+
+
+> The future of cloud is outcomes, not infrastructure.
+
+
+
 ### Set-Up
 
 ```bash
 git clone https://github.com/serverless/v2.git
+
 cd v2
+
+npm i -g
 ```
 
-### Run Example
+You will now have the `$ v2` command available in your terminal.
 
-Run the `app` example to see how everything fits together.
+### Deploy
+
+The examples require credentials for Amazon Web Services set as environment variables.
+
+Serverless Framework V.2 supports `.env` files in the same folder as `serverless.yml` or `serverless.js`.  Create one that looks like this:
+
+```text
+AWS_ACCESS_KEY_ID=123456789
+AWS_SECRET_ACCESS_KEY=987654321
+```
 
 ```bash
 app (master)$ cd examples/app
 app (master)$ node ../../bin/v2
 
    Status:  My App Deployed
-   
+
    Socket URL:  wss://98531tq37e.execute-api.us-east-1.amazonaws.com/dev/
    Website URL: http://my-app-dev-pqso3.s3-website-us-east-1.amazonaws.com
 
