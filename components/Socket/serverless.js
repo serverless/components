@@ -35,9 +35,9 @@ class Socket extends Component {
     inputs.description = inputs.description || 'Serverless Socket'
     inputs.stage = this.stage
 
-    this.cli.status(`Deploying Lambda`)
+    this.cli.status(`Deploying AwsLambda`)
 
-    const lambda = this.load('Lambda')
+    const lambda = this.load('AwsLambda')
     const lambdaOutputs = await lambda(inputs)
 
     inputs.routes = {
@@ -63,7 +63,7 @@ class Socket extends Component {
   async remove() {
     this.cli.status(`Removing`)
 
-    const lambda = this.load('Lambda')
+    const lambda = this.load('AwsLambda')
     const websockets = this.load('WebSockets')
 
     const lambdaOutputs = await lambda.remove()

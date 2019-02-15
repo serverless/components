@@ -24,7 +24,7 @@ const defaults = {
   region: 'us-east-1'
 }
 
-class Role extends Component {
+class AwsIamRole extends Component {
   async default(inputs = {}) {
     const config = mergeDeepRight(defaults, inputs)
     const iam = new aws.IAM({ region: config.region, credentials: this.credentials.aws })
@@ -84,4 +84,4 @@ class Role extends Component {
   }
 }
 
-module.exports = Role
+module.exports = AwsIamRole

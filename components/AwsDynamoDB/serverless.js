@@ -28,7 +28,7 @@ const defaults = {
   region: 'us-east-1'
 }
 
-class DynamoDB extends Component {
+class AwsDynamoDB extends Component {
   async default(inputs = {}) {
     const config = mergeDeepRight(defaults, inputs)
     const dynamodb = new AWS.DynamoDB({ region: config.region, credentials: this.credentials.aws })
@@ -80,4 +80,4 @@ class DynamoDB extends Component {
   }
 }
 
-module.exports = DynamoDB
+module.exports = AwsDynamoDB

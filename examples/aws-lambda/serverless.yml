@@ -2,4 +2,4 @@ name: aws-lambda
 stage: dev
 
 components:
-  Lambda::my-aws-lambda:
+  AwsLambda::my-aws-lambda:

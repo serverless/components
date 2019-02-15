@@ -27,7 +27,7 @@ const outputs = [
 
 const defaults = {
   name: 'serverless',
-  description: 'Serverless Lambda Component',
+  description: 'AWS Lambda Component',
   memory: 128,
   timeout: 10,
   code: process.cwd(),
@@ -38,7 +38,7 @@ const defaults = {
   region: 'us-east-1'
 }
 
-class Lambda extends Component {
+class AwsLambda extends Component {
   async default(inputs = {}) {
     const config = mergeDeepRight(defaults, inputs)
 
@@ -46,9 +46,9 @@ class Lambda extends Component {
 
     const lambda = new aws.Lambda({ region: config.region, credentials: this.credentials.aws })
 
-    const role = this.load('Role')
+    const awsIamRole = this.load('AwsIamRole')
 
-    config.role = config.role || (await role(config))
+    config.role = config.role || (await awsIamRole(config))
 
     this.cli.status(`Packaging`)
 
@@ -94,11 +94,11 @@ class Lambda extends Component {
 
     this.cli.status(`Removing`)
 
-    const role = this.load('Role')
+    const awsIamRole = this.load('AwsIamRole')
 
     // there's no need to pass role name as input
     // since it's saved in the Role component state
-    await role.remove()
+    await awsIamRole.remove()
 
     await deleteLambda({ lambda, name: config.name })
 
@@ -111,4 +111,4 @@ class Lambda extends Component {
   }
 }
 
-module.exports = Lambda
+module.exports = AwsLambda
