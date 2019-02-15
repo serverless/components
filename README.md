@@ -41,7 +41,7 @@ Run `$ v2`.
 
 ```bash
 $ website: v2
-  
+
   ✔  my-site
 
      URL  http://serverless-6vql3jp9.s3-website-us-east-1.amazonaws.com
@@ -64,7 +64,7 @@ Create a new javascript file, and load/use Components like this:
 ```javascript
 
 // To load a Component, instantiate it's class...
-const realtimeApp = new RealtimeApp('instanceId', { /* inputs */ })
+const realtimeApp = this.load('RealtimeApp')
 
 // To run/deploy/update a Component, call it's default function...
 await realtimeApp()
@@ -78,32 +78,28 @@ await realtimeApp.loadTest()
 Use a `serverless.yml` file, like this:
 
 ```yaml
-
-name: realtimeApp
+name: my-realtime-app
 stage: dev
 
-providers:
-  AwsProvider::aws:
-    accessKeyId: ${secrets:aws_access_key_id}
-    secretAccessKey: ${secrets:secret_access_key}
-
 components:
-  RealtimeApp::realtimeApp:
-    name: ${name}-${stage}
-    code: ./src/backend
+  RealtimeApp::realtime-app:
+    frontend:
+      assets: ./frontend/build
+    backend:
+      assets: ./backend
 ```
 
 Then use your CLI, like this:
 
 ```bash
 # To run/deploy/update all Components, call 'serverless'...
-$ serverless
+$ sf
 
 # To run extra functionality that comes with the a component, call this...
-$ serverless loadTest myRealtimeApp
+$ sf loadTest myRealtimeApp
 
 # To remove Components in YAML, call this...
-$ serverless remove
+$ sf remove
 ```
 
 ### How To Write A Serverless Component
