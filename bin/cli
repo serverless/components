@@ -16,6 +16,5 @@ config.silent = args.silent || false
 config.debug = (args.d || args.debug) ? (args.d || args.debug) : false
 
 // Run
-;(async () => {
-  await serverless.run(config)
-})().catch((e) => console.log(e.stack))
+;(async () => { return serverless.run(config) })()
+.catch((e) => console.log(e.stack))

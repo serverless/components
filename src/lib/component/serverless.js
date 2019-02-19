@@ -40,8 +40,8 @@ class Component {
     this.cli.outputs = (outputs) => {cli.renderOutputs(outputs, name)}
 
     // Define default function
-    // - Adds the instance context to it
-    // - TODO: validate that component author has defined a default() method
+    // Adds the instance context to it
+    // TODO: validate that component author has defined a default() method
     const that = this
     const defaultFunction = function(inputs) {
       return that.default.call(that, inputs)
@@ -54,16 +54,15 @@ class Component {
 
     // Add Component class methods like the save() method
     const classMethods = Object.getOwnPropertyNames(Component.prototype)
-
     classMethods.forEach((classMethod) => {
       defaultFunction[classMethod] = (classMethodInputs) =>
         this[classMethod].call(that, classMethodInputs) // apply instance context
     })
 
     // Add instance methods
-    // - those are the methods of the class that extends Component
-    // - if user added his own save() method for example,
-    // - this would overwrite the Component class save() method
+    // those are the methods of the class that extends Component
+    // if user added his own save() method for example,
+    // this would overwrite the Component class save() method
     const instanceMethods = Object.getOwnPropertyNames(Object.getPrototypeOf(this))
     instanceMethods.forEach((instanceMethod) => {
       defaultFunction[instanceMethod] = (instanceMethodInputs) =>

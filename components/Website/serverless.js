@@ -91,8 +91,7 @@ class Website extends Component {
     this.state.name = config.name
     this.state.bucketName = config.bucketName
     this.state.url = config.url
-    const results = this.save()
-    console.log(results)
+    await this.save()
 
     this.cli.outputs({ URL: config.url })
 
