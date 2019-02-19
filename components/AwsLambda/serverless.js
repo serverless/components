@@ -29,7 +29,7 @@ let outputs = [
 const defaults = {
   name: 'serverless',
   description: 'AWS Lambda Component',
-  memory: 128,
+  memory: 512,
   timeout: 10,
   code: process.cwd(),
   shim: null,

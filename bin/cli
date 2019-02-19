@@ -12,7 +12,7 @@ const config = {}
 config.stage = (args.s || args.stage) ? (args.s || args.stage) : 'dev'
 config.instance = args._[1] || null
 config.method = args._[0] || null
-config.silent = args.silent || false
+config.verbose = (args.v || args.verbose) ? (args.v || args.verbose) : false
 config.debug = (args.d || args.debug) ? (args.d || args.debug) : false
 
 // Run

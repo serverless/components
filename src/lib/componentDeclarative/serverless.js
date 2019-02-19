@@ -26,6 +26,9 @@ class ComponentDeclarative extends Component {
   */
 
   async default(inputs = {}) {
+
+    this.cli.status('Running')
+
     const config = mergeDeepRight(defaults, inputs)
     let fileContent
     fileContent = await readFile(path.join(this.context.root, this.context.rootFile))
@@ -61,6 +64,9 @@ class ComponentDeclarative extends Component {
   */
 
   async remove(inputs = {}) {
+
+    this.cli.status('Removing')
+
     const config = mergeDeepRight(defaults, inputs)
 
     let fileContent
@@ -88,9 +94,6 @@ class ComponentDeclarative extends Component {
       let inputs = value.inputs // eslint-disable-line
       const { component, instance } = value
       inputs = variables.resolveComponentVariables(vars, state, value)
-
-      this.cli.status('removing...')
-
       outputs[instanceId] = await instance.remove(inputs)
     }
 

@@ -65,14 +65,14 @@ class RealtimeApp extends Component {
     const socket = this.load('Socket')
 
     const socketOutputs = await socket(config.backend)
-    config.frontend.env.urlWebsocketApi = socketOutputs.websockets.url // pass backend url to frontend
+    config.frontend.env.urlWebsocketApi = socketOutputs.url // pass backend url to frontend
     const websiteOutputs = await website(config.frontend)
 
     // this high level component doesn't need to save any state!
 
     let outputs = {
       websiteUrl: websiteOutputs.url,
-      socketUrl: socketOutputs.websockets.url,
+      socketUrl: socketOutputs.url,
     }
     this.cli.outputs(outputs)
     return outputs

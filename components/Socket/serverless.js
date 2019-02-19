@@ -53,9 +53,17 @@ class Socket extends Component {
     this.state.socketFilePath = socketFilePath
     await this.save()
 
-    let outputs = {}
-    outputs.lambda = lambdaOutputs
-    outputs.websockets = websocketsOutputs
+    let outputs = {
+      url: websocketsOutputs.url,
+      code: {
+        runtime: lambdaOutputs.runtime,
+        env: Object.keys(lambdaOutputs.env) || [],
+        timeout: lambdaOutputs.timeout,
+        memory: lambdaOutputs.memory,
+      },
+      routes: Object.keys(websocketsOutputs.routes) || []
+    }
+
     this.cli.outputs(outputs)
     return outputs
   }

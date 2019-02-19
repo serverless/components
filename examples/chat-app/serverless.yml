@@ -6,3 +6,4 @@ components:
     # colorBackground: black
     # colorInputText: white
     # logoUrl:
+  AwsDynamoDb::users-temp:

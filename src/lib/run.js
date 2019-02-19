@@ -18,7 +18,7 @@ const components = require('../../components')
  * @param {String} config.instance - The instance name of an immediate child Component you want to target with the CLI.  Note: This only works with serverless.yml
  * @param {String} config.method - The method you want to call on the parent Component.
  * @param {Object} config.credentials - The credentials you wish to set in the context.
- * @param {String} config.silent - If you wish to silence the CLI.
+ * @param {String} config.verbose - If you wish to see outputs of all child Components.
  * @param {String} config.debug - If you wish to turn on debug mode.
  */
 
@@ -30,10 +30,10 @@ const run = async (config = {}) => {
   config.credentials = config.credentials || {}
   config.instance = config.instance || null
   config.method = config.method || null
-  config.silent = config.silent || false
+  config.verbose = config.verbose || false
   config.debug = config.debug || false
 
-  if (config.silent) process.env.SERVERLESS_SILENT = true
+  if (config.verbose) process.env.SERVERLESS_VERBOSE = true
   if (config.debug) process.env.SERVERLESS_DEBUG = true
 
   // Load env vars
@@ -85,13 +85,16 @@ const runProgrammatic = async (filePath, config) => {
   context.root = config.root
   context.rootFile = 'serverless.js'
   context.credentials = config.credentials
-  context.silent = config.silent
+  context.verbose = config.verbose
   context.debug = config.debug
   Component = require(filePath)
   component = new Component({ context })
 
-  // Start CLI
-  cli.start(config.stage, Component.name)
+  // Config CLI
+  cli.config({
+    stage: config.stage,
+    parentComponent: Component.name,
+  })
 
   try {
     // If method was provided, but doesn't exist, throw error
@@ -108,8 +111,8 @@ const runProgrammatic = async (filePath, config) => {
     return errorHandler(error, Component.name)
   }
 
-  // Stop CLI
-  cli.stop('done')
+  // Cleanup CLI
+  cli.close('done')
 
   return result
 }
@@ -128,7 +131,7 @@ const runDeclarative = async (filePath, config) => {
   context.root = config.root
   context.rootFile = path.basename(filePath)
   context.credentials = config.credentials
-  context.silent = config.silent
+  context.verbose = config.verbose
   context.debug = config.debug
 
   // TODO: Handle loading errors and validate...
@@ -137,8 +140,11 @@ const runDeclarative = async (filePath, config) => {
   // If no config.method or config.instance has been provided, run the default method...
   if (!config.instance && !config.method) {
 
-    // Start CLI
-    cli.start(config.stage, fileContent.name)
+    // Config CLI
+    cli.config({
+      stage: config.stage,
+      parentComponent: fileContent.name,
+    })
 
     try {
       component = new ComponentDeclarative({
@@ -154,8 +160,11 @@ const runDeclarative = async (filePath, config) => {
   // If config.method has been provided, run that...
   if (!config.instance && config.method) {
 
-    // Start CLI
-    cli.start(config.stage, fileContent.name)
+    // Config CLI
+    cli.config({
+      stage: config.stage,
+      parentComponent: fileContent.name,
+    })
 
     component = new ComponentDeclarative({
       name: fileContent.name, // Must pass in name to ComponentDeclaractive
@@ -192,12 +201,15 @@ const runDeclarative = async (filePath, config) => {
       throw Error(`Component "${componentName}" is not a valid Component.`)
     }
 
-    // Start CLI
-    cli.start(config.stage, componentName)
+    // Config CLI
+    cli.config({
+      stage: config.stage,
+      parentComponent: `${instanceName}`,
+    })
 
     Component = components[componentName]
     component = new Component({
-      name: `${fileContent.name}.${instanceName}`, // Construct correct name of child Component
+      id: `${context.stage}.${fileContent.name}.${instanceName}`, // Construct correct name of child Component
       context,
     })
     try {
@@ -207,8 +219,8 @@ const runDeclarative = async (filePath, config) => {
     }
   }
 
-  // Stop CLI
-  cli.stop('done')
+  // Cleanup CLI
+  cli.close('done')
 
   return result
 }

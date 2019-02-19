@@ -93,7 +93,8 @@ class Website extends Component {
     this.state.url = config.url
     await this.save()
 
-    outputs = pick(outputs, config)
+    outputs = {}
+    outputs.url = this.state.url
     this.cli.outputs(outputs)
     return outputs
   }
