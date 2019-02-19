@@ -25,7 +25,7 @@ $ git clone https://github.com/serverless/v2.git
 Install dependencies.
 
 ```
-cd v2 && npm i -g
+cd v2 && npm link
 ```
 
 Pick an [example](./examples). Each example requires credentials for Amazon Web Services set as environment variables.
@@ -42,11 +42,12 @@ Run `$ v2`.
 ```bash
 $ website: v2
 
-  ✔  my-site
+  website › outputs:
+  url:  'http://serverless-p35yxi.s3-website-us-east-1.amazonaws.com'
+  env:  []
 
-     URL  http://serverless-6vql3jp9.s3-website-us-east-1.amazonaws.com
 
-  3s › dev › my-site › Done
+  2s › dev › my-site › done
 ```
 
 You can leverage different environment variables for different stages by using this naming convention:
@@ -93,13 +94,10 @@ Then use your CLI, like this:
 
 ```bash
 # To run/deploy/update all Components, call 'serverless'...
-$ sf
+$ v2
 
-# To run extra functionality that comes with the a component, call this...
-$ sf loadTest myRealtimeApp
-
-# To remove Components in YAML, call this...
-$ sf remove
+# To run extra functionality that comes in a component, call it's method like this...
+$ v2 remove
 ```
 
 ### How To Write A Serverless Component
@@ -123,6 +121,13 @@ class MyComponent extends Component {
   */
 
   async remove() { }
+
+  /*
+  * Anything (Optional)
+  * - If you want to ship your Component w/ extra functionality, put it in a method.
+  */
+
+  async anything() { }
 }
 
 ```
@@ -131,3 +136,4 @@ class MyComponent extends Component {
 
 * Eslam Hefnawy - @eahefnawy
 * Philipp Muens - @pmmuens
+* Austen Collins - @austencollins

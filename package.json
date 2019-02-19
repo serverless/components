@@ -1,10 +1,10 @@
 {
-  "name": "@serverless/sf",
-  "version": "0.0.6",
+  "name": "@serverless/v2",
+  "version": "0.0.1",
   "description": "N/A",
   "main": "./index.js",
   "bin": {
-    "sf": "./bin/cli"
+    "v2": "./bin/cli"
   },
   "publishConfig": {
     "access": "public"
