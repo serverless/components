@@ -3,7 +3,7 @@
  */
 
 const { mergeDeepRight } = require('../../src/utils')
-const Component = require('../Component/serverless')
+const Component = require('../../src/lib/Component/serverless') // TODO: Change to { Component } = require('serverless')
 
 /*
  * Get Config
@@ -35,11 +35,8 @@ const getConfig = (inputs) => {
 
   config.backend.name = `${config.name}`
   config.backend.description = config.description
-  config.backend.credentials = config.credentials
   config.backend.region = config.region
-
   config.frontend.name = `${config.name}`
-  config.frontend.credentials = config.credentials
   config.frontend.region = config.region
 
   return config
@@ -50,10 +47,11 @@ const getConfig = (inputs) => {
  */
 
 class RealtimeApp extends Component {
+
   /*
    * Default
    */
-
+  
   async default(inputs = {}) {
     this.cli.status('Deploying')
     inputs = inputs || {}

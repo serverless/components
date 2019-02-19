@@ -1,5 +1,5 @@
 const { DepGraph } = require('dependency-graph')
-const { reduce } = require('../../../src/utils')
+const { reduce } = require('../../../utils')
 const { types } = require('./variables')
 
 function createGraph(prepareComponents, variableObjects) {

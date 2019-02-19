@@ -1,7 +1,7 @@
 const os = require('os')
 const chalk = require('chalk')
 const figures = require('figures')
-const { titelize, forEachObjIndexed } = require('../../../src/utils')
+const { titelize, forEachObjIndexed } = require('../../../utils')
 
 function logOutputs(cli, outputs) {
   const instanceIds = Object.keys(outputs)

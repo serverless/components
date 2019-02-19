@@ -1,5 +1,5 @@
 const traverse = require('traverse')
-const { union } = require('../../../../src/utils')
+const { union } = require('../../../../utils')
 const regex = require('./regex')
 
 function getMatches(serverlessFileContent) {

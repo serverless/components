@@ -1,6 +1,5 @@
 const aws = require('aws-sdk')
 const { mergeDeepRight, pick } = require('../../src/utils')
-const Component = require('../Component/serverless')
 const {
   createLambda,
   updateLambda,
@@ -10,6 +9,8 @@ const {
   pack,
   hash
 } = require('./utils')
+const Component = require('../../src/lib/Component/serverless') // TODO: Change to { Component } = require('serverless')
+
 
 const outputs = [
   'name',
@@ -44,7 +45,7 @@ class AwsLambda extends Component {
 
     this.cli.status(`Deploying`)
 
-    const lambda = new aws.Lambda({ region: config.region, credentials: this.credentials.aws })
+    const lambda = new aws.Lambda({ region: config.region, credentials: this.context.credentials.aws })
 
     const awsIamRole = this.load('AwsIamRole')
 
@@ -90,7 +91,7 @@ class AwsLambda extends Component {
   async remove(inputs = {}) {
     const config = mergeDeepRight(defaults, inputs)
     config.name = inputs.name || this.state.name || defaults.name
-    const lambda = new aws.Lambda({ region: config.region, credentials: this.credentials.aws })
+    const lambda = new aws.Lambda({ region: config.region, credentials: this.context.credentials.aws })
 
     this.cli.status(`Removing`)
 

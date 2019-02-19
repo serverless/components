@@ -1,12 +1,16 @@
-const { mergeDeepRight } = require('../../src/utils')
-const Component = require('../Component/serverless')
+/*
+* Component Declarative
+* - Use Serverless Framework w/
+*/
 
+const path = require('path')
+const Component = require('../component/serverless')
+const { mergeDeepRight, readFile } = require('../../utils')
 const {
-  loadServerlessFile,
   prepareComponents,
   createGraph,
   loadState,
-  logOutputs
+  logOutputs,
 } = require('./utils')
 const variables = require('./utils/variables')
 
@@ -14,7 +18,7 @@ const defaults = {
   path: process.cwd()
 }
 
-class Components extends Component {
+class ComponentDeclarative extends Component {
 
   /*
   * Default
@@ -23,9 +27,8 @@ class Components extends Component {
 
   async default(inputs = {}) {
     const config = mergeDeepRight(defaults, inputs)
-
     let fileContent
-    fileContent = await loadServerlessFile(config.path)
+    fileContent = await readFile(path.join(this.context.root, this.context.rootFile))
 
     // construct variable objects and resolve them (if possible)
     const vars = variables.constructObjects(fileContent)
@@ -46,18 +49,13 @@ class Components extends Component {
       const { component, instance } = value
       inputs = variables.resolveComponentVariables(vars, results, value)
 
-      // Update the CLI entity to the current component
-      this.cli.entity(`${instanceId}`)
-      this.cli.status('running...')
-
       const result = await instance.default(inputs)
       results[instanceId] = result
       outputs[instanceId] = instance.cli.outputs
     }
 
     // Update CLI entity to be the name of the YAML Component
-    this.cli.entity(fileContent.name)
-    logOutputs(this.cli, outputs)
+    // logOutputs(this.cli, outputs)
   }
 
   /*
@@ -69,7 +67,7 @@ class Components extends Component {
     const config = mergeDeepRight(defaults, inputs)
 
     let fileContent
-    fileContent = await loadServerlessFile(config.path)
+    fileContent = await readFile(path.join(this.context.root, this.context.rootFile))
 
     // construct variable objects and resolve them (if possible)
     const vars = variables.constructObjects(fileContent)
@@ -107,4 +105,4 @@ class Components extends Component {
   }
 }
 
-module.exports = Components
+module.exports = ComponentDeclarative

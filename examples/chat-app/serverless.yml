@@ -2,7 +2,7 @@ name: my-chat-app
 stage: dev
 
 components:
-  ChatApp::my-chat-app:
+  ChatApp::chat-app:
     # colorBackground: black
     # colorInputText: white
     # logoUrl:

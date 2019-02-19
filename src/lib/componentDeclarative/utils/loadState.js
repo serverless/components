@@ -1,4 +1,4 @@
-const { readState, reduce, assoc } = require('../../../src/utils')
+const { readState, reduce, assoc } = require('../../../utils')
 
 function loadState(ids) {
   return reduce(
