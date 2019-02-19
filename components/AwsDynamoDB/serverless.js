@@ -34,6 +34,10 @@ const defaults = {
 
 class AwsDynamoDb extends Component {
   async default(inputs = {}) {
+
+    // Set default name, if not included
+    inputs.name = inputs.name || this.id.split('.').slice(-1)[0]
+
     const config = mergeDeepRight(defaults, inputs)
     const dynamodb = new AWS.DynamoDB({ region: config.region, credentials: this.context.credentials.aws })
 
