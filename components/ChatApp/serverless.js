@@ -51,7 +51,7 @@ class ChatApp extends Component {
     })
 
     outputs = {
-      url: outputs.websiteUrl
+      url: outputs.frontend.url
     }
 
     this.cli.outputs(outputs)

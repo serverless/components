@@ -51,7 +51,6 @@ class ComponentDeclarative extends Component {
       let inputs = value.inputs // eslint-disable-line
       const { component, instance } = value
       inputs = variables.resolveComponentVariables(vars, results, value)
-
       outputs[instanceId] = await instance.default(inputs)
     }
 

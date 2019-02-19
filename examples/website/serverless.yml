@@ -2,5 +2,5 @@ name: my-site
 stage: dev
 
 components:
-  Website::my-website:
+  Website::website:
     assets: ./build

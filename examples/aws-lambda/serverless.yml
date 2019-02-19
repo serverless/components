@@ -1,5 +1,5 @@
-name: aws-lambda
+name: my-aws-lambda
 stage: dev
 
 components:
-  AwsLambda::my-aws-lambda:
+  AwsLambda::aws-lambda:

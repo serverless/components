@@ -95,6 +95,7 @@ class Website extends Component {
 
     outputs = {}
     outputs.url = this.state.url
+    outputs.env = Object.keys(config.env) || []
     this.cli.outputs(outputs)
     return outputs
   }

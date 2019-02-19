@@ -71,8 +71,14 @@ class RealtimeApp extends Component {
     // this high level component doesn't need to save any state!
 
     let outputs = {
-      websiteUrl: websiteOutputs.url,
-      socketUrl: socketOutputs.url,
+      frontend: {
+        url: websiteOutputs.url,
+        env: websiteOutputs.env,
+      },
+      backend: {
+        url: socketOutputs.url,
+        env: socketOutputs.code.env,
+      },
     }
     this.cli.outputs(outputs)
     return outputs
