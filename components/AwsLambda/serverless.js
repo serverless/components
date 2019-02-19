@@ -1,6 +1,5 @@
 const aws = require('aws-sdk')
 const { mergeDeepRight, pick } = require('../../src/utils')
-const Component = require('../Component/serverless')
 const {
   createLambda,
   updateLambda,
@@ -10,8 +9,10 @@ const {
   pack,
   hash
 } = require('./utils')
+const Component = require('../../src/lib/Component/serverless') // TODO: Change to { Component } = require('serverless')
 
-const outputs = [
+
+let outputs = [
   'name',
   'description',
   'memory',
@@ -28,7 +29,7 @@ const outputs = [
 const defaults = {
   name: 'serverless',
   description: 'AWS Lambda Component',
-  memory: 128,
+  memory: 512,
   timeout: 10,
   code: process.cwd(),
   shim: null,
@@ -44,7 +45,7 @@ class AwsLambda extends Component {
 
     this.cli.status(`Deploying`)
 
-    const lambda = new aws.Lambda({ region: config.region, credentials: this.credentials.aws })
+    const lambda = new aws.Lambda({ region: config.region, credentials: this.context.credentials.aws })
 
     const awsIamRole = this.load('AwsIamRole')
 
@@ -75,22 +76,17 @@ class AwsLambda extends Component {
 
     this.state.name = config.name
     this.state.arn = config.arn
-    this.save()
+    await this.save()
 
-    this.cli.output('Name', `    ${config.name}`)
-    this.cli.output('Memory', `  ${config.memory}`)
-    this.cli.output('Timeout', ` ${config.timeout}`)
-    this.cli.output('Runtime', ` ${config.runtime}`)
-    this.cli.output('Handler', ` ${config.handler}`)
-    this.cli.output('ARN', `     ${config.arn}`)
-
-    return pick(outputs, config)
+    outputs = pick(outputs, config)
+    this.cli.outputs(outputs)
+    return outputs
   }
 
   async remove(inputs = {}) {
     const config = mergeDeepRight(defaults, inputs)
     config.name = inputs.name || this.state.name || defaults.name
-    const lambda = new aws.Lambda({ region: config.region, credentials: this.credentials.aws })
+    const lambda = new aws.Lambda({ region: config.region, credentials: this.context.credentials.aws })
 
     this.cli.status(`Removing`)
 
@@ -103,11 +99,9 @@ class AwsLambda extends Component {
     await deleteLambda({ lambda, name: config.name })
 
     this.state = {}
-    this.save()
+    await this.save()
 
-    this.cli.output('Name', ` ${config.name}`)
-
-    return pick(outputs, config)
+    return {}
   }
 }
 

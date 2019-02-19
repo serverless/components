@@ -1,4 +1,4 @@
-const { reduce } = require('../../../../src/utils')
+const { reduce } = require('../../../../utils')
 
 function resolveSimpleVariable(serverlessFileContent, variable) {
   // remove `${` and `}` from matches to get the variables value

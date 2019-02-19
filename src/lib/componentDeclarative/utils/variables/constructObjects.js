@@ -1,4 +1,4 @@
-const { map } = require('../../../../src/utils')
+const { map } = require('../../../../utils')
 const getMatches = require('./getMatches')
 const regex = require('./regex')
 const types = require('./types')

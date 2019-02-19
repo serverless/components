@@ -1,11 +1,15 @@
 const { mergeDeepRight, pick, equals } = require('../../src/utils')
 const AWS = require('aws-sdk')
+const {
+  createTable,
+  deleteTable,
+  describeTable,
+  updateTable,
+  configChanged
+} = require('./utils')
+const Component = require('../../src/lib/Component/serverless') // TODO: Change to { Component } = require('serverless')
 
-const { createTable, deleteTable, describeTable, updateTable, configChanged } = require('./utils')
-
-const Component = require('../Component/serverless')
-
-const outputs = ['name', 'arn']
+let outputs = ['name', 'arn']
 
 const defaults = {
   name: 'serverless',
@@ -28,10 +32,14 @@ const defaults = {
   region: 'us-east-1'
 }
 
-class AwsDynamoDB extends Component {
+class AwsDynamoDb extends Component {
   async default(inputs = {}) {
+
+    // Set default name, if not included
+    inputs.name = inputs.name || this.id.split('.').slice(-1)[0]
+
     const config = mergeDeepRight(defaults, inputs)
-    const dynamodb = new AWS.DynamoDB({ region: config.region, credentials: this.credentials.aws })
+    const dynamodb = new AWS.DynamoDB({ region: config.region, credentials: this.context.credentials.aws })
 
     const prevTable = await describeTable({ dynamodb, name: this.state.name || null })
 
@@ -54,30 +62,27 @@ class AwsDynamoDB extends Component {
 
     this.state.arn = config.arn
     this.state.name = config.name
-    this.save()
+    await this.save()
 
-    this.cli.output('Name', ` ${config.name}`)
-    this.cli.output('ARN', `  ${config.arn}`)
-
-    return pick(outputs, config)
+    outputs = pick(outputs, config)
+    this.cli.outputs(outputs)
+    return outputs
   }
 
   async remove(inputs = {}) {
     const config = mergeDeepRight(defaults, inputs)
     config.name = inputs.name || this.state.name || defaults.name
 
-    const dynamodb = new AWS.DynamoDB({ region: config.region, credentials: this.credentials.aws })
+    const dynamodb = new AWS.DynamoDB({ region: config.region, credentials: this.context.credentials.aws })
 
     this.cli.status('Removing')
     await deleteTable({ dynamodb, ...config })
 
     this.state = {}
-    this.save()
+    await this.save()
 
-    this.cli.output('Name', ` ${config.name}`)
-
-    return pick(outputs, config)
+    return {}
   }
 }
 
-module.exports = AwsDynamoDB
+module.exports = AwsDynamoDb

@@ -1,12 +1,16 @@
-const { mergeDeepRight } = require('../../src/utils')
-const Component = require('../Component/serverless')
+/*
+* Component Declarative
+* - Use Serverless Framework w/
+*/
 
+const path = require('path')
+const Component = require('../component/serverless')
+const { mergeDeepRight, readFile } = require('../../utils')
 const {
-  loadServerlessFile,
   prepareComponents,
   createGraph,
   loadState,
-  logOutputs
+  logOutputs,
 } = require('./utils')
 const variables = require('./utils/variables')
 
@@ -14,7 +18,7 @@ const defaults = {
   path: process.cwd()
 }
 
-class Components extends Component {
+class ComponentDeclarative extends Component {
 
   /*
   * Default
@@ -22,10 +26,12 @@ class Components extends Component {
   */
 
   async default(inputs = {}) {
-    const config = mergeDeepRight(defaults, inputs)
 
+    this.cli.status('Running')
+
+    const config = mergeDeepRight(defaults, inputs)
     let fileContent
-    fileContent = await loadServerlessFile(config.path)
+    fileContent = await readFile(path.join(this.context.root, this.context.rootFile))
 
     // construct variable objects and resolve them (if possible)
     const vars = variables.constructObjects(fileContent)
@@ -45,18 +51,9 @@ class Components extends Component {
       let inputs = value.inputs // eslint-disable-line
       const { component, instance } = value
       inputs = variables.resolveComponentVariables(vars, results, value)
-
-      // Update the CLI entity to the current component
-      this.cli.entity(`${instanceId}`)
-      this.cli.status('running...')
-
-      const result = await instance.default(inputs)
-      results[instanceId] = result
-      outputs[instanceId] = instance.cli.outputs
+      outputs[instanceId] = await instance.default(inputs)
     }
 
-    // Update CLI entity to be the name of the YAML Component
-    this.cli.entity(fileContent.name)
     logOutputs(this.cli, outputs)
   }
 
@@ -66,10 +63,13 @@ class Components extends Component {
   */
 
   async remove(inputs = {}) {
+
+    this.cli.status('Removing')
+
     const config = mergeDeepRight(defaults, inputs)
 
     let fileContent
-    fileContent = await loadServerlessFile(config.path)
+    fileContent = await readFile(path.join(this.context.root, this.context.rootFile))
 
     // construct variable objects and resolve them (if possible)
     const vars = variables.constructObjects(fileContent)
@@ -93,18 +93,11 @@ class Components extends Component {
       let inputs = value.inputs // eslint-disable-line
       const { component, instance } = value
       inputs = variables.resolveComponentVariables(vars, state, value)
-
-      // Update the CLI entity to the current component
-      this.cli.entity(component)
-      this.cli.status('removing...')
-
-      const result = await instance.remove(inputs)
-      results[instanceId] = result
-      outputs[instanceId] = instance.cli.outputs
+      outputs[instanceId] = await instance.remove(inputs)
     }
 
     logOutputs(this.cli, outputs)
   }
 }
 
-module.exports = Components
+module.exports = ComponentDeclarative

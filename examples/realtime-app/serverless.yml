@@ -1,4 +1,4 @@
-name: realtime-app
+name: my-realtime-app
 stage: dev
 
 components:
@@ -7,3 +7,7 @@ components:
       assets: ./frontend/build
     backend:
       assets: ./backend
+      env:
+        dbMessages: ${ct:messages.name}
+  AwsDynamoDb::messages:
+    name: ${name}-messages

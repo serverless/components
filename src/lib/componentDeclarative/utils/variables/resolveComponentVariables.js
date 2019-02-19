@@ -1,4 +1,4 @@
-const { filter, reduce, assocPath, lensPath, view } = require('../../../../src/utils')
+const { filter, reduce, assocPath, lensPath, view } = require('../../../../utils')
 const types = require('./types')
 
 function resolveComponentVariables(variables, results, instance) {

@@ -2,8 +2,7 @@ const { resolve } = require('path')
 const { prompt } = require('enquirer')
 const WebSocket = require('ws')
 const { chalk, sleep, fileExists } = require('../../src/utils')
-
-const Component = require('../Component/serverless')
+const Component = require('../../src/lib/Component/serverless') // TODO: Change to { Component } = require('serverless')
 
 const isJson = (body) => {
   try {
@@ -19,7 +18,6 @@ class Socket extends Component {
     inputs = inputs || {}
     const socketFilePath = resolve(inputs.code || process.cwd(), 'socket.js')
     if (!(await fileExists(socketFilePath))) {
-      this.cli.log('no socket.js file found in your codebase')
       throw new Error(`No "socket.js" file found in the current directory.`)
       return null
     }
@@ -53,11 +51,21 @@ class Socket extends Component {
 
     this.state.url = websocketsOutputs.url
     this.state.socketFilePath = socketFilePath
-    this.save()
+    await this.save()
 
-    this.cli.output('URL', ` ${websocketsOutputs.url}`)
+    let outputs = {
+      url: websocketsOutputs.url,
+      code: {
+        runtime: lambdaOutputs.runtime,
+        env: Object.keys(lambdaOutputs.env) || [],
+        timeout: lambdaOutputs.timeout,
+        memory: lambdaOutputs.memory,
+      },
+      routes: Object.keys(websocketsOutputs.routes) || []
+    }
 
-    return { lambda: lambdaOutputs, websockets: websocketsOutputs }
+    this.cli.outputs(outputs)
+    return outputs
   }
 
   async remove() {
@@ -70,9 +78,8 @@ class Socket extends Component {
     const websocketsOutputs = await websockets.remove()
 
     this.state = {}
-    this.save()
-
-    return { lambda: lambdaOutputs, websockets: websocketsOutputs }
+    await this.save()
+    return {}
   }
 
   /*    /\

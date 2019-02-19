@@ -1,4 +1,4 @@
-const { reduce } = require('../../../../src/utils')
+const { reduce } = require('../../../../utils')
 
 function resolveServerlessFile(serverlessFileContent, variableObjects) {
   const stringified = JSON.stringify(serverlessFileContent)

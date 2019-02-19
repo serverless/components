@@ -3,7 +3,7 @@
  */
 
 const path = require('path')
-const Component = require('../../components/Component/serverless')
+const Component = require('../../src/lib/Component/serverless') // TODO: Change to { Component } = require('serverless')
 
 /*
  * Class – ChatApp
@@ -51,11 +51,10 @@ class ChatApp extends Component {
     })
 
     outputs = {
-      url: outputs.website.url
+      url: outputs.frontend.url
     }
 
-    this.cli.output('URL', `${outputs.url}`)
-
+    this.cli.outputs(outputs)
     return outputs
   }
 
@@ -69,7 +68,9 @@ class ChatApp extends Component {
     const realtimeApp = this.load('RealtimeApp')
     const outputs = await realtimeApp.remove()
 
-    return outputs
+    this.state = {}
+    await this.save()
+    return {}
   }
 
   async connect(inputs = {}) {

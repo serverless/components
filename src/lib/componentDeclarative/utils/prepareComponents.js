@@ -1,4 +1,4 @@
-const { assoc, reduce, addIndex } = require('../../../src/utils')
+const { assoc, reduce, addIndex } = require('../../../utils')
 
 const reduceIndexed = addIndex(reduce)
 

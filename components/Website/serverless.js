@@ -4,9 +4,9 @@ const util = require('util')
 const exec = util.promisify(require('child_process').exec)
 const { pick, isEmpty, mergeDeepRight, writeFile } = require('../../src/utils')
 const { getBucketName, uploadDir, deleteWebsiteBucket, configureWebsite } = require('./utils')
-const Component = require('../Component/serverless')
+const Component = require('../../src/lib/Component/serverless') // TODO: Change to { Component } = require('serverless')
 
-const outputs = ['name', 'url']
+let outputs = ['name', 'url']
 const defaults = {
   name: 'serverless',
   path: process.cwd(),
@@ -22,13 +22,14 @@ const defaults = {
  */
 
 class Website extends Component {
+
   /*
    * Default
    */
 
   async default(inputs = {}) {
     const config = mergeDeepRight(defaults, inputs)
-    const s3 = new aws.S3({ region: config.region, credentials: this.credentials.aws })
+    const s3 = new aws.S3({ region: config.region, credentials: this.context.credentials.aws })
 
     // Ensure paths are resolved
     config.path = path.resolve(config.path)
@@ -90,11 +91,13 @@ class Website extends Component {
     this.state.name = config.name
     this.state.bucketName = config.bucketName
     this.state.url = config.url
-    this.save()
+    await this.save()
 
-    this.cli.output('URL', ` ${config.url}`)
-
-    return pick(outputs, config)
+    outputs = {}
+    outputs.url = this.state.url
+    outputs.env = Object.keys(config.env) || []
+    this.cli.outputs(outputs)
+    return outputs
   }
 
   async remove(inputs = {}) {
@@ -104,14 +107,15 @@ class Website extends Component {
       return
     }
 
-    const s3 = new aws.S3({ region: config.region, credentials: this.credentials.aws })
+    const s3 = new aws.S3({ region: config.region, credentials: this.context.credentials.aws })
 
     this.cli.status(`Removing`)
 
     await deleteWebsiteBucket({ s3, ...this.state })
 
     this.state = {}
-    this.save()
+    await this.save()
+    return {}
   }
 }
 

@@ -3,7 +3,7 @@
  */
 
 const { mergeDeepRight } = require('../../src/utils')
-const Component = require('../Component/serverless')
+const Component = require('../../src/lib/Component/serverless') // TODO: Change to { Component } = require('serverless')
 
 /*
  * Get Config
@@ -35,11 +35,8 @@ const getConfig = (inputs) => {
 
   config.backend.name = `${config.name}`
   config.backend.description = config.description
-  config.backend.credentials = config.credentials
   config.backend.region = config.region
-
   config.frontend.name = `${config.name}`
-  config.frontend.credentials = config.credentials
   config.frontend.region = config.region
 
   return config
@@ -50,6 +47,7 @@ const getConfig = (inputs) => {
  */
 
 class RealtimeApp extends Component {
+
   /*
    * Default
    */
@@ -67,15 +65,23 @@ class RealtimeApp extends Component {
     const socket = this.load('Socket')
 
     const socketOutputs = await socket(config.backend)
-    config.frontend.env.urlWebsocketApi = socketOutputs.websockets.url // pass backend url to frontend
+    config.frontend.env.urlWebsocketApi = socketOutputs.url // pass backend url to frontend
     const websiteOutputs = await website(config.frontend)
 
     // this high level component doesn't need to save any state!
 
-    this.cli.output('Socket URL', ` ${socketOutputs.websockets.url}`)
-    this.cli.output('Website URL', `${websiteOutputs.url}`)
-
-    return { website: websiteOutputs, socket: socketOutputs }
+    let outputs = {
+      frontend: {
+        url: websiteOutputs.url,
+        env: websiteOutputs.env,
+      },
+      backend: {
+        url: socketOutputs.url,
+        env: socketOutputs.code.env,
+      },
+    }
+    this.cli.outputs(outputs)
+    return outputs
   }
 
   /*
@@ -92,10 +98,7 @@ class RealtimeApp extends Component {
 
     const outputs = await Promise.all([website.remove(), socket.remove()])
 
-    const websiteOutputs = outputs[0]
-    const socketOutputs = outputs[1]
-
-    return { website: websiteOutputs, socket: socketOutputs }
+    return {}
   }
 
   /*

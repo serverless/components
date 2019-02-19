@@ -15,9 +15,9 @@ const formatContents = (filePath, contents, options) => {
   return contents
 }
 
-const writeFile = curryN(1, async (filePath, contents = '', options = {}) => {
-  await fse.mkdirs(path.dirname(filePath))
-  return fse.writeFile(filePath, formatContents(filePath, contents, options))
-})
+const writeFile = async (filePath, contents = '', options = {}) => {
+  await fse.ensureDir(path.dirname(filePath))
+  await fse.writeFile(filePath, formatContents(filePath, contents, options))
+}
 
 module.exports = writeFile
