@@ -18,7 +18,6 @@ class Socket extends Component {
     inputs = inputs || {}
     const socketFilePath = resolve(inputs.code || process.cwd(), 'socket.js')
     if (!(await fileExists(socketFilePath))) {
-      this.cli.log('no socket.js file found in your codebase')
       throw new Error(`No "socket.js" file found in the current directory.`)
       return null
     }
@@ -52,11 +51,13 @@ class Socket extends Component {
 
     this.state.url = websocketsOutputs.url
     this.state.socketFilePath = socketFilePath
-    this.save()
+    await this.save()
 
-    this.cli.output('URL', ` ${websocketsOutputs.url}`)
-
-    return { lambda: lambdaOutputs, websockets: websocketsOutputs }
+    let outputs = {}
+    outputs.lambda = lambdaOutputs
+    outputs.websockets = websocketsOutputs
+    this.cli.outputs(outputs)
+    return outputs
   }
 
   async remove() {
@@ -69,9 +70,8 @@ class Socket extends Component {
     const websocketsOutputs = await websockets.remove()
 
     this.state = {}
-    this.save()
-
-    return { lambda: lambdaOutputs, websockets: websocketsOutputs }
+    await this.save()
+    return {}
   }
 
   /*    /\

@@ -9,7 +9,7 @@ const {
 } = require('./utils')
 const Component = require('../../src/lib/Component/serverless') // TODO: Change to { Component } = require('serverless')
 
-const outputs = ['name', 'arn']
+let outputs = ['name', 'arn']
 
 const defaults = {
   name: 'serverless',
@@ -34,7 +34,6 @@ const defaults = {
 
 class AwsDynamoDb extends Component {
   async default(inputs = {}) {
-    console.log(this)
     const config = mergeDeepRight(defaults, inputs)
     const dynamodb = new AWS.DynamoDB({ region: config.region, credentials: this.context.credentials.aws })
 
@@ -59,12 +58,11 @@ class AwsDynamoDb extends Component {
 
     this.state.arn = config.arn
     this.state.name = config.name
-    this.save()
+    await this.save()
 
-    this.cli.output('Name', ` ${config.name}`)
-    this.cli.output('ARN', `  ${config.arn}`)
-
-    return pick(outputs, config)
+    outputs = pick(outputs, config)
+    this.cli.outputs(outputs)
+    return outputs
   }
 
   async remove(inputs = {}) {
@@ -77,11 +75,9 @@ class AwsDynamoDb extends Component {
     await deleteTable({ dynamodb, ...config })
 
     this.state = {}
-    this.save()
+    await this.save()
 
-    this.cli.output('Name', ` ${config.name}`)
-
-    return pick(outputs, config)
+    return {}
   }
 }
 

@@ -11,7 +11,7 @@ const {
 } = require('./utils')
 const Component = require('../../src/lib/Component/serverless') // TODO: Change to { Component } = require('serverless')
 
-const outputs = ['name', 'service', 'policy', 'arn']
+let outputs = ['name', 'service', 'policy', 'arn']
 
 const defaults = {
   name: 'serverless',
@@ -56,13 +56,11 @@ class AwsIamRole extends Component {
 
     this.state.arn = config.arn
     this.state.name = config.name
-    this.save()
+    await this.save()
 
-    this.cli.output('Name', `    ${config.name}`)
-    this.cli.output('Service', ` ${config.service}`)
-    this.cli.output('ARN', `     ${config.arn}`)
-
-    return pick(outputs, config)
+    outputs = pick(outputs, config)
+    this.cli.outputs(outputs)
+    return outputs
   }
 
   async remove(inputs = {}) {
@@ -74,11 +72,9 @@ class AwsIamRole extends Component {
     await deleteRole({ iam, ...config })
 
     this.state = {}
-    this.save()
+    await this.save()
 
-    this.cli.output('Name', ` ${config.name}`)
-
-    return pick(outputs, config)
+    return {}
   }
 }
 

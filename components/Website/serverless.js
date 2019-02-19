@@ -6,7 +6,7 @@ const { pick, isEmpty, mergeDeepRight, writeFile } = require('../../src/utils')
 const { getBucketName, uploadDir, deleteWebsiteBucket, configureWebsite } = require('./utils')
 const Component = require('../../src/lib/Component/serverless') // TODO: Change to { Component } = require('serverless')
 
-const outputs = ['name', 'url']
+let outputs = ['name', 'url']
 const defaults = {
   name: 'serverless',
   path: process.cwd(),
@@ -93,9 +93,9 @@ class Website extends Component {
     this.state.url = config.url
     await this.save()
 
-    this.cli.outputs({ URL: config.url })
-
-    return pick(outputs, config)
+    outputs = pick(outputs, config)
+    this.cli.outputs(outputs)
+    return outputs
   }
 
   async remove(inputs = {}) {
@@ -112,7 +112,8 @@ class Website extends Component {
     await deleteWebsiteBucket({ s3, ...this.state })
 
     this.state = {}
-    this.save()
+    await this.save()
+    return {}
   }
 }
 

@@ -49,13 +49,10 @@ class ComponentDeclarative extends Component {
       const { component, instance } = value
       inputs = variables.resolveComponentVariables(vars, results, value)
 
-      const result = await instance.default(inputs)
-      results[instanceId] = result
-      outputs[instanceId] = instance.cli.outputs
+      outputs[instanceId] = await instance.default(inputs)
     }
 
-    // Update CLI entity to be the name of the YAML Component
-    // logOutputs(this.cli, outputs)
+    logOutputs(this.cli, outputs)
   }
 
   /*
@@ -92,13 +89,9 @@ class ComponentDeclarative extends Component {
       const { component, instance } = value
       inputs = variables.resolveComponentVariables(vars, state, value)
 
-      // Update the CLI entity to the current component
-      this.cli.entity(component)
       this.cli.status('removing...')
 
-      const result = await instance.remove(inputs)
-      results[instanceId] = result
-      outputs[instanceId] = instance.cli.outputs
+      outputs[instanceId] = await instance.remove(inputs)
     }
 
     logOutputs(this.cli, outputs)

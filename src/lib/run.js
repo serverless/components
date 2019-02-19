@@ -56,12 +56,16 @@ const run = async (config = {}) => {
   const serverlessYamlFilePath = path.join(process.cwd(), 'serverless.yaml')
   const serverlessJsonFilePath = path.join(process.cwd(), 'serverless.json')
 
-  if (await fileExists(serverlessJsFilePath)) return await runProgrammatic(serverlessJsFilePath, config)
-  else if (await fileExists(serverlessYmlFilePath)) return await runDeclarative(serverlessYmlFilePath, config)
-  else if (await fileExists(serverlessYamlFilePath)) return await runDeclarative(serverlessYamlFilePath, config)
-  else if (await fileExists(serverlessJsonFilePath)) return await runDeclarative(serverlessJsonFilePath, config)
-  else {
-    errorHandler(`No Serverless file (serverless.js, serverless.yml, serverless.yaml or serverless.json) found in ${process.cwd()}`)
+  try {
+    if (await fileExists(serverlessJsFilePath)) return await runProgrammatic(serverlessJsFilePath, config)
+    else if (await fileExists(serverlessYmlFilePath)) return await runDeclarative(serverlessYmlFilePath, config)
+    else if (await fileExists(serverlessYamlFilePath)) return await runDeclarative(serverlessYamlFilePath, config)
+    else if (await fileExists(serverlessJsonFilePath)) return await runDeclarative(serverlessJsonFilePath, config)
+    else {
+      throw new Error(`No Serverless file (serverless.js, serverless.yml, serverless.yaml or serverless.json) found in ${process.cwd()}`)
+    }
+  } catch (error) {
+    return errorHandler(error, 'Serverless Framework')
   }
 }
 
@@ -89,15 +93,19 @@ const runProgrammatic = async (filePath, config) => {
   // Start CLI
   cli.start(config.stage, Component.name)
 
-  if (!config.method) {
-    // If no method has been provided, run the default method...
-    result = await component()
-  } else {
-    // If method has been provided, run that...
-    if (!component[config.method]) {
-      throw Error(`Component "${Component.name}" does not have a "${config.method}" method`)
+  try {
+    // If method was provided, but doesn't exist, throw error
+    if (config.method && !component[config.method]) {
+      throw new Error(`Component "${Component.name}" does not have a "${config.method}" method`)
     }
-    result = await component[config.method]()
+
+    if (!config.method) {
+      result = await component()
+    } else {
+      result = await component[config.method]()
+    }
+  } catch(error) {
+    return errorHandler(error, Component.name)
   }
 
   // Stop CLI
@@ -139,23 +147,29 @@ const runDeclarative = async (filePath, config) => {
       })
       result = await component()
     } catch (error) {
-      cli.renderError(error)
-      cli.stop('error', error.message)
+      return errorHandler(error, fileContent.name)
     }
   }
 
   // If config.method has been provided, run that...
   if (!config.instance && config.method) {
+
+    // Start CLI
+    cli.start(config.stage, fileContent.name)
+
     component = new ComponentDeclarative({
       name: fileContent.name, // Must pass in name to ComponentDeclaractive
       context,
     })
-    result = await component[config.method]()
+    try {
+      result = await component[config.method]()
+    } catch (error) {
+      return errorHandler(error, fileContent.name)
+    }
   }
 
   // If config.method and config.instance, load and run that component's method...
   if (config.instance && config.method) {
-
     let instanceName
     let componentName
 
@@ -178,16 +192,23 @@ const runDeclarative = async (filePath, config) => {
       throw Error(`Component "${componentName}" is not a valid Component.`)
     }
 
+    // Start CLI
+    cli.start(config.stage, componentName)
+
     Component = components[componentName]
     component = new Component({
       name: `${fileContent.name}.${instanceName}`, // Construct correct name of child Component
       context,
     })
-    result = await component[config.method]()
+    try {
+      result = await component[config.method]()
+    } catch (error) {
+      return errorHandler(error, componentName)
+    }
   }
 
-  // Mark the cli as done if the component author hasn't done that
-  if (component.cli.running) component.cli.done()
+  // Stop CLI
+  cli.stop('done')
 
   return result
 }

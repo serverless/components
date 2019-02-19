@@ -51,7 +51,7 @@ class RealtimeApp extends Component {
   /*
    * Default
    */
-  
+
   async default(inputs = {}) {
     this.cli.status('Deploying')
     inputs = inputs || {}
@@ -70,10 +70,12 @@ class RealtimeApp extends Component {
 
     // this high level component doesn't need to save any state!
 
-    this.cli.output('Socket URL', ` ${socketOutputs.websockets.url}`)
-    this.cli.output('Website URL', `${websiteOutputs.url}`)
-
-    return { website: websiteOutputs, socket: socketOutputs }
+    let outputs = {
+      websiteUrl: websiteOutputs.url,
+      socketUrl: socketOutputs.websockets.url,
+    }
+    this.cli.outputs(outputs)
+    return outputs
   }
 
   /*
@@ -90,10 +92,7 @@ class RealtimeApp extends Component {
 
     const outputs = await Promise.all([website.remove(), socket.remove()])
 
-    const websiteOutputs = outputs[0]
-    const socketOutputs = outputs[1]
-
-    return { website: websiteOutputs, socket: socketOutputs }
+    return {}
   }
 
   /*

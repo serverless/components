@@ -5,9 +5,15 @@ const cli = require('../lib/cli')
  * @param {Error} error - A standard javascript error object
  */
 
-const errorHandler = (error) => {
-  cli.renderError(error)
-  process.exit(1)
+const errorHandler = (error, entity) => {
+  if (typeof error === 'string') error = new Error(error)
+  cli.renderError(error, entity)
+  if (cli.isActive()) {
+    cli.stop('error', error.message)
+  } else {
+    console.log('') // Insert space for nicer formatting
+    process.exit(1)
+  }
 }
 
 module.exports = errorHandler

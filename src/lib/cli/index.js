@@ -4,21 +4,20 @@ const ansiEscapes = require('ansi-escapes')
 const figures = require('figures')
 const sleep = require('../../utils/sleep')
 
-// State
-const state = {}
-state.running = false
-state.frame = 0
-state.seconds = 0
-state.stage = false
-state.entity = false
-state.method = false
-state.message = 'Running'
-state.loadingCount = 0
-state.loadingDots = ''
+// Defaults
+let running = false
+let frame = 0
+let seconds = 0
+let stage = false
+let entity = false
+let method = false
+let message = 'Running'
+let loadingCount = 0
+let loadingDots = ''
 
 // Event Handler: Control + C
 process.on('SIGINT', async function() {
-  state.running = false
+  running = false
   stop('cancel')
 })
 
@@ -39,29 +38,41 @@ const engine = async () => {
 const render = async (view, content) => {
 
   // Render status view by default
-  if (state.running && !view && !content) renderStatus()
+  if (running && !view && !content) renderStatus()
 
   // Increment frame count & seconds
-  state.frame++
-  state.seconds = String(Math.floor(state.frame / 10) + 1)
+  frame++
+  seconds = String(Math.floor(frame / 10) + 1)
+}
+
+/**
+ * Is Active
+ */
+
+const isActive = () => {
+  return running
 }
 
 /**
  * Start
  */
 
-const start = (stage, entity, method) => {
+const start = (currentStage, currentEntity, currentMethod) => {
+
+  // Start engine
+  running = true
 
   // Hide cursor to keep it clean
   process.stdout.write(ansiEscapes.cursorHide)
 
   // Set metadata
-  state.stage = chalk.cyan(stage)
-  state.entity = entity
-  state.method = method
+  stage = currentStage
+  entity = currentEntity
+  method = currentMethod
 
-  // Start engine
-  state.running = true
+  // Initial line break
+  console.log()
+
   engine()
 }
 
@@ -72,29 +83,40 @@ const start = (stage, entity, method) => {
 const stop = (reason, message) => {
 
   // Stop engine
-  state.running = false
+  running = false
 
-  if (reason === 'error') message = chalk.red(message)
-  if (reason === 'cancel') message = chalk.red('Canceled')
-  if (reason === 'done') message = chalk.green('Done')
+  if (reason === 'error') {
+    stage = chalk.red(stage)
+    message = chalk.red(message)
+  }
+  if (reason === 'cancel') {
+    stage = chalk.red(stage)
+    message = chalk.red('Canceled')
+  }
+  if (reason === 'done') {
+    stage = chalk.cyan(stage)
+    message = chalk.green('Done')
+  }
 
   // Clear any existing content
   process.stdout.write(ansiEscapes.cursorLeft)
   process.stdout.write(ansiEscapes.eraseDown)
+  console.log(os.EOL)
 
   // Write content
-  process.stdout.write(ansiEscapes.cursorDown(1))
-  content = `  ${chalk.grey(state.seconds + 's')}`
-  content += ` ${chalk.grey(figures.pointerSmall)} ${state.stage}`
-  content += ` ${chalk.grey(figures.pointerSmall)} ${state.entity}`
+  content = `  ${chalk.grey(seconds + 's')}`
+  content += ` ${chalk.grey(figures.pointerSmall)} ${stage}`
+  content += ` ${chalk.grey(figures.pointerSmall)} ${entity}`
   content += ` ${chalk.grey(figures.pointerSmall)} ${message}`
   process.stdout.write(content)
 
   // Put cursor to starting position for next view
-  process.stdout.write(ansiEscapes.cursorDown(2))
+  console.log(os.EOL, os.EOL)
   process.stdout.write(ansiEscapes.cursorLeft)
   process.stdout.write(ansiEscapes.cursorShow)
-  process.exit(0)
+
+  if (reason === 'error') process.exit(1)
+  else process.exit(0)
 }
 
 /**
@@ -105,31 +127,31 @@ const stop = (reason, message) => {
 const renderStatus = async (status) => {
 
   // Set message
-  if (status) state.message = status
+  if (status) message = status
 
   // Loading dots
-  if (state.loadingCount === 0) {
-    state.loadingDots = `.`
-  } else if (state.loadingCount === 2) {
-    state.loadingDots = `..`
-  } else if (state.loadingCount === 4) {
-    state.loadingDots = `...`
-  } else if (state.loadingCount === 6) {
-    state.loadingDots = ''
+  if (loadingCount === 0) {
+    loadingDots = `.`
+  } else if (loadingCount === 2) {
+    loadingDots = `..`
+  } else if (loadingCount === 4) {
+    loadingDots = `...`
+  } else if (loadingCount === 6) {
+    loadingDots = ''
   }
-  state.loadingCount++
-  if (state.loadingCount > 8) state.loadingCount = 0
+  loadingCount++
+  if (loadingCount > 8) loadingCount = 0
 
   // Clear any existing content
   process.stdout.write(ansiEscapes.eraseDown)
 
   // Write content
   process.stdout.write(ansiEscapes.cursorDown(1))
-  content = `  ${chalk.grey(state.seconds + 's')}`
-  content += ` ${chalk.grey(figures.pointerSmall)} ${state.stage}`
-  content += ` ${chalk.grey(figures.pointerSmall)} ${state.entity}`
-  content += ` ${chalk.grey(figures.pointerSmall)} ${chalk.grey(state.message)}`
-  content += ` ${chalk.grey(state.loadingDots)}`
+  content = `  ${chalk.grey(seconds + 's')}`
+  content += ` ${chalk.grey(figures.pointerSmall)} ${chalk.cyan(stage)}`
+  content += ` ${chalk.grey(figures.pointerSmall)} ${entity}`
+  content += ` ${chalk.grey(figures.pointerSmall)} ${chalk.grey(message)}`
+  content += ` ${chalk.grey(loadingDots)}`
   process.stdout.write(content)
 
   // Put cursor to starting position for next view
@@ -148,9 +170,9 @@ const renderLog = async (log, entity) => {
 
   // Clear any existing content
   process.stdout.write(ansiEscapes.eraseDown)
+  console.log()
 
   // Write log
-  process.stdout.write(ansiEscapes.cursorDown(1))
   if (entity) {
     entity = `${chalk.grey(entity)} ${chalk.grey(figures.pointerSmall)} ${chalk.grey(`Log:`)}`
     console.log(`  ${entity}`)
@@ -172,9 +194,9 @@ const renderWarning = async (warning, entity) => {
 
   // Clear any existing content
   process.stdout.write(ansiEscapes.eraseDown)
+  console.log()
 
   // Write warning
-  process.stdout.write(ansiEscapes.cursorDown(1))
   if (entity) {
     entity = `${chalk.yellow(entity)} ${chalk.yellow(figures.pointerSmall)} ${chalk.yellow(`Warning:`)}`
     console.log(`  ${entity}`)
@@ -198,9 +220,9 @@ const renderError = async (error, entity) => {
 
   // Clear any existing content
   process.stdout.write(ansiEscapes.eraseDown)
+  console.log()
 
   // Write Error
-  process.stdout.write(ansiEscapes.cursorDown(1))
   if (entity) {
     entity = `${chalk.red(entity)} ${chalk.red(figures.pointerSmall)} ${chalk.red(`Error:`)}`
     console.log(`  ${entity}`)
@@ -211,9 +233,6 @@ const renderError = async (error, entity) => {
 
   // Put cursor to starting position for next view
   process.stdout.write(ansiEscapes.cursorLeft)
-
-  // If engine is not running, this is a one-off.  Add a line break to improve formatting.
-  if (!state.running) process.stdout.write(ansiEscapes.cursorDown(1))
 }
 
 /**
@@ -227,9 +246,9 @@ const renderOutputs = async (outputs, entity) => {
 
   // Clear any existing content
   process.stdout.write(ansiEscapes.eraseDown)
+  console.log()
 
   // Write Outputs
-  process.stdout.write(ansiEscapes.cursorDown(1))
   if (entity) {
     entity = `${chalk.green(entity)} ${chalk.green(figures.pointerSmall)} ${chalk.green(`Outputs:`)}`
     console.log(`  ${entity}`)
@@ -237,7 +256,7 @@ const renderOutputs = async (outputs, entity) => {
     console.log(`  ${chalk.green('Outputs:')}`)
   }
   for (const output in outputs) {
-    console.log(`  ${chalk.grey(output + ':')} ${outputs[output]}`)
+    console.log(`  ${chalk.grey(output + ':')} `, outputs[output])
   }
 
   // Put cursor to starting position for next view
@@ -245,6 +264,7 @@ const renderOutputs = async (outputs, entity) => {
 }
 
 module.exports = {
+  isActive,
   start,
   stop,
   renderStatus,
@@ -255,7 +275,8 @@ module.exports = {
 }
 
 
-
+// Run this script alone to see a demo of the CLI
+//
 // start('dev', 'Website')
 //
 // setTimeout(() => {

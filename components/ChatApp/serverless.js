@@ -51,11 +51,10 @@ class ChatApp extends Component {
     })
 
     outputs = {
-      url: outputs.website.url
+      url: outputs.websiteUrl
     }
 
-    this.cli.output('URL', `${outputs.url}`)
-
+    this.cli.outputs(outputs)
     return outputs
   }
 
@@ -69,7 +68,9 @@ class ChatApp extends Component {
     const realtimeApp = this.load('RealtimeApp')
     const outputs = await realtimeApp.remove()
 
-    return outputs
+    this.state = {}
+    await this.save()
+    return {}
   }
 
   async connect(inputs = {}) {

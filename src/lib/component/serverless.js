@@ -1,7 +1,6 @@
 const path = require('path')
 const cli = require('../cli')
 const {
-  getCredentials,
   readState,
   writeState
 } = require('../../utils')
@@ -36,7 +35,6 @@ class Component {
     this.cli.log = (log) => {cli.renderLog(log, name)}
     this.cli.status = (status) => {cli.renderStatus(status, name)}
     this.cli.warn = (warning) => {cli.renderWarning(warning, name)}
-    this.cli.error = (error) => {cli.renderError(error, name)}
     this.cli.outputs = (outputs) => {cli.renderOutputs(outputs, name)}
 
     // Define default function
@@ -44,6 +42,7 @@ class Component {
     // TODO: validate that component author has defined a default() method
     const that = this
     const defaultFunction = function(inputs) {
+
       return that.default.call(that, inputs)
     }
 

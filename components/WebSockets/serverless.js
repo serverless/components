@@ -14,11 +14,11 @@ const {
 } = require('./utils')
 const Component = require('../../src/lib/Component/serverless') // TODO: Change to { Component } = require('serverless')
 
-const outputs = ['name', 'stage', 'description', 'routeSelectionExpression', 'routes', 'id', 'url']
+let outputs = ['name', 'deploymentStage', 'description', 'routeSelectionExpression', 'routes', 'id', 'url']
 
 const defaults = {
   name: 'serverless',
-  stage: 'dev',
+  deploymentStage: 'dev',
   description: 'Serverless WebSockets',
   routeSelectionExpression: '$request.body.action',
   routes: {}, // key (route): value (lambda arn)
@@ -27,6 +27,7 @@ const defaults = {
 
 class WebSockets extends Component {
   async default(inputs = {}) {
+
     const config = mergeDeepRight(defaults, inputs)
     const apig2 = new aws.ApiGatewayV2({ region: config.region, credentials: this.context.credentials.aws })
     const lambda = new aws.Lambda({ region: config.region, credentials: this.context.credentials.aws })
@@ -61,9 +62,9 @@ class WebSockets extends Component {
     await removeRoutes({ apig2, id: config.id, routes: routesToRemove })
 
     // deploy the API
-    await createDeployment({ apig2, id: config.id, stage: config.stage })
+    await createDeployment({ apig2, id: config.id, deploymentStage: this.context.stage })
 
-    config.url = getWebsocketUrl({ id: config.id, region: config.region, stage: config.stage })
+    config.url = getWebsocketUrl({ id: config.id, region: config.region, deploymentStage: this.context.stage })
 
     // if the user has changed the id,
     // remove the previous API
@@ -74,18 +75,11 @@ class WebSockets extends Component {
 
     this.state.id = config.id
     this.state.url = config.url
-    this.save()
+    await this.save()
 
-    this.cli.output('Name', `       ${config.name}`)
-    this.cli.output('ID', `         ${config.id}`)
-    this.cli.output('Stage', `      ${config.stage}`)
-    this.cli.output('Expression', ` ${config.routeSelectionExpression}`)
-    this.cli.output('URL', `        ${config.url}`)
-    this.cli.output('Routes', '')
-
-    Object.keys(config.routes).forEach((route) => this.cli.log(`  - ${route}`))
-
-    return pick(outputs, config)
+    outputs = pick(outputs, config)
+    this.cli.outputs(outputs)
+    return outputs
   }
 
   async remove(inputs = {}) {
@@ -100,9 +94,9 @@ class WebSockets extends Component {
     }
 
     this.state = {}
-    this.save()
+    await this.save()
 
-    return pick(outputs, config)
+    return {}
   }
 }
 

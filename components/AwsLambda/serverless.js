@@ -12,7 +12,7 @@ const {
 const Component = require('../../src/lib/Component/serverless') // TODO: Change to { Component } = require('serverless')
 
 
-const outputs = [
+let outputs = [
   'name',
   'description',
   'memory',
@@ -76,16 +76,11 @@ class AwsLambda extends Component {
 
     this.state.name = config.name
     this.state.arn = config.arn
-    this.save()
+    await this.save()
 
-    this.cli.output('Name', `    ${config.name}`)
-    this.cli.output('Memory', `  ${config.memory}`)
-    this.cli.output('Timeout', ` ${config.timeout}`)
-    this.cli.output('Runtime', ` ${config.runtime}`)
-    this.cli.output('Handler', ` ${config.handler}`)
-    this.cli.output('ARN', `     ${config.arn}`)
-
-    return pick(outputs, config)
+    outputs = pick(outputs, config)
+    this.cli.outputs(outputs)
+    return outputs
   }
 
   async remove(inputs = {}) {
@@ -104,11 +99,9 @@ class AwsLambda extends Component {
     await deleteLambda({ lambda, name: config.name })
 
     this.state = {}
-    this.save()
+    await this.save()
 
-    this.cli.output('Name', ` ${config.name}`)
-
-    return pick(outputs, config)
+    return {}
   }
 }
 

@@ -107,7 +107,7 @@ const removeRoutes = async ({ apig2, id, routes }) => {
   )
 }
 
-const createDeployment = async ({ apig2, id, stage }) => {
+const createDeployment = async ({ apig2, id, deploymentStage }) => {
   const { DeploymentId } = await apig2
     .createDeployment({
       ApiId: id
@@ -116,7 +116,7 @@ const createDeployment = async ({ apig2, id, stage }) => {
 
   const params = {
     ApiId: id,
-    StageName: stage,
+    StageName: deploymentStage,
     DeploymentId
   }
 
@@ -133,8 +133,8 @@ const removeApi = async ({ apig2, id }) => {
   return apig2.deleteApi({ ApiId: id }).promise()
 }
 
-const getWebsocketUrl = ({ id, region, stage }) => {
-  return `wss://${id}.execute-api.${region}.amazonaws.com/${stage}/`
+const getWebsocketUrl = ({ id, region, deploymentStage }) => {
+  return `wss://${id}.execute-api.${region}.amazonaws.com/${deploymentStage}/`
 }
 
 module.exports = {
