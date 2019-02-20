@@ -21,18 +21,19 @@ $ git clone https://github.com/serverless/v2.git
 Install dependencies.
 
 ```
-cd v2 && npm link
+$ cd v2 && npm link
 ```
 
 Go into an [example](./examples).
 
 ```
-cd examples/realtime-app
+$ cd examples/realtime-app
 ```
 
 Add provider credentials (all examples currently require [AWS](https://aws.amazon.com/) credentials).  Serverless Framework V.2 supports `.env` files in the same folder as `serverless.yml` or `serverless.js`.  Create one that looks like this:
 
 ```text
+# .env
 AWS_ACCESS_KEY_ID=123456789
 AWS_SECRET_ACCESS_KEY=987654321
 ```
@@ -77,6 +78,7 @@ await realtimeApp.loadTest()
 Use a `serverless.js` file, like this:
 
 ```javascript
+// serverless.js
 
 class MyComponent extends Component {
 
