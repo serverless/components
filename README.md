@@ -15,18 +15,31 @@ Deploy serverless infrastructure, or an entire serverless outcome (e.g. a chat a
 ```yaml
 # serverless.yml
 
-name: my-chat-app
+name: my-realtime-app
 
 components:
-  ChatApp::chat-app:
+  RealtimeApp::realtime-app:
+    frontend:
+      assets: ./frontend/build
+      env:
+    backend:
+      assets: ./backend
+      env:
 ```
+
 ```console
-$ chat-app: v2
+$ realtime-app: v2
 
-  chat-app › outputs:
-  url:  'http://chatapp-dw6zhn.s3-website-us-east-1.amazonaws.com'
+  realtime-app › outputs:
+  frontend: 
+    url:  'http://realtimeapp-xqu5n6.s3-website-us-east-1.amazonaws.com'
+    env:  [ ]
+  backend: 
+    url:  'wss://2ozttnximh.execute-api.us-east-1.amazonaws.com/dev/'
+    env:  [ ]
 
-  23s › dev › my-chat-app › done
+
+  12s › dev › my-realtime-app › done
 ```
 
 ## Get Started
