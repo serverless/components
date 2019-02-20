@@ -22,7 +22,7 @@ name: my-chat-app
 components:
   ChatApp::chat-app:
 ```
-```bash
+```console
 $ chat-app: v2
 
   chat-app › outputs:
@@ -35,19 +35,19 @@ $ chat-app: v2
 
 Clone repo.
 
-```bash
+```console
 $ git clone https://github.com/serverless/v2.git
 ```
 
 Install dependencies.
 
-```
+```console
 $ cd v2 && npm link
 ```
 
 Go into an [example](./examples).
 
-```
+```console
 $ cd examples/realtime-app
 ```
 
@@ -60,7 +60,7 @@ AWS_SECRET_ACCESS_KEY=987654321
 
 Run `$ v2`.
 
-```bash
+```console
 $ realtime-app: v2
 
   realtime-app › outputs:
@@ -71,7 +71,7 @@ $ realtime-app: v2
 
 Leverage stage-specific environment variables by creating `.env` files per stage:
 
-```
+```text
 .env # Default
 .env.dev
 .env.prod
