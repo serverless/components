@@ -64,9 +64,15 @@ Run `$ v2`.
 $ realtime-app: v2
 
   realtime-app › outputs:
-  url:  'http://serverless-p35yxi.s3-website-us-east-1.amazonaws.com'
+  frontend: 
+    url:  'http://realtimeapp-xqu5n6.s3-website-us-east-1.amazonaws.com'
+    env:  [ 'urlWebsocketApi' ]
+  backend: 
+    url:  'wss://2ozttnximh.execute-api.us-east-1.amazonaws.com/dev/'
+    env:  [ 'dbMessages' ]
 
-  2s › dev › realtime-app › done
+
+  12s › dev › my-realtime-app › done
 ```
 
 Leverage stage-specific environment variables by creating `.env` files per stage:
