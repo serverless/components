@@ -1,8 +1,4 @@
-# Serverless Framework V.2
-
-&nbsp;
-
-> _"The future of cloud is outcomes, not infrastructure."_
+[![Serverless Framework V.2](https://s3.amazonaws.com/assets.github.serverless/readme-serverless-framework-v2-1.png)](http://serverless.com)
 
 &nbsp;
 
