@@ -24,9 +24,13 @@ Install dependencies.
 cd v2 && npm link
 ```
 
-Pick an [example](./examples). Each example requires credentials for Amazon Web Services set as environment variables.
+Go into an [example](./examples).
 
-Serverless Framework V.2 supports `.env` files in the same folder as `serverless.yml` or `serverless.js`.  Create one that looks like this:
+```
+cd examples/realtime-app
+```
+
+Add provider credentials (all examples currently require [AWS](https://aws.amazon.com/) credentials).  Serverless Framework V.2 supports `.env` files in the same folder as `serverless.yml` or `serverless.js`.  Create one that looks like this:
 
 ```text
 AWS_ACCESS_KEY_ID=123456789
@@ -36,48 +40,20 @@ AWS_SECRET_ACCESS_KEY=987654321
 Run `$ v2`.
 
 ```bash
-$ website: v2
+$ realtime-app: v2
 
-  website › outputs:
+  realtime-app › outputs:
   url:  'http://serverless-p35yxi.s3-website-us-east-1.amazonaws.com'
-  env:  []
 
-
-  2s › dev › my-site › done
+  2s › dev › realtime-app › done
 ```
 
-You can leverage different environment variables for different stages by using this naming convention:
+Leverage stage-specific environment variables by creating `.env` files per stage:
 
 ```
 .env # Default
 .env.dev
 .env.prod
-```
-
-### How To Use A Serverless Component Declaratively
-
-Use a `serverless.yml` file, like this:
-
-```yaml
-name: my-realtime-app
-stage: dev
-
-components:
-  RealtimeApp::realtime-app:
-    frontend:
-      assets: ./frontend/build
-    backend:
-      assets: ./backend
-```
-
-Then use your CLI, like this:
-
-```bash
-# To run/deploy/update all Components, call 'serverless'...
-$ v2
-
-# To run extra functionality that comes in a component, call it's method like this...
-$ v2 remove
 ```
 
 ### How To Use A Serverless Component Programmatically
