@@ -12,7 +12,7 @@
 
 ## Example
 
-Deploy an entire outcome in seconds...
+Deploy serverless infrastructure, or an entire serverless outcome (e.g. a chat app) in seconds...
 
 ```yaml
 # serverless.yml
