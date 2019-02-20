@@ -10,6 +10,27 @@
 
 &nbsp;
 
+## Example
+
+Deploy an entire outcome in seconds...
+
+```yaml
+# serverless.yml
+
+name: my-chat-app
+
+components:
+  ChatApp::chat-app:
+```
+```bash
+$ chat-app: v2
+
+  chat-app › outputs:
+  url:  'http://chatapp-dw6zhn.s3-website-us-east-1.amazonaws.com'
+
+  23s › dev › my-chat-app › done
+```
+
 ## Get Started
 
 Clone repo.
