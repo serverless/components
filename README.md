@@ -20,7 +20,7 @@ name: my-realtime-app
 components:
   RealtimeApp::realtime-app:
     frontend:
-      assets: ./frontend/build
+      assets: ./frontend
       env:
     backend:
       assets: ./backend
