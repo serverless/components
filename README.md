@@ -126,8 +126,7 @@ class MyComponent extends Component {
     // Get the targeted stage
     console.log(this.context.stage)
     
-    // Get any credentials put in a .env file
-    // The Framework identifies common provider credentials in the environment and adds them to this.context.credentials
+    // Common provider credentials are identified in the environment or .env file and added to this.context.credentials
     const dynamodb = new AWS.DynamoDB({ credentials: this.context.credentials.aws })
   
     // Save state
