@@ -54,22 +54,6 @@ You can leverage different environment variables for different stages by using t
 .env.prod
 ```
 
-### How To Use A Serverless Component Programmatically
-
-Create a new javascript file, and load/use Components like this:
-
-```javascript
-
-// To load a Component, instantiate it's class...
-const realtimeApp = this.load('RealtimeApp')
-
-// To run/deploy/update a Component, call it's default function...
-await realtimeApp()
-
-// To run extra functionality, use custom methods that come w/ the Component...
-await realtimeApp.loadTest()
-```
-
 ### How To Use A Serverless Component Declaratively
 
 Use a `serverless.yml` file, like this:
@@ -94,6 +78,22 @@ $ v2
 
 # To run extra functionality that comes in a component, call it's method like this...
 $ v2 remove
+```
+
+### How To Use A Serverless Component Programmatically
+
+Create a new javascript file, and load/use Components like this:
+
+```javascript
+
+// To load a Component, instantiate it's class...
+const realtimeApp = this.load('RealtimeApp')
+
+// To run/deploy/update a Component, call it's default function...
+await realtimeApp()
+
+// To run extra functionality, use custom methods that come w/ the Component...
+await realtimeApp.loadTest()
 ```
 
 ### How To Write A Serverless Component
