@@ -4,7 +4,8 @@
   "description": "N/A",
   "main": "./index.js",
   "bin": {
-    "v2": "./bin/cli"
+    "v2": "./bin/cli",
+    "sf": "./bin/cli"
   },
   "publishConfig": {
     "access": "public"
