@@ -80,7 +80,19 @@ Leverage stage-specific environment variables by creating `.env` files per stage
 
 ### How To Write A Serverless Component
 
-Use a `serverless.js` file, like this:
+Use a `serverless.js` file, extend the Component class and add a `default` method.
+
+```javascript
+// serverless.js
+
+class MyComponent extends Component {
+
+  async default() { } // The default functionality to run/provision/update your Component
+  
+}
+```
+
+`default` is always required.  Other methods are optional.
 
 ```javascript
 // serverless.js
@@ -111,7 +123,7 @@ class MyComponent extends Component {
 
 ```
 
-There are a some handy things you can do inside your Component, to give it richer functionality...
+`this` comes loaded with lots of utilites which you can use.
 
 
 ```javascript
@@ -163,6 +175,8 @@ class MyComponent extends Component {
   }
 }
 ```
+
+Good luck.
 
 
 **Created By**
