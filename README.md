@@ -51,10 +51,9 @@ Go into an [example](./examples).
 $ cd examples/realtime-app
 ```
 
-Add provider credentials (all examples currently require [AWS](https://aws.amazon.com/) credentials).  Serverless Framework V.2 supports `.env` files in the same folder as `serverless.yml` or `serverless.js`.  Create one that looks like this:
+Add provider credentials (all examples currently require [AWS](https://aws.amazon.com/) credentials).  Serverless Framework V.2 supports `.env` files in the same folder as `serverless.yml` or `serverless.js`.  Create a `.env` that looks like this:
 
 ```text
-# .env
 AWS_ACCESS_KEY_ID=123456789
 AWS_SECRET_ACCESS_KEY=987654321
 ```
