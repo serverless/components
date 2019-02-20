@@ -10,7 +10,7 @@
 
 ## Example
 
-Deploy serverless infrastructure, or an entire serverless outcome (e.g. a chat app) in seconds...
+Deploy serverless infrastructure, or an entire serverless outcome (e.g. a fullstack realtime app) in seconds...
 
 ```yaml
 # serverless.yml
