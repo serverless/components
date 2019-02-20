@@ -136,8 +136,7 @@ class MyComponent extends Component {
     // Load a child Component
     let website = this.load('Website')
     
-    // If you are deploying multiple instances of the same Component, include an instance id.
-    // This also pre-fills them with any existing state
+    // If you are deploying multiple instances of the same Component, include an instance id. This also pre-fills them with any existing state.
     let website1 = this.load('Website', 'website1')
     let website2 = this.load('Website', 'website2')
     
