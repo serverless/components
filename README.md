@@ -59,7 +59,7 @@ $ cd v2 && npm link
 Go into an [example](./examples).
 
 ```console
-$ cd examples/realtime-app
+$ cd examples/chat-app
 ```
 
 Add provider credentials (all examples currently require [AWS](https://aws.amazon.com/) credentials).  Serverless Framework V.2 supports `.env` files in the same folder as `serverless.yml` or `serverless.js`.  Create a `.env` that looks like this:
@@ -72,18 +72,12 @@ AWS_SECRET_ACCESS_KEY=987654321
 Run `$ v2`.
 
 ```console
-$ realtime-app: v2
+$ chat-app: v2
 
-  realtime-app › outputs:
-  frontend: 
-    url:  'http://realtimeapp-xqu5n6.s3-website-us-east-1.amazonaws.com'
-    env:  [ 'urlWebsocketApi' ]
-  backend: 
-    url:  'wss://2ozttnximh.execute-api.us-east-1.amazonaws.com/dev/'
-    env:  [ 'dbMessages' ]
+  chat-app › outputs:
+  url:  'http://chatapp-5m53dym.s3-website-us-east-1.amazonaws.com'
 
-
-  12s › dev › my-realtime-app › done
+  12s › dev › my-chat-app › done
 ```
 
 Leverage stage-specific environment variables by creating `.env` files per stage:
@@ -94,7 +88,7 @@ Leverage stage-specific environment variables by creating `.env` files per stage
 .env.prod
 ```
 
-### How To Write A Serverless Component
+## How To Write A Serverless Component
 
 Use a `serverless.js` file, extend the Component class and add a `default` method.
 
