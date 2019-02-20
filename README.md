@@ -1,7 +1,5 @@
 [![Serverless Framework V.2](https://s3.amazonaws.com/assets.github.serverless/readme-serverless-framework-v2-1.png)](http://serverless.com)
 
-&nbsp;
-
 * [Chat App](./examples/chat-app)
 * [Realtime App](./examples/realtime-app)
 * [Websockets Backend](./examples/socket)
