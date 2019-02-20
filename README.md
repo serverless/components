@@ -111,7 +111,7 @@ class MyComponent extends Component {
 
 ```
 
-There are a few handy methods which you can use to load child Components, save state, and print things to the CLI...
+There are a some handy things you can do inside your Component, to give it richer functionality...
 
 
 ```javascript
