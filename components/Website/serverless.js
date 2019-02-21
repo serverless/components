@@ -1,9 +1,7 @@
-const aws = require('aws-sdk')
 const path = require('path')
 const util = require('util')
 const exec = util.promisify(require('child_process').exec)
-const { pick, isEmpty, mergeDeepRight, writeFile } = require('../../src/utils')
-const { getBucketName, uploadDir, deleteWebsiteBucket, configureWebsite } = require('./utils')
+const { isEmpty, mergeDeepRight, writeFile } = require('../../src/utils')
 const Component = require('../../src/lib/Component/serverless') // TODO: Change to { Component } = require('serverless')
 
 let outputs = ['name', 'url']
@@ -17,19 +15,26 @@ const defaults = {
   region: 'us-east-1'
 }
 
+const getBucketName = (websiteName) => {
+  websiteName = websiteName.toLowerCase()
+  const bucketId = Math.random()
+    .toString(36)
+    .substring(6)
+  websiteName = `${websiteName}-${bucketId}`
+  return websiteName
+}
+
 /*
  * Website
  */
 
 class Website extends Component {
-
   /*
    * Default
    */
 
   async default(inputs = {}) {
     const config = mergeDeepRight(defaults, inputs)
-    const s3 = new aws.S3({ region: config.region, credentials: this.context.credentials.aws })
 
     // Ensure paths are resolved
     config.path = path.resolve(config.path)
@@ -45,11 +50,9 @@ class Website extends Component {
 
     this.cli.status(`Deploying`)
 
-    // if bucket already exists in my account, this call still succeeds!
-    // if bucket name is unavailable, an error is thrown
-    await s3.createBucket({ Bucket: config.bucketName }).promise()
+    const bucket = this.load('AwsS3')
 
-    await configureWebsite({ s3, ...config }) // put policies
+    await bucket({ name: config.bucketName, website: true })
 
     if (!isEmpty(config.env) && config.buildCmd) {
       let script = 'window.env = {};\n'
@@ -64,12 +67,11 @@ class Website extends Component {
     if (config.buildCmd) {
       this.cli.status('Building')
 
-      let result
-      let options = { cwd: config.path }
+      const options = { cwd: config.path }
       try {
-        result = await exec(config.buildCmd, options)
+        await exec(config.buildCmd, options)
       } catch (err) {
-        console.error(err.stderr)
+        console.error(err.stderr) // eslint-disable-line
         throw new Error(
           `Failed building website via "${
             config.buildCmd
@@ -79,14 +81,9 @@ class Website extends Component {
     }
 
     this.cli.status('Uploading')
-    await uploadDir({ s3, ...config })
+    await bucket.upload({ path: config.assets })
 
     config.url = `http://${config.bucketName}.s3-website-${config.region}.amazonaws.com`
-
-    if (nameChanged) {
-      this.cli.status(`Replacing`)
-      await deleteWebsiteBucket({ s3, ...this.state })
-    }
 
     this.state.name = config.name
     this.state.bucketName = config.bucketName
@@ -100,18 +97,12 @@ class Website extends Component {
     return outputs
   }
 
-  async remove(inputs = {}) {
-    const config = mergeDeepRight(defaults, inputs)
-    if (!this.state.bucketName) {
-      this.cli.log('no website bucket name found in state.')
-      return
-    }
-
-    const s3 = new aws.S3({ region: config.region, credentials: this.context.credentials.aws })
-
+  async remove() {
     this.cli.status(`Removing`)
 
-    await deleteWebsiteBucket({ s3, ...this.state })
+    const bucket = this.load('AwsS3')
+
+    await bucket.remove()
 
     this.state = {}
     await this.save()

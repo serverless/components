@@ -1,30 +1,24 @@
+const aws = require('aws-sdk')
 const fs = require('fs')
 const path = require('path')
 const klawSync = require('klaw-sync')
 const mime = require('mime-types')
 
-const getBucketName = (websiteName) => {
-  websiteName = websiteName.toLowerCase()
-  const bucketId = Math.random()
-    .toString(36)
-    .substring(6)
-  websiteName = `${websiteName}-${bucketId}`
-  return websiteName
-}
-
-const bucketExists = async ({ s3, bucketName }) => {
-  try {
-    await s3.getBucketLocation({ Bucket: bucketName }).promise()
-  } catch (e) {
-    if (e.code === 'NoSuchBucket') {
-      return false
-    }
-    throw e
+const getClients = (credentials, region) => {
+  const params = {
+    region,
+    credentials
   }
-  return true
+
+  // we need two S3 clients because creating/deleting buckets
+  // is not available with the acceleration feature.
+  return {
+    regular: new aws.S3(params),
+    accelerated: new aws.S3({ ...params, endpoint: `s3-accelerate.amazonaws.com` })
+  }
 }
 
-const configureWebsite = async ({ s3, bucketName }) => {
+const configureWebsite = async (s3, bucketName) => {
   const s3BucketPolicy = {
     Version: '2012-10-17',
     Statement: [
@@ -83,10 +77,11 @@ const configureWebsite = async ({ s3, bucketName }) => {
   await s3.putBucketWebsite(staticHostParams).promise()
 }
 
-const uploadDir = async ({ s3, bucketName, assets }) => {
+const uploadDir = async (s3, bucketName, dirPath) => {
+  // todo check all files sizes and use multipart accordingly
   const items = await new Promise((resolve, reject) => {
     try {
-      resolve(klawSync(assets))
+      resolve(klawSync(dirPath))
     } catch (error) {
       reject(error)
     }
@@ -100,7 +95,7 @@ const uploadDir = async ({ s3, bucketName, assets }) => {
 
     const itemParams = {
       Bucket: bucketName,
-      Key: path.relative(assets, item.path),
+      Key: path.relative(dirPath, item.path),
       Body: fs.readFileSync(item.path)
     }
     const file = path.basename(item.path)
@@ -117,7 +112,7 @@ const uploadDir = async ({ s3, bucketName, assets }) => {
  * Delete Website Bucket
  */
 
-const deleteWebsiteBucket = async ({ s3, bucketName }) => {
+const clearBucket = async (s3, bucketName) => {
   try {
     const data = await s3.listObjects({ Bucket: bucketName }).promise()
 
@@ -131,6 +126,15 @@ const deleteWebsiteBucket = async ({ s3, bucketName }) => {
     }
 
     await Promise.all(promises)
+  } catch (error) {
+    if (error.code !== 'NoSuchBucket') {
+      throw error
+    }
+  }
+}
+
+const deleteBucket = async (s3, bucketName) => {
+  try {
     await s3.deleteBucket({ Bucket: bucketName }).promise()
   } catch (error) {
     if (error.code !== 'NoSuchBucket') {
@@ -140,9 +144,9 @@ const deleteWebsiteBucket = async ({ s3, bucketName }) => {
 }
 
 module.exports = {
-  getBucketName,
-  bucketExists,
   configureWebsite,
+  getClients,
   uploadDir,
-  deleteWebsiteBucket
+  clearBucket,
+  deleteBucket
 }
