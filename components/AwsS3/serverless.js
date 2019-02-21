@@ -3,7 +3,7 @@ const Component = require('../../src/lib/Component/serverless')
 const { getClients, configureWebsite, clearBucket, deleteBucket, uploadDir } = require('./utils')
 
 const defaults = {
-  name: 'serverless-testing-acceleration',
+  name: 'serverless',
   website: true,
   accelerated: true,
   region: 'us-east-1'
@@ -21,6 +21,7 @@ class AwsS3 extends Component {
 
     const clients = getClients(this.context.credentials.aws, config.region)
 
+    // if bucket already exists, this call still succeeds
     await clients.regular.createBucket({ Bucket: config.name }).promise()
 
     await clients.regular
@@ -54,18 +55,18 @@ class AwsS3 extends Component {
     return config
   }
 
-  async remove(inputs) {
-    // todo what if there's no region in state
+  async remove(inputs = {}) {
     if (!inputs.name && !this.state.name) {
       this.cli.log('no bucket name found in state.')
       return
     }
 
     const name = inputs.name || this.state.name
+    const region = inputs.region || this.state.region || defaults.region
 
     this.cli.status(`Removing`)
 
-    const clients = getClients(this.context.credentials.aws, this.state.region)
+    const clients = getClients(this.context.credentials.aws, region)
 
     await clearBucket(this.state.accelerated ? clients.accelerated : clients.regular, name)
 
