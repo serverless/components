@@ -21,10 +21,8 @@ components:
   RealtimeApp::realtime-app:
     frontend:
       assets: ./frontend
-      env:
     backend:
       assets: ./backend
-      env:
 ```
 
 ```console
@@ -33,11 +31,9 @@ $ realtime-app: v2
   realtime-app › outputs:
   frontend: 
     url:  'http://realtimeapp-xqu5n6.s3-website-us-east-1.amazonaws.com'
-    env:  [ ]
   backend: 
     url:  'wss://2ozttnximh.execute-api.us-east-1.amazonaws.com/dev/'
-    env:  [ ]
-
+    
 
   12s › dev › my-realtime-app › done
 ```
