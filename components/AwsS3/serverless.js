@@ -4,7 +4,7 @@ const { getClients, configureWebsite, clearBucket, deleteBucket, uploadDir } = r
 
 const defaults = {
   name: 'serverless',
-  website: true,
+  website: false,
   accelerated: true,
   region: 'us-east-1'
 }
