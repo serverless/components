@@ -1,1 +1,1 @@
-module.exports = /\${(\w*:?[\w\d.]+)}/g
+module.exports = /\${(\w*:?[\w\d.-]+)}/g
