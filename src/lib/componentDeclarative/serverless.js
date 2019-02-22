@@ -1,35 +1,23 @@
 /*
-* Component Declarative
-* - Use Serverless Framework w/
-*/
+ * Component Declarative
+ * - Use Serverless Framework w/
+ */
 
 const path = require('path')
 const Component = require('../component/serverless')
-const { mergeDeepRight, readFile } = require('../../utils')
-const {
-  prepareComponents,
-  createGraph,
-  loadState,
-  logOutputs,
-} = require('./utils')
+const { readFile } = require('../../utils')
+const { prepareComponents, createGraph, loadState, logOutputs } = require('./utils')
 const variables = require('./utils/variables')
 
-const defaults = {
-  path: process.cwd()
-}
-
 class ComponentDeclarative extends Component {
-
   /*
-  * Default
-  * - Loads serverless.yml and deploys all Components in it
-  */
+   * Default
+   * - Loads serverless.yml and deploys all Components in it
+   */
 
-  async default(inputs = {}) {
-
+  async default() {
     this.cli.status('Running')
 
-    const config = mergeDeepRight(defaults, inputs)
     let fileContent
     fileContent = await readFile(path.join(this.context.root, this.context.rootFile))
 
@@ -49,24 +37,23 @@ class ComponentDeclarative extends Component {
       const instanceId = instancesToProcess[i]
       const value = preparedComponents[instanceId]
       let inputs = value.inputs // eslint-disable-line
-      const { component, instance } = value
+      const { instance } = value
       inputs = variables.resolveComponentVariables(vars, results, value)
-      outputs[instanceId] = await instance.default(inputs)
+      const result = await instance.default(inputs)
+      results[instanceId] = result
+      outputs[instanceId] = result
     }
 
     logOutputs(this.cli, outputs)
   }
 
   /*
-  * Remove
-  * - Removes all Components in serverless.yml
-  */
+   * Remove
+   * - Removes all Components in serverless.yml
+   */
 
-  async remove(inputs = {}) {
-
+  async remove() {
     this.cli.status('Removing')
-
-    const config = mergeDeepRight(defaults, inputs)
 
     let fileContent
     fileContent = await readFile(path.join(this.context.root, this.context.rootFile))
@@ -84,14 +71,13 @@ class ComponentDeclarative extends Component {
     const graph = createGraph(preparedComponents, vars)
 
     // TODO: update to process nodes in parallel
-    const results = {}
     const outputs = {}
     const instancesToProcess = graph.overallOrder().reverse()
     for (let i = 0; i < instancesToProcess.length; i++) {
       const instanceId = instancesToProcess[i]
       const value = preparedComponents[instanceId]
       let inputs = value.inputs // eslint-disable-line
-      const { component, instance } = value
+      const { instance } = value
       inputs = variables.resolveComponentVariables(vars, state, value)
       outputs[instanceId] = await instance.remove(inputs)
     }

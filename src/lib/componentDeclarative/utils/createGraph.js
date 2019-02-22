@@ -34,6 +34,16 @@ function createGraph(prepareComponents, variableObjects) {
     Object.keys(prepareComponents)
   )
 
+  // TODO: explicitly check for circular dependencies here
+  // this is commented out since re-throwing the error won't cause
+  // the CLI to pick it up and print the error message in red
+  // // check for circular dependencies
+  // try {
+  //   dag.overallOrder()
+  // } catch (error) {
+  //   throw new Error(error.message)
+  // }
+
   return dag
 }
 
