@@ -18,6 +18,7 @@ class CLI {
     this._ = {}
     this._.stage = null
     this._.parentComponent = null
+    this._.useTimer = true
     this._.seconds = 0
     // Status defaults
     this._.status = {}
@@ -30,6 +31,9 @@ class CLI {
   config(config) {
     this._.stage = config.stage
     this._.parentComponent = config.parentComponent
+    if (typeof config.useTimer === 'boolean') {
+      this._.useTimer = config.useTimer
+    }
   }
 
   close(reason, message) {
@@ -92,8 +96,12 @@ class CLI {
     console.log(os.EOL) // eslint-disable-line
 
     // Write content
-    let content = `  ${grey(this._.seconds + 's')}`
-    content += ` ${grey(figures.pointerSmall)} ${stage}`
+    let content = ' '
+    if (this._.useTimer) {
+      content += ` ${grey(this._.seconds + 's')}`
+      content += ` ${grey(figures.pointerSmall)}`
+    }
+    content += ` ${stage}`
     content += ` ${grey(figures.pointerSmall)} ${this._.parentComponent}`
     content += ` ${grey(figures.pointerSmall)} ${message}`
     process.stdout.write(content)
@@ -141,8 +149,12 @@ class CLI {
 
     // Write content
     console.log(os.EOL) // eslint-disable-line
-    let content = `  ${grey(this._.seconds + 's')}`
-    content += ` ${grey(figures.pointerSmall)} ${green(this._.stage)}`
+    let content = ' '
+    if (this._.useTimer) {
+      content += ` ${grey(this._.seconds + 's')}`
+      content += ` ${grey(figures.pointerSmall)}`
+    }
+    content += ` ${green(this._.stage)}`
     content += ` ${grey(figures.pointerSmall)} ${this._.parentComponent}`
     content += ` ${grey(figures.pointerSmall)} ${grey(this._.status.message)}`
     content += ` ${grey(this._.status.loadingDots)}`
@@ -171,11 +183,11 @@ class CLI {
     console.log() // eslint-disable-line
 
     // Write log
-    entity = `${grey(this._.seconds + `s`)} ${grey(figures.pointerSmall)} ${grey(entity)} ${grey(
-      figures.pointerSmall
-    )} ${grey(`status:`)}`
+    entity = `${this._.useTimer ? grey(this._.seconds + `s` + figures.pointerSmall) : ''} ${grey(
+      entity
+    )} ${grey(figures.pointerSmall)} ${grey(`status:`)}`
     console.log(`  ${entity}`) // eslint-disable-line
-    console.log(` `, status) // eslint-disable-line
+    console.log(` `, status) //eslint-disable-line
 
     // Put cursor to starting position for next view
     process.stdout.write(ansiEscapes.cursorLeft)
@@ -203,7 +215,7 @@ class CLI {
       entity = `${grey(entity)} ${grey(figures.pointerSmall)} ${grey(`log:`)}`
       console.log(`  ${entity}`) // eslint-disable-line
     }
-    console.log(` `, util.format(log, { colors: false })) // eslint-disable-line
+    console.log(` `, util.format(log)) // eslint-disable-line
 
     // Put cursor to starting position for next view
     process.stdout.write(ansiEscapes.cursorLeft)
@@ -293,6 +305,27 @@ class CLI {
 
     // Put cursor to starting position for next view
     process.stdout.write(ansiEscapes.cursorLeft)
+  }
+
+  // basic CLI utilities
+  log(log, entity) {
+    this.renderLog(log, entity)
+  }
+
+  status(status, entity) {
+    this.renderStatus(false, status, entity)
+  }
+
+  warn(warning, entity) {
+    this.renderWarning(warning, entity)
+  }
+
+  error(error, entity) {
+    this.renderError(error, entity)
+  }
+
+  outputs(outputs, entity) {
+    this.renderOutputs(outputs, entity)
   }
 }
 

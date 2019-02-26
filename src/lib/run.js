@@ -1,6 +1,7 @@
 const path = require('path')
 const dotenv = require('dotenv')
-const cli = require('./cli')
+const cliInstance = require('./cli')
+const Context = require('./context')
 const ComponentDeclarative = require('./componentDeclarative/serverless')
 const {
   errorHandler,
@@ -22,7 +23,7 @@ const components = require('../../components')
  * @param {String} config.debug - If you wish to turn on debug mode.
  */
 
-const run = async (config = {}) => {
+const run = async (config = {}, cli = cliInstance) => {
 
   // Configuration defaults
   config.root = config.root || process.cwd()
@@ -32,6 +33,7 @@ const run = async (config = {}) => {
   config.method = config.method || null
   config.verbose = config.verbose || false
   config.debug = config.debug || false
+  config.watch = config.watch || false
 
   if (config.verbose) process.env.SERVERLESS_VERBOSE = true
   if (config.debug) process.env.SERVERLESS_DEBUG = true
@@ -57,10 +59,10 @@ const run = async (config = {}) => {
   const serverlessJsonFilePath = path.join(process.cwd(), 'serverless.json')
 
   try {
-    if (await fileExists(serverlessJsFilePath)) return await runProgrammatic(serverlessJsFilePath, config)
-    else if (await fileExists(serverlessYmlFilePath)) return await runDeclarative(serverlessYmlFilePath, config)
-    else if (await fileExists(serverlessYamlFilePath)) return await runDeclarative(serverlessYamlFilePath, config)
-    else if (await fileExists(serverlessJsonFilePath)) return await runDeclarative(serverlessJsonFilePath, config)
+    if (await fileExists(serverlessJsFilePath)) return await runProgrammatic(serverlessJsFilePath, config, cli)
+    else if (await fileExists(serverlessYmlFilePath)) return await runDeclarative(serverlessYmlFilePath, config, cli)
+    else if (await fileExists(serverlessYamlFilePath)) return await runDeclarative(serverlessYamlFilePath, config, cli)
+    else if (await fileExists(serverlessJsonFilePath)) return await runDeclarative(serverlessJsonFilePath, config, cli)
     else {
       throw new Error(`No Serverless file (serverless.js, serverless.yml, serverless.yaml or serverless.json) found in ${process.cwd()}`)
     }
@@ -75,18 +77,13 @@ const run = async (config = {}) => {
  * @param {Object} config - Configuration
  */
 
-const runProgrammatic = async (filePath, config) => {
+const runProgrammatic = async (filePath, config, cli) => {
 
   let Component, component, result
 
   // Load Component
-  let context = {}
-  context.stage = config.stage
-  context.root = config.root
-  context.rootFile = 'serverless.js'
-  context.credentials = config.credentials
-  context.verbose = config.verbose
-  context.debug = config.debug
+  let context = new Context(config)
+
   Component = require(filePath)
   component = new Component({ context })
 
@@ -111,8 +108,10 @@ const runProgrammatic = async (filePath, config) => {
     return errorHandler(error, Component.name)
   }
 
-  // Cleanup CLI
-  cli.close('done')
+  if (!context.watch) {
+    // Cleanup CLI
+    cli.close('done')
+  }
 
   return result
 }
@@ -123,16 +122,11 @@ const runProgrammatic = async (filePath, config) => {
  * @param {Object} config - Configuration
  */
 
-const runDeclarative = async (filePath, config) => {
+const runDeclarative = async (filePath, config, cli) => {
 
   let Component, component, result
-  let context = {}
-  context.stage = config.stage
-  context.root = config.root
-  context.rootFile = path.basename(filePath)
-  context.credentials = config.credentials
-  context.verbose = config.verbose
-  context.debug = config.debug
+
+  let context = new Context(config, path.basename(filePath))
 
   // TODO: Handle loading errors and validate...
   const fileContent = await readFile(filePath)
@@ -219,8 +213,10 @@ const runDeclarative = async (filePath, config) => {
     }
   }
 
-  // Cleanup CLI
-  cli.close('done')
+  if (!context.watch) {
+    // Cleanup CLI
+    cli.close('done')
+  }
 
   return result
 }
