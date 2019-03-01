@@ -6,7 +6,7 @@
 const path = require('path')
 const Component = require('../component/serverless')
 const { readFile } = require('../../utils')
-const { prepareComponents, createGraph, loadState, logOutputs } = require('./utils')
+const { getComponents, prepareComponents, createGraph, loadState, logOutputs } = require('./utils')
 const variables = require('./utils/variables')
 
 class ComponentDeclarative extends Component {
@@ -24,9 +24,10 @@ class ComponentDeclarative extends Component {
     // construct variable objects and resolve them (if possible)
     const vars = variables.constructObjects(fileContent)
     fileContent = variables.resolveServerlessFile(fileContent, vars)
+    const components = getComponents(fileContent)
 
     // TODO: refactor so that we don't need to pass `this` into it
-    const preparedComponents = prepareComponents(fileContent.components, this)
+    const preparedComponents = prepareComponents(components, this)
     const graph = createGraph(preparedComponents, vars)
 
     // TODO: update to process nodes in parallel
@@ -61,9 +62,10 @@ class ComponentDeclarative extends Component {
     // construct variable objects and resolve them (if possible)
     const vars = variables.constructObjects(fileContent)
     fileContent = variables.resolveServerlessFile(fileContent, vars)
+    const components = getComponents(fileContent)
 
     // TODO: refactor so that we don't need to pass `this` into it
-    const preparedComponents = prepareComponents(fileContent.components, this)
+    const preparedComponents = prepareComponents(components, this)
 
     // TODO: refactor so that we don't need to manually create the ids
     const ids = Object.keys(preparedComponents).map((componentId) => `${this.id}.${componentId}`)
