@@ -8,6 +8,6 @@ components:
     backend:
       assets: ./backend
       env:
-        dbMessages: ${ct:messages.name}
+        dbMessages: ${comp:messages.name}
   AwsDynamoDb::messages:
     name: ${name}-messages
