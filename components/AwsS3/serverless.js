@@ -75,7 +75,6 @@ class AwsS3 extends Component {
 
   async remove(inputs = {}) {
     if (!inputs.name && !this.state.name) {
-      this.cli.log('no bucket name found in state.')
       return
     }
 
