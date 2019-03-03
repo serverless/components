@@ -1,4 +1,4 @@
-const { equals, pick, mergeDeepRight } = require('../../src/utils')
+const { equals, mergeDeepRight } = require('../../src/utils')
 const aws = require('aws-sdk')
 const {
   createRole,
@@ -58,7 +58,15 @@ class AwsIamRole extends Component {
     this.state.name = config.name
     await this.save()
 
-    outputs = pick(outputs, config)
+    // for some weird reason using pick
+    // fails when deploying roles in parallel
+    outputs = {
+      name: config.name,
+      arn: config.arn,
+      service: config.service,
+      policy: config.policy
+    }
+
     this.cli.outputs(outputs)
     return outputs
   }
