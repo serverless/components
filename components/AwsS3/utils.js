@@ -3,6 +3,12 @@ const fs = require('fs')
 const path = require('path')
 const klawSync = require('klaw-sync')
 const mime = require('mime-types')
+const UploadStream = require('s3-stream-upload')
+const { isEmpty } = require('ramda')
+const { createReadStream } = require('fs-extra')
+const archiver = require('archiver')
+
+const { readFileIfExists } = require('../../src/utils')
 
 const getClients = (credentials, region) => {
   const params = {
@@ -78,7 +84,6 @@ const configureWebsite = async (s3, bucketName) => {
 }
 
 const uploadDir = async (s3, bucketName, dirPath) => {
-  // todo check all files sizes and use multipart accordingly
   const items = await new Promise((resolve, reject) => {
     try {
       resolve(klawSync(dirPath))
@@ -106,6 +111,65 @@ const uploadDir = async (s3, bucketName, dirPath) => {
   })
 
   await Promise.all(uploadItems)
+}
+
+const packAndUploadDir = async ({ s3, bucketName, dirPath, key, append = [] }) => {
+  const ignore = (await readFileIfExists(path.join(dirPath, '.slsignore'))) || []
+  return new Promise((resolve, reject) => {
+    const archive = archiver('zip', {
+      zlib: { level: 9 }
+    })
+
+    if (!isEmpty(append)) {
+      append.forEach((file) => {
+        const fileStream = createReadStream(file)
+        archive.append(fileStream, { name: path.basename(file) })
+      })
+    }
+
+    archive.glob(
+      '**/*',
+      {
+        cwd: dirPath,
+        ignore
+      },
+      {}
+    )
+
+    archive
+      .pipe(
+        UploadStream(s3, {
+          Bucket: bucketName,
+          Key: key
+        })
+      )
+      .on('error', function(err) {
+        return reject(err)
+      })
+      .on('finish', function() {
+        return resolve()
+      })
+
+    archive.finalize()
+  })
+}
+
+const uploadFile = async ({ s3, bucketName, filePath, key }) => {
+  return new Promise((resolve, reject) => {
+    fs.createReadStream(filePath)
+      .pipe(
+        UploadStream(s3, {
+          Bucket: bucketName,
+          Key: key
+        })
+      )
+      .on('error', function(err) {
+        return reject(err)
+      })
+      .on('finish', function() {
+        return resolve()
+      })
+  })
 }
 
 /*
@@ -147,6 +211,8 @@ module.exports = {
   configureWebsite,
   getClients,
   uploadDir,
+  packAndUploadDir,
+  uploadFile,
   clearBucket,
   deleteBucket
 }

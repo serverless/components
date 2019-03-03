@@ -6,7 +6,7 @@ const Component = require('../../src/lib/Component/serverless') // TODO: Change 
 
 let outputs = ['name', 'url']
 const defaults = {
-  name: 'serverless',
+  name: 'serverless-website-test-again',
   path: process.cwd(),
   assets: process.cwd(),
   envFile: path.join(process.cwd(), 'src', 'env.js'),
@@ -81,7 +81,7 @@ class Website extends Component {
     }
 
     this.cli.status('Uploading')
-    await bucket.upload({ path: config.assets })
+    await bucket.upload({ dir: config.assets })
 
     config.url = `http://${config.bucketName}.s3-website-${config.region}.amazonaws.com`
 

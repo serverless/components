@@ -35,14 +35,13 @@ const createLambda = async ({
   runtime,
   env,
   description,
-  zip,
+  zipPath,
+  bucket,
   role
 }) => {
   const params = {
     FunctionName: name,
-    Code: {
-      ZipFile: zip
-    },
+    Code: {},
     Description: description,
     Handler: handler,
     MemorySize: memory,
@@ -53,6 +52,13 @@ const createLambda = async ({
     Environment: {
       Variables: env
     }
+  }
+
+  if (bucket) {
+    params.Code.S3Bucket = bucket
+    params.Code.S3Key = path.basename(zipPath)
+  } else {
+    params.Code.ZipFile = readFileSync(zipPath)
   }
 
   const res = await lambda.createFunction(params).promise()
@@ -69,13 +75,20 @@ const updateLambda = async ({
   runtime,
   env,
   description,
-  zip,
+  zipPath,
+  bucket,
   role
 }) => {
   const functionCodeParams = {
     FunctionName: name,
-    ZipFile: zip,
     Publish: true
+  }
+
+  if (bucket) {
+    functionCodeParams.S3Bucket = bucket
+    functionCodeParams.S3Key = path.basename(zipPath)
+  } else {
+    functionCodeParams.ZipFile = readFileSync(zipPath)
   }
 
   const functionConfigParams = {
@@ -169,17 +182,19 @@ const pack = async ({ code, shim }) => {
     return readFileSync(code)
   }
   const shims = shim ? [shim] : []
-  const outputFileName = `${Date.now()}.zip`
+  const outputFileName = `${Math.random()
+    .toString(36)
+    .substring(6)}.zip`
   const outputFilePath = path.join(tmpdir(), outputFileName)
 
   await packDir(code, outputFilePath, shims)
-  return readFileSync(outputFilePath)
+  return outputFilePath
 }
 
-const hash = (zip) =>
+const hash = (zipPath) =>
   crypto
     .createHash('sha256')
-    .update(zip)
+    .update(readFileSync(zipPath))
     .digest('base64')
 
 module.exports = {
