@@ -21,8 +21,17 @@ class AwsS3 extends Component {
 
     const clients = getClients(this.context.credentials.aws, config.region)
 
-    // if bucket already exists, this call still succeeds
-    await clients.regular.createBucket({ Bucket: config.name }).promise()
+    try {
+      await clients.regular.headBucket({ Bucket: config.name }).promise()
+    } catch (e) {
+      if (e.code === 'NotFound') {
+        await clients.regular.createBucket({ Bucket: config.name }).promise()
+      } else if (e.code === 'Forbidden') {
+        throw Error(`Bucket name "${config.name}" is already taken.`)
+      } else {
+        throw e
+      }
+    }
 
     await clients.regular
       .putBucketAccelerateConfiguration({
