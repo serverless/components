@@ -77,10 +77,10 @@ class CLI {
     console.log(os.EOL)
 
     // Write content
-    let content = `  ${chalk.grey(this._.seconds + 's')}`
-    content += ` ${chalk.grey(figures.pointerSmall)} ${stage}`
-    content += ` ${chalk.grey(figures.pointerSmall)} ${this._.parentComponent}`
-    content += ` ${chalk.grey(figures.pointerSmall)} ${message}`
+    let content = `  ${chalk.dim(this._.seconds + 's')}`
+    content += ` ${chalk.dim(figures.pointerSmall)} ${stage}`
+    content += ` ${chalk.dim(figures.pointerSmall)} ${this._.parentComponent}`
+    content += ` ${chalk.dim(figures.pointerSmall)} ${message}`
     process.stdout.write(content)
 
     // Put cursor to starting position for next view
@@ -117,11 +117,11 @@ class CLI {
 
     // Write content
     console.log(os.EOL)
-    let content = `  ${chalk.grey(this._.seconds + 's')}`
-    content += ` ${chalk.grey(figures.pointerSmall)} ${chalk.green(this._.stage)}`
-    content += ` ${chalk.grey(figures.pointerSmall)} ${this._.parentComponent}`
-    content += ` ${chalk.grey(figures.pointerSmall)} ${chalk.grey(this._.status.message)}`
-    content += ` ${chalk.grey(this._.status.loadingDots)}`
+    let content = `  ${chalk.dim(this._.seconds + 's')}`
+    content += ` ${chalk.dim(figures.pointerSmall)} ${chalk.green(this._.stage)}`
+    content += ` ${chalk.dim(figures.pointerSmall)} ${this._.parentComponent}`
+    content += ` ${chalk.dim(figures.pointerSmall)} ${chalk.dim(this._.status.message)}`
+    content += ` ${chalk.dim(this._.status.loadingDots)}`
     process.stdout.write(content)
     console.log()
 
@@ -140,7 +140,7 @@ class CLI {
     console.log()
 
     // Write log
-    entity = `${chalk.grey(this._.seconds + `s`)} ${chalk.grey(figures.pointerSmall)} ${chalk.grey(entity)} ${chalk.grey(figures.pointerSmall)} ${chalk.grey(`status:`)}`
+    entity = `${chalk.dim(this._.seconds + `s`)} ${chalk.dim(figures.pointerSmall)} ${chalk.dim(entity)} ${chalk.dim(figures.pointerSmall)} ${chalk.dim(`status:`)}`
     console.log(`  ${entity}`)
     console.log(` `, status)
 
@@ -163,7 +163,7 @@ class CLI {
 
     // Write log
     if (entity) {
-      entity = `${chalk.grey(entity)} ${chalk.grey(figures.pointerSmall)} ${chalk.grey(`log:`)}`
+      entity = `${chalk.dim(entity)} ${chalk.dim(figures.pointerSmall)} ${chalk.dim(`log:`)}`
       console.log(`  ${entity}`)
     }
     console.log(` `, util.format(log, { colors: false }))
@@ -235,12 +235,12 @@ class CLI {
       // If nested object, pretty-print at least one level to help readability
       if ((!!outputs[output]) && (outputs[output].constructor === Object)) {
         const nextOutputs = outputs[output]
-        console.log(`  ${chalk.grey(output + ':')} `)
+        console.log(`  ${chalk.dim(output + ':')} `)
         for (const nextOutput in nextOutputs) {
-          console.log(`    ${chalk.grey(nextOutput + ':')} `, util.inspect(nextOutputs[nextOutput], { colors: false }))
+          console.log(`    ${chalk.dim(nextOutput + ':')} `, util.inspect(nextOutputs[nextOutput], { colors: false }))
         }
       } else {
-        console.log(`  ${chalk.grey(output + ':')} `, util.inspect(outputs[output], { colors: false }))
+        console.log(`  ${chalk.dim(output + ':')} `, util.inspect(outputs[output], { colors: false }))
       }
     }
 
