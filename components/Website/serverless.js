@@ -4,7 +4,8 @@ const exec = util.promisify(require('child_process').exec)
 const { isEmpty, mergeDeepRight, writeFile } = require('../../src/utils')
 const Component = require('../../src/lib/Component/serverless') // TODO: Change to { Component } = require('serverless')
 
-let outputs = ['name', 'url']
+let outputMask = ['name', 'url']
+
 const defaults = {
   name: 'serverless',
   path: process.cwd(),
@@ -90,7 +91,7 @@ class Website extends Component {
     this.state.url = config.url
     await this.save()
 
-    outputs = {}
+    const outputs = {}
     outputs.url = this.state.url
     outputs.env = Object.keys(config.env) || []
     this.cli.outputs(outputs)

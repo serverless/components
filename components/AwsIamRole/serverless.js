@@ -11,7 +11,7 @@ const {
 } = require('./utils')
 const Component = require('../../src/lib/Component/serverless') // TODO: Change to { Component } = require('serverless')
 
-let outputs = ['name', 'service', 'policy', 'arn']
+const outputMask = ['name', 'service', 'policy', 'arn']
 
 const defaults = {
   name: 'serverless',
@@ -60,7 +60,7 @@ class AwsIamRole extends Component {
 
     // for some weird reason using pick
     // fails when deploying roles in parallel
-    outputs = {
+    const outputs = {
       name: config.name,
       arn: config.arn,
       service: config.service,
