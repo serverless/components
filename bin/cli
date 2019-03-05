@@ -14,7 +14,12 @@ config.instance = args._[1] || null
 config.method = args._[0] || null
 config.verbose = (args.v || args.verbose) ? (args.v || args.verbose) : false
 config.debug = (args.d || args.debug) ? (args.d || args.debug) : false
+config.watch = (args.w || args.watch) ? (args.w || args.watch) : false
 
 // Run
-;(async () => { return serverless.run(config) })()
-.catch((e) => console.log(e.stack))
+;(async () => {
+  if (config.watch) {
+    return serverless.watch(config)
+  }
+  return serverless.run(config)
+})().catch((e) => console.log(e.stack))
