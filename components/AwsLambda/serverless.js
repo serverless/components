@@ -17,6 +17,7 @@ const outputMask = [
   'memory',
   'timeout',
   'code',
+  'bucket',
   'shim',
   'handler',
   'runtime',
@@ -31,6 +32,7 @@ const defaults = {
   memory: 512,
   timeout: 10,
   code: process.cwd(),
+  bucket: null,
   shim: null,
   handler: 'handler.hello',
   runtime: 'nodejs8.10',
@@ -55,17 +57,33 @@ class AwsLambda extends Component {
 
     this.cli.status(`Packaging`)
 
-    config.zip = await pack({ code: config.code, shim: config.shim })
-    config.hash = hash(config.zip)
+    config.zipPath = await pack({ code: config.code, shim: config.shim })
+    config.hash = hash(config.zipPath)
+
+    let deploymentBucket
+    if (config.bucket) {
+      deploymentBucket = this.load('AwsS3')
+      await deploymentBucket({ name: config.bucket })
+    }
 
     const prevLambda = await getLambda({ lambda, ...config })
 
     if (!prevLambda) {
+      if (config.bucket) {
+        this.cli.status(`Uploading`)
+        await deploymentBucket.upload({ file: config.zipPath })
+      }
+
       this.cli.status(`Creating`)
       config.arn = await createLambda({ lambda, ...config })
     } else {
       config.arn = prevLambda.arn
       if (configChanged(prevLambda, config)) {
+        if (config.bucket) {
+          this.cli.status(`Uploading`)
+          await deploymentBucket.upload({ file: config.zipPath })
+        }
+
         this.cli.status(`Updating`)
         await updateLambda({ lambda, ...config })
       }
@@ -96,10 +114,12 @@ class AwsLambda extends Component {
     this.cli.status(`Removing`)
 
     const awsIamRole = this.load('AwsIamRole')
+    const deploymentBucket = this.load('AwsS3')
 
-    // there's no need to pass role name as input
-    // since it's saved in the Role component state
+    // there's no need to pass names as input
+    // since it's saved in the child component state
     await awsIamRole.remove()
+    await deploymentBucket.remove()
 
     await deleteLambda({ lambda, name: config.name })
 

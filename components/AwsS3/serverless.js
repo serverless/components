@@ -1,6 +1,15 @@
-const { mergeDeepRight, dirExists } = require('../../src/utils')
+const path = require('path')
+const { mergeDeepRight, dirExists, sleep, fileExists } = require('../../src/utils')
 const Component = require('../../src/lib/Component/serverless')
-const { getClients, configureWebsite, clearBucket, deleteBucket, uploadDir } = require('./utils')
+const {
+  getClients,
+  configureWebsite,
+  clearBucket,
+  deleteBucket,
+  uploadDir,
+  packAndUploadDir,
+  uploadFile
+} = require('./utils')
 
 const defaults = {
   name: 'serverless',
@@ -66,7 +75,6 @@ class AwsS3 extends Component {
 
   async remove(inputs = {}) {
     if (!inputs.name && !this.state.name) {
-      this.cli.log('no bucket name found in state.')
       return
     }
 
@@ -86,22 +94,62 @@ class AwsS3 extends Component {
     return {}
   }
 
-  async upload(inputs = { path: process.cwd() }) {
-    if (!this.state.name) {
+  async clear() {
+    this.cli.status(`Clearing`)
+    const clients = getClients(this.context.credentials.aws, defaults.region)
+
+    const res = await clients.regular.listBuckets().promise()
+
+    const promises = res.Buckets.map(async (bucket) => {
+      await this.remove({ name: bucket.Name })
+      await sleep(1000)
+    })
+
+    await Promise.all(promises)
+  }
+
+  async upload(inputs = {}) {
+    this.cli.status('Uploading')
+
+    if (!inputs.name && !this.state.name) {
       this.cli.log('no bucket name found in state.')
       return
     }
 
-    const clients = getClients(this.context.credentials.aws, this.state.region)
+    const name = inputs.name || this.state.name
+    const region = inputs.region || this.state.region || defaults.region
 
-    if (await dirExists(inputs.path)) {
-      await uploadDir(
-        this.state.accelerated ? clients.accelerated : clients.regular,
-        this.state.name,
-        inputs.path
-      )
-    } else {
-      // todo upload single file with multipart uploads
+    const clients = getClients(this.context.credentials.aws, region)
+
+    if (inputs.dir && (await dirExists(inputs.dir))) {
+      if (inputs.zip) {
+        // pack & upload using multipart uploads
+        const defaultKey = Math.random()
+          .toString(36)
+          .substring(6)
+
+        await packAndUploadDir({
+          s3: this.state.accelerated ? clients.accelerated : clients.regular,
+          bucketName: name,
+          dirPath: inputs.dir,
+          key: inputs.key || `${defaultKey}.zip`
+        })
+      } else {
+        // upload directory contents
+        await uploadDir(
+          this.state.accelerated ? clients.accelerated : clients.regular,
+          name,
+          inputs.dir
+        )
+      }
+    } else if (inputs.file && (await fileExists(inputs.file))) {
+      // upload a single file using multipart uploads
+      await uploadFile({
+        s3: this.state.accelerated ? clients.accelerated : clients.regular,
+        bucketName: name,
+        filePath: inputs.file,
+        key: inputs.key || path.basename(inputs.file)
+      })
     }
   }
 }

@@ -82,7 +82,7 @@ class Website extends Component {
     }
 
     this.cli.status('Uploading')
-    await bucket.upload({ path: config.assets })
+    await bucket.upload({ dir: config.assets })
 
     config.url = `http://${config.bucketName}.s3-website-${config.region}.amazonaws.com`
 
