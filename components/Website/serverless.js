@@ -7,7 +7,7 @@ const Component = require('../../src/lib/Component/serverless') // TODO: Change 
 let outputMask = ['name', 'url']
 
 const defaults = {
-  name: 'serverless-website-test-again',
+  name: 'serverless',
   path: process.cwd(),
   assets: process.cwd(),
   envFile: path.join(process.cwd(), 'src', 'env.js'),
