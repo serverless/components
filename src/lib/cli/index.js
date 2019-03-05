@@ -5,6 +5,13 @@ const ansiEscapes = require('ansi-escapes')
 const figures = require('figures')
 const sleep = require('../../utils/sleep')
 
+// Serverless V.2 CLI Colors
+const grey = chalk.dim
+const green = chalk.rgb(0, 253, 88)
+const blue = chalk.rgb(67, 208, 255)
+const yellow = chalk.rgb(255, 242, 129)
+const red = chalk.rgb(255, 93, 93)
+
 class CLI {
   constructor(config) {
     // Defaults
@@ -59,16 +66,16 @@ class CLI {
 
     let stage
     if (reason === 'error') {
-      stage = chalk.red(this._.stage)
-      message = chalk.red(message)
+      stage = red(this._.stage)
+      message = red(message)
     }
     if (reason === 'cancel') {
-      stage = chalk.red(this._.stage)
-      message = chalk.red('canceled')
+      stage = red(this._.stage)
+      message = red('canceled')
     }
     if (reason === 'done') {
-      stage = chalk.green(this._.stage)
-      message = chalk.green('done')
+      stage = green(this._.stage)
+      message = green('done')
     }
 
     // Clear any existing content
@@ -77,10 +84,10 @@ class CLI {
     console.log(os.EOL)
 
     // Write content
-    let content = `  ${chalk.dim(this._.seconds + 's')}`
-    content += ` ${chalk.dim(figures.pointerSmall)} ${stage}`
-    content += ` ${chalk.dim(figures.pointerSmall)} ${this._.parentComponent}`
-    content += ` ${chalk.dim(figures.pointerSmall)} ${message}`
+    let content = `  ${grey(this._.seconds + 's')}`
+    content += ` ${grey(figures.pointerSmall)} ${stage}`
+    content += ` ${grey(figures.pointerSmall)} ${this._.parentComponent}`
+    content += ` ${grey(figures.pointerSmall)} ${message}`
     process.stdout.write(content)
 
     // Put cursor to starting position for next view
@@ -117,11 +124,11 @@ class CLI {
 
     // Write content
     console.log(os.EOL)
-    let content = `  ${chalk.dim(this._.seconds + 's')}`
-    content += ` ${chalk.dim(figures.pointerSmall)} ${chalk.green(this._.stage)}`
-    content += ` ${chalk.dim(figures.pointerSmall)} ${this._.parentComponent}`
-    content += ` ${chalk.dim(figures.pointerSmall)} ${chalk.dim(this._.status.message)}`
-    content += ` ${chalk.dim(this._.status.loadingDots)}`
+    let content = `  ${grey(this._.seconds + 's')}`
+    content += ` ${grey(figures.pointerSmall)} ${green(this._.stage)}`
+    content += ` ${grey(figures.pointerSmall)} ${this._.parentComponent}`
+    content += ` ${grey(figures.pointerSmall)} ${grey(this._.status.message)}`
+    content += ` ${grey(this._.status.loadingDots)}`
     process.stdout.write(content)
     console.log()
 
@@ -140,7 +147,7 @@ class CLI {
     console.log()
 
     // Write log
-    entity = `${chalk.dim(this._.seconds + `s`)} ${chalk.dim(figures.pointerSmall)} ${chalk.dim(entity)} ${chalk.dim(figures.pointerSmall)} ${chalk.dim(`status:`)}`
+    entity = `${grey(this._.seconds + `s`)} ${grey(figures.pointerSmall)} ${grey(entity)} ${grey(figures.pointerSmall)} ${grey(`status:`)}`
     console.log(`  ${entity}`)
     console.log(` `, status)
 
@@ -163,7 +170,7 @@ class CLI {
 
     // Write log
     if (entity) {
-      entity = `${chalk.dim(entity)} ${chalk.dim(figures.pointerSmall)} ${chalk.dim(`log:`)}`
+      entity = `${grey(entity)} ${grey(figures.pointerSmall)} ${grey(`log:`)}`
       console.log(`  ${entity}`)
     }
     console.log(` `, util.format(log, { colors: false }))
@@ -182,10 +189,10 @@ class CLI {
 
     // Write warning
     if (entity) {
-      entity = `${chalk.yellow(entity)} ${chalk.yellow(figures.pointerSmall)} ${chalk.yellow(`Warning:`)}`
+      entity = `${yellow(entity)} ${yellow(figures.pointerSmall)} ${yellow(`Warning:`)}`
       console.log(`  ${entity}`)
     } else {
-      console.log(` ${chalk.yellow('warning:')}`)
+      console.log(` ${yellow('warning:')}`)
     }
     console.log(` `, warning)
 
@@ -203,10 +210,10 @@ class CLI {
 
     // Write Error
     if (entity) {
-      entity = `${chalk.red(entity)} ${chalk.red(figures.pointerSmall)} ${chalk.red(`error:`)}`
+      entity = `${red(entity)} ${red(figures.pointerSmall)} ${red(`error:`)}`
       console.log(`  ${entity}`)
     } else {
-      console.log(`  ${chalk.red('error:')}`)
+      console.log(`  ${red('error:')}`)
     }
     console.log(` `, error)
 
@@ -224,10 +231,10 @@ class CLI {
 
     // Write Outputs
     if (entity) {
-      entity = `${chalk.green(entity)} ${chalk.green(figures.pointerSmall)} ${chalk.green(`outputs:`)}`
+      entity = `${green(entity)} ${green(figures.pointerSmall)} ${green(`outputs:`)}`
       console.log(`  ${entity}`)
     } else {
-      console.log(`  ${chalk.green('outputs:')}`)
+      console.log(`  ${green('outputs:')}`)
     }
 
     for (const output in outputs) {
@@ -235,12 +242,12 @@ class CLI {
       // If nested object, pretty-print at least one level to help readability
       if ((!!outputs[output]) && (outputs[output].constructor === Object)) {
         const nextOutputs = outputs[output]
-        console.log(`  ${chalk.dim(output + ':')} `)
+        console.log(`  ${grey(output + ':')} `)
         for (const nextOutput in nextOutputs) {
-          console.log(`    ${chalk.dim(nextOutput + ':')} `, util.inspect(nextOutputs[nextOutput], { colors: false }))
+          console.log(`    ${grey(nextOutput + ':')} `, util.inspect(nextOutputs[nextOutput], { colors: false }))
         }
       } else {
-        console.log(`  ${chalk.dim(output + ':')} `, util.inspect(outputs[output], { colors: false }))
+        console.log(`  ${grey(output + ':')} `, util.inspect(outputs[output], { colors: false }))
       }
     }
 
