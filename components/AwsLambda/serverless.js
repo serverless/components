@@ -11,7 +11,7 @@ const {
 } = require('./utils')
 const Component = require('../../src/lib/Component/serverless') // TODO: Change to { Component } = require('serverless')
 
-let outputs = [
+const outputMask = [
   'name',
   'description',
   'memory',
@@ -98,7 +98,7 @@ class AwsLambda extends Component {
     this.state.arn = config.arn
     await this.save()
 
-    outputs = pick(outputs, config)
+    const outputs = pick(outputMask, config)
     this.cli.outputs(outputs)
     return outputs
   }

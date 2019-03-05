@@ -32,6 +32,7 @@
     "minimist": "^1.2.0",
     "ramda": "^0.26.1",
     "s3-stream-upload": "^2.0.2",
+    "strip-ansi": "^5.0.0",
     "traverse": "^0.6.6",
     "ws": "^6.1.2"
   },

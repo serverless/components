@@ -9,7 +9,7 @@ const {
 } = require('./utils')
 const Component = require('../../src/lib/Component/serverless') // TODO: Change to { Component } = require('serverless')
 
-let outputs = ['name', 'arn']
+const outputMask = ['name', 'arn']
 
 const defaults = {
   name: 'serverless',
@@ -64,7 +64,8 @@ class AwsDynamoDb extends Component {
     this.state.name = config.name
     await this.save()
 
-    outputs = pick(outputs, config)
+    const outputs = pick(outputMask, config)
+
     this.cli.outputs(outputs)
     return outputs
   }
