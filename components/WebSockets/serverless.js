@@ -14,7 +14,7 @@ const {
 } = require('./utils')
 const Component = require('../../src/lib/Component/serverless') // TODO: Change to { Component } = require('serverless')
 
-let outputs = ['name', 'deploymentStage', 'description', 'routeSelectionExpression', 'routes', 'id', 'url']
+const outputMask = ['name', 'deploymentStage', 'description', 'routeSelectionExpression', 'routes', 'id', 'url']
 
 const defaults = {
   name: 'serverless',
@@ -77,7 +77,7 @@ class WebSockets extends Component {
     this.state.url = config.url
     await this.save()
 
-    outputs = pick(outputs, config)
+    const outputs = pick(outputMask, config)
     this.cli.outputs(outputs)
     return outputs
   }

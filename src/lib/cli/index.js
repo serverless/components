@@ -6,6 +6,12 @@ const stripAnsi = require('strip-ansi')
 const figures = require('figures')
 const sleep = require('../../utils/sleep')
 
+// Serverless V.2 CLI Colors
+const grey = chalk.dim
+const green = chalk.rgb(0, 253, 88)
+const yellow = chalk.rgb(255, 242, 129)
+const red = chalk.rgb(255, 93, 93)
+
 class CLI {
   constructor() {
     // Defaults
@@ -68,16 +74,16 @@ class CLI {
 
     let stage
     if (reason === 'error') {
-      stage = chalk.red(this._.stage)
-      message = chalk.red(message)
+      stage = red(this._.stage)
+      message = red(message)
     }
     if (reason === 'cancel') {
-      stage = chalk.red(this._.stage)
-      message = chalk.red('canceled')
+      stage = red(this._.stage)
+      message = red('canceled')
     }
     if (reason === 'done') {
-      stage = chalk.green(this._.stage)
-      message = chalk.green('done')
+      stage = green(this._.stage)
+      message = green('done')
     }
 
     // Clear any existing content
@@ -86,10 +92,10 @@ class CLI {
     console.log(os.EOL) // eslint-disable-line
 
     // Write content
-    let content = `  ${chalk.grey(this._.seconds + 's')}`
-    content += ` ${chalk.grey(figures.pointerSmall)} ${stage}`
-    content += ` ${chalk.grey(figures.pointerSmall)} ${this._.parentComponent}`
-    content += ` ${chalk.grey(figures.pointerSmall)} ${message}`
+    let content = `  ${grey(this._.seconds + 's')}`
+    content += ` ${grey(figures.pointerSmall)} ${stage}`
+    content += ` ${grey(figures.pointerSmall)} ${this._.parentComponent}`
+    content += ` ${grey(figures.pointerSmall)} ${message}`
     process.stdout.write(content)
 
     // Put cursor to starting position for next view
@@ -135,11 +141,11 @@ class CLI {
 
     // Write content
     console.log(os.EOL) // eslint-disable-line
-    let content = `  ${chalk.grey(this._.seconds + 's')}`
-    content += ` ${chalk.grey(figures.pointerSmall)} ${chalk.green(this._.stage)}`
-    content += ` ${chalk.grey(figures.pointerSmall)} ${this._.parentComponent}`
-    content += ` ${chalk.grey(figures.pointerSmall)} ${chalk.grey(this._.status.message)}`
-    content += ` ${chalk.grey(this._.status.loadingDots)}`
+    let content = `  ${grey(this._.seconds + 's')}`
+    content += ` ${grey(figures.pointerSmall)} ${green(this._.stage)}`
+    content += ` ${grey(figures.pointerSmall)} ${this._.parentComponent}`
+    content += ` ${grey(figures.pointerSmall)} ${grey(this._.status.message)}`
+    content += ` ${grey(this._.status.loadingDots)}`
     process.stdout.write(content)
     console.log() // eslint-disable-line
 
@@ -165,9 +171,9 @@ class CLI {
     console.log() // eslint-disable-line
 
     // Write log
-    entity = `${chalk.grey(this._.seconds + `s`)} ${chalk.grey(figures.pointerSmall)} ${chalk.grey(
-      entity
-    )} ${chalk.grey(figures.pointerSmall)} ${chalk.grey(`status:`)}`
+    entity = `${grey(this._.seconds + `s`)} ${grey(figures.pointerSmall)} ${grey(entity)} ${grey(
+      figures.pointerSmall
+    )} ${grey(`status:`)}`
     console.log(`  ${entity}`) // eslint-disable-line
     console.log(` `, status) // eslint-disable-line
 
@@ -194,7 +200,7 @@ class CLI {
 
     // Write log
     if (entity) {
-      entity = `${chalk.grey(entity)} ${chalk.grey(figures.pointerSmall)} ${chalk.grey(`log:`)}`
+      entity = `${grey(entity)} ${grey(figures.pointerSmall)} ${grey(`log:`)}`
       console.log(`  ${entity}`) // eslint-disable-line
     }
     console.log(` `, util.format(log, { colors: false })) // eslint-disable-line
@@ -215,12 +221,10 @@ class CLI {
 
     // Write warning
     if (entity) {
-      entity = `${chalk.yellow(entity)} ${chalk.yellow(figures.pointerSmall)} ${chalk.yellow(
-        `Warning:`
-      )}`
+      entity = `${yellow(entity)} ${yellow(figures.pointerSmall)} ${yellow(`Warning:`)}`
       console.log(`  ${entity}`) // eslint-disable-line
     } else {
-      console.log(` ${chalk.yellow('warning:')}`) // eslint-disable-line
+      console.log(` ${yellow('warning:')}`) // eslint-disable-line
     }
     console.log(` `, warning) // eslint-disable-line
 
@@ -240,10 +244,10 @@ class CLI {
 
     // Write Error
     if (entity) {
-      entity = `${chalk.red(entity)} ${chalk.red(figures.pointerSmall)} ${chalk.red(`error:`)}`
+      entity = `${red(entity)} ${red(figures.pointerSmall)} ${red(`error:`)}`
       console.log(`  ${entity}`) // eslint-disable-line
     } else {
-      console.log(`  ${chalk.red('error:')}`) // eslint-disable-line
+      console.log(`  ${red('error:')}`) // eslint-disable-line
     }
     console.log(` `, error) // eslint-disable-line
 
@@ -263,32 +267,27 @@ class CLI {
 
     // Write Outputs
     if (entity) {
-      entity = `${chalk.green(entity)} ${chalk.green(figures.pointerSmall)} ${chalk.green(
-        `outputs:`
-      )}`
+      entity = `${green(entity)} ${green(figures.pointerSmall)} ${green(`outputs:`)}`
       console.log(`  ${entity}`) // eslint-disable-line
     } else {
-      console.log(`  ${chalk.green('outputs:')}`) // eslint-disable-line
+      console.log(`  ${green('outputs:')}`) // eslint-disable-line
     }
 
     for (const output in outputs) {
       // If nested object, pretty-print at least one level to help readability
       if (!!outputs[output] && outputs[output].constructor === Object) {
         const nextOutputs = outputs[output]
-        console.log(`  ${chalk.grey(output + ':')} `) // eslint-disable-line
+        console.log(`  ${grey(output + ':')} `) // eslint-disable-line
         for (const nextOutput in nextOutputs) {
           // eslint-disable-next-line
           console.log(
-            `    ${chalk.grey(nextOutput + ':')} `,
+            `    ${grey(nextOutput + ':')} `,
             util.inspect(nextOutputs[nextOutput], { colors: false })
           )
         }
       } else {
         // eslint-disable-next-line
-        console.log(
-          `  ${chalk.grey(output + ':')} `,
-          util.inspect(outputs[output], { colors: false })
-        )
+        console.log(`  ${grey(output + ':')} `, util.inspect(outputs[output], { colors: false }))
       }
     }
 
