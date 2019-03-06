@@ -121,7 +121,8 @@ function getCorsOptionsConfig() {
 }
 
 // "public" function
-function getSwaggerDefinition(name, roleArn, routes) {
+function getSwaggerDefinition(name, roleArn, routes, securityDefinitions, definitions, params) {
+
   let paths = {}
 
   // TODO: udpate code to be functional
@@ -132,9 +133,6 @@ function getSwaggerDefinition(name, roleArn, routes) {
 
     forEachObjIndexed((methodObject, method) => {
       const normalizedMethod = getNormalizedMethod(method)
-      const uri = `arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/${
-        methodObject.lambdaArn
-      }/invocations`
 
       let isCorsEnabled
       if (methodObject.cors) {
@@ -144,12 +142,52 @@ function getSwaggerDefinition(name, roleArn, routes) {
         isCorsEnabled = false
       }
 
-      const apiGatewayIntegration = getApiGatewayIntegration(roleArn, uri, isCorsEnabled)
-      const defaultResponses = getDefaultResponses(isCorsEnabled)
+      let res = methodObject['x-amazon-apigateway-integration'].responses['200']
+      if(res != undefined) {
+        if(res.responseParameters['method.response.header.Access-Control-Allow-Origin'] == '\'*\'') {
+          isCorsEnabled = true
+        }
+      }
+
+      const apiGatewayIntegration = {
+        'x-amazon-apigateway-integration': {
+          type: 'http',
+          httpMethod: 'POST',
+          credentials: roleArn,
+          ...methodObject['x-amazon-apigateway-integration']
+        }
+      }
+
+      const defaultResponses = methodObject.responses
+      const parameters = methodObject.parameters
+      const tags = methodObject.tags
+      const summary = methodObject.summary
+      const validator = methodObject['x-amazon-apigateway-request-validator']
+
       updatedMethods = set(lensPath([normalizedMethod]), apiGatewayIntegration, updatedMethods)
       updatedMethods = set(
         lensPath([normalizedMethod, 'responses']),
         defaultResponses,
+        updatedMethods
+      )
+      updatedMethods = set(
+        lensPath([normalizedMethod, 'parameters']),
+        parameters,
+        updatedMethods
+      )
+      updatedMethods = set(
+        lensPath([normalizedMethod, 'tags']),
+        tags,
+        updatedMethods
+      )
+      updatedMethods = set(
+        lensPath([normalizedMethod, 'summary']),
+        summary,
+        updatedMethods
+      )
+      updatedMethods = set(
+        lensPath([normalizedMethod, 'x-amazon-apigateway-request-validator']),
+        validator,
         updatedMethods
       )
     }, methods)
@@ -172,8 +210,14 @@ function getSwaggerDefinition(name, roleArn, routes) {
     schemes: ['https'],
     consumes: ['application/json'],
     produces: ['application/json'],
-    paths
+    paths,
+    securityDefinitions: securityDefinitions,
+    definitions: definitions,
+    'x-amazon-apigateway-documentation': params['x-amazon-apigateway-documentation'],
+    'x-amazon-apigateway-gateway-responses': params['x-amazon-apigateway-gateway-responses'],
+    'x-amazon-apigateway-request-validators': params['x-amazon-apigateway-request-validators']
   }
+
   return definition
 }
 

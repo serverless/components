@@ -1,4 +1,4 @@
-const { clone, isNil, isEmpty } = require('ramda')
+const { clone, forEachObjIndexed } = require('ramda')
 
 const utils = require('./utils')
 
@@ -20,8 +20,6 @@ const {
 } = utils
 
 const run = async (command, options) => {
-  options.projectPath = options.projectPath || process.cwd()
-  const { projectPath, serverlessFileObject } = options
   if (command === 'package') {
     return packageComponent(options)
   }
@@ -31,22 +29,13 @@ const run = async (command, options) => {
   let stateFile = {}
   let archive = {}
   try {
-    stateFile = await readStateFile(projectPath, serverlessFileObject)
+    stateFile = await readStateFile()
     stateFile = setServiceId(stateFile)
     // TODO BRN: If we're using immutable data, we shouldn't need to clone here
     archive = clone(stateFile)
     let componentsToUse
     let orphanedComponents
-    let serverlessFileComponents
-    if (!isNil(serverlessFileObject) && !isEmpty(serverlessFileObject)) {
-      serverlessFileComponents = await getComponentsFromServerlessFile(
-        stateFile,
-        projectPath,
-        serverlessFileObject
-      )
-    } else {
-      serverlessFileComponents = await getComponentsFromServerlessFile(stateFile, projectPath)
-    }
+    const serverlessFileComponents = await getComponentsFromServerlessFile(stateFile)
     const stateFileComponents = getComponentsFromStateFile(stateFile)
     if (command === 'remove') {
       componentsToUse = stateFileComponents
@@ -57,6 +46,11 @@ const run = async (command, options) => {
     }
     components = { ...componentsToUse, ...orphanedComponents }
     if (command === 'deploy') trackDeployment(componentsToUse)
+    forEachObjIndexed((value, key) => {
+      if(value.type == 'aws-apigateway') {
+        delete componentsToUse[key].dependencies
+      }
+    }, componentsToUse)
     const graph = await buildGraph(componentsToUse, orphanedComponents, command)
     await executeGraph(graph, components, stateFile, archive, command, options, false)
     // run the "info" command on every component after a successful deployment
@@ -89,7 +83,7 @@ const run = async (command, options) => {
 
     throw error
   } finally {
-    await writeStateFile(projectPath, stateFile, serverlessFileObject)
+    await writeStateFile(stateFile)
   }
   return components
 }

@@ -1,4 +1,4 @@
-const { is, replace, map } = require('ramda')
+const { is, replace, map, forEachObjIndexed } = require('ramda')
 
 const regex = require('./getVariableSyntax')()
 const reservedNames = require('./reservedNames')
@@ -9,24 +9,26 @@ module.exports = (slsYml) => {
       return map(transformValue, value)
     }
     if (is(String, value)) {
-      return value.replace(regex, (reference) => {
+      let r = value.replace(regex, (reference) => {
         const referencedVariable = replace(/[${}]/g, '', reference).split('.')
         const referencedComponentAlias = referencedVariable[0]
-        if (!reservedNames.includes(referencedComponentAlias)) {
-          if (!slsYml.components[referencedComponentAlias]) {
-            /* eslint-disable */
-            console.log(`Error: Unable to find "${referencedComponentAlias}" variable reference in ${
-              slsYml.type
-            } component.
-Please double check spelling of reference in ${slsYml.type} component.`)
+        if (slsYml.components && !reservedNames.includes(referencedComponentAlias)) {
+          if (true || !slsYml.components[referencedComponentAlias]) {
+            forEachObjIndexed((v, k) => {
+              if(reference == '${custom.' + k + '}') {
+                let value = replace(/[${}]/g, '', v).split('.')[1].split(',')[1]
+                const len = value.length
+                value = value.substring(2, len - 1)
+                reference = value
+              }
+            }, slsYml.custom)
+            return reference
             /* eslint-enable */
           }
-          const componentId = slsYml.components[referencedComponentAlias].id
-          referencedVariable[0] = componentId
-          return `\${${referencedVariable.join('.')}}`
         }
         return reference
       })
+      return r
     }
     return value
   }

@@ -8,10 +8,7 @@ module.exports = (inputs, components) => {
     const referencedVariable = replace(/[${}]/g, '', reference).split('.')
     const referencedComponentId = referencedVariable[0]
     if (!reservedNames.includes(referencedComponentId)) {
-      const componentVariables = components[referencedComponentId].outputs
-      referencedVariable.splice(0, 1)
-      const resolvedValue = path(referencedVariable, componentVariables)
-      return resolvedValue
+      return "${" + referencedVariable.join('.') + "}"
     }
     return reference
   }
@@ -30,9 +27,6 @@ module.exports = (inputs, components) => {
 
       return value.replace(regex, (reference) => {
         const resolvedValue = resolveReferenceToValue(reference)
-        if (is(Object, resolvedValue)) {
-          throw new Error(`Cannot concatenate object reference ${reference} with string`)
-        }
         return resolvedValue
       })
     }

@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk')
-const { equals } = require('ramda')
+const { forEachObjIndexed, equals } = require('ramda')
 const { getSwaggerDefinition, generateUrl, generateUrls } = require('./utils')
 
 const APIGateway = new AWS.APIGateway({ region: process.env.AWS_DEFAULT_REGION || 'us-east-1' })
@@ -18,10 +18,70 @@ const deleteApi = async (params) => {
   return outputs
 }
 
-const createApi = async (params) => {
-  const { name, roleArn, routes } = params
+const updateStageVariables = async (params) => {
 
-  const swagger = getSwaggerDefinition(name, roleArn, routes)
+  let {
+    id, name, stageName, StageVariables
+  } = params
+
+  if (id == undefined) {
+    currentApis = await APIGateway.getRestApis().promise()
+    id = currentApis.items.filter(e => e.name == name)[0].id
+  }
+
+  let currentStage
+  try {
+    currentStage = await APIGateway.getStage({
+      restApiId: id,
+      stageName: stageName
+    }).promise()
+  } catch (e) {
+    if (e.message == 'Invalid stage identifier specified') {
+      await APIGateway.createDeployment({ restApiId: id, stageName: stageName }).promise()
+      currentStage = await APIGateway.getStage({
+        restApiId: id,
+        stageName: stageName
+      }).promise()
+    }
+  } finally {
+    let updatedKeys = Object.keys(StageVariables)
+    let patchOperations = []
+
+    if (currentStage.variables) {
+      currentKeys = Object.keys(currentStage.variables)
+      forEachObjIndexed((value, key) => {
+        if (!updatedKeys.includes(key)) {
+          patchOperations.push({
+            op: 'remove',
+            path: '/variables/' + key,
+            value: value
+          })
+        }
+      }, currentStage.variables)
+    }
+
+    forEachObjIndexed((value, key) => {
+      patchOperations.push({
+        op: 'replace',
+        path: '/variables/' + key,
+        value: value
+      })
+    }, StageVariables)
+
+    await APIGateway.updateStage({
+      restApiId: id,
+      stageName: stageName,
+      patchOperations: patchOperations
+    }).promise()
+  }
+}
+
+const createApi = async (params) => {
+  let {
+    name, roleArn, routes, stageName, securityDefinitions, definitions
+  } = params
+
+  const swagger = getSwaggerDefinition(name, roleArn, routes, securityDefinitions, definitions)
   const json = JSON.stringify(swagger)
 
   const res = await APIGateway.importRestApi({
@@ -30,9 +90,10 @@ const createApi = async (params) => {
 
   await APIGateway.createDeployment({
     restApiId: res.id,
-    stageName: 'dev'
+    stageName: stageName 
   }).promise()
 
+  updateStageVariables(params)
   const url = generateUrl(res.id)
   const urls = generateUrls(routes, res.id)
 
@@ -45,19 +106,30 @@ const createApi = async (params) => {
 }
 
 const updateApi = async (params) => {
-  const { name, roleArn, routes, id } = params
 
-  const swagger = getSwaggerDefinition(name, roleArn, routes)
+  let {
+    name, roleArn, routes, id, stageName, securityDefinitions, definitions
+  } = params
+
+  if (id == undefined) {
+    currentApis = await APIGateway.getRestApis().promise()
+    id = currentApis.items.filter(e => e.name == name)[0].id
+  }
+
+  updateStageVariables(params)
+
+  const swagger = getSwaggerDefinition(name, roleArn, routes, securityDefinitions, definitions, params)
   const json = JSON.stringify(swagger)
 
   await APIGateway.putRestApi({
     restApiId: id,
+    mode: 'overwrite',
     body: Buffer.from(json, 'utf8')
   }).promise()
 
   await APIGateway.createDeployment({
     restApiId: id,
-    stageName: 'dev'
+    stageName: stageName 
   }).promise()
 
   const url = generateUrl(id)
@@ -73,6 +145,7 @@ const updateApi = async (params) => {
 
 const deploy = async (inputs, context) => {
   const noChanges =
+    inputs.stageName === context.state.stageName &&
     inputs.name === context.state.name &&
     inputs.roleArn === context.state.roleArn &&
     equals(inputs.routes, context.state.routes)
@@ -82,10 +155,10 @@ const deploy = async (inputs, context) => {
     outputs = context.state
   } else if (inputs.name && !context.state.name) {
     context.log(`Creating API Gateway: "${inputs.name}"`)
-    outputs = await createApi(inputs)
+    outputs = createApi(inputs)
   } else {
     context.log(`Updating API Gateway: "${inputs.name}"`)
-    outputs = await updateApi({
+    outputs = updateApi({
       ...inputs,
       id: context.state.id,
       url: context.state.url
