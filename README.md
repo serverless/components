@@ -29,11 +29,11 @@ components:
 $ realtime-app: v2
 
   realtime-app › outputs:
-  frontend: 
+  frontend:
     url:  'http://realtimeapp-xqu5n6.s3-website-us-east-1.amazonaws.com'
-  backend: 
+  backend:
     url:  'wss://2ozttnximh.execute-api.us-east-1.amazonaws.com/dev/'
-    
+
 
   12s › dev › my-realtime-app › done
 ```
@@ -94,7 +94,7 @@ Use a `serverless.js` file, extend the Component class and add a `default` metho
 class MyComponent extends Component {
 
   async default() { } // The default functionality to run/provision/update your Component
-  
+
 }
 ```
 
@@ -137,50 +137,62 @@ class MyComponent extends Component {
 class MyComponent extends Component {
 
   async default() {
-  
+
     // this.context features useful information
     console.log(this.context)
-    
+
     // Get the targeted stage
     console.log(this.context.stage)
-    
+
     // Common provider credentials are identified in the environment or .env file and added to this.context.credentials
     const dynamodb = new AWS.DynamoDB({ credentials: this.context.credentials.aws })
-  
+
     // Save state
     this.state.name = 'myComponent'
     await this.save()
-    
+
     // Load a child Component
     let website = this.load('Website')
-    
+
     // If you are deploying multiple instances of the same Component, include an instance id. This also pre-fills them with any existing state.
     let website1 = this.load('Website', 'website1')
     let website2 = this.load('Website', 'website2')
-    
+
     // Call the default method on a Component
     let websiteOutputs = await website({ region: 'us-east-1' })
-    
+
     // Or call any other method on a Component
     let websiteRemoveOutputs = await website.remove()
-    
+
     // Show status...
     this.cli.status('Uploading')
-    
+
     // Show a nicely formatted log statement...
     this.cli.log('this is a log statement')
-    
+
     // Show a nicely formatted warning...
     this.cli.warn('this is a log statement')
-    
+
     // Show nicely formatted outputs at the end of everything
     this.cli.outputs({ url: websiteOutputs.url })
-    
+
     // Return your results
     return { url: websiteOutputs.url }
   }
 }
 ```
+
+### Reserved Inputs
+
+These can not be used as inputs for your Component and are reserved by the CLI:
+
+* `stage` `--stage`
+* `root` `--root`
+* `rootFile` `--rootFile`
+* `credentials` `--credentials`
+* `verbose` `--verbose`
+* `debug` `--debug`
+* `watch` `--watch`
 
 Good luck.
 
