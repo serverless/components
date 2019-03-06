@@ -184,7 +184,7 @@ class MyComponent extends Component {
 
 ### Reserved Inputs
 
-These can not be used as inputs for your Component and are reserved by the CLI:
+These can not be used as inputs for your Component and are reserved by the CLI.  They can be accessed in your Component within `this.context`.
 
 * `stage` `--stage`
 * `root` `--root`
