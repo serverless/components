@@ -4,6 +4,7 @@ const run = require('./run')
 const cli = require('./cli')
 
 async function watch(config = {}) {
+  let isProcessing = false
   const directory = process.cwd()
   const displayName = path.basename(directory)
 
@@ -28,7 +29,15 @@ async function watch(config = {}) {
 
     watcher.on('change', async () => {
       try {
+        // immediately return if another operation is currently processed
+        if (isProcessing) {
+          return
+        }
+        // perform operation
+        isProcessing = true
         await run(config, cli)
+        // reset everything
+        isProcessing = false
         cli.status(status)
         cli.log('----------')
         // TODO: this is a hack which should be refactored since it modifies private properties
