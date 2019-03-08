@@ -1,7 +1,6 @@
-const path = require('path')
-
-const LOCAL_REGISTRY_PATH = path.join(__dirname, '..')
+// using special characters here to reduce the likelihood of name collisions
+const ROOT_NODE_NAME = '[(root)]'
 
 module.exports = {
-  LOCAL_REGISTRY_PATH
+  ROOT_NODE_NAME
 }
