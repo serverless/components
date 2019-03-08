@@ -48,7 +48,7 @@ function getApiGatewayIntegration(roleArn, uri, useCors, type) {
       type: type || 'aws_proxy',
       httpMethod: 'POST',
       credentials: roleArn,
-      uri,
+      uri: uri,
       responses: {
         default: {
           statusCode: '200'
@@ -158,7 +158,7 @@ function getSwaggerDefinition(name, roleArn, routes, securityDefinitions, defini
           }
         }
       } else {
-        apiGatewayIntegration = getApiGatewayIntegration(roleArn, uri, isCorsEnabled)
+        apiGatewayIntegration = getApiGatewayIntegration(roleArn, params.uri, isCorsEnabled)
       }
 
       let defaultResponses

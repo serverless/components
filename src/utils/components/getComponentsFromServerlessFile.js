@@ -6,7 +6,7 @@ const getComponentFunctions = require('./getComponentFunctions')
 const getComponentRootPath = require('./getComponentRootPath')
 const getDependencies = require('../variables/getDependencies')
 const getState = require('../state/getState')
-const validateInputs = require('./validateInputs')
+const validateTypes = require('./validateTypes')
 
 const getComponentsFromServerlessFile = async (
   stateFile,
@@ -15,7 +15,7 @@ const getComponentsFromServerlessFile = async (
   componentId
 ) => {
   const component = await getComponent(componentRoot, componentId, inputs, stateFile)
-  validateInputs(component.id, component.inputTypes, component.inputs)
+  validateTypes(component.id, component.inputTypes, component.inputs)
   const nestedComponents = mergeAll(await Promise.all(map(async (componentAlias) => {
     const nestedComponentRoot = getComponentRootPath(component.components[componentAlias].type)
     const nestedComponentInputs = component.components[componentAlias].inputs || {}

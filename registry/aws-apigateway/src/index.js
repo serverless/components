@@ -48,7 +48,6 @@ const updateStageVariables = async (params) => {
     let patchOperations = []
 
     if (currentStage.variables) {
-      const currentKeys = Object.keys(currentStage.variables)
       forEachObjIndexed((value, key) => {
         if (!updatedKeys.includes(key)) {
           patchOperations.push({
