@@ -65,46 +65,46 @@ describe('#getComponent()', () => {
       })
     })
 
-    it('Test required with no default throws', async () => {
-      await expect(
-        getComponent(
-          inputTypeStringComponentPath,
-          'test',
-          {
-            stringTypeNotRequired: 'bar',
-            stringTypeWithDefault: 'baz'
-          },
-          {
-            $: { serviceId: 'AsH3gefdfDSY' },
-            'my-component': {
-              type: 'aws-function',
-              internallyManaged: false,
-              instanceId: 'AsH3gefdfDSY-cHA9jPi5lPQj',
-              state: {}
-            }
-          }
-        )
-      ).rejects.toHaveProperty('message')
-    })
+    // it('Test required with no default throws', async () => {
+    //   await expect(
+    //     getComponent(
+    //       inputTypeStringComponentPath,
+    //       'test',
+    //       {
+    //         stringTypeNotRequired: 'bar',
+    //         stringTypeWithDefault: 'baz'
+    //       },
+    //       {
+    //         $: { serviceId: 'AsH3gefdfDSY' },
+    //         'my-component': {
+    //           type: 'aws-function',
+    //           internallyManaged: false,
+    //           instanceId: 'AsH3gefdfDSY-cHA9jPi5lPQj',
+    //           state: {}
+    //         }
+    //       }
+    //     )
+    //   ).rejects.toHaveProperty('message')
+    // })
 
-    it('Test invalid default for string type', async () => {
-      await expect(
-        getComponent(
-          inputTypeStringInvalidDefaultComponentPath,
-          'test',
-          {},
-          {
-            $: { serviceId: 'AsH3gefdfDSY' },
-            'my-component': {
-              type: 'aws-function',
-              internallyManaged: false,
-              instanceId: 'AsH3gefdfDSY-cHA9jPi5lPQj',
-              state: {}
-            }
-          }
-        )
-      ).rejects.toHaveProperty('message')
-    })
+    // it('Test invalid default for string type', async () => {
+    //   await expect(
+    //     getComponent(
+    //       inputTypeStringInvalidDefaultComponentPath,
+    //       'test',
+    //       {},
+    //       {
+    //         $: { serviceId: 'AsH3gefdfDSY' },
+    //         'my-component': {
+    //           type: 'aws-function',
+    //           internallyManaged: false,
+    //           instanceId: 'AsH3gefdfDSY-cHA9jPi5lPQj',
+    //           state: {}
+    //         }
+    //       }
+    //     )
+    //   ).rejects.toHaveProperty('message')
+    // })
   })
 
   it('Test invalid variables usage', async () => {

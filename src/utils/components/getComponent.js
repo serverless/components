@@ -51,6 +51,10 @@ module.exports = async (componentRoot, componentId, inputs, stateFile) => {
 
   let slsYml = await readFile(path.join(componentRoot, 'serverless.yml'))
 
+  if(slsYml == {}) {
+    slsYml = ""
+  }
+
   await Promise.all(promises)
 
   await Promise.all(childPromises)
