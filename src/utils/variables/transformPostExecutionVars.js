@@ -16,7 +16,7 @@ module.exports = (slsYml) => {
           if (true || !slsYml.components[referencedComponentAlias]) {
             forEachObjIndexed((v, k) => {
               if(reference == '${custom.' + k + '}') {
-                let value = replace(/[${}]/g, '', v).split('.')[1].split(',')[1]
+                value = replace(/[${}]/g, '', v).split('.')[1].split(',')[1]
                 const len = value.length
                 value = value.substring(2, len - 1)
                 reference = value

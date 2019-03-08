@@ -42,10 +42,10 @@ function getDefaultResponses(useCors) {
   return defaultResponses
 }
 
-function getApiGatewayIntegration(roleArn, uri, useCors) {
+function getApiGatewayIntegration(roleArn, uri, useCors, type) {
   const apiGatewayIntegration = {
     'x-amazon-apigateway-integration': {
-      type: 'aws_proxy',
+      type: type || 'aws_proxy',
       httpMethod: 'POST',
       credentials: roleArn,
       uri,
@@ -139,26 +139,35 @@ function getSwaggerDefinition(name, roleArn, routes, securityDefinitions, defini
         isCorsEnabled = true
         enableCorsOnPath = true
       } else {
-        isCorsEnabled = false
-      }
-
-      let res = methodObject['x-amazon-apigateway-integration'].responses['200']
-      if(res != undefined) {
-        if(res.responseParameters['method.response.header.Access-Control-Allow-Origin'] == '\'*\'') {
-          isCorsEnabled = true
+        let res = methodObject['x-amazon-apigateway-integration'].responses['200']
+        if (res != undefined) {
+          if (res.responseParameters['method.response.header.Access-Control-Allow-Origin'] == '\'*\'') {
+            isCorsEnabled = true
+          }
         }
       }
 
-      const apiGatewayIntegration = {
-        'x-amazon-apigateway-integration': {
-          type: 'http',
-          httpMethod: 'POST',
-          credentials: roleArn,
-          ...methodObject['x-amazon-apigateway-integration']
+      let apiGatewayIntegration
+      if (methodObject['x-amazon-apigateway-integration']) {
+        apiGatewayIntegration = {
+          'x-amazon-apigateway-integration': {
+            type: 'http',
+            httpMethod: 'POST',
+            credentials: roleArn,
+            ...methodObject['x-amazon-apigateway-integration']
+          }
         }
+      } else {
+        apiGatewayIntegration = getApiGatewayIntegration(roleArn, uri, isCorsEnabled)
       }
 
-      const defaultResponses = methodObject.responses
+      let defaultResponses
+      if (methodObject.responses) {
+        defaultResponses = methodObject.responses
+      } else {
+        defaultResponses = getDefaultResponses(isCorsEnabled)
+      }
+
       const parameters = methodObject.parameters
       const tags = methodObject.tags
       const summary = methodObject.summary

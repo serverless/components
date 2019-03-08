@@ -20,12 +20,12 @@ const deleteApi = async (params) => {
 
 const updateStageVariables = async (params) => {
 
-  let {
+  const {
     id, name, stageName, StageVariables
   } = params
 
   if (id == undefined) {
-    currentApis = await APIGateway.getRestApis().promise()
+    const currentApis = await APIGateway.getRestApis().promise()
     id = currentApis.items.filter(e => e.name == name)[0].id
   }
 
@@ -48,7 +48,7 @@ const updateStageVariables = async (params) => {
     let patchOperations = []
 
     if (currentStage.variables) {
-      currentKeys = Object.keys(currentStage.variables)
+      const currentKeys = Object.keys(currentStage.variables)
       forEachObjIndexed((value, key) => {
         if (!updatedKeys.includes(key)) {
           patchOperations.push({
@@ -107,12 +107,12 @@ const createApi = async (params) => {
 
 const updateApi = async (params) => {
 
-  let {
+  const {
     name, roleArn, routes, id, stageName, securityDefinitions, definitions
   } = params
 
   if (id == undefined) {
-    currentApis = await APIGateway.getRestApis().promise()
+    const currentApis = await APIGateway.getRestApis().promise()
     id = currentApis.items.filter(e => e.name == name)[0].id
   }
 

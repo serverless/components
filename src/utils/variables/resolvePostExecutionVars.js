@@ -8,7 +8,14 @@ module.exports = (inputs, components) => {
     const referencedVariable = replace(/[${}]/g, '', reference).split('.')
     const referencedComponentId = referencedVariable[0]
     if (!reservedNames.includes(referencedComponentId)) {
-      return "${" + referencedVariable.join('.') + "}"
+      if (components[referencedComponentId] != undefined) {
+        const componentVariables = components[referencedComponentId].outputs
+        referencedVariable.splice(0, 1)
+        const resolvedValue = path(referencedVariable, componentVariables)
+        return resolvedValue
+      } else {
+        return "${" + referencedVariable.join('.') + "}"
+      }
     }
     return reference
   }

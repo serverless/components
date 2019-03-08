@@ -1,7 +1,7 @@
 const { readFile } = require('@serverless/utils')
 const path = require('path')
-const { forEachObjIndexed, replace } = require('ramda')
-const validateCoreVersion = require('../validateCoreVersion')
+const { forEachObjIndexed } = require('ramda')
+const validateCoreVersion = require('./validateCoreVersion')
 
 const getServiceId = require('../state/getServiceId')
 const transformPostExecutionVars = require('../variables/transformPostExecutionVars')
@@ -9,14 +9,13 @@ const resolvePreExecutionVars = require('../variables/resolvePreExecutionVars')
 const validateVarsUsage = require('../variables/validateVarsUsage')
 const getInstanceId = require('./getInstanceId')
 const setInputDefaults = require('./setInputDefaults')
-const validateInputs = require('./validateInputs')
 
 module.exports = async (componentRoot, componentId, inputs, stateFile) => {
 
   let json = {}
 
   // Get promise for each route in routes from inputs
-  const getChildJSON = async (value, key) => {
+  const getChildJSON = async (value) => {
     if(value != null && typeof value == 'string' && value.startsWith('${file:')) {
       const keylen = value.length
       const methodPath = value.substring(7, keylen - 1)
@@ -57,7 +56,7 @@ module.exports = async (componentRoot, componentId, inputs, stateFile) => {
   await Promise.all(childPromises)
 
   // Replace resolved promises to actual value
-  forEachObjIndexed((v, k) => {
+  forEachObjIndexed((v) => {
     forEachObjIndexed((vc, kc) => {
       vc.then(d => {
         v[kc] = d
