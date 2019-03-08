@@ -20,6 +20,8 @@ const {
 } = utils
 
 const run = async (command, options) => {
+  options.projectPath = options.projectPath || process.cwd()
+  const { projectPath, serverlessFileObject } = options
   if (command === 'package') {
     return packageComponent(options)
   }
@@ -29,7 +31,7 @@ const run = async (command, options) => {
   let stateFile = {}
   let archive = {}
   try {
-    stateFile = await readStateFile()
+    stateFile = await readStateFile(projectPath, serverlessFileObject)
     stateFile = setServiceId(stateFile)
     // TODO BRN: If we're using immutable data, we shouldn't need to clone here
     archive = clone(stateFile)
