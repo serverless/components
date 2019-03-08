@@ -49,7 +49,7 @@ describe('#run()', () => {
     })
 
     expect(utils.handleSignalEvents).toHaveBeenCalled()
-    // expect(utils.getComponentsFromServerlessFile.mock.calls[0][1]).toEqual(projectPath)
+    expect(utils.getComponentsFromServerlessFile.mock.calls[0][1]).toEqual(projectPath)
     expect(utils.getComponentsFromServerlessFile.mock.calls[0][2]).toBeFalsy() // no serverlessFileObject
     expect(utils.getComponentsFromStateFile).toHaveBeenCalled()
     expect(utils.getOrphanedComponents).toHaveBeenCalled()
