@@ -49,13 +49,7 @@ module.exports = async (componentRoot, componentId, inputs, stateFile) => {
     promises.push(getJSON(k, v))
   }, inputs)
 
-  const filepath = path.join(componentRoot, 'serverless.yml')
-
-  if(filepath == {}) {
-    filepath = ""
-  }
-  
-  let slsYml = await readFile(filepath)
+  let slsYml = await readFile(path.join(componentRoot, 'serverless.yml'))
 
   await Promise.all(promises)
 
