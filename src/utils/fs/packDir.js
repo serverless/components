@@ -9,7 +9,6 @@ const isValidFormat = (format) => contains(format, VALID_FORMATS)
 
 const packDir = async (inputDirPath, outputFilePath, include = [], prefix) => {
   const format = last(split('.', outputFilePath))
-  console.log(outputFilePath)
 
   if (!isValidFormat(format)) {
     throw new Error('Please provide a valid format. Either a "zip" or a "tar"')
