@@ -4,6 +4,8 @@ const run = require('./run')
 const cli = require('./cli')
 
 async function watch(config = {}) {
+  let isProcessing = false
+  let queuedOperation = false
   const directory = process.cwd()
   const displayName = path.basename(directory)
 
@@ -28,11 +30,24 @@ async function watch(config = {}) {
 
     watcher.on('change', async () => {
       try {
-        await run(config, cli)
-        cli.status(status)
-        cli.log('----------')
-        // TODO: this is a hack which should be refactored since it modifies private properties
-        cli._.parentComponent = parentComponent
+        if (isProcessing && !queuedOperation) {
+          queuedOperation = true
+        } else if (!isProcessing) {
+          // perform operation
+          isProcessing = true
+          await run(config, cli)
+          cli.log('----------')
+          // check if another operation is queued
+          if (queuedOperation) {
+            await run(config, cli)
+            cli.log('----------')
+          }
+          // reset everything
+          isProcessing = false
+          queuedOperation = false
+          cli.status(status)
+          cli._.parentComponent = parentComponent // TODO: this hack should be refactored
+        }
       } catch (error) {
         cli.error(error.message)
       }

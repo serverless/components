@@ -7,6 +7,7 @@ const path = require('path')
 const Component = require('../component/serverless')
 const { readFile } = require('../../utils')
 const { getComponents, prepareComponents, createGraph, loadState, logOutputs } = require('./utils')
+const { ROOT_NODE_NAME } = require('./constants')
 const variables = require('./utils/variables')
 
 class ComponentDeclarative extends Component {
@@ -30,19 +31,36 @@ class ComponentDeclarative extends Component {
     const preparedComponents = prepareComponents(components, this)
     const graph = createGraph(preparedComponents, vars)
 
-    // TODO: update to process nodes in parallel
     const results = {}
     const outputs = {}
-    const instancesToProcess = graph.overallOrder()
-    for (let i = 0; i < instancesToProcess.length; i++) {
-      const instanceId = instancesToProcess[i]
-      const value = preparedComponents[instanceId]
-      let inputs = value.inputs // eslint-disable-line
-      const { instance } = value
-      inputs = variables.resolveComponentVariables(vars, results, value)
-      const result = await instance.default(inputs)
-      results[instanceId] = result
-      outputs[instanceId] = result
+
+    const rootPredecessors = graph.predecessors(ROOT_NODE_NAME)
+    const predecessors = new Set([...rootPredecessors])
+    while (predecessors.size) {
+      await Promise.all(
+        [...predecessors].map(async (instanceId) => {
+          if (!instanceId) {
+            return
+          }
+          const value = preparedComponents[instanceId]
+          let inputs = value.inputs // eslint-disable-line
+          const { instance } = value
+          inputs = variables.resolveComponentVariables(vars, results, value)
+          // remove own insance from predecessors set
+          predecessors.delete(instanceId)
+          // add new predecessors to set (if any)
+          const nodePredecessors = graph.predecessors(instanceId)
+          if (nodePredecessors.length) {
+            nodePredecessors.forEach((pred) => predecessors.add(pred))
+          }
+          const res = await instance.default(inputs)
+          results[instanceId] = res
+          outputs[instanceId] = res
+          return {
+            [instanceId]: outputs
+          }
+        })
+      )
     }
 
     logOutputs(this.cli, outputs)
@@ -72,16 +90,38 @@ class ComponentDeclarative extends Component {
     const state = loadState(ids)
     const graph = createGraph(preparedComponents, vars)
 
-    // TODO: update to process nodes in parallel
     const outputs = {}
-    const instancesToProcess = graph.overallOrder().reverse()
-    for (let i = 0; i < instancesToProcess.length; i++) {
-      const instanceId = instancesToProcess[i]
-      const value = preparedComponents[instanceId]
-      let inputs = value.inputs // eslint-disable-line
-      const { instance } = value
-      inputs = variables.resolveComponentVariables(vars, state, value)
-      outputs[instanceId] = await instance.remove(inputs)
+
+    const sources = graph.sources()
+    const successors = new Set([...sources])
+    while (successors.size) {
+      await Promise.all(
+        [...successors].map(async (instanceId) => {
+          if (!instanceId) {
+            return
+          }
+          const value = preparedComponents[instanceId]
+          let inputs = value.inputs // eslint-disable-line
+          const { instance } = value
+          inputs = variables.resolveComponentVariables(vars, state, value)
+          // remove own insance from successors set
+          successors.delete(instanceId)
+          // add new successors to set (if any)
+          const nodePredecessors = graph.successors(instanceId)
+          if (nodePredecessors.length) {
+            nodePredecessors.forEach((succ) => {
+              if (succ !== ROOT_NODE_NAME) {
+                successors.add(succ)
+              }
+            })
+          }
+          const res = await instance.remove(inputs)
+          outputs[instanceId] = res
+          return {
+            [instanceId]: outputs
+          }
+        })
+      )
     }
 
     logOutputs(this.cli, outputs)
