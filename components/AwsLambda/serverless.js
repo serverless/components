@@ -1,13 +1,12 @@
 const aws = require('aws-sdk')
-const { mergeDeepRight, pick } = require('../../src/utils')
+const { mergeDeepRight, pick, hashFile } = require('../../src/utils')
 const {
   createLambda,
   updateLambda,
   getLambda,
   deleteLambda,
   configChanged,
-  pack,
-  hash
+  pack
 } = require('./utils')
 const Component = require('../../src/lib/Component/serverless') // TODO: Change to { Component } = require('serverless')
 
@@ -18,7 +17,7 @@ const outputMask = [
   'timeout',
   'code',
   'bucket',
-  'shim',
+  'shims',
   'handler',
   'runtime',
   'env',
@@ -33,7 +32,7 @@ const defaults = {
   timeout: 10,
   code: process.cwd(),
   bucket: null,
-  shim: null,
+  shims: [],
   handler: 'handler.hello',
   runtime: 'nodejs8.10',
   env: {},
@@ -57,8 +56,8 @@ class AwsLambda extends Component {
 
     this.cli.status(`Packaging`)
 
-    config.zipPath = await pack({ code: config.code, shim: config.shim })
-    config.hash = hash(config.zipPath)
+    config.zipPath = await pack(config.code, config.shims)
+    config.hash = await hashFile(config.zipPath)
 
     let deploymentBucket
     if (config.bucket) {

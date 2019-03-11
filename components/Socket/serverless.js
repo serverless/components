@@ -25,7 +25,7 @@ class Socket extends Component {
     // make sure user does not overwrite the following
     inputs.runtime = 'nodejs8.10'
     inputs.handler = 'shim.socket'
-    inputs.shim = resolve(__dirname, './shim.js')
+    inputs.shims = [resolve(__dirname, './shim.js')]
     inputs.routeSelectionExpression = '$request.body.route'
     inputs.service = 'lambda.amazonaws.com'
 
@@ -59,7 +59,7 @@ class Socket extends Component {
         runtime: lambdaOutputs.runtime,
         env: Object.keys(lambdaOutputs.env) || [],
         timeout: lambdaOutputs.timeout,
-        memory: lambdaOutputs.memory,
+        memory: lambdaOutputs.memory
       },
       routes: Object.keys(websocketsOutputs.routes) || []
     }

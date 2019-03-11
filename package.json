@@ -26,6 +26,7 @@
     "enquirer": "^2.3.0",
     "figures": "^2.0.0",
     "fs-extra": "^7.0.1",
+    "globby": "^9.1.0",
     "graphlib": "^2.1.7",
     "js-yaml": "^3.12.1",
     "klaw-sync": "^6.0.0",
