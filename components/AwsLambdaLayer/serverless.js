@@ -12,7 +12,7 @@ const defaults = {
   runtimes: ['nodejs8.10'],
   prefix: undefined,
   include: [],
-  // bucket: 'serverless-layers-deployment-bucket',
+  bucket: undefined,
   region: 'us-east-1'
 }
 
