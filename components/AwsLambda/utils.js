@@ -1,24 +1,7 @@
 const { tmpdir } = require('os')
-const crypto = require('crypto')
 const path = require('path')
-const { readFileSync } = require('fs')
-const { equals, not, packDir, pick, is, endsWith } = require('../../src/utils')
-
-const isArchivePath = (filePath) => {
-  if (!is(String, filePath)) {
-    return false
-  }
-
-  return (
-    endsWith('.zip', filePath) ||
-    endsWith('.jar', filePath) ||
-    endsWith('.tar', filePath) ||
-    endsWith('.rar', filePath) ||
-    endsWith('.gz', filePath) ||
-    endsWith('.bz2', filePath) ||
-    endsWith('.7z', filePath)
-  )
-}
+const { readFile } = require('fs-extra')
+const { equals, not, packDir, isArchivePath, pick } = require('../../src/utils')
 
 const getAccountId = async (aws) => {
   const STS = new aws.STS()
@@ -58,7 +41,7 @@ const createLambda = async ({
     params.Code.S3Bucket = bucket
     params.Code.S3Key = path.basename(zipPath)
   } else {
-    params.Code.ZipFile = readFileSync(zipPath)
+    params.Code.ZipFile = await readFile(zipPath)
   }
 
   const res = await lambda.createFunction(params).promise()
@@ -88,7 +71,7 @@ const updateLambda = async ({
     functionCodeParams.S3Bucket = bucket
     functionCodeParams.S3Key = path.basename(zipPath)
   } else {
-    functionCodeParams.ZipFile = readFileSync(zipPath)
+    functionCodeParams.ZipFile = await readFile(zipPath)
   }
 
   const functionConfigParams = {
@@ -177,25 +160,19 @@ const configChanged = (pervLambda, lambda) => {
   return not(equals(inputs, prevInputs))
 }
 
-const pack = async ({ code, shim }) => {
+const pack = async (code, shims = []) => {
   if (isArchivePath(code)) {
-    return readFileSync(code)
+    return path.resolve(code)
   }
-  const shims = shim ? [shim] : []
-  const outputFileName = `${Math.random()
-    .toString(36)
-    .substring(6)}.zip`
-  const outputFilePath = path.join(tmpdir(), outputFileName)
+  const outputFilePath = path.join(
+    tmpdir(),
+    `${Math.random()
+      .toString(36)
+      .substring(6)}.zip`
+  )
 
-  await packDir(code, outputFilePath, shims)
-  return outputFilePath
+  return packDir(code, outputFilePath, shims)
 }
-
-const hash = (zipPath) =>
-  crypto
-    .createHash('sha256')
-    .update(readFileSync(zipPath))
-    .digest('base64')
 
 module.exports = {
   createLambda,
@@ -205,6 +182,5 @@ module.exports = {
   getPolicy,
   getAccountId,
   configChanged,
-  pack,
-  hash
+  pack
 }

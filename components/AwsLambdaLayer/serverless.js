@@ -1,7 +1,7 @@
 const aws = require('aws-sdk')
 const Component = require('../../src/lib/Component/serverless')
-const { mergeDeepRight, pick } = require('../../src/utils')
-const { pack, publishLayer, deleteLayer, getLayer, hash, configChanged } = require('./utils')
+const { mergeDeepRight, pick, hashFile } = require('../../src/utils')
+const { pack, publishLayer, deleteLayer, getLayer, configChanged } = require('./utils')
 
 const outputMask = ['name', 'description', 'arn']
 
@@ -11,7 +11,8 @@ const defaults = {
   code: process.cwd(),
   runtimes: ['nodejs8.10'],
   prefix: undefined,
-  bucket: undefined,
+  include: [],
+  // bucket: 'serverless-layers-deployment-bucket',
   region: 'us-east-1'
 }
 
@@ -25,7 +26,7 @@ class AwsLambdaLayer extends Component {
     })
 
     if (this.state.name && this.state.name !== config.name) {
-      this.cli.status(`Replacing`)
+      this.cli.status('Replacing')
       await deleteLayer(lambda, this.state.arn)
       delete this.state.arn
     }
@@ -33,18 +34,29 @@ class AwsLambdaLayer extends Component {
     config.arn = this.state.arn
 
     this.cli.status('Packaging')
-    config.zipPath = await pack(config.code, config.prefix)
-    config.hash = hash(config.zipPath)
+
+    config.zipPath = await pack(config.code, config.prefix, config.include)
+    config.hash = await hashFile(config.zipPath)
 
     const prevLayer = await getLayer(lambda, config.arn)
 
+    if (this.state.bucket) {
+      prevLayer.bucket = this.state.bucket
+    }
+
     if (configChanged(prevLayer, config)) {
       this.cli.status('Uploading')
+      if (config.bucket) {
+        const bucket = this.load('AwsS3')
+        await bucket.upload({ name: config.bucket, file: config.zipPath })
+      }
       config.arn = await publishLayer({ lambda, ...config })
     }
 
     this.state.name = config.name
     this.state.arn = config.arn
+    this.state.bucket = config.bucket || undefined
+
     await this.save()
 
     const outputs = pick(outputMask, config)
@@ -57,7 +69,7 @@ class AwsLambdaLayer extends Component {
     if (!inputs.arn && !this.state.arn) {
       return
     }
-    this.cli.status(`Removing`)
+    this.cli.status('Removing')
 
     const lambda = new aws.Lambda({
       region: inputs.region || defaults.region,

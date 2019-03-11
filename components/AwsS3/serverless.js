@@ -12,7 +12,7 @@ const {
 } = require('./utils')
 
 const defaults = {
-  name: 'serverless',
+  name: 'serverless-layers-deployment-bucket',
   website: false,
   accelerated: true,
   region: 'us-east-1'
