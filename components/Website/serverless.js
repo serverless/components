@@ -2,7 +2,7 @@ const path = require('path')
 const util = require('util')
 const exec = util.promisify(require('child_process').exec)
 const { isEmpty, mergeDeepRight, writeFile } = require('../../src/utils')
-const Component = require('../../src/lib/Component/serverless') // TODO: Change to { Component } = require('serverless')
+const { Component } = require('../../src')
 
 let outputMask = ['name', 'url']
 

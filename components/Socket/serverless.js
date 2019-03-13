@@ -2,7 +2,7 @@ const { resolve } = require('path')
 const { prompt } = require('enquirer')
 const WebSocket = require('ws')
 const { chalk, sleep, fileExists } = require('../../src/utils')
-const Component = require('../../src/lib/Component/serverless') // TODO: Change to { Component } = require('serverless')
+const { Component } = require('../../src')
 
 const isJson = (body) => {
   try {

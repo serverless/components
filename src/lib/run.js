@@ -7,69 +7,10 @@ const {
   errorHandler,
   fileExists,
   readFile,
-  prepareCredentials,
+  coreComponentExists,
+  loadComponent,
+  prepareCredentials
 } = require('../utils')
-const components = require('../../components')
-
-/**
- * Identifies environment variables that are known vendor credentials and finds their corresponding SDK configuration properties
- * @param {Object} config - Configuration
- * @param {String} config.root - The root path of the parent Component.
- * @param {String} config.stage - The stage you wish to set in the context.
- * @param {String} config.instance - The instance name of an immediate child Component you want to target with the CLI.  Note: This only works with serverless.yml
- * @param {String} config.method - The method you want to call on the parent Component.
- * @param {Object} config.credentials - The credentials you wish to set in the context.
- * @param {String} config.verbose - If you wish to see outputs of all child Components.
- * @param {String} config.debug - If you wish to turn on debug mode.
- */
-
-const run = async (config = {}, cli = cliInstance) => {
-
-  // Configuration defaults
-  config.root = config.root || process.cwd()
-  config.stage = config.stage || 'dev'
-  config.credentials = config.credentials || {}
-  config.instance = config.instance || null
-  config.method = config.method || null
-  config.verbose = config.verbose || false
-  config.debug = config.debug || false
-  config.watch = config.watch || false
-
-  if (config.verbose) process.env.SERVERLESS_VERBOSE = true
-  if (config.debug) process.env.SERVERLESS_DEBUG = true
-
-  // Load env vars
-  let envVars = {}
-  let envFile = `.env`
-  let defaultEnvFilePath = path.join(process.cwd(), `.env`)
-  let stageEnvFilePath = path.join(process.cwd(), `.env.${config.stage}`)
-  if (await fileExists(stageEnvFilePath)) {
-    envVars = dotenv.config({ path: path.resolve(stageEnvFilePath) }).parsed || {}
-  } else if (await fileExists(defaultEnvFilePath)) {
-    envVars = dotenv.config({ path: path.resolve(defaultEnvFilePath) }).parsed || {}
-  }
-
-  // Prepare credentials
-  config.credentials = prepareCredentials(envVars)
-
-  // Determine programmatic or declarative usage
-  const serverlessJsFilePath = path.join(process.cwd(), 'serverless.js')
-  const serverlessYmlFilePath = path.join(process.cwd(), 'serverless.yml')
-  const serverlessYamlFilePath = path.join(process.cwd(), 'serverless.yaml')
-  const serverlessJsonFilePath = path.join(process.cwd(), 'serverless.json')
-
-  try {
-    if (await fileExists(serverlessJsFilePath)) return await runProgrammatic(serverlessJsFilePath, config, cli)
-    else if (await fileExists(serverlessYmlFilePath)) return await runDeclarative(serverlessYmlFilePath, config, cli)
-    else if (await fileExists(serverlessYamlFilePath)) return await runDeclarative(serverlessYamlFilePath, config, cli)
-    else if (await fileExists(serverlessJsonFilePath)) return await runDeclarative(serverlessJsonFilePath, config, cli)
-    else {
-      throw new Error(`No Serverless file (serverless.js, serverless.yml, serverless.yaml or serverless.json) found in ${process.cwd()}`)
-    }
-  } catch (error) {
-    return errorHandler(error, 'Serverless Framework')
-  }
-}
 
 /**
  * Run a serverless.js file
@@ -78,19 +19,18 @@ const run = async (config = {}, cli = cliInstance) => {
  */
 
 const runProgrammatic = async (filePath, config, cli) => {
-
-  let Component, component, result
+  let result
 
   // Load Component
-  let context = new Context(config)
+  const context = new Context(config)
 
-  Component = require(filePath)
-  component = new Component({ context })
+  const Component = require(filePath)
+  const component = new Component({ context })
 
   // Config CLI
   cli.config({
     stage: config.stage,
-    parentComponent: Component.name,
+    parentComponent: Component.name
   })
 
   try {
@@ -104,7 +44,7 @@ const runProgrammatic = async (filePath, config, cli) => {
     } else {
       result = await component[config.method]()
     }
-  } catch(error) {
+  } catch (error) {
     return errorHandler(error, Component.name)
   }
 
@@ -123,27 +63,25 @@ const runProgrammatic = async (filePath, config, cli) => {
  */
 
 const runDeclarative = async (filePath, config, cli) => {
-
   let Component, component, result
 
-  let context = new Context(config, path.basename(filePath))
+  const context = new Context(config, path.basename(filePath))
 
   // TODO: Handle loading errors and validate...
   const fileContent = await readFile(filePath)
 
   // If no config.method or config.instance has been provided, run the default method...
   if (!config.instance && !config.method) {
-
     // Config CLI
     cli.config({
       stage: config.stage,
-      parentComponent: fileContent.name,
+      parentComponent: fileContent.name
     })
 
     try {
       component = new ComponentDeclarative({
         name: fileContent.name, // Must pass in name to ComponentDeclaractive
-        context,
+        context
       })
       result = await component()
     } catch (error) {
@@ -153,16 +91,15 @@ const runDeclarative = async (filePath, config, cli) => {
 
   // If config.method has been provided, run that...
   if (!config.instance && config.method) {
-
     // Config CLI
     cli.config({
       stage: config.stage,
-      parentComponent: fileContent.name,
+      parentComponent: fileContent.name
     })
 
     component = new ComponentDeclarative({
       name: fileContent.name, // Must pass in name to ComponentDeclaractive
-      context,
+      context
     })
     try {
       result = await component[config.method]()
@@ -177,8 +114,8 @@ const runDeclarative = async (filePath, config, cli) => {
     let componentName
 
     for (const instance in fileContent.components || {}) {
-      let c = instance.split('::')[0]
-      let i = instance.split('::')[1]
+      const c = instance.split('::')[0]
+      const i = instance.split('::')[1]
       if (config.instance === i) {
         instanceName = i
         componentName = c
@@ -191,20 +128,20 @@ const runDeclarative = async (filePath, config, cli) => {
     }
 
     // Check Component exists
-    if (!components[componentName]) {
+    if (!(await coreComponentExists(componentName))) {
       throw Error(`Component "${componentName}" is not a valid Component.`)
     }
 
     // Config CLI
     cli.config({
       stage: config.stage,
-      parentComponent: `${instanceName}`,
+      parentComponent: `${instanceName}`
     })
 
-    Component = components[componentName]
+    Component = await loadComponent(componentName)
     component = new Component({
       id: `${context.stage}.${fileContent.name}.${instanceName}`, // Construct correct name of child Component
-      context,
+      context
     })
     try {
       result = await component[config.method]()
@@ -220,5 +157,78 @@ const runDeclarative = async (filePath, config, cli) => {
 
   return result
 }
+
+/**
+ * Identifies environment variables that are known vendor credentials and finds their corresponding SDK configuration properties
+ * @param {Object} config - Configuration
+ * @param {String} config.root - The root path of the parent Component.
+ * @param {String} config.stage - The stage you wish to set in the context.
+ * @param {String} config.instance - The instance name of an immediate child Component you want to target with the CLI.  Note: This only works with serverless.yml
+ * @param {String} config.method - The method you want to call on the parent Component.
+ * @param {Object} config.credentials - The credentials you wish to set in the context.
+ * @param {String} config.verbose - If you wish to see outputs of all child Components.
+ * @param {String} config.debug - If you wish to turn on debug mode.
+ */
+
+const run = async (config = {}, cli = cliInstance) => {
+  // Configuration defaults
+  config.root = config.root || process.cwd()
+  config.stage = config.stage || 'dev'
+  config.credentials = config.credentials || {}
+  config.instance = config.instance || null
+  config.method = config.method || null
+  config.verbose = config.verbose || false
+  config.debug = config.debug || false
+  config.watch = config.watch || false
+
+  if (config.verbose) {
+    process.env.SERVERLESS_VERBOSE = true
+  }
+  if (config.debug) {
+    process.env.SERVERLESS_DEBUG = true
+  }
+
+  // Load env vars
+  let envVars = {}
+  const defaultEnvFilePath = path.join(process.cwd(), `.env`)
+  const stageEnvFilePath = path.join(process.cwd(), `.env.${config.stage}`)
+  if (await fileExists(stageEnvFilePath)) {
+    envVars = dotenv.config({ path: path.resolve(stageEnvFilePath) }).parsed || {}
+  } else if (await fileExists(defaultEnvFilePath)) {
+    envVars = dotenv.config({ path: path.resolve(defaultEnvFilePath) }).parsed || {}
+  }
+
+  // Prepare credentials
+  config.credentials = prepareCredentials(envVars)
+
+  // Determine programmatic or declarative usage
+  const serverlessJsFilePath = path.join(process.cwd(), 'serverless.js')
+  const serverlessYmlFilePath = path.join(process.cwd(), 'serverless.yml')
+  const serverlessYamlFilePath = path.join(process.cwd(), 'serverless.yaml')
+  const serverlessJsonFilePath = path.join(process.cwd(), 'serverless.json')
+
+  try {
+    if (await fileExists(serverlessJsFilePath)) {
+      return await runProgrammatic(serverlessJsFilePath, config, cli)
+    } else if (await fileExists(serverlessYmlFilePath)) {
+      return await runDeclarative(serverlessYmlFilePath, config, cli)
+    } else if (await fileExists(serverlessYamlFilePath)) {
+      return await runDeclarative(serverlessYamlFilePath, config, cli)
+    } else if (await fileExists(serverlessJsonFilePath)) {
+      return await runDeclarative(serverlessJsonFilePath, config, cli)
+    }
+    throw new Error(
+      `No Serverless file (serverless.js, serverless.yml, serverless.yaml or serverless.json) found in ${process.cwd()}`
+    )
+  } catch (error) {
+    return errorHandler(error, 'Serverless Framework')
+  }
+}
+
+/**
+ * Run a serverless.yml, serverless.yaml or serverless.json file
+ * @param {String} filePath - Path of the declarative file
+ * @param {Object} config - Configuration
+ */
 
 module.exports = run

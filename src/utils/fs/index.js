@@ -12,6 +12,7 @@ const hashFile = require('./hashFile')
 const readState = require('./readState')
 const writeState = require('./writeState')
 const loadComponent = require('./loadComponent')
+const coreComponentExists = require('./coreComponentExists')
 
 module.exports = {
   isJsonPath,
@@ -27,5 +28,6 @@ module.exports = {
   hashFile,
   readState,
   writeState,
-  loadComponent
+  loadComponent,
+  coreComponentExists
 }

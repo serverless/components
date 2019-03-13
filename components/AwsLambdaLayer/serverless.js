@@ -1,5 +1,5 @@
 const aws = require('aws-sdk')
-const Component = require('../../src/lib/Component/serverless')
+const { Component } = require('../../src')
 const { mergeDeepRight, pick, hashFile } = require('../../src/utils')
 const { pack, publishLayer, deleteLayer, getLayer, configChanged } = require('./utils')
 

@@ -3,7 +3,7 @@
  */
 
 const { mergeDeepRight } = require('../../src/utils')
-const Component = require('../../src/lib/Component/serverless') // TODO: Change to { Component } = require('serverless')
+const { Component } = require('../../src')
 
 /*
  * Get Config

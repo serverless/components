@@ -3,7 +3,7 @@
  */
 
 const path = require('path')
-const Component = require('../../src/lib/Component/serverless') // TODO: Change to { Component } = require('serverless')
+const { Component } = require('../../src')
 
 /*
  * Class – ChatApp
