@@ -11,6 +11,7 @@ const packDir = require('./packDir')
 const hashFile = require('./hashFile')
 const readState = require('./readState')
 const writeState = require('./writeState')
+const loadComponent = require('./loadComponent')
 
 module.exports = {
   isJsonPath,
@@ -25,5 +26,6 @@ module.exports = {
   packDir,
   hashFile,
   readState,
-  writeState
+  writeState,
+  loadComponent
 }

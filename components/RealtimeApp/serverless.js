@@ -47,7 +47,6 @@ const getConfig = (inputs) => {
  */
 
 class RealtimeApp extends Component {
-
   /*
    * Default
    */
@@ -61,8 +60,8 @@ class RealtimeApp extends Component {
     }
     const config = getConfig(inputs)
 
-    const website = this.load('Website')
-    const socket = this.load('Socket')
+    const website = await this.load('Website')
+    const socket = await this.load('Socket')
 
     const socketOutputs = await socket(config.backend)
     config.frontend.env.urlWebsocketApi = socketOutputs.url // pass backend url to frontend
@@ -73,12 +72,12 @@ class RealtimeApp extends Component {
     let outputs = {
       frontend: {
         url: websiteOutputs.url,
-        env: websiteOutputs.env,
+        env: websiteOutputs.env
       },
       backend: {
         url: socketOutputs.url,
-        env: socketOutputs.code.env,
-      },
+        env: socketOutputs.code.env
+      }
     }
     this.cli.outputs(outputs)
     return outputs
@@ -93,8 +92,8 @@ class RealtimeApp extends Component {
     // it doesn't even need any inputs at all since all is available in children state!
     this.cli.status('Removing')
 
-    const website = this.load('Website')
-    const socket = this.load('Socket')
+    const website = await this.load('Website')
+    const socket = await this.load('Socket')
 
     const outputs = await Promise.all([website.remove(), socket.remove()])
 
@@ -105,7 +104,7 @@ class RealtimeApp extends Component {
    * Connect
    */
 
-  connect(inputs = {}) {
+  async connect(inputs = {}) {
     // in this particular case, we want to load the Socket component
     // AND turn on its cli, which is turned off by default since it's a child
     // that's why the last argument is false
@@ -113,7 +112,7 @@ class RealtimeApp extends Component {
     // the second (componentAlias) argument is undefined because we
     // only have a single instance, so the default behavor of using
     // the child component class name as an alias is fine
-    const socket = this.load('Socket', undefined, false)
+    const socket = await this.load('Socket', undefined, false)
     return socket.connect(inputs)
   }
 }

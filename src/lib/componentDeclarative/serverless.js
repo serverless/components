@@ -28,7 +28,7 @@ class ComponentDeclarative extends Component {
     const components = getComponents(fileContent)
 
     // TODO: refactor so that we don't need to pass `this` into it
-    const preparedComponents = prepareComponents(components, this)
+    const preparedComponents = await prepareComponents(components, this)
     const graph = createGraph(preparedComponents, vars)
 
     const results = {}
@@ -83,7 +83,7 @@ class ComponentDeclarative extends Component {
     const components = getComponents(fileContent)
 
     // TODO: refactor so that we don't need to pass `this` into it
-    const preparedComponents = prepareComponents(components, this)
+    const preparedComponents = await prepareComponents(components, this)
 
     // TODO: refactor so that we don't need to manually create the ids
     const ids = Object.keys(preparedComponents).map((componentId) => `${this.id}.${componentId}`)
