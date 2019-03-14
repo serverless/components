@@ -1,5 +1,6 @@
 const components = require('../../../registry.json')
 const path = require('path')
+const root = require('./root')
 const fileExists = require('./fileExists')
 const downloadComponent = require('./downloadComponent')
 
@@ -23,14 +24,7 @@ const isGitComponent = (query) => query.split('/').length === 2 && !query.starts
 const loadComponent = async (query) => {
   if (isCoreComponent(query)) {
     // core component
-    const coreComponentPath = path.join(
-      __dirname,
-      '..',
-      '..',
-      '..',
-      components[query],
-      'serverless.js'
-    )
+    const coreComponentPath = path.join(root, components[query], 'serverless.js')
 
     return require(coreComponentPath)
   } else if (isCommunityComponent(query)) {
