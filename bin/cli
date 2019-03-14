@@ -1,25 +1,26 @@
 #!/usr/bin/env node
 
 /*
-* Serverless Framework 2 – Command Line Interface
-*/
+ * Serverless Framework 2 – Command Line Interface
+ */
 
 const args = require('minimist')(process.argv.slice(2))
-const serverless = require('../src')
+const run = require('../src/lib/run')
+const watch = require('../src/lib/watch')
 
 // Set config from CLI input
 const config = {}
-config.stage = (args.s || args.stage) ? (args.s || args.stage) : 'dev'
+config.stage = args.s || args.stage ? args.s || args.stage : 'dev'
 config.instance = args._[1] || null
 config.method = args._[0] || null
-config.verbose = (args.v || args.verbose) ? (args.v || args.verbose) : false
-config.debug = (args.d || args.debug) ? (args.d || args.debug) : false
-config.watch = (args.w || args.watch) ? (args.w || args.watch) : false
+config.verbose = args.v || args.verbose ? args.v || args.verbose : false
+config.debug = args.d || args.debug ? args.d || args.debug : false
+config.watch = args.w || args.watch ? args.w || args.watch : false
 
 // Run
 ;(async () => {
   if (config.watch) {
-    return serverless.watch(config)
+    return watch(config)
   }
-  return serverless.run(config)
+  return run(config)
 })().catch((e) => console.log(e.stack))
