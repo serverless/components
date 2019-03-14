@@ -46,7 +46,7 @@ class Socket extends Component {
 
     this.cli.status(`Deploying WebSockets`)
 
-    const websockets = await this.load('WebSockets')
+    const websockets = await this.load('AwsWebSockets')
     const websocketsOutputs = await websockets(inputs)
 
     this.state.url = websocketsOutputs.url
@@ -72,7 +72,7 @@ class Socket extends Component {
     this.cli.status(`Removing`)
 
     const lambda = await this.load('AwsLambda')
-    const websockets = await this.load('WebSockets')
+    const websockets = await this.load('AwsWebSockets')
 
     const lambdaOutputs = await lambda.remove()
     const websocketsOutputs = await websockets.remove()

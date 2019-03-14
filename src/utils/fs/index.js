@@ -13,6 +13,8 @@ const readState = require('./readState')
 const writeState = require('./writeState')
 const loadComponent = require('./loadComponent')
 const coreComponentExists = require('./coreComponentExists')
+const downloadComponent = require('./downloadComponent')
+const downloadGitRepo = require('./downloadGitRepo')
 
 module.exports = {
   isJsonPath,
@@ -29,5 +31,7 @@ module.exports = {
   readState,
   writeState,
   loadComponent,
-  coreComponentExists
+  coreComponentExists,
+  downloadComponent,
+  downloadGitRepo
 }

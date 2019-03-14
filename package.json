@@ -23,6 +23,7 @@
     "chalk": "^2.4.2",
     "chokidar": "^2.1.2",
     "dotenv": "^6.2.0",
+    "download-git-repo": "^1.1.0",
     "enquirer": "^2.3.0",
     "figures": "^2.0.0",
     "fs-extra": "^7.0.1",
