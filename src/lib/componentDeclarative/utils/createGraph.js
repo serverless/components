@@ -3,7 +3,7 @@ const { reduce } = require('../../../utils')
 const { ROOT_NODE_NAME } = require('../constants')
 const { types } = require('./variables')
 
-function createGraph(prepareComponents, variableObjects) {
+function createGraph(componentsToRun, variableObjects) {
   let dag = new Graph()
 
   // reduce over all the variables and add the corresponding
@@ -24,15 +24,14 @@ function createGraph(prepareComponents, variableObjects) {
     variableObjects
   )
 
-  // reduce over all the components we've prepared based on
-  // the serverless file and add all instances to the graph
+  // reduce over all the components we run and add all instances to the graph
   dag = reduce(
     (accum, instanceId) => {
       accum.setNode(instanceId)
       return accum
     },
     dag,
-    Object.keys(prepareComponents)
+    Object.keys(componentsToRun)
   )
 
   // create a `root` node and add all nodes which are not dependent on other nodes
