@@ -1,18 +1,19 @@
-const components = require('../../../registry.json')
+const registry = require('../../../registry.json')
 const path = require('path')
 const root = require('./root')
 const fileExists = require('./fileExists')
 const downloadComponent = require('./downloadComponent')
 
-const isCoreComponent = (query) => components[query] && typeof components[query] === 'string'
-
-const isCommunityComponent = (query) => {
-  return (
-    query.includes('@') &&
-    components[query.split('@')[0]] &&
-    components[query.split('@')[0]][query.split('@')[1]]
-  )
+const getCoreComponent = async (componentName) => {
+  const coreComponentPath = path.join(root, 'components', componentName, 'serverless.js')
+  if (await fileExists(coreComponentPath)) {
+    return require(coreComponentPath)
+  }
+  return null
 }
+
+const isCommunityComponent = (query) =>
+  registry[query] || (query.includes('@') && registry[query.split('@')[0]])
 
 const isPathComponent = async (query) => {
   const externalComponentPath = path.resolve(path.join(query, 'serverless.js'))
@@ -22,17 +23,20 @@ const isPathComponent = async (query) => {
 const isGitComponent = (query) => query.split('/').length === 2 && !query.startsWith('.')
 
 const loadComponent = async (query) => {
-  if (isCoreComponent(query)) {
-    // core component
-    const coreComponentPath = path.join(root, components[query], 'serverless.js')
+  const coreComponent = await getCoreComponent(query)
 
-    return require(coreComponentPath)
+  if (coreComponent) {
+    return coreComponent
   } else if (isCommunityComponent(query)) {
     // community component
     const name = query.split('@')[0]
-    const version = query.split('@')[1]
+    const branch = query.split('@')[1]
 
-    const downloadedComponentPath = await downloadComponent(components[name][version], query)
+    const url = registry[name].repo
+    const repo = url.replace('https://github.com/', '')
+    const gitRepoBranch = branch ? `${repo}#${branch}` : repo
+
+    const downloadedComponentPath = await downloadComponent(gitRepoBranch, query)
     return require(downloadedComponentPath)
   } else if (await isPathComponent(query)) {
     // direct path

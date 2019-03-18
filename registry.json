@@ -1,15 +1,6 @@
 {
-  "AwsDynamoDb": "./components/AwsDynamoDb",
-  "AwsIamRole": "./components/AwsIamRole",
-  "AwsLambda": "./components/AwsLambda",
-  "AwsLambdaLayer": "./components/AwsLambdaLayer",
-  "AwsS3": "./components/AwsS3",
-  "AwsWebSockets": "./components/AwsWebSockets",
-  "ChatApp": "./components/ChatApp",
-  "RealtimeApp": "./components/RealtimeApp",
-  "Socket": "./components/Socket",
-  "Website": "./components/Website",
   "Users": {
-    "0.0.1": "eahefnawy/users#0.0.1"
+    "description": "A serverless component that provisions a users backend",
+    "repo": "https://github.com/eahefnawy/users"
   }
 }
