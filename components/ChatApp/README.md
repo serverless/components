@@ -18,8 +18,8 @@ Go back to the root folder...
 $ cd ..
 ```
 
-Run Serverless Framework V.2...
+Run Serverless Components...
 
 ```bash
-$ v2
+$ sf
 ```

@@ -6,9 +6,10 @@
 const path = require('path')
 const Component = require('../component/serverless')
 const { readFile } = require('../../utils')
-const { getComponents, prepareComponents, createGraph, loadState, logOutputs } = require('./utils')
 const { ROOT_NODE_NAME } = require('./constants')
+const state = require('./utils/state')
 const variables = require('./utils/variables')
+const { getComponents, prepareComponents, createGraph, logOutputs } = require('./utils')
 
 class ComponentDeclarative extends Component {
   /*
@@ -28,8 +29,9 @@ class ComponentDeclarative extends Component {
     const components = getComponents(fileContent)
 
     // TODO: refactor so that we don't need to pass `this` into it
-    const preparedComponents = await prepareComponents(components, this)
-    const graph = createGraph(preparedComponents, vars)
+
+    const componentsToRun = await prepareComponents(components, this)
+    const graph = createGraph(componentsToRun, vars)
 
     const results = {}
     const outputs = {}
@@ -42,7 +44,7 @@ class ComponentDeclarative extends Component {
           if (!instanceId) {
             return
           }
-          const value = preparedComponents[instanceId]
+          const value = componentsToRun[instanceId]
           let inputs = value.inputs // eslint-disable-line
           const { instance } = value
           inputs = variables.resolveComponentVariables(vars, results, value)
@@ -83,12 +85,11 @@ class ComponentDeclarative extends Component {
     const components = getComponents(fileContent)
 
     // TODO: refactor so that we don't need to pass `this` into it
-    const preparedComponents = await prepareComponents(components, this)
 
-    // TODO: refactor so that we don't need to manually create the ids
-    const ids = Object.keys(preparedComponents).map((componentId) => `${this.id}.${componentId}`)
-    const state = loadState(ids)
-    const graph = createGraph(preparedComponents, vars)
+    const componentsToRun = await prepareComponents(components, this)
+
+    const currentState = await state.load()
+    const graph = createGraph(componentsToRun, vars)
 
     const outputs = {}
 
@@ -100,10 +101,10 @@ class ComponentDeclarative extends Component {
           if (!instanceId) {
             return
           }
-          const value = preparedComponents[instanceId]
+          const value = componentsToRun[instanceId]
           let inputs = value.inputs // eslint-disable-line
           const { instance } = value
-          inputs = variables.resolveComponentVariables(vars, state, value)
+          inputs = variables.resolveComponentVariables(vars, currentState, value)
           // remove own insance from successors set
           successors.delete(instanceId)
           // add new successors to set (if any)

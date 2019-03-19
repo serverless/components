@@ -1,4 +1,4 @@
-[![Serverless Framework V.2](https://s3.amazonaws.com/assets.github.serverless/readme-serverless-framework-v2-1.png)](http://serverless.com)
+[![Serverless Components](https://s3.amazonaws.com/assets.github.serverless/readme-serverless-components-1.png)](http://serverless.com)
 
 * [Chat App](./examples/chat-app)
 * [Realtime App](./examples/realtime-app)
@@ -26,7 +26,7 @@ components:
 ```
 
 ```console
-$ realtime-app: v2
+$ realtime-app: sf
 
   realtime-app › outputs:
   frontend:
@@ -43,13 +43,13 @@ $ realtime-app: v2
 Clone repo.
 
 ```console
-$ git clone https://github.com/serverless/v2.git
+$ git clone https://github.com/serverless/components.git
 ```
 
 Install dependencies.
 
 ```console
-$ cd v2 && npm link
+$ cd components && npm link
 ```
 
 Go into an [example](./examples).
@@ -58,17 +58,17 @@ Go into an [example](./examples).
 $ cd examples/chat-app
 ```
 
-Add provider credentials (all examples currently require [AWS](https://aws.amazon.com/) credentials).  Serverless Framework V.2 supports `.env` files in the same folder as `serverless.yml` or `serverless.js`.  Create a `.env` that looks like this:
+Add provider credentials (all examples currently require [AWS](https://aws.amazon.com/) credentials).  Serverless Components supports `.env` files in the same folder as `serverless.yml` or `serverless.js`.  Create a `.env` that looks like this:
 
 ```text
 AWS_ACCESS_KEY_ID=123456789
 AWS_SECRET_ACCESS_KEY=987654321
 ```
 
-Run `$ v2`.
+Run `$ sf`.
 
 ```console
-$ chat-app: v2
+$ chat-app: sf
 
   chat-app › outputs:
   url:  'http://chatapp-5m53dym.s3-website-us-east-1.amazonaws.com'

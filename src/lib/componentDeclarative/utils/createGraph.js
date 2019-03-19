@@ -1,9 +1,9 @@
-const { Graph } = require('graphlib')
+const { Graph, alg } = require('graphlib')
 const { reduce } = require('../../../utils')
 const { ROOT_NODE_NAME } = require('../constants')
 const { types } = require('./variables')
 
-function createGraph(prepareComponents, variableObjects) {
+function createGraph(componentsToRun, variableObjects) {
   let dag = new Graph()
 
   // reduce over all the variables and add the corresponding
@@ -24,15 +24,14 @@ function createGraph(prepareComponents, variableObjects) {
     variableObjects
   )
 
-  // reduce over all the components we've prepared based on
-  // the serverless file and add all instances to the graph
+  // reduce over all the components we run and add all instances to the graph
   dag = reduce(
     (accum, instanceId) => {
       accum.setNode(instanceId)
       return accum
     },
     dag,
-    Object.keys(prepareComponents)
+    Object.keys(componentsToRun)
   )
 
   // create a `root` node and add all nodes which are not dependent on other nodes
@@ -49,15 +48,22 @@ function createGraph(prepareComponents, variableObjects) {
     dag.sinks()
   )
 
-  // TODO: explicitly check for circular dependencies here
-  // this is commented out since re-throwing the error won't cause
-  // the CLI to pick it up and print the error message in red
-  // // check for circular dependencies
-  // try {
-  //   dag.overallOrder()
-  // } catch (error) {
-  //   throw new Error(error.message)
-  // }
+  // checking for circular dependencies
+  const isAcyclic = alg.isAcyclic(dag)
+  if (!isAcyclic) {
+    const cycles = alg.findCycles(dag)
+    let msg = ['Your serverless.yml file has circular dependencies:']
+    cycles.forEach((cycle, index) => {
+      let fromAToB = cycle.join(' --> ')
+      fromAToB = `${(index += 1)}. ${fromAToB}`
+      const fromBToA = cycle.reverse().join(' <-- ')
+      const padLength = fromAToB.length + 4
+      msg.push(fromAToB.padStart(padLength))
+      msg.push(fromBToA.padStart(padLength))
+    }, cycles)
+    msg = msg.join('\n')
+    throw new Error(msg)
+  }
 
   return dag
 }

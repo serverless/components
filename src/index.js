@@ -1,5 +1,5 @@
 /*
- * Serverless Framework v2.0
+ * Serverless Components
  */
 
 const { pick } = require('ramda')
