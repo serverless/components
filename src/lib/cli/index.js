@@ -6,7 +6,7 @@ const stripAnsi = require('strip-ansi')
 const figures = require('figures')
 const sleep = require('../../utils/sleep')
 
-// Serverless V.2 CLI Colors
+// Serverless Components CLI Colors
 const grey = chalk.dim
 const green = chalk.rgb(0, 253, 88)
 const yellow = chalk.rgb(255, 242, 129)

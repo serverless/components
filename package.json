@@ -1,10 +1,10 @@
 {
-  "name": "@serverless/v2",
+  "name": "@serverless/components",
   "version": "0.0.1",
   "description": "N/A",
   "main": "./src/index.js",
   "bin": {
-    "v2": "./bin/cli",
+    "components": "./bin/cli",
     "sf": "./bin/cli"
   },
   "publishConfig": {
