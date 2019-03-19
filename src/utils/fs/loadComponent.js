@@ -3,6 +3,7 @@ const path = require('path')
 const root = require('./root')
 const fileExists = require('./fileExists')
 const downloadComponent = require('./downloadComponent')
+const getComponentLatestVersion = require('./getComponentLatestVersion')
 
 const getCoreComponent = async (componentName) => {
   const coreComponentPath = path.join(root, 'components', componentName, 'serverless.js')
@@ -30,13 +31,18 @@ const loadComponent = async (query) => {
   } else if (isCommunityComponent(query)) {
     // community component
     const name = query.split('@')[0]
-    const branch = query.split('@')[1]
 
     const url = registry[name].repo
-    const repo = url.replace('https://github.com/', '')
-    const gitRepoBranch = branch ? `${repo}#${branch}` : repo
+    const ownerRepo = url.replace('https://github.com/', '')
 
-    const downloadedComponentPath = await downloadComponent(gitRepoBranch, query)
+    const owner = ownerRepo.split('/')[0]
+    const repo = ownerRepo.split('/')[1]
+    const version = query.split('@')[1] || (await getComponentLatestVersion(owner, repo))
+
+    const ownerRepoVersion = `${ownerRepo}#${version}`
+    const dirName = `${name}@${version}`
+
+    const downloadedComponentPath = await downloadComponent(ownerRepoVersion, dirName)
     return require(downloadedComponentPath)
   } else if (await isPathComponent(query)) {
     // direct path

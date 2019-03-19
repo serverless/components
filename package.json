@@ -20,6 +20,7 @@
     "ansi-escapes": "^3.2.0",
     "archiver": "^3.0.0",
     "aws-sdk": "^2.387.0",
+    "axios": "^0.18.0",
     "chalk": "^2.4.2",
     "chokidar": "^2.1.2",
     "dotenv": "^6.2.0",
@@ -35,6 +36,8 @@
     "minimist": "^1.2.0",
     "ramda": "^0.26.1",
     "s3-stream-upload": "^2.0.2",
+    "semver-regex": "^2.0.0",
+    "semver-sort": "0.0.4",
     "strip-ansi": "^5.0.0",
     "traverse": "^0.6.6",
     "ws": "^6.1.2"
