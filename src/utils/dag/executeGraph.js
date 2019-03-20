@@ -18,15 +18,17 @@ const execute = async (
 
   const executions = map(async (componentId) => {
     const node = graph.node(componentId)
-    await executeComponent(
-      componentId,
-      components,
-      stateFile,
-      archive,
-      node.command,
-      options,
-      rollback
-    )
+    if (node != undefined) {
+      await executeComponent(
+        componentId,
+        components,
+        stateFile,
+        archive,
+        node.command,
+        options,
+        rollback
+      )
+    }
     graph.removeNode(componentId)
     if (global.signalEventHandling && global.signalEventHandling.shouldExitGracefully) {
       throw new Error('Operation gracefully exited. State successfully persisted...')

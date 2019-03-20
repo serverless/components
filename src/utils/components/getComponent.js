@@ -9,6 +9,7 @@ const resolvePreExecutionVars = require('../variables/resolvePreExecutionVars')
 const validateVarsUsage = require('../variables/validateVarsUsage')
 const getInstanceId = require('./getInstanceId')
 const setInputDefaults = require('./setInputDefaults')
+const validateTypes = require('./validateTypes')
 
 module.exports = async (componentRoot, componentId, inputs, stateFile, slsYml = null) => {
   const json = {}
@@ -88,6 +89,8 @@ module.exports = async (componentRoot, componentId, inputs, stateFile, slsYml = 
   )
 
   slsYml.inputs = setInputDefaults(slsYml.inputTypes, slsYml.inputs)
+
+  validateTypes(slsYml.id, slsYml.inputTypes, slsYml.inputs, { prefix: 'Input' })
 
   return slsYml
 }

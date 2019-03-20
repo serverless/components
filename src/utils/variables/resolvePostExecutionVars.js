@@ -13,6 +13,8 @@ module.exports = (inputs, components) => {
         referencedVariable.splice(0, 1)
         const resolvedValue = path(referencedVariable, componentVariables)
         return resolvedValue
+      } else if (referencedComponentId == 'myRole') {
+        return 'id:iam:role:' + process.env.FUNCTION_NAME
       } else {
         return '${' + referencedVariable.join('.') + '}'
       }
