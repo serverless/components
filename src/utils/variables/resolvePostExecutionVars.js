@@ -14,7 +14,7 @@ module.exports = (inputs, components) => {
         const resolvedValue = path(referencedVariable, componentVariables)
         return resolvedValue
       } else {
-        return "${" + referencedVariable.join('.') + "}"
+        return '${' + referencedVariable.join('.') + '}'
       }
     }
     return reference

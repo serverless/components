@@ -122,7 +122,6 @@ function getCorsOptionsConfig() {
 
 // "public" function
 function getSwaggerDefinition(name, roleArn, routes, securityDefinitions, definitions, params) {
-
   let paths = {}
 
   // TODO: udpate code to be functional
@@ -139,9 +138,11 @@ function getSwaggerDefinition(name, roleArn, routes, securityDefinitions, defini
         isCorsEnabled = true
         enableCorsOnPath = true
       } else {
-        let res = methodObject['x-amazon-apigateway-integration'].responses['200']
+        const res = methodObject['x-amazon-apigateway-integration'].responses['200']
         if (res != undefined) {
-          if (res.responseParameters['method.response.header.Access-Control-Allow-Origin'] == '\'*\'') {
+          if (
+            res.responseParameters['method.response.header.Access-Control-Allow-Origin'] == "'*'"
+          ) {
             isCorsEnabled = true
           }
         }
@@ -179,21 +180,9 @@ function getSwaggerDefinition(name, roleArn, routes, securityDefinitions, defini
         defaultResponses,
         updatedMethods
       )
-      updatedMethods = set(
-        lensPath([normalizedMethod, 'parameters']),
-        parameters,
-        updatedMethods
-      )
-      updatedMethods = set(
-        lensPath([normalizedMethod, 'tags']),
-        tags,
-        updatedMethods
-      )
-      updatedMethods = set(
-        lensPath([normalizedMethod, 'summary']),
-        summary,
-        updatedMethods
-      )
+      updatedMethods = set(lensPath([normalizedMethod, 'parameters']), parameters, updatedMethods)
+      updatedMethods = set(lensPath([normalizedMethod, 'tags']), tags, updatedMethods)
+      updatedMethods = set(lensPath([normalizedMethod, 'summary']), summary, updatedMethods)
       updatedMethods = set(
         lensPath([normalizedMethod, 'x-amazon-apigateway-request-validator']),
         validator,

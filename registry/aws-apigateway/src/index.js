@@ -19,14 +19,13 @@ const deleteApi = async (params) => {
 }
 
 const updateStageVariables = async (params) => {
+  let { id } = params
 
-  const {
-    id, name, stageName, StageVariables
-  } = params
+  const { name, stageName, StageVariables } = params
 
   if (id == undefined) {
     const currentApis = await APIGateway.getRestApis().promise()
-    id = currentApis.items.filter(e => e.name == name)[0].id
+    id = currentApis.items.filter((e) => e.name == name)[0].id
   }
 
   let currentStage
@@ -44,8 +43,8 @@ const updateStageVariables = async (params) => {
       }).promise()
     }
   } finally {
-    let updatedKeys = Object.keys(StageVariables)
-    let patchOperations = []
+    const updatedKeys = Object.keys(StageVariables)
+    const patchOperations = []
 
     if (currentStage.variables) {
       forEachObjIndexed((value, key) => {
@@ -76,11 +75,16 @@ const updateStageVariables = async (params) => {
 }
 
 const createApi = async (params) => {
-  let {
-    name, roleArn, routes, stageName, securityDefinitions, definitions
-  } = params
+  const { name, roleArn, routes, stageName, securityDefinitions, definitions } = params
 
-  const swagger = getSwaggerDefinition(name, roleArn, routes, securityDefinitions, definitions)
+  const swagger = getSwaggerDefinition(
+    name,
+    roleArn,
+    routes,
+    securityDefinitions,
+    definitions,
+    params
+  )
   const json = JSON.stringify(swagger)
 
   const res = await APIGateway.importRestApi({
@@ -89,7 +93,7 @@ const createApi = async (params) => {
 
   await APIGateway.createDeployment({
     restApiId: res.id,
-    stageName: stageName 
+    stageName: stageName
   }).promise()
 
   updateStageVariables(params)
@@ -105,19 +109,25 @@ const createApi = async (params) => {
 }
 
 const updateApi = async (params) => {
+  let { id } = params
 
-  const {
-    name, roleArn, routes, id, stageName, securityDefinitions, definitions
-  } = params
+  const { name, roleArn, routes, stageName, securityDefinitions, definitions } = params
 
   if (id == undefined) {
     const currentApis = await APIGateway.getRestApis().promise()
-    id = currentApis.items.filter(e => e.name == name)[0].id
+    id = currentApis.items.filter((e) => e.name == name)[0].id
   }
 
   updateStageVariables(params)
 
-  const swagger = getSwaggerDefinition(name, roleArn, routes, securityDefinitions, definitions, params)
+  const swagger = getSwaggerDefinition(
+    name,
+    roleArn,
+    routes,
+    securityDefinitions,
+    definitions,
+    params
+  )
   const json = JSON.stringify(swagger)
 
   await APIGateway.putRestApi({
@@ -128,7 +138,7 @@ const updateApi = async (params) => {
 
   await APIGateway.createDeployment({
     restApiId: id,
-    stageName: stageName 
+    stageName: stageName
   }).promise()
 
   const url = generateUrl(id)
@@ -154,7 +164,7 @@ const deploy = async (inputs, context) => {
     outputs = context.state
   } else if (inputs.name && !context.state.name) {
     context.log(`Creating API Gateway: "${inputs.name}"`)
-    outputs = createApi(inputs)
+    outputs = await createApi(inputs)
   } else {
     context.log(`Updating API Gateway: "${inputs.name}"`)
     outputs = updateApi({

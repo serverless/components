@@ -10,30 +10,29 @@ const validateVarsUsage = require('../variables/validateVarsUsage')
 const getInstanceId = require('./getInstanceId')
 const setInputDefaults = require('./setInputDefaults')
 
-module.exports = async (componentRoot, componentId, inputs, stateFile) => {
-
-  let json = {}
+module.exports = async (componentRoot, componentId, inputs, stateFile, slsYml = null) => {
+  const json = {}
 
   // Get promise for each route in routes from inputs
   const getChildJSON = async (value) => {
-    if(value != null && typeof value == 'string' && value.startsWith('${file:')) {
+    if (value != null && typeof value == 'string' && value.startsWith('${file:')) {
       const keylen = value.length
       const methodPath = value.substring(7, keylen - 1)
-      const methodJson = await readFile(path.join("./", methodPath))
+      const methodJson = await readFile(path.join('./', methodPath))
       return methodJson
     } else {
       return value
     }
   }
 
-  let childPromises = []
+  const childPromises = []
 
   // Get promise for each object in inputs
   const getJSON = async (k, v) => {
-    if(v != null && typeof v == 'string' && v.startsWith('${file:')) {
+    if (v != null && typeof v == 'string' && v.startsWith('${file:')) {
       const len = v.length
       const childPath = v.substring(7, len - 1)
-      const childJson = await readFile(path.join("./", childPath))
+      const childJson = await readFile(path.join('./', childPath))
       forEachObjIndexed((value, key) => {
         childJson[key] = getChildJSON(value, key)
         childPromises.push(childJson[key])
@@ -42,14 +41,16 @@ module.exports = async (componentRoot, componentId, inputs, stateFile) => {
       return childJson
     }
   }
-  
-  let promises = []
+
+  const promises = []
 
   forEachObjIndexed((v, k) => {
     promises.push(getJSON(k, v))
   }, inputs)
 
-  let slsYml = await readFile(path.join(componentRoot, 'serverless.yml'))
+  if (!slsYml) {
+    slsYml = await readFile(path.join(componentRoot, 'serverless.yml'))
+  }
 
   await Promise.all(promises)
 
@@ -58,7 +59,7 @@ module.exports = async (componentRoot, componentId, inputs, stateFile) => {
   // Replace resolved promises to actual value
   forEachObjIndexed((v) => {
     forEachObjIndexed((vc, kc) => {
-      vc.then(d => {
+      vc.then((d) => {
         v[kc] = d
       })
     }, v)

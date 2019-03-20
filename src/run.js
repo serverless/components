@@ -1,4 +1,4 @@
-const { clone, forEachObjIndexed } = require('ramda')
+const { clone, forEachObjIndexed, isNil, isEmpty } = require('ramda')
 
 const utils = require('./utils')
 
@@ -37,7 +37,16 @@ const run = async (command, options) => {
     archive = clone(stateFile)
     let componentsToUse
     let orphanedComponents
-    const serverlessFileComponents = await getComponentsFromServerlessFile(stateFile)
+    let serverlessFileComponents
+    if (!isNil(serverlessFileObject) && !isEmpty(serverlessFileObject)) {
+      serverlessFileComponents = await getComponentsFromServerlessFile(
+        stateFile,
+        projectPath,
+        serverlessFileObject
+      )
+    } else {
+      serverlessFileComponents = await getComponentsFromServerlessFile(stateFile, projectPath)
+    }
     const stateFileComponents = getComponentsFromStateFile(stateFile)
     if (command === 'remove') {
       componentsToUse = stateFileComponents
@@ -49,8 +58,8 @@ const run = async (command, options) => {
     components = { ...componentsToUse, ...orphanedComponents }
     if (command === 'deploy') trackDeployment(componentsToUse)
     forEachObjIndexed((value, key) => {
-      if(value.type == 'aws-apigateway') {
-        delete componentsToUse[key].dependencies
+      if (value.type == 'aws-apigateway') {
+        componentsToUse[key].dependencies = {}
       }
     }, componentsToUse)
     const graph = await buildGraph(componentsToUse, orphanedComponents, command)
@@ -85,7 +94,7 @@ const run = async (command, options) => {
 
     throw error
   } finally {
-    await writeStateFile(stateFile)
+    await writeStateFile(projectPath, stateFile, serverlessFileObject)
   }
   return components
 }

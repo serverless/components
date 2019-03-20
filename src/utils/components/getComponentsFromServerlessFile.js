@@ -1,5 +1,5 @@
-const { assoc, keys, mergeAll, map} = require('ramda')
-const deferredPromise = require('@serverless/utils')
+const { assoc, keys, mergeAll, map } = require('ramda')
+const { deferredPromise } = require('@serverless/utils')
 const getChildrenIds = require('./getChildrenIds')
 const getComponent = require('./getComponent')
 const getComponentFunctions = require('./getComponentFunctions')
@@ -10,23 +10,33 @@ const validateTypes = require('./validateTypes')
 
 const getComponentsFromServerlessFile = async (
   stateFile,
-  componentRoot = getComponentRootPath(),
+  componentRoot,
+  slsYml = null,
   inputs = {},
   componentId
 ) => {
-  const component = await getComponent(componentRoot, componentId, inputs, stateFile)
+  const component = await getComponent(componentRoot, componentId, inputs, stateFile, slsYml)
+
   validateTypes(component.id, component.inputTypes, component.inputs)
-  const nestedComponents = mergeAll(await Promise.all(map(async (componentAlias) => {
-    const nestedComponentRoot = getComponentRootPath(component.components[componentAlias].type)
-    const nestedComponentInputs = component.components[componentAlias].inputs || {}
-    const nestedComponentId = component.components[componentAlias].id
-    return getComponentsFromServerlessFile(
-      stateFile,
-      nestedComponentRoot,
-      nestedComponentInputs,
-      nestedComponentId
+
+  const nestedComponents = mergeAll(
+    await Promise.all(
+      map(async (componentAlias) => {
+        const nestedComponentRoot = await getComponentRootPath(
+          component.components[componentAlias].type
+        )
+        const nestedComponentInputs = component.components[componentAlias].inputs || {}
+        const nestedComponentId = component.components[componentAlias].id
+        return getComponentsFromServerlessFile(
+          stateFile,
+          nestedComponentRoot,
+          null,
+          nestedComponentInputs,
+          nestedComponentId
+        )
+      }, keys(component.components) || [])
     )
-  }, keys(component.components) || [])))
+  )
 
   return assoc(
     component.id,
@@ -35,6 +45,7 @@ const getComponentsFromServerlessFile = async (
       type: component.type,
       inputs: component.inputs,
       outputs: {},
+      outputTypes: component.outputTypes,
       rootPath: componentRoot,
       state: getState(stateFile, component.id),
       dependencies: getDependencies(component.inputs),

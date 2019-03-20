@@ -9,14 +9,16 @@ module.exports = (slsYml) => {
       return map(transformValue, value)
     }
     if (is(String, value)) {
-      let r = value.replace(regex, (reference) => {
+      const r = value.replace(regex, (reference) => {
         const referencedVariable = replace(/[${}]/g, '', reference).split('.')
         const referencedComponentAlias = referencedVariable[0]
         if (slsYml.components && !reservedNames.includes(referencedComponentAlias)) {
           if (true || !slsYml.components[referencedComponentAlias]) {
             forEachObjIndexed((v, k) => {
-              if(reference == '${custom.' + k + '}') {
-                value = replace(/[${}]/g, '', v).split('.')[1].split(',')[1]
+              if (reference == '${custom.' + k + '}') {
+                value = replace(/[${}]/g, '', v)
+                  .split('.')[1]
+                  .split(',')[1]
                 const len = value.length
                 value = value.substring(2, len - 1)
                 reference = value
