@@ -7,13 +7,14 @@ async function prepareComponents(components, that) {
   return reduceIndexed(
     // TODO: remove auto-aliasing support
     async (accum, key, idx) => {
+      const component = components[key]
       // figure out the Component class and instance names
       const splittedKey = key.split('::')
       const componentName = splittedKey[0] || key
       const instanceId = splittedKey[1] || `${componentName.toLowerCase()}${idx}`
+      const inputs = component || {} // Don't let inputs be null
       // load the component class
       const instance = await that.load(componentName, instanceId)
-      const inputs = components[key] || {} // Don't let inputs be null
       return assoc(
         instanceId,
         {

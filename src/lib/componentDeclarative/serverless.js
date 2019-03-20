@@ -5,7 +5,7 @@
 
 const path = require('path')
 const Component = require('../component/serverless')
-const { readFile } = require('../../utils')
+const { readFile, difference } = require('../../utils')
 const { ROOT_NODE_NAME } = require('./constants')
 const state = require('./utils/state')
 const variables = require('./utils/variables')
@@ -26,12 +26,30 @@ class ComponentDeclarative extends Component {
     // construct variable objects and resolve them (if possible)
     const vars = variables.constructObjects(fileContent)
     fileContent = variables.resolveServerlessFile(fileContent, vars)
-    const components = getComponents(fileContent)
+    const configComponents = getComponents(fileContent)
 
     // TODO: refactor so that we don't need to pass `this` into it
+    const componentsToRun = await prepareComponents(configComponents, this)
+    let componentsToRemove = {}
+    try {
+      const stateComponents = await state.load()
+      const stateComponentKeys = Object.keys(stateComponents)
+      const configComponentKeys = Object.keys(configComponents)
+      const toRemove = difference(stateComponentKeys, configComponentKeys)
+      componentsToRemove = Object.keys(stateComponents).reduce((accum, instanceId) => {
+        const stateContent = stateComponents[instanceId]
+        if (toRemove.includes(instanceId) && Object.keys(stateContent).length) {
+          accum[instanceId] = stateComponents[instanceId]
+        }
+        return accum
+      }, {})
+      componentsToRemove = await prepareComponents(componentsToRemove, this)
+    } catch (error) {
+      // no state. Nothing to remove...
+    }
+    const components = { ...componentsToRun, ...componentsToRemove }
 
-    const componentsToRun = await prepareComponents(components, this)
-    const graph = createGraph(componentsToRun, vars)
+    const graph = createGraph(componentsToRun, componentsToRemove, vars)
 
     const results = {}
     const outputs = {}
@@ -44,9 +62,9 @@ class ComponentDeclarative extends Component {
           if (!instanceId) {
             return
           }
-          const value = componentsToRun[instanceId]
+          const value = components[instanceId]
           let inputs = value.inputs // eslint-disable-line
-          const { instance } = value
+          const { component, instance } = value
           inputs = variables.resolveComponentVariables(vars, results, value)
           // remove own insance from predecessors set
           predecessors.delete(instanceId)
@@ -55,9 +73,15 @@ class ComponentDeclarative extends Component {
           if (nodePredecessors.length) {
             nodePredecessors.forEach((pred) => predecessors.add(pred))
           }
-          const res = await instance.default(inputs)
+          const operation = graph.node(instanceId)
+          const res = await instance[operation](inputs)
           results[instanceId] = res
           outputs[instanceId] = res
+          // save the component declarative state information
+          if (operation == 'remove') {
+            inputs = {}
+          }
+          await state.save(component, instanceId, inputs)
           return {
             [instanceId]: outputs
           }
@@ -82,14 +106,15 @@ class ComponentDeclarative extends Component {
     // construct variable objects and resolve them (if possible)
     const vars = variables.constructObjects(fileContent)
     fileContent = variables.resolveServerlessFile(fileContent, vars)
-    const components = getComponents(fileContent)
+    const configComponents = getComponents(fileContent)
 
     // TODO: refactor so that we don't need to pass `this` into it
-
-    const componentsToRun = await prepareComponents(components, this)
+    const componentsToRun = await prepareComponents(configComponents, this)
+    const componentsToRemove = {}
 
     const currentState = await state.load()
-    const graph = createGraph(componentsToRun, vars)
+    const components = { ...componentsToRun, ...componentsToRemove }
+    const graph = createGraph(componentsToRun, componentsToRemove, vars)
 
     const outputs = {}
 
@@ -101,9 +126,9 @@ class ComponentDeclarative extends Component {
           if (!instanceId) {
             return
           }
-          const value = componentsToRun[instanceId]
+          const value = components[instanceId]
           let inputs = value.inputs // eslint-disable-line
-          const { instance } = value
+          const { component, instance } = value
           inputs = variables.resolveComponentVariables(vars, currentState, value)
           // remove own insance from successors set
           successors.delete(instanceId)
@@ -118,6 +143,8 @@ class ComponentDeclarative extends Component {
           }
           const res = await instance.remove(inputs)
           outputs[instanceId] = res
+          // save the component declarative state information
+          await state.save(component, instanceId, {})
           return {
             [instanceId]: outputs
           }
