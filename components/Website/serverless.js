@@ -2,7 +2,7 @@ const path = require('path')
 const util = require('util')
 const exec = util.promisify(require('child_process').exec)
 const { isEmpty, mergeDeepRight, writeFile } = require('../../src/utils')
-const Component = require('../../src/lib/Component/serverless') // TODO: Change to { Component } = require('serverless')
+const { Component } = require('../../src')
 
 let outputMask = ['name', 'url']
 
@@ -51,7 +51,7 @@ class Website extends Component {
 
     this.cli.status(`Deploying`)
 
-    const bucket = this.load('AwsS3')
+    const bucket = await this.load('AwsS3')
 
     await bucket({ name: config.bucketName, website: true })
 
@@ -101,7 +101,7 @@ class Website extends Component {
   async remove() {
     this.cli.status(`Removing`)
 
-    const bucket = this.load('AwsS3')
+    const bucket = await this.load('AwsS3')
 
     await bucket.remove()
 

@@ -1,6 +1,6 @@
 const path = require('path')
 const { mergeDeepRight, dirExists, sleep, fileExists } = require('../../src/utils')
-const Component = require('../../src/lib/Component/serverless')
+const { Component } = require('../../src')
 const {
   getClients,
   configureWebsite,

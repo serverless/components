@@ -29,7 +29,8 @@ class ComponentDeclarative extends Component {
     const components = getComponents(fileContent)
 
     // TODO: refactor so that we don't need to pass `this` into it
-    const componentsToRun = prepareComponents(components, this)
+
+    const componentsToRun = await prepareComponents(components, this)
     const graph = createGraph(componentsToRun, vars)
 
     const results = {}
@@ -84,7 +85,8 @@ class ComponentDeclarative extends Component {
     const components = getComponents(fileContent)
 
     // TODO: refactor so that we don't need to pass `this` into it
-    const componentsToRun = prepareComponents(components, this)
+
+    const componentsToRun = await prepareComponents(components, this)
 
     const currentState = await state.load()
     const graph = createGraph(componentsToRun, vars)

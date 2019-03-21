@@ -8,7 +8,8 @@ const {
   configChanged,
   pack
 } = require('./utils')
-const Component = require('../../src/lib/Component/serverless') // TODO: Change to { Component } = require('serverless')
+
+const { Component } = require('../../src')
 
 const outputMask = [
   'name',
@@ -50,7 +51,7 @@ class AwsLambda extends Component {
       credentials: this.context.credentials.aws
     })
 
-    const awsIamRole = this.load('AwsIamRole')
+    const awsIamRole = await this.load('AwsIamRole')
 
     config.role = config.role || (await awsIamRole(config))
 
@@ -61,7 +62,7 @@ class AwsLambda extends Component {
 
     let deploymentBucket
     if (config.bucket) {
-      deploymentBucket = this.load('AwsS3')
+      deploymentBucket = await this.load('AwsS3')
       await deploymentBucket({ name: config.bucket })
     }
 
@@ -112,8 +113,8 @@ class AwsLambda extends Component {
 
     this.cli.status(`Removing`)
 
-    const awsIamRole = this.load('AwsIamRole')
-    const deploymentBucket = this.load('AwsS3')
+    const awsIamRole = await this.load('AwsIamRole')
+    const deploymentBucket = await this.load('AwsS3')
 
     // there's no need to pass names as input
     // since it's saved in the child component state

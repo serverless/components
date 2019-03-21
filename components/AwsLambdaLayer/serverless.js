@@ -1,5 +1,5 @@
 const aws = require('aws-sdk')
-const Component = require('../../src/lib/Component/serverless')
+const { Component } = require('../../src')
 const { mergeDeepRight, pick, hashFile } = require('../../src/utils')
 const { pack, publishLayer, deleteLayer, getLayer, configChanged } = require('./utils')
 
@@ -47,7 +47,7 @@ class AwsLambdaLayer extends Component {
     if (configChanged(prevLayer, config)) {
       this.cli.status('Uploading')
       if (config.bucket) {
-        const bucket = this.load('AwsS3')
+        const bucket = await this.load('AwsS3')
         await bucket.upload({ name: config.bucket, file: config.zipPath })
       }
       config.arn = await publishLayer({ lambda, ...config })

@@ -12,9 +12,17 @@ const {
   removeApi,
   getWebsocketUrl
 } = require('./utils')
-const Component = require('../../src/lib/Component/serverless') // TODO: Change to { Component } = require('serverless')
+const { Component } = require('../../src')
 
-const outputMask = ['name', 'deploymentStage', 'description', 'routeSelectionExpression', 'routes', 'id', 'url']
+const outputMask = [
+  'name',
+  'deploymentStage',
+  'description',
+  'routeSelectionExpression',
+  'routes',
+  'id',
+  'url'
+]
 
 const defaults = {
   name: 'serverless',
@@ -27,10 +35,15 @@ const defaults = {
 
 class WebSockets extends Component {
   async default(inputs = {}) {
-
     const config = mergeDeepRight(defaults, inputs)
-    const apig2 = new aws.ApiGatewayV2({ region: config.region, credentials: this.context.credentials.aws })
-    const lambda = new aws.Lambda({ region: config.region, credentials: this.context.credentials.aws })
+    const apig2 = new aws.ApiGatewayV2({
+      region: config.region,
+      credentials: this.context.credentials.aws
+    })
+    const lambda = new aws.Lambda({
+      region: config.region,
+      credentials: this.context.credentials.aws
+    })
 
     this.cli.status(`Deploying`)
 
@@ -64,7 +77,11 @@ class WebSockets extends Component {
     // deploy the API
     await createDeployment({ apig2, id: config.id, deploymentStage: this.context.stage })
 
-    config.url = getWebsocketUrl({ id: config.id, region: config.region, deploymentStage: this.context.stage })
+    config.url = getWebsocketUrl({
+      id: config.id,
+      region: config.region,
+      deploymentStage: this.context.stage
+    })
 
     // if the user has changed the id,
     // remove the previous API
@@ -85,7 +102,10 @@ class WebSockets extends Component {
   async remove(inputs = {}) {
     const config = { ...defaults, ...inputs }
     config.id = config.id || this.state.id
-    const apig2 = new aws.ApiGatewayV2({ region: config.region, credentials: this.context.credentials.aws })
+    const apig2 = new aws.ApiGatewayV2({
+      region: config.region,
+      credentials: this.context.credentials.aws
+    })
 
     this.cli.status(`Removing`)
 

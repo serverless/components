@@ -1,9 +1,4 @@
-const path = require('path')
-const cli = require('../cli')
-const {
-  readState,
-  writeState
-} = require('../../utils')
+const { readState, writeState, loadComponent } = require('../../utils')
 
 /**
  * Component core class
@@ -18,10 +13,9 @@ const {
 
 class Component {
   constructor(config) {
-
     // Set id
-    let name = config.name || this.constructor.name
-    let stage = config.context.stage || 'dev'
+    const name = config.name || this.constructor.name
+    const stage = config.context.stage || 'dev'
     this.id = config.id || `${stage}.${name}`
 
     // Set context
@@ -31,11 +25,22 @@ class Component {
     this.state = readState(this.id)
 
     // Add CLI utilities
-    this.cli = {}
-    this.cli.log = (log) => {cli.renderLog(log, this.context.verbose ? this.id : name)}
-    this.cli.status = (status) => {cli.renderStatus(this.context.verbose, status, this.context.verbose ? this.id : name)}
-    this.cli.warn = (warning) => {cli.renderWarning(warning, this.context.verbose ? this.id : name)}
-    this.cli.outputs = (outputs, entity) => {cli.renderOutputs(outputs, entity || (this.context.verbose ? this.id : name))}
+    // we need to keep the entire instance in memory to pass it to child components
+    this.cli = {
+      _: config.cli
+    }
+    this.cli.log = (log) => {
+      this.cli._.renderLog(log, this.context.verbose ? this.id : name)
+    }
+    this.cli.status = (status) => {
+      this.cli._.renderStatus(this.context.verbose, status, this.context.verbose ? this.id : name)
+    }
+    this.cli.warn = (warning) => {
+      this.cli._.renderWarning(warning, this.context.verbose ? this.id : name)
+    }
+    this.cli.outputs = (outputs, entity) => {
+      this.cli._.renderOutputs(outputs, entity || (this.context.verbose ? this.id : name))
+    }
 
     // Define default function
     // Adds the instance context to it
@@ -74,30 +79,31 @@ class Component {
     return writeState(this.id, this.state)
   }
 
-  load(componentName, componentAlias) {
-    try {
-      let componentPath = path.resolve(__dirname, '../../../components', componentName, 'serverless')
-      let childComponent = require(componentPath)
-      childComponent = new childComponent({
-        id: `${this.id}.${componentAlias || childComponent.name}`,
-        context: this.context,
-      })
+  async load(componentNameOrPath, componentAlias) {
+    const childComponent = await loadComponent(componentNameOrPath)
+    const childComponentInstance = new childComponent({
+      id: `${this.id}.${componentAlias || childComponent.name}`,
+      context: this.context,
+      cli: this.cli._
+    })
 
-      // If not verbose, replace outputs w/ empty function to silence child Components
-      if (!this.context.verbose) {
-        childComponent.cli.log = () => {return}
-        childComponent.cli.status = () => {return}
-        childComponent.cli.warn = () => {return}
-        childComponent.cli.outputs = () => {return}
+    // If not verbose, replace outputs w/ empty function to silence child Components
+    if (!this.context.verbose) {
+      childComponentInstance.cli.log = () => {
+        return
       }
-
-      // TODO: If terminal is very narrow, only show status as "Running"
-
-      return childComponent
-    } catch (e) {
-      console.log(e)
-      throw Error(`Component "${componentName}" does not exist`)
+      childComponentInstance.cli.status = () => {
+        return
+      }
+      childComponentInstance.cli.warn = () => {
+        return
+      }
+      childComponentInstance.cli.outputs = () => {
+        return
+      }
     }
+
+    return childComponentInstance
   }
 }
 
