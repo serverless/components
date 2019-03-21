@@ -1,7 +1,0 @@
-type: ${env.TYPE_NAME}
-version: ${env.VERSION_NUMBER}
-
-inputTypes:
-  name:
-    type: string
-    default: my-function

@@ -1,6 +1,0 @@
-type: await-child-components
-version: 0.0.1
-
-components:
-  awaitChildComponents:
-    type: tests-integration-await-child-components
