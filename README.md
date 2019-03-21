@@ -1,5 +1,7 @@
 [![Serverless Componentadsds](https://s3.amazonaws.com/assets.github.serverless/serverless-components-readme-2.gif)](http://serverless.com)
 
+&nbsp;
+
 * [Chat App](./examples/chat-app)
 * [Realtime App](./examples/realtime-app)
 * [Websockets Backend](./examples/socket)
