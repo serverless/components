@@ -12,7 +12,8 @@ const isPathComponent = async (query) => {
   return fileExists(externalComponentPath)
 }
 
-const isGitComponent = (query) => query.split('/').length === 2 && !query.startsWith('.')
+const isGitComponent = (query) =>
+  query.split('/').length === 2 && !query.startsWith('.') && !query.startsWith('@')
 
 const loadComponent = async (query) => {
   if (isRegistryComponent(query)) {
