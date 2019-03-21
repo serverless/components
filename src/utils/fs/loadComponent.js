@@ -40,8 +40,8 @@ const loadComponent = async (query) => {
     // todo check if external component is using a compatible version of core
     return require(downloadedComponentPath)
   }
-  const npmComponentPath = path.join(process.cwd(), 'node_modules', query)
-  return require(npmComponentPath)
+
+  return require(query)
 }
 
 module.exports = loadComponent
