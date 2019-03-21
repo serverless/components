@@ -1,4 +1,4 @@
-[![Serverless Components](https://s3.amazonaws.com/assets.github.serverless/readme-serverless-components-1.png)](http://serverless.com)
+[![Serverless Componentadsds](https://s3.amazonaws.com/assets.github.serverless/serverless-components-readme-2.gif)](http://serverless.com)
 
 * [Chat App](./examples/chat-app)
 * [Realtime App](./examples/realtime-app)
@@ -18,7 +18,7 @@ Deploy serverless infrastructure, or an **entire serverless outcome** (e.g. a fu
 name: my-realtime-app
 
 components:
-  RealtimeApp::realtime-app:
+  RealtimeApp@0.1.::realtime-app:
     frontend:
       assets: ./frontend
     backend:
@@ -26,7 +26,7 @@ components:
 ```
 
 ```console
-$ realtime-app: sf
+$ realtime-app: components
 
   realtime-app › outputs:
   frontend:
@@ -40,16 +40,10 @@ $ realtime-app: sf
 
 ## Get Started
 
-Clone repo.
+Install components.
 
 ```console
-$ git clone https://github.com/serverless/components.git
-```
-
-Install dependencies.
-
-```console
-$ cd components && npm link
+$ npm i -g @serverless/components
 ```
 
 Go into an [example](./examples).
@@ -65,15 +59,15 @@ AWS_ACCESS_KEY_ID=123456789
 AWS_SECRET_ACCESS_KEY=987654321
 ```
 
-Run `$ sf`.
+Run `$ components`.
 
 ```console
-$ chat-app: sf
+$ chat-app: components
 
   chat-app › outputs:
   url:  'http://chatapp-5m53dym.s3-website-us-east-1.amazonaws.com'
 
-  12s › dev › my-chat-app › done
+  60s › dev › my-chat-app › done
 ```
 
 Leverage stage-specific environment variables by creating `.env` files per stage:
@@ -86,10 +80,17 @@ Leverage stage-specific environment variables by creating `.env` files per stage
 
 ## How To Write A Serverless Component
 
+Install `@serverless/components` as a local dependency.
+
+```
+npm i --save @serverless/components
+``` 
+
 Use a `serverless.js` file, extend the Component class and add a `default` method.
 
 ```javascript
 // serverless.js
+const { Component } = require('@serverless/components')
 
 class MyComponent extends Component {
 
@@ -129,7 +130,7 @@ class MyComponent extends Component {
 
 ```
 
-`this` comes loaded with lots of utilites which you can use.
+`this` comes loaded with lots of utilities which you can use.
 
 
 ```javascript

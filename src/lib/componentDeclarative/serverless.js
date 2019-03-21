@@ -1,6 +1,6 @@
 /*
  * Component Declarative
- * - Use Serverless Framework w/
+ * - Use Serverless Components without JS
  */
 
 const path = require('path')

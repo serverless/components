@@ -225,7 +225,7 @@ const run = async (config = {}, cli = cliInstance) => {
       `No Serverless file (serverless.js, serverless.yml, serverless.yaml or serverless.json) found in ${process.cwd()}`
     )
   } catch (error) {
-    return errorHandler(error, 'Serverless Framework')
+    return errorHandler(error, 'Serverless Components')
   }
 }
 

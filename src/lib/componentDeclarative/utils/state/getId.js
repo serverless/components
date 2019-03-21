@@ -1,4 +1,4 @@
-// this is the "long" `id` the Framework uses internally
+// this is the "long" `id` the core uses internally
 function getId(fileName) {
   return fileName
     .split('.')

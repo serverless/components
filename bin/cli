@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /*
- * Serverless Framework 2 – Command Line Interface
+ * Serverless Components – Command Line Interface
  */
 
 const args = require('minimist')(process.argv.slice(2))
