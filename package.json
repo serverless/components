@@ -1,11 +1,10 @@
 {
   "name": "@serverless/components",
-  "version": "0.0.1",
-  "description": "N/A",
+  "version": "0.1.3",
+  "description": "Deploy serverless infrastructure, or an entire serverless outcome (e.g. a fullstack realtime app) in seconds",
   "main": "./src/index.js",
   "bin": {
-    "components": "./bin/cli",
-    "sf": "./bin/cli"
+    "components": "./bin/cli"
   },
   "publishConfig": {
     "access": "public"

@@ -1,4 +1,3 @@
-const cli = require('../cli')
 const { readState, writeState, loadComponent } = require('../../utils')
 
 /**
@@ -26,18 +25,21 @@ class Component {
     this.state = readState(this.id)
 
     // Add CLI utilities
-    this.cli = {}
+    // we need to keep the entire instance in memory to pass it to child components
+    this.cli = {
+      _: config.cli
+    }
     this.cli.log = (log) => {
-      cli.renderLog(log, this.context.verbose ? this.id : name)
+      this.cli._.renderLog(log, this.context.verbose ? this.id : name)
     }
     this.cli.status = (status) => {
-      cli.renderStatus(this.context.verbose, status, this.context.verbose ? this.id : name)
+      this.cli._.renderStatus(this.context.verbose, status, this.context.verbose ? this.id : name)
     }
     this.cli.warn = (warning) => {
-      cli.renderWarning(warning, this.context.verbose ? this.id : name)
+      this.cli._.renderWarning(warning, this.context.verbose ? this.id : name)
     }
     this.cli.outputs = (outputs, entity) => {
-      cli.renderOutputs(outputs, entity || (this.context.verbose ? this.id : name))
+      this.cli._.renderOutputs(outputs, entity || (this.context.verbose ? this.id : name))
     }
 
     // Define default function
@@ -81,7 +83,8 @@ class Component {
     const childComponent = await loadComponent(componentNameOrPath)
     const childComponentInstance = new childComponent({
       id: `${this.id}.${componentAlias || childComponent.name}`,
-      context: this.context
+      context: this.context,
+      cli: this.cli._
     })
 
     // If not verbose, replace outputs w/ empty function to silence child Components

@@ -5,16 +5,7 @@ const fileExists = require('./fileExists')
 const downloadComponent = require('./downloadComponent')
 const getComponentLatestVersion = require('./getComponentLatestVersion')
 
-const getCoreComponent = async (componentName) => {
-  const coreComponentPath = path.join(root, 'components', componentName, 'serverless.js')
-  if (await fileExists(coreComponentPath)) {
-    return require(coreComponentPath)
-  }
-  return null
-}
-
-const isCommunityComponent = (query) =>
-  registry[query] || (query.includes('@') && registry[query.split('@')[0]])
+const isRegistryComponent = (query) => query.includes('@') && registry[query.split('@')[0]]
 
 const isPathComponent = async (query) => {
   const externalComponentPath = path.resolve(path.join(query, 'serverless.js'))
@@ -24,20 +15,13 @@ const isPathComponent = async (query) => {
 const isGitComponent = (query) => query.split('/').length === 2 && !query.startsWith('.')
 
 const loadComponent = async (query) => {
-  const coreComponent = await getCoreComponent(query)
-
-  if (coreComponent) {
-    return coreComponent
-  } else if (isCommunityComponent(query)) {
+  if (isRegistryComponent(query)) {
     // community component
     const name = query.split('@')[0]
 
     const url = registry[name].repo
     const ownerRepo = url.replace('https://github.com/', '')
-
-    const owner = ownerRepo.split('/')[0]
-    const repo = ownerRepo.split('/')[1]
-    const version = query.split('@')[1] || (await getComponentLatestVersion(owner, repo))
+    const version = query.split('@')[1]
 
     const ownerRepoVersion = `${ownerRepo}#${version}`
     const dirName = `${name}@${version}`
@@ -55,8 +39,8 @@ const loadComponent = async (query) => {
     // todo check if external component is using a compatible version of core
     return require(downloadedComponentPath)
   }
-
-  throw Error(`Component ${query} not found`)
+  const npmComponentPath = path.join(process.cwd(), 'node_modules', query)
+  return require(npmComponentPath)
 }
 
 module.exports = loadComponent

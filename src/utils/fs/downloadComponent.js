@@ -28,13 +28,13 @@ const downloadComponent = async (gitRepoBranch, componentDirName) => {
   const componentDirPath = path.join(localRegistryPath, componentDirName || gitRepoBranchHash)
 
   if (await dirExists(componentDirPath)) {
-    return componentDirPath
+    return path.join(componentDirPath, 'serverless.js')
   }
 
   try {
     await downloadGitRepo(gitRepoBranch, componentDirPath)
-    await exec('npm i', { cwd: componentDirPath })
-    return componentDirPath
+    await exec('npm i --only=prod', { cwd: componentDirPath })
+    return path.join(componentDirPath, 'serverless.js')
   } catch (e) {
     // if an error happened in between, we'd have a broken component that we can't overwrite
     // so we gotta remove that broken component from the local cache

@@ -25,13 +25,14 @@ const runProgrammatic = async (filePath, config, cli) => {
   const context = new Context(config)
 
   const Component = require(filePath)
-  const component = new Component({ context })
 
   // Config CLI
   cli.config({
     stage: config.stage,
     parentComponent: Component.name
   })
+
+  const component = new Component({ context, cli })
 
   try {
     // If method was provided, but doesn't exist, throw error
@@ -81,7 +82,8 @@ const runDeclarative = async (filePath, config, cli) => {
     try {
       component = new ComponentDeclarative({
         name: fileContent.name, // Must pass in name to ComponentDeclaractive
-        context
+        context,
+        cli
       })
       result = await component()
     } catch (error) {
@@ -99,7 +101,8 @@ const runDeclarative = async (filePath, config, cli) => {
 
     component = new ComponentDeclarative({
       name: fileContent.name, // Must pass in name to ComponentDeclaractive
-      context
+      context,
+      cli
     })
     try {
       result = await component[config.method]()
@@ -141,7 +144,8 @@ const runDeclarative = async (filePath, config, cli) => {
     Component = await loadComponent(componentName)
     component = new Component({
       id: `${context.stage}.${fileContent.name}.${instanceName}`, // Construct correct name of child Component
-      context
+      context,
+      cli
     })
     try {
       result = await component[config.method]()
