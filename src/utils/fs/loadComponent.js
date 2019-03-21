@@ -41,7 +41,16 @@ const loadComponent = async (query) => {
     return require(downloadedComponentPath)
   }
 
-  return require(query)
+  try {
+    // in case of programatic usage of npm deps, this should work
+    // because the running core sits next to the component
+    return require(query)
+  } catch (e) {
+    // in case of declarative usage of npm deps, this should work
+    // because the running core is the global one
+    const npmComponentPath = path.join(process.cwd(), 'node_modules', query)
+    return require(npmComponentPath)
+  }
 }
 
 module.exports = loadComponent
