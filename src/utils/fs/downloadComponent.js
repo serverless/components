@@ -33,7 +33,7 @@ const downloadComponent = async (gitRepoBranch, componentDirName) => {
 
   try {
     await downloadGitRepo(gitRepoBranch, componentDirPath)
-    await exec('npm i --only=prod', { cwd: componentDirPath })
+    await exec('npm install', { cwd: componentDirPath })
     return path.join(componentDirPath, 'serverless.js')
   } catch (e) {
     // if an error happened in between, we'd have a broken component that we can't overwrite
