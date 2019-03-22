@@ -22,7 +22,7 @@ async function prepareComponents(components, that) {
           instance,
           inputs
         },
-        accum
+        await accum
       )
     },
     {},
