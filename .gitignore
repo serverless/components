@@ -18,3 +18,5 @@ dist
 build/
 .env*
 env.js
+tmp
+package-lock.json
