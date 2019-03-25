@@ -3,7 +3,7 @@ const { reduce } = require('../../../utils')
 const { ROOT_NODE_NAME } = require('../constants')
 const { types } = require('./variables')
 
-function createGraph(componentsToRun, variableObjects) {
+function createGraph(componentsToRun, componentsToRemove, variableObjects) {
   let dag = new Graph()
 
   // reduce over all the variables and add the corresponding
@@ -27,12 +27,24 @@ function createGraph(componentsToRun, variableObjects) {
   // reduce over all the components we run and add all instances to the graph
   dag = reduce(
     (accum, instanceId) => {
-      accum.setNode(instanceId)
+      accum.setNode(instanceId, 'default')
       return accum
     },
     dag,
     Object.keys(componentsToRun)
   )
+
+  // check if there are components which should be removed
+  if (componentsToRemove && Object.keys(componentsToRemove).length) {
+    dag = reduce(
+      (accum, instanceId) => {
+        accum.setNode(instanceId, 'remove')
+        return accum
+      },
+      dag,
+      Object.keys(componentsToRemove)
+    )
+  }
 
   // create a `root` node and add all nodes which are not dependent on other nodes
   // this `root` node will be used to walk the graph later on

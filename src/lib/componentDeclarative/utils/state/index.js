@@ -1,11 +1,9 @@
-const getComponentId = require('./getComponentId')
 const getFileNames = require('./getFileNames')
-const getId = require('./getId')
 const load = require('./load')
+const save = require('./save')
 
 module.exports = {
-  getComponentId,
   getFileNames,
-  getId,
-  load
+  load,
+  save
 }
