@@ -1,4 +1,4 @@
-[![Serverless Componentadsds](https://s3.amazonaws.com/assets.github.serverless/serverless-components-readme-2.gif)](http://serverless.com)
+[![Serverless Components](https://s3.amazonaws.com/assets.github.serverless/serverless-components-readme-2.gif)](http://serverless.com)
 
 &nbsp;
 
