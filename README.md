@@ -2,11 +2,11 @@
 
 &nbsp;
 
-* [Chat App](./examples/chat-app)
-* [Realtime App](./examples/realtime-app)
-* [Websockets Backend](./examples/socket)
-* [Website](./examples/website)
-* [AWS Lambda Function](./examples/aws-lambda)
+* [Chat App](./templates/chat-app)
+* [Realtime App](./templates/realtime-app)
+* [Websockets Backend](./templates/socket)
+* [Website](./templates/website)
+* [AWS Lambda Function](./templates/aws-lambda)
 
 &nbsp;
 
@@ -48,7 +48,7 @@ Install components.
 $ npm i -g @serverless/components
 ```
 
-Go into an [example](./examples).
+Go into a [template](./templates).
 
 ```console
 $ cd examples/chat-app
