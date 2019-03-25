@@ -4,7 +4,7 @@
 
 * [Chat App](./templates/chat-app)
 * [Realtime App](./templates/realtime-app)
-* [Websockets Backend](./templates/socket)
+* [Websockets Backend](./templates/websockets-backend)
 * [Website](./templates/website)
 * [AWS Lambda Function](./templates/aws-lambda)
 
