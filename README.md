@@ -9,6 +9,8 @@ It does not seek to be another general infrastructure provisioning tool (e.g. Cl
 This enables provisioning use-cases, alongside infrastructure, in the same configuration file, for rapid development.
 
 ```yaml
+# serverless.yml
+
 name: my-blog
 
 # higher-level abstraction
