@@ -19,12 +19,11 @@ Deploy serverless infrastructure, or an **entire serverless outcome** (e.g. a fu
 
 name: my-realtime-app
 
-components:
-  RealtimeApp@0.1.1::realtime-app:
-    frontend:
-      assets: ./frontend
-    backend:
-      assets: ./backend
+RealtimeApp@0.1.1::realtime-app:
+  frontend:
+    assets: ./frontend
+  backend:
+    assets: ./backend
 ```
 
 ```console
