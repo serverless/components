@@ -1,4 +1,8 @@
 {
+  "AwsApiGateway": {
+    "description": "A serverless component that provisions an AWS API Gateway REST API",
+    "repo": "https://github.com/serverless-components/AwsApiGateway"
+  },
   "AwsDynamoDb": {
     "description": "A serverless component that provisions a DynamoDB table",
     "repo": "https://github.com/serverless-components/AwsDynamoDb"
