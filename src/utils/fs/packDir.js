@@ -7,14 +7,20 @@ const path = require('path')
 const VALID_FORMATS = ['zip', 'tar']
 const isValidFormat = (format) => contains(format, VALID_FORMATS)
 
-const packDir = async (inputDirPath, outputFilePath, include = [], prefix) => {
+const packDir = async (inputDirPath, outputFilePath, include = [], exclude = [], prefix) => {
   const format = last(split('.', outputFilePath))
 
   if (!isValidFormat(format)) {
     throw new Error('Please provide a valid format. Either a "zip" or a "tar"')
   }
 
-  const files = (await globby(['**'], { cwd: inputDirPath }))
+  const patterns = ['**']
+
+  if (!isEmpty(exclude)) {
+    exclude.forEach((excludedItem) => patterns.push(`!${excludedItem}`))
+  }
+
+  const files = (await globby(patterns, { cwd: inputDirPath }))
     .sort() // we must sort to ensure correct hash
     .map((file) => ({
       input: path.join(inputDirPath, file),
@@ -38,7 +44,7 @@ const packDir = async (inputDirPath, outputFilePath, include = [], prefix) => {
       if (!isEmpty(include)) {
         include.forEach((file) => {
           const stream = createReadStream(file)
-          archive.append(stream, { name: path.basename(file) })
+          archive.append(stream, { name: path.basename(file), date: new Date(0) })
         })
       }
 
