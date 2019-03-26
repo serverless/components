@@ -1,0 +1,5 @@
+name: my-websockets-backend
+stage: dev
+
+Socket@0.1.0::websockets-backend:
+  code: ./code

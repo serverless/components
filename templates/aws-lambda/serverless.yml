@@ -1,0 +1,4 @@
+name: my-aws-lambda
+stage: dev
+
+AwsLambda@0.1.1::aws-lambda:

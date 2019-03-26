@@ -1,5 +1,3 @@
-node_modules
-tmp
-dist
 coverage
-examples/blog/*
+dist
+node_modules

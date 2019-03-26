@@ -1,8 +1,0 @@
-type: exmaple-component
-version: 1.0.0
-#This component is ONLY compatible with 0.2.x versions of components core
-core: 0.1.x
-
-inputTypes:
-  foo:
-    type: string

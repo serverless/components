@@ -1,13 +1,29 @@
-// eslint-disable-next-line no-underscore-dangle
-if (!global._babelPolyfill) {
-  // eslint-disable-next-line global-require
-  require('babel-polyfill')
-}
+/*
+ * Serverless Components
+ */
 
-const run = require('./run')
-const commands = require('./commands')
+const { pick } = require('ramda')
+const Component = require('./lib/component/serverless')
+const utils = require('./utils')
+
+// choose useful utils to export for component author
+const utilsToExport = [
+  'dirExists',
+  'fileExists',
+  'hashFile',
+  'isArchivePath',
+  'isJsonPath',
+  'isYamlPath',
+  'packDir',
+  'parseFile',
+  'readFile',
+  'readFileIfExists',
+  'writeFile',
+  'sleep',
+  'titelize'
+]
 
 module.exports = {
-  run,
-  ...commands
+  Component,
+  ...pick(utilsToExport, utils)
 }
