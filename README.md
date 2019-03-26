@@ -50,7 +50,7 @@ $ npm i -g @serverless/components
 Go into a [template](./templates).
 
 ```console
-$ cd examples/chat-app
+$ cd templates/chat-app
 ```
 
 Add provider credentials (all examples currently require [AWS](https://aws.amazon.com/) credentials).  Serverless Components supports `.env` files in the same folder as `serverless.yml` or `serverless.js`.  Create a `.env` that looks like this:
