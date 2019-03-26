@@ -1,0 +1,12 @@
+name: my-realtime-app
+stage: dev
+
+RealtimeApp@0.1.1::realtime-app:
+  frontend:
+    assets: ./frontend
+  backend:
+    assets: ./backend
+    env:
+      dbMessages: ${comp:messages.name}
+AwsDynamoDb@0.1.0::messages:
+  name: ${name}-messages

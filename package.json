@@ -1,0 +1,53 @@
+{
+  "name": "@serverless/components",
+  "version": "0.1.7",
+  "description": "Deploy serverless infrastructure, or an entire serverless outcome (e.g. a fullstack realtime app) in seconds",
+  "main": "./src/index.js",
+  "bin": {
+    "components": "./bin/cli",
+    "sc": "./bin/cli"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint . --fix --cache"
+  },
+  "author": "Serverless, Inc.",
+  "license": "MIT",
+  "dependencies": {
+    "ansi-escapes": "^3.2.0",
+    "archiver": "^3.0.0",
+    "aws-sdk": "^2.387.0",
+    "axios": "^0.18.0",
+    "chalk": "^2.4.2",
+    "chokidar": "^2.1.2",
+    "dotenv": "^6.2.0",
+    "download-git-repo": "^1.1.0",
+    "enquirer": "^2.3.0",
+    "figures": "^2.0.0",
+    "fs-extra": "^7.0.1",
+    "globby": "^9.1.0",
+    "graphlib": "^2.1.7",
+    "js-yaml": "^3.12.1",
+    "klaw-sync": "^6.0.0",
+    "mime-types": "^2.1.21",
+    "minimist": "^1.2.0",
+    "ramda": "^0.26.1",
+    "s3-stream-upload": "^2.0.2",
+    "semver-regex": "^2.0.0",
+    "semver-sort": "0.0.4",
+    "strip-ansi": "^5.0.0",
+    "traverse": "^0.6.6",
+    "ws": "^6.1.2"
+  },
+  "devDependencies": {
+    "babel-eslint": "9.0.0",
+    "eslint": "5.6.0",
+    "eslint-config-prettier": "^3.6.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-prettier": "^3.0.1",
+    "prettier": "^1.15.3"
+  }
+}
