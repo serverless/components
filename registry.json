@@ -23,6 +23,10 @@
     "description": "A serverless component that provisions a websockets API",
     "repo": "https://github.com/serverless-components/AwsWebSockets"
   },
+  "AwsApiGateway": {
+    "description": "A serverless component that provisions an API Gateway API",
+    "repo": "https://github.com/serverless-components/AwsApiGateway"
+  },
   "ChatApp": {
     "description": "A serverless component that provisions a chat app",
     "repo": "https://github.com/serverless-components/ChatApp"
