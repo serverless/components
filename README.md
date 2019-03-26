@@ -4,9 +4,9 @@
 
 **Serverless Components** is framework for easily provisioning and sharing application components on ~~cloud~~ serverless services.  
 
-It does not seek to be another general infrastructure provisioning tool (e.g. Cloudformation, Terraform), but a solution that enables developers to build their own reusable, shareable abstractions on top of infrastructure.
+It does not seek to be another general infrastructure provisioning tool (e.g. Cloudformation, Terraform), but a solution that enables developers to build their own reusable, shareable abstractions on top of infrastructure, that are closer to the use-case they are seeking to build (e.g. a Blog, Payment Processor, Realtime Application)
 
-This enables provisioning use-cases, alongside infrastructure, in the same configuration file, for rapid development.
+These Components are use-case focused, and you can deploy them alongside infrastructure, in the same configuration file.
 
 ```yaml
 # serverless.yml
