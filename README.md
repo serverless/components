@@ -18,8 +18,8 @@ Comments@2.1.0:comments:
   region: us-east-1
 
 # infrastructure
-AwsDynamoDb@1.2.1:comments-database:
-  autoscaling: true
+AwsLambda@1.2.1:listPosts:
+  memorySize: 1024
 ```
 
 
