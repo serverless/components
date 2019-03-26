@@ -2,6 +2,29 @@
 
 &nbsp;
 
+**Serverless Components** is framework for easily provisioning and sharing application components on ~~cloud~~ serverless services.  
+
+It does not seek to be another general infrastructure provisioning tool (e.g. Cloudformation, Terraform), but a solution that enables developers to build their own reusable, shareable abstractions on top of cloud services.
+
+This enables provisioning use-cases, alongside infrastructure, in the same configuration file, for rapid development.
+
+```yaml
+name: my-blog
+
+# higher-level abstraction
+Comments@2.1.0:comments:
+  region: us-east-1
+
+# infrastructure
+AwsDynamoDb@1.2.1:comments-database:
+  autoscaling: true
+```
+
+
+&nbsp;
+
+Here are some easy examples to get your started:
+
 * [Chat App](./templates/chat-app)
 * [Realtime App](./templates/realtime-app)
 * [Websockets Backend](./templates/websockets-backend)
