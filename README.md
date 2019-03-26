@@ -25,7 +25,7 @@ AwsDynamoDb@1.2.1:comments-database:
 
 &nbsp;
 
-Here are some easy examples to get your started:
+Here are some easy examples which you can deploy instantly to get started:
 
 * [Chat App](./templates/chat-app)
 * [Realtime App](./templates/realtime-app)
