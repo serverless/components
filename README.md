@@ -204,7 +204,7 @@ class MyComponent extends Component {
 
 To see a list of the available components you could use as children, checkout the [`registry.json`](./registry.json) file and checkout the referenced repos.
 
-### How to Publish a Serverless Component
+## How to Publish a Serverless Component
 
 Just publish your component to npm as you normally would with any package. The only caveat is that you'll need to point your `main` property to the `serverless.js` file. Now anyone could use your new component programmatically.
 
