@@ -63,6 +63,12 @@ class ComponentDeclarative extends Component {
             return
           }
           const value = components[instanceId]
+
+          // If component instance was not found, the variable is for an invalid instance
+          if (!value) {
+            throw new Error(`Invalid variable detected.  Component instance "${instanceId}" does not exist in this configuration file.`)
+          }
+
           let inputs = value.inputs // eslint-disable-line
           const { component, instance } = value
           inputs = variables.resolveComponentVariables(vars, results, value)
