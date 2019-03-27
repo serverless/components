@@ -1,6 +1,6 @@
 name: my-api
 
-AwsLambda@0.1.1::myLambda:
+AwsLambda@0.1.4::myLambda:
   name: ${name}-lambda
   code: ./code
   handler: index.handler

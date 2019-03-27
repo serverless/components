@@ -31,6 +31,7 @@ Here are some easy examples which you can deploy instantly to get started:
 * [Realtime App](./templates/realtime-app)
 * [Websockets Backend](./templates/websockets-backend)
 * [Website](./templates/website)
+* [API](./templates/api)
 * [AWS Lambda Function](./templates/aws-lambda)
 
 &nbsp;
@@ -178,12 +179,13 @@ class MyComponent extends Component {
     this.state.name = 'myComponent'
     await this.save()
 
-    // Load a child Component
-    let website = this.load('Website')
+    // Load a child Component. This assumes you have the "@serverless/website" component
+    // in your "package.json" file and ran "npm install"
+    let website = await this.load('@serverless/website')
 
     // If you are deploying multiple instances of the same Component, include an instance id. This also pre-fills them with any existing state.
-    let website1 = this.load('Website', 'website1')
-    let website2 = this.load('Website', 'website2')
+    let website1 = await this.load('@serverless/website', 'website1')
+    let website2 = await this.load('@serverless/website', 'website2')
 
     // Call the default method on a Component
     let websiteOutputs = await website({ region: 'us-east-1' })
@@ -209,6 +211,22 @@ class MyComponent extends Component {
 }
 ```
 
+To see a list of the available components you could use as children, checkout the [`registry.json`](./registry.json) file and checkout the referenced repos.
+
+### How to Publish a Serverless Component
+
+Just publish your component to npm as you normally would with any package. The only caveat is that you'll need to point your `main` property to the `serverless.js` file. Now anyone could use your new component programmatically.
+
+If you'd like users to be able to use your component declaratively in `serverless.yml` as well, tag and push your released version [(e.g. `0.1.4`)](https://github.com/serverless-components/AwsLambda/releases/tag/0.1.4) to Github, then add your component to [the `registry.json` file](./registry.json). Users could then use your component like this:
+
+```yml
+
+yourComponent@0.1.4::yourComponentInstance
+  firstInput: first-input
+  secondInput: second-input
+  
+```
+
 ### Reserved Inputs
 
 These can not be used as inputs for your Component and are reserved by the CLI.  They can be accessed in your Component within `this.context`.
@@ -226,6 +244,6 @@ Good luck.
 
 **Created By**
 
-* Eslam Hefnawy - @eahefnawy
-* Philipp Muens - @pmmuens
-* Austen Collins - @austencollins
+* Eslam Hefnawy - [@eahefnawy](https://github.com/eahefnawy)
+* Philipp Muens - [@pmmuens](https://github.com/pmmuens)
+* Austen Collins - [@austencollins](https://github.com/austencollins)
