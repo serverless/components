@@ -2,7 +2,7 @@
 
 &nbsp;
 
-**Serverless Components** is framework for easily provisioning and sharing application components on ~~cloud~~ serverless services.  
+**Serverless Components** is framework for easily provisioning and sharing application components on ~~cloud~~ serverless services.
 
 It does not seek to be another general infrastructure provisioning tool (e.g. Cloudformation, Terraform), but a solution that enables developers to build their own reusable abstractions on top of infrastructure, that resemble the use-case they are seeking to build (e.g. a Blog, Payment Processor, Realtime Application)
 
@@ -22,17 +22,16 @@ AwsLambda@1.2.1:listPosts:
   memorySize: 1024
 ```
 
-
 &nbsp;
 
 Here are some easy examples which you can deploy instantly to get started:
 
-* [Chat App](./templates/chat-app)
-* [Realtime App](./templates/realtime-app)
-* [Websockets Backend](./templates/websockets-backend)
-* [Website](./templates/website)
-* [API](./templates/api)
-* [AWS Lambda Function](./templates/aws-lambda)
+- [Chat App](./templates/chat-app)
+- [Realtime App](./templates/realtime-app)
+- [Websockets Backend](./templates/websockets-backend)
+- [Website](./templates/website)
+- [API](./templates/api)
+- [AWS Lambda Function](./templates/aws-lambda)
 
 &nbsp;
 
@@ -79,7 +78,7 @@ Go into a [template](./templates).
 $ cd templates/chat-app
 ```
 
-Add provider credentials (all examples currently require [AWS](https://aws.amazon.com/) credentials).  Serverless Components supports `.env` files in the same folder as `serverless.yml` or `serverless.js`.  Create a `.env` that looks like this:
+Add provider credentials (all examples currently require [AWS](https://aws.amazon.com/) credentials). Serverless Components supports `.env` files in the same folder as `serverless.yml` or `serverless.js`. Create a `.env` that looks like this:
 
 ```text
 AWS_ACCESS_KEY_ID=123456789
@@ -111,7 +110,7 @@ Install `@serverless/components` as a local dependency.
 
 ```
 npm i --save @serverless/components
-``` 
+```
 
 Use a `serverless.js` file, extend the Component class and add a `default` method.
 
@@ -120,52 +119,44 @@ Use a `serverless.js` file, extend the Component class and add a `default` metho
 const { Component } = require('@serverless/components')
 
 class MyComponent extends Component {
-
-  async default() { } // The default functionality to run/provision/update your Component
-
+  async default() {} // The default functionality to run/provision/update your Component
 }
 ```
 
-`default` is always required.  Other methods are optional.
+`default` is always required. Other methods are optional.
 
 ```javascript
 // serverless.js
 
 class MyComponent extends Component {
+  /*
+   * Default (Required)
+   * - The default functionality to run/provision/update your Component
+   */
+
+  async default() {}
 
   /*
-  * Default (Required)
-  * - The default functionality to run/provision/update your Component
-  */
+   * Remove (Optional)
+   * - If your Component removes infrastructure, this is recommended.
+   */
 
-  async default() { }
-
-  /*
-  * Remove (Optional)
-  * - If your Component removes infrastructure, this is recommended.
-  */
-
-  async remove() { }
+  async remove() {}
 
   /*
-  * Anything (Optional)
-  * - If you want to ship your Component w/ extra functionality, put it in a method.
-  */
+   * Anything (Optional)
+   * - If you want to ship your Component w/ extra functionality, put it in a method.
+   */
 
-  async anything() { }
+  async anything() {}
 }
-
 ```
 
 `this` comes loaded with lots of utilities which you can use.
 
-
 ```javascript
-
 class MyComponent extends Component {
-
   async default() {
-
     // this.context features useful information
     console.log(this.context)
 
@@ -224,26 +215,25 @@ If you'd like users to be able to use your component declaratively in `serverles
 yourComponent@0.1.4::yourComponentInstance
   firstInput: first-input
   secondInput: second-input
-  
+
 ```
 
 ### Reserved Inputs
 
-These can not be used as inputs for your Component and are reserved by the CLI.  They can be accessed in your Component within `this.context`.
+These can not be used as inputs for your Component and are reserved by the CLI. They can be accessed in your Component within `this.context`.
 
-* `stage` `--stage`
-* `root` `--root`
-* `rootFile` `--rootFile`
-* `credentials` `--credentials`
-* `verbose` `--verbose`
-* `debug` `--debug`
-* `watch` `--watch`
+- `stage` `--stage`
+- `root` `--root`
+- `rootFile` `--rootFile`
+- `credentials` `--credentials`
+- `verbose` `--verbose`
+- `debug` `--debug`
+- `watch` `--watch`
 
 Good luck.
 
-
 **Created By**
 
-* Eslam Hefnawy - [@eahefnawy](https://github.com/eahefnawy)
-* Philipp Muens - [@pmmuens](https://github.com/pmmuens)
-* Austen Collins - [@austencollins](https://github.com/austencollins)
+- Eslam Hefnawy - [@eahefnawy](https://github.com/eahefnawy)
+- Philipp Muens - [@pmmuens](https://github.com/pmuens)
+- Austen Collins - [@austencollins](https://github.com/austencollins)
