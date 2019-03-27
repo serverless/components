@@ -235,5 +235,5 @@ Good luck.
 **Created By**
 
 - Eslam Hefnawy - [@eahefnawy](https://github.com/eahefnawy)
-- Philipp Muens - [@pmmuens](https://github.com/pmuens)
+- Philipp Muens - [@pmuens](https://github.com/pmuens)
 - Austen Collins - [@austencollins](https://github.com/austencollins)
