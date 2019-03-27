@@ -1,0 +1,13 @@
+name: my-api
+
+AwsLambda@0.1.1::myLambda:
+  name: ${name}-lambda
+  code: ./code
+  handler: index.handler
+
+AwsApiGateway@0.1.0::myApiGateway:
+  name: ${name}
+  routes:
+    /foo:
+      post:
+        function: ${comp:myLambda.arn}
