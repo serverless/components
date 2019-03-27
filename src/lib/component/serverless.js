@@ -16,6 +16,7 @@ class Component {
     // Set id
     const name = config.name || this.constructor.name
     const stage = config.context.stage || 'dev'
+    this.stage = stage
     this.id = config.id || `${stage}.${name}`
 
     // Set context

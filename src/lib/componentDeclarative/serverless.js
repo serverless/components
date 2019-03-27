@@ -32,7 +32,7 @@ class ComponentDeclarative extends Component {
     const componentsToRun = await prepareComponents(configComponents, this)
     let componentsToRemove = {}
     try {
-      const stateComponents = await state.load()
+      const stateComponents = await state.load(this.stage)
       const stateComponentKeys = Object.keys(stateComponents)
       const configComponentKeys = Object.keys(configComponents)
       const toRemove = difference(stateComponentKeys, configComponentKeys)
@@ -66,7 +66,9 @@ class ComponentDeclarative extends Component {
 
           // If component instance was not found, the variable is for an invalid instance
           if (!value) {
-            throw new Error(`Invalid variable detected: 'comp:${instanceId}'  Component instance '${instanceId}' does not exist in this configuration file.`)
+            throw new Error(
+              `Invalid variable detected: 'comp:${instanceId}'  Component instance '${instanceId}' does not exist in this configuration file.`
+            )
           }
 
           let inputs = value.inputs // eslint-disable-line
@@ -87,7 +89,7 @@ class ComponentDeclarative extends Component {
           if (operation == 'remove') {
             inputs = {}
           }
-          await state.save(component, instanceId, inputs)
+          await state.save(component, instanceId, this.stage, inputs)
           return {
             [instanceId]: outputs
           }
@@ -118,7 +120,7 @@ class ComponentDeclarative extends Component {
     const componentsToRun = await prepareComponents(configComponents, this)
     const componentsToRemove = {}
 
-    const currentState = await state.load()
+    const currentState = await state.load(this.stage)
     const components = { ...componentsToRun, ...componentsToRemove }
     const graph = createGraph(componentsToRun, componentsToRemove, vars)
 
@@ -150,7 +152,7 @@ class ComponentDeclarative extends Component {
           const res = await instance.remove(inputs)
           outputs[instanceId] = res
           // save the component declarative state information
-          await state.save(component, instanceId, {})
+          await state.save(component, instanceId, this.stage, {})
           return {
             [instanceId]: outputs
           }
