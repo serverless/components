@@ -22,7 +22,11 @@ const loadComponent = async (query) => {
 
     const url = registry[name].repo
     const ownerRepo = url.replace('https://github.com/', '')
-    const version = query.split('@')[1]
+    let version = query.split('@')[1]
+
+    if (version.toLowerCase() === 'latest') {
+      version = 'master'
+    }
 
     const ownerRepoVersion = `${ownerRepo}#${version}`
     const dirName = `${name}@${version}`
