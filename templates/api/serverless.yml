@@ -5,9 +5,10 @@ AwsLambda@0.1.4::myLambda:
   code: ./code
   handler: index.handler
 
-AwsApiGateway@0.1.0::myApiGateway:
+AwsApiGateway@0.1.2::myApiGateway:
   name: ${name}
   routes:
     /foo:
       post:
         function: ${comp:myLambda.arn}
+        cors: true
