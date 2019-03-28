@@ -2,6 +2,6 @@ name: my-chat-app
 stage: dev
 
 ChatApp@0.1.3::chat-app:
-  # colorBackground: black
-  # colorInputText: white
-  # logoUrl:
+  # colorBackground: white
+  # colorInputText: black
+  # logoUrl: https://s3.amazonaws.com/assets.sales.serverless/temp/aws.png

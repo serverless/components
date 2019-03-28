@@ -1,0 +1,24 @@
+name: my-realtime-app
+stage: dev
+
+RealtimeApp@0.1.1::realtime-app:
+  frontend:
+    assets: ./frontend/build
+    envFile: ./frontend/src/env.js
+    buildCmd: npm run build
+  backend:
+    assets: ./backend
+    env:
+      connectionsTable: ${comp:connections.name}
+
+AwsDynamoDb@0.1.0::connections:
+  name: ${name}-connections
+  attributeDefinitions:
+    - AttributeName: connectionId
+      AttributeType: S
+  keySchema:
+    - AttributeName: connectionId
+      KeyType: HASH
+  provisionedThroughput:
+    ReadCapacityUnits: 3
+    WriteCapacityUnits: 3
