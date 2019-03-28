@@ -5,10 +5,15 @@ AwsLambda@0.1.4::myLambda:
   code: ./code
   handler: index.handler
 
+AwsIamRole@0.1.1::myApigRole:
+  name: ${name}-role
+  service: 'apigateway.amazonaws.com'
+
 AwsApiGateway@0.1.2::myApiGateway:
-  name: ${name}
+  name: ${name}-gateway
+  role: ${comp:myApigRole}
   routes:
     /foo:
-      post:
+      get:
         function: ${comp:myLambda.arn}
         cors: true
