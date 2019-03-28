@@ -119,11 +119,11 @@ Use a `serverless.js` file, extend the Component class and add a `default` metho
 const { Component } = require('@serverless/components')
 
 class MyComponent extends Component {
-  async default() {} // The default functionality to run/provision/update your Component
+  async default(inputs = {}) {} // The default functionality to run/provision/update your Component
 }
 ```
 
-`default` is always required. Other methods are optional.
+`default` is always required. Other methods are optional. They all take an `inputs` object.
 
 ```javascript
 // serverless.js
@@ -134,21 +134,21 @@ class MyComponent extends Component {
    * - The default functionality to run/provision/update your Component
    */
 
-  async default() {}
+  async default(inputs = {}) {}
 
   /*
    * Remove (Optional)
    * - If your Component removes infrastructure, this is recommended.
    */
 
-  async remove() {}
+  async remove(inputs = {}) {}
 
   /*
    * Anything (Optional)
    * - If you want to ship your Component w/ extra functionality, put it in a method.
    */
 
-  async anything() {}
+  async anything(inputs = {}) {}
 }
 ```
 
@@ -156,7 +156,7 @@ class MyComponent extends Component {
 
 ```javascript
 class MyComponent extends Component {
-  async default() {
+  async default(inputs = {}) {
     // this.context features useful information
     console.log(this.context)
 
@@ -217,6 +217,26 @@ yourComponent@0.1.4::yourComponentInstance:
   secondInput: second-input
 
 ```
+
+Here are the available components you could build on top of to construct a higher-level component:
+
+&nbsp;
+
+- [AwsDynamoDb](https://github.com/serverless-components/AwsDynamoDb)
+- [AwsApiGateway](https://github.com/serverless-components/AwsApiGateway)
+- [AwsIamRole](https://github.com/serverless-components/AwsIamRole)
+- [AwsLambda](https://github.com/serverless-components/AwsLambda)
+- [AwsLambdaLayer](https://github.com/serverless-components/AwsLambdaLayer)
+- [AwsS3](https://github.com/serverless-components/AwsS3)
+- [AwsWebSockets](https://github.com/serverless-components/AwsWebSockets)
+- [ChatApp](https://github.com/serverless-components/ChatApp)
+- [RealtimeApp](https://github.com/serverless-components/RealtimeApp)
+- [Socket](https://github.com/serverless-components/Socket)
+- [Website](https://github.com/serverless-components/Website)
+
+&nbsp;
+
+They also serve as complete examples on how to write a real-world serverless component.
 
 ### Reserved Inputs
 
