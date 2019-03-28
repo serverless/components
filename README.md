@@ -212,7 +212,7 @@ If you'd like users to be able to use your component declaratively in `serverles
 
 ```yml
 
-yourComponent@0.1.4::yourComponentInstance
+yourComponent@0.1.4::yourComponentInstance:
   firstInput: first-input
   secondInput: second-input
 
