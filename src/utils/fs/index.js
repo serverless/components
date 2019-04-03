@@ -1,4 +1,3 @@
-const root = require('./root')
 const isJsonPath = require('./isJsonPath')
 const isYamlPath = require('./isYamlPath')
 const isArchivePath = require('./isArchivePath')
@@ -13,12 +12,8 @@ const hashFile = require('./hashFile')
 const readState = require('./readState')
 const writeState = require('./writeState')
 const loadComponent = require('./loadComponent')
-const coreComponentExists = require('./coreComponentExists')
-const downloadComponent = require('./downloadComponent')
-const downloadGitRepo = require('./downloadGitRepo')
 
 module.exports = {
-  root,
   isJsonPath,
   isYamlPath,
   isArchivePath,
@@ -32,8 +27,5 @@ module.exports = {
   hashFile,
   readState,
   writeState,
-  loadComponent,
-  coreComponentExists,
-  downloadComponent,
-  downloadGitRepo
+  loadComponent
 }
