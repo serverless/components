@@ -2,6 +2,8 @@ const path = require('path')
 const dotenv = require('dotenv')
 const prompts = require('prompts')
 const chalk = require('chalk')
+const util = require('util')
+const exec = util.promisify(require('child_process').exec)
 const cliInstance = require('./cli')
 const Context = require('./context')
 const ComponentDeclarative = require('./componentDeclarative/serverless')
@@ -171,7 +173,7 @@ const runPrompt = async () => {
     name: 'template',
     message: 'What would you like to create in this directory?',
     choices: [
-      { title: 'Component', value: 'component' },
+      { title: 'My Own Component', value: 'component' },
       { title: 'Function', value: 'function' },
       { title: 'API', value: 'api' },
       { title: 'Website', value: 'website' },
@@ -189,11 +191,9 @@ const runPrompt = async () => {
   console.log(`  Successfully created "${selected.template}" in the current directory.`)
 
   if (selected.template === 'component') {
-    console.log()
-    console.log(chalk.gray('  Next Steps:'))
-    console.log(chalk.gray('    1. Run "npm install" to install dependencies.'))
-    console.log(chalk.gray('    2. Run "components" for a quick tour.'))
-    console.log(chalk.gray('    3. Check out the "serverless.js" file for for information.'))
+    console.log(`  Installing Dependencies...`)
+    await exec('npm install')
+    console.log(`  Done. You can now run "components" for a quick tour.`)
     console.log()
   }
   process.exit(0)
