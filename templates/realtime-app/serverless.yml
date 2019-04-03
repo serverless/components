@@ -1,22 +1,8 @@
 name: my-realtime-app
 stage: dev
 
-RealtimeApp@0.1.1::realtime-app:
+RealtimeApp@0.1.2::realtime-app:
   frontend:
     assets: ./frontend
   backend:
     assets: ./backend
-    env:
-      dbMessages: ${comp:messages.name}
-
-AwsDynamoDb@0.1.0::connections:
-  name: ${name}-connections
-  attributeDefinitions:
-    - AttributeName: connectionId
-      AttributeType: S
-  keySchema:
-    - AttributeName: id
-      KeyType: HASH
-  provisionedThroughput:
-    - ReadCapacityUnits: 2
-      WriteCapacityUnits: 2
