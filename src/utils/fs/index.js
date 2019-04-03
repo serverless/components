@@ -11,6 +11,8 @@ const packDir = require('./packDir')
 const hashFile = require('./hashFile')
 const readState = require('./readState')
 const writeState = require('./writeState')
+const walkDirSync = require('./walkDirSync')
+const copyDirContentsSync = require('./copyDirContentsSync')
 const loadComponent = require('./loadComponent')
 
 module.exports = {
@@ -27,5 +29,7 @@ module.exports = {
   hashFile,
   readState,
   writeState,
+  walkDirSync,
+  copyDirContentsSync,
   loadComponent
 }
