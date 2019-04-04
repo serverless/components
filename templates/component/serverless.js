@@ -48,7 +48,7 @@ class MyComponent extends Component {
 
     await sleep(2000)
 
-    this.cli.log('checkout the generated files for more information.')
+    this.cli.log('check out the generated files for more information.')
 
     await sleep(2000)
 

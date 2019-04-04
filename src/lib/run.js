@@ -1,7 +1,6 @@
 const path = require('path')
 const dotenv = require('dotenv')
 const prompts = require('prompts')
-const chalk = require('chalk')
 const util = require('util')
 const exec = util.promisify(require('child_process').exec)
 const cliInstance = require('./cli')
@@ -168,28 +167,33 @@ const runDeclarative = async (filePath, config, cli) => {
 }
 
 const runPrompt = async () => {
-  const selected = await prompts({
-    type: 'select',
-    name: 'template',
-    message: 'What would you like to create in this directory?',
-    choices: [
-      { title: 'My Own Component', value: 'component' },
-      { title: 'Function', value: 'function' },
-      { title: 'API', value: 'api' },
-      { title: 'Website', value: 'website' },
-      { title: 'Realtime Application', value: 'realtime-app' },
-      { title: 'Chat Application', value: 'chat-app' },
-      { title: 'Websocket Backend', value: 'websocket-backend' }
-    ],
-    initial: 0
-  })
+  const selected = await prompts(
+    {
+      type: 'select',
+      name: 'template',
+      message: 'What would you like to create in this directory?',
+      choices: [
+        { title: 'My Own Component', value: 'component' },
+        { title: 'Function', value: 'function' },
+        { title: 'API', value: 'api' },
+        { title: 'Website', value: 'website' },
+        { title: 'Realtime Application', value: 'realtime-app' },
+        { title: 'Chat Application', value: 'chat-app' },
+        { title: 'Websocket Backend', value: 'websocket-backend' }
+      ],
+      initial: 0
+    },
+    {
+      onCancel: () => process.exit(0)
+    }
+  )
 
-  // todo this throws an error when CTR+C
   const templateDirPath = path.join(__dirname, '..', '..', 'templates', selected.template)
 
   copyDirContentsSync(templateDirPath, process.cwd())
 
   console.log(`  Successfully created "${selected.template}" in the current directory.`)
+  console.log(`  Check out the generated files for some helpful instructions.`)
 
   if (selected.template === 'component') {
     console.log(`  Installing Dependencies...`)
