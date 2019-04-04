@@ -4,9 +4,9 @@
 
 **Serverless Components** is a framework for easily provisioning and sharing application components on ~~cloud~~ serverless services.
 
-It does not seek to be another general infrastructure provisioning tool (e.g. Cloudformation, Terraform), but a solution that enables developers to build their own reusable abstractions on top of infrastructure, that resemble the use-case they are seeking to build (e.g. a Blog, Payment Processor, Realtime Application). These components are simply npm packages.
+It does not seek to be another general infrastructure provisioning tool (e.g. Cloudformation, Terraform), but a solution that enables developers to build their own reusable abstractions on top of infrastructure, that resemble the use-case they are seeking to build (e.g. a Blog, Payment Processor, Realtime Application). Components are simply npm packages that provision infrastructure and high level use cases.
 
-You could use components either programmatically via a `serverless.js` file (which would also create a component in the process), or via a `serverless.yml` file. These Components are use-case focused, and you can deploy them alongside infrastructure, in the same file.
+You could use components either programmatically with a `serverless.js` file (which would also create a component in the process), or with a `serverless.yml` file. These Components are use-case focused, and you can deploy them alongside infrastructure, in the same file.
 
 ```yaml
 # serverless.yml
@@ -53,9 +53,9 @@ $ components
 
 Now every time you run `components`, you'll be running your new component. **Check out the generated files for more information**.
 
-## Using existing components
+## Available Components
 
-Instead of creating your own component, you could also choose to generate a `serverless.yml` template for an existing component (e.g. `Chat Application`), which would copy one of the available [templates](./templates) into the current working directory.
+Instead of creating your own component, you could also choose to generate a `serverless.yml` that uses one or more of the available components (e.g. `Chat Application`), which would copy one of the available [templates](./templates) into the current working directory.
 
 **Note:** If you don't have your aws access keys set globally, dont' forget to add them to a `.env` file in the current directory.
 
@@ -72,7 +72,7 @@ $ chat-app: components
 
 And there you have it! A complete chat application deployed to your own infrastructure in seconds.
 
-These are the available components you could instantly deploy, or programmatically use as child components. Check out each component repo for complete docs on how to use them. They also serve as complete examples on how to write a real-world serverless component.
+These are the available components you could instantly deploy declarateively with a `serverless.yml` file, or programmatically with a `serverless.js` file. Check out each component repo for complete docs on how to use them. They also serve as complete examples on how to write a real-world serverless component.
 
 &nbsp;
 
@@ -89,8 +89,6 @@ These are the available components you could instantly deploy, or programmatical
 - [AwsWebSockets](https://github.com/serverless-components/AwsWebSockets)
 
 &nbsp;
-
-Good luck.
 
 **Created By**
 
