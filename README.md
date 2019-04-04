@@ -4,9 +4,9 @@
 
 **Serverless Components** is framework for easily provisioning and sharing application components on ~~cloud~~ serverless services.
 
-It does not seek to be another general infrastructure provisioning tool (e.g. Cloudformation, Terraform), but a solution that enables developers to build their own reusable abstractions on top of infrastructure, that resemble the use-case they are seeking to build (e.g. a Blog, Payment Processor, Realtime Application)
+It does not seek to be another general infrastructure provisioning tool (e.g. Cloudformation, Terraform), but a solution that enables developers to build their own reusable abstractions on top of infrastructure, that resemble the use-case they are seeking to build (e.g. a Blog, Payment Processor, Realtime Application). These components are just packages published to npm.
 
-These Components are use-case focused, and you can deploy them alongside infrastructure, in the same configuration file.
+You could use components either programmatically via a `serverless.js` file (which would also create a component in the process), or via a `serverless.yml` file. These Components are use-case focused, and you can deploy them alongside infrastructure, in the same file.
 
 ```yaml
 # serverless.yml
@@ -14,54 +14,16 @@ These Components are use-case focused, and you can deploy them alongside infrast
 name: my-blog
 
 # higher-level abstraction
-Comments@2.1.0:comments:
-  region: us-east-1
+Comments:
+  component: @serverless/comments
+  inputs:
+    region: us-east-1
 
 # infrastructure
-AwsLambda@1.2.1:listPosts:
-  memorySize: 1024
-```
-
-&nbsp;
-
-Here are some easy examples which you can deploy instantly to get started:
-
-- [Chat App](./templates/chat-app)
-- [Realtime App](./templates/realtime-app)
-- [Websockets Backend](./templates/websockets-backend)
-- [Website](./templates/website)
-- [API](./templates/api)
-- [AWS Lambda Function](./templates/aws-lambda)
-
-&nbsp;
-
-## Example
-
-Deploy serverless infrastructure, or an **entire serverless use-case** (e.g. a full-stack realtime app) in seconds...
-
-```yaml
-# serverless.yml
-
-name: my-realtime-app
-
-RealtimeApp@0.1.1::realtime-app:
-  frontend:
-    assets: ./frontend
-  backend:
-    assets: ./backend
-```
-
-```console
-$ realtime-app: components
-
-  realtime-app › outputs:
-  frontend:
-    url:  'http://realtimeapp-xqu5n6.s3-website-us-east-1.amazonaws.com'
-  backend:
-    url:  'wss://2ozttnximh.execute-api.us-east-1.amazonaws.com/dev/'
-
-
-  12s › dev › my-realtime-app › done
+listPosts:
+  component: @serverless/aws-lambda
+  inputs:
+    memorySize: 1024
 ```
 
 ## Get Started
@@ -72,20 +34,28 @@ Install components.
 $ npm i -g @serverless/components
 ```
 
-Go into a [template](./templates).
+Create a directory for your new component.
 
 ```console
-$ cd templates/chat-app
+$ mkdir my-component
+$ cd my-component
 ```
 
-Add provider credentials (all examples currently require [AWS](https://aws.amazon.com/) credentials). Serverless Components supports `.env` files in the same folder as `serverless.yml` or `serverless.js`. Create a `.env` that looks like this:
+Run `components` and choose what you'd like to create. Choose `My Own Component` for a quick tour that helps you create your own component, which could programmatically use existing components from npm.
 
-```text
-AWS_ACCESS_KEY_ID=123456789
-AWS_SECRET_ACCESS_KEY=987654321
+```console
+$ components
 ```
 
-Run `$ components`.
+Now every time you run `components`, you'll be running your new component. Check out the generated files for more information.
+
+## Using existing components
+
+Instead of creating your own component, you could also choose to generate a `serverless.yml` template for an existing component (e.g. `Chat Application`), which would copy one of the available [templates](./templates) into the current working directory.
+
+**Note:** If you don't have your aws access keys set globally, dont' forget to add them to a `.env` file in the current directory.
+
+Run `$ components` to run your template.
 
 ```console
 $ chat-app: components
@@ -96,129 +66,7 @@ $ chat-app: components
   60s › dev › my-chat-app › done
 ```
 
-Leverage stage-specific environment variables by creating `.env` files per stage:
-
-```text
-.env # Default
-.env.dev
-.env.prod
-```
-
-## How To Write A Serverless Component
-
-Install `@serverless/components` as a local dependency.
-
-```
-npm i --save @serverless/components
-```
-
-Use a `serverless.js` file, extend the Component class and add a `default` method.
-
-```javascript
-// serverless.js
-const { Component } = require('@serverless/components')
-
-class MyComponent extends Component {
-  async default(inputs = {}) {} // The default functionality to run/provision/update your Component
-}
-```
-
-`default` is always required. Other methods are optional. They all take an `inputs` object.
-
-```javascript
-// serverless.js
-
-class MyComponent extends Component {
-  /*
-   * Default (Required)
-   * - The default functionality to run/provision/update your Component
-   */
-
-  async default(inputs = {}) {}
-
-  /*
-   * Remove (Optional)
-   * - If your Component removes infrastructure, this is recommended.
-   */
-
-  async remove(inputs = {}) {}
-
-  /*
-   * Anything (Optional)
-   * - If you want to ship your Component w/ extra functionality, put it in a method.
-   */
-
-  async anything(inputs = {}) {}
-}
-```
-
-`this` comes loaded with lots of utilities which you can use.
-
-```javascript
-class MyComponent extends Component {
-  async default(inputs = {}) {
-    // this.context features useful information
-    console.log(this.context)
-
-    // Get the targeted stage
-    console.log(this.context.stage)
-
-    // Common provider credentials are identified in the environment or .env file and added to this.context.credentials
-    const dynamodb = new AWS.DynamoDB({ credentials: this.context.credentials.aws })
-
-    // Save state
-    this.state.name = 'myComponent'
-    await this.save()
-
-    // Load a child Component. This assumes you have the "@serverless/website" component
-    // in your "package.json" file and ran "npm install"
-    let website = await this.load('@serverless/website')
-
-    // If you are deploying multiple instances of the same Component, include an instance id. This also pre-fills them with any existing state.
-    let website1 = await this.load('@serverless/website', 'website1')
-    let website2 = await this.load('@serverless/website', 'website2')
-
-    // Call the default method on a Component
-    let websiteOutputs = await website({ region: 'us-east-1' })
-
-    // Or call any other method on a Component
-    let websiteRemoveOutputs = await website.remove()
-
-    // Show status...
-    this.cli.status('Uploading')
-
-    // Show a nicely formatted log statement...
-    this.cli.log('this is a log statement')
-
-    // Show a nicely formatted warning...
-    this.cli.warn('this is a log statement')
-
-    // Show nicely formatted outputs at the end of everything
-    this.cli.outputs({ url: websiteOutputs.url })
-
-    // Return your results
-    return { url: websiteOutputs.url }
-  }
-}
-```
-
-To see a list of the available components you could use as children, checkout the [`registry.json`](./registry.json) file and checkout the referenced repos.
-
-## How to Publish a Serverless Component
-
-Just publish your component to npm as you normally would with any package. The only caveat is that you'll need to point your `main` property to the `serverless.js` file. Now anyone could use your new component programmatically.
-
-If you'd like users to be able to use your component declaratively in `serverless.yml` as well, tag and push your released version [(e.g. `0.1.4`)](https://github.com/serverless-components/AwsLambda/releases/tag/0.1.4) to Github, then add your component to [the `registry.json` file](./registry.json). Users could then use your component like this:
-
-```yml
-
-yourComponent@0.1.4::yourComponentInstance:
-  firstInput: first-input
-  secondInput: second-input
-
-```
-
-Here are the available components you could build on top of to construct a higher-level component:
+Here are the available components you could instantly deploy, or programmatically use as child components. Check out each component repo for complete docs on how to use them.
 
 &nbsp;
 
@@ -238,22 +86,10 @@ Here are the available components you could build on top of to construct a highe
 
 They also serve as complete examples on how to write a real-world serverless component.
 
-### Reserved Inputs
-
-These can not be used as inputs for your Component and are reserved by the CLI. They can be accessed in your Component within `this.context`.
-
-- `stage` `--stage`
-- `root` `--root`
-- `rootFile` `--rootFile`
-- `credentials` `--credentials`
-- `verbose` `--verbose`
-- `debug` `--debug`
-- `watch` `--watch`
-
 Good luck.
 
 **Created By**
 
 - Eslam Hefnawy - [@eahefnawy](https://github.com/eahefnawy)
 - Philipp Muens - [@pmuens](https://github.com/pmuens)
-- Austen Collins - [@austencollins](https://github.com/austencollins)
+- Austen Collins - [@aac360](https://github.com/ac360)

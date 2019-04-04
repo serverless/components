@@ -1,8 +1,17 @@
 name: my-realtime-app
-stage: dev
 
-RealtimeApp@0.1.2::realtime-app:
-  frontend:
-    assets: ./frontend
-  backend:
-    assets: ./backend
+app:
+  component: "@serverless/realtime-app"
+  inputs:
+    frontend:
+      assets: ./frontend
+    backend:
+      assets: ./backend
+      env:
+        dbMessages: ${comp:connectionsTable.name}
+
+connectionsTable:
+  components: "@serverless/aws-dynamodb"
+  inputs:
+    name: ${name}-connections
+

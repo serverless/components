@@ -1,24 +1,9 @@
 name: my-chat-app
 stage: dev
 
-RealtimeApp@0.1.2::realtime-app:
-  frontend:
-    assets: ./frontend/build
-    envFile: ./frontend/src/env.js
-    buildCmd: npm run build
-  backend:
-    assets: ./backend
-    env:
-      dbConnectionsName: ${comp:connections.name}
-
-AwsDynamoDb@0.1.0::connections:
-  name: ${name}-connections
-  attributeDefinitions:
-    - AttributeName: connectionId
-      AttributeType: S
-  keySchema:
-    - AttributeName: connectionId
-      KeyType: HASH
-  provisionedThroughput:
-    ReadCapacityUnits: 3
-    WriteCapacityUnits: 3
+myChatApp:
+  component: "@serverless/chat-app"
+  inputs:
+#     colorBackground: black
+#     colorInputText: white
+#     logoUrl:

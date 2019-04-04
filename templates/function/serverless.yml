@@ -1,4 +1,7 @@
-name: my-aws-lambda
-stage: dev
+name: my-function
 
-AwsLambda@0.1.4::aws-lambda:
+myFunction:
+  component: @serverless/aws-lambda
+  inputs:
+    name: ${name}-lambda
+    handler: index.handler

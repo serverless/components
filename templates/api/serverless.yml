@@ -1,19 +1,18 @@
 name: my-api
 
-AwsLambda@0.1.4::myLambda:
-  name: ${name}-lambda
-  code: ./code
-  handler: index.handler
+myLambda:
+  component: @serverless/aws-lambda
+  inputs:
+    name: ${name}-lambda
+    code: ./code
+    handler: index.handler
 
-AwsIamRole@0.1.1::myApigRole:
-  name: ${name}-role
-  service: 'apigateway.amazonaws.com'
-
-AwsApiGateway@0.1.2::myApiGateway:
-  name: ${name}-gateway
-  role: ${comp:myApigRole}
-  routes:
-    /foo:
-      get:
-        function: ${comp:myLambda.arn}
-        cors: true
+myApiGateway:
+  component: @serverless/aws-api-gateway
+  inputs:
+    name: ${name}-gateway
+    routes:
+      /foo:
+        get:
+          function: ${comp:myLambda.arn}
+          cors: true

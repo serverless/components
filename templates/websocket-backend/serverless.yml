@@ -1,5 +1,6 @@
-name: my-websockets-backend
-stage: dev
+name: my-websocket-backend
 
-Socket@0.1.0::websockets-backend:
-  code: ./code
+myWebsocketBackend:
+  components: @serverless/socket
+  inputs:
+    code: ./code
