@@ -45,9 +45,18 @@ Run `components` and choose what you'd like to create. Choose `My Own Component`
 
 ```console
 $ components
+? What would you like to create in this directory? › - Use arrow-keys. Return to submit.
+❯  My Own Component
+   Function
+   API
+   Website
+   Realtime Application
+   Chat Application
+   Websocket Backend
+
 ```
 
-Now every time you run `components`, you'll be running your new component. Check out the generated files for more information.
+Now every time you run `components`, you'll be running your new component. **Check out the generated files for more information**.
 
 ## Using existing components
 

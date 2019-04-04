@@ -184,6 +184,7 @@ const runPrompt = async () => {
     initial: 0
   })
 
+  // todo this throws an error when CTR+C
   const templateDirPath = path.join(__dirname, '..', '..', 'templates', selected.template)
 
   copyDirContentsSync(templateDirPath, process.cwd())
