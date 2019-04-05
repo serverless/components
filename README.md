@@ -15,25 +15,30 @@ name: my-blog
 
 # higher-level abstraction
 Comments:
-  component: @serverless/comments
+  component: "@serverless/comments"
   inputs:
     region: us-east-1
 
 # infrastructure
 listPosts:
-  component: @serverless/aws-lambda
+  component: "@serverless/aws-lambda"
   inputs:
     memorySize: 1024
 ```
 
 ## Get Started
 
-Install components, & create a directory for your new component.
+Install components.
 
 ```console
 $ npm i -g @serverless/components
-$ mkdir my-component
-$ cd my-component
+
+```
+
+create a directory for your new component.
+
+```console
+$ mkdir my-component && cd my-component
 ```
 
 Run `components` and choose what you'd like to create. Choose `My Own Component` for a quick tour that helps you create your own component, which could programmatically use existing components from npm.
