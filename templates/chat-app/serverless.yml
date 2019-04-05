@@ -4,6 +4,6 @@ stage: dev
 myChatApp:
   component: "@serverless/chat-app"
   inputs:
-#     colorBackground: black
-#     colorInputText: white
-#     logoUrl:
+    # colorBackground: black
+    # colorInputText: white
+    # logoUrl:

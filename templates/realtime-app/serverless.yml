@@ -11,7 +11,6 @@ app:
         dbMessages: ${comp:connectionsTable.name}
 
 connectionsTable:
-  components: "@serverless/aws-dynamodb"
+  component: "@serverless/aws-dynamodb"
   inputs:
     name: ${name}-connections
-
