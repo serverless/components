@@ -1,14 +1,14 @@
 name: my-api
 
 myLambda:
-  component: @serverless/aws-lambda
+  component: "@serverless/aws-lambda"
   inputs:
     name: ${name}-lambda
     code: ./code
     handler: index.handler
 
 myApiGateway:
-  component: @serverless/aws-api-gateway
+  component: "@serverless/aws-api-gateway"
   inputs:
     name: ${name}-gateway
     routes:

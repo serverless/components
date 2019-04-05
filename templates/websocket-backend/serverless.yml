@@ -1,6 +1,6 @@
 name: my-websocket-backend
 
 myWebsocketBackend:
-  components: @serverless/socket
+  component: "@serverless/socket"
   inputs:
     code: ./code

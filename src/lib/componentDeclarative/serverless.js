@@ -25,11 +25,13 @@ class ComponentDeclarative extends Component {
 
     // construct variable objects and resolve them (if possible)
     const vars = variables.constructObjects(fileContent)
+
     fileContent = variables.resolveServerlessFile(fileContent, vars)
     const configComponents = getComponents(fileContent)
 
     // TODO: refactor so that we don't need to pass `this` into it
     const componentsToRun = await prepareComponents(configComponents, this)
+
     let componentsToRemove = {}
     try {
       const stateComponents = await state.load(this.stage)
@@ -43,7 +45,9 @@ class ComponentDeclarative extends Component {
         }
         return accum
       }, {})
-      componentsToRemove = await prepareComponents(componentsToRemove, this)
+      // todo fix declarative state and removing components from yaml files
+      // componentsToRemove = await prepareComponents(componentsToRemove, this)
+      componentsToRemove = {}
     } catch (error) {
       // no state. Nothing to remove...
     }
@@ -56,6 +60,7 @@ class ComponentDeclarative extends Component {
 
     const rootPredecessors = graph.predecessors(ROOT_NODE_NAME)
     const predecessors = new Set([...rootPredecessors])
+
     while (predecessors.size) {
       await Promise.all(
         [...predecessors].map(async (instanceId) => {
