@@ -1,5 +1,7 @@
 name: my-site
-stage: dev
 
-Website@0.1.0::website:
-  assets: ./code
+website:
+  component: "@serverless/website"
+  inputs:
+    assets: ./code
+

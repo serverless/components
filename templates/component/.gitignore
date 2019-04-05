@@ -1,6 +1,3 @@
-components
-examples
-.idea
 .serverless
 coverage
 .env*

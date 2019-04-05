@@ -1,20 +1,21 @@
-const { assoc, reduce, addIndex } = require('../../../utils')
-
-const reduceIndexed = addIndex(reduce)
+const installComponents = require('./installComponents')
+const { assoc, reduce } = require('../../../utils')
 
 async function prepareComponents(components, that) {
-  const keys = Object.keys(components)
-  return reduceIndexed(
+  const instanceIds = Object.keys(components)
+
+  const componentNames = instanceIds.map((instanceId) => components[instanceId].component)
+
+  const componentsPaths = await installComponents(componentNames)
+  return reduce(
     // TODO: remove auto-aliasing support
-    async (accum, key, idx) => {
-      const component = components[key]
+    async (accum, instanceId) => {
+      const componentObj = components[instanceId]
       // figure out the Component class and instance names
-      const splittedKey = key.split('::')
-      const componentName = splittedKey[0] || key
-      const instanceId = splittedKey[1] || `${componentName.toLowerCase()}${idx}`
-      const inputs = component || {} // Don't let inputs be null
+      const componentName = componentObj.component
+      const inputs = componentObj.inputs || {} // Don't let inputs be null
       // load the component class
-      const instance = await that.load(componentName, instanceId)
+      const instance = await that.load(componentsPaths[componentName], instanceId)
       return assoc(
         instanceId,
         {
@@ -27,7 +28,7 @@ async function prepareComponents(components, that) {
       )
     },
     {},
-    keys
+    instanceIds
   )
 }
 

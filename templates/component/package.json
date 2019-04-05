@@ -1,0 +1,12 @@
+{
+  "name": "new-component",
+  "version": "0.1.0",
+  "main": "./serverless.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@serverless/components": "^0.1.0"
+  }
+}

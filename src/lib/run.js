@@ -1,5 +1,8 @@
 const path = require('path')
 const dotenv = require('dotenv')
+const prompts = require('prompts')
+const util = require('util')
+const exec = util.promisify(require('child_process').exec)
 const cliInstance = require('./cli')
 const Context = require('./context')
 const ComponentDeclarative = require('./componentDeclarative/serverless')
@@ -7,6 +10,7 @@ const {
   errorHandler,
   fileExists,
   readFile,
+  copyDirContentsSync,
   coreComponentExists,
   loadComponent,
   prepareCredentials
@@ -162,6 +166,44 @@ const runDeclarative = async (filePath, config, cli) => {
   return result
 }
 
+const runPrompt = async () => {
+  const selected = await prompts(
+    {
+      type: 'select',
+      name: 'template',
+      message: 'What would you like to create in this directory?',
+      choices: [
+        { title: 'My Own Component', value: 'component' },
+        { title: 'Function', value: 'function' },
+        { title: 'API', value: 'api' },
+        { title: 'Website', value: 'website' },
+        { title: 'Realtime Application', value: 'realtime-app' },
+        { title: 'Chat Application', value: 'chat-app' },
+        { title: 'Websocket Backend', value: 'websocket-backend' }
+      ],
+      initial: 0
+    },
+    {
+      onCancel: () => process.exit(0)
+    }
+  )
+
+  const templateDirPath = path.join(__dirname, '..', '..', 'templates', selected.template)
+
+  copyDirContentsSync(templateDirPath, process.cwd())
+
+  console.log(`  Successfully created "${selected.template}" in the current directory.`)
+  console.log(`  Check out the generated files for some helpful instructions.`)
+
+  if (selected.template === 'component') {
+    console.log(`  Installing Dependencies...`)
+    await exec('npm install')
+    console.log(`  Done. You can now run "components" for a quick tour.`)
+    console.log()
+  }
+  process.exit(0)
+}
+
 /**
  * Identifies environment variables that are known vendor credentials and finds their corresponding SDK configuration properties
  * @param {Object} config - Configuration
@@ -221,9 +263,9 @@ const run = async (config = {}, cli = cliInstance) => {
     } else if (await fileExists(serverlessJsonFilePath)) {
       return await runDeclarative(serverlessJsonFilePath, config, cli)
     }
-    throw new Error(
-      `No Serverless file (serverless.js, serverless.yml, serverless.yaml or serverless.json) found in ${process.cwd()}`
-    )
+
+    // run prompt if serverless files not found
+    await runPrompt()
   } catch (error) {
     return errorHandler(error, 'Serverless Components')
   }
