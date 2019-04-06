@@ -99,4 +99,4 @@ These are the available components you could instantly deploy declarateively wit
 
 - Eslam Hefnawy - [@eahefnawy](https://github.com/eahefnawy)
 - Philipp Muens - [@pmuens](https://github.com/pmuens)
-- Austen Collins - [@aac360](https://github.com/ac360)
+- Austen Collins - [@ac360](https://github.com/ac360)
