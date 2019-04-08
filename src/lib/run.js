@@ -1,6 +1,6 @@
 const path = require('path')
 const dotenv = require('dotenv')
-const prompts = require('prompts')
+const { prompt } = require('inquirer')
 const util = require('util')
 const exec = util.promisify(require('child_process').exec)
 const cliInstance = require('./cli')
@@ -167,26 +167,23 @@ const runDeclarative = async (filePath, config, cli) => {
 }
 
 const runPrompt = async () => {
-  const selected = await prompts(
+  const selected = await prompt([
     {
-      type: 'select',
+      type: 'list',
       name: 'template',
       message: 'What would you like to create in this directory?',
+      paginated: true,
       choices: [
-        { title: 'My Own Component', value: 'component' },
-        { title: 'Function', value: 'function' },
-        { title: 'API', value: 'api' },
-        { title: 'Website', value: 'website' },
-        { title: 'Realtime Application', value: 'realtime-app' },
-        { title: 'Chat Application', value: 'chat-app' },
-        { title: 'Websocket Backend', value: 'websocket-backend' }
-      ],
-      initial: 0
-    },
-    {
-      onCancel: () => process.exit(0)
+        { name: 'My Own Component', value: 'component' },
+        { name: 'Function', value: 'function' },
+        { name: 'API', value: 'api' },
+        { name: 'Website', value: 'website' },
+        { name: 'Realtime Application', value: 'realtime-app' },
+        { name: 'Chat Application', value: 'chat-app' },
+        { name: 'Websocket Backend', value: 'websocket-backend' }
+      ]
     }
-  )
+  ])
 
   const templateDirPath = path.join(__dirname, '..', '..', 'templates', selected.template)
 

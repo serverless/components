@@ -1,6 +1,6 @@
 {
   "name": "@serverless/components",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "description": "Deploy serverless infrastructure, or an entire serverless outcome (e.g. a fullstack realtime app) in seconds",
   "main": "./src/index.js",
   "bin": {
@@ -28,10 +28,10 @@
     "fs-extra": "^7.0.1",
     "globby": "^9.1.0",
     "graphlib": "^2.1.7",
+    "inquirer": "^6.2.2",
     "js-yaml": "^3.12.1",
     "minimist": "^1.2.0",
     "package-json": "^6.3.0",
-    "prompts": "^2.0.4",
     "ramda": "^0.26.1",
     "strip-ansi": "^5.0.0",
     "traverse": "^0.6.6"
