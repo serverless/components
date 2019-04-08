@@ -4,9 +4,9 @@ app:
   component: "@serverless/realtime-app"
   inputs:
     frontend:
-      assets: ./frontend
+      code: ./frontend
     backend:
-      assets: ./backend
+      code: ./backend
       env:
         dbMessages: ${comp:connectionsTable.name}
 

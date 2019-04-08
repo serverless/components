@@ -3,5 +3,5 @@ name: my-site
 website:
   component: "@serverless/website"
   inputs:
-    assets: ./code
+    code: ./code
 
