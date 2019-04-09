@@ -216,9 +216,7 @@ class MyComponent extends Component {
 Just run `components` in the directory that contains the `serverless.js` file to run your new component. You'll will see all the logs and outputs of your new components. Logs and outputs of any child component you use will not be shown, unless you run in verbose mode: `components --verbose`.
 
 ## Declarative Usage
-If you only want to simply compose some components together, without creating your own component, you could use one of the available components declaratively. All you need to do is:
-
-Create a `serverless.yml`
+If you only want to simply compose some components together, without creating your own component, you could use one of the available components declaratively. All you need to do is create a `serverless.yml` file.
 
 
 ```yml
