@@ -222,7 +222,7 @@ If you only want to simply compose some components together, without creating yo
 ```yml
 name: my-stack # optional name to be reused
 stage: dev # optional stage to be reused
-anything: you can put any property here that could be reused.
+anything: something # you can put any property here that could be reused.
 
 # this property is identified as a component because it contains a component key
 myLambda:
