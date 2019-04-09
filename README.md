@@ -26,6 +26,13 @@ listPosts:
     memorySize: 1024
 ```
 
+&nbsp;
+
+- [Get Started](#get-started)
+- [Available Components](#available-components)
+- [Programatic Usage](#programatic-usage)
+- [Declarative Usage](#declarative-usage)
+
 ## Get Started
 
 Install components.
@@ -93,7 +100,150 @@ These are the available components you could instantly deploy declarateively wit
 - [AwsS3](https://github.com/serverless-components/AwsS3)
 - [AwsWebSockets](https://github.com/serverless-components/AwsWebSockets)
 
-&nbsp;
+
+## Programatic Usage
+
+You can use any of the above components programatically, while at the same time creating your own higher level component. All you need to do is:
+
+Install `@serverless/components` as a local dependency.
+
+```
+npm i --save @serverless/components
+```
+
+Create a `serverless.js` file, extend the Component class and add a `default` method.
+
+```javascript
+// serverless.js
+const { Component } = require('@serverless/components')
+
+class MyComponent extends Component {
+  async default(inputs = {}) {} // The default functionality to run/provision/update your Component
+}
+```
+
+`default` is always required. Other methods are optional. They all take an `inputs` object.
+
+```javascript
+// serverless.js
+
+class MyComponent extends Component {
+  /*
+   * Default (Required)
+   * - The default functionality to run/provision/update your Component
+   * - You can run this function by running the "components" command
+   */
+
+  async default(inputs = {}) {}
+
+  /*
+   * Remove (Optional)
+   * - If your Component removes infrastructure, this is recommended.
+   * - You can run this function by running the "components remove"
+   */
+
+  async remove(inputs = {}) {}
+
+  /*
+   * Anything (Optional)
+   * - If you want to ship your Component w/ extra functionality, put it in a method.
+   * - You can run this function by running the "components anything" command
+   */
+
+  async anything(inputs = {}) {}
+}
+```
+
+`this` comes loaded with lots of utilities which you can use.
+
+```javascript
+class MyComponent extends Component {
+  async default(inputs = {}) {
+    // this.context features useful information
+    console.log(this.context)
+
+    // Get the targeted stage
+    console.log(this.context.stage)
+
+    // Common provider credentials are identified in the environment or .env file and added to this.context.credentials
+    // when you run "components", then the credentials in .env will be used
+    // when you run "components --stage prod", then the credentials in .env.prod will be used...etc
+    // if you don't have any .env files, then global aws credentials will be used
+    const dynamodb = new AWS.DynamoDB({ credentials: this.context.credentials.aws })
+
+    // Save state
+    this.state.name = 'myComponent'
+    await this.save()
+
+    // Load a child Component. This assumes you have the "@serverless/website" component
+    // in your "package.json" file and ran "npm install"
+    let website = await this.load('@serverless/website')
+
+    // If you are deploying multiple instances of the same Component, include an instance id. This also pre-fills them with any existing state.
+    let website1 = await this.load('@serverless/website', 'website1')
+    let website2 = await this.load('@serverless/website', 'website2')
+    
+    // You can also load a local component that is not yet published to npm
+    // just reference the root dir that contains the serverless.js file
+    let localComponent = await this.load('../my-local-component')
+
+    // Call the default method on a Component
+    let websiteOutputs = await website({ region: 'us-east-1' })
+
+    // Or call any other method on a Component
+    let websiteRemoveOutputs = await website.remove()
+
+    // Show status...
+    this.cli.status('Uploading')
+
+    // Show a nicely formatted log statement...
+    this.cli.log('this is a log statement')
+
+    // Show a nicely formatted warning...
+    this.cli.warn('this is a log statement')
+
+    // Show nicely formatted outputs at the end of everything
+    this.cli.outputs({ url: websiteOutputs.url })
+
+    // Return your results
+    return { url: websiteOutputs.url }
+  }
+}
+```
+
+Just run `components` in the directory that contains the `serverless.js` file to run your new component. You'll will see all the logs and outputs of your new components. Logs and outputs of any child component you use will not be shown, unless you run in verbose mode: `components --verbose`.
+
+## Declarative Usage
+If you only want to simply compose some components together, without creating your own component, you could use one of the available components declaratively. All you need to do is:
+
+Create a `serverless.yml`
+
+
+```yml
+name: my-stack # optional name to be reused
+stage: dev # optional stage to be reused
+anything: you can put any property here that could be reused.
+
+# this property is identified as a component because it contains a component key
+myLambda:
+  component: "@serverless/aws-lambda" # the npm package name of the component that core would download and cache.
+  
+  # inputs to be passed to the component.
+  # each component expects a different set of inputs.
+  # check the respective docs of each component.
+  inputs: 
+    name: ${name}-{stage}-lambda # you can reference any property above
+    env:
+      TABLE_NAME: {comp:myTable.name} # you can also reference the outputs of another component in this file
+      
+myTable:
+  component: "@serverless/aws-dynamodb@0.1.0" # you could pint to a specific npm version
+  inputs:
+    name: {name}-table
+
+```
+
+when you run `components` or `components remove` in the directory that contains the `serverless.yml` file, the core will set up a dependency graph based on your references and run the `default` function of each component in order. Only `default` and `remove` functions could be run when using `serverless.yml`. If you'd like to call a custom function of a component, use it programatically as explained above.
 
 **Created By**
 
