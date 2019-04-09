@@ -86,7 +86,7 @@ $ chat-app: components
 
 And there you have it! A complete chat application deployed to your own infrastructure in seconds.
 
-These are the available components you could instantly deploy declarateively with a `serverless.yml` file, or programmatically with a `serverless.js` file. Check out each component repo for complete docs on how to use them. They also serve as complete examples on how to write a real-world serverless component.
+These are the available components you could instantly deploy declarateively with a `serverless.yml` file, or programmatically with a `serverless.js` file. Check out each component repo for complete docs on how to use them.
 
 &nbsp;
 
@@ -102,6 +102,7 @@ These are the available components you could instantly deploy declarateively wit
 - [AwsS3](https://github.com/serverless-components/AwsS3)
 - [AwsWebSockets](https://github.com/serverless-components/AwsWebSockets)
 
+&nbsp;
 
 ## Programatic Usage
 
@@ -214,6 +215,8 @@ class MyComponent extends Component {
 ```
 
 Just run `components` in the directory that contains the `serverless.js` file to run your new component. You'll will see all the logs and outputs of your new components. Logs and outputs of any child component you use will not be shown, unless you run in verbose mode: `components --verbose`.
+
+For complete real-world examples on writing components, [check out our official components](https://github.com/serverless-components)
 
 ## Declarative Usage
 If you only want to simply compose some components together, without creating your own component, you could use one of the available components declaratively. All you need to do is create a `serverless.yml` file.
