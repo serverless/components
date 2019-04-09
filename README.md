@@ -33,6 +33,8 @@ listPosts:
 - [Programatic Usage](#programatic-usage)
 - [Declarative Usage](#declarative-usage)
 
+&nbsp;
+
 ## Get Started
 
 Install components.
@@ -244,6 +246,8 @@ myTable:
 ```
 
 when you run `components` or `components remove` in the directory that contains the `serverless.yml` file, the core will set up a dependency graph based on your references and run the `default` function of each component in order. Only `default` and `remove` functions could be run when using `serverless.yml`. If you'd like to call a custom function of a component, use it programatically as explained above.
+
+&nbsp;
 
 **Created By**
 
