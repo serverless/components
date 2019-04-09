@@ -1,4 +1,4 @@
-const installComponents = require('./installComponents')
+const getComponentsPaths = require('./getComponentsPaths')
 const { assoc, reduce } = require('../../../utils')
 
 async function prepareComponents(components, that) {
@@ -6,7 +6,8 @@ async function prepareComponents(components, that) {
 
   const componentNames = instanceIds.map((instanceId) => components[instanceId].component)
 
-  const componentsPaths = await installComponents(componentNames)
+  const componentsPaths = await getComponentsPaths(componentNames)
+
   return reduce(
     // TODO: remove auto-aliasing support
     async (accum, instanceId) => {

@@ -8,7 +8,7 @@ const util = require('util')
 const exec = util.promisify(require('child_process').exec)
 const dirExists = require('../../../utils/fs/dirExists')
 
-const getComponentVersionToInstall = async (component) => {
+async function getComponentVersionToInstall(component) {
   let packageName
   let specifiedVersion
   if (component.startsWith('@')) {
@@ -68,7 +68,11 @@ const getComponentVersionToInstall = async (component) => {
  *
  */
 
-const installComponents = async (componentsToInstall) => {
+async function getRegistryComponentsPaths(componentsToInstall) {
+  if (!componentsToInstall.length) {
+    return {}
+  }
+
   const localRegistryPath = path.join(os.homedir(), '.serverless', 'components', 'registry', 'npm')
   await ensureDir(localRegistryPath)
 
@@ -96,4 +100,4 @@ const installComponents = async (componentsToInstall) => {
   return componentsPathsMap
 }
 
-module.exports = installComponents
+module.exports = getRegistryComponentsPaths
