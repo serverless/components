@@ -70,6 +70,10 @@ class MyComponent extends Component {
     // const website1 = await this.load('@serverless/website', 'website1')
     // const website2 = await this.load('@serverless/website', 'website2')
 
+    // You can also load a local component that is not yet published to npm
+    // just reference the root dir that contains the serverless.js file
+    // const localComponent = await this.load('../my-local-component')
+
     // Call the default method on a Component
     // const websiteOutputs = await website({ region: 'us-east-1' })
 
