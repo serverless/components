@@ -5,11 +5,11 @@
 
 const path = require('path')
 const Component = require('../component/serverless')
-const { readFile, difference } = require('../../utils')
+const { readFile } = require('../../utils')
 const { ROOT_NODE_NAME } = require('./constants')
-const state = require('./utils/state')
+const meta = require('./utils/meta')
 const variables = require('./utils/variables')
-const { getComponents, prepareComponents, createGraph, logOutputs } = require('./utils')
+const { getComponents, prepareComponents, createGraph, logOutputs, loadState } = require('./utils')
 
 class ComponentDeclarative extends Component {
   /*
@@ -32,31 +32,15 @@ class ComponentDeclarative extends Component {
     // TODO: refactor so that we don't need to pass `this` into it
     const componentsToRun = await prepareComponents(configComponents, this)
 
-    let componentsToRemove = {}
-    try {
-      const stateComponents = await state.load(this.stage)
-      const stateComponentKeys = Object.keys(stateComponents)
-      const configComponentKeys = Object.keys(configComponents)
-      const toRemove = difference(stateComponentKeys, configComponentKeys)
-      componentsToRemove = Object.keys(stateComponents).reduce((accum, instanceId) => {
-        const stateContent = stateComponents[instanceId]
-        if (toRemove.includes(instanceId) && Object.keys(stateContent).length) {
-          accum[instanceId] = stateComponents[instanceId]
-        }
-        return accum
-      }, {})
-      // todo fix declarative state and removing components from yaml files
-      // componentsToRemove = await prepareComponents(componentsToRemove, this)
-      componentsToRemove = {}
-    } catch (error) {
-      // no state. Nothing to remove...
-    }
+    // TODO: re-implement component auto-removal
+    const componentsToRemove = {}
     const components = { ...componentsToRun, ...componentsToRemove }
 
     const graph = createGraph(componentsToRun, componentsToRemove, vars)
 
     const results = {}
     const outputs = {}
+    const usedComponents = []
 
     const rootPredecessors = graph.predecessors(ROOT_NODE_NAME)
     const predecessors = new Set([...rootPredecessors])
@@ -90,17 +74,20 @@ class ComponentDeclarative extends Component {
           const res = await instance[operation](inputs)
           results[instanceId] = res
           outputs[instanceId] = res
-          // save the component declarative state information
-          if (operation == 'remove') {
-            inputs = {}
-          }
-          await state.save(component, instanceId, this.stage, inputs)
+          // push information about used component (used in the meta data)
+          usedComponents.push({
+            instanceId,
+            component,
+            stateFileName: `${instance.id}.json`
+          })
           return {
             [instanceId]: outputs
           }
         })
       )
     }
+
+    await meta.save({ components: usedComponents })
 
     logOutputs(this.cli, outputs)
   }
@@ -125,10 +112,10 @@ class ComponentDeclarative extends Component {
     const componentsToRun = await prepareComponents(configComponents, this)
     const componentsToRemove = {}
 
-    const currentState = await state.load(this.stage)
     const components = { ...componentsToRun, ...componentsToRemove }
     const graph = createGraph(componentsToRun, componentsToRemove, vars)
 
+    const state = await loadState()
     const outputs = {}
 
     const sources = graph.sources()
@@ -141,8 +128,8 @@ class ComponentDeclarative extends Component {
           }
           const value = components[instanceId]
           let inputs = value.inputs // eslint-disable-line
-          const { component, instance } = value
-          inputs = variables.resolveComponentVariables(vars, currentState, value)
+          const { instance } = value
+          inputs = variables.resolveComponentVariables(vars, state, value)
           // remove own insance from successors set
           successors.delete(instanceId)
           // add new successors to set (if any)
@@ -156,14 +143,14 @@ class ComponentDeclarative extends Component {
           }
           const res = await instance.remove(inputs)
           outputs[instanceId] = res
-          // save the component declarative state information
-          await state.save(component, instanceId, this.stage, {})
           return {
             [instanceId]: outputs
           }
         })
       )
     }
+
+    await meta.save({ components: [] })
 
     logOutputs(this.cli, outputs)
   }
