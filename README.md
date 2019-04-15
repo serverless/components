@@ -62,10 +62,23 @@ $ components
    Realtime Application
    Chat Application
    Websocket Backend
-
 ```
 
 Now every time you run `components`, you'll be running your new component. **Check out the generated files for more information**.
+
+When you're using or building components, you'll likely need provider api keys (e.g. AWS), you can set api keys for each stage by creating `.env` files in the directory that contains `serverless.js` or `serverless.yml`.
+
+```
+$ touch .env      # your development AWS api keys
+$ touch .env.prod # your production AWS api keys
+```
+
+the `.env` files are not required if you have the aws keys set globally and you want to use a single stage, but they should look like this in the case of AWS.
+
+```
+AWS_ACCESS_KEY_ID=XXX
+AWS_SECRET_ACCESS_KEY=XXX
+```
 
 ## Available Components
 
