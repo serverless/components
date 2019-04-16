@@ -1,0 +1,6 @@
+name: my-job
+
+myJob:
+  component: "@serverless/cron"
+  inputs:
+    rate: 2m
