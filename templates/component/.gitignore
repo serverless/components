@@ -3,3 +3,5 @@ coverage
 .env*
 env.js
 tmp
+node_modules
+.idea
