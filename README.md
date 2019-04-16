@@ -109,6 +109,8 @@ These are the available components you could instantly deploy declarateively wit
 - [Socket](https://github.com/serverless-components/Socket)
 - [Website](https://github.com/serverless-components/Website)
 - [ChatApp](https://github.com/serverless-components/ChatApp)
+- [Cron](https://github.com/serverless-components/cron)
+- [Mono](https://github.com/serverless-components/mono)
 - [AwsDynamoDb](https://github.com/serverless-components/AwsDynamoDb)
 - [AwsApiGateway](https://github.com/serverless-components/AwsApiGateway)
 - [AwsIamRole](https://github.com/serverless-components/AwsIamRole)
