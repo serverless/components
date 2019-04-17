@@ -1,4 +1,3 @@
-const meta = require('./meta')
 const variables = require('./variables')
 const createGraph = require('./createGraph')
 const getComponents = require('./getComponents')
@@ -10,7 +9,6 @@ const logOutputs = require('./logOutputs')
 const prepareComponents = require('./prepareComponents')
 
 module.exports = {
-  ...meta,
   ...variables,
   createGraph,
   getComponents,

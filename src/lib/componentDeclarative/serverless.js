@@ -7,7 +7,6 @@ const path = require('path')
 const Component = require('../component/serverless')
 const { readFile } = require('../../utils')
 const { ROOT_NODE_NAME } = require('./constants')
-const meta = require('./utils/meta')
 const variables = require('./utils/variables')
 const { getComponents, prepareComponents, createGraph, logOutputs, loadState } = require('./utils')
 
@@ -74,7 +73,7 @@ class ComponentDeclarative extends Component {
           const res = await instance[operation](inputs)
           results[instanceId] = res
           outputs[instanceId] = res
-          // push information about used component (used in the meta data)
+          // push information about used component (used in the the components state data)
           usedComponents.push({
             instanceId,
             component,
@@ -87,7 +86,8 @@ class ComponentDeclarative extends Component {
       )
     }
 
-    await meta.save({ components: usedComponents })
+    this.state = { components: usedComponents }
+    await this.save()
 
     logOutputs(this.cli, outputs)
   }
@@ -115,7 +115,7 @@ class ComponentDeclarative extends Component {
     const components = { ...componentsToRun, ...componentsToRemove }
     const graph = createGraph(componentsToRun, componentsToRemove, vars)
 
-    const state = await loadState()
+    const state = await loadState(this.state)
     const outputs = {}
 
     const sources = graph.sources()
@@ -150,7 +150,8 @@ class ComponentDeclarative extends Component {
       )
     }
 
-    await meta.save({ components: [] })
+    this.state = {}
+    await this.save()
 
     logOutputs(this.cli, outputs)
   }

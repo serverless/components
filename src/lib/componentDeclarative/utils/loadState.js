@@ -1,10 +1,7 @@
 const { readState } = require('../../../utils')
-const meta = require('./meta')
 
-async function loadState() {
-  const metaData = await meta.load()
-
-  return metaData.components.reduce(async (accum, config) => {
+async function loadState(state) {
+  return state.components.reduce(async (accum, config) => {
     accum = await accum
     const id = config.stateFileName
       .split('.')
