@@ -167,17 +167,21 @@ const runDeclarative = async (filePath, config, cli) => {
 }
 
 const runPrompt = async () => {
+
+  // Add whitespace
+  console.log('')
+
   const selected = await prompt([
     {
       type: 'list',
       name: 'template',
-      message: 'What would you like to create in this directory?',
+      message: 'Pick a starting point:',
       paginated: true,
       choices: [
-        { name: 'My Own Component', value: 'component' },
+        { name: 'Create A New Component', value: 'component' },
         { name: 'Function', value: 'function' },
-        { name: 'API', value: 'api' },
-        { name: 'Schedule', value: 'schedule' },
+        { name: 'REST API', value: 'api' },
+        { name: 'Scheduled Task', value: 'schedule' },
         { name: 'Website', value: 'website' },
         { name: 'Realtime Application', value: 'realtime-app' },
         { name: 'Chat Application', value: 'chat-app' },
@@ -185,6 +189,9 @@ const runPrompt = async () => {
       ]
     }
   ])
+
+  // Add whitespace
+  console.log('')
 
   const templateDirPath = path.join(__dirname, '..', '..', 'templates', selected.template)
 
@@ -199,6 +206,10 @@ const runPrompt = async () => {
     console.log(`  Done. You can now run "components" for a quick tour.`)
     console.log()
   }
+
+  // Add whitespace
+  console.log('')
+
   process.exit(0)
 }
 
