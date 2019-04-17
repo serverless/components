@@ -5,7 +5,7 @@
 
 **Serverless Components** is a framework for provisioning and composing cloud services into higher-level abstractions, like features and applications.  
 
-It depends on external [Components](https://www.github.com/serverless-components), which are javascript libraries that can provision themselves.  
+It depends on external [Components](https://www.github.com/serverless-components), which are javascript libraries that can provision something, like infrastructure or a whole software feature built on multiple piecs of infrastructure.  
 
 You can use Components programmatically with a `serverless.js` file:
 
