@@ -1,4 +1,4 @@
-const { contains, isEmpty, last, split } = require('ramda')
+const { contains, isNil, last, split } = require('ramda')
 const { createReadStream, createWriteStream } = require('fs-extra')
 const archiver = require('archiver')
 const globby = require('globby')
@@ -16,7 +16,7 @@ const packDir = async (inputDirPath, outputFilePath, include = [], exclude = [],
 
   const patterns = ['**']
 
-  if (!isEmpty(exclude)) {
+  if (!isNil(exclude)) {
     exclude.forEach((excludedItem) => patterns.push(`!${excludedItem}`))
   }
 
@@ -41,7 +41,7 @@ const packDir = async (inputDirPath, outputFilePath, include = [], exclude = [],
         archive.append(createReadStream(file.input), { name: file.output, date: new Date(0) })
       )
 
-      if (!isEmpty(include)) {
+      if (!isNil(include)) {
         include.forEach((file) => {
           const stream = createReadStream(file)
           archive.append(stream, { name: path.basename(file), date: new Date(0) })
