@@ -238,8 +238,9 @@ If you only want to simply compose some components together, without creating yo
 
 
 ```yml
-name: my-stack # optional name to be reused
-stage: dev # optional stage to be reused
+name: my-stack      # a unique name to be reused
+stage: dev          # a global stage to be reused
+region: us-east-2   # a global region to be reused
 anything: something # you can put any property here that could be reused.
 
 # this property is identified as a component because it contains a component key
@@ -250,7 +251,8 @@ myLambda:
   # each component expects a different set of inputs.
   # check the respective docs of each component.
   inputs: 
-    name: ${name}-{stage}-lambda # you can reference any property above
+    name: ${name}-{stage}-lambda      # you can reference any property above
+    region: ${region}                 # referencing the global region
     env:
       TABLE_NAME: {comp:myTable.name} # you can also reference the outputs of another component in this file
       
@@ -258,6 +260,7 @@ myTable:
   component: "@serverless/aws-dynamodb@0.1.0" # you could pint to a specific npm version
   inputs:
     name: {name}-table
+    region: ${region}
 
 # you could also use point to a local component directory with a serverless.js file
 # very useful when developing & testing components
