@@ -177,7 +177,7 @@ const runPrompt = async () => {
         { name: 'My Own Component', value: 'component' },
         { name: 'Function', value: 'function' },
         { name: 'API', value: 'api' },
-        { name: 'Cron', value: 'cron' },
+        { name: 'Schedule', value: 'schedule' },
         { name: 'Website', value: 'website' },
         { name: 'Realtime Application', value: 'realtime-app' },
         { name: 'Chat Application', value: 'chat-app' },
