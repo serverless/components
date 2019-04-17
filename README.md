@@ -2,6 +2,7 @@
 
 <h4 align="center">Updates ⚡️ <a href="https://github.com/serverless/components/releases/tag/0.1.18">v0.1.18 is released with 14 components & 8 high level templates.</a></h4>
 
+
 **Serverless Components** is a framework for provisioning and composing cloud services into higher-level abstractions, like features and applications.  
 
 It depends on external [Components](https://www.github.com/serverless-components), which are javascript libraries that know how to provision themselves.  
