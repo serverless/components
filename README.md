@@ -18,10 +18,6 @@ MyComponent extends Component {
     this.state.url = outputs.url
     await this.save()
   }
-  async remove() {
-    const website = this.load('@serverless/website') // Load a component
-    const outputs = website.remove() // Remove it
-  }
 }
 
 ```
