@@ -2,7 +2,9 @@
 
 <h4 align="center">Updates ⚡️ <a href="https://github.com/serverless/components/releases/tag/0.1.18">v0.1.18 is released with 14 components & 8 high level templates.</a></h4>
 
-**Serverless Components** is a framework for provisioning and composing cloud services into higher-level abstractions, like features and applications.  It works with external [Components](https://www.github.com/serverless-components), which are merely javascript libraries that know how to provision themselves.  
+**Serverless Components** is a framework for provisioning and composing cloud services into higher-level abstractions, like features and applications.  
+
+It depends on external [Components](https://www.github.com/serverless-components), which are javascript libraries that know how to provision themselves.  
 
 You can use Components programmatically with a `serverless.js` file:
 
@@ -26,8 +28,6 @@ MyComponent extends Component {
 You can also use Components declaratively with a `serverless.yml` file:
 
 ```yaml
-# serverless.yml
-
 name: my-app
 
 website:
