@@ -1,6 +1,6 @@
 [![Serverless Components](https://s3.amazonaws.com/assets.github.serverless/components/serverless-components-readme.gif)](http://serverless.com)
 
-<h4 align="center">Updates ⚡️ <a href="https://github.com/serverless/components/releases/tag/0.1.17">v0.1.17 is released with 14 components & 8 high level templates.</a></h4>
+<h4 align="center">Updates ⚡️ <a href="https://github.com/serverless/components/releases/tag/0.1.18">v0.1.18 is released with 14 components & 8 high level templates.</a></h4>
 
 **Serverless Components** is a framework for easily provisioning and sharing application components on ~~cloud~~ serverless services.
 
