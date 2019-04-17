@@ -234,7 +234,10 @@ Just run `components` in the directory that contains the `serverless.js` file to
 For complete real-world examples on writing components, [check out our official components](https://github.com/serverless-components)
 
 ## Declarative Usage
-If you only want to simply compose some components together, without creating your own component, you could use one of the available components declaratively. All you need to do is create a `serverless.yml` file.
+
+If you want to compose some components together, without creating your own component, you can also do it in declaratively, in YAML.
+
+Create a `serverless.yml` file that looks like this.
 
 
 ```yml
