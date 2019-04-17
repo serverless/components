@@ -2,28 +2,44 @@
 
 <h4 align="center">Updates ⚡️ <a href="https://github.com/serverless/components/releases/tag/0.1.18">v0.1.18 is released with 14 components & 8 high level templates.</a></h4>
 
-**Serverless Components** is a framework for easily provisioning and sharing application components on ~~cloud~~ serverless services.
+**Serverless Components** is a framework for provisioning and composing cloud services into higher-level abstractions, like features and applications.  It works with external [Components](https://www.github.com/serverless-components), which are merely javascript libraries that know how to provision themselves.  
 
-It does not seek to be another general infrastructure provisioning tool (e.g. Cloudformation, Terraform), but a solution that enables developers to build their own reusable abstractions on top of infrastructure, that resemble the use-case they are seeking to build (e.g. a Blog, Payment Processor, Realtime Application). Components are simply npm packages that provision infrastructure and high level use cases.
+You can use Components programmatically with a `serverless.js` file:
 
-You could use components either programmatically with a `serverless.js` file (which would also create a component in the process), or with a `serverless.yml` file. These Components are use-case focused, and you can deploy them alongside infrastructure, in the same file.
+```javascript
+
+MyComponent extends Component {
+  async default() {
+    const website = this.load('@serverless/website') // Load a component
+    const outputs = website({ code: './code' }) // Deploy it
+    this.state.url = outputs.url
+    await this.save()
+  }
+  async remove() {
+    const website = this.load('@serverless/website') // Load a component
+    const outputs = website.remove() // Remove it
+  }
+}
+
+```
+
+You can also use Components declaratively with a `serverless.yml` file:
 
 ```yaml
 # serverless.yml
 
-name: my-blog
+name: my-app
 
-# higher-level abstraction
-Comments:
-  component: "@serverless/comments"
+website:
+  component: "@serverless/website"
   inputs:
-    region: us-east-1
+    code: ./code
+```
 
-# infrastructure
-listPosts:
-  component: "@serverless/aws-lambda"
-  inputs:
-    memorySize: 1024
+Deploy with the CLI, like this:
+
+```shell
+$ components
 ```
 
 &nbsp;
