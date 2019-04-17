@@ -86,8 +86,6 @@ AWS_SECRET_ACCESS_KEY=XXX
 
 Instead of creating your own component, you could also choose to generate a `serverless.yml` template that uses one or more of the available components (e.g. `Chat Application`), which would copy one of the available [templates](./templates) into the current working directory.
 
-**Note:** If you don't have your aws access keys set globally, don't forget to add them to a `.env` file in the current directory.
-
 After choosing what you'd like to create from the prompt, run `components` to run your template.
 
 ```console
