@@ -1,9 +1,0 @@
-name: my-chat-app
-stage: dev
-
-myChatApp:
-  component: "@serverless/chat-app"
-  inputs:
-    # colorBackground: black
-    # colorInputText: white
-    # logoUrl:

@@ -180,12 +180,11 @@ const runPrompt = async () => {
       choices: [
         { name: 'Create A New Component', value: 'component' },
         { name: 'Function', value: 'function' },
-        { name: 'REST API', value: 'api' },
         { name: 'Scheduled Task', value: 'schedule' },
+        { name: 'REST API', value: 'api' },
         { name: 'Website', value: 'website' },
-        { name: 'Realtime Application', value: 'realtime-app' },
-        { name: 'Chat Application', value: 'chat-app' },
-        { name: 'Websocket Backend', value: 'websocket-backend' }
+        { name: 'Websocket Backend', value: 'websocket-backend' },
+        { name: 'Realtime Application', value: 'realtime-app' }
       ]
     }
   ])
