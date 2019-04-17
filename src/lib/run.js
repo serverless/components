@@ -202,8 +202,7 @@ const runPrompt = async () => {
   if (selected.template === 'component') {
     console.log(`  Installing Dependencies...`)
     await exec('npm install')
-    console.log(`  Done. You can now run "components" for a quick tour.`)
-    console.log()
+    console.log(`  Installed.  Run "components" for a quick tour.`)
   }
 
   // Add whitespace
