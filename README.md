@@ -37,10 +37,8 @@ website:
     code: ./code
 ```
 
-Deploy with the CLI, like this:
-
 ```shell
-$ components
+$ components # Run this CLI command to deploy
 ```
 
 &nbsp;
