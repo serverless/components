@@ -1,6 +1,6 @@
 [![Serverless Components](https://s3.amazonaws.com/assets.github.serverless/components/serverless-components-readme.gif)](http://serverless.com)
 
-<h4 align="center">Updates ⚡️ <a href="https://github.com/serverless/components/releases/tag/0.1.18">v0.1.18 is released with 14 components & 8 high level templates.</a></h4>
+<h4 align="center">Updates ⚡️ <a href="https://github.com/serverless/components/releases/tag/0.1.19">v0.1.19 is released. We're now exporting utils under a utils object.</a></h4>
 
 
 Serverless Components is a framework for provisioning and composing cloud services into higher-level abstractions, like features and applications.  It depends on external [Components](https://www.github.com/serverless-components), which are javascript libraries that can provision something, like infrastructure or a whole software feature built on multiple piecs of infrastructure.  
@@ -112,19 +112,22 @@ These are the available components you could instantly deploy declarateively wit
 
 &nbsp;
 
-- [RealtimeApp](https://github.com/serverless-components/RealtimeApp)
-- [Socket](https://github.com/serverless-components/Socket)
-- [Website](https://github.com/serverless-components/Website)
-- [ChatApp](https://github.com/serverless-components/ChatApp)
-- [Schedule](https://github.com/serverless-components/schedule)
-- [Mono](https://github.com/serverless-components/mono)
-- [AwsDynamoDb](https://github.com/serverless-components/AwsDynamoDb)
-- [AwsApiGateway](https://github.com/serverless-components/AwsApiGateway)
-- [AwsIamRole](https://github.com/serverless-components/AwsIamRole)
-- [AwsLambda](https://github.com/serverless-components/AwsLambda)
-- [AwsLambdaLayer](https://github.com/serverless-components/AwsLambdaLayer)
-- [AwsS3](https://github.com/serverless-components/AwsS3)
-- [AwsWebSockets](https://github.com/serverless-components/AwsWebSockets)
+- [realtime-app](https://github.com/serverless-components/realtime-app)
+- [socket](https://github.com/serverless-components/socket)
+- [website](https://github.com/serverless-components/website)
+- [chat-app](https://github.com/serverless-components/chat-app)
+- [schedule](https://github.com/serverless-components/schedule)
+- [function](https://github.com/serverless-components/function)
+- [mono](https://github.com/serverless-components/mono)
+- [aws-dynamodb](https://github.com/serverless-components/aws-dynamodb)
+- [aws-api-gateway](https://github.com/serverless-components/aws-api-gateway)
+- [aws-iam-role](https://github.com/serverless-components/aws-iam-role)
+- [aws-iam-policy](https://github.com/serverless-components/aws-iam-policy)
+- [aws-lambda](https://github.com/serverless-components/aws-lambda)
+- [aws-lambda-layer](https://github.com/serverless-components/aws-lambda-layer)
+- [aws-s3](https://github.com/serverless-components/aws-s3)
+- [aws-websockets](https://github.com/serverless-components/aws-websockets)
+- [cloudflare-dns](https://github.com/serverless-components/cloudflare-dns)
 
 &nbsp;
 
