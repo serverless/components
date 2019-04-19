@@ -11,8 +11,8 @@ You can use Components programmatically with a `serverless.js` file:
 
 MyComponent extends Component {
   async default() {
-    const website = this.load('@serverless/website') // Load a component
-    const outputs = website({ code: './code' }) // Deploy it
+    const website = await this.load('@serverless/website') // Load a component
+    const outputs = await website({ code: './code' }) // Deploy it
     this.state.url = outputs.url
     await this.save()
   }
