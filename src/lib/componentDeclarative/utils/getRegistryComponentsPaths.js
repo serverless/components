@@ -85,6 +85,15 @@ async function getRegistryComponentsPaths(componentsToInstall) {
     const requirePath = path.join(npmInstallPath, 'node_modules', componentVersionToInstall.name)
     const exactVersion = componentVersionToInstall.pair
 
+    // todo - Eslam
+    // for now we are auto checking for updates for all components in the local cache
+    // this ensures if there's a bug fix for one of the component dependencies
+    // the user will be able to get it without having to nuke their local cache (or even know about it)
+    // however, this adds couple of seconds to the deployment speed and might not be optimal in the long term
+    // let's test it for a while, if we find that it's too slow, we could make it manually triggered
+    // with a --update / -u flag. In that case, just edit the following line :)
+    const shouldUpdate = true || process.argv.find((arg) => arg === '--update' || arg === '-u')
+
     if (!(await dirExists(requirePath))) {
       try {
         await exec(`npm install ${exactVersion} --prefix ${npmInstallPath}`)
@@ -92,6 +101,8 @@ async function getRegistryComponentsPaths(componentsToInstall) {
         await remove(npmInstallPath)
         throw e
       }
+    } else if (shouldUpdate) {
+      await exec(`npm update`, { cwd: requirePath })
     }
 
     componentsPathsMap[component] = requirePath

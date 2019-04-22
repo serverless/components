@@ -4,7 +4,7 @@
 
 const { pick } = require('ramda')
 const Component = require('./lib/component/serverless')
-const utils = require('./utils')
+const allUtils = require('./utils')
 
 // choose useful utils to export for component author
 const utilsToExport = [
@@ -25,5 +25,6 @@ const utilsToExport = [
 
 module.exports = {
   Component,
-  ...pick(utilsToExport, utils)
+  utils: pick(utilsToExport, allUtils),
+  ...pick(utilsToExport, allUtils) // todo remove later when no components are using it. #430
 }
