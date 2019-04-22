@@ -1,6 +1,6 @@
 [![Serverless Components](https://s3.amazonaws.com/assets.github.serverless/components/serverless-components-readme.gif)](http://serverless.com)
 
-<h4 align="center">Updates ⚡️ <a href="https://github.com/serverless/components/releases/tag/0.1.19">v0.1.19 is released. We're now exporting utils under a utils object.</a></h4>
+<h4 align="center">Updates ⚡️ <a href="https://github.com/serverless/components/releases/tag/0.1.20">v0.1.20 is released! We are now auto updating the local cache.</a></h4>
 
 
 Serverless Components is a framework for provisioning and composing cloud services into higher-level abstractions, like features and applications.  It depends on external [Components](https://www.github.com/serverless-components), which are javascript libraries that can provision something, like infrastructure or a whole software feature built on multiple piecs of infrastructure.  
