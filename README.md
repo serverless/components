@@ -3,7 +3,7 @@
 <h4 align="center">Updates ⚡️ <a href="https://github.com/serverless/components/releases/tag/0.1.20">v0.1.20 is released! We are now auto updating the local cache dependencies.</a></h4>
 
 
-Serverless Components is a framework for provisioning and composing cloud services into higher-level abstractions, like features and applications.  It depends on external [Components](https://www.github.com/serverless-components), which are javascript libraries that can provision something, like infrastructure or a whole software feature built on multiple piecs of infrastructure.  
+Serverless Components is a framework for provisioning and composing cloud services into higher-level abstractions, like features and applications.  It depends on external [Components](https://www.github.com/serverless-components), which are javascript libraries that can provision something, like infrastructure or a whole software feature built on multiple piecs of infrastructure.
 
 You can use Components programmatically with a `serverless.js` file:
 
@@ -126,6 +126,7 @@ These are the available components you could instantly deploy declarateively wit
 - [aws-lambda](https://github.com/serverless-components/aws-lambda)
 - [aws-lambda-layer](https://github.com/serverless-components/aws-lambda-layer)
 - [aws-s3](https://github.com/serverless-components/aws-s3)
+- [aws-sns-topic](https://github.com/serverless-components/aws-sns-topic)
 - [aws-websockets](https://github.com/serverless-components/aws-websockets)
 - [cloudflare-dns](https://github.com/serverless-components/cloudflare-dns)
 
@@ -212,7 +213,7 @@ class MyComponent extends Component {
     // If you are deploying multiple instances of the same Component, include an instance id. This also pre-fills them with any existing state.
     let website1 = await this.load('@serverless/website', 'website1')
     let website2 = await this.load('@serverless/website', 'website2')
-    
+
     // You can also load a local component that is not yet published to npm
     // just reference the root dir that contains the serverless.js file
     let localComponent = await this.load('../my-local-component')
@@ -261,16 +262,16 @@ anything: something # you can put any property here that could be reused.
 # this property is identified as a component because it contains a component key
 myLambda:
   component: "@serverless/aws-lambda" # the npm package name of the component that core would download and cache.
-  
+
   # inputs to be passed to the component.
   # each component expects a different set of inputs.
   # check the respective docs of each component.
-  inputs: 
+  inputs:
     name: ${name}-{stage}-lambda      # you can reference any property above
     region: ${region}                 # referencing the global region
     env:
       TABLE_NAME: {comp:myTable.name} # you can also reference the outputs of another component in this file
-      
+
 myTable:
   component: "@serverless/aws-dynamodb@0.1.0" # you could pint to a specific npm version
   inputs:
