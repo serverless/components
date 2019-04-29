@@ -5,7 +5,7 @@
 
 const path = require('path')
 const Component = require('../component/serverless')
-const { readFile } = require('../../utils')
+const { readFile, difference } = require('../../utils')
 const { ROOT_NODE_NAME } = require('./constants')
 const variables = require('./utils/variables')
 const { getComponents, prepareComponents, createGraph, logOutputs, loadState } = require('./utils')
@@ -30,9 +30,30 @@ class ComponentDeclarative extends Component {
 
     // TODO: refactor so that we don't need to pass `this` into it
     const componentsToRun = await prepareComponents(configComponents, this)
+    let componentsToRemove = {}
 
-    // TODO: re-implement component auto-removal
-    const componentsToRemove = {}
+    if (this.state.components) {
+      const declarativeState = this.state
+      const stateComponentKeys = declarativeState.components.map((comp) => comp.instanceId)
+      const configComponentKeys = Object.keys(configComponents)
+      const toRemove = difference(stateComponentKeys, configComponentKeys)
+      const stateComponents = await loadState(declarativeState)
+      componentsToRemove = Object.keys(stateComponents).reduce((accum, instanceId) => {
+        const inputs = stateComponents[instanceId]
+        if (toRemove.includes(instanceId) && Object.keys(inputs).length) {
+          const { component } = declarativeState.components.find(
+            (comp) => comp.instanceId === instanceId
+          )
+          accum[instanceId] = {
+            component,
+            inputs
+          }
+        }
+        return accum
+      }, {})
+      componentsToRemove = await prepareComponents(componentsToRemove, this)
+    }
+
     const components = { ...componentsToRun, ...componentsToRemove }
 
     const graph = createGraph(componentsToRun, componentsToRemove, vars)
@@ -74,11 +95,13 @@ class ComponentDeclarative extends Component {
           results[instanceId] = res
           outputs[instanceId] = res
           // push information about used component (used in the the components state data)
-          usedComponents.push({
-            instanceId,
-            component,
-            stateFileName: `${instance.id}.json`
-          })
+          if (operation !== 'remove') {
+            usedComponents.push({
+              instanceId,
+              component,
+              stateFileName: `${instance.id}.json`
+            })
+          }
           return {
             [instanceId]: outputs
           }
