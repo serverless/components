@@ -3,9 +3,7 @@ const path = require('path')
 function getLocalComponentsPaths(localComponents) {
   if (localComponents.length) {
     return localComponents.reduce(
-      (accum, component) => ({
-        [component]: path.resolve(component)
-      }),
+      (accum, component) => Object.assign(accum, { [component]: path.resolve(component) }),
       {}
     )
   }

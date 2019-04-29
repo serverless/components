@@ -267,15 +267,15 @@ myLambda:
   # each component expects a different set of inputs.
   # check the respective docs of each component.
   inputs:
-    name: ${name}-{stage}-lambda      # you can reference any property above
+    name: ${name}-${stage}-lambda      # you can reference any property above
     region: ${region}                 # referencing the global region
     env:
-      TABLE_NAME: {comp:myTable.name} # you can also reference the outputs of another component in this file
+      TABLE_NAME: ${comp:myTable.name} # you can also reference the outputs of another component in this file
 
 myTable:
-  component: "@serverless/aws-dynamodb@0.1.0" # you could pint to a specific npm version
+  component: "@serverless/aws-dynamodb@0.1.0" # you could point to a specific npm version
   inputs:
-    name: {name}-table
+    name: ${name}-table
     region: ${region}
 
 # you could also use point to a local component directory with a serverless.js file
@@ -283,7 +283,7 @@ myTable:
 localComponent:
   component: "../my-component" # path to local component
   inputs:
-    name: {anything}-something
+    name: ${anything}-something
 ```
 
 when you run `components` or `components remove` in the directory that contains the `serverless.yml` file, the core will set up a dependency graph based on your references and run the `default` function of each component in order. Only `default` and `remove` functions could be run when using `serverless.yml`. If you'd like to call a custom function of a component, use it programatically as explained above.
