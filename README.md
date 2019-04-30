@@ -119,6 +119,7 @@ These are the available components you could instantly deploy declarateively wit
 - [schedule](https://github.com/serverless-components/schedule)
 - [function](https://github.com/serverless-components/function)
 - [mono](https://github.com/serverless-components/mono)
+- [passwordless](https://github.com/serverless-components/passwordless)
 - [aws-dynamodb](https://github.com/serverless-components/aws-dynamodb)
 - [aws-api-gateway](https://github.com/serverless-components/aws-api-gateway)
 - [aws-iam-role](https://github.com/serverless-components/aws-iam-role)
