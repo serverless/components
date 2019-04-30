@@ -3,7 +3,7 @@
 <h4 align="center">Updates ⚡️ New Component: <a href="https://github.com/serverless-components/aws-sns-topic">aws-sns-topic</a> - shout out to <a href="https://github.com/laardee">Eetu Tuomala</a> for building this component.</h4>
 
 
-Serverless Components is a framework for provisioning and composing cloud services into higher-level abstractions, like features and applications.  It depends on external [Components](https://www.github.com/serverless-components), which are javascript libraries that can provision something, like infrastructure or a whole software feature built on multiple piecs of infrastructure.
+Serverless Components is a framework for provisioning and composing cloud services into higher-level abstractions, like features and applications.  It depends on external [Components](https://www.github.com/serverless-components), which are javascript libraries that can provision something, like infrastructure or a whole software feature built on multiple pieces of infrastructure.
 
 You can use Components programmatically with a `serverless.js` file:
 
