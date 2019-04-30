@@ -1,6 +1,6 @@
 [![Serverless Components](https://s3.amazonaws.com/assets.github.serverless/components/serverless-components-readme.gif)](http://serverless.com)
 
-<h4 align="center">Updates ⚡️ <a href="https://github.com/serverless-components/passwordless">New Component: Passwordless - Enable your users to sign-up/sign-in with SMS. </a></h4>
+<h4 align="center">Updates ⚡️ New Component: <a href="https://github.com/serverless-components/aws-sns-topic">aws-sns-topic</a> - Special thanks to <a href="https://github.com/laardee">Eetu Tuomala</a> for building this component.</h4>
 
 
 Serverless Components is a framework for provisioning and composing cloud services into higher-level abstractions, like features and applications.  It depends on external [Components](https://www.github.com/serverless-components), which are javascript libraries that can provision something, like infrastructure or a whole software feature built on multiple piecs of infrastructure.
