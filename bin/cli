@@ -3,19 +3,51 @@
 /*
  * Serverless Components – Command Line Interface
  */
+const path = require('path');
+const { ArgumentParser } = require('argparse');
+const { version } = require(path.resolve(path.join(__dirname, '../package.json')));
+
+const parser = new ArgumentParser({
+  version: version,
+  addHelp:true,
+  prog: "components",
+  description: 'Serverless components usage'
+});
+
+parser.addArgument('method', {
+  action: 'store',
+  nargs: "?",
+  choices: ['deploy', 'remove'],
+  defaultValue: null,
+  help: 'Methods'
+})
+
+parser.addArgument([ '-s', '--stage' ], {
+  help: 'Stage of the service',
+  required: false,
+  defaultValue: 'dev'
+});
+
+parser.addArgument([ '-d', '--debug' ], {
+  action: 'storeTrue',
+  help: 'Debug mode'
+});
+
+parser.addArgument([ '-w', '--watch' ], {
+  action: 'storeTrue',
+  help: 'Watch mode'
+});
+
+parser.addArgument([ '-vv', '--verbose' ], {
+  action: 'storeTrue',
+  help: 'Verbose mode'
+});
+
+const config = parser.parseArgs();
 
 const args = require('minimist')(process.argv.slice(2))
 const run = require('../src/lib/run')
 const watch = require('../src/lib/watch')
-
-// Set config from CLI input
-const config = {}
-config.stage = args.s || args.stage ? args.s || args.stage : 'dev'
-config.instance = args._[1] || null
-config.method = args._[0] || null
-config.verbose = args.v || args.verbose ? args.v || args.verbose : false
-config.debug = args.d || args.debug ? args.d || args.debug : false
-config.watch = args.w || args.watch ? args.w || args.watch : false
 
 // Run
 ;(async () => {
