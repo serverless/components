@@ -1,6 +1,6 @@
 [![Serverless Components](https://s3.amazonaws.com/assets.github.serverless/components/serverless-components-readme.gif)](http://serverless.com)
 
-<h4 align="center">Updates ⚡️ New Component: <a href="https://github.com/serverless-components/aws-sns-topic">aws-sns-topic</a> - shout-out to <a href="https://github.com/laardee">Eetu Tuomala</a> for building this component.</h4>
+<h4 align="center">Updates ⚡️ New Component: <a href="https://github.com/serverless-components/aws-sns-subscription">aws-sns-subscription</a> - shout-out to <a href="https://github.com/laardee">Eetu Tuomala</a> for building this component.</h4>
 
 
 Serverless Components is a framework for provisioning and composing cloud services into higher-level abstractions, like features and applications.  It depends on external [Components](https://www.github.com/serverless-components), which are javascript libraries that can provision something, like infrastructure or a whole software feature built on multiple pieces of infrastructure.
@@ -128,6 +128,7 @@ These are the available components you could instantly deploy declarateively wit
 - [aws-lambda-layer](https://github.com/serverless-components/aws-lambda-layer)
 - [aws-s3](https://github.com/serverless-components/aws-s3)
 - [aws-sns-topic](https://github.com/serverless-components/aws-sns-topic)
+- [aws-sns-subscription](https://github.com/serverless-components/aws-sns-subscription)
 - [aws-websockets](https://github.com/serverless-components/aws-websockets)
 - [cloudflare-dns](https://github.com/serverless-components/cloudflare-dns)
 
