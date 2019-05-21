@@ -17,7 +17,6 @@ const parser = new ArgumentParser({
 parser.addArgument('method', {
   action: 'store',
   nargs: "?",
-  choices: ['deploy', 'remove'],
   defaultValue: null,
   help: 'Methods'
 })
