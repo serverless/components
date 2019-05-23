@@ -117,44 +117,28 @@ const runDeclarative = async (filePath, config, cli) => {
 
   // If config.method and config.instance, load and run that component's method...
   if (config.instance && config.method) {
-    let instanceName
-    let componentName
-
-    for (const instance in fileContent.components || {}) {
-      const c = instance.split('::')[0]
-      const i = instance.split('::')[1]
-      if (config.instance === i) {
-        instanceName = i
-        componentName = c
-      }
-    }
 
     // Check Component instance exists in serverless.yml
-    if (!instanceName) {
+    if (!fileContent[config.instance]) {
       throw Error(`Component instance "${config.instance}" does not exist in your project.`)
-    }
-
-    // Check Component exists
-    if (!(await coreComponentExists(componentName))) {
-      throw Error(`Component "${componentName}" is not a valid Component.`)
     }
 
     // Config CLI
     cli.config({
       stage: config.stage,
-      parentComponent: `${instanceName}`
+      parentComponent: `${config.instance}`
     })
 
-    Component = await loadComponent(componentName)
+    Component = await loadComponent(fileContent[config.instance].component)
     component = new Component({
-      id: `${context.stage}.${fileContent.name}.${instanceName}`, // Construct correct name of child Component
+      id: `${context.stage}.${fileContent.name}.${config.instance}`, // Construct correct name of child Component
       context,
       cli
     })
     try {
-      result = await component[config.method]()
+      result = await component[config.method](config.inputs)
     } catch (error) {
-      return errorHandler(error, componentName)
+      return errorHandler(error, fileContent[config.instance].component)
     }
   }
 

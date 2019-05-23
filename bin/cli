@@ -11,11 +11,23 @@ const watch = require('../src/lib/watch')
 // Set config from CLI input
 const config = {}
 config.stage = args.s || args.stage ? args.s || args.stage : 'dev'
+if (args.s) delete args.s
+if (args.stage) delete args.stage
 config.instance = args._[1] || null
 config.method = args._[0] || null
+if (args._) delete args._
 config.verbose = args.v || args.verbose ? args.v || args.verbose : false
+if (args.v) delete args.v
+if (args.verbose) delete args.verbose
 config.debug = args.d || args.debug ? args.d || args.debug : false
+if (args.d) delete args.d
+if (args.debug) delete args.debug
 config.watch = args.w || args.watch ? args.w || args.watch : false
+if (args.w) delete args.w
+if (args.watch) delete args.watch
+
+// Everything else is treated as an input
+config.inputs = args
 
 // Run
 ;(async () => {
