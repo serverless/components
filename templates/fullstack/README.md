@@ -12,7 +12,42 @@ This example will included, but is not limited to:
 
 ## Structure
 
+```yaml
 
+name: fullstack
 
+# Client-Website
+client-website:
+  component: "@serverless/website"
+  inputs:
+    code: ./client-website
 
-## Roadmap
+# Functions    
+createUser:
+  component: "@serverless/function"
+  inputs:
+    name: ${name}-create-user
+    code: ./code
+    handler: index.createUser
+getUsers:
+  component: "@serverless/function"
+  inputs:
+    name: ${name}-get-users
+    code: ./code
+    handler: index.getUsers
+
+# REST API
+restApi:
+  component: "@serverless/api"
+  inputs:
+    name: ${name}
+    description: Serverless REST API
+    endpoints:
+      - path: /users
+        method: POST
+        function: ${comp:createUser.arn}
+      - path: /users
+        method: GET
+        function: ${comp:getUsers.arn}
+
+```
