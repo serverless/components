@@ -16,24 +16,24 @@ This example will included, but is not limited to:
 
 name: fullstack
 
-# Client-Website
-client-website:
+# Frontend
+frontend:
   component: "@serverless/website"
   inputs:
-    code: ./client-website
+    code: ./frontend
 
-# Functions    
+# Functions
 createUser:
   component: "@serverless/aws-lambda"
   inputs:
     name: ${name}-create-user
-    code: ./code
+    code: ./backend
     handler: index.createUser
 getUsers:
   component: "@serverless/aws-lambda"
   inputs:
     name: ${name}-get-users
-    code: ./code
+    code: ./backend
     handler: index.getUsers
 
 # REST API
