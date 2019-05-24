@@ -167,7 +167,6 @@ const runDeclarative = async (filePath, config, cli) => {
 }
 
 const runPrompt = async () => {
-
   // Add whitespace
   console.log('')
 
@@ -180,10 +179,9 @@ const runPrompt = async () => {
       choices: [
         { name: 'Create A New Component', value: 'component' },
         { name: 'Function', value: 'function' },
-        { name: 'Scheduled Task', value: 'schedule' },
         { name: 'REST API', value: 'api' },
         { name: 'Website', value: 'website' },
-        { name: 'Websocket Backend', value: 'websocket-backend' },
+        { name: 'Fullstack Application', value: 'fullstack' },
         { name: 'Realtime Application', value: 'realtime-app' }
       ]
     }
