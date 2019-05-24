@@ -37,14 +37,17 @@ $ components # Run this CLI command to deploy
 
 &nbsp;
 
-- [Get Started](#get-started)
-- [Available Components](#available-components)
-- [Programatic Usage](#programatic-usage)
-- [Declarative Usage](#declarative-usage)
+- [Getting Started](#getting-started)
+- [Programatic Usage (`serverless.js`)](#programatic-usage)
+- [Declarative Usage (`serverless.yml`)](#declarative-usage)
+- [Components Registry](https://github.com/serverless-components/)
+- [Example Templates](./templates)
+- [Join Us on Slack](https://serverless.com/slack)
+
 
 &nbsp;
 
-## Get Started
+## Getting Started
 
 Install components.
 
@@ -59,21 +62,24 @@ create a directory for your new component.
 $ mkdir my-component && cd my-component
 ```
 
-Run `components` and choose what you'd like to create. Choose `My Own Component` for a quick tour that helps you create your own component, which could programmatically use existing components from npm.
+Run `components` and choose what you'd like to create. Choose `Create A New Component` for a quick tour that helps you create your own component, which could programmatically use existing components from npm.
 
 ```console
 $ components
-? What would you like to create in this directory? › - Use arrow-keys. Return to submit.
-❯  My Own Component
-   Function
-   API
-   Website
-   Realtime Application
-   Chat Application
-   Websocket Backend
+
+? Pick a starting point: (Use arrow keys)
+❯ Create A New Component 
+  Function 
+  Scheduled Task 
+  REST API 
+  Website 
+  Websocket Backend 
+  Realtime Application 
 ```
 
 Now every time you run `components`, you'll be running your new component. **Check out the generated files for more information**.
+
+Instead of creating your own component, you could choose to generate a `serverless.yml` template that uses one or more of the available components (e.g. `Chat Application` template), which would copy one of the available [templates](./templates) into the current working directory. This time, everytime you run `components`, you'd be running this template.
 
 #### Setting Credentials
 
@@ -90,49 +96,6 @@ the `.env` files are not required if you have the aws keys set globally and you 
 AWS_ACCESS_KEY_ID=XXX
 AWS_SECRET_ACCESS_KEY=XXX
 ```
-
-## Available Components
-
-Instead of creating your own component, you could also choose to generate a `serverless.yml` template that uses one or more of the available components (e.g. `Chat Application`), which would copy one of the available [templates](./templates) into the current working directory.
-
-After choosing what you'd like to create from the prompt, run `components` to run your template.
-
-```console
-$ chat-app: components
-
-  chat-app › outputs:
-  url:  'http://chatapp-5m53dym.s3-website-us-east-1.amazonaws.com'
-
-  53s › dev › my-chat-app › done
-```
-
-And there you have it! A complete chat application deployed to your own infrastructure in seconds.
-
-These are the available components you could instantly deploy declarateively with a `serverless.yml` file, or programmatically with a `serverless.js` file. Check out each component repo for complete docs on how to use them.
-
-&nbsp;
-
-- [realtime-app](https://github.com/serverless-components/realtime-app)
-- [socket](https://github.com/serverless-components/socket)
-- [website](https://github.com/serverless-components/website)
-- [chat-app](https://github.com/serverless-components/chat-app)
-- [schedule](https://github.com/serverless-components/schedule)
-- [function](https://github.com/serverless-components/function)
-- [mono](https://github.com/serverless-components/mono)
-- [passwordless](https://github.com/serverless-components/passwordless)
-- [aws-dynamodb](https://github.com/serverless-components/aws-dynamodb)
-- [aws-api-gateway](https://github.com/serverless-components/aws-api-gateway)
-- [aws-iam-role](https://github.com/serverless-components/aws-iam-role)
-- [aws-iam-policy](https://github.com/serverless-components/aws-iam-policy)
-- [aws-lambda](https://github.com/serverless-components/aws-lambda)
-- [aws-lambda-layer](https://github.com/serverless-components/aws-lambda-layer)
-- [aws-s3](https://github.com/serverless-components/aws-s3)
-- [aws-sns-topic](https://github.com/serverless-components/aws-sns-topic)
-- [aws-sns-subscription](https://github.com/serverless-components/aws-sns-subscription)
-- [aws-websockets](https://github.com/serverless-components/aws-websockets)
-- [cloudflare-dns](https://github.com/serverless-components/cloudflare-dns)
-
-&nbsp;
 
 ## Programatic Usage
 
