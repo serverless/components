@@ -99,7 +99,7 @@ AWS_SECRET_ACCESS_KEY=XXX
 
 ## Programatic Usage
 
-You can use any of the above components programatically, while at the same time creating your own higher level component. All you need to do is:
+You can use any component programatically, while at the same time creating your own higher level component. All you need to do is:
 
 Install `@serverless/components` as a local dependency.
 
@@ -207,7 +207,7 @@ class MyComponent extends Component {
 }
 ```
 
-Just run `components` in the directory that contains the `serverless.js` file to run your new component. You'll will see all the logs and outputs of your new components. Logs and outputs of any child component you use will not be shown, unless you run in verbose mode: `components --verbose`.
+Just run `components` in the directory that contains the `serverless.js` file to run your new component. You'll will see all the logs and outputs of your new components. Logs and outputs of any child component you use will not be shown, unless you run in verbose mode: `components --verbose`. You can also run any custom method/command you've defined with `components <methodName>`.
 
 For complete real-world examples on writing components, [check out our official components](https://github.com/serverless-components)
 
