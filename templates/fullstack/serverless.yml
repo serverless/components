@@ -19,6 +19,12 @@ getUsers:
     name: ${name}-get-users
     code: ./backend
     handler: index.getUsers
+auth:
+  component: "@serverless/aws-lambda"
+  inputs:
+    name: ${name}-auth
+    code: ./backend
+    handler: index.auth
 
 # REST API
 restApi:
@@ -30,6 +36,8 @@ restApi:
       - path: /users
         method: POST
         function: ${comp:createUser.arn}
+        authorizer: ${comp:auth.arn}
       - path: /users
         method: GET
         function: ${comp:getUsers.arn}
+        authorizer: ${comp:auth.arn}
