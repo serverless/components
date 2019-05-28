@@ -42,6 +42,7 @@ $ components # Run this CLI command to deploy
 - [Declarative Usage (`serverless.yml`)](#declarative-usage)
 - [Components Registry](https://github.com/serverless-components/)
 - [Example Templates](./templates)
+- [Roadmap](https://github.com/serverless/components/projects/1)
 - [Join Us on Slack](https://serverless.com/slack)
 
 
