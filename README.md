@@ -213,7 +213,7 @@ For complete real-world examples on writing components, [check out our official 
 
 ## Declarative Usage
 
-If you want to compose some components together, without creating your own component, you can also do it in declaratively, in YAML.
+If you want to compose some components together, without creating your own component, you can also do it declaratively, in YAML.
 
 Create a `serverless.yml` file that looks like this.
 
