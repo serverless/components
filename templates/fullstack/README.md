@@ -24,13 +24,13 @@ frontend:
 
 # Functions
 createUser:
-  component: "@serverless/aws-lambda"
+  component: "@serverless/function"
   inputs:
     name: ${name}-create-user
     code: ./backend
     handler: index.createUser
 getUsers:
-  component: "@serverless/aws-lambda"
+  component: "@serverless/function"
   inputs:
     name: ${name}-get-users
     code: ./backend
@@ -38,7 +38,7 @@ getUsers:
 
 # REST API
 restApi:
-  component: "@serverless/aws-api-gateway"
+  component: "@serverless/api"
   inputs:
     name: ${name}
     description: Serverless REST API
