@@ -1,4 +1,4 @@
-name: my-realtime-app
+name: fullstack-realtime-app
 
 app:
   component: "@serverless/realtime-app"

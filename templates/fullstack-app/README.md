@@ -14,7 +14,7 @@ This example will included, but is not limited to:
 
 ```yaml
 
-name: fullstack
+name: fullstack-app
 
 # Frontend
 frontend:
@@ -40,7 +40,7 @@ getUsers:
 restApi:
   component: "@serverless/api"
   inputs:
-    name: ${name}
+    name: ${name}-api
     description: Serverless REST API
     endpoints:
       - path: /users

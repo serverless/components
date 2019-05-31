@@ -1,4 +1,4 @@
-name: fullstack
+name: fullstack-app
 
 # Frontend
 frontend:
@@ -30,7 +30,7 @@ auth:
 restApi:
   component: "@serverless/api"
   inputs:
-    name: ${name}
+    name: ${name}-api
     description: Serverless REST API
     endpoints:
       - path: /users

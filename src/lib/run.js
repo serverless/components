@@ -181,8 +181,8 @@ const runPrompt = async () => {
         { name: 'Function', value: 'function' },
         { name: 'REST API', value: 'api' },
         { name: 'Website', value: 'website' },
-        { name: 'Fullstack Application', value: 'fullstack' },
-        { name: 'Realtime Application', value: 'realtime-app' }
+        { name: 'Fullstack App', value: 'fullstack-app' },
+        { name: 'Fullstack Realtime App', value: 'fullstack-realtime-app' }
       ]
     }
   ])
