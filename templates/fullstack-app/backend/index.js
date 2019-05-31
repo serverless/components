@@ -27,3 +27,10 @@ module.exports.auth = async (event, context) => {
     }
   }
 }
+
+module.exports.sendNotification = async (e) => {
+  return {
+    statusCode: 200,
+    body: 'Notification Sent'
+  }
+}

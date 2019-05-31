@@ -35,6 +35,18 @@ getUsers:
     name: ${name}-get-users
     code: ./backend
     handler: index.getUsers
+auth:
+  component: "@serverless/function"
+  inputs:
+    name: ${name}-auth
+    code: ./backend
+    handler: index.auth
+sendNotification:
+  component: "@serverless/function"
+  inputs:
+    name: ${name}-send-notification
+    code: ./backend
+    handler: index.sendNotification
 
 # REST API
 restApi:
@@ -45,9 +57,19 @@ restApi:
     endpoints:
       - path: /users
         method: POST
-        function: ${comp:createUser.arn}
+        function: ${comp:createUser}
+        authorizer: ${comp:auth}
       - path: /users
         method: GET
-        function: ${comp:getUsers.arn}
+        function: ${comp:getUsers}
+        authorizer: ${comp:auth}
+
+# PubSub
+subscriptions:
+  component: "@serverless/subscriptions"
+  inputs:
+    - source: userCreated # topic name
+      function: ${comp:sendNotification}
+
 
 ```
