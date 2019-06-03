@@ -20,3 +20,4 @@ build/
 env.js
 tmp
 package-lock.json
+test

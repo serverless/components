@@ -65,11 +65,12 @@ restApi:
         authorizer: ${comp:auth}
 
 # PubSub
-subscriptions:
-  component: "@serverless/subscriptions"
+PubSub:
+  component: "@serverless/pubsub"
   inputs:
     - source: userCreated # topic name
       function: ${comp:sendNotification}
+
 
 
 ```
