@@ -23,35 +23,49 @@ class Component {
     this.context = config.context
 
     // Set state
-    this.state = readState(this.id)
+    this.state = readState(this.context.root, this.id)
+
+    const entity = this.context.verbose ? this.id : name
 
     // Add CLI utilities
     // we need to keep the entire instance in memory to pass it to child components
-    this.cli = {
-      _: config.cli
+    this.ui = {
+      instance: config.ui,
+      outputs: {}
     }
-    this.cli.log = (log) => {
-      this.cli._.renderLog(log, this.context.verbose ? this.id : name)
+
+    this.ui.log = (log) => {
+      this.ui.instance.log(log, entity)
     }
-    this.cli.status = (status) => {
-      this.cli._.renderStatus(this.context.verbose, status, this.context.verbose ? this.id : name)
+    this.ui.status = (status) => {
+      this.ui.instance.status(this.context.verbose, status, entity)
     }
-    this.cli.warn = (warning) => {
-      this.cli._.renderWarning(warning, this.context.verbose ? this.id : name)
+    this.ui.warn = (warning) => {
+      this.ui.instance.warn(warning, entity)
     }
-    this.cli.outputs = (outputs, entity) => {
-      this.cli._.renderOutputs(outputs, entity || (this.context.verbose ? this.id : name))
+    this.ui.error = (error) => {
+      this.ui.instance.error(error, entity)
+    }
+
+    this.ui.output = (key, value) => {
+      this.ui.outputs[key] = value
+      this.ui.instance.output(key, value)
     }
 
     // Define default function
     // Adds the instance context to it
-    // TODO: validate that component author has defined a default() method
     const that = this
+
+    // make sure author defined at least a default function
+    if (typeof that.default !== 'function') {
+      throw Error(`default function is missing for component "${name}"`)
+    }
+
     const defaultFunction = function(inputs) {
       return that.default.call(that, inputs)
     }
 
-    // Add Component class properties like cli and state
+    // Add Component class properties like ui and state
     Object.keys(this).forEach((prop) => {
       defaultFunction[prop] = this[prop]
     })
@@ -77,7 +91,7 @@ class Component {
   }
 
   save() {
-    return writeState(this.id, this.state)
+    return writeState(this.context.root, this.id, this.state)
   }
 
   async load(componentNameOrPath, componentAlias) {
@@ -85,21 +99,23 @@ class Component {
     const childComponentInstance = new childComponent({
       id: `${this.id}.${componentAlias || childComponent.name}`,
       context: this.context,
-      cli: this.cli._
+      ui: this.ui.instance
     })
 
     // If not verbose, replace outputs w/ empty function to silence child Components
     if (!this.context.verbose) {
-      childComponentInstance.cli.log = () => {
+      childComponentInstance.ui.log = () => {
         return
       }
-      childComponentInstance.cli.status = () => {
+      childComponentInstance.ui.status = () => {
         return
       }
-      childComponentInstance.cli.warn = () => {
+      childComponentInstance.ui.warn = () => {
         return
       }
-      childComponentInstance.cli.outputs = () => {
+      childComponentInstance.ui.output = (key, value) => {
+        childComponentInstance.ui.outputs[key] = value
+        // console.log(childComponentInstance.ui.outputs)
         return
       }
     }

@@ -3,17 +3,15 @@ const dotenv = require('dotenv')
 const { prompt } = require('inquirer')
 const util = require('util')
 const exec = util.promisify(require('child_process').exec)
-const cliInstance = require('./cli')
-const Context = require('./context')
-const ComponentDeclarative = require('./componentDeclarative/serverless')
+const ComponentDeclarative = require('./declarative/serverless')
 const {
-  errorHandler,
   fileExists,
   readFile,
   copyDirContentsSync,
   coreComponentExists,
   loadComponent,
-  prepareCredentials
+  prepareCredentials,
+  api
 } = require('../utils')
 
 /**
@@ -22,7 +20,19 @@ const {
  * @param {Object} config - Configuration
  */
 
-const runProgrammatic = async (filePath, config, cli) => {
+class Context {
+  constructor(config, rootFile = 'serverless.js') {
+    this.stage = config.stage
+    this.root = config.root
+    this.rootFile = rootFile
+    this.credentials = config.credentials
+    this.verbose = config.verbose
+    this.debug = config.debug
+    this.watch = config.watch
+  }
+}
+
+const runProgrammatic = async (filePath, config, ui) => {
   let result
 
   // Load Component
@@ -31,12 +41,12 @@ const runProgrammatic = async (filePath, config, cli) => {
   const Component = require(filePath)
 
   // Config CLI
-  cli.config({
+  ui.config({
     stage: config.stage,
     parentComponent: Component.name
   })
 
-  const component = new Component({ context, cli })
+  const component = new Component({ context, ui })
 
   try {
     // If method was provided, but doesn't exist, throw error
@@ -50,12 +60,12 @@ const runProgrammatic = async (filePath, config, cli) => {
       result = await component[config.method]()
     }
   } catch (error) {
-    return errorHandler(error, Component.name)
+    return ui.error(error, Component.name)
   }
 
   if (!context.watch) {
     // Cleanup CLI
-    cli.close('done')
+    ui.close('done')
   }
 
   return result
@@ -67,7 +77,7 @@ const runProgrammatic = async (filePath, config, cli) => {
  * @param {Object} config - Configuration
  */
 
-const runDeclarative = async (filePath, config, cli) => {
+const runDeclarative = async (filePath, config, ui) => {
   let Component, component, result
 
   const context = new Context(config, path.basename(filePath))
@@ -78,7 +88,7 @@ const runDeclarative = async (filePath, config, cli) => {
   // If no config.method or config.instance has been provided, run the default method...
   if (!config.instance && !config.method) {
     // Config CLI
-    cli.config({
+    ui.config({
       stage: config.stage,
       parentComponent: fileContent.name
     })
@@ -87,18 +97,18 @@ const runDeclarative = async (filePath, config, cli) => {
       component = new ComponentDeclarative({
         name: fileContent.name, // Must pass in name to ComponentDeclaractive
         context,
-        cli
+        ui
       })
       result = await component()
     } catch (error) {
-      return errorHandler(error, fileContent.name)
+      return ui.error(error, fileContent.name)
     }
   }
 
   // If config.method has been provided, run that...
   if (!config.instance && config.method) {
     // Config CLI
-    cli.config({
+    ui.config({
       stage: config.stage,
       parentComponent: fileContent.name
     })
@@ -106,12 +116,12 @@ const runDeclarative = async (filePath, config, cli) => {
     component = new ComponentDeclarative({
       name: fileContent.name, // Must pass in name to ComponentDeclaractive
       context,
-      cli
+      ui
     })
     try {
       result = await component[config.method]()
     } catch (error) {
-      return errorHandler(error, fileContent.name)
+      return ui.error(error, fileContent.name)
     }
   }
 
@@ -121,7 +131,7 @@ const runDeclarative = async (filePath, config, cli) => {
     let componentName
 
     for (const instance in fileContent.components || {}) {
-      const c = instance.split('::')[0]
+      const c = instance.split('::')[0] // eslint-disable-line
       const i = instance.split('::')[1]
       if (config.instance === i) {
         instanceName = i
@@ -140,7 +150,7 @@ const runDeclarative = async (filePath, config, cli) => {
     }
 
     // Config CLI
-    cli.config({
+    ui.config({
       stage: config.stage,
       parentComponent: `${instanceName}`
     })
@@ -149,18 +159,18 @@ const runDeclarative = async (filePath, config, cli) => {
     component = new Component({
       id: `${context.stage}.${fileContent.name}.${instanceName}`, // Construct correct name of child Component
       context,
-      cli
+      ui
     })
     try {
       result = await component[config.method]()
     } catch (error) {
-      return errorHandler(error, componentName)
+      return ui.error(error, componentName)
     }
   }
 
   if (!context.watch) {
     // Cleanup CLI
-    cli.close('done')
+    ui.close('done')
   }
 
   return result
@@ -168,7 +178,7 @@ const runDeclarative = async (filePath, config, cli) => {
 
 const runPrompt = async () => {
   // Add whitespace
-  console.log('')
+  console.log('') // eslint-disable-line
 
   const selected = await prompt([
     {
@@ -188,23 +198,23 @@ const runPrompt = async () => {
   ])
 
   // Add whitespace
-  console.log('')
+  console.log('') // eslint-disable-line
 
   const templateDirPath = path.join(__dirname, '..', '..', 'templates', selected.template)
 
   copyDirContentsSync(templateDirPath, process.cwd())
 
-  console.log(`  Successfully created "${selected.template}" in the current directory.`)
-  console.log(`  Check out the generated files for some helpful instructions.`)
+  console.log(`  Successfully created "${selected.template}" in the current directory.`) // eslint-disable-line
+  console.log(`  Check out the generated files for some helpful instructions.`) // eslint-disable-line
 
   if (selected.template === 'component') {
-    console.log(`  Installing Dependencies...`)
+    console.log(`  Installing Dependencies...`) // eslint-disable-line
     await exec('npm install')
-    console.log(`  Installed.  Run "components" for a quick tour.`)
+    console.log(`  Installed.  Run "components" for a quick tour.`) // eslint-disable-line
   }
 
   // Add whitespace
-  console.log('')
+  console.log('') // eslint-disable-line
 
   process.exit(0)
 }
@@ -221,7 +231,7 @@ const runPrompt = async () => {
  * @param {String} config.debug - If you wish to turn on debug mode.
  */
 
-const run = async (config = {}, cli = cliInstance) => {
+const run = async (config = {}, ui = api) => {
   // Configuration defaults
   config.root = config.root || process.cwd()
   config.stage = config.stage || 'dev'
@@ -241,8 +251,8 @@ const run = async (config = {}, cli = cliInstance) => {
 
   // Load env vars
   let envVars = {}
-  const defaultEnvFilePath = path.join(process.cwd(), `.env`)
-  const stageEnvFilePath = path.join(process.cwd(), `.env.${config.stage}`)
+  const defaultEnvFilePath = path.join(config.root, `.env`)
+  const stageEnvFilePath = path.join(config.root, `.env.${config.stage}`)
   if (await fileExists(stageEnvFilePath)) {
     envVars = dotenv.config({ path: path.resolve(stageEnvFilePath) }).parsed || {}
   } else if (await fileExists(defaultEnvFilePath)) {
@@ -253,26 +263,26 @@ const run = async (config = {}, cli = cliInstance) => {
   config.credentials = prepareCredentials(envVars)
 
   // Determine programmatic or declarative usage
-  const serverlessJsFilePath = path.join(process.cwd(), 'serverless.js')
-  const serverlessYmlFilePath = path.join(process.cwd(), 'serverless.yml')
-  const serverlessYamlFilePath = path.join(process.cwd(), 'serverless.yaml')
-  const serverlessJsonFilePath = path.join(process.cwd(), 'serverless.json')
+  const serverlessJsFilePath = path.join(config.root, 'serverless.js')
+  const serverlessYmlFilePath = path.join(config.root, 'serverless.yml')
+  const serverlessYamlFilePath = path.join(config.root, 'serverless.yaml')
+  const serverlessJsonFilePath = path.join(config.root, 'serverless.json')
 
   try {
     if (await fileExists(serverlessJsFilePath)) {
-      return await runProgrammatic(serverlessJsFilePath, config, cli)
+      return await runProgrammatic(serverlessJsFilePath, config, ui)
     } else if (await fileExists(serverlessYmlFilePath)) {
-      return await runDeclarative(serverlessYmlFilePath, config, cli)
+      return await runDeclarative(serverlessYmlFilePath, config, ui)
     } else if (await fileExists(serverlessYamlFilePath)) {
-      return await runDeclarative(serverlessYamlFilePath, config, cli)
+      return await runDeclarative(serverlessYamlFilePath, config, ui)
     } else if (await fileExists(serverlessJsonFilePath)) {
-      return await runDeclarative(serverlessJsonFilePath, config, cli)
+      return await runDeclarative(serverlessJsonFilePath, config, ui)
     }
 
     // run prompt if serverless files not found
     await runPrompt()
   } catch (error) {
-    return errorHandler(error, 'Serverless Components')
+    return ui.error(error, 'Serverless Components')
   }
 }
 

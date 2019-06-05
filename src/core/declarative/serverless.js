@@ -4,7 +4,7 @@
  */
 
 const path = require('path')
-const Component = require('../component/serverless')
+const Component = require('../programatic/serverless')
 const { readFile, difference } = require('../../utils')
 const { ROOT_NODE_NAME } = require('./constants')
 const variables = require('./utils/variables')
@@ -17,7 +17,7 @@ class ComponentDeclarative extends Component {
    */
 
   async default() {
-    this.cli.status('Running')
+    this.ui.status('Running')
 
     let fileContent
     fileContent = await readFile(path.join(this.context.root, this.context.rootFile))
@@ -93,7 +93,7 @@ class ComponentDeclarative extends Component {
           const operation = graph.node(instanceId)
           const res = await instance[operation](inputs)
           results[instanceId] = res
-          outputs[instanceId] = res
+          outputs[instanceId] = instance.ui.outputs
           // push information about used component (used in the the components state data)
           if (operation !== 'remove') {
             usedComponents.push({
@@ -103,7 +103,7 @@ class ComponentDeclarative extends Component {
             })
           }
           return {
-            [instanceId]: outputs
+            [instanceId]: res
           }
         })
       )
@@ -112,7 +112,7 @@ class ComponentDeclarative extends Component {
     this.state = { components: usedComponents }
     await this.save()
 
-    logOutputs(this.cli, outputs)
+    logOutputs(this.ui, outputs)
   }
 
   /*
@@ -121,7 +121,7 @@ class ComponentDeclarative extends Component {
    */
 
   async remove() {
-    this.cli.status('Removing')
+    this.ui.status('Removing')
 
     let fileContent
     fileContent = await readFile(path.join(this.context.root, this.context.rootFile))
@@ -165,9 +165,9 @@ class ComponentDeclarative extends Component {
             })
           }
           const res = await instance.remove(inputs)
-          outputs[instanceId] = res
+          outputs[instanceId] = instance.ui.outputs
           return {
-            [instanceId]: outputs
+            [instanceId]: res
           }
         })
       )
@@ -176,7 +176,7 @@ class ComponentDeclarative extends Component {
     this.state = {}
     await this.save()
 
-    logOutputs(this.cli, outputs)
+    logOutputs(this.ui, outputs)
   }
 }
 

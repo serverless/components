@@ -4,13 +4,14 @@ const chalk = require('chalk')
 const ansiEscapes = require('ansi-escapes')
 const stripAnsi = require('strip-ansi')
 const figures = require('figures')
-const sleep = require('../../utils/sleep')
+const sleep = require('../utils/sleep')
 
 // Serverless Components CLI Colors
 const grey = chalk.dim
 const green = chalk.rgb(0, 253, 88)
 const yellow = chalk.rgb(255, 242, 129)
 const red = chalk.rgb(255, 93, 93)
+const light = chalk.gray.bold
 
 class CLI {
   constructor() {
@@ -200,9 +201,9 @@ class CLI {
     return this.renderStatusStatement(status, entity)
   }
 
-  renderLog(log, entity) {
-    // If no argument, skip
+  renderLog(log) {
     if (!log || log == '') {
+      console.log() // eslint-disable-line
       return
     }
 
@@ -210,12 +211,7 @@ class CLI {
     process.stdout.write(ansiEscapes.eraseDown)
     console.log() // eslint-disable-line
 
-    // Write log
-    if (entity) {
-      entity = `${grey(entity)} ${grey(figures.pointerSmall)} ${grey(`log:`)}`
-      console.log(`  ${entity}`) // eslint-disable-line
-    }
-    console.log(` `, util.format(log)) // eslint-disable-line
+    console.log(`  ${log}`) // eslint-disable-line
 
     // Put cursor to starting position for next view
     process.stdout.write(ansiEscapes.cursorLeft)
@@ -307,13 +303,25 @@ class CLI {
     process.stdout.write(ansiEscapes.cursorLeft)
   }
 
-  // basic CLI utilities
-  log(log, entity) {
-    this.renderLog(log, entity)
+  renderOutput(key, value) {
+    // If no argument, skip
+    if (!key || !value) {
+      console.log()
+      return
+    }
+    // Clear any existing content
+    process.stdout.write(ansiEscapes.eraseDown)
+
+    console.log(`  ${light(key + ':')} ${value}`)
   }
 
-  status(status, entity) {
-    this.renderStatus(false, status, entity)
+  // basic CLI utilities
+  log(log) {
+    this.renderLog(log)
+  }
+
+  status(verbose, status, entity) {
+    this.renderStatus(verbose, status, entity)
   }
 
   warn(warning, entity) {
@@ -321,11 +329,19 @@ class CLI {
   }
 
   error(error, entity) {
+    if (typeof error === 'string') {
+      error = new Error(error)
+    }
     this.renderError(error, entity)
+    this.close('error', error)
   }
 
   outputs(outputs, entity) {
     this.renderOutputs(outputs, entity)
+  }
+
+  output(key, value) {
+    this.renderOutput(key, value)
   }
 }
 
