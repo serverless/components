@@ -1,5 +1,3 @@
-// todo remove this file and use downloadComponents from core utils
-
 const os = require('os')
 const path = require('path')
 const { ensureDir, remove } = require('fs-extra')
@@ -8,7 +6,7 @@ const semver = require('semver')
 const BbPromise = require('bluebird')
 const util = require('util')
 const exec = util.promisify(require('child_process').exec)
-const dirExists = require('../../../utils/fs/dirExists')
+const dirExists = require('./dirExists')
 
 async function getComponentVersionToInstall(component) {
   let packageName
@@ -94,7 +92,8 @@ async function getRegistryComponentsPaths(componentsToInstall) {
     // however, this adds couple of seconds to the deployment speed and might not be optimal in the long term
     // let's test it for a while, if we find that it's too slow, we could make it manually triggered
     // with a --update / -u flag. In that case, just edit the following line :)
-    const shouldUpdate = true || process.argv.find((arg) => arg === '--update' || arg === '-u')
+    // const shouldUpdate = true || process.argv.find((arg) => arg === '--update' || arg === '-u')
+    const shouldUpdate = false
 
     if (!(await dirExists(requirePath))) {
       try {

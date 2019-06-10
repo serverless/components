@@ -21,12 +21,13 @@ const utilsToExport = [
   'readFileIfExists',
   'writeFile',
   'sleep',
-  'titelize'
+  'titelize',
+  'loadComponent',
+  'initNpmComponent'
 ]
 
 module.exports = {
   Component,
   run,
-  utils: pick(utilsToExport, allUtils),
-  ...pick(utilsToExport, allUtils) // todo remove later when no components are using it. #430
+  utils: pick(utilsToExport, allUtils)
 }

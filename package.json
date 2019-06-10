@@ -1,6 +1,6 @@
 {
   "name": "@serverless/components",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "description": "Deploy serverless infrastructure, or an entire serverless outcome (e.g. a fullstack realtime app) in seconds",
   "main": "./src/index.js",
   "bin": {

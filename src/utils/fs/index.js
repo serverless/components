@@ -14,6 +14,9 @@ const writeState = require('./writeState')
 const walkDirSync = require('./walkDirSync')
 const copyDirContentsSync = require('./copyDirContentsSync')
 const loadComponent = require('./loadComponent')
+const downloadComponents = require('./downloadComponents')
+const loadComponentsFromNpm = require('./loadComponentsFromNpm')
+const initNpmComponent = require('./initNpmComponent')
 
 module.exports = {
   isJsonPath,
@@ -31,5 +34,8 @@ module.exports = {
   writeState,
   walkDirSync,
   copyDirContentsSync,
-  loadComponent
+  loadComponent,
+  downloadComponents,
+  loadComponentsFromNpm,
+  initNpmComponent
 }
