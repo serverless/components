@@ -2,8 +2,7 @@
 
 <br/>
 
-⚡️ Updates: <a href="https://github.com/serverless/components/releases/tag/0.1.22">v0.1.22 has been released</a> - Includes the function & api provider agnostic components.
-
+⚡️ Updates: Serverless Components are now available within the [Serverless Framework](https://www.github.com/serverless/serverless)!  Upgrade to the latest version of the Framework to start using them.
 <br/>
 
 Forget infrastructure.  Serverless Components enable you to create reusable use-cases out of cloud services, like a *blog*, a *user registration system*, a *payment system* or an *entire application*.
