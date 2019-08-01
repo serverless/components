@@ -4,16 +4,16 @@
 
 **Forget infrastructure** — Serverless Components gives you a new option for deploying **entire serverless use-cases**, like a *blog*, a *user registration system*, a *payment system* or an *entire application* — without managing complex cloud infrastructure configurations.
 
-You can use them now via Serverless Framework.
+You can use them now via the Serverless Framework.
 
 <br/>
 
 - [Quick-Start](#quick-start)
 - [Features](#features)
 - [Getting Started](#getting-started)
-- [Using Components](#declarative-usage)
-- [Building Components](#programatic-usage)
-- [Example Templates](./templates)
+- [Using Components](#using-components)
+- [Building Components](#building-components)
+- [Templates](./templates)
 - [Artwork](./artwork)
 - [Join Us on Slack](https://serverless.com/slack)
 - [Roadmap](https://github.com/serverless/components/projects/1)
@@ -124,8 +124,7 @@ Serverless Components are written in vanilla javascript and seek to use the leas
 
 <br/>
 
-
-# Declarative Usage
+# Using Components
 
 If you want to compose components together and deploy them, you can do it declaratively via the Serverless Framework's `serverless.yml` file, like this:
 
