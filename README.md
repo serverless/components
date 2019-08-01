@@ -19,6 +19,8 @@ This repo contains the Components core, the Components documentation (below), an
   - [Outputs](#outputs)
   - [Credentials](#credentials)
 - [Building Components](#building-components)
+  - [Serverless.js Basics](#serverlessjs-basics)
+  - [Best Practices](#best-practices)
 - [Templates](./templates)
 - [Artwork](./artwork)
 - [Join Us on Slack](https://serverless.com/slack)
@@ -36,7 +38,7 @@ Install the [Serverless Framework](https://www.github.com/serverless/serverless)
 
 Then, [clone one of the pre-made Templates](./templates) and deploy it, to rapidly create a serverless *REST API*, *Websockets API*, *Website*, *Scheduled Task*, and much more!  Each Template has a `README.md` with clear instructions on what it does and how to get started.
 
-Check out more Serverless Components [here](https://github.com/serverless-components/)
+Check out more Serverless Components [here](https://github.com/serverless-components/).
 
 <br/>
 
@@ -44,7 +46,7 @@ Check out more Serverless Components [here](https://github.com/serverless-compon
 
 ### Simplicity
 
-Serverless Components are mostly built around higher-order use-cases (e.g. a website, blog, payment system).  Irrelevant low-level infrastructure details are abstracted away, and simpler configuration is offered instead.
+Serverless Components are built around higher-order use-cases (e.g. a website, blog, payment system).  Irrelevant low-level infrastructure details are abstracted away, and simpler configuration is offered instead.
 
 For example, with minimal configuration, you can deploy... 
 
@@ -126,7 +128,7 @@ Serverless Components are being designed entirely vendor agnostic, enabling you 
 
 ### Vanilla Javascript
 
-Serverless Components are written in vanilla javascript and seek to use the least amount of dependencies and fads, making the entire project as approachable as possible to all beginners and fatigued veterans.
+Serverless Components are written in vanilla javascript and seek to use the least amount of dependencies, making the entire project as approachable as possible to beginners (and fatigued veterans).
 
 <br/>
 
@@ -403,29 +405,31 @@ Here are some best practices when it comes to writing Serverless Components:
 
 #### Start With The Outcome
 
-When making a Serverless Component, it can be tempting to break it down into several levels of child Components, to maintain separation of concerns and optimize ways your work could be re-used.
+When making a Serverless Component, it can be tempting to break it down into several levels of child Components, to maintain separation of concerns and increase the ways your work could be re-used.
 
-However, provisioniong back-end stuff can be a lot more complicated than designing a React Component.  And we've learned over-optimizing for granular separation of concerns is a fast way to burn yourself out :O  
+However, provisioniong back-end logic can be more complicated than designing a front-end React Component.  We've learned over-optimizing for granular separation of concerns is a fast way to burn yourself out!  
 
-So, we recommend starting with a strict focus on your desired outcome.  Create one big Serverless Component that perfectly solves that problem first.  After you've achieved your initial goal via an awesome Serverless Component, then start breaking it down into child Components.
+We recommend starting with a focus on your desired outcome.  Create one Serverless Component that solves that problem first.  After you've achieved your initial goal, then start breaking it down into child Components.
 
-#### The Use-Case Is Your Guiding Light
+#### The Outcome Is Your Advantage
 
-Provisioning infrastructure can be quite complicated.  However, Serverless Components have one powerful advantage over infrastructure provisiong tools that seek to enable every possible option and combination of infrastructure (e.g. AWS Cloudformation) — Serverless Components have specific use-cases they are trying to achieve.
+Provisioning infrastructure can be quite complicated.  However, Serverless Components have one powerful advantage over general infrastructure provisiong tools that seek to enable every possible option and combination (e.g. AWS Cloudformation) — Serverless Components know the specific use-case they are trying to deliver.
 
-If there is anything we've learned about software development tools, it's that once you know the use-case, you can create a much better tool.
+One of the most important lessons we've learned about software development tools is that once you know the use-case, you can create a much better tool.
 
-Once you know the use-case, 
-
-#### Simplicity, Vanilla Javascript & Minimal Dependencies
-
-We believe serverless will empower more people to develop software than ever before.  So, were designing all of our projects to be as approachable as possible.  Please use simple, vanilla Javascript.  Design your Component as if it will be examined by new students of a coding bootcamp.
-
-Additionally, we want to reduce security risks and general bloat, so please try to use the least amount of NPM dependencies as possible.
+Components know their use-case.  You can use that knowledge to: 1) provision infrastructure more reliably, because you have a clear provisioning path and you can program around the pitfalls.  2) provision infrastructure more quickly 3) add use-case specific automation to your Component in the form of custom methods.
 
 #### Keep State On The Cloud Provider
 
-Serverless Components save remarkably little state.  Many powerful Components have only around 8 properties in their state objects.  What we've chosen to do.
+Serverless Components save remarkably little state.  In fact, many powerful Components have less than 10 properties in their state objects.
+
+Components rely on the state saved within the cloud services they use as the source of truth.  This prevents drift issues that break inrastructure provisioning tools.  It also opens up the possibility of working with existing resources, that were not originally managed by Serverless Components.
+
+#### Optimize For Approachability
+
+We believe serverless infrastructure and architectures will empower more people to develop software than ever before.  
+
+Becasue of this, we're designing all of our projects to be as approachable as possible.  Please try to use simple, vanilla Javascript.  Additionally, to reduce security risks and general bloat, please try to use the least amount of NPM dependencies as possible.
 
 
 
