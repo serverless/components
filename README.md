@@ -198,6 +198,8 @@ website: # An instance of a component.
 
 When you add a version, only that Component version is used.  When you don't add a version, upon every deployment, the Serverless Framework will check for a newer version, and use that, if it exists.
 
+**Note:** While in Beta, you cannot currently use Serverless Components within an existing Serverless Framework project file (i.e. a project file that contains `functions`, `events`, `resources` and `plugins`).
+
 ### Inputs
 
 Every Serverless Component has one main function to make it deploy *something*.  This is known as the `default()` function (you can learn more about it in the "Building Components" section).  This `default()` function takes an `inputs` object.
