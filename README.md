@@ -22,13 +22,13 @@ You can use them now via [Serverless Framework](https://www.github.com/serverles
 
 # Quick-Start
 
-1. Install the [Serverless Framework](https://www.github.com/serverless/serverless) via NPM:
+* Install the [Serverless Framework](https://www.github.com/serverless/serverless) via NPM:
 
   ```console
   $ npm i -g serverless
   ```
 
-2. [Clone one of the pre-made Templates and deploy it](./templates), to rapidly create a serverless *REST API*, *Websockets API*, *Website*, *Scheduled Task*, and much more!  Each Template has a `README.md` with clear instructions on what it does and how to get started.
+* [Clone one of the pre-made Templates and deploy it](./templates), to rapidly create a serverless *REST API*, *Websockets API*, *Website*, *Scheduled Task*, and much more!  Each Template has a `README.md` with clear instructions on what it does and how to get started.
 
 <br/>
 
