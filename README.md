@@ -35,7 +35,7 @@ Check out more Serverless Components [here](https://github.com/serverless-compon
 
 # Features
 
-#### Simplicity
+### Simplicity
 
 Serverless Components are mostly built around higher-order use-cases (e.g. a website, blog, payment system).  Irrelevant low-level infrastructure details are abstracted away, and simpler configuration is offered instead.
 
@@ -84,7 +84,7 @@ For example, with minimal configuration, you can deploy...
 * and [much more!](./templates)
 
 
-#### Composition
+### Reusability
 
 Serverless Components are easy to compose.  You can compose them declaratively via YAML (**serverless.yml**) or programatically via javascript (**serverless.js**).
 
