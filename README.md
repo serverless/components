@@ -6,8 +6,6 @@
 
 You can use them now with the Serverless Framework.
 
-This repo contains the Components core, the Components documentation (below), and Templates to get you started easily.
-
 <br/>
 
 - [Quick-Start](#quick-start)
