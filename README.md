@@ -28,7 +28,7 @@ Install the [Serverless Framework](https://www.github.com/serverless/serverless)
   $ npm i -g serverless
   ```
 
-[Clone one of the pre-made Templates and deploy it](./templates), to rapidly create a serverless *REST API*, *Websockets API*, *Website*, *Scheduled Task*, and much more!  Each Template has a `README.md` with clear instructions on what it does and how to get started.
+Then, [clone one of the pre-made Templates](./templates) and deploy it, to rapidly create a serverless *REST API*, *Websockets API*, *Website*, *Scheduled Task*, and much more!  Each Template has a `README.md` with clear instructions on what it does and how to get started.
 
 Check out more Serverless Components [here](https://github.com/serverless-components/)
 
