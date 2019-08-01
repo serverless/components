@@ -2,10 +2,11 @@
 
 <br/>
 
-⚡️ Updates: Serverless Components are now available within the [Serverless Framework](https://www.github.com/serverless/serverless)!  Upgrade to the latest version of the Framework to start using them.
+⚡️ **Updates:** Serverless Components are now available within the [Serverless Framework](https://www.github.com/serverless/serverless)!  Upgrade to the latest version of the Framework to start deploying Components!
+
 <br/>
 
-Forget infrastructure.  Serverless Components enable you to create reusable use-cases out of cloud services, like a *blog*, a *user registration system*, a *payment system* or an *entire application*.
+**Forget infrastructure.**  Serverless Components gives you a new option for deploying serverless use-cases, like a *blog*, a *user registration system*, a *payment system* or an *entire application* — without managing complex cloud infrastructure configurations.
 
 You can use them via the [Serverless Framework](https://www.github.com/serverless/serverless).
 
