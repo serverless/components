@@ -11,9 +11,8 @@ You can use them now via [Serverless Framework](https://www.github.com/serverles
 - [Quick-Start](#quick-start)
 - [Features](#features)
 - [Getting Started](#getting-started)
-- [Declarative Usage (serverless.yml)](#declarative-usage)
-- [Programatic Usage (serverless.js)](#programatic-usage)
-- [Components Registry](https://github.com/serverless-components/)
+- [Using Components](#declarative-usage)
+- [Building Components](#programatic-usage)
 - [Example Templates](./templates)
 - [Join Us on Slack](https://serverless.com/slack)
 - [Roadmap](https://github.com/serverless/components/projects/1)
@@ -30,6 +29,8 @@ Install the [Serverless Framework](https://www.github.com/serverless/serverless)
 
 [Clone one of the pre-made Templates and deploy it](./templates), to rapidly create a serverless *REST API*, *Websockets API*, *Website*, *Scheduled Task*, and much more!  Each Template has a `README.md` with clear instructions on what it does and how to get started.
 
+Check out more Serverless Components [here](https://github.com/serverless-components/)
+
 <br/>
 
 # Features
@@ -42,10 +43,11 @@ Serverless Components are mostly built around higher-order use-cases (e.g. a web
 # serverless.yml
 
 website:
-  component: @serverless/website@2.0.5
+  component: @serverless/website
   inputs:
     code:
       src: ./src
+    domain: www.serverless-website.com
 ```
 
 #### Composition
