@@ -14,9 +14,9 @@ const formatContents = (filePath, contents, options) => {
   return contents
 }
 
-const writeFile = async (filePath, contents = '', options = {}) => {
-  await fse.ensureDir(path.dirname(filePath))
-  await fse.writeFile(filePath, formatContents(filePath, contents, options))
+const writeFileSync = (filePath, contents = '', options = {}) => {
+  fse.ensureDirSync(path.dirname(filePath))
+  fse.writeFileSync(filePath, formatContents(filePath, contents, options))
 }
 
-module.exports = writeFile
+module.exports = writeFileSync

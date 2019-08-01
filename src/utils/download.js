@@ -1,16 +1,14 @@
-// todo remove this file and use downloadComponents from core utils
-
 const os = require('os')
 const path = require('path')
 const { ensureDir, remove } = require('fs-extra')
 const packageJson = require('package-json')
 const semver = require('semver')
-const BbPromise = require('bluebird')
+// const BbPromise = require('bluebird')
 const util = require('util')
 const exec = util.promisify(require('child_process').exec)
-const dirExists = require('../../../utils/fs/dirExists')
+const dirExists = require('./fs/dirExists')
 
-async function getComponentVersionToInstall(component) {
+async function getComponentVersionToDownload(component) {
   let packageName
   let specifiedVersion
   if (component.startsWith('@')) {
@@ -70,8 +68,8 @@ async function getComponentVersionToInstall(component) {
  *
  */
 
-async function getRegistryComponentsPaths(componentsToInstall) {
-  if (!componentsToInstall.length) {
+async function download(componentsToDownload) {
+  if (!componentsToDownload.length) {
     return {}
   }
 
@@ -80,8 +78,8 @@ async function getRegistryComponentsPaths(componentsToInstall) {
 
   const componentsPathsMap = {}
 
-  await BbPromise.map(componentsToInstall, async (component) => {
-    const componentVersionToInstall = await getComponentVersionToInstall(component)
+  const promises = componentsToDownload.map(async (component) => {
+    const componentVersionToInstall = await getComponentVersionToDownload(component)
 
     const npmInstallPath = path.join(localRegistryPath, componentVersionToInstall.pair)
     const requirePath = path.join(npmInstallPath, 'node_modules', componentVersionToInstall.name)
@@ -94,7 +92,8 @@ async function getRegistryComponentsPaths(componentsToInstall) {
     // however, this adds couple of seconds to the deployment speed and might not be optimal in the long term
     // let's test it for a while, if we find that it's too slow, we could make it manually triggered
     // with a --update / -u flag. In that case, just edit the following line :)
-    const shouldUpdate = true || process.argv.find((arg) => arg === '--update' || arg === '-u')
+    // const shouldUpdate = true || process.argv.find((arg) => arg === '--update' || arg === '-u')
+    const shouldUpdate = false
 
     if (!(await dirExists(requirePath))) {
       try {
@@ -110,7 +109,9 @@ async function getRegistryComponentsPaths(componentsToInstall) {
     componentsPathsMap[component] = requirePath
   })
 
+  await Promise.all(promises)
+
   return componentsPathsMap
 }
 
-module.exports = getRegistryComponentsPaths
+module.exports = download

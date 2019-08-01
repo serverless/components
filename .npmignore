@@ -1,8 +1,10 @@
 components
 examples
+artwork
 .idea
 .serverless
 coverage
 .env*
 env.js
 tmp
+test
