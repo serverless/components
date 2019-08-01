@@ -1,17 +1,13 @@
-const chalk = require('chalk')
-const ramda = require('ramda')
 const fs = require('./fs')
+const load = require('./load')
+const download = require('./download')
 const sleep = require('./sleep')
-const prepareCredentials = require('./prepareCredentials')
-const titelize = require('./titelize')
-const api = require('./api')
+const randomId = require('./randomId')
 
 module.exports = {
-  ...ramda,
   ...fs,
+  load,
+  download,
   sleep,
-  prepareCredentials,
-  titelize,
-  chalk,
-  api
+  randomId
 }

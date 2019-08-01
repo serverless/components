@@ -1,12 +1,8 @@
 {
-  "name": "@serverless/components",
-  "version": "0.2.2",
-  "description": "Deploy serverless infrastructure, or an entire serverless outcome (e.g. a fullstack realtime app) in seconds",
+  "name": "@serverless/core",
+  "version": "1.0.0",
+  "description": "Serverless Components Core",
   "main": "./src/index.js",
-  "bin": {
-    "components": "./bin/cli",
-    "sc": "./bin/cli"
-  },
   "publishConfig": {
     "access": "public"
   },
@@ -17,25 +13,11 @@
   "author": "Serverless, Inc.",
   "license": "MIT",
   "dependencies": {
-    "ansi-escapes": "^3.2.0",
-    "archiver": "^3.0.0",
-    "argparse": "^1.0.10",
-    "bluebird": "^3.5.3",
-    "chalk": "^2.4.2",
-    "chokidar": "^2.1.2",
-    "dotenv": "^6.2.0",
-    "enquirer": "^2.3.0",
-    "figures": "^2.0.0",
     "fs-extra": "^7.0.1",
-    "globby": "^9.1.0",
-    "graphlib": "^2.1.7",
-    "inquirer": "^6.2.2",
     "js-yaml": "^3.13.1",
-    "minimist": "^1.2.0",
     "package-json": "^6.3.0",
     "ramda": "^0.26.1",
-    "strip-ansi": "^5.0.0",
-    "traverse": "^0.6.6"
+    "semver": "^6.1.1"
   },
   "devDependencies": {
     "babel-eslint": "9.0.0",

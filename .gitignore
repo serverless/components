@@ -17,6 +17,8 @@ dist
 .idea
 build/
 .env*
+.cache*
+.serverless
 env.js
 tmp
 package-lock.json

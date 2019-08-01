@@ -1,41 +1,33 @@
 const isJsonPath = require('./isJsonPath')
 const isYamlPath = require('./isYamlPath')
 const isArchivePath = require('./isArchivePath')
+const fileExistsSync = require('./fileExistsSync')
 const fileExists = require('./fileExists')
 const dirExists = require('./dirExists')
 const parseFile = require('./parseFile')
 const readFile = require('./readFile')
+const readFileSync = require('./readFileSync')
 const readFileIfExists = require('./readFileIfExists')
 const writeFile = require('./writeFile')
-const packDir = require('./packDir')
+const writeFileSync = require('./writeFileSync')
 const hashFile = require('./hashFile')
-const readState = require('./readState')
-const writeState = require('./writeState')
 const walkDirSync = require('./walkDirSync')
-const copyDirContentsSync = require('./copyDirContentsSync')
-const loadComponent = require('./loadComponent')
-const downloadComponents = require('./downloadComponents')
-const loadComponentsFromNpm = require('./loadComponentsFromNpm')
-const initNpmComponent = require('./initNpmComponent')
+const copyDir = require('./copyDir')
 
 module.exports = {
   isJsonPath,
   isYamlPath,
   isArchivePath,
   parseFile,
+  fileExistsSync,
   fileExists,
   dirExists,
   writeFile,
+  writeFileSync,
   readFile,
+  readFileSync,
   readFileIfExists,
-  packDir,
   hashFile,
-  readState,
-  writeState,
   walkDirSync,
-  copyDirContentsSync,
-  loadComponent,
-  downloadComponents,
-  loadComponentsFromNpm,
-  initNpmComponent
+  copyDir
 }
