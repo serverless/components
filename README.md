@@ -130,6 +130,8 @@ Serverless Components are written in vanilla javascript and seek to use the leas
 
 Serverless Components are merely Javascript libraries that provision something/anything.
 
+They are focused primarily on back-end use-cases, and cloud infrastructure with serverless qualities, enabling you to deliver software architectures with radically less overhead and cost.  Serverless Components are to serverless back-end use-cases, what React Components are to front-end use-cases.
+
 A Component can be designed to provision low-level infrastructure (e.g. an AWS S3 bucket).  However, they can also provision higher-order outcomes — which is when they are at their best.  Examples of a higher-order outcome are: 
 
   1) A group of infrastructure with a purpose, like a type of data processing pipeline.
