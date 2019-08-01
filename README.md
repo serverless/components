@@ -12,7 +12,7 @@ This repo contains the Components core, the Components documentation (below), an
 
 - [Quick-Start](#quick-start)
 - [Features](#features)
-- [Getting Started](#getting-started)
+- [Overview](#overview)
 - [Using Components](#using-components)
 - [Building Components](#building-components)
 - [Templates](./templates)
@@ -126,7 +126,11 @@ Serverless Components are written in vanilla javascript and seek to use the leas
 
 <br/>
 
-# Using Components
+# Overview
+
+Serverless Components are merely Javascript libraries that provision something/anything.
+
+A Component can be designed to provision low-level infrastructure (e.g. an AWS S3 bucket).  However, they can also provision higher-order outcomes — which is when they are at their best.  The syntax for writing a Serverless Component makes it trivial to load child Components and deploy them, enablng you to lean on low-level Components to handle difficult infrastructure provisioning tasks, while you simply deploy them to create a higher-order abstraction.
 
 Serverless Components can be used **declaratively** (via the Serverless Framework's `serverless.yml` file) or **programatically** (via a `serverless.js` file).
 
@@ -134,7 +138,11 @@ Using Components declaratively is great if you want to build a serverless applic
 
 Using Components programmatically is also great for building serverless applications easily, and if you'd like to build a reusable Serverless Component for anything, this is currently the only way.
 
-In this section we'll focus on the declarative experience (`serverless.yml`).  The [Building Components](#building-components) section will focus on the programmatic expereince (`serverless.js`).
+In the [Using Components](#using-components) section, we'll focus on the declarative experience (`serverless.yml`).  In the [Building Components](#building-components) section, we'll focus on the programmatic expereince (`serverless.js`).
+
+<br/>
+
+# Using Components
 
 ### Serverless.yml Basics
 
@@ -147,7 +155,7 @@ name: my-serverless-website
 
 website: # An instance of a component.
   component: @serverless/website@2.0.5 # The component you want to create an instance of.
-  inputs: # Inputs to pass into the component's deafult method
+  inputs: # Inputs to pass into the component's default function
     code:
       src: ./src
 ```
@@ -178,7 +186,53 @@ website: # An instance of a component.
 
 When you add a version, only that Component version is used.  When you don't add a version, upon every deployment, the Serverless Framework will check for a newer version, and use that, if it exists.
 
+### Inputs
 
+Every Serverless Component has one main function to make it deploy *something*.  This is known as the `default()` function (you can learn more about it in the "Building Components" section).  This `default()` function takes an `inputs` object.
+
+When you specify `inputs` for a Component in `serverless.yml`, they are simply arguments that are being passed into that Serverless Component's `default()` function.
+
+```yml
+name: my-serverless-website
+
+website:
+  component: @serverless/website@3.0.5
+  inputs: # Inputs to pass into the component's default function
+    code:
+      src: ./src
+```
+
+### Outputs
+
+When a Component function (e.g. the `default()` function) is finished running, it returns an `outputs` object.
+
+You can reference values of this `outputs` object in `serverless.yml` to pass data into Components, like this:
+
+```yml
+
+backend:
+  component: @serverless/backend@1.0.2
+  inputs:
+    code:
+      src: ./src
+    env:
+      dbName: ${database.name}
+      dbName: ${database.region}
+      
+database:
+  component: @serverless/aws-dynamodb@4.3.1
+  inputs:
+    name: users-database
+```
+
+This tells the Serverless Framework to pass a few of the outputs from the `database` instance into the `backend` instance.  Specifically, the `name` and `region` of the database are being added as environment variables to the `backend` instance, so that it can interact with that database.
+
+This also tells the Serverless Framework what depends on what.  The Framework builds a graph based on this, and deploys everything in that order.  Circular references however do not work and the Framework will throw an error.
+
+
+
+
+### Credentials
 
 
 
