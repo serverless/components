@@ -107,7 +107,7 @@ MyBlog extends Component {
 
 Anyone can build a Serverless Component and share it in our upcoming Registry.
 
-#### Fast Deployments
+### Fast Deployments
 
 Most Serverless Componetns deploy 20x faster than traditional cloud provisioning tools. Our intention is to design Serverless Components' that deploy almost instantly, removing the need to emulate cloud services locally.
 
@@ -117,7 +117,7 @@ Serverless Components favor cloud infrastructure with serverless qualities (shoc
 
 Serverless Components are being designed entirely vendor agnostic, enabling you to easily use services from different vendors, together!  Like, AWS Lambda, AWS S3, Azure Functions, Google Big Query, Twilio, Stripe, Algolia, Cloudflare Workers and more.
 
-#### Vanilla Javascript
+### Vanilla Javascript
 
 Serverless Components are written in vanilla javascript and seek to use the least amount of dependencies and fads, making the entire project as approachable as possible to all beginners and fatigued veterans.
 
