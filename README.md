@@ -39,6 +39,11 @@ Check out more Serverless Components [here](https://github.com/serverless-compon
 
 Serverless Components are mostly built around higher-order use-cases (e.g. a website, blog, payment system).  Irrelevant low-level infrastructure details are abstracted away, and simpler configuration is offered instead.
 
+For example, with minimal configuration, you can deploy... 
+
+* A **serverless website** hosted on AWS S3, delivered globally and quickly w/ AWS Cloudfront, via a custom domain on AWS Route 53, secured by a free AWS ACM SSL Certificate:
+
+
 ```yaml
 # serverless.yml
 
@@ -47,8 +52,37 @@ website:
   inputs:
     code:
       src: ./src
-    domain: www.serverless-website.com
+    domain: www.serverless-app.com
 ```
+
+* A **serverless API** hosted on AWS Lambda, accessible via an AWS API Gateway endpoint under a custom domain on AWS Route 53, secured by a free AWS ACM SSL Certificate:
+
+
+```yaml
+# serverless.yml
+
+api:
+  component: @serverless/backend
+  inputs:
+    code:
+      src: ./src
+    domain: api.serverless-app.com
+```
+
+* A **serverless websockets API ** hosted on AWS Lambda, accessible via an AWS API Gateway Websockets endpoint:
+
+```yaml
+# serverless.yml
+
+api:
+  component: @serverless/backend-socket
+  inputs:
+    code:
+      src: ./src
+```
+
+* and [much more!](./templates)
+
 
 #### Composition
 
