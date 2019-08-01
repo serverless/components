@@ -1,0 +1,33 @@
+name: serverless-fullstack
+
+dashboard:
+  component: '@serverless/website'
+  inputs:
+    code:
+      src: dist
+      root: dashboard
+      hook: npm run build
+    env:
+      apiUrl: ${api.domain} # Change to ${api.domain} if using a custom domain
+    domain: www.serverless-fullstack.com # Register a custom domain on AWS Route 53 to enable this.
+
+api:
+  component: '@serverless/backend'
+  inputs:
+    code:
+      src: api/src
+    env:
+      dbName: ${database.name}
+      dbRegion: ${database.region}
+    domain: api.serverless-fullstack.com # Register a custom domain on AWS Route 53 to enable this.
+
+database:
+  component: '@serverless/aws-dynamodb'
+  inputs:
+    region: us-east-1
+    attributeDefinitions:
+      - AttributeName: 'pk'
+        AttributeType: 'S'
+    keySchema:
+      - AttributeName: 'pk'
+        KeyType: 'HASH'

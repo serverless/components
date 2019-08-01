@@ -1,0 +1,12 @@
+{
+  "name": "component-boilerplate",
+  "version": "1.0.0",
+  "main": "./serverless.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@serverless/core": "latest"
+  }
+}

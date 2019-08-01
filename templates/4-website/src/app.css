@@ -1,0 +1,83 @@
+@font-face {
+    font-family: 'serverless';
+    src: url('./fonts/serverless-regular.woff2') format('woff2'),
+         url('./fonts/serverless-regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+html,
+body,
+div {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  line-height: normal;
+  background: var(--mainBg);
+  font-family: 'serverless', 'HelveticaNeue-Regular', 'Helvetica Neue Regular', 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif;
+  font-weight: 300;
+  font-size: 14px;
+  line-height: 20px;
+  color: #000000;
+  word-wrap: break-word;
+  letter-spacing: 0.25px;
+}
+
+html,
+body {
+  background: #000000;
+}
+
+.container {
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 30px 50px 50px 50px;
+}
+
+.hero {
+  align-items: center;
+  justify-content: center;
+  height: auto;
+  min-height: 40vh;
+  animation-duration: 2000ms;
+  animation-name: fadeIn;
+}
+
+.hero img {
+  max-height: 40vh;
+  pointer-events: none;
+}
+
+.tagline {
+  align-items: center;
+  height: auto;
+  margin-top: 40px;
+  color: #ffffff;
+  font-size: 18px;
+  text-align: center;
+  opacity: 0;
+  animation-fill-mode: forwards;
+  animation-delay: 500ms;
+  animation-duration: 2000ms;
+  animation-name: fadeIn;
+}
+
+/**
+ * Animations
+ */
+
+@keyframes fadeIn {
+ from {
+   opacity: 0;
+ }
+
+ to {
+   opacity: 1;
+ }
+}

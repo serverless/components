@@ -1,6 +1,0 @@
-name: my-schedule
-
-mySchedule:
-  component: "@serverless/schedule"
-  inputs:
-    rate: 2m

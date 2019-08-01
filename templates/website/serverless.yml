@@ -1,7 +1,0 @@
-name: my-site
-
-website:
-  component: "@serverless/website"
-  inputs:
-    code: ./code
-

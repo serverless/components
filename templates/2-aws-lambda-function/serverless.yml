@@ -1,0 +1,12 @@
+name: aws-lambda-function
+
+myFunction:
+  component: '@serverless/aws-lambda'
+  inputs:
+    code: ./src
+    handler: index.hello
+    runtime: nodejs8.10
+    memory: 896
+    timeout: 10
+    env:
+      hello: world

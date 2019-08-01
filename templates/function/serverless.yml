@@ -1,7 +1,0 @@
-name: my-function
-
-myFunction:
-  component: "@serverless/aws-lambda"
-  inputs:
-    name: ${name}-lambda
-    handler: index.handler

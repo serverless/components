@@ -1,0 +1,30 @@
+name: backend-microservices
+
+createUser:
+  component: '@serverless/function'
+  inputs:
+    code: ./src
+    handler: index.createUser
+getUser:
+  component: '@serverless/function'
+  inputs:
+    code: ./src
+    handler: index.getUser
+auth:
+  component: '@serverless/function'
+  inputs:
+    code: ./src
+    handler: index.auth
+
+restApi:
+  component: '@serverless/api'
+  inputs:
+    endpoints:
+      - path: /users
+        method: POST
+        function: ${createUser}
+        authorizer: ${auth}
+      - path: /users
+        method: GET
+        function: ${getUser}
+        authorizer: ${auth}
