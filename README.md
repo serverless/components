@@ -14,6 +14,7 @@ This repo contains the Components core, the Components documentation (below), an
 - [Features](#features)
 - [Overview](#overview)
 - [Using Components](#using-components)
+  - [Serverless.yml Basics](#serverless.yml-basics)
 - [Building Components](#building-components)
 - [Templates](./templates)
 - [Artwork](./artwork)
