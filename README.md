@@ -130,13 +130,19 @@ Serverless Components are written in vanilla javascript and seek to use the leas
 
 Serverless Components are merely Javascript libraries that provision something/anything.
 
-A Component can be designed to provision low-level infrastructure (e.g. an AWS S3 bucket).  However, they can also provision higher-order outcomes — which is when they are at their best.  The syntax for writing a Serverless Component makes it trivial to load child Components and deploy them, enablng you to lean on low-level Components to handle difficult infrastructure provisioning tasks, while you simply deploy them to create a higher-order abstraction.
+A Component can be designed to provision low-level infrastructure (e.g. an AWS S3 bucket).  However, they can also provision higher-order outcomes — which is when they are at their best.  Examples of a higher-order outcome are: 
+
+  1) A group of infrastructure with a purpose, like a type of data processing pipeline.
+  2) A software feature, like user registration, comments, or a payment system.
+  3) An entire application, like a blog, video streaming service, or landing page.
+
+The syntax for writing a Serverless Component makes it trivial to load child Components and deploy them, enablng you to lean on low-level Components to handle difficult infrastructure provisioning tasks, while you rapidly create a higher-order abstraction.
 
 Serverless Components can be used **declaratively** (via the Serverless Framework's `serverless.yml` file) or **programatically** (via a `serverless.js` file).
 
-Using Components declaratively is great if you want to build a serverless application as easily as possible, and not re-use it.
+Using Components declaratively is great if you want to build a serverless application as easily as possible, but not re-use it.
 
-Using Components programmatically is also great for building serverless applications easily, and if you'd like to build a reusable Serverless Component for anything, this is currently the only way.
+Using Components programmatically is also great for building serverless applications easily.  And if you'd like to build a reusable Serverless Component, this is currently the only way.
 
 In the [Using Components](#using-components) section, we'll focus on the declarative experience (`serverless.yml`).  In the [Building Components](#building-components) section, we'll focus on the programmatic expereince (`serverless.js`).
 
