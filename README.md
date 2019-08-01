@@ -14,6 +14,7 @@ You can use them now via Serverless Framework.
 - [Using Components](#declarative-usage)
 - [Building Components](#programatic-usage)
 - [Example Templates](./templates)
+- [Artwork](./artwork)
 - [Join Us on Slack](https://serverless.com/slack)
 - [Roadmap](https://github.com/serverless/components/projects/1)
 
