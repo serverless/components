@@ -264,7 +264,7 @@ If you want to build resuable Serverless Components, it starts and ends with a `
 
 ### Serverless.js Basics
 
-In your current working directory, install the Serverless Components core`@serverless/core` as a local dependency.
+In your current working directory, install the Serverless Components core (`@serverless/core`) as a local dependency.
 
 ```
 npm i --save @serverless/core
