@@ -2,7 +2,7 @@
 
 <br/>
 
-⚡️ **Updates:** Serverless Components are now available within the [Serverless Framework](https://www.github.com/serverless/serverless)!  Upgrade to the latest version of the Framework to start deploying Components!
+**Latest Update:** Serverless Components are now available within the [Serverless Framework](https://www.github.com/serverless/serverless)!  Upgrade to the latest version of the Framework to start deploying Components!
 
 <br/>
 
