@@ -28,7 +28,7 @@ You can use them now via [Serverless Framework](https://www.github.com/serverles
   $ npm i -g serverless
   ```
 
-* [Clone one of the pre-made Templates and deploy it](./templates), to rapidly deploy a serverless *REST API*, *Websockets API*, *Website*, *Scheduled Task*, and much more!  Each Template has a `README.md` with clear instructions on what it does and how to get started.
+* [Clone one of the pre-made Templates and deploy it](./templates), to rapidly create a serverless *REST API*, *Websockets API*, *Website*, *Scheduled Task*, and much more!  Each Template has a `README.md` with clear instructions on what it does and how to get started.
 
 <br/>
 
