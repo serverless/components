@@ -260,6 +260,8 @@ AWS_SECRET_ACCESS_KEY=123456789
 
 These credentials will be used by any and all Components in your `serverless.yml` or `serverless.js` — as well as their child Components — if you specify the environment variables exactly like this.
 
+<br/>
+
 # Building Components
 
 If you want to build resuable Serverless Components, it starts and ends with a `serverless.js` file.
