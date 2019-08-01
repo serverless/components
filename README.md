@@ -2,7 +2,7 @@
 
 <br/>
 
-**Forget infrastructure** — Serverless Components enables you to deploy **entire serverless use-cases**, like a *blog*, a *user registration system*, a *payment system* or an *entire application* — without managing bloated cloud infrastructure configurations.
+**Forget infrastructure** — Serverless Components enables you to **deploy entire serverless use-cases**, like a *blog*, a *user registration system*, a *payment system* or an *entire application* — without managing bloated cloud infrastructure configurations.
 
 You can use them now with the Serverless Framework.
 
