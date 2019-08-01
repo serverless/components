@@ -6,6 +6,8 @@
 
 You can use them now with the Serverless Framework.
 
+This repo contains the Components core, the Components documentation (below), and Templates to get you started easily.
+
 <br/>
 
 - [Quick-Start](#quick-start)
@@ -134,7 +136,7 @@ Using Components programmatically is also great for building serverless applicat
 
 In this section we'll focus on the declarative experience (`serverless.yml`).  The [Building Components](#building-components) section will focus on the programmatic expereince (`serverless.js`).
 
-### serverless.yml Basics
+### Serverless.yml Basics
 
 `serverless.yml` is the easiest way to compose Serverless Components into an application.
 
@@ -150,10 +152,36 @@ website: # An instance of a component.
       src: ./src
 ```
 
+You can deploy this easily via the Serverless Framework with the `$ serverless` command.
 
-
-Deploy everything with:
-
-```shell
+```console
 $ serverless # Deploys the components...
 ```
+
+There is nothing to install when using Serverless Components via `serverless.yml`.  Instead, when you deploy a `serverless.yml`, its Components are downloaded automatically at the beginning of that deployment (if they aren't already downloaded), and stored in a central folder at the root of your machine.  This effectively caches the Components in one location, so you don't clutter your project files with Component libraries and don't download duplicates.
+
+Serverless Components are distributed via [NPM](https://www.npmjs.com/).  When Components are downloaded, a basic NPM installation is happening behind the scenes.  
+
+Because of this, you use the NPM name in the `component:` property.
+
+```yml
+website: # An instance of a component.
+  component: @serverless/website # This is the NPM package name
+```
+
+You can also use the same semantic versioning strategy that NPM uses.
+
+```yml
+website: # An instance of a component.
+  component: @serverless/website@3.0.5 # This is the NPM package name and version
+```
+
+When you add a version, only that Component version is used.  When you don't add a version, upon every deployment, the Serverless Framework will check for a newer version, and use that, if it exists.
+
+
+
+
+
+
+
+
