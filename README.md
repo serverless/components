@@ -4,7 +4,7 @@
 
 **Forget infrastructure.**  Serverless Components gives you a new option for deploying **entire serverless use-cases**, like a *blog*, a *user registration system*, a *payment system* or an *entire application* — without managing complex cloud infrastructure configurations.
 
-You can use them now via [Serverless Framework](https://www.github.com/serverless/serverless).
+You can use them now via Serverless Framework.
 
 <br/>
 
@@ -35,7 +35,7 @@ Check out more Serverless Components [here](https://github.com/serverless-compon
 
 # Features
 
-## Simplicity
+### Simplicity
 
 Serverless Components are mostly built around higher-order use-cases (e.g. a website, blog, payment system).  Irrelevant low-level infrastructure details are abstracted away, and simpler configuration is offered instead.
 
@@ -86,33 +86,18 @@ For example, with minimal configuration, you can deploy...
 
 ### Reusability
 
-Serverless Components are easy to compose.  You can compose them declaratively via YAML (**serverless.yml**) or programatically via javascript (**serverless.js**).
-
-```yaml
-# serverless.yml
-
-backend:
-  component: @serverless/backend
-  inputs:
-    code:
-      src: ./backend
-
-website:
-  component: @serverless/website
-  inputs:
-    code:
-      src: ./frontend
-    env:
-      api: ${backend.url} # An output from "backend" to make available in the website
-```
+While Serverless Components can be easily composed in YAML (`serverless.yml`), they are written as reusable javascript libraries (`serverless.js`), with simple syntax inspired by component-based frameworks, like React.
 
 ```javascript
 // serverless.js
 
-MyComponent extends Component {
-  async default() {
+const { Component } = require('@serverless/core')
+
+MyBlog extends Component {
+  async default(inputs) {
+    this.context.status('Deploying a serverless blog')
     const website = await this.load('@serverless/website') // Load a component
-    const outputs = await website({ code: { src: './src' } }) // Deploy it
+    const outputs = await website({ code: { src: './blog-code' } }) // Deploy it
     this.state.url = outputs.url
     await this.save()
     return outputs
@@ -120,31 +105,24 @@ MyComponent extends Component {
 }
 ```
 
-#### Serverless & Vendor-Agnostic
-
-Serverless Components favor cloud services with serverless qualities (shocker!) across all vendors, like AWS Lambda, AWS S3, Azure Functions, Google Big Query, Twilio, Stripe, Algolia, Cloudflare Workers and more.
+Anyone can build a Serverless Component and share it in our upcoming Registry.
 
 #### Fast Deployments
 
-Most Serverless Componetns deploy 10x faster than traditional cloud provisioning tools.  One of Serverless Components' goals is to deploy near instantly, removing the need to emulate clodu services locally.
+Most Serverless Componetns deploy 20x faster than traditional cloud provisioning tools. Our intention is to design Serverless Components' that deploy almost instantly, removing the need to emulate cloud services locally.
+
+### Vendor-Agnostic
+
+Serverless Components favor cloud infrastructure with serverless qualities (shocker!).  We also believe in order to deliver the best product, you must be free to use the best services.
+
+Serverless Components are being designed entirely vendor agnostic, enabling you to easily use services from different vendors, together!  Like, AWS Lambda, AWS S3, Azure Functions, Google Big Query, Twilio, Stripe, Algolia, Cloudflare Workers and more.
 
 #### Vanilla Javascript
 
-Serverless Components are written in vanilla javascript and seek to use the least amount of dependencies and fads, enabling ease of understanding by both beginning and fatigued javascripters.
+Serverless Components are written in vanilla javascript and seek to use the least amount of dependencies and fads, making the entire project as approachable as possible to all beginners and fatigued veterans.
 
 <br/>
 
-# Getting Started
-
-Install the [Serverless Framework](https://www.github.com/serverless/serverless).
-
-```shell
-$ npm i -g serverless
-```
-
-Serverless Components can written by anyone, but you can see several [available Components here](https://www.github.com/serverless-components).
-
-<br/>
 
 # Declarative Usage
 
