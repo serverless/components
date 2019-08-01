@@ -130,7 +130,7 @@ Serverless Components are written in vanilla javascript and seek to use the leas
 
 Serverless Components are merely Javascript libraries that provision something/anything.
 
-They are focused primarily on back-end use-cases, and cloud infrastructure with serverless qualities, enabling you to deliver software architectures with radically less overhead and cost.  Serverless Components are to serverless back-end use-cases, what React Components are to front-end use-cases.
+They are focused primarily on back-end use-cases, and cloud infrastructure with serverless qualities, enabling you to deliver software with radically less overhead and cost.  Serverless Components are to serverless back-end use-cases, what React Components are to front-end use-cases.
 
 A Component can be designed to provision low-level infrastructure (e.g. an AWS S3 bucket).  However, they can also provision higher-order outcomes — which is when they are at their best.  Examples of a higher-order outcome are: 
 
@@ -171,7 +171,7 @@ website: # An instance of a component.
 You can deploy this easily via the Serverless Framework with the `$ serverless` command.
 
 ```console
-$ serverless # Deploys the components...
+$ serverless # Installs and deploys the components...
 ```
 
 There is nothing to install when using Serverless Components via `serverless.yml`.  Instead, when you deploy a `serverless.yml`, its Components are downloaded automatically at the beginning of that deployment (if they aren't already downloaded), and stored in a central folder at the root of your machine.  This effectively caches the Components in one location, so you don't clutter your project files with Component libraries and don't download duplicates.
@@ -237,10 +237,22 @@ This tells the Serverless Framework to pass a few of the outputs from the `datab
 
 This also tells the Serverless Framework what depends on what.  The Framework builds a graph based on this, and deploys everything in that order.  Circular references however do not work and the Framework will throw an error.
 
-
-
-
 ### Credentials
+
+Upon deployment, whether it's a `serverless.yml` or `serverless.js`, Serverless Components' core looks for a `.env` file in the current working directory.
+
+Upon deployment, if a `.env` file exists, Serverless Components will add the content of it as environment variables.  If you use specific environment variable names that match that of a cloud infrastructure vendor's access keys/tokens, upon deployment, Serverless Components will automatically inject that into the Components that need that vendor to provision infrastructure.
+
+Here are the keys that are currently supported (keep in mind Components are in Beta and we've mostly been focused on AWS infrastructure up until now):
+
+```bash
+AWS_ACCESS_KEY_ID=123456789
+AWS_SECRET_ACCESS_KEY=123456789
+```
+
+These credentials will be used by any and all Components in your `serverless.yml` or `serverless.js` — as well as their child Components — if you specify the environment variables exactly like this.
+
+# Building Components
 
 
 
