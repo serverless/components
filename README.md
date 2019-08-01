@@ -126,17 +126,31 @@ Serverless Components are written in vanilla javascript and seek to use the leas
 
 # Using Components
 
-If you want to compose components together and deploy them, you can do it declaratively via the Serverless Framework's `serverless.yml` file, like this:
+Serverless Components can be used **declaratively** (via the Serverless Framework's `serverless.yml` file) or **programatically** (via a `serverless.js` file).
+
+Using Components declaratively is great if you want to build a serverless application as easily as possible, and not re-use it.
+
+Using Components programmatically is also great for building serverless applications easily, and if you'd like to build a reusable Serverless Component for anything, this is currently the only way.
+
+In this section we'll focus on the declarative experience (`serverless.yml`).  The [Building Components](#building-components) section will focus on the programmatic expereince (`serverless.js`).
+
+### serverless.yml Basics
+
+`serverless.yml` is the easiest way to compose Serverless Components into an application.
+
+The syntax for using Serverless Components looks like this:
 
 ```yml
-name: my-stack
+name: my-serverless-website
 
 website: # An instance of a component.
   component: @serverless/website@2.0.5 # The component you want to create an instance of.
-  inputs: # Inputs to pass into the component.
+  inputs: # Inputs to pass into the component's deafult method
     code:
       src: ./src
 ```
+
+
 
 Deploy everything with:
 
