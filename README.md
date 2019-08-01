@@ -425,6 +425,10 @@ Serverless Components save remarkably little state.  In fact, many powerful Comp
 
 Components rely on the state saved within the cloud services they use as the source of truth.  This prevents drift issues that break inrastructure provisioning tools.  It also opens up the possibility of working with existing resources, that were not originally managed by Serverless Components.
 
+#### Store State Immediately After A Successful Operation
+
+If you do need to store state, try to store it immediately after a successful operation.  This way, if anything after that operation fails, your Serverless Component can pick up where it left off, when the end user tries to deploy it again.
+
 #### Optimize For Approachability
 
 We believe serverless infrastructure and architectures will empower more people to develop software than ever before.  
