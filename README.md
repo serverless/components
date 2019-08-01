@@ -165,9 +165,9 @@ The syntax for using Serverless Components looks like this:
 ```yml
 name: my-serverless-website
 
-website: # An instance of a component.
-  component: @serverless/website@2.0.5 # The component you want to create an instance of.
-  inputs: # Inputs to pass into the component's default function
+website: # An instance of a component is declared here.
+  component: @serverless/website@2.0.5 # This is the component you want to create an instance of.
+  inputs: # These are inputs to pass into the component's "default()" function
     code:
       src: ./src
 ```
@@ -260,6 +260,142 @@ These credentials will be used by any and all Components in your `serverless.yml
 
 # Building Components
 
+If you want to build resuable Serverless Components, it starts and ends with a `serverless.js` file.
+
+### Serverless.js Basics
+
+In your current working directory, install the Serverless Components core`@serverless/core` as a local dependency.
+
+```
+npm i --save @serverless/core
+```
+
+Create a `serverless.js` file, extend the Component class and add a `default` method, to make a bare minimum Serverless Component, like this:
+
+```javascript
+// serverless.js
+
+const { Component } = require('@serverless/core')
+
+class MyComponent extends Component {
+  async default(inputs = {}) { return {} } // The default functionality to run/provision/update your Component
+}
+```
+
+`default()` is always required.  It is where the logic resides in order for your Component to *make* something.  Whenever you run the `$ serverless` command, it's always calling the `default()` method.
+
+You can also any other methods to this class.  A `remove()` method is often the next logical choice, if you want your Serverless Component to remove the things it creates.
+
+You can add as many methods as you want.  This is interesting because it enables you to ship more automation with your Component, than logic that merely *deploys* and *removes* something.
+
+It's still early days for Serverless Components, but we are starting to work on Components that ship with their own `test()` function, or their own `logs()` and `metrics()` functions, or `seed()` for establishing initial values in a database Component.  Overall, there is a lot of opportunity here to deliver outcomes that are loaded with useful automation.
+
+All methods other than the `default()` method are optional. All methods take a single `inputs` object, not individual arguments, and return a single `outputs` object.
+
+Here is what it looks like to add a `remove` method, as well as a custom method.
+
+```javascript
+// serverless.js
+
+const { Component } = require('@serverless/core')
+
+class MyComponent extends Component {
+
+  /*
+   * Default (Required)
+   * - The default functionality to run/provision/update your Component
+   * - You can run this function by running the "$ serverless" command
+   */
+
+  async default(inputs = {}) { return {} }
+
+  /*
+   * Remove (Optional)
+   * - If your Component removes infrastructure, this is recommended.
+   * - You can run this function by running "$ serverless remove"
+   */
+
+  async remove(inputs = {}) { return {} }
+
+  /*
+   * Anything (Optional)
+   * - If you want to ship your Component w/ extra functionality, put it in a method.
+   * - You can run this function by running "$ serverless anything"
+   */
+
+  async anything(inputs = {}) { return {} }
+}
+```
+
+When inside a Component method, `this` comes with utilities which you can use.  Here is a guide to what's available to you within the context of a Component.
+
+```javascript
+// serverless.js
+
+const { Component } = require('@serverless/core')
+
+class MyComponent extends Component {
+
+  async default(inputs = {}) {
+  
+    // this.context features useful information
+    console.log(this.context)
+
+    // Common provider credentials are identified in the environment or .env file and added to this.context.credentials
+    // when you run "components", then the credentials in .env will be used
+    // when you run "components --stage prod", then the credentials in .env.prod will be used...etc
+    // if you don't have any .env files, then global aws credentials will be used
+    const dynamodb = new AWS.DynamoDB({ credentials: this.context.credentials.aws })
+    
+    // You can easily create a random ID to name cloud infrastruture resources with using this utility.
+    const s3BucketName = `my-bucket-${this.context.resourceId()}`
+    // This prevents name collisions.
+
+    // Components have built-in state storage.
+    // Here is how to save state to your Component:
+    this.state.name = 'myComponent'
+    await this.save()
+
+    // Here is how to load a child Component. 
+    // This assumes you have the "@serverless/website" component in your "package.json" file and you've run "npm install"
+    let website = await this.load('@serverless/website')
+    
+    // You can run the default method of a child Component two ways:
+    let websiteOutputs = website({ code: { src: './src' }})
+    let websiteOutputs = website.default({ code: { src: './src' }})
+
+    // If you are deploying multiple instances of the same Component, include an instance id.
+    let website1 = await this.load('@serverless/website', 'website1')
+    let website2 = await this.load('@serverless/website', 'website2')
+    
+    // Child Components save their state automatically.
+
+    // You can also load a local component that is not yet published to npm
+    // just reference the root dir that contains the serverless.js file
+    // You can also use similar syntax in serverless.yml to run local Components
+    let localComponent = await this.load('../my-local-component')
+
+    // Here is how you can easily remove a Component.
+    let websiteRemoveOutputs = await website.remove()
+    
+    // Here is how you can call any custom method on a Component.
+    let websiteRemoveOutputs = await website.test({})
+
+    // If you want to show a status update to the CLI in an elegant way, use this.
+    this.context.status('Uploading')
+
+    // If you want to show a log statement in the CLI in an elegant way, use this.
+    this.context.log('this is a log statement')
+
+    // Return your results
+    return { url: websiteOutputs.url }
+  }
+}
+```
+
+Just run `serverless` in the directory that contains the `serverless.js` file to run your new component. You'll will see all the logs and outputs of your new component. Logs and outputs of any child component you use will not be shown, unless you run in debug mode: `serverless --debug`. You can also run any custom method/command you've defined with `serverless <methodName>`.
+
+For complete real-world examples on writing components, [check out our official components](https://github.com/serverless-components)
 
 
 
