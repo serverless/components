@@ -1,4 +1,4 @@
-# Template - Fullstack
+# Template - Fullstack Application
 
 &nbsp;
 

@@ -1,4 +1,4 @@
-name: serverless-fullstack
+name: fullstack-application
 
 dashboard:
   component: '@serverless/website'
