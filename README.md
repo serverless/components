@@ -69,7 +69,7 @@ For example, with minimal configuration, you can deploy...
       domain: api.serverless-app.com
   ```
 
-* A **serverless websockets API ** hosted on AWS Lambda, accessible via an AWS API Gateway Websockets endpoint:
+* A **serverless real-time websockets API** hosted on AWS Lambda, accessible via an AWS API Gateway Websockets endpoint:
 
   ```yaml
   # serverless.yml
