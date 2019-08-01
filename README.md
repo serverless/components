@@ -397,6 +397,40 @@ Just run `serverless` in the directory that contains the `serverless.js` file to
 
 For complete real-world examples on writing components, [check out our official components](https://github.com/serverless-components)
 
+### Best Practices
+
+Here are some best practices when it comes to writing Serverless Components:
+
+#### Start With The Outcome
+
+When making a Serverless Component, it can be tempting to break it down into several levels of child Components, to maintain separation of concerns and optimize ways your work could be re-used.
+
+However, provisioniong back-end stuff can be a lot more complicated than designing a React Component.  And we've learned over-optimizing for granular separation of concerns is a fast way to burn yourself out :O  
+
+So, we recommend starting with a strict focus on your desired outcome.  Create one big Serverless Component that perfectly solves that problem first.  After you've achieved your initial goal via an awesome Serverless Component, then start breaking it down into child Components.
+
+#### The Use-Case Is Your Guiding Light
+
+Provisioning infrastructure can be quite complicated.  However, Serverless Components have one powerful advantage over infrastructure provisiong tools that seek to enable every possible option and combination of infrastructure (e.g. AWS Cloudformation) — Serverless Components have specific use-cases they are trying to achieve.
+
+If there is anything we've learned about software development tools, it's that once you know the use-case, you can create a much better tool.
+
+Once you know the use-case, 
+
+#### Simplicity, Vanilla Javascript & Minimal Dependencies
+
+We believe serverless will empower more people to develop software than ever before.  So, were designing all of our projects to be as approachable as possible.  Please use simple, vanilla Javascript.  Design your Component as if it will be examined by new students of a coding bootcamp.
+
+Additionally, we want to reduce security risks and general bloat, so please try to use the least amount of NPM dependencies as possible.
+
+#### Keep State On The Cloud Provider
+
+Serverless Components save remarkably little state.  Many powerful Components have only around 8 properties in their state objects.  What we've chosen to do.
+
+
+
+
+
 
 
 
