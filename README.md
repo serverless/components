@@ -116,7 +116,7 @@ Anyone can build a Serverless Component and share it in our upcoming Registry.
 
 ### Fast Deployments
 
-Most Serverless Componetns deploy 20x faster than traditional cloud provisioning tools. Our intention is to design Serverless Components' that deploy almost instantly, removing the need to emulate cloud services locally.
+Most Serverless Components deploy 20x faster than traditional cloud provisioning tools. Our intention is to design Serverless Components' that deploy almost instantly, removing the need to emulate cloud services locally.
 
 ### Vendor-Agnostic
 
