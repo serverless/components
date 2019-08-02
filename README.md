@@ -100,7 +100,7 @@ While Serverless Components can be easily composed in YAML (`serverless.yml`), t
 
 const { Component } = require('@serverless/core')
 
-MyBlog extends Component {
+class MyBlog extends Component {
   async default(inputs) {
     this.context.status('Deploying a serverless blog')
     const website = await this.load('@serverless/website') // Load a component
@@ -110,6 +110,8 @@ MyBlog extends Component {
     return outputs
   }
 }
+
+module.exports = MyBlog
 ```
 
 Anyone can build a Serverless Component and share it in our upcoming Registry.
