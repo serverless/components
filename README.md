@@ -282,6 +282,8 @@ const { Component } = require('@serverless/core')
 class MyComponent extends Component {
   async default(inputs = {}) { return {} } // The default functionality to run/provision/update your Component
 }
+
+module.exports = MyComponent;
 ```
 
 `default()` is always required.  It is where the logic resides in order for your Component to *make* something.  Whenever you run the `$ serverless` command, it's always calling the `default()` method.
@@ -327,6 +329,8 @@ class MyComponent extends Component {
 
   async anything(inputs = {}) { return {} }
 }
+
+module.exports = MyComponent;
 ```
 
 When inside a Component method, `this` comes with utilities which you can use.  Here is a guide to what's available to you within the context of a Component.
@@ -393,6 +397,8 @@ class MyComponent extends Component {
     return { url: websiteOutputs.url }
   }
 }
+
+module.exports = MyComponent;
 ```
 
 Just run `serverless` in the directory that contains the `serverless.js` file to run your new component. You'll will see all the logs and outputs of your new component. Logs and outputs of any child component you use will not be shown, unless you run in debug mode: `serverless --debug`. You can also run any custom method/command you've defined with `serverless <methodName>`.
