@@ -433,7 +433,7 @@ If you do need to store state, try to store it immediately after a successful op
 
 We believe serverless infrastructure and architectures will empower more people to develop software than ever before.  
 
-Becasue of this, we're designing all of our projects to be as approachable as possible.  Please try to use simple, vanilla Javascript.  Additionally, to reduce security risks and general bloat, please try to use the least amount of NPM dependencies as possible.
+Because of this, we're designing all of our projects to be as approachable as possible.  Please try to use simple, vanilla Javascript.  Additionally, to reduce security risks and general bloat, please try to use the least amount of NPM dependencies as possible.
 
 
 
