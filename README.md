@@ -18,7 +18,7 @@ You can use them now with the Serverless Framework.
   - [Credentials](#credentials)
 - [Building Components](#building-components)
   - [Serverless.js Basics](#serverlessjs-basics)
-  - [Best Practices](#best-practices)
+  - [Development Tips](#development-tips)
 - [Templates](./templates)
 - [Artwork](./artwork)
 - [Join Us on Slack](https://serverless.com/slack)
@@ -100,7 +100,7 @@ While Serverless Components can be easily composed in YAML (`serverless.yml`), t
 
 const { Component } = require('@serverless/core')
 
-MyBlog extends Component {
+class MyBlog extends Component {
   async default(inputs) {
     this.context.status('Deploying a serverless blog')
     const website = await this.load('@serverless/website') // Load a component
@@ -110,13 +110,15 @@ MyBlog extends Component {
     return outputs
   }
 }
+
+module.exports = MyBlog
 ```
 
 Anyone can build a Serverless Component and share it in our upcoming Registry.
 
 ### Fast Deployments
 
-Most Serverless Componetns deploy 20x faster than traditional cloud provisioning tools. Our intention is to design Serverless Components' that deploy almost instantly, removing the need to emulate cloud services locally.
+Most Serverless Components deploy 20x faster than traditional cloud provisioning tools. Our intention is to design Serverless Components' that deploy almost instantly, removing the need to emulate cloud services locally.
 
 ### Vendor-Agnostic
 
@@ -282,6 +284,8 @@ const { Component } = require('@serverless/core')
 class MyComponent extends Component {
   async default(inputs = {}) { return {} } // The default functionality to run/provision/update your Component
 }
+
+module.exports = MyComponent;
 ```
 
 `default()` is always required.  It is where the logic resides in order for your Component to *make* something.  Whenever you run the `$ serverless` command, it's always calling the `default()` method.
@@ -327,6 +331,8 @@ class MyComponent extends Component {
 
   async anything(inputs = {}) { return {} }
 }
+
+module.exports = MyComponent;
 ```
 
 When inside a Component method, `this` comes with utilities which you can use.  Here is a guide to what's available to you within the context of a Component.
@@ -393,15 +399,44 @@ class MyComponent extends Component {
     return { url: websiteOutputs.url }
   }
 }
+
+module.exports = MyComponent;
 ```
 
 Just run `serverless` in the directory that contains the `serverless.js` file to run your new component. You'll will see all the logs and outputs of your new component. Logs and outputs of any child component you use will not be shown, unless you run in debug mode: `serverless --debug`. You can also run any custom method/command you've defined with `serverless <methodName>`.
 
 For complete real-world examples on writing components, [check out our official components](https://github.com/serverless-components)
 
-### Best Practices
+### Development Tips
 
-Here are some best practices when it comes to writing Serverless Components:
+Here are some development tips when it comes to writing Serverless Components:
+
+#### Use Local References
+
+When writing a Serverless Component, you can reference it locally via a `serverless.yml`, or another `serverless.js`.  Keep in mind, a directory can only contain 1 `serverless.yml` or `serverless.js`.  A directory cannot contain a both a `serverless.yml` and a `serverless.js`.
+
+Here's how to reference a local Component via `serverless.yml`:
+
+```yaml
+name: my-project
+
+myComponent:
+  component: ../src
+  inputs:
+    foo: bar
+```
+
+Here's how to reference a local Component via `serverless.js`:
+
+```javascript
+class myFirstComponent extends Component {
+
+  default() {
+    const mySecondComponent = this.load('../components/my-second-component')
+  }
+ 
+}
+```
 
 #### Start With The Outcome
 
@@ -419,7 +454,7 @@ One of the most important lessons we've learned about software development tools
 
 Components know their use-case.  You can use that knowledge to: 1) provision infrastructure more reliably, because you have a clear provisioning path and you can program around the pitfalls.  2) provision infrastructure more quickly 3) add use-case specific automation to your Component in the form of custom methods.
 
-#### Keep State On The Cloud Provider
+#### Keep Most State On The Cloud Provider
 
 Serverless Components save remarkably little state.  In fact, many powerful Components have less than 10 properties in their state objects.
 
@@ -429,11 +464,11 @@ Components rely on the state saved within the cloud services they use as the sou
 
 If you do need to store state, try to store it immediately after a successful operation.  This way, if anything after that operation fails, your Serverless Component can pick up where it left off, when the end user tries to deploy it again.
 
-#### Optimize For Approachability
+#### Optimize For Accessibility
 
 We believe serverless infrastructure and architectures will empower more people to develop software than ever before.  
 
-Becasue of this, we're designing all of our projects to be as approachable as possible.  Please try to use simple, vanilla Javascript.  Additionally, to reduce security risks and general bloat, please try to use the least amount of NPM dependencies as possible.
+Because of this, we're designing all of our projects to be as approachable as possible.  Please try to use simple, vanilla Javascript.  Additionally, to reduce security risks and general bloat, please try to use the least amount of NPM dependencies as possible.
 
 
 
