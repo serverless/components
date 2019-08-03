@@ -1,7 +1,7 @@
 name: aws-lambda-function
 
 myFunction:
-  component: '@serverless/aws-lambda'
+  component: '@serverless/function'
   inputs:
     code: ./src
     handler: index.hello

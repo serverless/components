@@ -8,8 +8,8 @@ dashboard:
       root: dashboard
       hook: npm run build
     env:
-      apiUrl: ${api.domain} # Change to ${api.domain} if using a custom domain
-    domain: www.serverless-fullstack.com # Register a custom domain on AWS Route 53 to enable this.
+      apiUrl: ${api.url} # Change to ${api.domain} if using a custom domain
+    # domain: www.serverless-fullstack.com # Register a custom domain on AWS Route 53 to enable this.
 
 api:
   component: '@serverless/backend'
@@ -19,7 +19,7 @@ api:
     env:
       dbName: ${database.name}
       dbRegion: ${database.region}
-    domain: api.serverless-fullstack.com # Register a custom domain on AWS Route 53 to enable this.
+    # domain: api.serverless-fullstack.com # Register a custom domain on AWS Route 53 to enable this.
 
 database:
   component: '@serverless/aws-dynamodb'
