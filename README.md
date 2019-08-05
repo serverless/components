@@ -144,15 +144,15 @@ A Component can be designed to provision low-level infrastructure (e.g. an AWS S
   2) A software feature, like user registration, comments, or a payment system.
   3) An entire application, like a blog, video streaming service, or landing page.
 
-The syntax for writing a Serverless Component makes it trivial to load child Components and deploy them, enablng you to lean on low-level Components to handle difficult infrastructure provisioning tasks, while you rapidly create a higher-order abstraction.
+The syntax for writing a Serverless Component makes it trivial to load child Components and deploy them, enabling you to lean on low-level Components to handle difficult infrastructure provisioning tasks, while you rapidly create a higher-order abstraction.
 
-Serverless Components can be used **declaratively** (via the Serverless Framework's `serverless.yml` file) or **programatically** (via a `serverless.js` file).
+Serverless Components can be used **declaratively** (via the Serverless Framework's `serverless.yml` file) or **programmatically** (via a `serverless.js` file).
 
 Using Components declaratively is great if you want to build a serverless application as easily as possible, but not re-use it.
 
 Using Components programmatically is also great for building serverless applications easily.  And if you'd like to build a reusable Serverless Component, this is currently the only way.
 
-In the [Using Components](#using-components) section, we'll focus on the declarative experience (`serverless.yml`).  In the [Building Components](#building-components) section, we'll focus on the programmatic expereince (`serverless.js`).
+In the [Using Components](#using-components) section, we'll focus on the declarative experience (`serverless.yml`).  In the [Building Components](#building-components) section, we'll focus on the programmatic experience (`serverless.js`).
 
 <br/>
 
@@ -264,7 +264,7 @@ These credentials will be used by any and all Components in your `serverless.yml
 
 # Building Components
 
-If you want to build resuable Serverless Components, it starts and ends with a `serverless.js` file.
+If you want to build reusable Serverless Components, it starts and ends with a `serverless.js` file.
 
 ### Serverless.js Basics
 
@@ -355,7 +355,7 @@ class MyComponent extends Component {
     // if you don't have any .env files, then global aws credentials will be used
     const dynamodb = new AWS.DynamoDB({ credentials: this.context.credentials.aws })
     
-    // You can easily create a random ID to name cloud infrastruture resources with using this utility.
+    // You can easily create a random ID to name cloud infrastructure resources with using this utility.
     const s3BucketName = `my-bucket-${this.context.resourceId()}`
     // This prevents name collisions.
 
@@ -442,13 +442,13 @@ class myFirstComponent extends Component {
 
 When making a Serverless Component, it can be tempting to break it down into several levels of child Components, to maintain separation of concerns and increase the ways your work could be re-used.
 
-However, provisioniong back-end logic can be more complicated than designing a front-end React Component.  We've learned over-optimizing for granular separation of concerns is a fast way to burn yourself out!  
+However, provisioning back-end logic can be more complicated than designing a front-end React Component.  We've learned over-optimizing for granular separation of concerns is a fast way to burn yourself out!  
 
 We recommend starting with a focus on your desired outcome.  Create one Serverless Component that solves that problem first.  After you've achieved your initial goal, then start breaking it down into child Components.
 
 #### The Outcome Is Your Advantage
 
-Provisioning infrastructure can be quite complicated.  However, Serverless Components have one powerful advantage over general infrastructure provisiong tools that seek to enable every possible option and combination (e.g. AWS Cloudformation) — Serverless Components know the specific use-case they are trying to deliver.
+Provisioning infrastructure can be quite complicated.  However, Serverless Components have one powerful advantage over general infrastructure provision tools that seek to enable every possible option and combination (e.g. AWS Cloudformation) — Serverless Components know the specific use-case they are trying to deliver.
 
 One of the most important lessons we've learned about software development tools is that once you know the use-case, you can create a much better tool.
 
@@ -458,7 +458,7 @@ Components know their use-case.  You can use that knowledge to: 1) provision inf
 
 Serverless Components save remarkably little state.  In fact, many powerful Components have less than 10 properties in their state objects.
 
-Components rely on the state saved within the cloud services they use as the source of truth.  This prevents drift issues that break inrastructure provisioning tools.  It also opens up the possibility of working with existing resources, that were not originally managed by Serverless Components.
+Components rely on the state saved within the cloud services they use as the source of truth.  This prevents drift issues that break infrastructure provisioning tools.  It also opens up the possibility of working with existing resources, that were not originally managed by Serverless Components.
 
 #### Store State Immediately After A Successful Operation
 
