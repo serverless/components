@@ -66,7 +66,7 @@ serverless create --template-url https://github.com/serverless/components/tree/m
   
 [Check out all of the pre-made Templates](./templates) to deploy serverless *REST APsI*, *Websockets APIs*, *Websites*, *Scheduled Tasks*, and much more!  Each Template has a `README.md` with clear instructions on what it does and how to get started.
 
-Also, all more Serverless Components can be founde [here](https://github.com/serverless-components/).
+Also, all more Serverless Components can be found [here](https://github.com/serverless-components/).
 
 <br/>
 
