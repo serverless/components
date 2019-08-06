@@ -46,7 +46,7 @@ Check out more Serverless Components [here](https://github.com/serverless-compon
 
 Serverless Components are built around higher-order use-cases (e.g. a website, blog, payment system).  Irrelevant low-level infrastructure details are abstracted away, and simpler configuration is offered instead.
 
-For example, with minimal configuration, you can deploy... 
+For example, with minimal configuration, you can deploy...
 
 * A **serverless website** hosted on AWS S3, delivered globally and quickly w/ AWS Cloudfront, via a custom domain on AWS Route 53, secured by a free AWS ACM SSL Certificate:
 
@@ -138,7 +138,7 @@ Serverless Components are merely Javascript libraries that provision something/a
 
 They are focused primarily on back-end use-cases, and cloud infrastructure with serverless qualities, enabling you to deliver software with radically less overhead and cost.  Serverless Components are to serverless back-end use-cases, what React Components are to front-end use-cases.
 
-A Component can be designed to provision low-level infrastructure (e.g. an AWS S3 bucket).  However, they can also provision higher-order outcomes — which is when they are at their best.  Examples of a higher-order outcome are: 
+A Component can be designed to provision low-level infrastructure (e.g. an AWS S3 bucket).  However, they can also provision higher-order outcomes — which is when they are at their best.  Examples of a higher-order outcome are:
 
   1) A group of infrastructure with a purpose, like a type of data processing pipeline.
   2) A software feature, like user registration, comments, or a payment system.
@@ -234,7 +234,7 @@ backend:
     env:
       dbName: ${database.name}
       dbName: ${database.region}
-      
+
 database:
   component: @serverless/aws-dynamodb@4.3.1
   inputs:
@@ -345,7 +345,7 @@ const { Component } = require('@serverless/core')
 class MyComponent extends Component {
 
   async default(inputs = {}) {
-  
+
     // this.context features useful information
     console.log(this.context)
 
@@ -354,7 +354,7 @@ class MyComponent extends Component {
     // when you run "components --stage prod", then the credentials in .env.prod will be used...etc
     // if you don't have any .env files, then global aws credentials will be used
     const dynamodb = new AWS.DynamoDB({ credentials: this.context.credentials.aws })
-    
+
     // You can easily create a random ID to name cloud infrastructure resources with using this utility.
     const s3BucketName = `my-bucket-${this.context.resourceId()}`
     // This prevents name collisions.
@@ -364,10 +364,10 @@ class MyComponent extends Component {
     this.state.name = 'myComponent'
     await this.save()
 
-    // Here is how to load a child Component. 
+    // Here is how to load a child Component.
     // This assumes you have the "@serverless/website" component in your "package.json" file and you've run "npm install"
     let website = await this.load('@serverless/website')
-    
+
     // You can run the default method of a child Component two ways:
     let websiteOutputs = website({ code: { src: './src' }})
     let websiteOutputs = website.default({ code: { src: './src' }})
@@ -375,7 +375,7 @@ class MyComponent extends Component {
     // If you are deploying multiple instances of the same Component, include an instance id.
     let website1 = await this.load('@serverless/website', 'website1')
     let website2 = await this.load('@serverless/website', 'website2')
-    
+
     // Child Components save their state automatically.
 
     // You can also load a local component that is not yet published to npm
@@ -385,7 +385,7 @@ class MyComponent extends Component {
 
     // Here is how you can easily remove a Component.
     let websiteRemoveOutputs = await website.remove()
-    
+
     // Here is how you can call any custom method on a Component.
     let websiteRemoveOutputs = await website.test({})
 
@@ -434,7 +434,7 @@ class myFirstComponent extends Component {
   default() {
     const mySecondComponent = this.load('../components/my-second-component')
   }
- 
+
 }
 ```
 
@@ -469,12 +469,3 @@ If you do need to store state, try to store it immediately after a successful op
 We believe serverless infrastructure and architectures will empower more people to develop software than ever before.  
 
 Because of this, we're designing all of our projects to be as approachable as possible.  Please try to use simple, vanilla Javascript.  Additionally, to reduce security risks and general bloat, please try to use the least amount of NPM dependencies as possible.
-
-
-
-
-
-
-
-
-
