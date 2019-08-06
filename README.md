@@ -34,7 +34,9 @@ Install the [Serverless Framework](https://www.github.com/serverless/serverless)
   $ npm i -g serverless
   ```
   
-Next, use the `create --template-url` command to install a [Serverless Components Template](./templates), which contains Components as well as boilerplate code, to get you started quickly.  Here are a few popular ones:
+Next, use the `create --template-url` command to install a [Serverless Components Template](./templates), which contains Components as well as boilerplate code, to get you started quickly.  
+
+Here are a few popular templates...
 
 #### [Deploy A Website](https://github.com/serverless/components/tree/master/templates/website)
 
