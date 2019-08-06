@@ -38,27 +38,34 @@ Next, use the `create --template-url` command to install a [Serverless Component
 
 **Deploy A Website...**
 
-AWS S3 & AWS Cloudfront powered serverless website w/ custom domain.  [View the README here.](https://github.com/serverless/components/tree/master/templates/website)
+AWS S3 & AWS Cloudfront powered serverless website w/ custom domain.
 
 ```shell
 serverless create --template-url https://github.com/serverless/components/tree/master/templates/website
 ```
 
+[View the Website Template documentation here.](https://github.com/serverless/components/tree/master/templates/website)
+
 **Deploy A Backend API...**
 
-AWS Lambda & AWS API Gateway powered serverless API w/ custom domain.  [View the README here.](https://github.com/serverless/components/tree/master/templates/backend-monolith)
+AWS Lambda & AWS API Gateway powered serverless API w/ custom domain.
 
 ```shell
 serverless create --template-url https://github.com/serverless/components/tree/master/templates/backend-monolith
 ```
 
+[View the Backend API Template documentation here.](https://github.com/serverless/components/tree/master/templates/backend-monolith)
+
 **Deploy A Fullstack Application...**
 
-A React-based frontend and AWS Lambda based API fullstack application.  [View the README here.](https://github.com/serverless/components/tree/master/templates/fullstack-application)
+A React-based frontend and AWS Lambda based API fullstack application.
 
 ```shell
 serverless create --template-url https://github.com/serverless/components/tree/master/templates/fullstack-application
 ```
+
+[View the Fullstack Application documentation here.](https://github.com/serverless/components/tree/master/templates/fullstack-application)
+
 **And More**
   
 [Check out all of the pre-made Templates](./templates) to deploy serverless *REST APsI*, *Websockets APIs*, *Websites*, *Scheduled Tasks*, and much more!  Each Template has a `README.md` with clear instructions on what it does and how to get started.
