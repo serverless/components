@@ -36,7 +36,7 @@ Install the [Serverless Framework](https://www.github.com/serverless/serverless)
   
 Next, use the `create --template-url` command to install a [Serverless Components Template](./templates), which contains Components as well as boilerplate code, to get you started quickly.  Here are a few popular ones:
 
-**Website**
+**Deploy A Website...**
 
 AWS S3 & AWS Cloudfront powered serverless website w/ custom domain.
 
@@ -44,7 +44,7 @@ AWS S3 & AWS Cloudfront powered serverless website w/ custom domain.
 serverless create --template-url https://github.com/serverless/components/tree/master/templates/website
 ```
 
-**Backend API**
+**Deploy A Backend API...**
 
 AWS Lambda & AWS API Gateway powered serverless API w/ custom domain.
 
@@ -52,7 +52,7 @@ AWS Lambda & AWS API Gateway powered serverless API w/ custom domain.
 serverless create --template-url https://github.com/serverless/components/tree/master/templates/backend-monolith
 ```
 
-**Fullstack Application**
+**Deploy A Fullstack Application...**
 
 A React-based frontend and AWS Lambda based API fullstack application.
 
