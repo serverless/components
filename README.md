@@ -33,10 +33,37 @@ Install the [Serverless Framework](https://www.github.com/serverless/serverless)
   ```console
   $ npm i -g serverless
   ```
+  
+Next, use the `create --template-url` command to install a [Serverless Components Template](./templates), which contains Components as well as boilerplate code, to get you started quickly.  Here are a few popular ones:
 
-Then, [clone one of the pre-made Templates](./templates) and deploy it, to rapidly create a serverless *REST API*, *Websockets API*, *Website*, *Scheduled Task*, and much more!  Each Template has a `README.md` with clear instructions on what it does and how to get started.
+**Website**
 
-Check out more Serverless Components [here](https://github.com/serverless-components/).
+AWS S3 & AWS Cloudfront powered serverless website w/ custom domain.
+
+```shell
+serverless create --template-url https://github.com/serverless/components/tree/master/templates/website
+```
+
+**Backend API**
+
+AWS Lambda & AWS API Gateway powered serverless API w/ custom domain.
+
+```shell
+serverless create --template-url https://github.com/serverless/components/tree/master/templates/backend-monolith
+```
+
+**Fullstack Application**
+
+A React-based frontend and AWS Lambda based API fullstack application.
+
+```shell
+serverless create --template-url https://github.com/serverless/components/tree/master/templates/fullstack-application
+```
+**And More**
+  
+[Check out all of the pre-made Templates](./templates) to deploy serverless *REST APsI*, *Websockets APIs*, *Websites*, *Scheduled Tasks*, and much more!  Each Template has a `README.md` with clear instructions on what it does and how to get started.
+
+Also, all more Serverless Components can be founder [here](https://github.com/serverless-components/).
 
 <br/>
 
