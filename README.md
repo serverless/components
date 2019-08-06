@@ -36,7 +36,7 @@ Install the [Serverless Framework](https://www.github.com/serverless/serverless)
   
 Next, use the `create --template-url` command to install a [Serverless Components Template](./templates), which contains Components as well as boilerplate code, to get you started quickly.  Here are a few popular ones:
 
-### [Deploy A Website](https://github.com/serverless/components/tree/master/templates/website)
+#### [Deploy A Website](https://github.com/serverless/components/tree/master/templates/website)
 
 AWS S3 & AWS Cloudfront powered serverless website w/ custom domain.
 
@@ -44,7 +44,7 @@ AWS S3 & AWS Cloudfront powered serverless website w/ custom domain.
 serverless create --template-url https://github.com/serverless/components/tree/master/templates/website
 ```
 
-### [Deploy A REST API](https://github.com/serverless/components/tree/master/templates/backend-monolith)
+#### [Deploy A REST API](https://github.com/serverless/components/tree/master/templates/backend-monolith)
 
 AWS Lambda & AWS API Gateway powered serverless REST API w/ custom domain.
 
@@ -52,7 +52,7 @@ AWS Lambda & AWS API Gateway powered serverless REST API w/ custom domain.
 serverless create --template-url https://github.com/serverless/components/tree/master/templates/backend-monolith
 ```
 
-### [Deploy A Fullstack Web Application](https://github.com/serverless/components/tree/master/templates/fullstack-application)
+#### [Deploy A Fullstack Web Application](https://github.com/serverless/components/tree/master/templates/fullstack-application)
 
 A React-based frontend and AWS Lambda based API fullstack application.
 
@@ -60,7 +60,7 @@ A React-based frontend and AWS Lambda based API fullstack application.
 serverless create --template-url https://github.com/serverless/components/tree/master/templates/fullstack-application
 ```
 
-### [Deploy Other Use-Cases](./templates)
+#### [Deploy Other Use-Cases](./templates)
   
 [Check out all of the pre-made Templates](./templates) to deploy serverless *REST APsI*, *Websockets APIs*, *Websites*, *Scheduled Tasks*, and much more!  Each Template has a `README.md` with clear instructions on what it does and how to get started.
 
