@@ -38,7 +38,7 @@ Next, use the `create --template-url` command to install a [Serverless Component
 
 **Deploy A Website...**
 
-AWS S3 & AWS Cloudfront powered serverless website w/ custom domain.
+AWS S3 & AWS Cloudfront powered serverless website w/ custom domain.  [View the README here.](https://github.com/serverless/components/tree/master/templates/website)
 
 ```shell
 serverless create --template-url https://github.com/serverless/components/tree/master/templates/website
@@ -46,7 +46,7 @@ serverless create --template-url https://github.com/serverless/components/tree/m
 
 **Deploy A Backend API...**
 
-AWS Lambda & AWS API Gateway powered serverless API w/ custom domain.
+AWS Lambda & AWS API Gateway powered serverless API w/ custom domain.  [View the README here.](https://github.com/serverless/components/tree/master/templates/backend-monolith)
 
 ```shell
 serverless create --template-url https://github.com/serverless/components/tree/master/templates/backend-monolith
@@ -54,7 +54,7 @@ serverless create --template-url https://github.com/serverless/components/tree/m
 
 **Deploy A Fullstack Application...**
 
-A React-based frontend and AWS Lambda based API fullstack application.
+A React-based frontend and AWS Lambda based API fullstack application.  [View the README here.](https://github.com/serverless/components/tree/master/templates/fullstack-application)
 
 ```shell
 serverless create --template-url https://github.com/serverless/components/tree/master/templates/fullstack-application
