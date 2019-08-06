@@ -52,8 +52,6 @@ AWS Lambda & AWS API Gateway powered serverless REST API w/ custom domain.
 serverless create --template-url https://github.com/serverless/components/tree/master/templates/backend-monolith
 ```
 
-[View the Backend API Template documentation here.](https://github.com/serverless/components/tree/master/templates/backend-monolith)
-
 ### [Deploy A Fullstack Web Application](https://github.com/serverless/components/tree/master/templates/fullstack-application)
 
 A React-based frontend and AWS Lambda based API fullstack application.
