@@ -444,6 +444,25 @@ For complete real-world examples on writing components, [check out our official 
 
 Here are some development tips when it comes to writing Serverless Components:
 
+#### Use the `--debug` flag
+
+The Serverless Components CLI experience is intentionally minimal.  But if you ever want to see what Components are doing behnd the scenes, use the `--debug` flag when you run a Component.  You'll see output like this:
+
+![Serverless Components Debugging](https://s3.amazonaws.com/assets.github.serverless/components/serverless_components_debugging.png)
+
+Many Serverless Components include debug statements to report what work they are doing.  We recommend you add debug statements into your Component as well.  Just use this:
+
+```javascript
+class MyComponent extends Component {
+  async default () {
+    this.context.debug(`Starting MyComponent.`)
+    this.context.debug(`Creating resources.`)
+    this.context.debug(`Waiting for resources to be provisioned.`)
+    this.context.debug(`Finished MyComponent.`)
+  }
+}
+```
+
 #### Use Local References
 
 When writing a Serverless Component, you can reference it locally via a `serverless.yml`, or another `serverless.js`.  Keep in mind, a directory can only contain 1 `serverless.yml` or `serverless.js`.  A directory cannot contain a both a `serverless.yml` and a `serverless.js`.
