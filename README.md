@@ -34,6 +34,8 @@ Install the [Serverless Framework](https://www.github.com/serverless/serverless)
   ```console
   $ npm i -g serverless
   ```
+
+**Make sure you are using Serverless Framework version 1.49 or above.**  Serverless Components Beta will not work with older versions.
   
 Next, use the `create --template-url` command to install a [Serverless Components Template](./templates), which contains Components as well as boilerplate code, to get you started quickly.  
 
