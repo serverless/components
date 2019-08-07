@@ -19,6 +19,7 @@ You can use them now with the Serverless Framework.
 - [Building Components](#building-components)
   - [Serverless.js Basics](#serverlessjs-basics)
   - [Development Tips](#development-tips)
+- [Available Components](https://github.com/serverless-components)
 - [Templates](./templates)
 - [Artwork](./artwork)
 - [Join Us on Slack](https://serverless.com/slack)
