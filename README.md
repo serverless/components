@@ -444,7 +444,7 @@ For complete real-world examples on writing components, [check out our official 
 
 Here are some development tips when it comes to writing Serverless Components:
 
-#### Use the `--debug` flag
+#### Use Debug Statements and the `--debug` Flag
 
 The Serverless Components CLI experience is intentionally minimal.  But if you ever want to see what Components are doing behnd the scenes, use the `--debug` flag when you run a Component.  You'll see output like this:
 
