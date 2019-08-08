@@ -6,8 +6,7 @@
 
 You can use them now with the Serverless Framework.
 
-
-[Here's a video guide on using a Serverless Component to deploy a React App](https://www.youtube.com/watch?v=ts26BVuX3j0)
+[Watch a video guide on using a Serverless Component here](https://www.youtube.com/watch?v=ts26BVuX3j0)
 
 <br/>
 
