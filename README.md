@@ -6,6 +6,9 @@
 
 You can use them now with the Serverless Framework.
 
+
+[Here's a video guide on using a Serverless Component to deploy a React App](https://www.youtube.com/watch?v=ts26BVuX3j0)
+
 <br/>
 
 - [Quick-Start](#quick-start)
@@ -43,7 +46,7 @@ Here are a few popular templates...
 
 #### [Deploy A Website](https://github.com/serverless/components/tree/master/templates/website)
 
-AWS S3 & AWS Cloudfront powered serverless website w/ custom domain.
+AWS S3 & AWS Cloudfront powered serverless website w/ custom domain.  [A video guide on this can be found here](https://www.youtube.com/watch?v=ts26BVuX3j0)
 
 ```shell
 serverless create --template-url https://github.com/serverless/components/tree/master/templates/website
