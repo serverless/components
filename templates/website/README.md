@@ -2,7 +2,7 @@
 
 &nbsp;
 
-**[A video guide on this can be founder here](https://www.youtube.com/watch?v=ts26BVuX3j0)**
+**[A video guide on this can be found here](https://www.youtube.com/watch?v=ts26BVuX3j0)**
 
 This is a template for deploying a [React](https://reactjs.org) application onto a serverless website via the [Website Component](https://www.github.com/serverless-components/website).
 
