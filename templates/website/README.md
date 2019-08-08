@@ -2,6 +2,8 @@
 
 &nbsp;
 
+**[A video guide on this can be founder here](https://www.youtube.com/watch?v=ts26BVuX3j0)**
+
 This is a template for deploying a [React](https://reactjs.org) application onto a serverless website via the [Website Component](https://www.github.com/serverless-components/website).
 
 The Website Component sets up everything you need within seconds.  It uses AWS S3 for hosting, AWS Cloudfront for a blazing fast CDN, AWS Route 53 to configure your custom domain and an AWS ACM Certificate to secure your with with SSL.
