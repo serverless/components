@@ -266,7 +266,7 @@ backend:
       src: ./src
     env:
       dbName: ${database.name}
-      dbName: ${database.region}
+      dbRegion: ${database.region}
 
 database:
   component: @serverless/aws-dynamodb@4.3.1
