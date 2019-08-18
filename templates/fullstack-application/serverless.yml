@@ -29,5 +29,5 @@ database:
       - AttributeName: 'pk'
         AttributeType: 'S'
     keySchema:
-      - AttributeName: 'sk'
+      - AttributeName: 'pk'
         KeyType: 'HASH'
