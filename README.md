@@ -2,9 +2,9 @@
 
 <br/>
 
-**Forget infrastructure** — Serverless Components enables you to **deploy entire serverless use-cases**, like a *blog*, a *user registration system*, a *payment system* or an *entire application* — without managing complex cloud infrastructure configurations.
+**Forget infrastructure** — Serverless Components enables you to **deploy entire serverless use-cases**, like a _blog_, a _user registration system_, a _payment system_ or an _entire application_ — without managing complex cloud infrastructure configurations.
 
-You can use them now with the Serverless Framework.  [Watch a video guide on using a Serverless Component here](https://www.youtube.com/watch?v=ts26BVuX3j0).
+You can use them now with the Serverless Framework. [Watch a video guide on using a Serverless Component here](https://www.youtube.com/watch?v=ts26BVuX3j0).
 
 <br/>
 
@@ -31,19 +31,19 @@ You can use them now with the Serverless Framework.  [Watch a video guide on usi
 
 Install the [Serverless Framework](https://www.github.com/serverless/serverless) via NPM:
 
-  ```console
-  $ npm i -g serverless
-  ```
+```console
+$ npm i -g serverless
+```
 
-**Make sure you are using Serverless Framework version 1.49 or above.**  Serverless Components Beta will not work with older versions.
-  
-Next, use the `create --template-url` command to install a [Serverless Components Template](./templates), which contains Components as well as boilerplate code, to get you started quickly.  
+**Make sure you are using Serverless Framework version 1.49 or above.** Serverless Components Beta will not work with older versions.
+
+Next, use the `create --template-url` command to install a [Serverless Components Template](./templates), which contains Components as well as boilerplate code, to get you started quickly.
 
 Here are a few popular templates...
 
 #### [Deploy A Website](https://github.com/serverless/components/tree/master/templates/website)
 
-AWS S3 & AWS Cloudfront powered serverless website w/ custom domain.  [A video guide on this can be found here](https://www.youtube.com/watch?v=ts26BVuX3j0)
+AWS S3 & AWS Cloudfront powered serverless website w/ custom domain. [A video guide on this can be found here](https://www.youtube.com/watch?v=ts26BVuX3j0)
 
 ```shell
 serverless create --template-url https://github.com/serverless/components/tree/master/templates/website
@@ -66,8 +66,8 @@ serverless create --template-url https://github.com/serverless/components/tree/m
 ```
 
 #### [Deploy Other Use-Cases](./templates)
-  
-[Check out all of the pre-made Templates](./templates) to deploy serverless *REST APsI*, *Websockets APIs*, *Websites*, *Scheduled Tasks*, and much more!  Each Template has a `README.md` with clear instructions on what it does and how to get started.
+
+[Check out all of the pre-made Templates](./templates) to deploy serverless _REST APsI_, _Websockets APIs_, _Websites_, _Scheduled Tasks_, and much more! Each Template has a `README.md` with clear instructions on what it does and how to get started.
 
 Also, all more Serverless Components can be found [here](https://github.com/serverless-components/).
 
@@ -77,52 +77,49 @@ Also, all more Serverless Components can be found [here](https://github.com/serv
 
 ### Simplicity
 
-Serverless Components are built around higher-order use-cases (e.g. a website, blog, payment system).  Irrelevant low-level infrastructure details are abstracted away, and simpler configuration is offered instead.
+Serverless Components are built around higher-order use-cases (e.g. a website, blog, payment system). Irrelevant low-level infrastructure details are abstracted away, and simpler configuration is offered instead.
 
 For example, with minimal configuration, you can deploy...
 
-* A **serverless website** hosted on AWS S3, delivered globally and quickly w/ AWS Cloudfront, via a custom domain on AWS Route 53, secured by a free AWS ACM SSL Certificate:
+- A **serverless website** hosted on AWS S3, delivered globally and quickly w/ AWS Cloudfront, via a custom domain on AWS Route 53, secured by a free AWS ACM SSL Certificate:
 
+```yaml
+# serverless.yml
 
-  ```yaml
-  # serverless.yml
+website:
+  component: '@serverless/website'
+  inputs:
+    code:
+      src: ./src
+    domain: www.serverless-app.com
+```
 
-  website:
-    component: @serverless/website
-    inputs:
-      code:
-        src: ./src
-      domain: www.serverless-app.com
-  ```
+- A **serverless API** hosted on AWS Lambda, accessible via an AWS API Gateway endpoint under a custom domain on AWS Route 53, secured by a free AWS ACM SSL Certificate:
 
-* A **serverless API** hosted on AWS Lambda, accessible via an AWS API Gateway endpoint under a custom domain on AWS Route 53, secured by a free AWS ACM SSL Certificate:
+```yaml
+# serverless.yml
 
+api:
+  component: '@serverless/backend'
+  inputs:
+    code:
+      src: ./src
+    domain: api.serverless-app.com
+```
 
-  ```yaml
-  # serverless.yml
-
-  api:
-    component: @serverless/backend
-    inputs:
-      code:
-        src: ./src
-      domain: api.serverless-app.com
-  ```
-
-* A **serverless real-time websockets API** hosted on AWS Lambda, accessible via an AWS API Gateway Websockets endpoint:
+- A **serverless real-time websockets API** hosted on AWS Lambda, accessible via an AWS API Gateway Websockets endpoint:
 
   ```yaml
   # serverless.yml
 
   api:
-    component: @serverless/backend-socket
+    component: '@serverless/backend-socket'
     inputs:
       code:
         src: ./src
   ```
 
-* and [much more!](./templates)
-
+- and [much more!](./templates)
 
 ### Reusability
 
@@ -155,9 +152,9 @@ Most Serverless Components deploy 20x faster than traditional cloud provisioning
 
 ### Vendor-Agnostic
 
-Serverless Components favor cloud infrastructure with serverless qualities (shocker!).  We also believe in order to deliver the best product, you must be free to use the best services.
+Serverless Components favor cloud infrastructure with serverless qualities (shocker!). We also believe in order to deliver the best product, you must be free to use the best services.
 
-Serverless Components are being designed entirely vendor agnostic, enabling you to easily use services from different vendors, together!  Like, AWS Lambda, AWS S3, Azure Functions, Google Big Query, Twilio, Stripe, Algolia, Cloudflare Workers and more.
+Serverless Components are being designed entirely vendor agnostic, enabling you to easily use services from different vendors, together! Like, AWS Lambda, AWS S3, Azure Functions, Google Big Query, Twilio, Stripe, Algolia, Cloudflare Workers and more.
 
 ### Vanilla Javascript
 
@@ -169,13 +166,13 @@ Serverless Components are written in vanilla javascript and seek to use the leas
 
 Serverless Components are merely Javascript libraries that provision something/anything.
 
-They are focused primarily on back-end use-cases, and cloud infrastructure with serverless qualities, enabling you to deliver software with radically less overhead and cost.  Serverless Components are to serverless back-end use-cases, what React Components are to front-end use-cases.
+They are focused primarily on back-end use-cases, and cloud infrastructure with serverless qualities, enabling you to deliver software with radically less overhead and cost. Serverless Components are to serverless back-end use-cases, what React Components are to front-end use-cases.
 
-A Component can be designed to provision low-level infrastructure (e.g. an AWS S3 bucket).  However, they can also provision higher-order outcomes — which is when they are at their best.  Examples of a higher-order outcome are:
+A Component can be designed to provision low-level infrastructure (e.g. an AWS S3 bucket). However, they can also provision higher-order outcomes — which is when they are at their best. Examples of a higher-order outcome are:
 
-  1) A group of infrastructure with a purpose, like a type of data processing pipeline.
-  2) A software feature, like user registration, comments, or a payment system.
-  3) An entire application, like a blog, video streaming service, or landing page.
+1. A group of infrastructure with a purpose, like a type of data processing pipeline.
+2. A software feature, like user registration, comments, or a payment system.
+3. An entire application, like a blog, video streaming service, or landing page.
 
 The syntax for writing a Serverless Component makes it trivial to load child Components and deploy them, enabling you to lean on low-level Components to handle difficult infrastructure provisioning tasks, while you rapidly create a higher-order abstraction.
 
@@ -183,9 +180,9 @@ Serverless Components can be used **declaratively** (via the Serverless Framewor
 
 Using Components declaratively is great if you want to build a serverless application as easily as possible, but not re-use it.
 
-Using Components programmatically is also great for building serverless applications easily.  And if you'd like to build a reusable Serverless Component, this is currently the only way.
+Using Components programmatically is also great for building serverless applications easily. And if you'd like to build a reusable Serverless Component, this is currently the only way.
 
-In the [Using Components](#using-components) section, we'll focus on the declarative experience (`serverless.yml`).  In the [Building Components](#building-components) section, we'll focus on the programmatic experience (`serverless.js`).
+In the [Using Components](#using-components) section, we'll focus on the declarative experience (`serverless.yml`). In the [Building Components](#building-components) section, we'll focus on the programmatic experience (`serverless.js`).
 
 <br/>
 
@@ -201,7 +198,7 @@ The syntax for using Serverless Components looks like this:
 name: my-serverless-website
 
 website: # An instance of a component is declared here.
-  component: @serverless/website@2.0.5 # This is the component you want to create an instance of.
+  component: '@serverless/website@2.0.5' # This is the component you want to create an instance of.
   inputs: # These are inputs to pass into the component's "default()" function
     code:
       src: ./src
@@ -213,31 +210,31 @@ You can deploy this easily via the Serverless Framework with the `$ serverless` 
 $ serverless # Installs and deploys the components...
 ```
 
-There is nothing to install when using Serverless Components via `serverless.yml`.  Instead, when you deploy a `serverless.yml`, its Components are downloaded automatically at the beginning of that deployment (if they aren't already downloaded), and stored in a central folder at the root of your machine.  This effectively caches the Components in one location, so you don't clutter your project files with Component libraries and don't download duplicates.
+There is nothing to install when using Serverless Components via `serverless.yml`. Instead, when you deploy a `serverless.yml`, its Components are downloaded automatically at the beginning of that deployment (if they aren't already downloaded), and stored in a central folder at the root of your machine. This effectively caches the Components in one location, so you don't clutter your project files with Component libraries and don't download duplicates.
 
-Serverless Components are distributed via [NPM](https://www.npmjs.com/).  When Components are downloaded, a basic NPM installation is happening behind the scenes.  
+Serverless Components are distributed via [NPM](https://www.npmjs.com/). When Components are downloaded, a basic NPM installation is happening behind the scenes.
 
 Because of this, you use the NPM name in the `component:` property.
 
 ```yml
 website: # An instance of a component.
-  component: @serverless/website # This is the NPM package name
+  component: '@serverless/website' # This is the NPM package name
 ```
 
 You can also use the same semantic versioning strategy that NPM uses.
 
 ```yml
 website: # An instance of a component.
-  component: @serverless/website@3.0.5 # This is the NPM package name and version
+  component: '@serverless/website@3.0.5' # This is the NPM package name and version
 ```
 
-When you add a version, only that Component version is used.  When you don't add a version, upon every deployment, the Serverless Framework will check for a newer version, and use that, if it exists.
+When you add a version, only that Component version is used. When you don't add a version, upon every deployment, the Serverless Framework will check for a newer version, and use that, if it exists.
 
 **Note:** While in Beta, you cannot currently use Serverless Components within an existing Serverless Framework project file (i.e. a project file that contains `functions`, `events`, `resources` and `plugins`).
 
 ### Inputs
 
-Every Serverless Component has one main function to make it deploy *something*.  This is known as the `default()` function (you can learn more about it in the "Building Components" section).  This `default()` function takes an `inputs` object.
+Every Serverless Component has one main function to make it deploy _something_. This is known as the `default()` function (you can learn more about it in the "Building Components" section). This `default()` function takes an `inputs` object.
 
 When you specify `inputs` for a Component in `serverless.yml`, they are simply arguments that are being passed into that Serverless Component's `default()` function.
 
@@ -245,7 +242,7 @@ When you specify `inputs` for a Component in `serverless.yml`, they are simply a
 name: my-serverless-website
 
 website:
-  component: @serverless/website@3.0.5
+  component: '@serverless/website@3.0.5'
   inputs: # Inputs to pass into the component's default function
     code:
       src: ./src
@@ -258,9 +255,8 @@ When a Component function (e.g. the `default()` function) is finished running, i
 You can reference values of this `outputs` object in `serverless.yml` to pass data into Components, like this:
 
 ```yml
-
 backend:
-  component: @serverless/backend@1.0.2
+  component: '@serverless/backend@1.0.2'
   inputs:
     code:
       src: ./src
@@ -269,29 +265,79 @@ backend:
       dbRegion: ${database.region}
 
 database:
-  component: @serverless/aws-dynamodb@4.3.1
+  component: '@serverless/aws-dynamodb@4.3.1'
   inputs:
     name: users-database
 ```
 
-This tells the Serverless Framework to pass a few of the outputs from the `database` instance into the `backend` instance.  Specifically, the `name` and `region` of the database are being added as environment variables to the `backend` instance, so that it can interact with that database.
+This tells the Serverless Framework to pass a few of the outputs from the `database` instance into the `backend` instance. Specifically, the `name` and `region` of the database are being added as environment variables to the `backend` instance, so that it can interact with that database.
 
-This also tells the Serverless Framework what depends on what.  The Framework builds a graph based on this, and deploys everything in that order.  Circular references however do not work and the Framework will throw an error.
+This also tells the Serverless Framework what depends on what. The Framework builds a graph based on this, and deploys everything in that order. Circular references however do not work and the Framework will throw an error.
 
 ### Credentials
 
 Upon deployment, whether it's a `serverless.yml` or `serverless.js`, Serverless Components' core looks for a `.env` file in the current working directory.
 
-Upon deployment, if a `.env` file exists, Serverless Components will add the content of it as environment variables.  If you use specific environment variable names that match that of a cloud infrastructure vendor's access keys/tokens, upon deployment, Serverless Components will automatically inject that into the Components that need that vendor to provision infrastructure.
+Upon deployment, if a `.env` file exists, Serverless Components will add the content of it as environment variables. If you use specific environment variable names that match that of a cloud infrastructure vendor's access keys/tokens, upon deployment, Serverless Components will automatically inject that into the Components that need that vendor to provision infrastructure.
 
-Here are the keys that are currently supported (keep in mind Components are in Beta and we've mostly been focused on AWS infrastructure up until now):
+These credentials will be used by any and all Components in your `serverless.yml` or `serverless.js` — as well as their child Components — if you specify the environment variables exactly as shown below.
+
+Here are the keys that are currently supported:
+
+#### AWS Credentials
 
 ```bash
 AWS_ACCESS_KEY_ID=123456789
 AWS_SECRET_ACCESS_KEY=123456789
+AWS_REGION=us-east-1
 ```
 
-These credentials will be used by any and all Components in your `serverless.yml` or `serverless.js` — as well as their child Components — if you specify the environment variables exactly like this.
+Components could access these AWS credentials using `this.context.credentials.aws`. This object would look like this:
+
+```js
+{
+  accessKeyId: '123456789',
+  secretAccessKey: '123456789',
+  region: 'us-east-1'
+}
+```
+
+#### Google Credentials
+
+```bash
+# You can specify the path to the JSON credentials file that you downloaded from Google
+GOOGLE_APPLICATION_CREDENTIALS=path/to/credentials/json/file
+
+# Or you could just provide your project id, client email & private key
+GOOGLE_PROJECT_ID=project-id-xxx
+GOOGLE_CLIENT_EMAIL=project-id-xxx@appspot.gserviceaccount.com
+GOOGLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgk..."
+```
+
+Components could access these google credentials using `this.context.credentials.google`. This object would look like this:
+
+```js
+{
+  applicationCredentials: 'path/to/credentials/json/file',
+  projectId: 'project-id-xxx',
+  clientEmail: 'project-id-xxx@appspot.gserviceaccount.com',
+  privateKey: '-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgk...'
+}
+```
+
+### Environment Variables
+
+You can reference environment variables (e.g. those that you defined in the `.env` file) directly in `serverless.yml` by referencing the `${env}` object. For example, if you want to reference the `TABLE` environment variable, you could do that with `${env.TABLE}`.
+
+```yml
+backend:
+  component: '@serverless/backend'
+  inputs:
+    code:
+      src: ./src
+    env:
+      table: ${env.TABLE}
+```
 
 <br/>
 
@@ -315,19 +361,21 @@ Create a `serverless.js` file, extend the Component class and add a `default` me
 const { Component } = require('@serverless/core')
 
 class MyComponent extends Component {
-  async default(inputs = {}) { return {} } // The default functionality to run/provision/update your Component
+  async default(inputs = {}) {
+    return {}
+  } // The default functionality to run/provision/update your Component
 }
 
-module.exports = MyComponent;
+module.exports = MyComponent
 ```
 
-`default()` is always required.  It is where the logic resides in order for your Component to *make* something.  Whenever you run the `$ serverless` command, it's always calling the `default()` method.
+`default()` is always required. It is where the logic resides in order for your Component to _make_ something. Whenever you run the `$ serverless` command, it's always calling the `default()` method.
 
-You can also any other methods to this class.  A `remove()` method is often the next logical choice, if you want your Serverless Component to remove the things it creates.
+You can also any other methods to this class. A `remove()` method is often the next logical choice, if you want your Serverless Component to remove the things it creates.
 
-You can add as many methods as you want.  This is interesting because it enables you to ship more automation with your Component, than logic that merely *deploys* and *removes* something.
+You can add as many methods as you want. This is interesting because it enables you to ship more automation with your Component, than logic that merely _deploys_ and _removes_ something.
 
-It's still early days for Serverless Components, but we are starting to work on Components that ship with their own `test()` function, or their own `logs()` and `metrics()` functions, or `seed()` for establishing initial values in a database Component.  Overall, there is a lot of opportunity here to deliver outcomes that are loaded with useful automation.
+It's still early days for Serverless Components, but we are starting to work on Components that ship with their own `test()` function, or their own `logs()` and `metrics()` functions, or `seed()` for establishing initial values in a database Component. Overall, there is a lot of opportunity here to deliver outcomes that are loaded with useful automation.
 
 All methods other than the `default()` method are optional. All methods take a single `inputs` object, not individual arguments, and return a single `outputs` object.
 
@@ -339,14 +387,15 @@ Here is what it looks like to add a `remove` method, as well as a custom method.
 const { Component } = require('@serverless/core')
 
 class MyComponent extends Component {
-
   /*
    * Default (Required)
    * - The default functionality to run/provision/update your Component
    * - You can run this function by running the "$ serverless" command
    */
 
-  async default(inputs = {}) { return {} }
+  async default(inputs = {}) {
+    return {}
+  }
 
   /*
    * Remove (Optional)
@@ -354,7 +403,9 @@ class MyComponent extends Component {
    * - You can run this function by running "$ serverless remove"
    */
 
-  async remove(inputs = {}) { return {} }
+  async remove(inputs = {}) {
+    return {}
+  }
 
   /*
    * Anything (Optional)
@@ -362,13 +413,15 @@ class MyComponent extends Component {
    * - You can run this function by running "$ serverless anything"
    */
 
-  async anything(inputs = {}) { return {} }
+  async anything(inputs = {}) {
+    return {}
+  }
 }
 
-module.exports = MyComponent;
+module.exports = MyComponent
 ```
 
-When inside a Component method, `this` comes with utilities which you can use.  Here is a guide to what's available to you within the context of a Component.
+When inside a Component method, `this` comes with utilities which you can use. Here is a guide to what's available to you within the context of a Component.
 
 ```javascript
 // serverless.js
@@ -376,9 +429,7 @@ When inside a Component method, `this` comes with utilities which you can use.  
 const { Component } = require('@serverless/core')
 
 class MyComponent extends Component {
-
   async default(inputs = {}) {
-
     // this.context features useful information
     console.log(this.context)
 
@@ -402,8 +453,8 @@ class MyComponent extends Component {
     let website = await this.load('@serverless/website')
 
     // You can run the default method of a child Component two ways:
-    let websiteOutputs = website({ code: { src: './src' }})
-    let websiteOutputs = website.default({ code: { src: './src' }})
+    let websiteOutputs = website({ code: { src: './src' } })
+    let websiteOutputs = website.default({ code: { src: './src' } })
 
     // If you are deploying multiple instances of the same Component, include an instance id.
     let website1 = await this.load('@serverless/website', 'website1')
@@ -433,7 +484,7 @@ class MyComponent extends Component {
   }
 }
 
-module.exports = MyComponent;
+module.exports = MyComponent
 ```
 
 Just run `serverless` in the directory that contains the `serverless.js` file to run your new component. You'll will see all the logs and outputs of your new component. Logs and outputs of any child component you use will not be shown, unless you run in debug mode: `serverless --debug`. You can also run any custom method/command you've defined with `serverless <methodName>`.
@@ -446,15 +497,15 @@ Here are some development tips when it comes to writing Serverless Components:
 
 #### Use Debug Statements and the `--debug` Flag
 
-The Serverless Components CLI experience is intentionally minimal.  But if you ever want to see what Components are doing behnd the scenes, use the `--debug` flag when you run a Component.  You'll see output like this:
+The Serverless Components CLI experience is intentionally minimal. But if you ever want to see what Components are doing behnd the scenes, use the `--debug` flag when you run a Component. You'll see output like this:
 
 ![Serverless Components Debugging](https://s3.amazonaws.com/assets.github.serverless/components/serverless_components_debugging.png)
 
-Many Serverless Components include debug statements to report what work they are doing.  We recommend you add debug statements into your Component as well.  Just use this:
+Many Serverless Components include debug statements to report what work they are doing. We recommend you add debug statements into your Component as well. Just use this:
 
 ```javascript
 class MyComponent extends Component {
-  async default () {
+  async default() {
     this.context.debug(`Starting MyComponent.`)
     this.context.debug(`Creating resources.`)
     this.context.debug(`Waiting for resources to be provisioned.`)
@@ -465,7 +516,7 @@ class MyComponent extends Component {
 
 #### Use Local References
 
-When writing a Serverless Component, you can reference it locally via a `serverless.yml`, or another `serverless.js`.  Keep in mind, a directory can only contain 1 `serverless.yml` or `serverless.js`.  A directory cannot contain a both a `serverless.yml` and a `serverless.js`.
+When writing a Serverless Component, you can reference it locally via a `serverless.yml`, or another `serverless.js`. Keep in mind, a directory can only contain 1 `serverless.yml` or `serverless.js`. A directory cannot contain a both a `serverless.yml` and a `serverless.js`.
 
 Here's how to reference a local Component via `serverless.yml`:
 
@@ -482,11 +533,9 @@ Here's how to reference a local Component via `serverless.js`:
 
 ```javascript
 class myFirstComponent extends Component {
-
   default() {
     const mySecondComponent = this.load('../components/my-second-component')
   }
-
 }
 ```
 
@@ -494,30 +543,30 @@ class myFirstComponent extends Component {
 
 When making a Serverless Component, it can be tempting to break it down into several levels of child Components, to maintain separation of concerns and increase the ways your work could be re-used.
 
-However, provisioning back-end logic can be more complicated than designing a front-end React Component.  We've learned over-optimizing for granular separation of concerns is a fast way to burn yourself out!  
+However, provisioning back-end logic can be more complicated than designing a front-end React Component. We've learned over-optimizing for granular separation of concerns is a fast way to burn yourself out!
 
-We recommend starting with a focus on your desired outcome.  Create one Serverless Component that solves that problem first.  After you've achieved your initial goal, then start breaking it down into child Components.
+We recommend starting with a focus on your desired outcome. Create one Serverless Component that solves that problem first. After you've achieved your initial goal, then start breaking it down into child Components.
 
 #### The Outcome Is Your Advantage
 
-Provisioning infrastructure can be quite complicated.  However, Serverless Components have one powerful advantage over general infrastructure provision tools that seek to enable every possible option and combination (e.g. AWS Cloudformation) — Serverless Components know the specific use-case they are trying to deliver.
+Provisioning infrastructure can be quite complicated. However, Serverless Components have one powerful advantage over general infrastructure provision tools that seek to enable every possible option and combination (e.g. AWS Cloudformation) — Serverless Components know the specific use-case they are trying to deliver.
 
 One of the most important lessons we've learned about software development tools is that once you know the use-case, you can create a much better tool.
 
-Components know their use-case.  You can use that knowledge to: 1) provision infrastructure more reliably, because you have a clear provisioning path and you can program around the pitfalls.  2) provision infrastructure more quickly 3) add use-case specific automation to your Component in the form of custom methods.
+Components know their use-case. You can use that knowledge to: 1) provision infrastructure more reliably, because you have a clear provisioning path and you can program around the pitfalls. 2) provision infrastructure more quickly 3) add use-case specific automation to your Component in the form of custom methods.
 
 #### Keep Most State On The Cloud Provider
 
-Serverless Components save remarkably little state.  In fact, many powerful Components have less than 10 properties in their state objects.
+Serverless Components save remarkably little state. In fact, many powerful Components have less than 10 properties in their state objects.
 
-Components rely on the state saved within the cloud services they use as the source of truth.  This prevents drift issues that break infrastructure provisioning tools.  It also opens up the possibility of working with existing resources, that were not originally managed by Serverless Components.
+Components rely on the state saved within the cloud services they use as the source of truth. This prevents drift issues that break infrastructure provisioning tools. It also opens up the possibility of working with existing resources, that were not originally managed by Serverless Components.
 
 #### Store State Immediately After A Successful Operation
 
-If you do need to store state, try to store it immediately after a successful operation.  This way, if anything after that operation fails, your Serverless Component can pick up where it left off, when the end user tries to deploy it again.
+If you do need to store state, try to store it immediately after a successful operation. This way, if anything after that operation fails, your Serverless Component can pick up where it left off, when the end user tries to deploy it again.
 
 #### Optimize For Accessibility
 
-We believe serverless infrastructure and architectures will empower more people to develop software than ever before.  
+We believe serverless infrastructure and architectures will empower more people to develop software than ever before.
 
-Because of this, we're designing all of our projects to be as approachable as possible.  Please try to use simple, vanilla Javascript.  Additionally, to reduce security risks and general bloat, please try to use the least amount of NPM dependencies as possible.
+Because of this, we're designing all of our projects to be as approachable as possible. Please try to use simple, vanilla Javascript. Additionally, to reduce security risks and general bloat, please try to use the least amount of NPM dependencies as possible.
