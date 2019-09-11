@@ -16,6 +16,7 @@ You can use them now with the Serverless Framework. [Watch a video guide on usin
   - [Inputs](#inputs)
   - [Outputs](#outputs)
   - [Credentials](#credentials)
+  - [Environment Variables](#environment-variables)
 - [Building Components](#building-components)
   - [Serverless.js Basics](#serverlessjs-basics)
   - [Development Tips](#development-tips)
