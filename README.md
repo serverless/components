@@ -211,6 +211,12 @@ You can deploy this easily via the Serverless Framework with the `$ serverless` 
 $ serverless # Installs and deploys the components...
 ```
 
+You can also watch for changes with the `--watch` flag
+
+```console
+$ serverless --watch # Watches for changes and redeploy if any detected
+```
+
 There is nothing to install when using Serverless Components via `serverless.yml`. Instead, when you deploy a `serverless.yml`, its Components are downloaded automatically at the beginning of that deployment (if they aren't already downloaded), and stored in a central folder at the root of your machine. This effectively caches the Components in one location, so you don't clutter your project files with Component libraries and don't download duplicates.
 
 Serverless Components are distributed via [NPM](https://www.npmjs.com/). When Components are downloaded, a basic NPM installation is happening behind the scenes.
@@ -376,6 +382,8 @@ You can also any other methods to this class. A `remove()` method is often the n
 
 You can add as many methods as you want. This is interesting because it enables you to ship more automation with your Component, than logic that merely _deploys_ and _removes_ something.
 
+You can use the `serverless --watch` flag when you run any method. This would keep watching for changes in the current working directory, and rerun your method if changes are detected. So you could also do `serverless remove --watch` for example.
+
 It's still early days for Serverless Components, but we are starting to work on Components that ship with their own `test()` function, or their own `logs()` and `metrics()` functions, or `seed()` for establishing initial values in a database Component. Overall, there is a lot of opportunity here to deliver outcomes that are loaded with useful automation.
 
 All methods other than the `default()` method are optional. All methods take a single `inputs` object, not individual arguments, and return a single `outputs` object.
@@ -495,6 +503,10 @@ For complete real-world examples on writing components, [check out our official 
 ### Development Tips
 
 Here are some development tips when it comes to writing Serverless Components:
+
+#### Activate Watch Mode with the `--watch` Flag
+
+During development, it's super helpful to keep the terminal running with `serverless --watch` (or with any method other than the default) while you develop your component. This way you get instant feedback and reduce friction.
 
 #### Use Debug Statements and the `--debug` Flag
 
