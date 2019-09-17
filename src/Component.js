@@ -102,6 +102,7 @@ class Component {
     }
 
     if (await fileExists(externalComponentPath)) {
+      delete require.cache[require.resolve(externalComponentPath)]
       childComponent = require(externalComponentPath)
     } else {
       childComponent = require(nameOrPath)
