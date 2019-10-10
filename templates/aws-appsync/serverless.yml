@@ -1,0 +1,26 @@
+myTable:
+  component: '@serverless/aws-dynamodb'
+
+appsync:
+  component: '@serverless/aws-app-sync'
+  inputs:
+    name: Todos
+    authenticationType: API_KEY
+    apiKeys:
+      - myApiKey
+    dataSources:
+      - type: AMAZON_DYNAMODB
+        name: Todos
+        config:
+          tableName: ${myTable.name}
+    mappingTemplates:
+      - dataSource: Todos
+        type: Mutation
+        field: addTodo
+        request: templates/addTodo-request.vtl
+        response: templates/addTodo-response.vtl
+      - dataSource: Todos
+        type: Query
+        field: getTodos
+        request: templates/getTodos-request.vtl
+        response: templates/getTodos-response.vtl
