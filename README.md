@@ -22,7 +22,7 @@ You can use them now with the Serverless Framework. [Watch a video guide on usin
   - [Development Tips](#development-tips)
 - [Available Components](https://github.com/serverless-components)
 - [Templates](./templates)
-- [Artwork](./artwork)
+- [Artwork](https://github.com/serverless/artwork)
 - [Join Us on Slack](https://serverless.com/slack)
 - [Roadmap](https://github.com/serverless/components/projects/1)
 

@@ -1,0 +1,6 @@
+name: ssr-nextjs
+
+nextApp:
+  component: serverless-next.js
+  inputs:
+    # domain: www.serverless-nextjs.com # Register this on AWS Route53 first

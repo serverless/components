@@ -6,7 +6,6 @@
 v8-compile-cache-*
 jest/*
 coverage
-.serverless_plugins
 testProjects/*/package-lock.json
 testProjects/*/yarn.lock
 .serverlessUnzipped
@@ -19,7 +18,10 @@ build/
 .env*
 .cache*
 .serverless
+.serverless_nextjs
+.serverless_plugins
 env.js
 tmp
 package-lock.json
+yarn.lock
 test

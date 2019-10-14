@@ -3,6 +3,6 @@ name: backend-monolith
 backend:
   component: '@serverless/backend'
   inputs:
-    domain: api.serverless-fullstack.com # Register a custom domain on AWS Route 53 to enable this and SSL.
     code:
       src: code
+    # domain: api.serverless-fullstack.com # Register a custom domain on AWS Route 53 to enable this and SSL.

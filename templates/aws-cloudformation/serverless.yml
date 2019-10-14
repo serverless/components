@@ -1,0 +1,21 @@
+name: my-service
+
+myStack:
+  component: '@serverless/aws-cloudformation'
+  inputs:
+    stackName: example-stack-1
+    template:
+      AWSTemplateFormatVersion: '2010-09-09'
+      Description: Example stack 1
+      Resources:
+        LogGroup:
+          Type: AWS::Logs::LogGroup
+          Properties:
+            LogGroupName: /log/group/one
+            RetentionInDays: 14
+      Outputs:
+        LogGroupArn:
+          Value:
+            Fn::GetAtt:
+              - LogGroup
+              - Arn

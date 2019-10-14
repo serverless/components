@@ -17,7 +17,7 @@ module.exports = async (event = {}, ctx) => {
       'Access-Control-Allow-Credentials': true,
     },
     body: {
-      message: `Response received at "${path}" path via a "${method}" method.`
+      message: `Response received at "${path}" path via a "${method}" method!!!`
     }
   }
 }
