@@ -1,4 +1,4 @@
-# Template - GraphQL API (AWS AppSync)
+# Template - GraphQL API (AWS AppSync DynamoDB)
 
 &nbsp;
 
