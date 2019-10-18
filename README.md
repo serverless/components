@@ -25,7 +25,7 @@ website:
       domain: www.serverlesscomponents.com
 ```
 
-[Watch a video guide on using a Serverless Component here](https://www.youtube.com/watch?v=ts26BVuX3j0).
+[^ Watch a video guide on using a Serverless Component here](https://www.youtube.com/watch?v=ts26BVuX3j0).
 
 <br/>
 
