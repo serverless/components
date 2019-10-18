@@ -9,7 +9,7 @@ Build, compose, & deploy serverless apps in seconds with **Serverless Components
 - - [x] **Composition -** Easily compose Components together in YAML or Javascript.
 - - [x] **Re-Use -** Everything you build is reusable by you, your team, and if you'd like, the world.
 
-You can use Components now with the Serverless Framework, like this:
+Here's how easy it is to use Components with Serverless Framework:
 
 
 ```yaml
