@@ -11,6 +11,19 @@ You can use them now with the Serverless Framework. [Watch a video guide on usin
 * **Composition –** Compose them in YAML or Javascript.
 * **Re-Use –** Everything you build is reusable by you, your team or share with the world.
 
+```yaml
+# serverless.yml
+name: website
+
+website:
+  component: '@serverless/website'
+  inputs:
+    code:
+      src: ./src
+      hook: npm run build
+      domain: www.serverlesscomponents.com
+```
+
 <br/>
 
 - [Quick-Start](#quick-start)
