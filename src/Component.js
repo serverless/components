@@ -44,8 +44,8 @@ class Component {
     // Add Component class methods like the save() method
     const classMethods = Object.getOwnPropertyNames(Component.prototype)
     classMethods.forEach((classMethod) => {
-      defaultFunction[classMethod] = (classMethodInputs) =>
-        this[classMethod].call(that, classMethodInputs) // apply instance context
+      defaultFunction[classMethod] = (...classMethodInputs) =>
+        this[classMethod].call(that, ...classMethodInputs) // apply instance context
     })
 
     // Add instance methods
