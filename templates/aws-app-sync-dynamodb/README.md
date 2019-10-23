@@ -13,7 +13,7 @@ This is a great architecture if you want to build a GraphQL API, without having 
 
 1. [Install](#1-install)
 2. [Deploy](#2-deploy)
-3. [Notes](#3-notes)
+3. [Use your API](#3-use-your-api)
 
 &nbsp;
 
@@ -47,6 +47,18 @@ Use the `--debug` flag if you'd like to learn what's happening behind the scenes
 
 ```console
 $ serverless --debug
+```
+
+
+### 3. Use your API
+
+On the client, the API key is specified by the header x-api-key.
+
+
+For example, you can send a GraphQL query via curl as follows:
+
+```console
+$ curl -XPOST -H "Content-Type:application/graphql" -H "x-api-key:YOUR_API_KEY" -d '{ "query": "query { getTodos { description } }" }' http://YOURAPPSYNCENDPOINT/graphql
 ```
 
 ## New to Components?
