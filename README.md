@@ -87,6 +87,14 @@ A React-based frontend and AWS Lambda based API fullstack application.
 serverless create --template-url https://github.com/serverless/components/tree/master/templates/fullstack-application
 ```
 
+#### [Deploy A GraphQL API](https://github.com/serverless/components/tree/master/templates/aws-app-sync-dynamodb)
+
+AWS AppSync & DynamoDB powered GraphQL API.
+
+```shell
+serverless create --template-url https://github.com/serverless/components/tree/master/templates/aws-app-sync-dynamodb
+```
+
 #### [Deploy Other Use-Cases](./templates)
 
 [Check out all of the pre-made Templates](./templates) to deploy serverless _REST APsI_, _Websockets APIs_, _Websites_, _Scheduled Tasks_, and much more! Each Template has a `README.md` with clear instructions on what it does and how to get started.
