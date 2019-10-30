@@ -1,6 +1,12 @@
 const path = require('path')
+const cjsResolve = require('ncjsm/resolve')
 const Context = require('./Context')
 const { fileExists } = require('./utils')
+
+const stackRe = /^[^(]+\((.+):\d+:\d+\)$/
+const resolveParentDir = () => {
+  return path.dirname(new Error().stack.split('\n')[3].match(stackRe)[1])
+}
 
 class Component {
   constructor(id, context) {
@@ -94,6 +100,7 @@ class Component {
   async load(nameOrPath, componentAlias) {
     let externalComponentPath
     let childComponent
+    nameOrPath = (await cjsResolve(resolveParentDir(), nameOrPath)).targetPath
 
     if (this.context.instance.root) {
       externalComponentPath = path.resolve(this.context.instance.root, nameOrPath, 'serverless.js')

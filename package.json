@@ -15,6 +15,7 @@
   "dependencies": {
     "fs-extra": "^7.0.1",
     "js-yaml": "^3.13.1",
+    "ncjsm": "^4.0.1",
     "package-json": "^6.3.0",
     "ramda": "^0.26.1",
     "semver": "^6.1.1"

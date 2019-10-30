@@ -6,6 +6,7 @@ const semver = require('semver')
 // const BbPromise = require('bluebird')
 const util = require('util')
 const exec = util.promisify(require('child_process').exec)
+const cjsResolve = require('ncjsm/resolve')
 const dirExists = require('./fs/dirExists')
 
 async function getComponentVersionToDownload(component) {
@@ -72,6 +73,15 @@ async function download(componentsToDownload) {
   if (!componentsToDownload.length) {
     return {}
   }
+
+  const result = {}
+  await Promise.all(
+    componentsToDownload.map(
+      async (componentPath) =>
+        (result[componentPath] = (await cjsResolve(process.cwd(), componentPath)).targetPath)
+    )
+  )
+  return result
 
   const localRegistryPath = path.join(os.homedir(), '.serverless', 'components', 'registry', 'npm')
   await ensureDir(localRegistryPath)
