@@ -22,6 +22,7 @@
   ],
   "license": "ISC",
   "devDependencies": {
+    "parcel": "^1.12.4",
     "cssnano": "^4.1.10"
   }
 }
