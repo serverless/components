@@ -8,14 +8,19 @@ This template includes:
 
 * **A serverless REST API** - powered by a single Servelress Cloud Function and a single API Gateway endpoint, which sends all requests to the function, enabling you to do routing and logic all in your code.
 
-* **A serverless website with a Vue.js application*** - powered by Cloud Object Storage.  The backend API endpoint is already passed into the front-end, and the Vue.js application is already configured to use it.
+* **A serverless website with a Vue.js application** - powered by Cloud Object Storage.  The backend API endpoint is already passed into the front-end, and the Vue.js application is already configured to use it.
+
+&nbsp;
+
+* [请点击这里查看中文版部署文档](./README_CN.md)
 
 &nbsp;
 
 1. [Install](#1-install)
-2. [Deploy](#2-deploy)
-3. [Development](#3-development)
-4. [Notes](#4-notes)
+2. [Create](#2-create)
+3. [Deploy](#3-deploy)
+4. [Development](#4-development)
+5. [Notes](#5-notes)
 
 &nbsp;
 
@@ -28,13 +33,24 @@ Install the [Serverless Framework](https://www.github.com/serverless/serverless)
 $ npm i -g serverless
 ```
 
-Add the access keys of an Cloud Access Management role in a `.env` file, using this format:
+### 2. Create
 
-```bash
-TENCENT_SECRET_ID=1234
-TENCENT_SECRET_KEY=1234
-TENCENT_APP_ID=1234
+Just create `.env` file:
+
+```console
+$ touch .env # your Tencent API Keys
 ```
+
+Add the access keys of a [Tencent CAM Role](https://console.cloud.tencent.com/cam/capi) with `AdministratorAccess` in the `.env` file, using this format: 
+
+```
+# .env
+TENCENT_SECRET_ID=123
+TENCENT_SECRET_KEY=123
+TENCENT_APP_ID=123
+```
+
+* If you don't have a Tencent Cloud account, you could [sign up](https://intl.cloud.tencent.com/register) first.
 
 Or, you can set these as environment variables manually before deploying.
 
@@ -44,7 +60,16 @@ Install the NPM dependencies in the front-end `dashboard` and backend `api` dire
 $ npm i
 ```
 
-### 2. Deploy
+Move/Create your file in the folder, and the directory should look something like this:
+
+```
+|- api
+|- dashboard
+|- serverless.yml      # Inside the repo
+|- .env      # your Tencent SecretId/Key/AppId
+```
+
+### 3. Deploy
 
 Deploy via the `serverless` command:
 
@@ -58,7 +83,7 @@ Use the `--debug` flag if you'd like to learn what's happening behind the scenes
 $ serverless --debug
 ```
 
-### 3. Development
+### 4. Development
 
 
 After your first deployment, you will be able to run the front-end locally and have it communicate to the live back-end, in the cloud.

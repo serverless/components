@@ -7,13 +7,14 @@
 该 Template 包括:
 
 * **serverless REST API** - 由腾讯云 Servelress Cloud Function（无服务云函数SCF） 和腾讯云 API Gateway 提供相关能力，帮助开发者架构自己的项目和路由。
-* **serverless Vue.js 站点 ** - 由腾讯云 Cloud Object Storage（对象存储COS）提供相关存储能力.  通过后端API传递到前端，并使用 Vue.js 做相关渲染。
+* **serverless Vue.js 站点** - 由腾讯云 Cloud Object Storage（对象存储COS）提供相关存储能力.  通过后端API传递到前端，并使用 Vue.js 做相关渲染。
 
 &nbsp;
 
 1. [安装](#1-安装)
-2. [部署](#2-部署)
-3. [使用](#3-使用)
+2. [创建](#2-创建)
+3. [部署](#3-部署)
+4. [使用](#4-使用)
 
 &nbsp;
 
@@ -26,20 +27,45 @@
 $ npm i -g serverless
 ```
 
-添加腾讯云的 SECRET_ID 和 SECRET_KEY 等信息到  `.env` 文件
+### 2. 创建
 
-```bash
-TENCENT_SECRET_ID=1234
-TENCENT_SECRET_KEY=1234
-TENCENT_APP_ID=1234
+本地创建 `.env` 文件
+
+```console
+$ touch .env # 腾讯云的配置信息
+```
+
+在 `.env` 文件中配置腾讯云的 APPID，SecretId 和 SecretKey 信息并保存
+
+如果没有腾讯云账号，可以在此[注册新账号](https://cloud.tencent.com/register)。
+
+如果已有腾讯云账号，可以在[API密钥管理](https://console.cloud.tencent.com/cam/capi)中获取`APPID`, `SecretId` 和`SecretKey`
+
+```
+# .env
+TENCENT_SECRET_ID=123
+TENCENT_SECRET_KEY=123
+TENCENT_APP_ID=123
 ```
 
 或者，可以在部署之前手动将它们设置为环境变量。
 
-将 NPM 依赖项安装在  `dashboard` 和 `api` ：
+将 NPM 依赖项分别安装在  `dashboard` 和 `api` 两个文件目录：
 
 ```console
+$ cd dashboard
 $ npm i
+$ cd ../api
+$ npm i
+```
+
+完成后的目录结构，如下所示:
+
+```
+|- api
+|- dashboard
+|- serverless.yml      # 使用项目中的 yml 文件
+|- .env      # 腾讯云 SecretId/Key/AppId
 ```
 
 ### 2. 部署
@@ -58,7 +84,7 @@ $ serverless --debug
 
 ### 3. 使用
 
-首次部署成功后，即可在本地运行服务，并与后端的腾讯云进行通讯
+首次部署成功后，即可在本地运行服务，并与后端腾讯云服务进行通讯
 
 ```console
 $ cd dashboard && npm run start
