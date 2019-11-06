@@ -55,7 +55,10 @@ TENCENT_APP_ID=123
 ```console
 $ cd dashboard
 $ npm i
-$ cd ../api
+```
+
+```
+$ cd api
 $ npm i
 ```
 
