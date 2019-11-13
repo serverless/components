@@ -27,9 +27,15 @@
 $ npm i -g serverless
 ```
 
+然后，我们可以新建一个本地文件夹，使用 `create --template-url` ，安装相关template。或者也可以将文件直接下载到本地：
+
+```console
+$ serverless create --template-url https://github.com/serverless/components/tree/master/templates/tencent-fullstack-application
+```
+
 ### 2. 创建
 
-本地创建 `.env` 文件
+使用`cd`命令，进入`tencent-fullstack-application` 文件夹，在其根目录创建 `.env` 文件
 
 ```console
 $ touch .env # 腾讯云的配置信息
@@ -71,7 +77,7 @@ $ npm i
 |- .env      # 腾讯云 SecretId/Key/AppId
 ```
 
-### 2. 部署
+### 3. 部署
 
 可以直接通过 `serverless` 命令来部署应用:
 
@@ -85,12 +91,21 @@ $ serverless
 $ serverless --debug
 ```
 
-### 3. 使用
+### 4. 使用
 
 首次部署成功后，即可在本地运行服务，并与后端腾讯云服务进行通讯
 
 ```console
 $ cd dashboard && npm run start
+```
+
+### 5. 注意
+
+目前暂不支持淘宝等第三方npm源，报错`Component "@serverless/tencent-express" was not found on NPM nor could it be resolved locally.`请设置并使用npm官方源体验：
+
+```console
+$ npm config rm registry
+$ npm set registry https://registry.npmjs.org/
 ```
 
 ## 第一次接触 Components?
