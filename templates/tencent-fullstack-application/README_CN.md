@@ -64,7 +64,7 @@ $ serverless
 
 如果希望查看部署详情，可以通过调试模式的命令 `serverless --debug` 进行部署。
 
-如您的账号未登陆或注册腾讯云，您可以直接通过微信扫描命令行中的二维码进行授权登陆和注册。
+如您的账号未[登陆](https://cloud.tencent.com/login)或[注册](https://cloud.tencent.com/register)腾讯云，您可以直接通过微信扫描命令行中的二维码进行授权登陆和注册。
 
 部署成功后，可以直接在浏览器中访问日志中返回的dashboard url地址，查看该全栈Web app的效果:
 ```
@@ -81,6 +81,8 @@ $ serverless
   15s » dashboard » done
 ```
 
+&nbsp;
+
 >注: 
 1. 首次部署成功后，也可以通过以下命令，在本地运行服务，并与后端腾讯云服务进行通讯：
 ```console
@@ -93,4 +95,20 @@ $ npm config rm registry
 $ npm set registry https://registry.npmjs.org/
 ```
 
+3. 腾讯云Component已支持二维码一键登录，如您希望使用配置秘钥的方式登录，也可以参考如下步骤：
+在`tencent-fullstack-application` 文件夹根目录创建 `.env` 文件
+
+```console
+$ touch .env # 腾讯云的配置信息
+```
+
+在 `.env` 文件中配置腾讯云的 APPID，SecretId 和 SecretKey 信息并保存
+如果没有腾讯云账号，可以在此[注册新账号](https://cloud.tencent.com/register)。
+如果已有腾讯云账号，可以在[API密钥管理](https://console.cloud.tencent.com/cam/capi)中获取`APPID`, `SecretId` 和`SecretKey`
+```
+# .env
+TENCENT_SECRET_ID=123
+TENCENT_SECRET_KEY=123
+TENCENT_APP_ID=123
+```
 
