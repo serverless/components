@@ -9,15 +9,15 @@
 * **serverless REST API** - 由腾讯云 Servelress Cloud Function（无服务云函数SCF） 和腾讯云 API Gateway 提供相关能力，帮助开发者架构自己的项目和路由。
 * **serverless Vue.js 站点** - 由腾讯云 Cloud Object Storage（对象存储COS）提供相关存储能力.  通过后端API传递到前端，并使用 Vue.js 做相关渲染。
 
+该全栈Web应用架构图如下:
+![架构图](https://main.qcloudimg.com/raw/21ae7465b6927c14d9bc4ae6dc33fc17.png)
+
 &nbsp;
 
 1. [安装](#1-安装)
-2. [创建](#2-创建)
-3. [部署](#3-部署)
-4. [使用](#4-使用)
+2. [部署](#2-部署)
 
 &nbsp;
-
 
 ### 1. 安装
 
@@ -27,36 +27,21 @@
 $ npm i -g serverless
 ```
 
-然后，我们可以新建一个本地文件夹，使用 `create --template-url` ，安装相关template。或者也可以将文件直接下载到本地：
+之后可以新建一个空的文件夹，使用 `create --template-url`，安装相关template。
 
 ```console
 $ serverless create --template-url https://github.com/serverless/components/tree/master/templates/tencent-fullstack-application
 ```
 
-### 2. 创建
-
-使用`cd`命令，进入`tencent-fullstack-application` 文件夹，在其根目录创建 `.env` 文件
-
-```console
-$ touch .env # 腾讯云的配置信息
-```
-
-在 `.env` 文件中配置腾讯云的 APPID，SecretId 和 SecretKey 信息并保存
-
-如果没有腾讯云账号，可以在此[注册新账号](https://cloud.tencent.com/register)。
-
-如果已有腾讯云账号，可以在[API密钥管理](https://console.cloud.tencent.com/cam/capi)中获取`APPID`, `SecretId` 和`SecretKey`
+使用`cd`命令，进入`templates\tencent-fullstack-application` 文件夹，可以查看到如下目录结构：
 
 ```
-# .env
-TENCENT_SECRET_ID=123
-TENCENT_SECRET_KEY=123
-TENCENT_APP_ID=123
+|- api
+|- dashboard
+|- serverless.yml      # 使用项目中的 yml 文件
 ```
 
-或者，可以在部署之前手动将它们设置为环境变量。
-
-将 NPM 依赖项分别安装在  `dashboard` 和 `api` 两个文件目录：
+分别在`dashboard` 和 `api` 两个文件目录执行 NPM 依赖的安装，如下命令所示：
 
 ```console
 $ cd dashboard
@@ -68,46 +53,29 @@ $ cd api
 $ npm i
 ```
 
-完成后的目录结构，如下所示:
+### 2. 部署
 
-```
-|- api
-|- dashboard
-|- serverless.yml      # 使用项目中的 yml 文件
-|- .env      # 腾讯云 SecretId/Key/AppId
-```
-
-### 3. 部署
-
-可以直接通过 `serverless` 命令来部署应用:
+回到`tencent-fullstack-application`目录下，直接通过 `serverless` 命令来部署应用:
 
 ```console
 $ serverless
 ```
 
-当然，也可以使用 `--debug` 调试命令来查看所有环境部署的详细情况：
+如果希望查看部署详情，可以通过调试模式的命令 `serverless --debug` 进行部署。
 
-```console
-$ serverless --debug
-```
+如您的账号未登陆或注册腾讯云，您可以直接通过微信扫描命令行中的二维码进行授权登陆和注册。
 
-### 4. 使用
+部署成功后，可以直接访问日志中返回的dashboard url地址，查看full-stack app的效果。
 
-首次部署成功后，即可在本地运行服务，并与后端腾讯云服务进行通讯
-
+>注: 
+1. 首次部署成功后，也可以通过以下命令，在本地运行服务，并与后端腾讯云服务进行通讯：
 ```console
 $ cd dashboard && npm run start
 ```
-
-### 5. 注意
-
-目前暂不支持淘宝等第三方npm源，报错`Component "@serverless/tencent-express" was not found on NPM nor could it be resolved locally.`请设置并使用npm官方源体验：
-
+2. 目前暂不支持淘宝等第三方npm源，如报错`Component "@serverless/tencent-express" was not found on NPM nor could it be resolved locally.`请设置并使用npm官方源体验：
 ```console
 $ npm config rm registry
 $ npm set registry https://registry.npmjs.org/
 ```
 
-## 第一次接触 Components?
 
-可以在 [Serverless Components](https://github.com/serverless/components) 仓库查看更多内容
