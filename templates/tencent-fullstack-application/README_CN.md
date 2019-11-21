@@ -1,10 +1,10 @@
-# Template - 在腾讯云上部署全栈WEB应用
+# 在腾讯云部署Serverless全栈WEB应用
 
 用于通过多个 Serverless Components 部署 Serverless 全栈应用程序。可以帮助开发者更方便快捷的部署 Serverless 应用，比如利用后端API与前端Vue.js结合等场景。
 
 此项目的完全基于腾讯云 Serverless 服务器，可大大缩减使用成本。 如果正在寻找一个低开销的便捷轻量的 Serverless 服务管理框架，这里将是最好的选择。
 
-该 Template 包括:
+该示例包括:
 
 * **serverless REST API** - 由腾讯云 Servelress Cloud Function（无服务云函数SCF） 和腾讯云 API Gateway 提供相关能力，帮助开发者架构自己的项目和路由。
 * **serverless Vue.js 站点** - 由腾讯云 Cloud Object Storage（对象存储COS）提供相关存储能力.  通过后端API传递到前端，并使用 Vue.js 做相关渲染。
@@ -14,6 +14,7 @@
 
 &nbsp;
 
+操作步骤：
 1. [安装](#1-安装)
 2. [部署](#2-部署)
 
@@ -65,13 +66,27 @@ $ serverless
 
 如您的账号未登陆或注册腾讯云，您可以直接通过微信扫描命令行中的二维码进行授权登陆和注册。
 
-部署成功后，可以直接访问日志中返回的dashboard url地址，查看full-stack app的效果。
+部署成功后，可以直接在浏览器中访问日志中返回的dashboard url地址，查看该全栈Web app的效果:
+```
+  dashboard:
+    url: https://jcwm1l-myappid.cos-website.ap-guangzhou.myqcloud.com
+    env:
+      apiUrl: https://service-id-myappid.gz.apigw.tencentcs.com/release/
+  api:
+    region:              undefined
+    functionName:        tencent-fullstack-api
+    apiGatewayServiceId: service-id
+    url:                 https://service-id-myappid.gz.apigw.tencentcs.com/release/
+
+  15s » dashboard » done
+```
 
 >注: 
 1. 首次部署成功后，也可以通过以下命令，在本地运行服务，并与后端腾讯云服务进行通讯：
 ```console
 $ cd dashboard && npm run start
 ```
+
 2. 目前暂不支持淘宝等第三方npm源，如报错`Component "@serverless/tencent-express" was not found on NPM nor could it be resolved locally.`请设置并使用npm官方源体验：
 ```console
 $ npm config rm registry
