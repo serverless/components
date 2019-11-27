@@ -9,7 +9,7 @@ dashboard:
       hook: npm run build
     env:
       apiUrl: ${api.url}
-      # domain: www.serverlessmetrics.com # Insert your custom domain here after registering it on Route53
+      # domain: www.serverlessmetrics.com # Insert your custom domain here
 
 api:
   component: '@serverless/tencent-express'
