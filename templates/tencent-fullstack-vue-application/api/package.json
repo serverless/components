@@ -1,5 +1,5 @@
 {
-  "name": "tencent-fullstack-api",
+  "name": "tencent-fullstack-vue-api",
   "version": "0.0.0",
   "dependencies": {
     "cors": "^2.8.5",

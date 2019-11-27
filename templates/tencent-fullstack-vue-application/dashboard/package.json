@@ -1,0 +1,28 @@
+{
+  "name": "tencent-fullstack-vue-app",
+  "version": "0.0.0",
+  "description": "",
+  "dependencies": {
+    "vue": "^2.6.10"
+  },
+  "scripts": {
+    "start": "parcel index.html",
+    "build": "parcel build index.html"
+  },
+  "alias": {
+    "vue": "./node_modules/vue/dist/vue.common.js"
+  },
+  "eslintConfig": {
+    "env": {
+      "browser": true
+    }
+  },
+  "browserslist": [
+    "last 1 Chrome version"
+  ],
+  "license": "ISC",
+  "devDependencies": {
+    "cssnano": "^4.1.10",
+    "parcel": "^1.12.4"
+  }
+}
