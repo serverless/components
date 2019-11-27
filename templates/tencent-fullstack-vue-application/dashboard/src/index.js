@@ -12,7 +12,7 @@ module.exports = new Vue({
   },
   methods: {
     async queryServer() {
-      const response = await fetch(`${window.env.apiUrl}`)
+      const response = await fetch(window.env.apiUrl)
       const result = await response.json()
       this.message = result.message
     }
