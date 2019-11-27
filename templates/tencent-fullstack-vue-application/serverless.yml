@@ -1,4 +1,4 @@
-name: tencent-fullstack-application
+name: tencent-fullstack-vue-application
 
 dashboard:
   component: '@serverless/tencent-website'

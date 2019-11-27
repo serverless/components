@@ -32,10 +32,10 @@ Install the [Serverless Framework](https://www.github.com/serverless/serverless)
 $ npm i -g serverless
 ```
 
-Next, use the `create --template-url` command to install a `tencent-fullstack-application`.
+Next, use the `create --template-url` command to install a `tencent-fullstack-vue-application`.
 
 ```console
-$ serverless create --template-url https://github.com/serverless/components/tree/master/templates/tencent-fullstack-application
+$ serverless create --template-url https://github.com/serverless/components/tree/master/templates/tencent-fullstack-vue-application
 ```
 
 ### 2. Create

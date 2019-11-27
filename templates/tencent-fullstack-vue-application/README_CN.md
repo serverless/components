@@ -32,10 +32,10 @@ $ npm i -g serverless
 之后可以新建一个空的文件夹，使用 `create --template-url`，安装相关 template。
 
 ```console
-$ serverless create --template-url https://github.com/serverless/components/tree/master/templates/tencent-fullstack-application
+$ serverless create --template-url https://github.com/serverless/components/tree/master/templates/tencent-fullstack-vue-application
 ```
 
-使用`cd`命令，进入`templates\tencent-fullstack-application` 文件夹，可以查看到如下目录结构：
+使用`cd`命令，进入`templates\tencent-fullstack-vue-application` 文件夹，可以查看到如下目录结构：
 
 ```
 |- api
@@ -57,7 +57,7 @@ $ npm i
 
 ### 2. 部署
 
-回到`tencent-fullstack-application`目录下，直接通过 `serverless` 命令来部署应用:
+回到`tencent-fullstack-vue-application`目录下，直接通过 `serverless` 命令来部署应用:
 
 ```console
 $ serverless
@@ -101,7 +101,7 @@ $ npm set registry https://registry.npmjs.org/
 ```
 
 3. 腾讯云 Component 已支持二维码一键登录，如您希望使用配置秘钥的方式登录，也可以参考如下步骤：
-   在`tencent-fullstack-application` 文件夹根目录创建 `.env` 文件
+   在`tencent-fullstack-vue-application` 文件夹根目录创建 `.env` 文件
 
 ```console
 $ touch .env # 腾讯云的配置信息
