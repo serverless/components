@@ -2,17 +2,17 @@
 
 This is a template for deploying a serverless fullstack application via multiple Serverless Components. This aims to be the simplest possible way to build a serverless fullstack application, including a Vue.js application on the front-end bundled with Parcel and back-end API.
 
-This fullstack application's software stack is completely serverless has the lowest total overhead, and cost.  **If you are looking for an efficient solution that enables you to build more and manage less (cheaply), there is no better option.**
+This fullstack application's software stack is completely serverless has the lowest total overhead, and cost. **If you are looking for an efficient solution that enables you to build more and manage less (cheaply), there is no better option.**
 
 This template includes:
 
-* **A serverless REST API** - powered by a single Servelress Cloud Function and a single API Gateway endpoint, which sends all requests to the function, enabling you to do routing and logic all in your code.
+- **A serverless REST API** - powered by a single Servelress Cloud Function and a single API Gateway endpoint, which sends all requests to the function, enabling you to do routing and logic all in your code.
 
-* **A serverless website with a Vue.js application** - powered by Cloud Object Storage.  The backend API endpoint is already passed into the front-end, and the Vue.js application is already configured to use it.
+- **A serverless website with a Vue.js application** - powered by Cloud Object Storage. The backend API endpoint is already passed into the front-end, and the Vue.js application is already configured to use it.
 
 &nbsp;
 
-* [请点击这里查看中文版部署文档](./README_CN.md)
+- [请点击这里查看中文版部署文档](./README_CN.md)
 
 &nbsp;
 
@@ -23,7 +23,6 @@ This template includes:
 5. [Notes](#5-notes)
 
 &nbsp;
-
 
 ### 1. Install
 
@@ -47,7 +46,7 @@ Just create `.env` file:
 $ touch .env # your Tencent API Keys
 ```
 
-Add the access keys of a [Tencent CAM Role](https://console.cloud.tencent.com/cam/capi) with `AdministratorAccess` in the `.env` file, using this format: 
+Add the access keys of a [Tencent CAM Role](https://console.cloud.tencent.com/cam/capi) with `AdministratorAccess` in the `.env` file, using this format:
 
 ```
 # .env
@@ -56,7 +55,7 @@ TENCENT_SECRET_KEY=123
 TENCENT_APP_ID=123
 ```
 
-* If you don't have a Tencent Cloud account, you could [sign up](https://intl.cloud.tencent.com/register) first.
+- If you don't have a Tencent Cloud account, you could [sign up](https://intl.cloud.tencent.com/register) first.
 
 Or, you can set these as environment variables manually before deploying.
 
@@ -90,7 +89,6 @@ $ serverless --debug
 ```
 
 ### 4. Development
-
 
 After your first deployment, you will be able to run the front-end locally and have it communicate to the live back-end, in the cloud.
 
