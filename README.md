@@ -87,6 +87,14 @@ A React-based frontend and AWS Lambda based API fullstack application.
 serverless create --template-url https://github.com/serverless/components/tree/master/templates/fullstack-application
 ```
 
+#### [Deploy A Fullstack Web Application with Tencent Cloud Services](https://github.com/serverless/components/tree/master/templates/tencent-fullstack-application)
+
+A Vue.js-based frontend and Serverless Cloud Function based REST API application.
+
+```shell
+serverless create --template-url https://github.com/serverless/components/tree/master/templates/tencent-fullstack-application
+```
+
 #### [Deploy A GraphQL API](https://github.com/serverless/components/tree/master/templates/aws-app-sync-dynamodb)
 
 AWS AppSync & DynamoDB powered GraphQL API.
