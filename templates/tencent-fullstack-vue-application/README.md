@@ -59,10 +59,10 @@ TENCENT_APP_ID=123
 
 Or, you can set these as environment variables manually before deploying.
 
-Install the NPM dependencies in the front-end `dashboard` and backend `api` directories:
+Install the NPM dependencies:
 
 ```console
-$ npm i
+$ npm run bootstrap
 ```
 
 Move/Create your file in the folder, and the directory should look something like this:

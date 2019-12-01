@@ -1,12 +1,13 @@
 {
-  "name": "tencent-fullstack-vue-application",
+  "name": "fullstack-application",
   "version": "0.0.0",
   "scripts": {
     "bootstrap": "node scripts/bootstrap.js"
   },
   "dependencies": {
-    "@serverless/tencent-express": "^1.2.2",
-    "@serverless/tencent-website": "^1.2.0"
+    "@serverless/backend": "^4.1.0",
+    "@serverless/website": "^4.0.0",
+    "@serverless/aws-dynamodb": "^3.1.0"
   },
   "devDependencies": {
     "@serverless/eslint-config": "^1.2.1",
@@ -21,5 +22,5 @@
       "ecmaVersion": 2018
     }
   },
-  "license": "ISC"
+  "license": "MIT"
 }

@@ -1,5 +1,5 @@
 {
-  "name": "tencent-fullstack-vue-application",
+  "name": "tencent-fullstack-react-application",
   "version": "0.0.0",
   "scripts": {
     "bootstrap": "node scripts/bootstrap.js"

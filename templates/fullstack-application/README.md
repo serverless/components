@@ -41,10 +41,10 @@ AWS_SECRET_ACCESS_KEY=1234
 
 Or, you can set these as environment variables manually before deploying.
 
-Install the NPM dependencies in the front-end `dashboard` directory:
+Install the NPM dependencies:
 
 ```console
-$ npm i
+$ npm run bootstrap
 ```
 
 Please note that while these Serverless Components set up almost everything for you with a single command, if you want to set up a custom domain, you MUST purchase it in your AWS account manually via Route 53.  We have not yet automated domain registration.  After registering it, you may have to wait a few minutes for registration to complete before you can use it.
