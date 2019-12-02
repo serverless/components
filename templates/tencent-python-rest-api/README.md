@@ -1,6 +1,6 @@
 <!--
-title: Deploy Serverless Nodejs REST API
-description: "Deploy Serverless Nodejs REST API with Tencent SCF component"
+title: Deploy Serverless python REST API
+description: "Deploy Serverless python REST API with Tencent SCF component"
 date: 2019-12-02
 thumbnail: 'http://url-to-thumbnail.jpg'
 categories:
@@ -46,7 +46,7 @@ $ npm install -g serverless
 Create a template in a new folder, with the following command
 
 ```console
-$ serverless create --template-url https://github.com/serverless/components/tree/master/templates/tencent-nodejs-rest-api
+$ serverless create --template-url https://github.com/serverless/components/tree/master/templates/tencent-python-rest-api
 ```
 
 Here is the content of the template:
