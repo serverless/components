@@ -1,0 +1,39 @@
+myRestAPI:
+  component: "@serverless/tencent-scf"
+  inputs:
+    name: myRestAPI
+    enableRoleAuth: ture
+    codeUri: ./code
+    handler: index.main_handler
+    runtime: Python3.6
+    region: ap-singapore
+    description: My Serverless Function
+    memorySize: 128
+    timeout: 20
+    events:
+      - apigw:
+          name: serverless
+          parameters:
+            protocol: http
+            serviceName: serverless
+            description: the serverless service
+            environment: release
+            endpoints:
+              - path: /users/{user_type}/{action}
+                method: GET
+                description: Serverless REST API
+                enableCORS: TRUE
+                serviceTimeout: 10
+                param:
+                  - name: user_type
+                    position: PATH
+                    required: 'TRUE'
+                    type: string
+                    defaultValue: teacher
+                    desc: mytest
+                  - name: action
+                    position: PATH
+                    required: 'TRUE'
+                    type: string
+                    defaultValue: go
+                    desc: mytest
