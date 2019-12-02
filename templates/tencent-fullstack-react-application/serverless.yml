@@ -1,0 +1,20 @@
+name: tencent-fullstack-react-application
+
+dashboard:
+  component: '@serverless/tencent-website'
+  inputs:
+    code:
+      src: dist
+      root: dashboard
+      hook: npm run build
+    env:
+      apiUrl: ${api.url}
+      # domain: www.serverlessmetrics.com # Insert your custom domain here
+
+api:
+  component: '@serverless/tencent-express'
+  inputs:
+    code: ./api
+    functionName: tencent-fullstack-react-api
+    apigatewayConf:
+      protocol: https
