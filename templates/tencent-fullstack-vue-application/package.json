@@ -1,0 +1,22 @@
+{
+  "name": "tencent-fullstack-vue-application",
+  "version": "0.0.0",
+  "dependencies": {
+    "@serverless/tencent-express": "^1.2.2",
+    "@serverless/tencent-website": "^1.2.0"
+  },
+  "devDependencies": {
+    "@serverless/eslint-config": "^1.2.1",
+    "eslint": "^6.6.0",
+    "eslint-plugin-import": "^2.18.2",
+    "prettier": "^1.18.2"
+  },
+  "eslintConfig": {
+    "extends": "@serverless/eslint-config/node",
+    "root": true,
+    "parserOptions": {
+      "ecmaVersion": 2018
+    }
+  },
+  "license": "ISC"
+}
