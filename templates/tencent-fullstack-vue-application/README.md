@@ -52,7 +52,6 @@ Add the access keys of a [Tencent CAM Role](https://console.cloud.tencent.com/ca
 # .env
 TENCENT_SECRET_ID=123
 TENCENT_SECRET_KEY=123
-TENCENT_APP_ID=123
 ```
 
 - If you don't have a Tencent Cloud account, you could [sign up](https://intl.cloud.tencent.com/register) first.
