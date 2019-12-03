@@ -1,30 +1,31 @@
-'use strict';
+const path = require('path')
+const util = require('util')
+const exec = util.promisify(require('child_process').exec)
 
-const path = require('path');
-const util = require('util');
-const exec = util.promisify(require('child_process').exec);
-
-const rootDir = path.join(__dirname, '..');
-const apiDir = path.join(rootDir, 'api');
-const dashboardDir = path.join(rootDir, 'dashboard');
+const rootDir = path.join(__dirname, '..')
+const apiDir = path.join(rootDir, 'api')
+const dashboardDir = path.join(rootDir, 'dashboard')
 
 async function installDependencies(dir) {
-  await exec(`cd ${dir} && npm install`);
+  await exec('npm install', {
+    cwd: dir
+  })
 }
 
-/* eslint-disable  no-console*/
+/* eslint-disable no-console*/
 async function bootstrap() {
-  try {
-    console.log('Start install dependencies...')
-    await Promise.all([
-      installDependencies(rootDir),
-      installDependencies(apiDir),
-      installDependencies(dashboardDir),
-    ]);
-    console.log('All dependencies installed.')
-  } catch (e) {
-    console.error(e);
-  }
+  console.log('Start install dependencies...\n')
+  await installDependencies(rootDir)
+  console.log('Root dependencies installed success.')
+  await installDependencies(apiDir)
+  console.log('Api dependencies installed success.')
+  await installDependencies(dashboardDir)
+  console.log('Dashboard dependencies installed success.')
+  console.log('All dependencies installed.')
 }
 
-bootstrap();
+bootstrap()
+
+process.on('unhandledRejection', (e) => {
+  throw e
+})
