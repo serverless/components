@@ -1,30 +1,55 @@
-# 快速构建REST API
+<!--
+title: Deploy Serverless python REST API
+description: "Deploy Serverless python REST API with Tencent SCF component"
+date: 2019-12-02
+thumbnail: 'http://url-to-thumbnail.jpg'
+categories:
+  - toturial
+authors:
+  - Tinafang
+authorslink: 
+  - https://github.com/tinafangkunding
+translators: 
+  - None
+translatorslink: 
+  - None
+-->
 
-## 快速开始
+# Build a RESTful API
 
-通过Serverless SCF组件快速构建一个REST API应用，实现GET/PUT操作。
+## Quick Start
 
-1. [安装](#1-安装)
-2. [配置](#2-配置)
-3. [部署](#3-部署)
-4. [测试](#4-测试)
-5. [移除](#5-移除)
+Build a serverless REST API application with tencent serverless SCF component, support GET/PUT methods.
 
-### 1. 安装
+&nbsp;
 
-**安装 Serverless Framework**
+- [请点击这里查看中文版部署文档](./README_CN.md)
+
+&nbsp;
+
+1. [Install](#1-install)
+2. [Configure](#2-configure)
+3. [Deploy](#3-deploy)
+4. [Test](#4-test)
+5. [Remove](#5-remove)
+6. [Account (optional)](#6-account-optional)
+
+### 1. Install
+
+**Install Serverless Framework**
 ```console
 $ npm install -g serverless
 ```
 
-### 2. 配置
+### 2. Configure
 
-通过如下命令直接下载该例子，目录结构如下：
+Create a template in a new folder, with the following command
 
 ```console
-serverless create --template-url https://github.com/serverless/components/tree/master/templates/tencent-python-rest-api
+$ serverless create --template-url https://github.com/serverless/components/tree/master/templates/tencent-python-rest-api
 ```
 
+Here is the content of the template:
 ```
 .
 ├── code
@@ -32,7 +57,7 @@ serverless create --template-url https://github.com/serverless/components/tree/m
 └── serverless.yml
 ```
 
-查看code/index.py代码，可以看到接口的传参和返回逻辑：
+In `code/index.py` there are some definitions about APIs:
 
 ```python
 # -*- coding: utf8 -*-
@@ -67,11 +92,13 @@ def main_handler(event, context):
             return student_come()
 ```
 
-### 3. 部署
+### 3. Deploy
 
-通过`sls`命令进行部署，并可以添加`--debug`参数查看部署过程中的信息
+Use `sls` command to deploy your project, you could also add `--debug` to see the detail information in the process.
 
-如您的账号未[登陆](https://cloud.tencent.com/login)或[注册](https://cloud.tencent.com/register)腾讯云，您可以直接通过`微信`扫描命令行中的二维码进行授权登陆和注册。
+If you have a `Wechat` account, you don't need to configure the `.env` file, just scan the QR code in terminal and sign-up a new account of Tencent Cloud. It's a streamlined experience.
+
+If you don't have a wechat account, you could jump to [account](#6-account-optional) step and configure the account info.
 
 ```text
 $ serverless --debug
@@ -85,7 +112,7 @@ $ serverless --debug
   DEBUG ─ Executing the template's components graph.
   DEBUG ─ Compressing function myRestAPI file to /Users/dfounderliu/Desktop/restAPI/component/.serverless/myRestAPI.zip.
   DEBUG ─ Compressed function myRestAPI file successful
-  DEBUG ─ Uploading service package to cos[sls-cloudfunction-ap-singapore-code]. sls-cloudfunction-default-myRestAPI-1574856533.zip
+  DEBUG ─ Uploading service package to cos[sls-cloudfunction-ap-guangzhou-code]. sls-cloudfunction-default-myRestAPI-1574856533.zip
   DEBUG ─ Uploaded package successful /Users/dfounderliu/Desktop/restAPI/component/.serverless/myRestAPI.zip
   DEBUG ─ Creating function myRestAPI
   DEBUG ─ Updating code... 
@@ -93,11 +120,11 @@ $ serverless --debug
   DEBUG ─ Created function myRestAPI successful
   DEBUG ─ Setting tags for function myRestAPI
   DEBUG ─ Creating trigger for function myRestAPI
-  DEBUG ─ Starting API-Gateway deployment with name myRestAPI.serverless in the ap-singapore region
+  DEBUG ─ Starting API-Gateway deployment with name myRestAPI.serverless in the ap-guangzhou region
   DEBUG ─ Service with ID service-ibmk6o22 created.
   DEBUG ─ API with id api-pjs3q3qi created.
   DEBUG ─ Deploying service with id service-ibmk6o22.
-  DEBUG ─ Deployment successful for the api named myRestAPI.serverless in the ap-singapore region.
+  DEBUG ─ Deployment successful for the api named myRestAPI.serverless in the ap-guangzhou region.
   DEBUG ─ Deployed function myRestAPI successful
 
   myRestAPI: 
@@ -106,36 +133,35 @@ $ serverless --debug
     Handler:     index.main_handler
     MemorySize:  128
     Timeout:     20
-    Region:      ap-singapore
+    Region:      ap-guangzhou
     Role:        QCS_SCFExcuteRole
     Description: My Serverless Function
     APIGateway: 
-      - serverless - http://service-ibmk6o22-1250000000.sg.apigw.tencentcs.com/release
+      - serverless - http://service-ibmk6o22-1250000000.gz.apigw.tencentcs.com/release
 
   10s › myRestAPI › done
 
 ```
 
-### 4. 测试
+### 4. Test
 
-通过如下命令测试REST API的返回情况：
-> 注：如windows系统中未安装`curl`，也可以直接通过浏览器打开对应链接查看返回情况
+Use the following command to test REST API and check the response:
 
 ```console
-$ curl -XGET http://service-9t28e0tg-1250000000.sg.apigw.tencentcs.com/release/users/teacher/go
+$ curl -XGET http://service-9t28e0tg-1250000000.gz.apigw.tencentcs.com/release/users/teacher/go
 
 {"result": "it is student_get action"}
 ```
 
 ```console
-$ curl -PUT http://service-9t28e0tg-1250000000.sg.apigw.tencentcs.com/release/users/student/go
+$ curl -PUT http://service-9t28e0tg-1250000000.gz.apigw.tencentcs.com/release/users/student/go
 
 {"result": "it is teacher_put action"}
 ```
 
-### 5. 移除
+### 5. Remove
 
-可以通过以下命令移除 REST API应用
+Use the following command to remove the project
 ```console
 $ sls remove --debug
 
@@ -149,22 +175,20 @@ $ sls remove --debug
   7s » myRestAPI » done
 ```
 
-### 账号配置（可选）
+### 5. Account (optional)
 
-当前默认支持CLI扫描二维码登录，如您希望配置持久的环境变量/秘钥信息，也可以本地创建 `.env` 文件
+Just create a `.env` file
 
 ```console
-$ touch .env # 腾讯云的配置信息
+$ touch .env # your Tencent API Keys
 ```
 
-在 `.env` 文件中配置腾讯云的SecretId和SecretKey信息并保存
-
-如果没有腾讯云账号，可以在此[注册新账号](https://cloud.tencent.com/register)。
-
-如果已有腾讯云账号，可以在[API密钥管理](https://console.cloud.tencent.com/cam/capi)中获取 `SecretId` 和`SecretKey`.
+Add the access keys of a [Tencent CAM Role](https://console.cloud.tencent.com/cam/capi) with `AdministratorAccess` in the `.env` file, using this format: 
 
 ```
 # .env
 TENCENT_SECRET_ID=123
 TENCENT_SECRET_KEY=123
 ```
+
+* If you don't have a Tencent Cloud account, you could [sign up](https://intl.cloud.tencent.com/register) first. 

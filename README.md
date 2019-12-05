@@ -102,6 +102,14 @@ A React.js-based frontend and Serverless Cloud Function based REST API applicati
 serverless create --template-url https://github.com/serverless/components/tree/master/templates/tencent-fullstack-react-application
 ```
 
+#### [Deploy A REST API with Tencent Cloud Services](https://github.com/serverless/components/tree/master/templates/tencent-python-rest-api)
+
+A REST API template based on Serverless Cloud Function and API Gateway trigger.
+
+```shell
+serverless create --template-url https://github.com/serverless/components/tree/master/templates/tencent-python-rest-api
+```
+
 #### [Deploy A GraphQL API](https://github.com/serverless/components/tree/master/templates/aws-app-sync-dynamodb)
 
 AWS AppSync & DynamoDB powered GraphQL API.
@@ -154,15 +162,15 @@ api:
 
 - A **serverless real-time websockets API** hosted on AWS Lambda, accessible via an AWS API Gateway Websockets endpoint:
 
-  ```yaml
-  # serverless.yml
+```yaml
+# serverless.yml
 
-  api:
-    component: '@serverless/backend-socket'
-    inputs:
-      code:
-        src: ./src
-  ```
+api:
+  component: '@serverless/backend-socket'
+  inputs:
+    code:
+      src: ./src
+```
 
 - and [much more!](./templates)
 
