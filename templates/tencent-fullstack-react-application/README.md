@@ -1,4 +1,4 @@
-[![Serverless Vue Tencent Cloud](https://main.qcloudimg.com/raw/04b03dc93ebb0db58668811845c9a003.png)
+![Serverless Vue Tencent Cloud](https://main.qcloudimg.com/raw/04b03dc93ebb0db58668811845c9a003.png)
 
 &nbsp;
 
@@ -20,6 +20,8 @@
 &nbsp;
 
 - [Check out the English version tutorial here.](./README_EN.md)
+
+&nbsp;
 
 操作步骤：
 

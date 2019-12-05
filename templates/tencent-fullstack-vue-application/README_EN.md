@@ -16,7 +16,7 @@ This template includes:
 
 &nbsp;
 
-- [请点击这里查看中文版部署文档](./README_CN.md)
+- [请点击这里查看中文版部署文档](./README.md)
 
 &nbsp;
 

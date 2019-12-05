@@ -1,4 +1,4 @@
-[![Serverless Vue Tencent Cloud](https://main.qcloudimg.com/raw/04b03dc93ebb0db58668811845c9a003.png)
+![Serverless Vue Tencent Cloud](https://main.qcloudimg.com/raw/04b03dc93ebb0db58668811845c9a003.png)
 
 &nbsp;
 
@@ -17,7 +17,7 @@ This template includes:
 
 &nbsp;
 
-- [请点击这里查看中文版部署文档](./README_CN.md)
+- [请点击这里查看中文版部署文档](./README.md)
 
 &nbsp;
 

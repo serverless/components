@@ -21,7 +21,11 @@ translatorslink:
 
 通过Serverless Website组件快速构建一个Serverless Hexo站点 <p/>
 
+&nbsp;
+
 - [Check out the English version tutorial here.](./README_EN.md) Build a serverless hexo website with serverless website component.
+
+&nbsp;
 
 1. [安装](#1-安装)
 2. [配置](#2-配置)

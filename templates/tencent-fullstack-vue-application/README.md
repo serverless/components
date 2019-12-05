@@ -21,6 +21,8 @@
 
 - [Check out the English version tutorial here.](./README_EN.md)
 
+&nbsp;
+
 操作步骤：
 
 1. [安装](#1-安装)
