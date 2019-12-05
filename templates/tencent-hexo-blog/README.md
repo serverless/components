@@ -23,7 +23,7 @@ translatorslink:
 
 &nbsp;
 
-- [Check out the English version tutorial here.](./README_EN.md) Build a serverless hexo website with serverless website component.
+- [Check out the English version tutorial here.](./README_EN.md).
 
 &nbsp;
 
