@@ -1,12 +1,12 @@
 myRestAPI:
-  component: "@serverless/tencent-scf"
+  component: '@serverless/tencent-scf'
   inputs:
     name: myRestAPI
     enableRoleAuth: ture
     codeUri: ./code
     handler: index.main_handler
     runtime: Python3.6
-    region: ap-singapore
+    region: ap-guangzhou
     description: My Serverless Function
     memorySize: 128
     timeout: 20
