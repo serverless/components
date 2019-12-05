@@ -1,11 +1,12 @@
-# 快速构建REST API
+# 快速构建 REST API
 
 ## 简介
-REST API 模板使用 Tencent SCF 组件及其触发器能力，方便的在腾讯云创建，配置和管理一个REST API 应用。
+
+REST API 模板使用 Tencent SCF 组件及其触发器能力，方便的在腾讯云创建，配置和管理一个 REST API 应用。
 
 ## 快速开始
 
-通过Serverless SCF组件快速构建一个REST API应用，实现GET/PUT操作。
+通过 Serverless SCF 组件快速构建一个 REST API 应用，实现 GET/PUT 操作。
 
 &nbsp;
 
@@ -24,6 +25,7 @@ REST API 模板使用 Tencent SCF 组件及其触发器能力，方便的在腾�
 ### 1. 安装
 
 **安装 Serverless Framework**
+
 ```console
 $ npm install -g serverless
 ```
@@ -43,7 +45,7 @@ serverless create --template-url https://github.com/serverless/components/tree/m
 └── serverless.yml
 ```
 
-查看code/index.py代码，可以看到接口的传参和返回逻辑：
+查看 code/index.py 代码，可以看到接口的传参和返回逻辑：
 
 ```python
 # -*- coding: utf8 -*-
@@ -99,8 +101,8 @@ $ serverless --debug
   DEBUG ─ Uploading service package to cos[sls-cloudfunction-ap-guangzhou-code]. sls-cloudfunction-default-myRestAPI-1574856533.zip
   DEBUG ─ Uploaded package successful /Users/dfounderliu/Desktop/restAPI/component/.serverless/myRestAPI.zip
   DEBUG ─ Creating function myRestAPI
-  DEBUG ─ Updating code... 
-  DEBUG ─ Updating configure... 
+  DEBUG ─ Updating code...
+  DEBUG ─ Updating configure...
   DEBUG ─ Created function myRestAPI successful
   DEBUG ─ Setting tags for function myRestAPI
   DEBUG ─ Creating trigger for function myRestAPI
@@ -111,7 +113,7 @@ $ serverless --debug
   DEBUG ─ Deployment successful for the api named myRestAPI.serverless in the ap-guangzhou region.
   DEBUG ─ Deployed function myRestAPI successful
 
-  myRestAPI: 
+  myRestAPI:
     Name:        myRestAPI
     Runtime:     Python3.6
     Handler:     index.main_handler
@@ -120,7 +122,7 @@ $ serverless --debug
     Region:      ap-guangzhou
     Role:        QCS_SCFExcuteRole
     Description: My Serverless Function
-    APIGateway: 
+    APIGateway:
       - serverless - http://service-ibmk6o22-1250000000.gz.apigw.tencentcs.com/release
 
   10s › myRestAPI › done
@@ -129,8 +131,9 @@ $ serverless --debug
 
 ### 4. 测试
 
-通过如下命令测试REST API的返回情况：
-> 注：如windows系统中未安装`curl`，也可以直接通过浏览器打开对应链接查看返回情况
+通过如下命令测试 REST API 的返回情况：
+
+> 注：如 windows 系统中未安装`curl`，也可以直接通过浏览器打开对应链接查看返回情况
 
 ```console
 $ curl -XGET http://service-9t28e0tg-1250000000.gz.apigw.tencentcs.com/release/users/teacher/go
@@ -146,7 +149,8 @@ $ curl -PUT http://service-9t28e0tg-1250000000.gz.apigw.tencentcs.com/release/us
 
 ### 5. 移除
 
-可以通过以下命令移除 REST API应用
+可以通过以下命令移除 REST API 应用
+
 ```console
 $ sls remove --debug
 
@@ -162,17 +166,17 @@ $ sls remove --debug
 
 ### 账号配置（可选）
 
-当前默认支持CLI扫描二维码登录，如您希望配置持久的环境变量/秘钥信息，也可以本地创建 `.env` 文件
+当前默认支持 CLI 扫描二维码登录，如您希望配置持久的环境变量/秘钥信息，也可以本地创建 `.env` 文件
 
 ```console
 $ touch .env # 腾讯云的配置信息
 ```
 
-在 `.env` 文件中配置腾讯云的SecretId和SecretKey信息并保存
+在 `.env` 文件中配置腾讯云的 SecretId 和 SecretKey 信息并保存
 
 如果没有腾讯云账号，可以在此[注册新账号](https://cloud.tencent.com/register)。
 
-如果已有腾讯云账号，可以在[API密钥管理](https://console.cloud.tencent.com/cam/capi)中获取 `SecretId` 和`SecretKey`.
+如果已有腾讯云账号，可以在[API 密钥管理](https://console.cloud.tencent.com/cam/capi)中获取 `SecretId` 和`SecretKey`.
 
 ```
 # .env

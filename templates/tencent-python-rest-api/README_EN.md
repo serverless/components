@@ -7,11 +7,11 @@ categories:
   - toturial
 authors:
   - Tinafang
-authorslink: 
+authorslink:
   - https://github.com/tinafangkunding
-translators: 
+translators:
   - None
-translatorslink: 
+translatorslink:
   - None
 -->
 
@@ -37,6 +37,7 @@ Build a serverless REST API application with tencent serverless SCF component, s
 ### 1. Install
 
 **Install Serverless Framework**
+
 ```console
 $ npm install -g serverless
 ```
@@ -50,6 +51,7 @@ $ serverless create --template-url https://github.com/serverless/components/tree
 ```
 
 Here is the content of the template:
+
 ```
 .
 ├── code
@@ -115,8 +117,8 @@ $ serverless --debug
   DEBUG ─ Uploading service package to cos[sls-cloudfunction-ap-guangzhou-code]. sls-cloudfunction-default-myRestAPI-1574856533.zip
   DEBUG ─ Uploaded package successful /Users/dfounderliu/Desktop/restAPI/component/.serverless/myRestAPI.zip
   DEBUG ─ Creating function myRestAPI
-  DEBUG ─ Updating code... 
-  DEBUG ─ Updating configure... 
+  DEBUG ─ Updating code...
+  DEBUG ─ Updating configure...
   DEBUG ─ Created function myRestAPI successful
   DEBUG ─ Setting tags for function myRestAPI
   DEBUG ─ Creating trigger for function myRestAPI
@@ -127,7 +129,7 @@ $ serverless --debug
   DEBUG ─ Deployment successful for the api named myRestAPI.serverless in the ap-guangzhou region.
   DEBUG ─ Deployed function myRestAPI successful
 
-  myRestAPI: 
+  myRestAPI:
     Name:        myRestAPI
     Runtime:     Python3.6
     Handler:     index.main_handler
@@ -136,7 +138,7 @@ $ serverless --debug
     Region:      ap-guangzhou
     Role:        QCS_SCFExcuteRole
     Description: My Serverless Function
-    APIGateway: 
+    APIGateway:
       - serverless - http://service-ibmk6o22-1250000000.gz.apigw.tencentcs.com/release
 
   10s › myRestAPI › done
@@ -162,6 +164,7 @@ $ curl -PUT http://service-9t28e0tg-1250000000.gz.apigw.tencentcs.com/release/us
 ### 5. Remove
 
 Use the following command to remove the project
+
 ```console
 $ sls remove --debug
 
@@ -183,7 +186,7 @@ Just create a `.env` file
 $ touch .env # your Tencent API Keys
 ```
 
-Add the access keys of a [Tencent CAM Role](https://console.cloud.tencent.com/cam/capi) with `AdministratorAccess` in the `.env` file, using this format: 
+Add the access keys of a [Tencent CAM Role](https://console.cloud.tencent.com/cam/capi) with `AdministratorAccess` in the `.env` file, using this format:
 
 ```
 # .env
@@ -191,4 +194,4 @@ TENCENT_SECRET_ID=123
 TENCENT_SECRET_KEY=123
 ```
 
-* If you don't have a Tencent Cloud account, you could [sign up](https://intl.cloud.tencent.com/register) first. 
+- If you don't have a Tencent Cloud account, you could [sign up](https://intl.cloud.tencent.com/register) first.

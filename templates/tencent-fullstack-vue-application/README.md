@@ -2,7 +2,6 @@
 
 &nbsp;
 
-
 # 在腾讯云部署 Serverless 全栈 WEB 应用 （Vue.js）
 
 用于通过多个 Serverless Components 部署 Serverless 全栈应用程序。可以帮助开发者更方便快捷的部署 Serverless 应用，比如利用后端 API 与前端 Vue.js 结合等场景。
@@ -119,7 +118,7 @@ $ touch .env # 腾讯云的配置信息
 在 `.env` 文件中配置腾讯云的 SecretId 和 SecretKey 信息并保存
 如果没有腾讯云账号，可以在此[注册新账号](https://cloud.tencent.com/register)。
 
-如果已有腾讯云账号，可以在[API密钥管理](https://console.cloud.tencent.com/cam/capi)中获取 `SecretId` 和`SecretKey`
+如果已有腾讯云账号，可以在[API 密钥管理](https://console.cloud.tencent.com/cam/capi)中获取 `SecretId` 和`SecretKey`
 
 ```
 # .env

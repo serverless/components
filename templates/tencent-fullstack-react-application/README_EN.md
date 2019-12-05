@@ -2,7 +2,6 @@
 
 &nbsp;
 
-
 # Template - Fullstack Application deployed with Tencent Cloud Services
 
 This is a template for deploying a serverless fullstack application via multiple Serverless Components. This aims to be the simplest possible way to build a serverless fullstack application, including a React.js application on the front-end bundled with Parcel and back-end API.

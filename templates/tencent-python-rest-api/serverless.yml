@@ -1,5 +1,5 @@
 myRestAPI:
-  component: "@serverless/tencent-scf"
+  component: '@serverless/tencent-scf'
   inputs:
     name: myRestAPI
     enableRoleAuth: ture
