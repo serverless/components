@@ -1,7 +1,0 @@
-name: my-cdn
-
-cdn:
-  component: '@serverless/cdn'
-  inputs:
-    region: us-east-1
-    # domain: cdn.serverless.com # optional

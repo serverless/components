@@ -1,0 +1,8 @@
+#!/usr/bin/env node
+
+const cli = require('../src/cli')
+
+// Run
+;(async () => {
+  return cli()
+  })().catch((e) => console.log(e.stack)) // eslint-disable-line

@@ -1,7 +1,0 @@
-name: backend-websocket
-
-myWebsocketBackend:
-  component: '@serverless/backend-socket'
-  inputs:
-    code:
-      src: code

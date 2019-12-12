@@ -1,9 +1,0 @@
-name: website
-
-website:
-  component: '@serverless/website'
-  inputs:
-    code:
-      src: dist
-      hook: npm run build
-    # domain: www.serverlessmetrics.com
