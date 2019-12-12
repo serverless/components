@@ -14,7 +14,8 @@ myRestAPI:
       - apigw:
           name: serverless
           parameters:
-            protocol: http
+            protocols:
+              - http
             serviceName: serverless
             description: the serverless service
             environment: release
