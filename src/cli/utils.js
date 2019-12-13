@@ -206,11 +206,41 @@ const getOrCreateAccessKey = async (org) => {
   return user.dashboard.accessKeys[org]
 }
 
+const isComponentsFile = (serverlessFile) => {
+  if (typeof serverlessFile !== 'object') {
+    return false
+  }
+
+  // make sure it's NOT a framework file
+  if (serverlessFile.provider && serverlessFile.provider.name) {
+    return false
+  }
+
+  // make sure it IS a components file
+  if (serverlessFile.component) {
+    return true
+  }
+
+  return false
+}
+
+const runningComponents = () => {
+  const serverlessFile = getConfig('serverless')
+  const serverlessComponentFile = getConfig('serverless.component')
+
+  if (serverlessComponentFile || isComponentsFile(serverlessFile)) {
+    return true
+  }
+
+  return false
+}
+
 module.exports = {
   getOrCreateAccessKey,
   getCredentials,
   getConfig,
   resolveConfig,
   isComponentsProject,
-  fileExistsSync
+  fileExistsSync,
+  runningComponents
 }
