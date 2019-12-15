@@ -2,12 +2,14 @@
 
 <br/>
 
-Build, compose, & deploy serverless apps in seconds with **Serverless Components**, the **[Serverless Framework's](https://github.com/serverless/serverless)** new infrastructure provisioning technology.
+Serverless Components are simple abstractions for the Serverless Framework that enable you to deploy powerful serverless applications and use-cases, easily.
 
-- - [x] **Speed -** The fastest way to deploy serverless infra and apps.
-- - [x] **Power -** Deploy low-level infra, or higher-order use-case abstractions.
-- - [x] **Re-Use -** Everything you build is reusable by you, your team, and (if you want) the world.
-- - [x] **Composition -** Easily compose Components together in YAML or Javascript.
+- - [x] **Abstraction -** Deploy low-level infra, or higher-order use-case abstractions.
+- - [x] **Instant Deployments -** Serverless Components deploy in 2-4 seconds.
+- - [x] **Registry -** Everything you build is reusable by you, your team, and (if you want) the world, via the Serverless Component Registry.
+
+Here's how easy it is to use Components with Serverless Framework:
+
 
 Here's how easy it is to use Components with Serverless Framework:
 
