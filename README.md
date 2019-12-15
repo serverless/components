@@ -292,13 +292,36 @@ inputs:
 
 # Building Components
 
-If you want to build reusable Serverless Components, it starts and ends with a `serverless.js` file.
+If you want to build reusable Serverless Components, there are 2 essential files you need to be aware of:
 
-The most important thing to note is that Serverless Components only run in the cloud and **do not** run locally.  You must publish your Component first, to run it.  Fortunately, we've made this process easy, as described below...
+* `serverless.component.yml` - This contains the definition of your Serverless Component.
+* `serverelss.js` - This contains your Serverless Component's code.
 
-### Serverless.js Basics
+One of the most important things to note is that Serverless Components **only** run in the cloud and **do not** run locally.  You must publish your Component first, to run it.  Fortunately, we've made this process easy, as described below.
 
-Create a `serverless.js` file, extend the Component class and add a `deploy` method, to make a bare minimum Serverless Component, like this:
+### serverless.component.yml
+
+To declare a Serverless Component and make it available within the Serverless Registry, you must create a `serverless.component.yml` file with the following properties:
+
+```yaml
+# serverless.component.yml
+
+name: express # Required. The name of the Component
+version: 0.0.4 # Required. The version of the Component
+author: eahefnawy # Required. The author of the Component
+org: serverlessinc # Required. The Serverless Framework org which owns this Component
+description: Deploys Serverless Express.js Apps # Optional. The description of the Component
+keywords: aws, serverless, express # Optional. The keywords of the Component to make it easier to find at registry.serverless.com
+repo: https://github.com/owner/project # Optional. The code repository of the Component
+license: MIT # Optional. The license of the Component code
+main: ./src # Optional. The directory which contains the Component code
+```
+
+### serverless.js
+
+A `serverless.js` file contains the Serverless Component's code.
+
+To make a bare minimum Serverless Component, create a `serverless.js` file, extend the Component class and add a `deploy` method like this:
 
 ```javascript
 // serverless.js
@@ -432,7 +455,37 @@ class MyComponent extends Component {
 module.exports = MyComponent
 ```
 
-Just run `serverless deploy` in the directory that contains the `serverless.js` file to run your new component. You'll will see all the logs and outputs of your new component. Logs and outputs of any child component you use will not be shown, unless you run in debug mode: `serverless --debug`. You can also run any custom method/command you've defined with `serverless <methodName>`.
+### Testing Serverless Components
+
+Serverless Components only run in the cloud and cannot be run locally.  This presents some tremendous advantages to Component consumers, but the workflow can be a bit tedious to Component authors.  Fortunately, we've added some workflow tricks to make the authoring workflow easier.  Here they are...
+
+When you have added or updated the code of your Serverless Component and you want to test the change, you will need to publish it first.  Since you don't want to publish your changes to a proper version of your Component just for testing (because people may be using it), we allow for you to publish a "dev" version of your Component.  
+
+Simply run the following command to publish your Serverless Component to the "dev" version:
+
+```console
+$ serverless publish --dev
+```
+
+You can consume the "dev" version of your Component in `serverless.yml`, via the following syntax:
+
+```yaml
+# serverless.yml
+
+component: express # DO NOT ADD A @version HERE.  By keeping blank, it will use the "dev" version.
+org: acme 
+app: fullstack
+name: rest-api
+
+inputs:
+  src: ./src
+```
+
+
+
+
+
+Just run `serverless deploy` in the directory that contains the `serverless.js` file to run your new component. You will see all the logs and outputs of your new component. Logs and outputs of any child component you use will not be shown, unless you run in debug mode: `serverless --debug`. You can also run any custom method/command you've defined with `serverless <methodName>`.
 
 For complete real-world examples on writing components, [check out our official components](https://github.com/serverless-components)
 
