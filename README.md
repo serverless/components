@@ -12,12 +12,12 @@ Here's how easy it is to use Components with the Serverless Framework:
 
 ```yaml
 # serverless.yml
-component: express
-org: acme
-app: fullstack
-name: rest-api
+component: express # The name of the Component in the Registry
+org: acme # Your Org
+app: fullstack # Your App
+name: rest-api # What you want to call this Component Instance
 
-inputs:
+inputs: # The parameters the Component takes
   src: ./src
 ```
 
