@@ -8,7 +8,7 @@
 * - [x] **Instant Deployments** - Serverless Components deploy in 2-4 seconds.
 * - [x] **Registry** - Everything you build is reusable by you, your team, and the world, via the Registry.
 
-Here's how easy it is to use Components with Serverless Framework:
+Here's how easy it is to use Components with the Serverless Framework:
 
 ```yaml
 # serverless.yml
