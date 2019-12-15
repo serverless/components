@@ -1,4 +1,4 @@
-**IMPORTANT –**  This branch features a large update to Serverless Components, which include cloud deployments, remote state storage, staging and the Serverless Registry.  All docs and templates have been updated.  You can read more about these changes here.
+**IMPORTANT –**  This branch features a large update to Serverless Components, which include *cloud deployments*, *remote state storage*, *stages* and the *Serverless Registry*.  All docs and templates have been updated.  You can read more about these changes here.
 
 <br/>
 
