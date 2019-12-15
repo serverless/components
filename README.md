@@ -4,7 +4,7 @@
 
 **Serverless Components** are simple abstractions that enable developers to deploy serverless applications and use-cases easily, via the **[Serverless Framework](https://github.com/serverless/serverless)**
 
-* **Abstraction** - Deploy low-level infra, or higher-order use-case abstractions.
+* **Easy** - Deploy low-level infra, or higher-order serverless applications, easily.
 * **Instant Deployments** - Serverless Components deploy in 2-4 seconds.
 * **Registry** - Everything you build is reusable by you, your team, and (if you want) the world, via the Serverless Component Registry.
 
