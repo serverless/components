@@ -1,3 +1,7 @@
+[![Serverless Components](https://s3.amazonaws.com/assets.github.serverless/readme-serverless-components-3.gif)](http://serverless.com)
+
+<br/>
+
 **Serverless Components** are simple abstractions that enable developers to deploy powerful serverless applications and use-cases, easily, via the **[Serverless Framework](https://github.com/serverless/serverless)**
 
 * **Abstraction** - Deploy low-level infra, or higher-order use-case abstractions.
