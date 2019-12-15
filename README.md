@@ -6,7 +6,7 @@
 
 * **Easy** - Deploy low-level infra, or higher-order serverless applications, easily.
 * **Instant Deployments** - Serverless Components deploy in 2-4 seconds.
-* **Registry** - Everything you build is reusable by you, your team, and (if you want) the world, via the Serverless Component Registry.
+* **Registry** - Everything you build is reusable by you, your team, and the world, via the Registry.
 
 Here's how easy it is to use Components with Serverless Framework:
 
