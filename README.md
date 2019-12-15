@@ -4,7 +4,7 @@
 
 **IMPORTANT –**  This branch features a large update to Serverless Components, which include cloud deployments and the Serverless Registry.  All docs and templates have been updated.  You can read more about these changes here.
 
-Serverless Components are simple abstractions that enable developers to deploy serverless applications and use-cases easily, via the **[Serverless Framework](https://github.com/serverless/serverless)**
+Serverless Components are simple abstractions that enable developers to deploy serverless applications and use-cases easily, via the [Serverless Framework](https://github.com/serverless/serverless)
 
 * - [x] **Easy** - Deploy low-level infra, or higher-order serverless applications, easily.
 * - [x] **Instant Deployments** - Serverless Components deploy in 2-4 seconds.
