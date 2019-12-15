@@ -2,6 +2,8 @@
 
 <br/>
 
+**Note:**  This branch features a large update to Serverless Components, which include cloud deployments and the Serverless Registry.  All docs and templates have been updated.  You can read more about these changes here.
+
 **Serverless Components** are simple abstractions that enable developers to deploy serverless applications and use-cases easily, via the **[Serverless Framework](https://github.com/serverless/serverless)**
 
 * - [x] **Easy** - Deploy low-level infra, or higher-order serverless applications, easily.
@@ -46,10 +48,10 @@ inputs: # The configuration the Component accepts
 
 # Quick-Start
 
-Install the [Serverless Framework](https://www.github.com/serverless/serverless) via NPM:
+While in beta, you can use Components with the [Serverless Framework](https://www.github.com/serverless/serverless) via a special package on NPM:
 
 ```console
-$ npm i -g serverless
+$ npm i -g serverless@components
 ```
 
 **Make sure you are using Serverless Framework version 1.49 or above.** Serverless Components Beta will not work with older versions.
