@@ -27,7 +27,7 @@ inputs: # The configuration the Component accepts according to its docs
 
 Read the [Quick-Start](#quick-start) to get started, or learn more via the documentation below!
 
-<br/>
+<br/><br/>
 
 - [Quick-Start](#quick-start)
 - [Features](#features)
