@@ -1,0 +1,19 @@
+component: express@0.0.4
+org: ac360
+app: demos
+name: express-api
+stage: prod
+
+inputs:
+  src: ./src
+
+
+
+
+
+
+
+
+
+
+  

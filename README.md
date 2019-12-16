@@ -267,6 +267,8 @@ You can deploy Components easily via the Serverless Framework with the `$ server
 $ serverless deploy
 ```
 
+While Serverless Components deploy incredibly fast, please note that first deployments can often be 10x slower because creating cloud resources takes a lot longer than updating them.
+
 ### State
 
 Serverless Components automatically save their state remotely.  This means you can easily push your Components to Github, Gitlab, Bitbucket, etc., and collaborate on them with others as long as the `serverless.yml` contains an `org` which your collaboraters are added to:

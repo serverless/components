@@ -1,0 +1,14 @@
+component: website
+org: ac360
+app: demos
+name: website-1
+stage: prod
+
+inputs:
+  src:
+    src: ./src
+    hook: npm run build
+    dist: ./dist
+
+
+
