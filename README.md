@@ -31,19 +31,21 @@ inputs: # The configuration the Component accepts according to its docs
 - [Features](#features)
 - [Overview](#overview)
 - [Using Components](#using-components)
-  - [Serverless.yml Basics](#serverlessyml-basics)
+  - [Serverless.yml](#serverless.yml)
   - [Inputs](#inputs)
+  - [Deployment](#deployment)
+  - [State](#state)
+  - [Versioning](#versioning)
   - [Outputs](#outputs)
   - [Credentials](#credentials)
   - [Environment Variables](#environment-variables)
 - [Building Components](#building-components)
-  - [Serverless.js Basics](#serverlessjs-basics)
+  - [Serverless.component.yml](#serverless.component.yml)
+  - [Serverless.js](#serverless.js)
   - [Development Tips](#development-tips)
-- [Available Components](https://github.com/serverless-components)
 - [Templates](./templates)
 - [Artwork](https://github.com/serverless/artwork)
 - [Join Us on Slack](https://serverless.com/slack)
-- [Roadmap](https://github.com/serverless/components/projects/1)
 
 <br/>
 
@@ -172,7 +174,7 @@ If you want to create a Serverless Component, it's easy!  It's also trivial to l
 
 # Using Components
 
-### `serverless.yml`
+### serverless.yml
 
 Serverless Components live exclusively in the cloud, where they await to deploy your serverless use-cases.
 
