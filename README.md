@@ -27,7 +27,7 @@ inputs: # The configuration the Component accepts according to its docs
 
 Read the [Quick-Start](#quick-start) to get started, or learn more via the documentation below!
 
-<br/><br/>
+<br/>
 
 - [Quick-Start](#quick-start)
 - [Features](#features)
@@ -363,6 +363,26 @@ inputs:
   src: ./src
   env:
     foo: ${env.BAR}
+```
+
+### Stages
+
+Serverless Components have a Stages concept, which enables you to deploy entirely separate Component Instances and their cloud resources per stage.
+
+The `dev` Stage is the default.  If you wish to change your stage, set it in `serverless.yml`, like thisL
+
+```yaml
+component: express@0.0.4
+org: my-org
+app: my-app
+name: my-component-instance
+stage: prod # Enter the stage here
+```
+
+You can also specify a Stage upon deployment, which overrides anything set in `serverless.yml`, like this:
+
+```bash
+$ serverless deploy --stage prod
 ```
 
 <br/>
