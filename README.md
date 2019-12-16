@@ -41,6 +41,7 @@ Read the [Quick-Start](#quick-start) to get started, or learn more via the docum
   - [Outputs](#outputs)
   - [Credentials](#credentials)
   - [Environment Variables](#environment-variables)
+  - [Stages](#stages)
 - [Building Components](#building-components)
   - [Serverless.component.yml](#serverless.component.yml)
   - [Serverless.js](#serverless.js)
