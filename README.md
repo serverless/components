@@ -226,7 +226,7 @@ If you want to create a Serverless Component, it's easy!  It's also trivial to l
 
 Serverless Components live exclusively in the cloud, where they await to deploy your serverless use-cases.
 
-They are discoverable and usable via the Serverless Registry.  Please note, the Registry API exists today, but currently does not have a front-end with search functionality until January 4th, 2020.  Instead, reference the (templates)[./templates] directory for available Components.
+They are discoverable and usable via the Serverless Registry.  Please note, the Registry API exists today, but currently does not have a front-end with search functionality until January 4th, 2020.  Instead, reference the [templates](./templates) directory for available Components.
 
 To use a Serverless Component, declare the name of one that exists in the Serverless Registry in your `serverless.yml`.  The syntax looks like this:
 
@@ -370,7 +370,7 @@ inputs:
 
 Serverless Components have a Stages concept, which enables you to deploy entirely separate Component Instances and their cloud resources per stage.
 
-The `dev` Stage is the default.  If you wish to change your stage, set it in `serverless.yml`, like thisL
+The `dev` Stage is the default.  If you wish to change your stage, set it in `serverless.yml`, like this:
 
 ```yaml
 component: express@0.0.4
@@ -395,7 +395,7 @@ If you want to build reusable Serverless Components, there are 2 essential files
 * `serverless.component.yml` - This contains the definition of your Serverless Component.
 * `serverelss.js` - This contains your Serverless Component's code.
 
-One of the most important things to note is that Serverless Components **only** run in the cloud and **do not** run locally.  You must publish your Component first, to run it.  Fortunately, we've made this process easy, as described below.
+One of the most important things to note is that Serverless Components **only** run in the cloud and **do not** run locally.  You must publish your Component first, to run it (it takes only few seconds to publish).  Fortunately, we've made this process easy, as described below.
 
 ### serverless.component.yml
 
@@ -514,15 +514,16 @@ class MyComponent extends Component {
     this.state.name = 'myComponent'
     await this.save()
 
-    // Here is how to load a child Component via its name in the Registry:
-    let website = await this.load('website')
+    // Here is how to load a child Component via its name in the Registry
+    // Please note that the .load method is NOT an async function.
+    let website = this.load('website')
 
     // You can run a method on the child Component, like this:
-    let websiteOutputs = website.deploy({ code: { src: './src' } })
+    let websiteOutputs = await website.deploy({ code: { src: './src' } })
 
     // If you are deploying multiple instances of the same Component, include an instance id.
-    let website1 = await this.load('website', 'website1')
-    let website2 = await this.load('website', 'website2')
+    let website1 = this.load('website', 'website1')
+    let website2 = this.load('website', 'website2')
     // Child Components save their state automatically.
 
     // Here is how you can easily remove a Component.
