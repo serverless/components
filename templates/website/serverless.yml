@@ -1,8 +1,7 @@
 component: website
-org: ac360
-app: demos
-name: website-1
-stage: prod
+org: # Your Serverless Framework Org
+app: # Your Serverless Framework App
+name: landing-page
 
 inputs:
   src:

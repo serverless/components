@@ -1,6 +1,6 @@
 component: express@0.0.4
-org: ac360
-app: demos
+org: # Your Serverless Framework Org
+app: # Your Serverless Framework App
 name: express-api
 stage: prod
 
