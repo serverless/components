@@ -79,7 +79,7 @@ const build = async (inputs, context) => {
         ${err.stdout}`
       )
     }
-    inputs.inputs.src = path.resolve(path.join(inputs.inputs.src.src, inputs.inputs.src.dist))
+    inputs.inputs.src = path.resolve(path.join(process.cwd(), inputs.inputs.src.dist))
   } else if (typeof inputs.inputs.src === 'object' && inputs.inputs.src.src) {
     inputs.inputs.src = path.resolve(inputs.inputs.src.src)
   } else if (typeof inputs.inputs.src === 'string') {
