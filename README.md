@@ -6,17 +6,17 @@
 
 Serverless Components are simple abstractions that enable developers to deploy serverless applications and use-cases easily, via the [Serverless Framework](https://github.com/serverless/serverless).
 
-* - [x] **Simplicity** - Easily deploy low-level infra, or higher-order serverless applications via Components.
-* - [x] **Instant Deployments** - Components deploy in 2-4 seconds.
-* - [x] **Build Your Own** - Components are easy to build.
-* - [x] **Registry** - Share your Components with you, your team, and the world, via the Serverless Registry.
+- [x] **Simplicity** - Easily deploy low-level infra, or higher-order serverless applications via Components.
+- [x] **Instant Deployments** - Components deploy in 2-4 seconds.
+- [x] **Build Your Own** - Components are easy to build.
+- [x] **Registry** - Share your Components with you, your team, and the world, via the Serverless Registry.
 
 Here's how easy it is to use Serverless Components with the Serverless Framework:
 
 ```yaml
 # serverless.yml
 
-component: express # The name of the Component in the Registry
+component: express@0.0.6 # The name of the Component in the Registry
 org: acme # Your Serverless Framework Org
 app: fullstack # Your Serverless Framework App
 name: rest-api # The name of your instance of this Component
@@ -73,7 +73,9 @@ serverless create --template-url https://github.com/serverless/components/tree/c
 serverless create --template-url https://github.com/serverless/components/tree/cloud/templates/website
 ```
 
-Within one of the templates, log in to enable deployment and saving state in the cloud:
+Next, both templates feaure `package.json` files.  Be sure to run `npm i` to enable them to work.
+
+After that, within your template, log in to enable deployment and saving state in the cloud:
 
 ```bash
 $ serverless login
