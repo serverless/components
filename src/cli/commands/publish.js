@@ -1,3 +1,4 @@
+const args = require('minimist')(process.argv.slice(2))
 const { validate, publish } = require('../../core')
 const { getConfig, resolveConfig, getOrCreateAccessKey } = require('../utils')
 
@@ -20,6 +21,11 @@ module.exports = async (context) => {
       `Run 'serverless login' first to rapidly deploy your serverless application.`,
       true
     )
+  }
+
+  // if using --dev flag, publish to the "dev" version
+  if (args.dev) {
+    delete serverlessComponentFile.version
   }
 
   await publish(serverlessComponentFile, context)
