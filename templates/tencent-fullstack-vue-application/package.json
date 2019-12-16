@@ -2,7 +2,7 @@
   "name": "tencent-fullstack-vue-application",
   "version": "0.0.0",
   "dependencies": {
-    "@serverless/tencent-express": "^1.2.2",
+    "@serverless/tencent-express": "^2.0.0",
     "@serverless/tencent-website": "^1.2.0"
   },
   "devDependencies": {

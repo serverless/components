@@ -17,4 +17,5 @@ api:
     code: ./api
     functionName: tencent-fullstack-vue-api
     apigatewayConf:
-      protocol: https
+      protocols:
+        - https
