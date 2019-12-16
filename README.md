@@ -73,6 +73,49 @@ serverless create --template-url https://github.com/serverless/components/tree/c
 serverless create --template-url https://github.com/serverless/components/tree/cloud/templates/website
 ```
 
+Within one of the templates, log in to enable deployment and saving state in the cloud:
+
+```bash
+$ serverless login
+```
+
+Be sure to copy your `org` and your `app` so that you can put these values into your `serverless.yml`.  They are required to save your state.
+
+```yaml
+# serverless.yml
+
+org: my-org
+app: my-app
+...
+
+```
+
+Lastly, enter your cloud provider credentials into a `.env` file within the folder that contains your `serverles.yml`.
+
+```text
+AWS_ACCESS_KEY_ID=12345
+AWS_SECRET_ACCESS_KEY=5321
+```
+
+Deploy!
+
+```bash
+$ serverless deploy
+```
+
+Use `--debug` to see what your Components are doing upon deployment.
+
+```bash
+$ serverless deploy --dev
+```
+
+Run the remove command to remove your Component Instance and all of its cloud resources:
+
+```bash
+$ serverless remove
+```
+
+
 <br/>
 
 # Features
