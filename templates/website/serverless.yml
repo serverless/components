@@ -9,6 +9,3 @@ inputs:
     src: ./src
     hook: npm run build
     dist: ./dist
-
-
-

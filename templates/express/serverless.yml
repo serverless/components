@@ -6,14 +6,3 @@ stage: prod
 
 inputs:
   src: ./src
-
-
-
-
-
-
-
-
-
-
-  
