@@ -143,15 +143,15 @@ const validateComponent = (component) => {
 }
 
 const validateInstance = (instance) => {
-  if (typeof instance.component === 'undefined') {
+  if (typeof instance.component === 'undefined' || !instance.component) {
     throw new Error(`Unable to run component. Missing "component" property.`)
   }
 
-  if (typeof instance.name === 'undefined') {
+  if (typeof instance.name === 'undefined' || !instance.name) {
     throw new Error(`Unable to run component. Missing "name" property.`)
   }
 
-  if (typeof instance.app === 'undefined') {
+  if (typeof instance.app === 'undefined' || !instance.app) {
     throw new Error(`Unable to run component. Missing "app" property.`)
   }
 

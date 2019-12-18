@@ -24,6 +24,8 @@ const getCredentials = () => {
   let envVars = {}
   const defaultEnvFilePath = path.join(process.cwd(), `.env`)
   const stageEnvFilePath = path.join(process.cwd(), `.env.dev`) // todo remove this
+
+  // Load environment variables via .env file
   if (fileExistsSync(stageEnvFilePath)) {
     envVars = dotenv.config({ path: path.resolve(stageEnvFilePath) }).parsed || {}
   } else if (fileExistsSync(defaultEnvFilePath)) {
@@ -62,13 +64,16 @@ const getCredentials = () => {
   for (const provider in providers) {
     const providerEnvVars = providers[provider]
     for (const providerEnvVar in providerEnvVars) {
-      if (!envVars.hasOwnProperty(providerEnvVar)) {
-        continue
-      }
       if (!credentials[provider]) {
         credentials[provider] = {}
       }
-      credentials[provider][providerEnvVars[providerEnvVar]] = envVars[providerEnvVar]
+      // Proper environment variables override what's in the .env file
+      if (process.env.hasOwnProperty(providerEnvVar)) {
+        credentials[provider][providerEnvVars[providerEnvVar]] = process.env[providerEnvVar]
+      } else if (envVars.hasOwnProperty(providerEnvVar)) {
+        credentials[provider][providerEnvVars[providerEnvVar]] = envVars[providerEnvVar]
+      }
+      continue
     }
   }
 

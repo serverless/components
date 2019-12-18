@@ -1,9 +1,6 @@
 import React, { Component } from 'react'
 import lib from './lib'
 import imageHero from './images/hero.png'
-import lodash from 'lodash'
-import moment from 'moment'
-import chartJs from 'chart.js'
 
 export default class App extends Component {
 
