@@ -277,9 +277,11 @@ website:
 
 ### Outputs
 
-When a Component function (e.g. the `default()` function) is finished running, it returns an `outputs` object.
+当 Component 的函数（例如上文中的 `default()` 函数）运行完成后，会返回一些 `outputs` 对象。
 
-You can reference values of this `outputs` object in `serverless.yml` to pass data into Components, like this:
+你可以在 `serverless.yml` 中引用这些 `outputs` 对象，并且把返回值传入到 Components 中，例如下面的例子
+
+<!--@yuga do you have any good demo instead of this? -->
 
 ```yml
 backend:
@@ -297,29 +299,36 @@ database:
     name: users-database
 ```
 
-This tells the Serverless Framework to pass a few of the outputs from the `database` instance into the `backend` instance. Specifically, the `name` and `region` of the database are being added as environment variables to the `backend` instance, so that it can interact with that database.
+上面这段描述可以让 Serverless Framework 将 `database` 实例的输出值作为输入传到 `backend` 实例里面。具体来说，数据库里的 `name` 和 `region` 这两个字段作为环境变量传入了 `backend` 实例，所以它才可以和数据库进行交互操作。
 
-This also tells the Serverless Framework what depends on what. The Framework builds a graph based on this, and deploys everything in that order. Circular references however do not work and the Framework will throw an error.
+上面的例子也同时告诉了 Serverless Framework 模块之间的依赖关系，因此 Framework 会根据这些关系构建有向图，并且按照先后依赖顺序来进行部署。也正因此，当前不支持循环引用，如果出现循环引用 Framework 会报错。
 
 ### 秘钥配置
 
-Upon deployment, whether it's a `serverless.yml` or `serverless.js`, Serverless Components' core looks for a `.env` file in the current working directory.
+在部署时，无论是使用 `serverless.yml` 还是 `serverless.js`，Serverless Components 会在当前目录寻找 `.env` 或者 `.env_temp` 文件。
 
+部署过程中，如果 `.env` 或者 `.env_temp` 文件存在，Serverless Components 会将其作为环境变量上传。如果你使用的和各云厂商提供的 `secretId` 和 `secretKey` 字段一致的环境变量名，Serverless Components 在部署期间会自动将其注入到需要该秘钥的 Components 中，用来创建基础设施服务。
+
+<!--
 Upon deployment, if a `.env` file exists, Serverless Components will add the content of it as environment variables. If you use specific environment variable names that match that of a cloud infrastructure vendor's access keys/tokens, upon deployment, Serverless Components will automatically inject that into the Components that need that vendor to provision infrastructure.
+-->
 
-These credentials will be used by any and all Components in your `serverless.yml` or `serverless.js` — as well as their child Components — if you specify the environment variables exactly as shown below.
+如果你按照如下方式配置，这些秘钥可以被 `serverless.yml` 以及 `serverless.js` 中的所有 Components 使用，也包括其中引用到的基础 Componenets。
 
-Here are the keys that are currently supported:
+以下是目前支持的秘钥配置：
 
-#### AWS Credentials
+#### 腾讯云秘钥配置
+
+> 注：当前腾讯云支持通过`微信`扫描二维码一键授权登录/注册，扫码生成的临时秘钥文件为  `.env_temp` ，但目前该秘钥最长可以支持 30 天有效期授权，过期需要重新授权。如果需要持久秘钥或者在角色中提供了其他权限控制，也可以通过下面方式填写 `.env` 文件进行持久授权。
 
 ```bash
-AWS_ACCESS_KEY_ID=123456789
-AWS_SECRET_ACCESS_KEY=123456789
-AWS_REGION=us-east-1
+TENCENT_SECRET_ID=123456789
+TENCENT_SECRET_KEY=123456789
 ```
 
 Components could access these AWS credentials using `this.context.credentials.aws`. This object would look like this:
+
+<!--@yuga do you have any good demo instead of this? -->
 
 ```js
 {
@@ -331,7 +340,7 @@ Components could access these AWS credentials using `this.context.credentials.aw
 
 ### 环境变量
 
-You can reference environment variables (e.g. those that you defined in the `.env` file) directly in `serverless.yml` by referencing the `${env}` object. For example, if you want to reference the `TABLE` environment variable, you could do that with `${env.TABLE}`.
+你可以直接在 `serverless.yml` 中引用环境变量（例如上文中定义的 `.env` 文件），使用方式是在 yaml 中直接引用 `${env}` 对象。如下例子，如果你希望引用环境变量 `TABLE`，你可以通过下面方式配置 `serverless.yml`
 
 ```yml
 backend:
@@ -347,17 +356,16 @@ backend:
 
 # 开发 Components
 
-If you want to build reusable Serverless Components, it starts and ends with a `serverless.js` file.
+如果你希望开发可复用的 Serverless Components，那么可以围绕 `serverless.js` 文件进行开发。
 
 ### Serverless.js 介绍
 
-In your current working directory, install the Serverless Components core (`@serverless/core`) as a local dependency.
+在当前的工作目录下，通过如下命令安装 Serverless Components core (`@serverless/core`) 作为本地依赖。
 
 ```
 npm i --save @serverless/core
 ```
-
-Create a `serverless.js` file, extend the Component class and add a `default` method, to make a bare minimum Serverless Component, like this:
+创建一个新的 `serverless.js` 文件，扩展 Component 类，并且增加一个 `default` 方法，这样就实现了一个最基本的 Serverless Component，如下所示：
 
 ```javascript
 // serverless.js
@@ -373,11 +381,11 @@ class MyComponent extends Component {
 module.exports = MyComponent
 ```
 
-`default()` is always required. It is where the logic resides in order for your Component to _make_ something. Whenever you run the `$ serverless` command, it's always calling the `default()` method.
+`default()` 方法是必须的，它构成了 Component 调用和构建的基本逻辑。当你运行 `$ serverless` 命令时，总是会先调用 `default()` 方法。
 
-You can also any other methods to this class. A `remove()` method is often the next logical choice, if you want your Serverless Component to remove the things it creates.
+你也可以在类下面增加一些其他的方法，比如 `remove()` 经常是下一个需要支持的逻辑，这个方法支持你的 Serverless Component 将创建的云上资源移除掉。 
 
-You can add as many methods as you want. This is interesting because it enables you to ship more automation with your Component, than logic that merely _deploys_ and _removes_ something.
+你也可以增加更多的方法，这种方式比较灵活，你可以通过 Component 实现更多自动化的方法，而不仅仅是 _部署_ and _移除_ 的逻辑。
 
 You can use the `serverless --watch` flag when you run any method. This would keep watching for changes in the current working directory, and rerun your method if changes are detected. So you could also do `serverless remove --watch` for example.
 
@@ -385,7 +393,7 @@ It's still early days for Serverless Components, but we are starting to work on 
 
 All methods other than the `default()` method are optional. All methods take a single `inputs` object, not individual arguments, and return a single `outputs` object.
 
-Here is what it looks like to add a `remove` method, as well as a custom method.
+下面例子展示了 `remove` 方法的实现，也展示了自定义方法的实现方式：
 
 ```javascript
 // serverless.js
@@ -427,7 +435,9 @@ class MyComponent extends Component {
 module.exports = MyComponent
 ```
 
-When inside a Component method, `this` comes with utilities which you can use. Here is a guide to what's available to you within the context of a Component.
+<!--@yuga do you have any good demo instead of this? -->
+
+在 Component 方法里，`this` 指的是一些可用的实体，下面有一些指南可以展示出在 Component 方法中哪些语义是可用的。(?????)
 
 ```javascript
 // serverless.js
@@ -495,11 +505,11 @@ module.exports = MyComponent
 
 Just run `serverless` in the directory that contains the `serverless.js` file to run your new component. You'll will see all the logs and outputs of your new component. Logs and outputs of any child component you use will not be shown, unless you run in debug mode: `serverless --debug`. You can also run any custom method/command you've defined with `serverless <methodName>`.
 
-For complete real-world examples on writing components, [check out our official components](https://github.com/serverless-components)
+开发过程中，如果希望参考完整的 Components 实现案例，可以通过[官方 Components 仓库](https://github.com/serverless-components)了解其实现方式。
 
-### Development Tips
+### 开发建议
 
-Here are some development tips when it comes to writing Serverless Components:
+当你开始开发 Serverless Components 的时候，这里有一些实用的开发建议：
 
 #### Activate Watch Mode with the `--watch` Flag
 
