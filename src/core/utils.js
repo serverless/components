@@ -59,16 +59,12 @@ const engine = new Proxy(
           return res.data
         } catch (requestError) {
           if (requestError.response) {
-            const { message, stack, code } = requestError.response.data
+            const { status, statusText } = requestError.response
 
-            const backendError = new Error(message)
+            const backendError = new Error(`${status} - ${statusText}`)
 
-            if (stack) {
-              backendError.stack = stack
-            }
-
-            if (code) {
-              backendError.code = code
+            if (requestError.response.stack) {
+              backendError.stack = requestError.response.stack
             }
 
             throw backendError
@@ -143,15 +139,15 @@ const validateComponent = (component) => {
 }
 
 const validateInstance = (instance) => {
-  if (typeof instance.component === 'undefined') {
+  if (typeof instance.component === 'undefined' || !instance.component) {
     throw new Error(`Unable to run component. Missing "component" property.`)
   }
 
-  if (typeof instance.name === 'undefined') {
+  if (typeof instance.name === 'undefined' || !instance.name) {
     throw new Error(`Unable to run component. Missing "name" property.`)
   }
 
-  if (typeof instance.app === 'undefined') {
+  if (typeof instance.app === 'undefined' || !instance.app) {
     throw new Error(`Unable to run component. Missing "app" property.`)
   }
 

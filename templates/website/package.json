@@ -8,9 +8,6 @@
   },
   "license": "MIT",
   "dependencies": {
-    "chart.js": "^2.8.0",
-    "lodash": "^4.17.15",
-    "moment": "^2.24.0",
     "react": "^16.5.2",
     "react-chartjs-2": "^2.7.6",
     "react-dom": "^16.5.2"

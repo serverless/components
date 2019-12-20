@@ -29,6 +29,7 @@ const connect = async (inputs, context) => {
 
   return new Promise((resolve, reject) => {
     const ws = new WebSocket(endpoints.socket)
+
     ws.on('open', () => {
       ws.send(
         JSON.stringify({
@@ -56,8 +57,6 @@ const connect = async (inputs, context) => {
 }
 
 const validate = async (inputs, context) => {
-  // context.status(`Validating`)
-
   if (inputs.component) {
     return validateComponent(inputs.component)
   }
@@ -88,6 +87,11 @@ const build = async (inputs, context) => {
 }
 
 const upload = async (inputs, context) => {
+  // Skip packaging if no "src" input
+  if (!inputs.src) {
+    return inputs
+  }
+
   // remove inputs if not deploying
   if (context.method !== 'deploy') {
     inputs.inputs = {}
@@ -134,8 +138,6 @@ const upload = async (inputs, context) => {
 
 const run = async (inputs, context) => {
   inputs = await validate({ instance: inputs }, context)
-
-  // context.status(`Running`, inputs.name)
 
   const data = {
     ...inputs,
