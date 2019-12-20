@@ -17,7 +17,7 @@ const getEndpoints = () => {
 
   const stages = {
     dev: {
-      http: `https://y6w6rsjkib.execute-api.us-east-1.amazonaws.com/dev`,
+      http: `https://components-api.serverless-dev.com`,
       socket: `wss://kiexxv95i8.execute-api.us-east-1.amazonaws.com/dev`
     },
     prod: {
@@ -227,6 +227,8 @@ const runComponent = async (inputs) => engine.runComponent(inputs)
 
 const getPackageUrls = async (inputs) => engine.getPackageUrls(inputs)
 
+const addConnectionToInstance = async (inputs) => engine.addConnectionToInstance(inputs)
+
 module.exports = {
   sleep,
   pack,
@@ -236,5 +238,6 @@ module.exports = {
   getComponentUploadUrl,
   putComponentPackage,
   runComponent,
-  getPackageUrls
+  getPackageUrls,
+  addConnectionToInstance
 }

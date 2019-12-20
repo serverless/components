@@ -18,14 +18,11 @@ const {
   getComponentUploadUrl,
   putComponentPackage,
   runComponent,
-  getPackageUrls
+  getPackageUrls,
+  addConnectionToInstance
 } = require('./utils')
 
 const connect = async (inputs, context) => {
-  if (!context.debugMode) {
-    return
-  }
-
   context.debug('Establishing streaming connection')
 
   const endpoints = getEndpoints()
@@ -43,11 +40,12 @@ const connect = async (inputs, context) => {
     ws.on('message', (message) => {
       const msg = JSON.parse(message)
       if (msg.event === 'echo') {
+        context.socket = msg.data
         resolve(msg.data)
       } else if (msg.event === 'debug') {
         context.debug(msg.data)
       } else if (msg.event === 'log') {
-        context.log(msg.data)
+        context.log(`${msg.data}`)
       } else if (msg.event === 'status') {
         context.status(msg.data)
       }
@@ -58,7 +56,7 @@ const connect = async (inputs, context) => {
 }
 
 const validate = async (inputs, context) => {
-  context.status(`Validating`)
+  // context.status(`Validating`)
 
   if (inputs.component) {
     return validateComponent(inputs.component)
@@ -137,7 +135,7 @@ const upload = async (inputs, context) => {
 const run = async (inputs, context) => {
   inputs = await validate({ instance: inputs }, context)
 
-  context.status(`Running`, inputs.name)
+  // context.status(`Running`, inputs.name)
 
   const data = {
     ...inputs,
@@ -190,11 +188,22 @@ const publish = async (inputs, context) => {
   context.debug(`Component package uploaded`)
 }
 
+const dev = async (inputs, context) => {
+  const data = {
+    ...inputs,
+    accessKey: context.accessKey,
+    socket: context.socket || {}
+  }
+
+  await addConnectionToInstance(data)
+}
+
 module.exports = {
   connect,
   validate,
   build,
   upload,
   run,
-  publish
+  publish,
+  dev
 }

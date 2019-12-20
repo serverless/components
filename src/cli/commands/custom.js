@@ -28,11 +28,15 @@ module.exports = async (context) => {
 
   serverlessYmlFile = await build(serverlessYmlFile, context)
 
-  const res = await Promise.all([connect({}, context), upload(serverlessYmlFile, context)])
+  const promises = [upload(serverlessYmlFile, context)]
 
-  context.socket = res[0]
+  if (context.debugMode) {
+    promises.push(connect({}, context))
+  }
 
-  serverlessYmlFile = res[1]
+  const res = await Promise.all(promises)
+
+  serverlessYmlFile = res[0]
 
   context.status('Running', serverlessYmlFile.name)
 

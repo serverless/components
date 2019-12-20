@@ -142,7 +142,7 @@ class Context {
     process.stdout.write(ansiEscapes.eraseDown)
 
     // Write log
-    console.log(`${msg}`) // eslint-disable-line
+    process.stdout.write(`${msg}`) // eslint-disable-line
 
     // Put cursor to starting position for next view
     process.stdout.write(ansiEscapes.cursorLeft)
