@@ -59,16 +59,12 @@ const engine = new Proxy(
           return res.data
         } catch (requestError) {
           if (requestError.response) {
-            const { message, stack, code } = requestError.response.data
+            const { status, statusText } = requestError.response
 
-            const backendError = new Error(message)
+            const backendError = new Error(`${status} - ${statusText}`)
 
-            if (stack) {
-              backendError.stack = stack
-            }
-
-            if (code) {
-              backendError.code = code
+            if (requestError.response.stack) {
+              backendError.stack = requestError.response.stack
             }
 
             throw backendError

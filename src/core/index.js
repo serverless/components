@@ -32,6 +32,7 @@ const connect = async (inputs, context) => {
 
   return new Promise((resolve, reject) => {
     const ws = new WebSocket(endpoints.socket)
+
     ws.on('open', () => {
       ws.send(
         JSON.stringify({
