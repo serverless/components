@@ -90,6 +90,9 @@ const build = async (inputs, context) => {
 }
 
 const upload = async (inputs, context) => {
+  // Skip packaging if no "src" input
+  if (!inputs.src) return inputs
+
   // remove inputs if not deploying
   if (context.method !== 'deploy') {
     inputs.inputs = {}
@@ -163,7 +166,7 @@ const publish = async (inputs, context) => {
   const entity = `${inputs.name}@${inputs.version}`
 
   context.status(`Publishing`, entity)
-
+  console.log(inputs)
   // Get Component path and temporary path for packaging
   const componentPackagePath = path.join(
     tmpdir(),

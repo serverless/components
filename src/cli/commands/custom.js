@@ -31,7 +31,6 @@ module.exports = async (context) => {
   const res = await Promise.all([connect({}, context), upload(serverlessYmlFile, context)])
 
   context.socket = res[0]
-
   serverlessYmlFile = res[1]
 
   context.status('Running', serverlessYmlFile.name)

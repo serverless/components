@@ -7,6 +7,7 @@ module.exports = async () => {
   const config = {}
   config.method = args._[0] || 'deploy'
   config.debug = args.debug ? true : false
+  config.debug = process.env.SLS_DEBUG || config.debug
   config.timer = commands[config.method] ? false : true
   config.credentials = getCredentials()
 
