@@ -166,7 +166,7 @@ const publish = async (inputs, context) => {
   const entity = `${inputs.name}@${inputs.version}`
 
   context.status(`Publishing`, entity)
-  console.log(inputs)
+
   // Get Component path and temporary path for packaging
   const componentPackagePath = path.join(
     tmpdir(),
