@@ -88,7 +88,7 @@ const build = async (inputs, context) => {
 
 const upload = async (inputs, context) => {
   // Skip packaging if no "src" input
-  if (!inputs.src) {
+  if (!inputs.inputs.src) {
     return inputs
   }
 
