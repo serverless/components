@@ -2,6 +2,11 @@
 
 <br/>
 
+<p align="center">
+  <span>English</span> |
+  <a href="./README_CN.md">简体中文</a>
+</p>
+
 Build, compose, & deploy serverless apps in seconds with **Serverless Components**, the **[Serverless Framework's](https://github.com/serverless/serverless)** new infrastructure provisioning technology.
 
 - - [x] **Speed -** The fastest way to deploy serverless infra and apps.

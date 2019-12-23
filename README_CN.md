@@ -2,6 +2,11 @@
 
 <br/>
 
+<p align="center">
+  <span>简体中文</span> |
+  <a href="./README.md">English</a>
+</p>
+
 **Serverless Components** 是 **[Serverless Framework](https://github.com/serverless/serverless/blob/master/README_CN.md)** 重磅推出的基础设置编排能力，支持开发者通过 **Serverless Components** 构建，组合并部署你的 Serverless 应用。
 
 - - [x] **快速部署 -** Components 支持极速部署 Serverless 架构和应用
@@ -23,6 +28,7 @@ website:
       # hook: npm run build
       # domain: www.serverlesscomponents.com
 ```
+
 <!--
 [^ Watch a video guide on using a Serverless Component here](https://www.youtube.com/watch?v=ts26BVuX3j0).
 -->
@@ -55,6 +61,7 @@ website:
 ```console
 $ npm i -g serverless
 ```
+
 **确保你使用的是 Serverless Framework 1.49 及以上的版本**。更早的版本无法支持 Serverless Components Beta。
 
 之后，通过 `create --template-url` 命令安装一个 [Serverless Components 模板](./templates)，模板中会包含了 Componenets 及示例代码，可以让你更快的了解 Component。
@@ -95,7 +102,7 @@ serverless create --template-url https://github.com/serverless/components/tree/m
 
 #### [部署其他模板](./templates)
 
-[在这里查看所有预设的 Components 模板](./templates)，你可以通过这些模板方便的部署_REST API_， 网站, _定时任务_等多种场景。每个模板都提供了清晰的 `README.md` 来说明怎样使用。
+[在这里查看所有预设的 Components 模板](./templates)，你可以通过这些模板方便的部署*REST API*， 网站, *定时任务*等多种场景。每个模板都提供了清晰的 `README.md` 来说明怎样使用。
 
 此外，所有的 Serverless Components 可都在这个 [Github 仓库](https://github.com/serverless-components/)里。
 
@@ -123,7 +130,7 @@ website:
       - host: www.serverless-app.com
 ```
 
-- 一个 **Express 框架**，通过腾讯云云函数 SCF 以及 API 网关服务，支持 Node.js 的 Express 框架，支持 HTTPS API 访问。 
+- 一个 **Express 框架**，通过腾讯云云函数 SCF 以及 API 网关服务，支持 Node.js 的 Express 框架，支持 HTTPS API 访问。
 
 ```yaml
 # serverless.yml
@@ -142,7 +149,7 @@ api:
 
 ### 可复用
 
-Serverless Components 可以通过 YAML 中的配置灵活组合 (`serverless.yml`)，这些配置是通过可复用的 javascrpt 库实现的（`serverless.js`），实现语法简单，设计思想受到了组件化的开发框架如  React 的启发。
+Serverless Components 可以通过 YAML 中的配置灵活组合 (`serverless.yml`)，这些配置是通过可复用的 javascrpt 库实现的（`serverless.js`），实现语法简单，设计思想受到了组件化的开发框架如 React 的启发。
 
 ```javascript
 // serverless.js
@@ -195,7 +202,6 @@ Serverless Components 既可以提供基础设施服务（例如，[对象存储
 
 开发 Serverless Components 的语法可以直接调用和封装低维度的组件，并且部署对应的资源。这样的设计可以让你无需考虑底层基础设施的配置，快速构建更高阶的组件。
 
-
 Serverless Components 可以通过**声明**的方式使用（通过 `serverless.yml` 文件），也可以通过**编程**的方式使用（通过 `serverless.js` 文件）。
 
 如果你希望尽可能简单快速的部署一个 Serverless 应用，并且不会复用这个组件的话，那么用声明的方式来调用组件就可以满足你的需求。
@@ -236,7 +242,7 @@ $ serverless --watch # 检测变更，并且重新部署
 ```
 -->
 
-当你使用 `serverless.yml` 来调用 Serverless Components 的时候，不需要安装额外的依赖，而在部署的时候  `serverless.yml` 中使用的 Serverless Components 会被自动下载，并且存储在你的本地环境中。这样 Serverless Components 会被缓存在特定的位置，所以你的项目目录中不会直接存储 Serverless Components 依赖，并且 Serverless Components 也不需要被多次下载。
+当你使用 `serverless.yml` 来调用 Serverless Components 的时候，不需要安装额外的依赖，而在部署的时候 `serverless.yml` 中使用的 Serverless Components 会被自动下载，并且存储在你的本地环境中。这样 Serverless Components 会被缓存在特定的位置，所以你的项目目录中不会直接存储 Serverless Components 依赖，并且 Serverless Components 也不需要被多次下载。
 
 Serverless Components 通过 [NPM](https://www.npmjs.com/) 进行发布，因此当它们被下载时，后台会默认通过 NPM 安装对应的模块。
 
@@ -280,7 +286,6 @@ website:
 
 你可以在 `serverless.yml` 中引用这些 `outputs` 对象，并且把返回值传入到其他组件中，比如下面的例子
 
-
 ```yml
 backend:
   component: '@serverless/tencent-express'
@@ -317,7 +322,7 @@ Upon deployment, if a `.env` file exists, Serverless Components will add the con
 
 #### 腾讯云账号配置
 
-> 注：当前腾讯云支持通过`微信`扫描二维码一键授权登录/注册，扫码生成的临时秘钥文件为  `.env_temp` ，但目前该秘钥最长可以支持 30 天有效期授权，过期需要重新授权。如果需要持久秘钥或者在角色中提供了其他权限控制，也可以通过下面方式填写 `.env` 文件进行持久授权。
+> 注：当前腾讯云支持通过`微信`扫描二维码一键授权登录/注册，扫码生成的临时秘钥文件为 `.env_temp` ，但目前该秘钥最长可以支持 30 天有效期授权，过期需要重新授权。如果需要持久秘钥或者在角色中提供了其他权限控制，也可以通过下面方式填写 `.env` 文件进行持久授权。
 
 ```bash
 TENCENT_SECRET_ID=123456789
@@ -361,6 +366,7 @@ backend:
 ```
 npm i --save @serverless/core
 ```
+
 创建一个新的 `serverless.js` 文件，扩展 Component 类，并且增加一个 `default` 方法，这样就实现了一个最基本的 Serverless Component，如下所示：
 
 ```javascript
@@ -379,7 +385,7 @@ module.exports = MyComponent
 
 `default()` 方法是必须的，它构成了 Component 调用和构建的基本逻辑。当你运行 `$ serverless` 命令时，总是会先调用 `default()` 方法。
 
-你也可以在类下面增加一些其他的方法，比如 `remove()` 经常是下一个需要支持的逻辑，这个方法支持你的 Serverless Component 将创建的云上资源移除掉。 
+你也可以在类下面增加一些其他的方法，比如 `remove()` 经常是下一个需要支持的逻辑，这个方法支持你的 Serverless Component 将创建的云上资源移除掉。
 
 你也可以增加更多的方法，这种方式比较灵活，你可以通过 Component 实现更多自动化的方法，而不仅仅是 _部署_ 和 _移除_ 的逻辑。
 
@@ -497,7 +503,7 @@ class MyComponent extends Component {
 module.exports = MyComponent
 ```
 
-在包含 `serverless.js` 文件的目录下运行 `serverless` 命令来运行你写的 component，你会看到其所有的日志和输出信息。除非你使用 `serverless --debug` debug模式，否则你所依赖/调用的 components 的日志和输出则不会展示出来。你也可以通过 `serverless <methodName>` 来运行一些自定义的方法/命令。
+在包含 `serverless.js` 文件的目录下运行 `serverless` 命令来运行你写的 component，你会看到其所有的日志和输出信息。除非你使用 `serverless --debug` debug 模式，否则你所依赖/调用的 components 的日志和输出则不会展示出来。你也可以通过 `serverless <methodName>` 来运行一些自定义的方法/命令。
 
 开发过程中，如果希望参考完整的 Components 实现案例，可以通过[官方 Components 仓库](https://github.com/serverless-components)了解其实现方式。
 
@@ -517,7 +523,6 @@ module.exports = MyComponent
 
 很多 Serverless Components 都支持 debug 参数，用来上报组件当前在做什么，是怎样的状态。我们建议你在开发自己的 Component 的时候也可以加上 debug 的声明，如下所示：
 
-
 ```javascript
 class MyComponent extends Component {
   async default() {
@@ -531,7 +536,7 @@ class MyComponent extends Component {
 
 #### 使用本地引用
 
-在开发自己的 Serverless Component 时，你可以通过 `serverless.yml` 或者 `serverless.js` 本地引用自己的 Component，需要注意的是，文件目录中只能存在一个 `serverless.yml` 或者 `serverless.js` 文件，并且没有办法同时存在 `serverless.yml` 和 `serverless.js` 文件。 
+在开发自己的 Serverless Component 时，你可以通过 `serverless.yml` 或者 `serverless.js` 本地引用自己的 Component，需要注意的是，文件目录中只能存在一个 `serverless.yml` 或者 `serverless.js` 文件，并且没有办法同时存在 `serverless.yml` 和 `serverless.js` 文件。
 
 下面例子展示了怎样在 `serverless.yml` 中引用一个本地的组件：
 
@@ -564,14 +569,14 @@ class myFirstComponent extends Component {
 
 #### 结果是你的优势
 
-对基础设施的服务进行配置其实非常复杂，因此市面上也有非常多的配置工具会支持所有的配置和组合方式（例如 AWS 的 Cloudformation等），但 Serverless Components 和他们相比，最有力的优势就是它知道自己需要提供什么样的具体场景。
+对基础设施的服务进行配置其实非常复杂，因此市面上也有非常多的配置工具会支持所有的配置和组合方式（例如 AWS 的 Cloudformation 等），但 Serverless Components 和他们相比，最有力的优势就是它知道自己需要提供什么样的具体场景。
 
 关于软件部署工具，我们学到一个非常重要的方面就是，一旦你知道自己希望得到场景，你就可以据此创造出一个更好的工具。
 
 Components 了解用户场景，基于场景，你可以实现如下几点：
 1）更加可靠的配置基础设施，因为你对于自己希望的效果和配置方案十分清晰，所以可以采用最简洁优雅的方案配置。
 2）更快的配置基础设施
-3）通过给 Components 增加自定义的方法，针对特定的用例实现自动化的配置。 
+3）通过给 Components 增加自定义的方法，针对特定的用例实现自动化的配置。
 
 #### 将大部分状态存在云服务商中
 
