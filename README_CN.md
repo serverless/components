@@ -39,7 +39,7 @@ website:
   - [账号配置](#账号配置)
   - [环境变量](#环境变量)
 - [开发 Components](#开发-Components)
-  - [Serverless.js 介绍](#serverlessjs-basics)
+  - [Serverless.js 介绍](#Serverless.js-介绍)
   - [开发建议](#开发建议)
 - [目前支持的 Components](https://github.com/serverless-components)
 - [用例模板](./templates)
@@ -202,7 +202,7 @@ Serverless Components 可以通过**声明**的方式使用（通过 `serverless
 
 如果你希望构建一个可复用的组件，那么应该用编程的方式来使用这些基础的组件，并且快速构建自己的 Serverless 应用。
 
-在[使用 Components](#using-components) 这一章，我们会主要讲解声明式的体验（`serverless.yml`）；而在[开发 Components](#building-components) 这一章，我们会着重说明编程式的体验（`serverless.js`）。
+在[使用 Components](#使用-Components) 这一章，我们会主要讲解声明式的体验（`serverless.yml`）；而在[开发 Components](#开发-Components) 这一章，我们会着重说明编程式的体验（`serverless.js`）。
 
 <br/>
 
