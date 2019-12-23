@@ -285,7 +285,7 @@ website:
 
 ```yml
 backend:
-  component: '@serverless/backend@1.0.2'
+  component: '@serverless/tencent-express'
   inputs:
     code:
       src: ./src
@@ -294,7 +294,7 @@ backend:
       dbRegion: ${database.region}
 
 database:
-  component: '@serverless/aws-dynamodb@4.3.1'
+  component: '@serverless/tencent-postgresql'
   inputs:
     name: users-database
 ```
@@ -326,15 +326,15 @@ TENCENT_SECRET_ID=123456789
 TENCENT_SECRET_KEY=123456789
 ```
 
-Components could access these AWS credentials using `this.context.credentials.aws`. This object would look like this:
+Components could access these Tencent credentials using `this.context.credentials.tencent`. This object would look like this:
 
 <!--@yuga do you have any good demo instead of this? -->
 
 ```js
 {
-  accessKeyId: '123456789',
-  secretAccessKey: '123456789',
-  region: 'us-east-1'
+  secret_id: '123456789',
+	secret_key: '123456789',
+  region: 'ap-guangzhou'
 }
 ```
 
@@ -344,7 +344,7 @@ Components could access these AWS credentials using `this.context.credentials.aw
 
 ```yml
 backend:
-  component: '@serverless/backend'
+  component: '@serverless/tencent-express'
   inputs:
     code:
       src: ./src
@@ -437,7 +437,7 @@ module.exports = MyComponent
 
 <!--@yuga do you have any good demo instead of this? -->
 
-在 Component 方法里，`this` 指的是一些可用的实体，下面有一些指南可以展示出在 Component 方法中哪些语义是可用的。(?????)
+在 Component 方法里，`this` 指的是一些可用的工具实例，下面有一些指南可以展示出在 Component 方法中哪些语法是可用的。
 
 ```javascript
 // serverless.js
@@ -452,11 +452,11 @@ class MyComponent extends Component {
     // Common provider credentials are identified in the environment or .env file and added to this.context.credentials
     // when you run "components", then the credentials in .env will be used
     // when you run "components --stage prod", then the credentials in .env.prod will be used...etc
-    // if you don't have any .env files, then global aws credentials will be used
-    const dynamodb = new AWS.DynamoDB({ credentials: this.context.credentials.aws })
+    // if you don't have any .env files, then global tencent credentials will be used
+    const tencentCredentials = this.context.credentials.tencent
 
     // You can easily create a random ID to name cloud infrastructure resources with using this utility.
-    const s3BucketName = `my-bucket-${this.context.resourceId()}`
+    const bucketName = `my-bucket-${this.context.resourceId()}`
     // This prevents name collisions.
 
     // Components have built-in state storage.
@@ -465,16 +465,16 @@ class MyComponent extends Component {
     await this.save()
 
     // Here is how to load a child Component.
-    // This assumes you have the "@serverless/website" component in your "package.json" file and you've run "npm install"
-    let website = await this.load('@serverless/website')
+    // This assumes you have the "@serverless/tencent-website" component in your "package.json" file and you've run "npm install"
+    let website = await this.load('@serverless/tencent-website')
 
     // You can run the default method of a child Component two ways:
-    let websiteOutputs = website({ code: { src: './src' } })
-    let websiteOutputs = website.default({ code: { src: './src' } })
+    let websiteOutputs = await website({ code: { src: './src' } })
+    let websiteOutputs = await website.default({ code: { src: './src' } })
 
     // If you are deploying multiple instances of the same Component, include an instance id.
-    let website1 = await this.load('@serverless/website', 'website1')
-    let website2 = await this.load('@serverless/website', 'website2')
+    let website1 = await this.load('@serverless/tencent-website', 'website1')
+    let website2 = await this.load('@serverless/tencent-website', 'website2')
 
     // Child Components save their state automatically.
 
@@ -557,7 +557,7 @@ myComponent:
 ```javascript
 class myFirstComponent extends Component {
   default() {
-    const mySecondComponent = this.load('../components/my-second-component')
+    const mySecondComponent = await this.load('../components/my-second-component')
   }
 }
 ```
