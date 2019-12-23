@@ -387,11 +387,11 @@ module.exports = MyComponent
 
 你也可以增加更多的方法，这种方式比较灵活，你可以通过 Component 实现更多自动化的方法，而不仅仅是 _部署_ and _移除_ 的逻辑。
 
-You can use the `serverless --watch` flag when you run any method. This would keep watching for changes in the current working directory, and rerun your method if changes are detected. So you could also do `serverless remove --watch` for example.
+当你运行任何一个命令时，可以使用 `serverless --watch` 参数，这个参数支持检测当前工作目录下的改动，并且在检测到改动时重新运行该命令。所以你也可以增加对 `serverless remove --watch`的支持。
 
-It's still early days for Serverless Components, but we are starting to work on Components that ship with their own `test()` function, or their own `logs()` and `metrics()` functions, or `seed()` for establishing initial values in a database Component. Overall, there is a lot of opportunity here to deliver outcomes that are loaded with useful automation.
+目前 Serverless Components 依然在较为早期的阶段，但我们正在对 `test()` 方法，或者是 `logs()` 和 `metrics()` 等方法做支持，也可能会支持 `seed()` 方法，用于在数据库 Component 中生成初始值。因此 Components 有非常多的机会可以提供更加完善的场景支持，并且将这一过程更加自动化
 
-All methods other than the `default()` method are optional. All methods take a single `inputs` object, not individual arguments, and return a single `outputs` object.
+除了 `default()` 方法之外，所有其他的方法都是可选的。所有的方法都以一个 `inputs` 对象作为输入，而不是单独的参数；并且返回一个 `outputs` 对象。
 
 下面例子展示了 `remove` 方法的实现，也展示了自定义方法的实现方式：
 
@@ -503,7 +503,7 @@ class MyComponent extends Component {
 module.exports = MyComponent
 ```
 
-Just run `serverless` in the directory that contains the `serverless.js` file to run your new component. You'll will see all the logs and outputs of your new component. Logs and outputs of any child component you use will not be shown, unless you run in debug mode: `serverless --debug`. You can also run any custom method/command you've defined with `serverless <methodName>`.
+在包含 `serverless.js` 文件的目录下运行 `serverless` 命令来运行你写的 component，你会看到其所有的日志和输出信息。除非你使用 `serverless --debug` debug模式，否则你所依赖/调用的 components 的日志和输出则不会展示出来。你也可以通过 `serverless <methodName>` 来运行一些自定义的方法/命令。
 
 开发过程中，如果希望参考完整的 Components 实现案例，可以通过[官方 Components 仓库](https://github.com/serverless-components)了解其实现方式。
 
@@ -511,17 +511,20 @@ Just run `serverless` in the directory that contains the `serverless.js` file to
 
 当你开始开发 Serverless Components 的时候，这里有一些实用的开发建议：
 
-#### Activate Watch Mode with the `--watch` Flag
+#### 使用 `--watch` 参数启动监听模式
 
-During development, it's super helpful to keep the terminal running with `serverless --watch` (or with any method other than the default) while you develop your component. This way you get instant feedback and reduce friction.
+在开发过程中，运行各个方法时，使用 `serverless --watch` 让终端持续运行是非常有帮助的，因为这样可以拿到及时的反馈，减少开发的阻碍。
 
-#### Use Debug Statements and the `--debug` Flag
+#### 使用 `--debug` 参数启动调试状态
 
 The Serverless Components CLI experience is intentionally minimal. But if you ever want to see what Components are doing behnd the scenes, use the `--debug` flag when you run a Component. You'll see output like this:
 
-![Serverless Components Debugging](https://s3.amazonaws.com/assets.github.serverless/components/serverless_components_debugging.png)
+为了更优雅的体验， Serverless Components CLI 的命令十分简单，但是如果你希望知道在运行时究竟发生了什么，就在部署时使用 `--debug` 参数，则会得到如下的输出：
 
-Many Serverless Components include debug statements to report what work they are doing. We recommend you add debug statements into your Component as well. Just use this:
+![Serverless Components Debugging](https://img.serverlesscloud.cn/20191222/1577035892816-zip-pic-debug.jpeg)
+
+很多 Serverless Components 都支持 debug 参数，用来上报组件当前在做什么，是怎样的状态。我们建议你在开发自己的 Component 的时候也可以加上 debug 的声明，如下所示：
+
 
 ```javascript
 class MyComponent extends Component {
@@ -534,11 +537,11 @@ class MyComponent extends Component {
 }
 ```
 
-#### Use Local References
+#### 使用本地引用
 
-When writing a Serverless Component, you can reference it locally via a `serverless.yml`, or another `serverless.js`. Keep in mind, a directory can only contain 1 `serverless.yml` or `serverless.js`. A directory cannot contain a both a `serverless.yml` and a `serverless.js`.
+在开发自己的 Serverless Component 时，你可以通过 `serverless.yml` 或者 `serverless.js` 本地引用自己的 Component，需要注意的是，文件目录中只能存在一个 `serverless.yml` 或者 `serverless.js` 文件，并且没有办法同时存在 `serverless.yml` 和 `serverless.js` 文件。 
 
-Here's how to reference a local Component via `serverless.yml`:
+下面例子展示了怎样在 `serverless.yml` 中引用一个本地的 component：
 
 ```yaml
 name: my-project
@@ -549,7 +552,7 @@ myComponent:
     foo: bar
 ```
 
-Here's how to reference a local Component via `serverless.js`:
+下面例子展示了怎样在 `serverless.js` 中引用一个本地的 component：
 
 ```javascript
 class myFirstComponent extends Component {
@@ -559,34 +562,37 @@ class myFirstComponent extends Component {
 }
 ```
 
-#### Start With The Outcome
+#### 结果导向/自顶向下
 
-When making a Serverless Component, it can be tempting to break it down into several levels of child Components, to maintain separation of concerns and increase the ways your work could be re-used.
+在开发自己的 Serverless Component 时，可以比较容易的将其分解成不同层级的 Components，这样可以保持结构的解耦，并且增加自己组件的可复用性。
 
-However, provisioning back-end logic can be more complicated than designing a front-end React Component. We've learned over-optimizing for granular separation of concerns is a fast way to burn yourself out!
+然而，提供后端逻辑比设计 React 这样的前端组件要复杂得多。如果太过关注结构并且对其过度优化，那很可能让你精疲力尽。
 
-We recommend starting with a focus on your desired outcome. Create one Serverless Component that solves that problem first. After you've achieved your initial goal, then start breaking it down into child Components.
+因此我们建议你从结果入手，关注点更多在于你希望提供的结果是怎样的，并且创建这个 Component 的首要目的是解决你的问题。在完成最初的目标之后，再去做结构优化，将其分解成为不同层级的 Components。
 
-#### The Outcome Is Your Advantage
+#### 结果是你的优势
 
-Provisioning infrastructure can be quite complicated. However, Serverless Components have one powerful advantage over general infrastructure provision tools that seek to enable every possible option and combination (e.g. AWS Cloudformation) — Serverless Components know the specific use-case they are trying to deliver.
+对基础设施的服务进行配置其实非常复杂，因此市面上也有非常多的配置工具会支持所有的配置和组合方式（例如 AWS 的 Cloudformation等），但 Serverless Components 和他们相比，最有力的优势就是它知道自己需要提供什么样的具体场景。
 
-One of the most important lessons we've learned about software development tools is that once you know the use-case, you can create a much better tool.
+关于软件部署工具，我们学到一个非常重要的方面就是，一旦你知道自己希望得到场景，你就可以据此创造出一个更好的工具。
 
-Components know their use-case. You can use that knowledge to: 1) provision infrastructure more reliably, because you have a clear provisioning path and you can program around the pitfalls. 2) provision infrastructure more quickly 3) add use-case specific automation to your Component in the form of custom methods.
+Components 了解用户场景，基于场景，你可以实现如下几点：
+1）更加可靠的配置基础设施，因为你对于自己希望的效果和配置方案十分清晰，所以可以采用最简洁优雅的方案配置。
+2）更快的配置基础设施
+3）通过给 Components 增加自定义的方法，针对特定的用例实现自动化的配置。 
 
-#### Keep Most State On The Cloud Provider
+#### 将大部分状态存在云服务商中
 
-Serverless Components save remarkably little state. In fact, many powerful Components have less than 10 properties in their state objects.
+Serverless Components 节省了很多状态信息。事实上，很多功能强大的 Components 在其状态对象中也只有不到 10 个属性。
 
-Components rely on the state saved within the cloud services they use as the source of truth. This prevents drift issues that break infrastructure provisioning tools. It also opens up the possibility of working with existing resources, that were not originally managed by Serverless Components.
+Components 依赖云服务作为状态的来源，并用其存储状态信息。这样可以防止服务出现状态转移，从而影响基础设施配置工具。这样做也可以支持 Components 使用已有的云资源，也就是那些一开始不是由 Components 创建的资源，用于迁移等场景。
 
-#### Store State Immediately After A Successful Operation
+#### 操作成功后立即存储状态信息
 
-If you do need to store state, try to store it immediately after a successful operation. This way, if anything after that operation fails, your Serverless Component can pick up where it left off, when the end user tries to deploy it again.
+如果你确实需要存储状态，那么试着在一次成功的部署后立即存储状态信息。用这种方式，如果后续的部署和操作中有发生失败的情况，终端客户需要再次部署的时候，你的 Serverless Component 可以从中断的地方开始继续部署。这样也减少了冗余资源的创建。
 
-#### Optimize For Accessibility
+#### 易用性优化
 
-We believe serverless infrastructure and architectures will empower more people to develop software than ever before.
+我们相信 serverless 的基础设施和架构可以让更多人拥有更强大的能力来开发软件。
 
-Because of this, we're designing all of our projects to be as approachable as possible. Please try to use simple, vanilla Javascript. Additionally, to reduce security risks and general bloat, please try to use the least amount of NPM dependencies as possible.
+正因如此，我们将我们所有的项目设计的尽可能的易于理解和学习。请尝试使用简单的，原始的 Javascript 语法。此外，为了减少安全风险和依赖的复杂度，请您尽可能少的使用 NPM 依赖。
