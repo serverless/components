@@ -66,7 +66,7 @@ $ npm i -g serverless
 通过 Serverless Website 组件快速构建一个 Serverless Hexo 站点
 
 ```shell
-serverless create --template-url https://github.com/serverless/components/tree/master/templates/website
+serverless create --template-url https://github.com/serverless/components/tree/master/templates/tencent-hexo-blog
 ```
 
 #### [快速构建 REST API](https://github.com/serverless/components/tree/master/templates/tencent-python-rest-api)
