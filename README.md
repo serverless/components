@@ -567,7 +567,7 @@ During development, it's super helpful to keep the terminal running with `server
 
 #### Use Debug Statements and the `--debug` Flag
 
-The Serverless Components CLI experience is intentionally minimal. But if you ever want to see what Components are doing behand the scenes, use the `--debug` flag when you run a Component. You'll see output like this:
+The Serverless Components CLI experience is intentionally minimal. But if you ever want to see what Components are doing behind the scenes, use the `--debug` flag when you run a Component. You'll see output like this:
 
 ![Serverless Components Debugging](https://s3.amazonaws.com/assets.github.serverless/components/serverless_components_debugging.png)
 
