@@ -34,16 +34,16 @@ website:
 - [概述](#overview)
 - [使用 Components](#using-components)
   - [Serverless.yml 介绍](#serverlessyml-basics)
-  - [输入](#inputs)
-  - [输出](#outputs)
-  - [账号配置](#credentials)
+  - [输入](#输入)
+  - [输出](#输出)
+  - [账号配置](#账号配置)
   - [环境变量](#environment-variables)
 - [开发 Components](#building-components)
   - [Serverless.js 介绍](#serverlessjs-basics)
   - [开发建议](#development-tips)
 - [目前支持的 Components](https://github.com/serverless-components)
 - [用例模板](./templates)
-- [中文技术社区]](https://serverlesscloud.cn/)
+- [中文技术社区](https://serverlesscloud.cn/)
 - [后续规划](https://github.com/serverless/components/projects/1)
 
 <br/>
@@ -174,7 +174,7 @@ module.exports = MyBlog
 
 Serverless Components 倾向于支持 Serverless 化的云服务，为了提供更好的产品体验，Serverless 化的云产品支持用户按需付费，无需付费即可享受到最好的服务。
 
-Serverless Components 的设计是非云厂商绑定的，支持你方便的使用不同云厂商的不同服务。例如 腾讯云云函数 SCF，对象存储 COS 服务，AWS 的 Lmabda 服务，Azure Functions，Twilio，Stripe, Algolia, Cloudflare Workers 等。
+Serverless Components 的设计是非云厂商绑定的，支持你方便的使用不同云厂商的不同服务。例如 腾讯云云函数 SCF，对象存储 COS 服务，AWS 的 Lmabda 服务，Azure Functions，Twilio，Stripe，Algolia，Cloudflare Workers 等。
 
 ### Vanilla Javascript
 
@@ -259,7 +259,7 @@ website: # Component 实例
 
 **注意：** 在 Component Beta 版本中，目前不能在已有的 Serverless Framework 项目中使用 Component，比如项目中已有 `functions`， `events`， `resources` 或者 `plugins`等属性的时候。
 
-### Inputs
+### 输入
 
 每个 Serverless Component 都有一个用于部署的主函数，也就是 `default()` 函数（你也可以在 “开发 Components” 这一章来了解更多相关信息）。这个 `default()` 函数会把 `inputs` 内的参数作为输入。
 
@@ -275,7 +275,7 @@ website:
       src: ./src
 ```
 
-### Outputs
+### 输出
 
 当 Component 的函数（例如上文中的 `default()` 函数）运行完成后，会返回一些 `outputs` 对象。
 
@@ -303,7 +303,7 @@ database:
 
 上面的例子也同时告诉了 Serverless Framework 模块之间的依赖关系，因此 Framework 会根据这些关系构建有向图，并且按照先后依赖顺序来进行部署。也正因此，当前不支持循环引用，如果出现循环引用 Framework 会报错。
 
-### 秘钥配置
+### 账号配置
 
 在部署时，无论是使用 `serverless.yml` 还是 `serverless.js`，Serverless Components 会在当前目录寻找 `.env` 或者 `.env_temp` 文件。
 
@@ -317,7 +317,7 @@ Upon deployment, if a `.env` file exists, Serverless Components will add the con
 
 以下是目前支持的秘钥配置：
 
-#### 腾讯云秘钥配置
+#### 腾讯云账号配置
 
 > 注：当前腾讯云支持通过`微信`扫描二维码一键授权登录/注册，扫码生成的临时秘钥文件为  `.env_temp` ，但目前该秘钥最长可以支持 30 天有效期授权，过期需要重新授权。如果需要持久秘钥或者在角色中提供了其他权限控制，也可以通过下面方式填写 `.env` 文件进行持久授权。
 
@@ -326,7 +326,7 @@ TENCENT_SECRET_ID=123456789
 TENCENT_SECRET_KEY=123456789
 ```
 
-Components could access these Tencent credentials using `this.context.credentials.tencent`. This object would look like this:
+Components 也可以通过 `this.context.credentials.tencent` 来获取腾讯云的秘钥配置，返回的格式如下所示：
 
 <!--@yuga do you have any good demo instead of this? -->
 
