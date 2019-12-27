@@ -9,7 +9,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint . --fix --cache"
+    "lint": "eslint . --fix --cache",
+    "prettify": "prettier --write --ignore-path .gitignore \"**/*.{css,html,js,json,md,yaml,yml}\""
   },
   "author": "Serverless, Inc.",
   "license": "MIT",

@@ -11,11 +11,9 @@ const Home = () => (
 
     <Nav />
 
-    <div className='hero'>
-      <h1 className='title'>Welcome to Serverless Next.js!</h1>
-      <p className='description'>
-        This runs on AWS Lambda@Edge.
-      </p>
+    <div className="hero">
+      <h1 className="title">Welcome to Serverless Next.js!</h1>
+      <p className="description">This runs on AWS Lambda@Edge.</p>
     </div>
 
     <style jsx>{`

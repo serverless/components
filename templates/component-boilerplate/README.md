@@ -8,7 +8,7 @@ Serverless Components can be used declaratively (via `serverless.yml`) as well a
 
 If you want to build a Serverless Component that you would like to re-use, write it programmatically, using `serverless.js`, which is featured in this boilerplate.
 
-If you want to compose existing Serverless Components to build an application for yourself, you could use `serverless.js`, but you can also use `serverless.yml` to do this more easily.  Look at the other templates for `serverless.yml` examples.
+If you want to compose existing Serverless Components to build an application for yourself, you could use `serverless.js`, but you can also use `serverless.yml` to do this more easily. Look at the other templates for `serverless.yml` examples.
 
 &nbsp;
 
@@ -18,7 +18,6 @@ If you want to compose existing Serverless Components to build an application fo
 4. [Deploy](#4-deploy)
 
 &nbsp;
-
 
 ### 1. Install
 
@@ -42,7 +41,7 @@ Run this boilerplate Component (and any Serverless Component) via the `serverles
 $ serverless
 ```
 
-This boilerplate gives you helpful tips when you run it.  Also try running it with the `--debug` flag:
+This boilerplate gives you helpful tips when you run it. Also try running it with the `--debug` flag:
 
 ```console
 $ serverless --debug
@@ -62,10 +61,9 @@ myComponent:
   inputs:
     firstInput: firstExampleValue
     secondInput: secondExampleValue
-
 ```
 
-Run the `serverless` command to see it in action.  Don't forget to put `this.context.debug()` statements in your Component, which you can see when you run `serverless --debug` when running the YAML file:
+Run the `serverless` command to see it in action. Don't forget to put `this.context.debug()` statements in your Component, which you can see when you run `serverless --debug` when running the YAML file:
 
 ```console
 $ serverless --debug

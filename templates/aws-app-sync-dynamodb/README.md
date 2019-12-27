@@ -17,7 +17,6 @@ This is a great architecture if you want to build a GraphQL API, without having 
 
 &nbsp;
 
-
 ### 1. Install
 
 Install the [Serverless Framework](https://www.github.com/serverless/serverless):
@@ -49,11 +48,9 @@ Use the `--debug` flag if you'd like to learn what's happening behind the scenes
 $ serverless --debug
 ```
 
-
 ### 3. Use your API
 
 On the client, the API key is specified by the header x-api-key.
-
 
 For example, you can send a GraphQL query via curl as follows:
 

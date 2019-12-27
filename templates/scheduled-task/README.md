@@ -15,7 +15,6 @@ It uses the [Schedule Component](https://www.github.com/serverless-components/sc
 
 &nbsp;
 
-
 ### 1. Install
 
 Install the [Serverless Framework](https://www.github.com/serverless/serverless):

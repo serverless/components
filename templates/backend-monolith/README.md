@@ -2,7 +2,7 @@
 
 &nbsp;
 
-This is a template for deploying a serverless API with a monolithic architecture via the [Backend Component](https://www.github.com/serverless-components/backend).  It consists of 1 AWS Lambda Function connected to a single AWS API Gateway endpoint that proxies all requests to the AWS Lambda Function, where you can route those requests in code.
+This is a template for deploying a serverless API with a monolithic architecture via the [Backend Component](https://www.github.com/serverless-components/backend). It consists of 1 AWS Lambda Function connected to a single AWS API Gateway endpoint that proxies all requests to the AWS Lambda Function, where you can route those requests in code.
 
 This is a great architecture if you want to build a powerful serverless backend, without having to deal with the (sometimes) complex AWS API Gateway configuration and wrangling multiple AWS Lambda functions.
 
@@ -17,7 +17,6 @@ Additionally, the Backend Component will set up a custom domain for your API if 
 3. [Notes](#3-notes)
 
 &nbsp;
-
 
 ### 1. Install
 
@@ -36,7 +35,7 @@ AWS_SECRET_ACCESS_KEY=1234
 
 Or, you can set these as environment variables manually before deploying.
 
-Please note that while the Backend Component sets up almost everything for you with a single command, if you want to set up a custom domain, you MUST purchase it in your AWS account manually via Route 53.  We have not yet automated domain registration.  After registering it, you may have to wait a few minutes for registration to complete before you can use it.
+Please note that while the Backend Component sets up almost everything for you with a single command, if you want to set up a custom domain, you MUST purchase it in your AWS account manually via Route 53. We have not yet automated domain registration. After registering it, you may have to wait a few minutes for registration to complete before you can use it.
 
 ### 2. Deploy
 
@@ -54,7 +53,7 @@ $ serverless --debug
 
 ### 3. Notes
 
-Remember, once you deploy with a custom domain for the first time, it may take up to an hour for DNS servers to propagate that change.  Meaning, your API won't immediately available after first deployment.
+Remember, once you deploy with a custom domain for the first time, it may take up to an hour for DNS servers to propagate that change. Meaning, your API won't immediately available after first deployment.
 
 ## New to Components?
 

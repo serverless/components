@@ -4,11 +4,11 @@ Closes #XXXXX
 
 ## Steps to verify
 
-* Run X
-* ...
+- Run X
+- ...
 
 ## Todos:
 
-* [ ] Write tests
-* [ ] Write / update documentation
-* [ ] Run Prettier
+- [ ] Write tests
+- [ ] Write / update documentation
+- [ ] Run Prettier

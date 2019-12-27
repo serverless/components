@@ -2,7 +2,7 @@
 
 &nbsp;
 
-This is a template for deploying a serverless real-time websockets API with a monolithic architecture via the [Backend Socket Component](https://www.github.com/serverless-components/backend-socket).  It consists of 1 AWS Lambda Function connected to a single AWS API Gateway Websockets endpoint that proxies all requests to the AWS Lambda Function, where you can route those requests in code.
+This is a template for deploying a serverless real-time websockets API with a monolithic architecture via the [Backend Socket Component](https://www.github.com/serverless-components/backend-socket). It consists of 1 AWS Lambda Function connected to a single AWS API Gateway Websockets endpoint that proxies all requests to the AWS Lambda Function, where you can route those requests in code.
 
 This is a great architecture if you want to build a real-time serverless backend, without having to deal with the (sometimes) complex AWS API Gateway configuration and wrangling multiple AWS Lambda functions.
 
@@ -14,7 +14,6 @@ This is a great architecture if you want to build a real-time serverless backend
 2. [Deploy](#2-deploy)
 
 &nbsp;
-
 
 ### 1. Install
 

@@ -1,4 +1,3 @@
-
 module.exports.createUser = async (e) => {
   return {
     statusCode: 200,

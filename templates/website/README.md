@@ -6,7 +6,7 @@
 
 This is a template for deploying a [React](https://reactjs.org) application onto a serverless website via the [Website Component](https://www.github.com/serverless-components/website).
 
-The Website Component sets up everything you need within seconds.  It uses AWS S3 for hosting, AWS Cloudfront for a blazing fast CDN, AWS Route 53 to configure your custom domain and an AWS ACM Certificate to secure your with with SSL.
+The Website Component sets up everything you need within seconds. It uses AWS S3 for hosting, AWS Cloudfront for a blazing fast CDN, AWS Route 53 to configure your custom domain and an AWS ACM Certificate to secure your with with SSL.
 
 Overall, this infrastructure stack is perhaps the cheapest possible way to deploy a front-end application, that is massively scalable, and performant.
 
@@ -19,7 +19,6 @@ Overall, this infrastructure stack is perhaps the cheapest possible way to deplo
 3. [Notes](#3-notes)
 
 &nbsp;
-
 
 ### 1. Install
 
@@ -50,7 +49,7 @@ Run the website locally with Parcel, using:
 $ npm run start
 ```
 
-Please note that while the Website Component sets up almost everything for you with a single command, if you want to set up a custom domain, you MUST purchase it in your AWS account manually via Route 53.  We have not yet automated domain registration.  After registering it, you may have to wait a few minutes for registration to complete before you can use it.
+Please note that while the Website Component sets up almost everything for you with a single command, if you want to set up a custom domain, you MUST purchase it in your AWS account manually via Route 53. We have not yet automated domain registration. After registering it, you may have to wait a few minutes for registration to complete before you can use it.
 
 ### 2. Deploy
 
@@ -68,7 +67,7 @@ $ serverless --debug
 
 ### 3. Notes
 
-If you aren't using a custom domain, AWS Cloudfront and `HTTPS://` will not be set up.  Instead, you will receive an `HTTP://` domain from AWS S3.
+If you aren't using a custom domain, AWS Cloudfront and `HTTPS://` will not be set up. Instead, you will receive an `HTTP://` domain from AWS S3.
 
 When you add a custom domain, AWS Cloudfront and `HTTPS://` will be set up automatically with it.
 

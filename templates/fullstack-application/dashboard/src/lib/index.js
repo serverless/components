@@ -3,7 +3,6 @@
  */
 
 const getVotes = async () => {
-
   let data = await fetch(window.env.apiUrl + '/v1/votes')
   data = await data.json()
 
@@ -18,13 +17,10 @@ const getVotes = async () => {
  */
 
 const saveVote = async () => {
-
-  let data = await fetch(window.env.apiUrl + '/v1/votes',
-    {
-      method: 'POST',
-      mode: 'cors'
-    }
-  )
+  let data = await fetch(window.env.apiUrl + '/v1/votes', {
+    method: 'POST',
+    mode: 'cors'
+  })
   data = await data.json()
 
   console.log('** Votes Fetched **')
@@ -35,5 +31,5 @@ const saveVote = async () => {
 
 module.exports = {
   getVotes,
-  saveVote,
+  saveVote
 }
