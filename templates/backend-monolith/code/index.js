@@ -3,7 +3,6 @@
  */
 
 module.exports = async (event = {}, ctx) => {
-
   const path = event.path.toLowerCase()
   const method = event.httpMethod.toLowerCase()
   const body = event.body
@@ -14,7 +13,7 @@ module.exports = async (event = {}, ctx) => {
     statusCode: 200,
     headers: {
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Credentials': true,
+      'Access-Control-Allow-Credentials': true
     },
     body: {
       message: `Response received at "${path}" path via a "${method}" method!!!`

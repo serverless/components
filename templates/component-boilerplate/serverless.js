@@ -34,20 +34,30 @@ class MyComponent extends Component {
     // Show a nicely formatted debug statement...
     this.context.log('Printing a "debug" statement (use "--debug" to see it)...')
     this.context.log('')
-    this.context.debug('This is a debug statement visible when someone uses the "serverless --debug" option')
+    this.context.debug(
+      'This is a debug statement visible when someone uses the "serverless --debug" option'
+    )
     this.context.log('------------')
 
     await utils.sleep(4000)
 
     this.context.log('You can specify credentials in a ".env" file')
-    this.context.log('Serverless Components recognizes various ENV keys from popular cloud vendors and will add them to the "this.context.credentials" object.')
+    this.context.log(
+      'Serverless Components recognizes various ENV keys from popular cloud vendors and will add them to the "this.context.credentials" object.'
+    )
     this.context.log('------------')
 
     await utils.sleep(6000)
 
     this.context.log('The "this.context" object features some useful info and methods.')
-    this.context.log('Use "this.context.resourceId()" to generate a string to use for cloud resource names, to ensure no name collisions occur:')
-    this.context.log('Here is the result of running "this.context.resourceId()":  "' + this.context.resourceId() + '"')
+    this.context.log(
+      'Use "this.context.resourceId()" to generate a string to use for cloud resource names, to ensure no name collisions occur:'
+    )
+    this.context.log(
+      'Here is the result of running "this.context.resourceId()":  "' +
+        this.context.resourceId() +
+        '"'
+    )
     this.context.log('------------')
 
     await utils.sleep(3000)

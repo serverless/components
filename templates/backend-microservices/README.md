@@ -17,7 +17,6 @@ This is a great architecture if separation of concerns is a priority.
 
 &nbsp;
 
-
 ### 1. Install
 
 Install the [Serverless Framework](https://www.github.com/serverless/serverless):

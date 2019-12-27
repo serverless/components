@@ -8,11 +8,10 @@ const db = new AWS.DynamoDB.DocumentClient()
  */
 
 const getVotes = async () => {
-
   var params = {
     TableName: process.env.dbName,
     Key: {
-      'pk': 'votes'
+      pk: 'votes'
     }
   }
 
@@ -26,7 +25,7 @@ const getVotes = async () => {
     statusCode: 200,
     headers: {
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Credentials': true,
+      'Access-Control-Allow-Credentials': true
     },
     body: votes
   }
@@ -37,7 +36,6 @@ const getVotes = async () => {
  */
 
 const saveVote = async (event = {}) => {
-
   let params = {
     TableName: process.env.dbName,
     ReturnValue: 'ALL_NEW',
@@ -51,8 +49,7 @@ const saveVote = async (event = {}) => {
   return await getVotes()
 }
 
-
 module.exports = {
   saveVote,
-  getVotes,
+  getVotes
 }

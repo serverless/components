@@ -4,7 +4,7 @@
 
 This is a template for deploying an AWS Lambda Function via Serverless Components.
 
-The [AWS Lambda Component](https://www.github.com/serverless-components/aws-lambda) is incredibly powerful and fast.  For example, it uses AWS S3 Transfer Acceleration for fast uploads and automatically takes NPM dependencies and packages them as an AWS Lambda layer, then it only updates the layer when it detects changes to your NPM dependencies, resulting in fast upload speeds because your custom code is being uploaded primarily.  
+The [AWS Lambda Component](https://www.github.com/serverless-components/aws-lambda) is incredibly powerful and fast. For example, it uses AWS S3 Transfer Acceleration for fast uploads and automatically takes NPM dependencies and packages them as an AWS Lambda layer, then it only updates the layer when it detects changes to your NPM dependencies, resulting in fast upload speeds because your custom code is being uploaded primarily.
 
 [Learn more about this Component in its repository.](https://www.github.com/serverless-components/aws-lambda)
 
@@ -14,7 +14,6 @@ The [AWS Lambda Component](https://www.github.com/serverless-components/aws-lamb
 2. [Deploy](#2-deploy)
 
 &nbsp;
-
 
 ### 1. Install
 

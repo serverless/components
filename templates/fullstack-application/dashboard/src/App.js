@@ -3,7 +3,6 @@ import lib from './lib'
 import imageHero from './images/hero.png'
 
 export default class App extends Component {
-
   constructor(props) {
     super(props)
     this.state = {}
@@ -53,25 +52,26 @@ export default class App extends Component {
    */
 
   render() {
-
     return (
-      <div className='container'>
-
-        <div className='hero'>
-          <img src={imageHero}/>
+      <div className="container">
+        <div className="hero">
+          <img src={imageHero} />
         </div>
 
-        <div className='tagline'>
+        <div className="tagline">
           a fullstack app built on serverless components via the serverless framework
         </div>
 
-        <div className='buttonContainer'>
+        <div className="buttonContainer">
           <div
             className={`button`}
-            onClick={() => { this.saveVote() }}>
+            onClick={() => {
+              this.saveVote()
+            }}
+          >
             <div className={`buttonInner`}>
               <div className={`buttonLeft`}>ß</div>
-              <div className='buttonRight'>{ this.state.votes }</div>
+              <div className="buttonRight">{this.state.votes}</div>
             </div>
           </div>
         </div>
