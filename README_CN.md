@@ -14,7 +14,7 @@
 - - [x] **轻松复用 -** 你构建的每个 Component 都可复用，并且对外发布后，也可以支持他人使用。
 - - [x] **灵活组合 -** 可以通过 YAML 或者 Javascript 灵活组合不同的 Components。
 
-下面是一个通过 Serverless Framework 使用 Components 的例子，可以看出 Component 多么易用：
+下面通过一个 Serverless Framework 使用 Components 的例子，可以看出 Component 多么易用：
 
 ```yaml
 # serverless.yml
@@ -102,9 +102,34 @@ serverless create --template-url https://github.com/serverless/components/tree/m
 
 #### [部署其他模板](./templates)
 
-[在这里查看所有预设的 Components 模板](./templates)，你可以通过这些模板方便的部署*REST API*， 网站, *定时任务*等多种场景。每个模板都提供了清晰的 `README.md` 来说明怎样使用。
+在这里查看所有预设的 [Components 模板](./templates)，你可以通过这些模板方便的部署*REST API*， 网站, *定时任务*等多种场景。每个模板都提供了清晰的 `README.md` 来说明怎样使用。
 
-此外，所有的 Serverless Components 可都在这个 [Github 仓库](https://github.com/serverless-components/)里。
+当前 Serverless Components 支持的多语言开发框架和应用：
+
+[![Serverless Components Tencent](https://img.serverlesscloud.cn/20191213/1576236739852-Component%20Gallery.png)](https://github.com/serverless-components/)
+
+基础组件：
+- [@serverless/tencent-apigateway](https://github.com/serverless-components/tencent-apigateway) - 腾讯云API网关组件
+- [@serverless/tencent-cos](https://github.com/serverless-components/tencent-cos) - 腾讯云对象存储组件
+- [@serverless/tencent-scf](https://github.com/serverless-components/tencent-scf) - 腾讯云云函数组件
+- [@serverless/tencent-cdn](https://github.com/serverless-components/tencent-cdn) - 腾讯云 CDN 组件
+- [@serverless/tencent-cam-role](https://github.com/serverless-components/tencent-cam-role) - 腾讯云 CAM 角色组件
+- [@serverless/tencent-cam-policy](https://github.com/serverless-components/tencent-cam-policy) - 腾讯云 CAM 策略组件
+
+高阶组件：
+- [@serverless/tencent-express](https://github.com/serverless-components/tencent-express) - 快速部署基于 Express.js 的后端服务到腾讯云函数的组件
+- [@serverless/tencent-egg](https://github.com/serverless-components/tencent-egg) - 快速部署基于 Egg.js 的后端服务到腾讯云函数的组件
+- [@serverless/tencent-koa](https://github.com/serverless-components/tencent-koa) - 快速部署基于 Koa.js 的后端服务到腾讯云函数的组件
+- [@serverless/tencent-flask](https://github.com/serverless-components/tencent-flask) - 腾讯云 Python Flask Restful API 组件
+- [@serverless/tencent-laravel](https://github.com/serverless-components/tencent-laravel) - 腾讯云 PHP Laravel Restful API 组件
+- [@serverless/tencent-website](https://github.com/serverless-components/tencent-website) - 快速部署静态网站到腾讯云的组件
+
+第三方贡献：
+- [@twn39/tencent-fastify](https://github.com/twn39/tencent-fastify) - 快速部署基于 fastify.js 的后端服务到腾讯云函数的组件
+- [@twn39/tencent-php-slim](https://github.com/twn39/tencent-php-slim) - 快速部署基于 Slim PHP 微框架的后端服务到腾讯云函数的组件
+
+
+此外，所有的 Serverless Components 可都在这个 [Github 仓库](https://github.com/serverless-components/)里查看。
 
 <br/>
 
