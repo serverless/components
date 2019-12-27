@@ -2,6 +2,11 @@
 
 <br/>
 
+<p align="center">
+  <span>English</span> |
+  <a href="./README_CN.md">简体中文</a>
+</p>
+
 Build, compose, & deploy serverless apps in seconds with **Serverless Components**, the **[Serverless Framework's](https://github.com/serverless/serverless)** new infrastructure provisioning technology.
 
 - - [x] **Speed -** The fastest way to deploy serverless infra and apps.
@@ -120,7 +125,7 @@ serverless create --template-url https://github.com/serverless/components/tree/m
 
 #### [Deploy Other Use-Cases](./templates)
 
-[Check out all of the pre-made Templates](./templates) to deploy serverless _REST APsI_, _Websockets APIs_, _Websites_, _Scheduled Tasks_, and much more! Each Template has a `README.md` with clear instructions on what it does and how to get started.
+[Check out all of the pre-made Templates](./templates) to deploy serverless _REST APIs_, _Websockets APIs_, _Websites_, _Scheduled Tasks_, and much more! Each Template has a `README.md` with clear instructions on what it does and how to get started.
 
 Also, all Serverless Components can be found [here](https://github.com/serverless-components/).
 
@@ -562,7 +567,7 @@ During development, it's super helpful to keep the terminal running with `server
 
 #### Use Debug Statements and the `--debug` Flag
 
-The Serverless Components CLI experience is intentionally minimal. But if you ever want to see what Components are doing behnd the scenes, use the `--debug` flag when you run a Component. You'll see output like this:
+The Serverless Components CLI experience is intentionally minimal. But if you ever want to see what Components are doing behind the scenes, use the `--debug` flag when you run a Component. You'll see output like this:
 
 ![Serverless Components Debugging](https://s3.amazonaws.com/assets.github.serverless/components/serverless_components_debugging.png)
 
