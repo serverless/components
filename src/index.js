@@ -7,5 +7,5 @@ module.exports = {
   runningComponents,
   version,
   cli,
-  core
+  ...core
 }

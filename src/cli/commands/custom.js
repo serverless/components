@@ -1,20 +1,23 @@
-const { validate, connect, build, upload, run } = require('../../core')
+const args = require('minimist')(process.argv.slice(2))
+const { Instance } = require('../../core')
 const { getConfig, resolveConfig, getOrCreateAccessKey, getCredentials } = require('../utils')
 
 module.exports = async (context) => {
-  context.status('Initializing')
-
   let serverlessYmlFile = getConfig('serverless')
 
   if (!serverlessYmlFile) {
-    context.error('"serverless.yml" file not found in the current working directory.', true)
+    throw new Error('"serverless.yml" file not found in the current working directory.')
   }
 
   serverlessYmlFile = resolveConfig(serverlessYmlFile)
 
-  serverlessYmlFile = await validate({ instance: serverlessYmlFile }, context)
+  const credentials = getCredentials()
 
-  context.accessKey = await getOrCreateAccessKey(serverlessYmlFile.org)
+  const instance = new Instance(serverlessYmlFile, context)
+
+  const accessKey = await getOrCreateAccessKey(instance.org)
+
+  context.update({ accessKey, credentials })
 
   // you must be logged in
   if (!context.accessKey) {
@@ -24,24 +27,35 @@ module.exports = async (context) => {
     )
   }
 
-  context.credentials = getCredentials()
+  const method = args._[0] || 'deploy'
 
-  serverlessYmlFile = await build(serverlessYmlFile, context)
-
-  const promises = [upload(serverlessYmlFile, context)]
-
-  if (context.debugMode) {
-    promises.push(connect({}, context))
+  // only build if deploying
+  if (method === 'deploy') {
+    await instance.build()
   }
 
-  const res = await Promise.all(promises)
+  const promises = []
 
-  serverlessYmlFile = res[0]
+  // only upload if deploying
+  if (method === 'deploy') {
+    promises.push(instance.upload())
+  } else {
+    // remove inputs if not deploying
+    instance.inputs = {}
+  }
 
-  context.status('Running', serverlessYmlFile.name)
+  // only connect if using debug mode
+  if (context.debugMode) {
+    promises.push(instance.connect())
+  }
 
-  const outputs = await run(serverlessYmlFile, context)
+  await Promise.all(promises)
+
+  context.status('Running', instance.name)
+
+  const outputs = await instance.run(method)
 
   context.outputs(outputs)
+
   context.close('done', 'Done')
 }

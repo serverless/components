@@ -10,6 +10,8 @@ const grey = chalk.dim
 const green = chalk.rgb(0, 253, 88)
 const red = chalk.rgb(255, 93, 93)
 
+const { Context } = require('../core')
+
 /**
  * Sleep
  * - Because our "utils" contains business logic (and isn't exclusive to utils), circular dependencies are created and therefore "utils" cannot be required in this module.  Hence copying this here...
@@ -21,8 +23,9 @@ const sleep = async (wait) => new Promise((resolve) => setTimeout(() => resolve(
  * - Controls the CLI experience in the framework.
  * - Once instantiated, it starts a single, long running process.
  */
-class Context {
+class CLI extends Context {
   constructor(config) {
+    super()
     // Defaults
     this._ = {}
     this._.entity = 'Serverless'
@@ -34,11 +37,15 @@ class Context {
     this._.timerSeconds = 0
     this._.loadingDots = ''
     this._.loadingDotCount = 0
-
     this.accessKey = config.accessKey
     this.credentials = config.credentials
     this.debugMode = config.debug || false
-    this.method = config.method
+  }
+
+  update(config) {
+    this.accessKey = config.accessKey || this.accessKey
+    this.credentials = config.credentials || this.credentials
+    this.debugMode = config.debug || this.debugMode
   }
 
   /**
@@ -142,6 +149,11 @@ class Context {
     process.stdout.write(ansiEscapes.eraseDown)
 
     // Write log
+
+    if (!msg.endsWith('\n')) {
+      msg = `${msg}\n`
+    }
+
     process.stdout.write(`${msg}`) // eslint-disable-line
 
     // Put cursor to starting position for next view
@@ -204,7 +216,7 @@ class Context {
    * - Render outputs cleanly.
    */
   outputs(outputs) {
-    if (typeof outputs !== 'object' || Object.keys(outputs).length === 0) {
+    if (!outputs || typeof outputs !== 'object' || Object.keys(outputs).length === 0) {
       return
     }
     // Clear any existing content
@@ -296,4 +308,4 @@ class Context {
   }
 }
 
-module.exports = Context
+module.exports = CLI

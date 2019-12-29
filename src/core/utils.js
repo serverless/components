@@ -59,6 +59,16 @@ const engine = new Proxy(
           return res.data
         } catch (requestError) {
           if (requestError.response) {
+            // component level error that was reflected back to the CLI
+            // with the message & stack
+            if (requestError.response.data) {
+              const { message, stack } = requestError.response.data
+              const componentError = new Error(message)
+              componentError.stack = stack
+              throw componentError
+            }
+
+            // otherwise it's a generic backend error
             const { status, statusText } = requestError.response
 
             const backendError = new Error(`${status} - ${statusText}`)
@@ -69,6 +79,8 @@ const engine = new Proxy(
 
             throw backendError
           }
+
+          // any other uncaught error
           throw requestError
         }
       }

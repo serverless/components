@@ -1,4 +1,4 @@
-const { validate, connect, dev, build, upload, run } = require('../../core')
+const { Instance } = require('../../core')
 const { getConfig, resolveConfig, getOrCreateAccessKey, getCredentials } = require('../utils')
 
 const chokidar = require('chokidar')
@@ -10,50 +10,33 @@ const wait = async () => {
   return wait()
 }
 
-const deploy = async (context) => {
-  context.method = 'deploy'
-
+const deploy = async (instance) => {
   let serverlessYmlFile = getConfig('serverless')
 
   if (!serverlessYmlFile) {
-    context.error('"serverless.yml" file not found in the current working directory.', true)
-  }
-
-  serverlessYmlFile = resolveConfig(serverlessYmlFile)
-
-  serverlessYmlFile = await validate({ instance: serverlessYmlFile }, context)
-
-  context.accessKey = await getOrCreateAccessKey(serverlessYmlFile.org)
-
-  // you must be logged in
-  if (!context.accessKey) {
-    context.error(
-      `Run 'serverless login' first to rapidly deploy your serverless application.`,
+    instance.context.error(
+      '"serverless.yml" file not found in the current working directory.',
       true
     )
   }
 
-  context.credentials = getCredentials()
+  serverlessYmlFile = resolveConfig(serverlessYmlFile)
 
-  serverlessYmlFile = await build(serverlessYmlFile, context)
+  instance.set(serverlessYmlFile)
 
-  const res = await Promise.all([connect({}, context), upload(serverlessYmlFile, context)])
-
-  context.socket = res[0]
-
-  serverlessYmlFile = res[1]
-
-  await run(serverlessYmlFile, context)
+  await instance.build()
+  await instance.upload()
+  await instance.run()
 }
 
-const watch = (context) => {
+const watch = (instance) => {
   let isProcessing = false
   let queuedOperation = false
 
   const watcher = chokidar.watch(process.cwd(), { ignored: /\.serverless/ })
 
   watcher.on('ready', async () => {
-    context.status('Watching')
+    instance.context.status('Watching')
   })
 
   watcher.on('change', async () => {
@@ -63,27 +46,25 @@ const watch = (context) => {
       } else if (!isProcessing) {
         isProcessing = true
 
-        await deploy(context)
+        await deploy(instance)
         if (queuedOperation) {
           queuedOperation = false
-          await deploy(context)
+          await deploy(instance)
         }
 
         isProcessing = false
-        context.status('Watching')
+        instance.context.status('Watching')
       }
     } catch (e) {
       isProcessing = false
       queuedOperation = false
-      context.error(e)
-      context.status('Watching')
+      instance.context.error(e)
+      instance.context.status('Watching')
     }
   })
 }
 
 module.exports = async (context) => {
-  context.status('Initializing')
-
   let serverlessYmlFile = getConfig('serverless')
 
   if (!serverlessYmlFile) {
@@ -92,9 +73,13 @@ module.exports = async (context) => {
 
   serverlessYmlFile = resolveConfig(serverlessYmlFile)
 
-  serverlessYmlFile = await validate({ instance: serverlessYmlFile }, context)
+  const instance = new Instance(serverlessYmlFile, context)
 
-  context.accessKey = await getOrCreateAccessKey(serverlessYmlFile.org)
+  const credentials = getCredentials()
+
+  const accessKey = await getOrCreateAccessKey(instance.org)
+
+  context.update({ accessKey, credentials })
 
   if (!context.accessKey) {
     context.error(
@@ -103,11 +88,9 @@ module.exports = async (context) => {
     )
   }
 
-  context.status('Connecting')
+  await instance.connect()
 
-  context.socket = await connect({}, context)
+  await instance.dev()
 
-  await dev(serverlessYmlFile, context)
-
-  await watch(context)
+  await watch(instance)
 }

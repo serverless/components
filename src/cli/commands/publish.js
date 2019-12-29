@@ -1,19 +1,22 @@
 const args = require('minimist')(process.argv.slice(2))
-const { validate, publish } = require('../../core')
+const { Component } = require('../../core')
 const { getConfig, resolveConfig, getOrCreateAccessKey } = require('../utils')
 
 module.exports = async (context) => {
+  context.status('Publishing')
+
   let serverlessComponentFile = getConfig('serverless.component')
 
   if (!serverlessComponentFile) {
-    context.error(`serverless.component.yml file not found in the current working directory`, true)
+    throw new Error('serverless.component.yml file not found in the current working directory')
   }
 
   serverlessComponentFile = resolveConfig(serverlessComponentFile)
 
-  serverlessComponentFile = await validate({ component: serverlessComponentFile }, context)
+  const accessKey = await getOrCreateAccessKey(serverlessComponentFile.org)
 
-  context.accessKey = await getOrCreateAccessKey(serverlessComponentFile.org)
+  // update context with access key
+  context.update({ accessKey })
 
   // you must be logged in
   if (!context.accessKey) {
@@ -28,7 +31,9 @@ module.exports = async (context) => {
     delete serverlessComponentFile.version
   }
 
-  await publish(serverlessComponentFile, context)
+  const component = new Component(serverlessComponentFile, context)
+
+  await component.publish(serverlessComponentFile, context)
 
   context.close('done', 'Published')
 }
