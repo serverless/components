@@ -1,13 +1,13 @@
-'use strict';
+'use strict'
 
-const { ONE_SECOND } = require('./constants');
+const { ONE_SECOND } = require('./constants')
 
 async function sleep(seconds) {
   setTimeout(() => {
-    Promise.resolve(true);
-  }, seconds * ONE_SECOND);
+    Promise.resolve(true)
+  }, seconds * ONE_SECOND)
 }
 
 module.exports = {
-  sleep,
-};
+  sleep
+}

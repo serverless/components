@@ -53,7 +53,7 @@ $ serverless create --template-url https://github.com/serverless/components/tree
 > 如您的账号未 [登录](https://cloud.tencent.com/login) 或 [注册](https://cloud.tencent.com/register) 腾讯云，您可以直接通过 `微信` 扫描命令行中的二维码进行授权登录和注册。
 
 ```shell
-$ serverless --debug       
+$ serverless --debug
 
   DEBUG ─ Resolving the template's static variables.
   DEBUG ─ Collecting components from the template.
@@ -77,7 +77,7 @@ $ serverless --debug
   DEBUG ─ Deploying service with id service-p0mbr9ho.
   DEBUG ─ Deployment successful for the api named MyEgg.TencentApiGateway in the ap-guangzhou region.
 
-  MyEgg: 
+  MyEgg:
     region:              ap-guangzhou
     functionName:        egg-function
     apiGatewayServiceId: service-p0mbr9ho

@@ -55,7 +55,7 @@ If you have a `Wechat` account, you don't need to configure the `.env` file, jus
 If you don't have a wechat account, you could jump to [account](#6-account-optional) step and configure the account info.
 
 ```text
-$ serverless --debug       
+$ serverless --debug
 
   DEBUG ─ Resolving the template's static variables.
   DEBUG ─ Collecting components from the template.
@@ -79,7 +79,7 @@ $ serverless --debug
   DEBUG ─ Deploying service with id service-p0mbr9ho.
   DEBUG ─ Deployment successful for the api named MyEgg.TencentApiGateway in the ap-guangzhou region.
 
-  MyEgg: 
+  MyEgg:
     region:              ap-guangzhou
     functionName:        egg-function
     apiGatewayServiceId: service-p0mbr9ho
