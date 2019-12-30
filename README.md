@@ -645,7 +645,7 @@ Because of this, we're designing all of our projects to be as approachable as po
 
 You could use components programatically and integrate them into your own application or CLI using a simple object-oriented abstraction. All you need is an `accessKey` from the Serverless Dashboard that you simply pass to one of the core classes.
 
-We export two main classes for working with components:
+We export 3 main classes for working with components:
 
 1. The `Component` Class: This class represnets and manages components in the registry. You could use this class if you'd like to publish or unpublish components to the registry.
 
