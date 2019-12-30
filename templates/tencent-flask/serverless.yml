@@ -1,0 +1,19 @@
+myFlask:
+  component: '@serverless/tencent-flask'
+  inputs:
+    region: ap-guangzhou
+    functionName: flask-function
+    code: ./
+    functionConf:
+      timeout: 10
+      memorySize: 128
+      environment:
+        variables:
+          TEST: vale
+      vpcConfig:
+        subnetId: ''
+        vpcId: ''
+    apigatewayConf:
+      protocols:
+        - https
+      environment: release
