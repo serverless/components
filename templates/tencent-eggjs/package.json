@@ -1,0 +1,32 @@
+{
+  "name": "tencent-eggjs",
+  "version": "1.0.0",
+  "description": "demo",
+  "private": true,
+  "egg": {
+    "declarations": true
+  },
+  "dependencies": {
+    "aws-serverless-express": "^3.3.6",
+    "egg": "^2.15.1",
+    "egg-view-nunjucks": "^2.2.0"
+  },
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "ci": "npm run lint && npm run cov",
+    "deploy": "scf deploy -f",
+    "dev": "scf native invoke --template template.yaml --event event.json"
+  },
+  "ci": {
+    "version": "10"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "yugasun",
+  "license": "MIT"
+}
