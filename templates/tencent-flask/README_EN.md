@@ -19,7 +19,7 @@ translatorslink:
 
 [中文](./README.md) | English
 
-Build a serverless Flask application with [Tencent Flask Component](https://github.com/serverless-components/tencent-flask).
+Build a serverless Flask application with the [Tencent Flask Component](https://github.com/serverless-components/tencent-flask).
 
 ## Quick Start
 
@@ -40,13 +40,13 @@ $ npm install -g serverless
 
 ### 2. Configure
 
-Create a template in a new folder, with the following command
+Create a template in a new folder with the following command
 
 ```shell
 $ serverless create --template-url https://github.com/serverless/components/tree/master/templates/tencent-flask
 ```
 
-In `app.py` there are some definitions about APIs:
+You can find the API definitions in `app.py`:
 
 ```python
 # -*- coding: utf8 -*-
@@ -79,13 +79,13 @@ def getUser(id):
     return jsonify(data={'name': 'test1'})
 ```
 
-> Notice: This project use `@serverless/tencent-flask` component, when deploying it will automaticly install dependencies by  `requirements.txt` file.
+> Notice: This project uses the `@serverless/tencent-flask` component. When deploying it will automatically install dependencies defined in the `requirements.txt` file.
 
 ### 3. Deploy
 
-Use `serverless` command to deploy your project, you could also add `--debug` to see the detail information in the process.
+Use the `serverless` command to deploy your project, you could also add the `--debug` flag to see detailed information about the deployment process.
 
-> If you have a `Wechat` account, you don't need to configure the `.env` file, just scan the QR code in terminal and sign-up a new account of Tencent Cloud. It's a streamlined experience.If you don't have a wechat account, you could jump to [account](#6-account-optional) step and configure the account info.
+> If you have a `WeChat` account, you don't need to configure the `.env` file, just scan the QR code in terminal and use your Tencent Cloud. If you don't have a WeChat account, you could jump to the [account](#6-account-optional) step and configure the account information manually.
 
 ```shell
 $ serverless --debug
@@ -105,8 +105,8 @@ omponents/templates/tencent-python-flask/.serverless/requirements.txt...
   DEBUG ─ Uploading service package to cos[sls-cloudfunction-ap-guangzhou-code]. sls-cloudfunction-default-flask-function-1577343417.zip
   DEBUG ─ Uploaded package successful /Users/yugasun/Desktop/Develop/@yugasun/components/templates/tencent-python-flask/.serverless/flask-function.zip
   DEBUG ─ Creating function flask-function
-  DEBUG ─ Updating code... 
-  DEBUG ─ Updating configure... 
+  DEBUG ─ Updating code...
+  DEBUG ─ Updating configure...
   DEBUG ─ Created function flask-function successful
   DEBUG ─ Setting tags for function flask-function
   DEBUG ─ Creating trigger for function flask-function
@@ -120,7 +120,7 @@ omponents/templates/tencent-python-flask/.serverless/requirements.txt...
   DEBUG ─ Deploying service with id service-mm30nd1i.
   DEBUG ─ Deployment successful for the api named MyFlask.TencentApiGateway in the ap-guangzhou region.
 
-  MyFlask: 
+  MyFlask:
     region:              ap-guangzhou
     functionName:        flask-function
     apiGatewayServiceId: service-mm30nd1i
@@ -129,7 +129,7 @@ omponents/templates/tencent-python-flask/.serverless/requirements.txt...
 
 ### 4. Test
 
-Use the following command to test API and check the response:
+Use the following command to test the API and check the response:
 
 ```shell
 $ curl -X GET https://service-mm30nd1i-1251556596.gz.apigw.tencentcs.com/release/user
@@ -143,7 +143,7 @@ $ curl -X POST -H 'Content-Type":"application/json' -d '{"name":"yugasun","email
 {"data":{"email":"yuga_sun@163.com","name":"yugasun"}}
 ```
 
-> Notice: Please change the api url to your deployed one.
+> Notice: Please change the API url to the deployed one.
 
 ### 5. Remove
 
@@ -164,7 +164,7 @@ $ serverless remove --debug
 
 ### 5. Account (optional)
 
-Just create a `.env` file
+Just create an `.env` file
 
 ```shell
 $ touch .env # your Tencent API Keys
@@ -178,4 +178,4 @@ TENCENT_SECRET_ID=123
 TENCENT_SECRET_KEY=123
 ```
 
-- If you don't have a Tencent Cloud account, you could [sign up](https://intl.cloud.tencent.com/register) first.
+- If you don't have a Tencent Cloud account, you should [sign up](https://intl.cloud.tencent.com/register) first.

@@ -1,4 +1,4 @@
-MyFlask:
+myFlask:
   component: '@serverless/tencent-flask'
   inputs:
     region: ap-guangzhou

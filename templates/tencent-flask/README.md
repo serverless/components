@@ -105,8 +105,8 @@ omponents/templates/tencent-python-flask/.serverless/requirements.txt...
   DEBUG ─ Uploading service package to cos[sls-cloudfunction-ap-guangzhou-code]. sls-cloudfunction-default-flask-function-1577343417.zip
   DEBUG ─ Uploaded package successful /Users/yugasun/Desktop/Develop/@yugasun/components/templates/tencent-python-flask/.serverless/flask-function.zip
   DEBUG ─ Creating function flask-function
-  DEBUG ─ Updating code... 
-  DEBUG ─ Updating configure... 
+  DEBUG ─ Updating code...
+  DEBUG ─ Updating configure...
   DEBUG ─ Created function flask-function successful
   DEBUG ─ Setting tags for function flask-function
   DEBUG ─ Creating trigger for function flask-function
@@ -120,7 +120,7 @@ omponents/templates/tencent-python-flask/.serverless/requirements.txt...
   DEBUG ─ Deploying service with id service-mm30nd1i.
   DEBUG ─ Deployment successful for the api named MyFlask.TencentApiGateway in the ap-guangzhou region.
 
-  MyFlask: 
+  MyFlask:
     region:              ap-guangzhou
     functionName:        flask-function
     apiGatewayServiceId: service-mm30nd1i
