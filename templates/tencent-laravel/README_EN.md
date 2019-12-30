@@ -42,7 +42,6 @@ $ npm install -g serverless
 
 Create a template in a new folder, with the following command
 
-
 ```shell
 $ serverless create --template-url https://github.com/serverless/components/tree/master/templates/tencent-laravel
 ```
@@ -88,7 +87,7 @@ $ serverless --debug
   DEBUG ─ Deploying service with id service-js0qnn8k.
   DEBUG ─ Deployment successful for the api named MyLaravel.TencentApiGateway in the ap-guangzhou region.
 
-  MyLaravel: 
+  MyLaravel:
     region:              ap-guangzhou
     functionName:        laravel-function
     apiGatewayServiceId: service-js0qnn8k
@@ -102,7 +101,7 @@ View in Browser: https://service-js0qnn8k-1251556596.gz.apigw.tencentcs.com/rele
 Use the following command to test API and check the response:
 
 ```shell
-$ curl -X GET https://service-js0qnn8k-1251556596.gz.apigw.tencentcs.com/release/api/user 
+$ curl -X GET https://service-js0qnn8k-1251556596.gz.apigw.tencentcs.com/release/api/user
 {"data":[{"name":"yugasun","email":"yuga.sun.bj@gmail.com"}]}
 ```
 
