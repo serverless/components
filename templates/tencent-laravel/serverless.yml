@@ -1,4 +1,4 @@
-MyLaravel:
+myLaravel:
   component: '@serverless/tencent-laravel'
   inputs:
     region: ap-guangzhou

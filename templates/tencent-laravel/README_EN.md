@@ -19,7 +19,7 @@ translatorslink:
 
 [中文](./README.md) | English
 
-This template using [Tencent Laravel compoonent](https://github.com/serverless-components/tencent-laravel) quickly create an Laravel application on tencent cloud.
+Use the [Tencent Laravel Component](https://github.com/serverless-components/tencent-laravel) to quickly create a Laravel application on the Tencent Cloud.
 
 ## Quick Start
 
@@ -40,27 +40,27 @@ $ npm install -g serverless
 
 ### 2. Configure
 
-Create a template in a new folder, with the following command
+Create the template in a new folder with the following command
 
 ```shell
 $ serverless create --template-url https://github.com/serverless/components/tree/master/templates/tencent-laravel
 ```
 
-Install PHP dependencies:
+Install the PHP dependencies:
 
 ```shell
 $ composer install
 ```
 
-> Notice：Laravel use Composer manage dependencies, so you should install Composer firstly. Refer to [Official Install](https://getcomposer.org/doc/00-intro.md#installation-linux-unix-macos)
+> Notice：Laravel uses Composer to manage dependencies so you should install Composer first. Please refer to the [official installation guide](https://getcomposer.org/doc/00-intro.md#installation-linux-unix-macos) for an in-depth guide.
 
 ### 3. Deploy
 
-Use `serveless` command to deploy your project, you could also add `--debug` to see the detail information in the process.
+Use the `serveless` command to deploy your project. You could also add the `--debug` flag to see detailed information about th deployment process.
 
-If you have a `Wechat` account, you don't need to configure the `.env` file, just scan the QR code in terminal and sign-up a new account of Tencent Cloud. It's a streamlined experience.
+If you have a `WeChat` account you don't need to configure the `.env` file, just scan the QR code in terminal and use your Tencent Cloud account.
 
-If you don't have a wechat account, you could jump to [account](#6-account-optional) step and configure the account info.
+If you don't have a WeChat account, you can jump to [account](#6-account-optional) step and configure the account info manually.
 
 ```text
 $ serverless --debug
@@ -96,9 +96,9 @@ $ serverless --debug
 
 ### 4. Test
 
-View in Browser: https://service-js0qnn8k-1251556596.gz.apigw.tencentcs.com/release/, you will get welcome page.
+Open up the following URL in your favorite browser: https://service-js0qnn8k-1251556596.gz.apigw.tencentcs.com/release/. You should see the welcome page.
 
-Use the following command to test API and check the response:
+Use the following command to test the API and check the response:
 
 ```shell
 $ curl -X GET https://service-js0qnn8k-1251556596.gz.apigw.tencentcs.com/release/api/user
@@ -145,4 +145,4 @@ TENCENT_SECRET_ID=123
 TENCENT_SECRET_KEY=123
 ```
 
-- If you don't have a Tencent Cloud account, you could [sign up](https://intl.cloud.tencent.com/register) first.
+- If you don't have a Tencent Cloud account you need to [sign up](https://intl.cloud.tencent.com/register) first.
