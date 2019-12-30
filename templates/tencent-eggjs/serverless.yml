@@ -1,4 +1,4 @@
-MyEgg:
+myEgg:
   component: '@serverless/tencent-egg'
   inputs:
     region: ap-guangzhou

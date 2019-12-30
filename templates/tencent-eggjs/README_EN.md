@@ -19,7 +19,7 @@ translatorslink:
 
 [中文](./README.md) | English
 
-This template using [Tencent Egg compoonent](https://github.com/serverless-tencent/tencent-egg) quickly create an Egg.js application on tencent cloud.
+This template is using the [Tencent Egg Component](https://github.com/serverless-tencent/tencent-egg) to quickly create an Egg.js application on the Tencent Cloud.
 
 ## Quick Start
 
@@ -40,7 +40,7 @@ $ npm install -g serverless
 
 ### 2. Configure
 
-Create a template in a new folder, with the following command
+Create the template in a new folder with the following command
 
 ```shell
 $ serverless create --template-url https://github.com/serverless/components/tree/master/templates/tencent-eggjs
@@ -48,11 +48,11 @@ $ serverless create --template-url https://github.com/serverless/components/tree
 
 ### 3. Deploy
 
-Use `serverless` command to deploy your project, you could also add `--debug` to see the detail information in the process.
+Use the `serverless` command to deploy your project. You can also add the `--debug` flag to see more detailed deployment process information.
 
-If you have a `Wechat` account, you don't need to configure the `.env` file, just scan the QR code in terminal and sign-up a new account of Tencent Cloud. It's a streamlined experience.
+If you have a `WeChat` account you don't need to configure the `.env` file, just scan the QR code in terminal and use your Tencent Cloud account.
 
-If you don't have a wechat account, you could jump to [account](#6-account-optional) step and configure the account info.
+If you don't have a WeChat account you can jump to the [account](#6-account-optional) step and configure the account info manually.
 
 ```text
 $ serverless --debug
@@ -90,7 +90,7 @@ $ serverless --debug
 
 ### 4. Test
 
-Use the following command to test REST API and check the response:
+Use the following command to test the REST API and check the response:
 
 ```shell
 $ curl -X GET https://service-p0mbr9ho-1251556596.gz.apigw.tencentcs.com/release/users
@@ -131,7 +131,7 @@ $ serverless remove --debug
 
 ### 6. Account (optional)
 
-Just create a `.env` file
+Just create an `.env` file
 
 ```shell
 $ touch .env # your Tencent API Keys
@@ -145,4 +145,4 @@ TENCENT_SECRET_ID=123
 TENCENT_SECRET_KEY=123
 ```
 
-- If you don't have a Tencent Cloud account, you could [sign up](https://intl.cloud.tencent.com/register) first.
+- If you don't have a Tencent Cloud account, you need to [sign up](https://intl.cloud.tencent.com/register) first.
