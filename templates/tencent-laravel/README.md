@@ -2,7 +2,7 @@
 title: Deploy Serverless Laravel Application
 description: "Deploy Serverless Laravel application with Tencent Laravel component"
 date: 2019-12-26
-thumbnail: 'http://url-to-thumbnail.jpg'
+thumbnail: 'https://img.serverlesscloud.cn/20191226/1577347087676-website_%E9%95%BF.png'
 categories:
   - toturial
 authors:
@@ -14,6 +14,8 @@ translators:
 translatorslink:
   - None
 -->
+
+[![Serverless PHP Laravel Tencent Cloud](https://img.serverlesscloud.cn/20191226/1577347087676-website_%E9%95%BF.png)](http://serverless.com)
 
 # 快速构建 Laravel 应用
 
