@@ -2,7 +2,7 @@
 title: Deploy Serverless Python Flask Application
 description: "Deploy Serverless python Flask application with Tencent Flask component"
 date: 2019-12-26
-thumbnail: 'http://url-to-thumbnail.jpg'
+thumbnail: 'https://img.serverlesscloud.cn/20191226/1577347052683-flask_%E9%95%BF.png'
 categories:
   - toturial
 authors:
@@ -14,6 +14,8 @@ translators:
 translatorslink:
   - None
 -->
+
+[![Serverless Python Flask Tencent Cloud](https://img.serverlesscloud.cn/20191226/1577347052683-flask_%E9%95%BF.png)](http://serverless.com)
 
 # Build a Flask Application
 

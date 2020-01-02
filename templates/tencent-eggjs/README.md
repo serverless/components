@@ -2,7 +2,7 @@
 title: Deploy Serverless Egg.js Application
 description: "Deploy Serverless Egg.js application with Tencent Egg component"
 date: 2019-12-26
-thumbnail: 'http://url-to-thumbnail.jpg'
+thumbnail: 'https://img.serverlesscloud.cn/20191226/1577361751088-egg_width.png'
 categories:
   - toturial
 authors:
@@ -14,6 +14,8 @@ translators:
 translatorslink:
   - None
 -->
+
+[![Serverless Egg Tencent Cloud](https://img.serverlesscloud.cn/20191226/1577361751088-egg_width.png)](http://serverless.com)
 
 # 快速构建 Egg.js 应用
 
