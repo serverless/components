@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return "Hello Flash"
+    return "Hello Flask"
 
 @app.route('/user', methods = ['POST'])
 def addUser():
