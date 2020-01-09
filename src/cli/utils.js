@@ -8,7 +8,7 @@ const {
   writeConfigFile,
   createAccessKeyForTenant
 } = require('@serverless/platform-sdk')
-const { merge, endsWith } = require('ramda')
+const R = require('ramda')
 
 const fileExistsSync = (filePath) => {
   try {
@@ -80,16 +80,16 @@ const getCredentials = () => {
   return credentials
 }
 
-const isYamlPath = (filePath) => endsWith('.yml', filePath) || endsWith('.yaml', filePath)
+const isYamlPath = (filePath) => R.endsWith('.yml', filePath) || R.endsWith('.yaml', filePath)
 
-const isJsonPath = (filePath) => endsWith('.json', filePath)
+const isJsonPath = (filePath) => R.endsWith('.json', filePath)
 
 const parseFile = (filePath, contents, options = {}) => {
   if (isJsonPath(filePath)) {
     return JSON.parse(contents)
   } else if (isYamlPath(filePath)) {
-    return YAML.load(contents.toString(), merge(options, { filename: filePath }))
-  } else if (filePath.endsWith('.slsignore')) {
+    return YAML.load(contents.toString(), R.merge(options, { filename: filePath }))
+  } else if (filePath.R.endsWith('.slsignore')) {
     return contents.toString().split('\n')
   }
   return contents.toString().trim()
@@ -149,7 +149,7 @@ const resolveConfig = (config) => {
 
           if (!config[referencedTopLevelProperty].component) {
             variableResolved = true
-            const referencedPropertyValue = path(referencedPropertyPath, config)
+            const referencedPropertyValue = R.path(referencedPropertyPath, config)
 
             if (referencedPropertyValue === undefined) {
               throw Error(`invalid reference ${match}`)

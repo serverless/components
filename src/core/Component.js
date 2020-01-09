@@ -1,7 +1,11 @@
 const Context = require('./Context')
 const path = require('path')
+const fs = require('fs')
 const { tmpdir } = require('os')
-const { pack, getComponentUploadUrl, putComponentPackage } = require('./utils')
+const chokidar = require('chokidar')
+const axios = require('axios')
+const { Registry, WebSockets } = require('@serverless/client')
+const { pack } = require('./utils')
 
 class Component {
   constructor(props = {}, context = {}) {
@@ -65,6 +69,8 @@ class Component {
       throw new Error(`Unable to publish. Missing accessKey.`)
     }
 
+    const registry = new Registry({ accessKey: this.context.accessKey })
+
     const entity = `${this.name}@${this.version}`
 
     this.context.status(`Publishing`, entity)
@@ -80,19 +86,78 @@ class Component {
     this.context.debug(`Packaging component from ${this.main}`)
 
     const res = await Promise.all([
-      getComponentUploadUrl(props, this.context.accessKey),
+      registry.prePublish(props),
       pack(this.main, componentPackagePath)
     ])
 
-    const componentUploadUrl = res[0]
+    const componentUploadUrl = res[0].url
 
     this.context.debug(`Component packaged into ${componentPackagePath}`)
-
     this.context.debug(`Uploading component package`)
 
-    await putComponentPackage(componentPackagePath, componentUploadUrl)
+    // axios auto adds headers that causes signature mismatch
+    // so we gotta remove them manually
+    const instance = axios.create()
+    instance.defaults.headers.common = {}
+    instance.defaults.headers.put = {}
+    const file = fs.readFileSync(componentPackagePath)
+
+    try {
+      await instance.put(componentUploadUrl, file)
+    } catch (e) {
+      throw e
+    }
 
     this.context.debug(`Component package uploaded`)
+  }
+
+  async connect() {
+    const websockets = new WebSockets({ accessKey: this.context.accessKey })
+
+    const data = {
+      connectionId: this.context.connectionId,
+      channelId: `component/${this.name}`
+    }
+
+    await websockets.connectToChannel(data)
+  }
+
+  async dev() {
+    await this.connect()
+
+    let isProcessing = false
+    let queuedOperation = false
+    const entity = `${this.name}@${this.version}`
+
+    const watcher = chokidar.watch(this.main, { ignored: /\.serverless/ })
+
+    watcher.on('ready', async () => {
+      this.context.status('Watching', entity)
+    })
+
+    watcher.on('change', async () => {
+      try {
+        if (isProcessing && !queuedOperation) {
+          queuedOperation = true
+        } else if (!isProcessing) {
+          isProcessing = true
+
+          await this.publish()
+          if (queuedOperation) {
+            queuedOperation = false
+            await this.publish()
+          }
+
+          isProcessing = false
+          this.context.status('Watching', entity)
+        }
+      } catch (e) {
+        isProcessing = false
+        queuedOperation = false
+        this.context.error(e)
+        this.context.status('Watching', entity)
+      }
+    })
   }
 }
 

@@ -4,15 +4,9 @@ const fs = require('fs')
 const { tmpdir } = require('os')
 const axios = require('axios')
 const util = require('util')
+const { Engine, WebSockets } = require('@serverless/client')
 const exec = util.promisify(require('child_process').exec)
-const WebSocket = require('ws')
-const {
-  getEndpoints,
-  pack,
-  runComponent,
-  getPackageUrls,
-  addConnectionToInstance
-} = require('./utils')
+const { pack } = require('./utils')
 
 class Instance {
   constructor(props = {}, context = {}) {
@@ -83,46 +77,6 @@ class Instance {
     }
   }
 
-  async connect() {
-    this.context.debug('Establishing streaming connection')
-
-    const endpoints = getEndpoints()
-
-    return new Promise((resolve, reject) => {
-      const ws = new WebSocket(endpoints.socket)
-
-      ws.on('open', () => {
-        ws.send(
-          JSON.stringify({
-            action: '$default'
-          })
-        )
-      })
-
-      ws.on('message', (message) => {
-        const { event, data } = JSON.parse(message)
-        if (event === 'echo') {
-          this.context.socket = data
-          resolve(data)
-        } else if (event === 'status') {
-          this.context.status(data)
-        } else if (event === 'log') {
-          this.context.log(data)
-        } else if (event === 'debug') {
-          this.context.debug(data)
-        } else if (event === 'outputs') {
-          this.context.outputs(data)
-        } else if (event === 'error') {
-          this.context.error(data)
-        } else {
-          this.context.log(data)
-        }
-      })
-
-      ws.on('error', (e) => reject(e))
-    })
-  }
-
   async build() {
     if (typeof this.inputs.src === 'object' && this.inputs.src.hook && this.inputs.src.dist) {
       // First run the build hook, if "hook" and "dist" are specified
@@ -150,6 +104,8 @@ class Instance {
       return
     }
 
+    const engine = new Engine({ accessKey: this.context.accessKey })
+
     const packagePath = path.join(
       tmpdir(),
       `${Math.random()
@@ -160,10 +116,7 @@ class Instance {
     this.context.debug(`Packaging from ${this.inputs.src} into ${packagePath}`)
     this.context.status('Packaging')
 
-    const res = await Promise.all([
-      getPackageUrls({ org: this.org, accessKey: this.context.accessKey }),
-      pack(this.inputs.src, packagePath)
-    ])
+    const res = await Promise.all([engine.getPackageUrls(), pack(this.inputs.src, packagePath)])
 
     const packageUrls = res[0]
 
@@ -187,28 +140,32 @@ class Instance {
   }
 
   async run(method = 'deploy') {
-    const { accessKey, credentials, socket, debugMode } = this.context
+    const { accessKey, credentials, connectionId, debugMode } = this.context
+
+    const engine = new Engine({ accessKey })
 
     const runComponentInputs = {
       ...this.get(),
-      accessKey,
       credentials,
-      socket,
+      connectionId,
       debugMode,
       method
     }
 
-    return runComponent(runComponentInputs)
+    return engine.runComponent(runComponentInputs)
   }
 
-  async dev() {
+  async connect() {
+    const websockets = new WebSockets({ accessKey: this.context.accessKey })
+    const instanceId = `${this.org}.${this.app}.${this.stage}.${this.name}`
+
     const data = {
       ...this.get(),
-      accessKey: this.context.accessKey,
-      socket: this.context.socket
+      connectionId: this.context.connectionId,
+      channelId: `instance/${instanceId}`
     }
 
-    await addConnectionToInstance(data)
+    await websockets.connectToChannel(data)
   }
 }
 

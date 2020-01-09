@@ -20,10 +20,7 @@ module.exports = async (context) => {
 
   // you must be logged in
   if (!context.accessKey) {
-    context.error(
-      `Run 'serverless login' first to rapidly deploy your serverless application.`,
-      true
-    )
+    context.error(`Run 'serverless login' first to publish your serverless component.`, true)
   }
 
   // if using --dev flag, publish to the "dev" version

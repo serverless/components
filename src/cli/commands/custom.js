@@ -46,7 +46,7 @@ module.exports = async (context) => {
 
   // only connect if using debug mode
   if (context.debugMode) {
-    promises.push(instance.connect())
+    promises.push(context.connect())
   }
 
   await Promise.all(promises)
