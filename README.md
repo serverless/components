@@ -170,7 +170,7 @@ const { Component } = require('@serverless/core')
 class MyBlog extends Component {
   async deploy(inputs) {
     await this.status('Deploying a serverless blog')
-    const website = await this.load('website') // Load a component
+    const website = this.load('website', 'website-1') // Load a component
     const outputs = await website.deploy({ code: { src: inputs.src } }) // Deploy it
     this.state.url = outputs.url
     await this.save()
@@ -514,9 +514,6 @@ class MyComponent extends Component {
     await this.save()
 
     // Here is how to load a child Component via its name in the Registry
-    // Please note that the .load method is NOT an async function.
-    let website = this.load('website')
-
     // You can run a method on the child Component, like this:
     let websiteOutputs = await website.deploy({ code: { src: './src' } })
 
