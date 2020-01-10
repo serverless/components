@@ -1,4 +1,4 @@
-component: express@0.0.4
+component: express@0.0.5
 org: # Your Serverless Framework Org
 app: # Your Serverless Framework App
 name: express-api
