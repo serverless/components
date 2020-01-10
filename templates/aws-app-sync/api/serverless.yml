@@ -1,0 +1,25 @@
+org: # Enter org name here
+app: # Enter app name here
+component: aws-app-sync
+stage: prod
+name: graph-api
+
+inputs:
+  name: graph-api
+  src: ./src
+  authenticationType: API_KEY
+  apiKeys:
+    - myApiKey
+
+  # defining your lambda data source
+  dataSources:
+    - type: AWS_LAMBDA
+      name: getAirport
+      config:
+        lambdaFunctionArn: ${output:myApp:prod:graph-api-function.arn} # Replace "myApp" with the app containing the "graph-api-function" (likely the same app as this)
+
+  # mapping schema fields to the data source
+  mappingTemplates:
+    - dataSource: getAirport
+      type: Query
+      field: getAirport

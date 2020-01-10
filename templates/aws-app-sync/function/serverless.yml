@@ -1,0 +1,9 @@
+org: # Enter org name
+app: # Enter app name
+component: aws-lambda
+stage: dev
+name: graph-api-function
+
+inputs:
+  src: ./src
+  handler: handler.handler

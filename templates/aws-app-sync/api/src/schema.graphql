@@ -1,0 +1,13 @@
+schema {
+  query: Query
+}
+
+type Query {
+  getAirport(code: String!): Airport
+}
+
+type Airport {
+  code: String!
+  name: String!
+  location: String!
+}
