@@ -34,7 +34,7 @@ module.exports = async (context) => {
     await instance.build()
   }
 
-  const promises = []
+  const promises = [context.connect()]
 
   // only upload if deploying
   if (method === 'deploy') {
@@ -45,9 +45,9 @@ module.exports = async (context) => {
   }
 
   // only connect if using debug mode
-  if (context.debugMode) {
-    promises.push(context.connect())
-  }
+  // if (context.debugMode) {
+  //   promises.push(context.connect())
+  // }
 
   await Promise.all(promises)
 
@@ -55,7 +55,9 @@ module.exports = async (context) => {
 
   const outputs = await instance.run(method)
 
-  context.outputs(outputs)
+  // console.log(outputs)
 
-  context.close('done', 'Done')
+  // context.outputs(outputs)
+
+  // context.close('done', 'Done')
 }

@@ -37,6 +37,7 @@ class Context {
           this.debug(data)
         } else if (event === 'outputs') {
           this.outputs(data)
+          this.close('done', 'Done')
         } else if (event === 'error') {
           this.error(data)
         } else {
