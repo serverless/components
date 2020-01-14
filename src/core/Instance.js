@@ -128,8 +128,14 @@ class Instance {
     instance.defaults.headers.put = {}
     const body = fs.readFileSync(packagePath)
 
+    // make sure axios handles large packages
+    const config = {
+      maxContentLength: Infinity,
+      maxBodyLength: Infinity
+    }
+
     try {
-      await instance.put(packageUrls.upload, body)
+      await instance.put(packageUrls.upload, body, config)
     } catch (e) {
       throw e
     }

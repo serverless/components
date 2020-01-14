@@ -49,23 +49,7 @@ const pack = async (inputDirPath, outputFilePath, include = [], exclude = []) =>
   return outputFilePath
 }
 
-const putComponentPackage = async (componentPackagePath, componentUploadUrl) => {
-  // axios auto adds headers that causes signature mismatch
-  // so we gotta remove them manually
-  const instance = axios.create()
-  instance.defaults.headers.common = {}
-  instance.defaults.headers.put = {}
-  const file = fs.readFileSync(componentPackagePath)
-
-  try {
-    await instance.put(componentUploadUrl, file)
-  } catch (e) {
-    throw e
-  }
-}
-
 module.exports = {
   sleep,
-  pack,
-  putComponentPackage
+  pack
 }

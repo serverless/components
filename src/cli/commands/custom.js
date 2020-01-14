@@ -44,20 +44,9 @@ module.exports = async (context) => {
     instance.inputs = {}
   }
 
-  // only connect if using debug mode
-  // if (context.debugMode) {
-  //   promises.push(context.connect())
-  // }
-
   await Promise.all(promises)
 
   context.status('Running', instance.name)
 
-  const outputs = await instance.run(method)
-
-  // console.log(outputs)
-
-  // context.outputs(outputs)
-
-  // context.close('done', 'Done')
+  return instance.run(method)
 }

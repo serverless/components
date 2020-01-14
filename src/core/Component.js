@@ -102,8 +102,14 @@ class Component {
     instance.defaults.headers.put = {}
     const file = fs.readFileSync(componentPackagePath)
 
+    // make sure axios handles large packages
+    const config = {
+      maxContentLength: Infinity,
+      maxBodyLength: Infinity
+    }
+
     try {
-      await instance.put(componentUploadUrl, file)
+      await instance.put(componentUploadUrl, file, config)
     } catch (e) {
       throw e
     }
