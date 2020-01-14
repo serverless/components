@@ -9,6 +9,15 @@ module.exports = async (context) => {
     throw new Error('"serverless.yml" file not found in the current working directory.')
   }
 
+  // If stage has been added via CLI option or environment variable, override serverless.yml
+  if (context.stage) {
+    serverlessYmlFile.stage = context.stage
+  }
+  // If no stage has been provided via CLI flag, env variable, or serverless,yml, default to "dev" stage
+  if (!serverlessYmlFile.stage) {
+    serverlessYmlFile.stage = 'dev'
+  }
+
   serverlessYmlFile = resolveConfig(serverlessYmlFile)
 
   const credentials = getCredentials()

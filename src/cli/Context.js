@@ -39,6 +39,7 @@ class CLI extends Context {
     this._.loadingDotCount = 0
     this.accessKey = config.accessKey
     this.credentials = config.credentials
+    this.stage = config.stage
     this.debugMode = config.debug || false
   }
 
