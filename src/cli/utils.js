@@ -138,31 +138,9 @@ const resolveConfig = (config) => {
       let newValue = value
       for (const match of matches) {
         const referencedPropertyPath = match.substring(2, match.length - 1).split('.')
-        const referencedTopLevelProperty = referencedPropertyPath[0]
         if (/\${env\.(\w*:?[\w\d.-]+)}/g.test(match)) {
           newValue = process.env[referencedPropertyPath[1]]
           variableResolved = true
-        } else {
-          if (!config[referencedTopLevelProperty]) {
-            throw Error(`invalid reference ${match}`)
-          }
-
-          if (!config[referencedTopLevelProperty].component) {
-            variableResolved = true
-            const referencedPropertyValue = R.path(referencedPropertyPath, config)
-
-            if (referencedPropertyValue === undefined) {
-              throw Error(`invalid reference ${match}`)
-            }
-
-            if (match === value) {
-              newValue = referencedPropertyValue
-            } else if (typeof referencedPropertyValue === 'string') {
-              newValue = newValue.replace(match, referencedPropertyValue)
-            } else {
-              throw Error(`the referenced substring is not a string`)
-            }
-          }
         }
       }
       this.update(newValue)
