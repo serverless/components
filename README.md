@@ -42,6 +42,7 @@ Read the [Quick-Start](#quick-start) to get started, or learn more via the docum
   - [Credentials](#credentials)
   - [Environment Variables](#environment-variables)
   - [Stages](#stages)
+  - [Variables](#variables)
 - [Building Components](#building-components)
   - [Serverless.component.yml](#serverless.component.yml)
   - [Serverless.js](#serverless.js)
@@ -349,27 +350,11 @@ Components could access these google credentials using `this.credentials.google`
 }
 ```
 
-### Environment Variables
-
-You can reference environment variables (e.g. those that you defined in the `.env` file) directly in `serverless.yml` by referencing the `${env}` object. For example, if you want to reference the `TABLE` environment variable, you could do that with `${env.TABLE}`.
-
-```yml
-component: express
-org: acme
-app: ecommerce
-name: rest-api
-
-inputs:
-  src: ./src
-  env:
-    foo: ${env.BAR}
-```
-
 ### Stages
 
 Serverless Components have a Stages concept, which enables you to deploy entirely separate Component Instances and their cloud resources per stage.
 
-The `dev` Stage is the default. If you wish to change your stage, set it in `serverless.yml`, like this:
+The `dev` Stage is always used as the default stage. If you wish to change your stage, set it in `serverless.yml`, like this:
 
 ```yaml
 component: express@0.0.4
@@ -379,13 +364,147 @@ name: my-component-instance
 stage: prod # Enter the stage here
 ```
 
-You can also specify a Stage upon deployment, which overrides anything set in `serverless.yml`, like this:
+You can also specify a Stage within the `SERVERLESS_STAGE` Environment Variable, which overrides the `stage` set in `serverless.yml`:
+
+```bash
+SERVERLESS_STAGE=prod
+```
+
+Lastly, you can specify a Stage upon deployment via a CLI flag, which overrides anything set in `serverless.yml` AND an Environment Variable, like this:
 
 ```bash
 $ serverless deploy --stage prod
 ```
 
+Again, the CLI flag overrides both a `stage` in `serverless.yml` and an Environment Variable.  Whereas an Environment Variable can only override the `stage` in `serverless.yml`.
+
 <br/>
+
+### Variables
+
+You can use Variables within your Component Instances `serverless.yml` to reference Environment Variables, values from within `serverless.yml` and Outputs from other Serverless Component Instances that you've already deployed.
+
+Here is a quick preview of possibilities:
+
+```yaml
+org: acme
+app: ecommerce
+component: express
+name: rest-api
+stage: prod
+
+inputs:
+  name: ${org}-${stage}-${app}-${name} # Results in "acme-prod-ecommerce-rest-api"
+  region: ${env.REGION} # Results in whatever your environment variable REGION= is set to.
+  roleArn: ${output:shared:prod:role.arn} # Fetches an output from another component instance that is already deployed
+```
+
+#### Variables: Org
+
+You can reference your `org` value in the `inputs` of your YAML in `serverless.yml` by using the `${org}` Variable, like this: 
+
+```yml
+org: acme
+app: ecommerce
+component: express
+name: rest-api
+stage: prod
+
+inputs:
+  name: ${org}-api # Results in "acme-api"
+
+```
+
+#### Variables: Stage
+
+You can reference your `stage` value in the `inputs` of your YAML in `serverless.yml` by using the `${stage}` Variable, like this: 
+
+```yml
+org: acme
+app: ecommerce
+component: express
+name: rest-api
+stage: prod
+
+inputs:
+  name: ${stage}-api # Results in "prod-api"
+
+```
+
+#### Variables: App
+
+You can reference your `app` value in the `inputs` of your YAML in `serverless.yml` by using the `${app}` Variable, like this: 
+
+```yml
+org: acme
+app: ecommerce
+component: express
+name: rest-api
+stage: prod
+
+inputs:
+  name: ${app}-api # Results in "ecommerce-api"
+
+```
+
+#### Variables: Name
+
+You can reference your `name` value in the `inputs` of your YAML in `serverless.yml` by using the `${name}` Variable, like this: 
+
+```yml
+org: acme
+app: ecommerce
+component: express
+name: rest-api
+stage: prod
+
+inputs:
+  name: ${name} # Results in "rest-api"
+
+```
+
+#### Variables: Environment Variables
+
+You can reference Environment Variables (e.g. those that you defined in the `.env` file or that you've set in your environment manually) directly in `serverless.yml` by using the `${env}` Variable. 
+
+For example, if you want to reference the `REGION` environment variable, you could do that with `${env.REGION}`.
+
+```yml
+component: express
+org: acme
+app: ecommerce
+name: rest-api
+stage: prod
+
+inputs:
+  region: ${env.REGION}
+```
+
+#### Variables: Outputs
+
+Perhaps one of the most useful Variables is the ability to reference Outputs from other Component Instances that you have already deployed.  This allows you to share configuration/data easily across as many Component Instances as you'd like.
+
+If you want to reference an Output of another Component Instance, use the `${output:[app]:[stage]:[instance name].[output]}` syntax, like this:
+
+```yml
+component: express
+org: acme
+app: ecommerce
+name: rest-api
+stage: prod
+
+inputs:
+  roleArn: ${output:shared:prod:role.arn} # Fetches an output from another component instance that is already deployed
+
+```
+
+You can access Outputs across any App, Instance, in an any Stage, within the same Org.
+
+A killer feature of this is the ability to share resources easily, and even do so across environments.  This is useful when developers want to deploy a Component Instance in their own personal Stage, but access shared resources within a common "development" Stage, like a database.  This way, the developers on your team do not have to recreate the entire development stage to perform their feature work or bug fix, only the Component Instance that needs changes.
+
+
+<br/>
+
 
 # Building Components
 
