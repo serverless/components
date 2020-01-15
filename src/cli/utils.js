@@ -129,6 +129,12 @@ const getConfig = (fileName) => {
   return false
 }
 
+/**
+ * Resolves any variables that require resolving before the engine.
+ * This currently supports only ${env}.  All others should be resolved within the deployment engine.
+ *  
+ * @param {*} config 
+ */
 const resolveConfig = (config) => {
   const regex = /\${(\w*:?[\w\d.-]+)}/g
   let variableResolved = false
@@ -138,6 +144,7 @@ const resolveConfig = (config) => {
       let newValue = value
       for (const match of matches) {
         const referencedPropertyPath = match.substring(2, match.length - 1).split('.')
+        // Search for ${env:}
         if (/\${env\.(\w*:?[\w\d.-]+)}/g.test(match)) {
           newValue = process.env[referencedPropertyPath[1]]
           variableResolved = true
