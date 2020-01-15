@@ -218,7 +218,7 @@ class CLI extends Context {
    */
   outputs(outputs) {
     if (!outputs || typeof outputs !== 'object' || Object.keys(outputs).length === 0) {
-      return
+      this.close('done', 'Done')
     }
     // Clear any existing content
     process.stdout.write(ansiEscapes.eraseDown)
@@ -232,6 +232,8 @@ class CLI extends Context {
         0
       )
     ) // eslint-disable-line
+
+    this.close('done', 'Done')
   }
 
   /**

@@ -152,13 +152,21 @@ class Instance {
 
     const runComponentInputs = {
       ...this.get(),
+      accessKey,
       credentials,
       connectionId,
       debugMode,
       method
     }
 
-    return engine.runComponent(runComponentInputs)
+    this.context.ws.send(
+      JSON.stringify({
+        action: '$default',
+        body: { method: 'runComponent', inputs: runComponentInputs }
+      })
+    )
+
+    // return engine.runComponent(runComponentInputs)
   }
 
   async connect() {

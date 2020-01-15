@@ -71,14 +71,18 @@ const devInstance = async (context) => {
         } else if (!isProcessing) {
           isProcessing = true
 
-          await deploy(instance)
-          if (queuedOperation) {
-            queuedOperation = false
-            await deploy(instance)
+          // once outputs are received (deployment is done)
+          // go back to watching
+          instance.context.outputs = () => {
+            if (queuedOperation) {
+              queuedOperation = false
+              deploy(instance)
+            }
+            isProcessing = false
+            instance.context.status('Watching', instance.name)
           }
 
-          isProcessing = false
-          instance.context.status('Watching', instance.name)
+          await deploy(instance)
         }
       } catch (e) {
         isProcessing = false
@@ -117,6 +121,9 @@ const devInstance = async (context) => {
 
   // connect the instance using the generated connectionId
   await instance.connect()
+
+  // don't send the connectionId to runComponent
+  // instance.context.connectionId = null
 
   await watch(instance)
 }
