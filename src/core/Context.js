@@ -28,6 +28,7 @@ class Context {
 
       ws.on('message', (message) => {
         const { event, data } = JSON.parse(message)
+        console.log(message)
         if (event === 'echo') {
           this.connectionId = data.connectionId
           resolve(data)

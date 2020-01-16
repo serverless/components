@@ -1,6 +1,6 @@
 {
   "name": "@serverless/components",
-  "version": "2.7.4",
+  "version": "2.7.5",
   "description": "Serverless Components",
   "main": "./src/index.js",
   "bin": {
@@ -16,7 +16,7 @@
   "author": "Serverless, Inc.",
   "license": "MIT",
   "dependencies": {
-    "@serverless/client": "^0.1.4",
+    "@serverless/client": "latest",
     "@serverless/platform-sdk": "^2.2.1",
     "adm-zip": "^0.4.13",
     "ansi-escapes": "^4.2.0",
