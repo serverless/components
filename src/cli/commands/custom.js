@@ -3,6 +3,7 @@ const { Instance } = require('../../core')
 const { getConfig, resolveConfig, getOrCreateAccessKey, getCredentials } = require('../utils')
 
 module.exports = async (context) => {
+  // get serverless.yml file from the cwd
   let serverlessYmlFile = getConfig('serverless')
 
   if (!serverlessYmlFile) {
@@ -18,17 +19,22 @@ module.exports = async (context) => {
     serverlessYmlFile.stage = 'dev'
   }
 
+  // resolve any local variables (ie env references) found in the serverless.yml file
   serverlessYmlFile = resolveConfig(serverlessYmlFile)
 
+  // get the credentials from the .env file in the cwd
   const credentials = getCredentials()
 
+  // create a new component instannce to be run based on the serverless.yml file
   const instance = new Instance(serverlessYmlFile, context)
 
+  // make sure the user is logged or has an access key for the org specified in the serverless.yml file
   const accessKey = await getOrCreateAccessKey(instance.org)
 
+  // update the context with the access key and credentials to be used by the component instance
   context.update({ accessKey, credentials })
 
-  // you must be logged in
+  // throw error if not logged in or not set access key env var
   if (!context.accessKey) {
     context.error(
       `Run 'serverless login' first to rapidly deploy your serverless application.`,
@@ -43,6 +49,7 @@ module.exports = async (context) => {
     await instance.build()
   }
 
+  // always connect to get a connection id and recieve outputs, errors and logs
   const promises = [context.connect()]
 
   // only upload if deploying
@@ -53,9 +60,11 @@ module.exports = async (context) => {
     instance.inputs = {}
   }
 
+  // connect and upload in parallel
   await Promise.all(promises)
 
   context.status('Running', instance.name)
 
+  // run the component instance with the method/command provided and await socket streams
   return instance.run(method)
 }

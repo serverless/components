@@ -8,7 +8,7 @@ const {
   writeConfigFile,
   createAccessKeyForTenant
 } = require('@serverless/platform-sdk')
-const R = require('ramda')
+const R = require('ramda') // eslint-disable-line
 
 const fileExistsSync = (filePath) => {
   try {
@@ -100,6 +100,10 @@ const readFileSync = (filePath, options = {}) => {
   return parseFile(filePath, contents, options)
 }
 
+/*
+ * reads a serverless config file based on the file name relative to the cwd.
+ * whether that file is serverless.yml or serverless.component.yml
+ */
 const getConfig = (fileName) => {
   const ymlFilePath = path.join(process.cwd(), `${fileName}.yml`)
   const yamlFilePath = path.join(process.cwd(), `${fileName}.yaml`)
@@ -132,8 +136,8 @@ const getConfig = (fileName) => {
 /**
  * Resolves any variables that require resolving before the engine.
  * This currently supports only ${env}.  All others should be resolved within the deployment engine.
- *  
- * @param {*} config 
+ *
+ * @param {*} config
  */
 const resolveConfig = (config) => {
   const regex = /\${(\w*:?[\w\d.-]+)}/g
@@ -159,23 +163,15 @@ const resolveConfig = (config) => {
   return resolvedConfig
 }
 
-const isComponentsProject = () => {
-  const serverlessComponentFile = getConfig('serverless.component')
-  const serverlessFile = getConfig('serverless')
-
-  if (serverlessComponentFile || (serverlessFile && !serverlessFile.provider)) {
-    return true
-  }
-
-  return false
-}
-
-// Gets or creates an access key based on org
+/*
+ * gets or creates an access key based on org
+ */
 const getOrCreateAccessKey = async (org) => {
   if (process.env.SERVERLESS_ACCESS_KEY) {
     return process.env.SERVERLESS_ACCESS_KEY
   }
 
+  // read config file from the user machine
   const userConfigFile = readConfigFile()
 
   // Verify config file
@@ -193,9 +189,13 @@ const getOrCreateAccessKey = async (org) => {
     return accessKey
   }
 
+  // return the access key for the specified org
   return user.dashboard.accessKeys[org]
 }
 
+/*
+ * checks whether the provided serverless.yml file object is a component file
+ */
 const isComponentsFile = (serverlessFile) => {
   if (typeof serverlessFile !== 'object') {
     return false
@@ -214,11 +214,31 @@ const isComponentsFile = (serverlessFile) => {
   return false
 }
 
+/*
+ * checks whether the cwd is a component project based on the yaml file that exists
+ * used by the framework v1 to determine whether to load v1 or components
+ */
 const runningComponents = () => {
   const serverlessFile = getConfig('serverless')
   const serverlessComponentFile = getConfig('serverless.component')
 
   if (serverlessComponentFile || isComponentsFile(serverlessFile)) {
+    return true
+  }
+
+  return false
+}
+
+/*
+ * checks whether the cwd is a component project based on the yaml file that exists
+ * used by the framework v1 to determine whether to load v1 or components
+ */
+// TODO this is probably a duplicate of the runningComponents function above
+const isComponentsProject = () => {
+  const serverlessComponentFile = getConfig('serverless.component')
+  const serverlessFile = getConfig('serverless')
+
+  if (serverlessComponentFile || (serverlessFile && !serverlessFile.provider)) {
     return true
   }
 

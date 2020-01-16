@@ -85,6 +85,7 @@ class Component {
 
     this.context.debug(`Packaging component from ${this.main}`)
 
+    // package the component and get an upload url at the same time
     const res = await Promise.all([
       registry.prePublish(props),
       pack(this.main, componentPackagePath)
@@ -120,6 +121,7 @@ class Component {
   async connect() {
     const websockets = new WebSockets({ accessKey: this.context.accessKey })
 
+    // connect to that component channel to receive console.logs from component lambda
     const data = {
       connectionId: this.context.connectionId,
       channelId: `component/${this.name}`
