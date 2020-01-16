@@ -553,7 +553,7 @@ class MyComponent extends Component {
 module.exports = MyComponent
 ```
 
-Just run `serverless` in the directory that contains the `serverless.js` file to run your new component. You'll will see all the logs and outputs of your new component. Logs and outputs of any child component you use will not be shown, unless you run in debug mode: `serverless --debug`. You can also run any custom method/command you've defined with `serverless <methodName>`.
+Just run `serverless` in the directory that contains the `serverless.js` file to run your new component. You will see all the logs and outputs of your new component. Logs and outputs of any child component you use will not be shown, unless you run in debug mode: `serverless --debug`. You can also run any custom method/command you've defined with `serverless <methodName>`.
 
 For complete real-world examples on writing components, [check out our official components](https://github.com/serverless-components)
 
