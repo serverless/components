@@ -1,31 +1,42 @@
-const Context = require('./Context')
+/*
+ * SERVERLESS COMPONENTS: INSTANCE
+ */
+
 const path = require('path')
 const fs = require('fs')
 const { tmpdir } = require('os')
 const axios = require('axios')
 const util = require('util')
-const { Engine, WebSockets } = require('@serverless/client')
 const exec = util.promisify(require('child_process').exec)
-const { pack } = require('./utils')
+const { 
+  pack,
+  getDirSize,
+  loadInstanceConfig,
+  loadInstanceCredentials,
+  resolveInputVariables,
+} = require('../utils')
 
 class Instance {
-  constructor(props = {}, context = {}) {
-    this.name = props.name
-    this.org = props.org
-    this.app = props.app
-    this.component = props.component
-    this.stage = props.stage || 'dev'
-    this.inputs = props.inputs || {}
 
-    // use the provided context instance, or create a new basic context available in core
-    this.context = typeof context.log === 'function' ? context : new Context(context)
+  constructor(client) {
+    this.client = client
 
-    // validate the provided config
-    this.validate()
+    // Config file properties
+    this.name = null
+    this.org = null
+    this.app = null
+    this.component = null
+    this.stage = process.env.SERVERLESS_STAGE || 'dev'
+    this.inputs = {}
+
+    // Additional properties
+    this.componentName = null
+    this.componentVersion = null
+    this.credentials = {}
   }
 
-  /*
-   * validates the component instance properties
+  /**
+   * Validates the component instance properties
    */
   validate() {
     if (typeof this.component !== 'string') {
@@ -40,15 +51,30 @@ class Instance {
       throw new Error(`Invalid component instance. Missing "app" property.`)
     }
 
+    // org is required
+    if (typeof this.org !== 'string') {
+      throw new Error(`Invalid component instance. Missing "org" property.`)
+    }
+  }
+
+  /**
+   * Sets and updates the component instance properties and validates them again
+   * @param {*} props 
+   */
+  set(props = {}) {
+    this.name = props.name ? props.name.trim() : this.name
+    this.org = props.org ? props.org.trim() : this.org
+    this.app = props.app ? props.app.trim() : this.app
+    this.component = props.component ? props.component.trim() : this.component
+    this.stage = process.env.SERVERLESS_STAGE || props.stage || this.stage // ENV var always takes precedence 
+    this.stage = this.stage.trim()
+    this.inputs = props.inputs || this.inputs
+    this.credentials = props.credentials || this.credentials
+
     // parse the org/app string (ie. app: serverlessinc/myApp)
     if (this.app.includes('/')) {
       this.org = this.app.split('/')[0]
       this.app = this.app.split('/')[1]
-    }
-
-    // org is required
-    if (typeof this.org !== 'string') {
-      throw new Error(`Invalid component instance. Missing "org" property.`)
     }
 
     // set the specified component name and version (ie. component: express@0.1.0)
@@ -60,24 +86,15 @@ class Instance {
       this.componentName = this.component
       this.componentVersion = 'dev'
     }
-  }
 
-  /*
-   * sets and updates the component instance properties and validates them again
-   */
-  set(props = {}) {
-    this.name = props.name || this.name
-    this.org = props.org || this.org
-    this.app = props.app || this.app
-    this.component = props.component || this.component
-    this.stage = props.stage || this.stage
-    this.inputs = props.inputs || this.inputs
+    // Resolve Serverless Variables for environment variables only
+    this.inputs = resolveInputVariables(this.inputs)
 
     this.validate()
   }
 
-  /*
-   * gets a clean object of the component instance properties
+  /**
+   * Gets a clean object of the component instance properties
    */
   get() {
     return {
@@ -92,42 +109,122 @@ class Instance {
     }
   }
 
-  /*
-   * build and resolve the component instance src input if provided
+  /**
+   * Load an instance via serverless.yml/json given a directory where it should exist
+   * @param {*} directoryPath 
    */
-  async build() {
-    if (typeof this.inputs.src === 'object' && this.inputs.src.hook && this.inputs.src.dist) {
-      // First run the build hook, if "hook" and "dist" are specified
-      this.context.status('Building')
-      const options = { cwd: this.inputs.src.src }
-      try {
-        await exec(this.inputs.src.hook, options)
-      } catch (err) {
-        throw new Error(`Failed building website via "${this.inputs.src.hook}" due to the following error: "${err.stderr}"
-        ${err.stdout}`)
+  load(directoryPath) {
+    const serverlessInstanceFile = loadInstanceConfig(directoryPath)
+    serverlessInstanceFile.credentials = loadInstanceCredentials(directoryPath)
+    this.set(serverlessInstanceFile)
+  }
+
+  /**
+   * Run a method. "inputs" override serverless.yml inputs and should only be provided when using custom methods.
+   * @param {*} method 
+   * @param {*} inputs 
+   * @param {*} options 
+   */
+  async preRun(method, inputs = {}, options = {}) {
+    // Validate and sanitize
+    if (!method) {
+      throw new Error(`A "method" argument is required`)
+    }
+    if (!this.org) {
+      throw new Error(`This instance is missing an "org"`)
+    }
+    if (!this.app) {
+      throw new Error(`This instance is missing an "app"`)
+    }
+    if (!this.name) {
+      throw new Error(`This instance is missing an instance "name"`)
+    }
+    // Override inputs if "deploy" method
+    if (method === 'deploy') inputs = this.inputs
+
+    // Run source hook and upload source
+    let size
+    if (inputs.src) {
+      // Check to ensure file size does not exceed 100MB
+      size = await getDirSize(inputs.src)
+
+      // lock deployment of code size greater than 200MB
+      if (size > 200000000) {
+        throw new Error('Your code size must be less than 200MB.  Try using Webpack, Parcel, AWS Lambda layers to reduce your code size.')
       }
-      this.inputs.src = path.resolve(path.join(process.cwd(), this.inputs.src.dist))
-    } else if (typeof this.inputs.src === 'object' && this.inputs.src.src) {
-      this.inputs.src = path.resolve(this.inputs.src.src)
-    } else if (typeof this.inputs.src === 'string') {
-      this.inputs.src = path.resolve(this.inputs.src)
+
+      inputs.src = await this.runSrcHook(inputs.src)
+      inputs.src = await this.uploadSource(inputs.src)
     }
 
-    return this.get()
+    return {
+      method,
+      inputs,
+      options,
+      size,
+    }
+  }
+
+  /**
+   * Run a method. "inputs" override serverless.yml inputs and should only be provided when using custom methods.
+   * @param {*} method 
+   * @param {*} inputs 
+   * @param {*} options 
+   */
+  async run(method, inputs = {}, options = {}, size, skipPreRun) {
+
+    if (!skipPreRun) {
+      const result = await this.preRun(method, inputs, options)
+      method = result.method
+      inputs = result.inputs
+      options = result.options
+      size = result.size
+    }
+    
+    return await this.client.run(
+      {
+        instance: {
+          org: this.org,
+          stage: this.stage,
+          app: this.app,
+          component: this.component,
+          name: this.name,
+          inputs,
+        },
+        method,
+        credentials: this.credentials,
+        options,
+        size,
+      }
+    )
   }
 
   /*
-   * uploads the component instance src input reference if available
+   * Run a "src" hook, if one is specified
    */
-  async upload() {
-    // Skip packaging if no "src" input
-    if (!this.inputs.src) {
-      return
+  async runSrcHook(src) {
+    if (typeof src === 'object' && src.hook && src.dist) {
+      // First run the build hook, if "hook" and "dist" are specified
+      const options = { cwd: src.src }
+      try {
+        await exec(src.hook, options)
+      } catch (err) {
+        throw new Error(`Failed running "src.hook": "${src.hook}" due to the following error: "${err.stderr}"
+        ${err.stdout}`)
+      }
+      src = path.resolve(path.join(process.cwd(), src.dist))
+    } else if (typeof src === 'object' && src.src) {
+      src = path.resolve(src.src)
+    } else if (typeof src === 'string') {
+      src = path.resolve(src)
     }
+    return src
+  }
 
-    // initialize the engine service
-    const engine = new Engine({ accessKey: this.context.accessKey })
-
+  /*
+   * Uploads the component instance src input reference if available
+   */
+  async uploadSource(src) {
     const packagePath = path.join(
       tmpdir(),
       `${Math.random()
@@ -135,85 +232,41 @@ class Instance {
         .substring(6)}.zip`
     )
 
-    this.context.debug(`Packaging from ${this.inputs.src} into ${packagePath}`)
-    this.context.status('Packaging')
-
-    // get the upload and download urls for the src input
+    // Get the upload and download urls for the src input
     // and package the src input directory at the same time for speed
-    const res = await Promise.all([engine.getPackageUrls(), pack(this.inputs.src, packagePath)])
+    const res = await Promise.all([
+      this.client.getUploadUrls(this.org), 
+      pack(this.inputs.src, packagePath)
+    ])
 
-    // set the package signed urls. This is an object includes both the upload and downnload urls
+    // Set the package signed urls. This is an object includes both the upload and downnload urls
     // the upload url is used to upload the package to s3
     // while the download url is passed to the component instannce to be downnloaded in the lambda runtime
     const packageUrls = res[0]
 
-    this.context.status('Uploading')
-    this.context.debug(`Uploading ${packagePath} to ${packageUrls.upload.split('?')[0]}`)
-
-    // create a new axios instance and make sure we clear the default axios headers
+    // Create a new axios instance and make sure we clear the default axios headers
     // as they cause a mismatch with the signature provided by aws
-    const instance = axios.create()
-    instance.defaults.headers.common = {}
-    instance.defaults.headers.put = {}
+    const request = axios.create()
+    request.defaults.headers.common = {}
+    request.defaults.headers.put = {}
     const body = fs.readFileSync(packagePath)
 
-    // make sure axios handles large packages
+    // Make sure axios handles large packages
     const config = {
       maxContentLength: Infinity,
       maxBodyLength: Infinity
     }
 
+    let result
     try {
-      await instance.put(packageUrls.upload, body, config)
+      result = await request.put(packageUrls.upload, body, config)
     } catch (e) {
       throw e
     }
 
-    this.context.debug(`Upload completed`)
-
     // replace the src input to point to the download url so that it's download in the lambda runtime
-    this.inputs.src = packageUrls.download
-  }
-
-  /*
-   * run the component instance via websockets with the provided method and properties
-   */
-  async run(method = 'deploy') {
-    const { accessKey, credentials, connectionId, debugMode } = this.context
-
-    const runComponentInputs = {
-      ...this.get(),
-      accessKey,
-      credentials,
-      connectionId,
-      debugMode,
-      method
-    }
-
-    // send a websockets request to run the component instance based on the provided inputs
-    this.context.ws.send(
-      JSON.stringify({
-        action: '$default',
-        body: { method: 'runComponent', inputs: runComponentInputs }
-      })
-    )
-  }
-
-  /*
-   * connect to the component instnace channel to receive console.log statements whenever it runs
-   */
-  async connect() {
-    // initialize a new instance of the WebSockets service of the platform
-    const websockets = new WebSockets({ accessKey: this.context.accessKey })
-    const instanceId = `${this.org}.${this.app}.${this.stage}.${this.name}`
-
-    const data = {
-      ...this.get(),
-      connectionId: this.context.connectionId, // the connection id of this CLI session
-      channelId: `instance/${instanceId}`
-    }
-
-    await websockets.connectToChannel(data)
+    src = packageUrls.download
+    return src
   }
 }
 

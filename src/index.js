@@ -1,11 +1,7 @@
-const { version } = require('../package.json')
-const cli = require('./cli')
-const core = require('./core')
-const { runningComponents } = require('./cli/utils')
+const ServerlessComponents = require('./core')
+const ServerlessUtilities = require('./utils')
 
 module.exports = {
-  runningComponents,
-  version,
-  cli,
-  ...core
+  ServerlessComponents,
+  ServerlessUtilities,
 }

@@ -1,36 +1,68 @@
+/*
+ * CLI: Command: Publish
+ */
+
 const args = require('minimist')(process.argv.slice(2))
-const { Component } = require('../../core')
-const { getConfig, resolveConfig, getOrCreateAccessKey } = require('../utils')
+const ServerlessComponents = require('../../core')
 
-module.exports = async (context) => {
-  context.status('Publishing')
+module.exports = async (config, cli) => {
+  const serverless = new ServerlessComponents()
 
-  let serverlessComponentFile = getConfig('serverless.component')
+  // Start CLI persistance status
+  cli.start()
 
-  if (!serverlessComponentFile) {
-    throw new Error('serverless.component.yml file not found in the current working directory')
+  // Load serverless component instance.  Submit a directory where its config files should be.
+  const component = serverless.component(process.cwd())
+
+  // Get or create access key for his org
+  const accessKey = await serverless.getOrCreateAccessKey(component.org)
+
+  // Check they are logged in
+  if (!accessKey) {
+    cli.error(`Run 'serverless login' first to publish your serverless component.`, true)
   }
 
-  serverlessComponentFile = resolveConfig(serverlessComponentFile)
-
-  const accessKey = await getOrCreateAccessKey(serverlessComponentFile.org)
-
-  // update context with access key
-  context.update({ accessKey })
-
-  // you must be logged in
-  if (!context.accessKey) {
-    context.error(`Run 'serverless login' first to publish your serverless component.`, true)
-  }
-
+  // Update the SDK with the access key
+  serverless.config({ 
+    orgName: component.org,
+    accessKey 
+  })
+  
   // if using --dev flag, publish to the "dev" version
-  if (args.dev) {
-    delete serverlessComponentFile.version
+  if (args.dev) { component.set({ version: '0.0.0-dev' }) }
+
+  const connectAndWait = () => {
+    return new Promise(async (resolve, reject) => {
+      // Establish connection with Serverless Platform
+      cli.status('Connecting')
+      const onEvent = (event) => {
+        if (event.event === 'component.publish.succeeded') {
+          return resolve(event)
+        }
+      }
+      const onDisconnect = (event) => {
+        console.log(event)
+      }
+
+      try {
+        await serverless.connect({ onEvent, onDisconnect })
+        cli.status('Publishing')
+        await component.publish()
+      } catch(error) {
+        reject(error)
+      }
+    })
   }
 
-  const component = new Component(serverlessComponentFile, context)
+  let response
+  try {
+    response = await connectAndWait()
+  } catch(error) {
+    serverless.disconnect()
+    cli.error(error, true)
+  }
 
-  await component.publish(serverlessComponentFile, context)
+  if (response.data.componentVersion === '0.0.0-dev') response.data.componentVersion = 'dev'
 
-  context.close('done', 'Published')
+  cli.close('done', `Successfully published ${response.data.componentName}@${response.data.componentVersion}`)
 }

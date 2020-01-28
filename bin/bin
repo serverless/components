@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { cli } = require('../src')
+const cli = require('../src/cli')
 
 // Run
 ;(async () => {

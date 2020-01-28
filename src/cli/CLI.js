@@ -1,3 +1,7 @@
+/*
+ * SERVERLESS COMPONENTS: CLI
+ */
+
 const os = require('os')
 const chalk = require('chalk')
 const ansiEscapes = require('ansi-escapes')
@@ -10,11 +14,8 @@ const grey = chalk.dim
 const green = chalk.rgb(0, 253, 88)
 const red = chalk.rgb(255, 93, 93)
 
-const { Context } = require('../core')
-
 /**
- * Sleep
- * - Because our "utils" contains business logic (and isn't exclusive to utils), circular dependencies are created and therefore "utils" cannot be required in this module.  Hence copying this here...
+ * Utility - Sleep
  */
 const sleep = async (wait) => new Promise((resolve) => setTimeout(() => resolve(), wait))
 
@@ -23,9 +24,8 @@ const sleep = async (wait) => new Promise((resolve) => setTimeout(() => resolve(
  * - Controls the CLI experience in the framework.
  * - Once instantiated, it starts a single, long running process.
  */
-class CLI extends Context {
+class CLI {
   constructor(config) {
-    super()
     // Defaults
     this._ = {}
     this._.entity = 'Serverless'
@@ -37,16 +37,6 @@ class CLI extends Context {
     this._.timerSeconds = 0
     this._.loadingDots = ''
     this._.loadingDotCount = 0
-    this.accessKey = config.accessKey
-    this.credentials = config.credentials
-    this.stage = config.stage
-    this.debugMode = config.debug || false
-  }
-
-  update(config) {
-    this.accessKey = config.accessKey || this.accessKey
-    this.credentials = config.credentials || this.credentials
-    this.debugMode = config.debug || this.debugMode
   }
 
   /**
@@ -150,12 +140,13 @@ class CLI extends Context {
     process.stdout.write(ansiEscapes.eraseDown)
 
     // Write log
-
-    if (!msg.endsWith('\n')) {
+    if (typeof msg === 'string' && !msg.endsWith('\n')) {
       msg = `${msg}\n`
+      process.stdout.write(grey(msg)) // eslint-disable-line
+    } else {
+      console.log(msg)
+      console.log('')
     }
-
-    process.stdout.write(`${msg}`) // eslint-disable-line
 
     // Put cursor to starting position for next view
     process.stdout.write(ansiEscapes.cursorLeft)
@@ -247,8 +238,7 @@ class CLI extends Context {
     if (this._.debug) {
       // Print Status
       if (this._.status !== this._.lastStatus) {
-        const content = `${this._.timerSeconds}s - Status - ${this._.status}`
-        process.stdout.write(content + os.EOL)
+        this.log(this._.status + '...')
         this._.lastStatus = '' + this._.status
       }
     }

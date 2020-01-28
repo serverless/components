@@ -1,30 +1,32 @@
-const Context = require('./Context')
+/*
+ * SERVERLESS COMPONENTS: COMPONENTS
+ */
+
 const path = require('path')
 const fs = require('fs')
 const { tmpdir } = require('os')
-const chokidar = require('chokidar')
 const axios = require('axios')
-const { Registry, WebSockets } = require('@serverless/client')
-const { pack } = require('./utils')
+const utils = require('../utils')
 
 class Component {
-  constructor(props = {}, context = {}) {
-    this.name = props.name
-    this.version = props.version
-    this.org = props.org
-    this.author = props.author
-    this.description = props.description || 'This is a Serverless Component'
-    this.keywords = props.keywords || 'aws, serverless'
-    this.repo = props.repo
-    this.readme = props.readme
-    this.license = props.license || 'MIT'
-    this.main = props.main || './src'
+  constructor(client) {
+    this.name = null
+    this.version = null
+    this.org = null
+    this.author = null
+    this.description = null
+    this.keywords = null
+    this.repo = null
+    this.readme = null
+    this.license = 'MIT'
+    this.main = './src'
 
-    this.context = typeof context.log === 'function' ? context : new Context(context)
-
-    this.validate()
+    this.client = client
   }
 
+  /**
+   * Validates the component's properties
+   */
   validate() {
     if (!this.name) {
       throw new Error('Invalid component. Missing name.')
@@ -47,6 +49,24 @@ class Component {
     }
   }
 
+  /*
+   * Sets and updates the component properties and validates them
+   */
+  set(props = {}) {
+    this.name = props.name ? props.name.trim() : this.name
+    this.version = props.version ? props.version.trim() : this.version
+    this.org = props.org ? props.org.trim() : this.org
+    this.author = props.author ? props.author.trim() : this.author
+    this.description = props.description ? props.description.trim() : this.description
+    this.keywords = props.keywords ? props.keywords.trim() : this.keywords
+    this.repo = props.repo ? props.repo.trim() : this.repo
+    this.readme = props.readme ? props.readme.trim() : this.readme
+    this.license = props.license ? props.license.trim() : this.license
+    this.main = props.main ? props.main.trim() : this.main
+
+    this.validate()
+  }
+
   get() {
     return {
       name: this.name,
@@ -62,18 +82,19 @@ class Component {
     }
   }
 
+  /*
+   * Load a component via serverless.component.yml/json given a directory where it should exist
+   */
+  load(directoryPath) {
+    const serverlessComponentFile = utils.loadComponentConfig(directoryPath)
+    this.set(serverlessComponentFile)
+  }
+
+  /**
+   * Publish to the Registry
+   */
   async publish() {
     const props = this.get()
-
-    if (!this.context.accessKey) {
-      throw new Error(`Unable to publish. Missing accessKey.`)
-    }
-
-    const registry = new Registry({ accessKey: this.context.accessKey })
-
-    const entity = `${this.name}@${this.version}`
-
-    this.context.status(`Publishing`, entity)
 
     // Get Component path and temporary path for packaging
     const componentPackagePath = path.join(
@@ -83,89 +104,43 @@ class Component {
         .substring(6)}.zip`
     )
 
-    this.context.debug(`Packaging component from ${this.main}`)
+    // Ensure "dev" version is translated correctly
+    if (this.version === 'dev') { this.version = '0.0.0-dev' }
 
-    // package the component and get an upload url at the same time
+    // Package the component and get an upload url at the same time
     const res = await Promise.all([
-      registry.prePublish(props),
-      pack(this.main, componentPackagePath)
+      this.prePublish(),
+      utils.pack(this.main, componentPackagePath)
     ])
 
+    // Upload Component to AWS S3
     const componentUploadUrl = res[0].url
 
-    this.context.debug(`Component packaged into ${componentPackagePath}`)
-    this.context.debug(`Uploading component package`)
-
-    // axios auto adds headers that causes signature mismatch
-    // so we gotta remove them manually
-    const instance = axios.create()
-    instance.defaults.headers.common = {}
-    instance.defaults.headers.put = {}
+    // Axios auto-adds headers that causes signature mismatch
+    // So we remove them manually
+    const request = axios.create()
+    request.defaults.headers.common = {}
+    request.defaults.headers.put = {}
     const file = fs.readFileSync(componentPackagePath)
 
-    // make sure axios handles large packages
+    // Make sure axios handles large packages
     const config = {
       maxContentLength: Infinity,
       maxBodyLength: Infinity
     }
 
     try {
-      await instance.put(componentUploadUrl, file, config)
+      await request.put(componentUploadUrl, file, config)
     } catch (e) {
       throw e
     }
-
-    this.context.debug(`Component package uploaded`)
   }
 
-  async connect() {
-    const websockets = new WebSockets({ accessKey: this.context.accessKey })
-
-    // connect to that component channel to receive console.logs from component lambda
-    const data = {
-      connectionId: this.context.connectionId,
-      channelId: `component/${this.name}`
-    }
-
-    await websockets.connectToChannel(data)
-  }
-
-  async dev() {
-    await this.connect()
-
-    let isProcessing = false
-    let queuedOperation = false
-    const entity = `${this.name}@${this.version}`
-
-    const watcher = chokidar.watch(this.main, { ignored: /\.serverless/ })
-
-    watcher.on('ready', async () => {
-      this.context.status('Watching', entity)
-    })
-
-    watcher.on('change', async () => {
-      try {
-        if (isProcessing && !queuedOperation) {
-          queuedOperation = true
-        } else if (!isProcessing) {
-          isProcessing = true
-
-          await this.publish()
-          if (queuedOperation) {
-            queuedOperation = false
-            await this.publish()
-          }
-
-          isProcessing = false
-          this.context.status('Watching', entity)
-        }
-      } catch (e) {
-        isProcessing = false
-        queuedOperation = false
-        this.context.error(e)
-        this.context.status('Watching', entity)
-      }
-    })
+  /**
+   * Gets temporary upload URLs
+   */
+  async prePublish() {
+    return await this.client.prePublish(this.get())
   }
 }
 
