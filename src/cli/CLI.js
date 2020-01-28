@@ -130,7 +130,7 @@ class CLI {
    * Log
    * - Render log statements cleanly
    */
-  log(msg) {
+  log(msg, header) {
     if (!msg || msg == '') {
       console.log() // eslint-disable-line
       return
@@ -141,9 +141,17 @@ class CLI {
 
     // Write log
     if (typeof msg === 'string' && !msg.endsWith('\n')) {
+      if (header) {
+        header = `${header}\n`
+        process.stdout.write(grey(header))
+      }
       msg = `${msg}\n`
-      process.stdout.write(grey(msg)) // eslint-disable-line
+      process.stdout.write(msg) // eslint-disable-line
     } else {
+      if (header) {
+        header = `${header}\n`
+        process.stdout.write(grey(header))
+      }
       console.log(msg)
       console.log('')
     }
@@ -222,9 +230,7 @@ class CLI {
         },
         0
       )
-    ) // eslint-disable-line
-
-    this.close('done', 'Done')
+    )
   }
 
   /**

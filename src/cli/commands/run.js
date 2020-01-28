@@ -88,5 +88,5 @@ module.exports = async (config, cli, command) => {
   // Give websockets a bit of time to receive any slow messages
   await sleep(100)
   serverless.disconnect()
-  cli.close('done', 'Success')
+  cli.close('done', 'success')
 }
