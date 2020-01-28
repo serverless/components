@@ -1,16 +1,16 @@
 const { getLoggedInUser, logout } = require('@serverless/platform-sdk')
 
-module.exports = async (context) => {
-  context.status('Logging out')
+module.exports = async (config, cli, command) => {
+  cli.status('Logging out')
 
   const user = getLoggedInUser()
 
   if (!user) {
-    context.close('done', `You are already logged out`)
+    cli.close('done', `You are already logged out`)
   }
 
   await logout()
 
-  context.status('Logged Out')
-  context.close('done', `Successfully logged out of "${user.username}"`)
+  cli.status('Logged Out')
+  cli.close('done', `Successfully logged out of "${user.username}"`)
 }
