@@ -36,7 +36,7 @@ module.exports = async (context, cli) => {
    * Event Handler tells this client what to do with Serverless Platform Events received via websockets
    */ 
   const onEvent = (event) => {
-    cli.log(event.event)
+    // cli.log(event)
     const d = new Date()
 
     // Status
@@ -47,6 +47,7 @@ module.exports = async (context, cli) => {
     if (event.event === 'instance.run.succeeded' && event.data.method === 'deploy') {
       cli.log('deployment successful', headerStatus)
       cli.outputs(event.data.outputs)
+      cli.status('Watching')
     }
     if (event.event === 'instance.run.failed' && event.data.method === 'deploy') {
       cli.log('deployment failed', headerStatus)
@@ -64,6 +65,12 @@ module.exports = async (context, cli) => {
       cli.log(event.data.message, headerError)
       cli.log(event.data.stack)
     }
+
+    // Success - TODO: NOt sure what to do with this
+    // const headerSuccess = `${d.toLocaleTimeString()} - ${event.instanceName} - transaction`
+    // if (event.event === 'instance.succeeded') {
+    //   cli.log('successful transaction', headerSuccess)
+    // }
 
   }
 
@@ -94,7 +101,8 @@ module.exports = async (context, cli) => {
   const watcher = chokidar.watch(process.cwd(), { ignored: /\.serverless/ })
 
   watcher.on('ready', async () => {
-    cli.status('Watching')
+    cli.status('Deploying')
+    await instance.run('deploy', {}, { debug: true })
   })
 
   watcher.on('change', async () => {
@@ -105,7 +113,7 @@ module.exports = async (context, cli) => {
     } else if (!isProcessing) {
       const instance = serverless.instance(process.cwd())
       cli.status('Deploying')
-      await instance.run('deploy', { debug: true })
+      await instance.run('deploy', {}, { debug: true })
     }
   })
 }

@@ -231,6 +231,7 @@ class CLI {
         0
       )
     )
+    console.log('')
   }
 
   /**
