@@ -10,6 +10,8 @@ module.exports = async (context, cli) => {
 
   const serverless = new ServerlessComponents
 
+  console.log()
+
   // Start CLI persistance status
   cli.start()
 
