@@ -67,6 +67,9 @@ class Component {
     this.validate()
   }
 
+  /**
+   * Get
+   */
   get() {
     return {
       name: this.name,
@@ -110,7 +113,7 @@ class Component {
     // Package the component and get an upload url at the same time
     const res = await Promise.all([
       this.prePublish(),
-      utils.pack(this.main, componentPackagePath)
+      utils.pack(this.main, componentPackagePath, [ path.join(__dirname, '_handler.js') ])
     ])
 
     // Upload Component to AWS S3

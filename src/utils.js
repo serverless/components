@@ -302,8 +302,8 @@ const pack = async (inputDirPath, outputFilePath, include = [], exclude = []) =>
     }
   })
 
-  if (!isNil(include)) {
-    include.forEach((file) => zip.addLocalFile(path.join(inputDirPath, file)))
+  if (include && include.length) {
+    include.forEach((filePath) => zip.addLocalFile(path.resolve(filePath)))
   }
 
   zip.writeZip(outputFilePath)

@@ -145,8 +145,15 @@ class Instance {
     // Run source hook and upload source
     let size
     if (inputs.src) {
+      let p = inputs.src
+      if (typeof p !== 'string' && p.src) {
+        p = p.src
+      } else if (typeof p !== 'string' && p.dist) {
+        p = p.dist
+      }
+
       // Check to ensure file size does not exceed 100MB
-      size = await getDirSize(inputs.src)
+      size = await getDirSize(p)
 
       // lock deployment of code size greater than 200MB
       if (size > 200000000) {
