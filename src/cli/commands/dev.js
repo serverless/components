@@ -4,7 +4,6 @@
 
 const path = require('path')
 const chokidar = require('chokidar')
-const ServerlessComponents = require('../../core')
 
 module.exports = async (context, cli) => {
 
