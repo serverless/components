@@ -2,12 +2,10 @@
  * CLI: Command: RUN
  */
 
-const args = require('minimist')(process.argv.slice(2))
 const { ServerlessSDK } = require('@serverless/platform-client')
 const utils = require('../utils')
 
 module.exports = async (config, cli, command) => {
-
   // Start CLI persistance status
   cli.start()
 
@@ -16,9 +14,8 @@ module.exports = async (config, cli, command) => {
 
   // Set default stage
   instanceYaml.stage = instanceYaml.stage || 'dev'
-
   // Get access key
-  const accessKey = await utils.getOrCreateAccessKey(instanceYaml.org)
+  const accessKey = await utils.getTokenId()
 
   // Check they are logged in
   if (!accessKey) {
@@ -28,30 +25,40 @@ module.exports = async (config, cli, command) => {
   // Load Instance Credentials
   const instanceCredentials = await utils.loadInstanceCredentials(instanceYaml.stage)
 
+  // initialize SDK
   const sdk = new ServerlessSDK({
     accessKey,
     context: {
-      orgName: instanceYaml.org,
+      orgName: instanceYaml.org
     }
   })
 
   // Prepare Options
   const options = {}
   options.debug = config.debug
-  
+
+  // connect if in debug mode
   if (options.debug) {
     await sdk.connect({
       onEvent: (evt) => {
-        console.log(evt)
+        console.log(evt) // eslint-disable-line
       }
     })
   }
 
-  // Deploy
-  cli.status('Deploying')
-  const instance = await sdk.deploy(instanceYaml, instanceCredentials, options)
-
-  cli.outputs(instance.outputs)
-  
+  if (command === 'deploy') {
+    // run deploy
+    cli.status('Deploying')
+    const instance = await sdk.deploy(instanceYaml, instanceCredentials, options)
+    cli.outputs(instance.outputs)
+  } else if (command === 'remove') {
+    // run remove
+    cli.status('Removing')
+    await sdk.remove(instanceYaml, instanceCredentials, options)
+  } else {
+    // run a custom method
+    cli.status('Running')
+    await sdk.run(command, instanceYaml, instanceCredentials, options)
+  }
   cli.close('done', 'success')
 }

@@ -2,40 +2,41 @@
  * CLI: Command: Dev
  */
 
-const path = require('path')
 const chokidar = require('chokidar')
+const { ServerlessSDK } = require('@serverless/platform-client')
+const utils = require('../utils')
 
-module.exports = async (context, cli) => {
-
-  const serverless = new ServerlessComponents
-
-  console.log()
-
+module.exports = async (config, cli) => {
   // Start CLI persistance status
   cli.start()
 
   // Load serverless component instance.  Submit a directory where its config files should be.
-  const instance = serverless.instance(process.cwd())
+  let instanceYaml = await utils.loadInstanceConfig(process.cwd())
 
   // Get or create access key for his org
-  const accessKey = await serverless.getOrCreateAccessKey(instance.org)
-
-  // Update the SDK with the access key
-  serverless.config({ 
-    accessKey,
-    orgName: instance.org 
-  })
+  const accessKey = await utils.getOrCreateAccessKey(instanceYaml.org)
 
   // Check they are logged in
   if (!accessKey) {
     cli.error(`Run 'serverless login' first to publish your serverless component.`, true)
   }
 
-  cli.status('Connecting', instance.name)
+  // Load Instance Credentials
+  const instanceCredentials = await utils.loadInstanceCredentials(instanceYaml.stage)
+
+  const sdk = new ServerlessSDK({
+    accessKey,
+    context: {
+      orgName: instanceYaml.org
+    }
+  })
+
+  cli.status('Connecting', instanceYaml.name)
 
   /**
    * Event Handler tells this client what to do with Serverless Platform Events received via websockets
-   */ 
+   */
+
   const onEvent = (event) => {
     // cli.log(event)
     const d = new Date()
@@ -72,29 +73,28 @@ module.exports = async (context, cli) => {
     // if (event.event === 'instance.succeeded') {
     //   cli.log('successful transaction', headerSuccess)
     // }
-
   }
 
   // Establish connection with Serverless Platform
   try {
-    await serverless.connect({
-      org: instance.org,
+    await sdk.connect({
+      org: instanceYaml.org,
       filter: {
-        stageName: instance.stage,
-        appName: instance.app,
-        instanceName: instance.name,
+        stageName: instanceYaml.stage,
+        appName: instanceYaml.app,
+        instanceName: instanceYaml.name,
         events: []
       },
       onEvent
     })
-  } catch(error) {
+  } catch (error) {
     throw new Error(error)
   }
 
   /**
    * Watch logic
    */
-  
+
   let isProcessing = false // whether there's already a deployment in progress
   let queuedOperation = false // whether there's another deployment queued
 
@@ -103,7 +103,7 @@ module.exports = async (context, cli) => {
 
   watcher.on('ready', async () => {
     cli.status('Deploying')
-    await instance.run('deploy', {}, { debug: true })
+    await sdk.run('deploy', instanceYaml, instanceCredentials, { debug: true })
   })
 
   watcher.on('change', async () => {
@@ -112,9 +112,20 @@ module.exports = async (context, cli) => {
       // queue another deploy operation to be run after the first one
       queuedOperation = true
     } else if (!isProcessing) {
-      const instance = serverless.instance(process.cwd())
+      // reload serverless component instance
+      instanceYaml = await utils.loadInstanceConfig(process.cwd())
       cli.status('Deploying')
-      await instance.run('deploy', {}, { debug: true })
+      await sdk.run('deploy', instanceYaml, instanceCredentials, { debug: true })
+
+      if (queuedOperation) {
+        // reload serverless component instance
+        instanceYaml = await utils.loadInstanceConfig(process.cwd())
+        cli.status('Deploying')
+        await sdk.run('deploy', instanceYaml, instanceCredentials, { debug: true })
+      }
+
+      isProcessing = false
+      queuedOperation = false
     }
   })
 }

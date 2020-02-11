@@ -217,7 +217,7 @@ class CLI {
    */
   outputs(outputs) {
     if (!outputs || typeof outputs !== 'object' || Object.keys(outputs).length === 0) {
-      this.close('done', 'Done')
+      this.close('done', 'Success')
     }
     // Clear any existing content
     process.stdout.write(ansiEscapes.eraseDown)

@@ -14,21 +14,22 @@ const dotenv = require('dotenv')
 const {
   readConfigFile,
   writeConfigFile,
-  createAccessKeyForTenant
+  createAccessKeyForTenant,
+  refreshToken
 } = require('@serverless/platform-sdk')
 
 /**
  * Wait for a number of miliseconds
- * @param {*} wait 
+ * @param {*} wait
  */
 const sleep = async (wait) => new Promise((resolve) => setTimeout(() => resolve(), wait))
 
 /**
  * Make HTTP API requests, easily
- * @param {*} options.endpoint 
- * @param {*} options.data 
- * @param {*} options.accessKey 
- * @param {*} options.method 
+ * @param {*} options.endpoint
+ * @param {*} options.data
+ * @param {*} options.accessKey
+ * @param {*} options.method
  */
 const request = async (options) => {
   const requestOptions = {
@@ -37,7 +38,7 @@ const request = async (options) => {
     headers: {
       'Content-Type': 'application/json'
     },
-    data: options.data,
+    data: options.data
   }
 
   if (options.accessKey) {
@@ -47,7 +48,7 @@ const request = async (options) => {
   let res
   try {
     res = await axios(requestOptions)
-  } catch(error) {
+  } catch (error) {
     if (error.response && error.response.status && error.response.data.message) {
       throw new Error(`${error.response.status} - ${error.response.data.message}`)
     }
@@ -58,7 +59,7 @@ const request = async (options) => {
 
 /**
  * Checks if a file exists
- * @param {*} filePath 
+ * @param {*} filePath
  */
 const fileExistsSync = (filePath) => {
   try {
@@ -70,9 +71,21 @@ const fileExistsSync = (filePath) => {
 }
 
 /**
+ * Determines if a given file path is a YAML file
+ * @param {*} filePath
+ */
+const isYamlPath = (filePath) => endsWith('.yml', filePath) || endsWith('.yaml', filePath)
+
+/**
+ * Determines if a given file path is a JSON file
+ * @param {*} filePath
+ */
+const isJsonPath = (filePath) => endsWith('.json', filePath)
+
+/**
  * Reads a file on the file system
- * @param {*} filePath 
- * @param {*} options 
+ * @param {*} filePath
+ * @param {*} options
  */
 const readFileSync = (filePath, options = {}) => {
   if (!fileExistsSync(filePath)) {
@@ -91,20 +104,8 @@ const readFileSync = (filePath, options = {}) => {
 }
 
 /**
- * Determines if a given file path is a YAML file
- * @param {*} filePath 
- */
-const isYamlPath = (filePath) => endsWith('.yml', filePath) || endsWith('.yaml', filePath)
-
-/**
- * Determines if a given file path is a JSON file
- * @param {*} filePath 
- */
-const isJsonPath = (filePath) => endsWith('.json', filePath)
-
-/**
  * Reads a serverless instance config file in a given directory path
- * @param {*} directoryPath 
+ * @param {*} directoryPath
  */
 const loadInstanceConfig = (directoryPath) => {
   directoryPath = path.resolve(directoryPath)
@@ -134,12 +135,14 @@ const loadInstanceConfig = (directoryPath) => {
   // Read file
   if (isYaml) {
     try {
-      instanceFile = readFileSync(filePath) 
+      instanceFile = readFileSync(filePath)
     } catch (e) {
       // todo currently our YAML parser does not support
       // CF schema (!Ref for example). So we silent that error
       // because the framework can deal with that
-      if (e.name !== 'YAMLException') { throw e }
+      if (e.name !== 'YAMLException') {
+        throw e
+      }
     }
   } else {
     instanceFile = readFileSync(filePath)
@@ -150,7 +153,7 @@ const loadInstanceConfig = (directoryPath) => {
 
 /**
  * Reads a serverless component config file in a given directory path
- * @param {*} directoryPath 
+ * @param {*} directoryPath
  */
 const loadComponentConfig = (directoryPath) => {
   directoryPath = path.resolve(directoryPath)
@@ -180,12 +183,14 @@ const loadComponentConfig = (directoryPath) => {
   // Read file
   if (isYaml) {
     try {
-      componentFile = readFileSync(filePath) 
+      componentFile = readFileSync(filePath)
     } catch (e) {
       // todo currently our YAML parser does not support
       // CF schema (!Ref for example). So we silent that error
       // because the framework can deal with that
-      if (e.name !== 'YAMLException') { throw e }
+      if (e.name !== 'YAMLException') {
+        throw e
+      }
     }
   } else {
     componentFile = readFileSync(filePath)
@@ -195,15 +200,17 @@ const loadComponentConfig = (directoryPath) => {
 }
 
 const getDirSize = async (p) => {
-  return fse.stat(p).then(stat => {
-    if(stat.isFile())
+  return fse.stat(p).then((stat) => {
+    if (stat.isFile()) {
       return stat.size
-    else if(stat.isDirectory())
-      return fse.readdir(p)
-        .then(entries => Promise.all(entries.map(e => getDirSize(path.join(p, e)))))
-        .then(e => e.reduce((a, c) => a + c, 0))
-    else return 0; // can't take size of a stream/symlink/socket/etc
-  });
+    } else if (stat.isDirectory()) {
+      return fse
+        .readdir(p)
+        .then((entries) => Promise.all(entries.map((e) => getDirSize(path.join(p, e)))))
+        .then((e) => e.reduce((a, c) => a + c, 0))
+    }
+    return 0 // can't take size of a stream/symlink/socket/etc
+  })
 }
 
 /**
@@ -236,8 +243,30 @@ const resolveInputVariables = (inputs) => {
 }
 
 /**
+ * Gets the logged in user's token id
+ */
+const getTokenId = async () => {
+  // refresh token if it's expired.
+  // this platform-sdk method returns immediately if the idToken did not expire
+  // if it did expire, it'll refresh it and update the config file
+  await refreshToken()
+
+  // read config file from user machine
+  const userConfigFile = readConfigFile()
+
+  // Verify config file and that the user is logged in
+  if (!userConfigFile || !userConfigFile.users || !userConfigFile.users[userConfigFile.userId]) {
+    return null
+  }
+
+  const user = userConfigFile.users[userConfigFile.userId]
+
+  return user.dashboard.idToken
+}
+
+/**
  * Gets or creates an access key based on org
- * @param {*} org 
+ * @param {*} org
  */
 const getOrCreateAccessKey = async (org) => {
   if (process.env.SERVERLESS_ACCESS_KEY) {
@@ -263,15 +292,16 @@ const getOrCreateAccessKey = async (org) => {
   }
 
   // return the access key for the specified org
-  return user.dashboard.accessKeys[org]
+  // return user.dashboard.accessKeys[org]
+  return user.dashboard.idToken
 }
 
 /**
  * Package files into a zip
- * @param {*} inputDirPath 
- * @param {*} outputFilePath 
- * @param {*} include 
- * @param {*} exclude 
+ * @param {*} inputDirPath
+ * @param {*} outputFilePath
+ * @param {*} include
+ * @param {*} exclude
  */
 const pack = async (inputDirPath, outputFilePath, include = [], exclude = []) => {
   const format = last(split('.', outputFilePath))
@@ -313,7 +343,7 @@ const pack = async (inputDirPath, outputFilePath, include = [], exclude = []) =>
 
 /**
  * Load credentials from a ".env" or ".env.[stage]" file
- * @param {*} stage 
+ * @param {*} stage
  */
 const loadInstanceCredentials = (stage) => {
   // Load env vars
@@ -389,5 +419,6 @@ module.exports = {
   resolveInputVariables,
   getDirSize,
   getOrCreateAccessKey,
-  pack,
+  getTokenId,
+  pack
 }

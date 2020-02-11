@@ -7,7 +7,6 @@ const { ServerlessSDK } = require('@serverless/platform-client')
 const utils = require('../utils')
 
 module.exports = async (config, cli) => {
-
   // Start CLI persistance status
   cli.start()
 
@@ -23,17 +22,24 @@ module.exports = async (config, cli) => {
   }
 
   const sdk = new ServerlessSDK({
-    accessKey,
+    accessKey
   })
-  
+
   // if using --dev flag, publish to the "dev" version
-  if (args.dev) { componentYaml.version = '0.0.0-dev' }
+  if (args.dev) {
+    componentYaml.version = '0.0.0-dev'
+  }
 
   // Publish
   cli.status('Publishing')
   const component = await sdk.publishComponent(componentYaml)
 
-  if (component.component && component.component.version === '0.0.0-dev') { component.component.version = 'dev' }
+  if (component.component && component.component.version === '0.0.0-dev') {
+    component.component.version = 'dev'
+  }
 
-  cli.close('done', `Successfully published ${component.component.componentName}@${component.component.version}`)
+  cli.close(
+    'done',
+    `Successfully published ${component.component.componentName}@${component.component.version}`
+  )
 }

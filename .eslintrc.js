@@ -54,6 +54,7 @@ module.exports = {
     'no-useless-constructor': 'error',
     'object-curly-newline': 'off',
     'object-shorthand': 'off',
+    'id-length': 'off',
     'prefer-const': 'error',
     'prefer-destructuring': ['error', { object: true, array: false }],
     quotes: [

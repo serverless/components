@@ -9,14 +9,16 @@ const commands = require('./commands')
 module.exports = async () => {
   const command = args._[0]
   const config = { ...args }
-  if (config._) delete config._
+  if (config._) {
+    delete config._
+  }
 
   config.platformStage = process.env.SERVERLESS_PLATFORM_STAGE || 'prod'
   config.debug = process.env.SLS_DEBUG || (args.debug ? true : false)
   config.timer = commands[command] ? false : true
 
   // Add stage environment variable
-  if (args.stage && !process.env.SERVERLESS_STAGE ) {
+  if (args.stage && !process.env.SERVERLESS_STAGE) {
     process.env.SERVERLESS_STAGE = args.stage
   }
 

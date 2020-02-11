@@ -16,9 +16,9 @@
   "author": "Serverless, Inc.",
   "license": "MIT",
   "dependencies": {
-    "@serverless/platform-client": "latest",
+    "@serverless/platform-client": "^0.15.1",
     "@serverless/platform-sdk": "^2.3.0",
-    "adm-zip": "^0.4.13",
+    "adm-zip": "^0.4.14",
     "ansi-escapes": "^4.2.0",
     "axios": "^0.19.2",
     "chalk": "^2.4.2",
