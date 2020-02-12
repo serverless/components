@@ -63,7 +63,11 @@ module.exports = async (config, cli) => {
     if (event.event === 'instance.log') {
       const header = `${d.toLocaleTimeString()} - ${event.instanceName} - log`
       cli.logHeader(header)
-      cli.log(event.data.log)
+      if (event.data.log && Array.isArray(event.data.log)) {
+        event.data.log.forEach((log) => { cli.log(log) })
+      } else {
+        cli.log(event.data.log)
+      }
     }
 
     // Error
