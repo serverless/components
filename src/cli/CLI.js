@@ -30,6 +30,7 @@ class CLI {
     this._ = {}
     this._.entity = 'Serverless'
     this._.status = 'Initializing'
+    this._.statusColor = grey
     this._.lastStatus = null
     this._.debug = config.debug || false
     this._.timer = config.timer || false
@@ -121,16 +122,19 @@ class CLI {
    * - Update status in the CLI session
    * - Renders every 100ms
    */
-  status(status, entity) {
+  status(status = null, entity = null, statusColor = null) {
     this._.status = status || this._.status
     this._.entity = entity || this._.entity
+    if (statusColor === 'green') statusColor = green
+    if (statusColor === 'red') statusColor = red
+    this._.statusColor = statusColor || grey
   }
 
   /**
    * Log
    * - Render log statements cleanly
    */
-  log(msg, header) {
+  log(msg) {
     if (!msg || msg == '') {
       console.log() // eslint-disable-line
       return
@@ -141,20 +145,42 @@ class CLI {
 
     // Write log
     if (typeof msg === 'string' && !msg.endsWith('\n')) {
-      if (header) {
-        header = `${header}\n`
-        process.stdout.write(grey(header))
-      }
       msg = `${msg}\n`
       process.stdout.write(msg) // eslint-disable-line
     } else {
-      if (header) {
-        header = `${header}\n`
-        process.stdout.write(grey(header))
-      }
       console.log(msg)
       console.log('')
     }
+
+    // Put cursor to starting position for next view
+    process.stdout.write(ansiEscapes.cursorLeft)
+  }
+
+  /**
+   * Logs grey stylized text
+   * @param {string} header 
+   */
+  logHeader(header) {
+    // Clear any existing content
+    process.stdout.write(ansiEscapes.eraseDown)
+
+    header = `${header}\n`
+    process.stdout.write(grey(header))
+
+    // Put cursor to starting position for next view
+    process.stdout.write(ansiEscapes.cursorLeft)
+  }
+
+  /**
+   * Logs red stylized text
+   * @param {string} header 
+   */
+  logError(header) {
+    // Clear any existing content
+    process.stdout.write(ansiEscapes.eraseDown)
+
+    header = `${header}\n`
+    process.stdout.write(red(header))
 
     // Put cursor to starting position for next view
     process.stdout.write(ansiEscapes.cursorLeft)
@@ -226,7 +252,14 @@ class CLI {
       prettyoutput(
         outputs,
         {
-          colors: {}
+          colors: {
+            keys: 'bold',
+            dash: 'white',
+            number: 'white',
+            string: 'white',
+            true: 'white',
+            false: 'white',
+          }
         },
         0
       )
@@ -280,8 +313,8 @@ class CLI {
         content += `${grey(figures.pointerSmall)} `
       }
       content += `${this._.entity} `
-      content += `${grey(figures.pointerSmall)} ${grey(this._.status)}`
-      content += ` ${grey(this._.loadingDots)}`
+      content += `${grey(figures.pointerSmall)} ${this._.statusColor(this._.status)}`
+      content += ` ${this._.statusColor(this._.loadingDots)}`
       process.stdout.write(content)
       console.log() // eslint-disable-line
 

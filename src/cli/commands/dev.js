@@ -5,6 +5,7 @@
 const chokidar = require('chokidar')
 const { ServerlessSDK } = require('@serverless/platform-client')
 const utils = require('../utils')
+const ansiEscapes = require('ansi-escapes')
 
 module.exports = async (config, cli) => {
   // Start CLI persistance status
@@ -38,41 +39,52 @@ module.exports = async (config, cli) => {
    */
 
   const onEvent = (event) => {
-    // cli.log(event)
+    
+    // cli.log(event.event)
     const d = new Date()
 
     // Status
-    const headerStatus = `${d.toLocaleTimeString()} - ${event.instanceName} - update`
-    if (event.event === 'instance.run.started' && event.data.method === 'deploy') {
-      cli.log('deployment in progress', headerStatus)
-    }
-    if (event.event === 'instance.run.succeeded' && event.data.method === 'deploy') {
-      cli.log('deployment successful', headerStatus)
+    if (event.event === 'instance.deployment.succeeded') {
+      const header = `${d.toLocaleTimeString()} - ${event.instanceName} - deployment`
+      cli.logHeader(header)
       cli.outputs(event.data.outputs)
       cli.status('Watching')
     }
-    if (event.event === 'instance.run.failed' && event.data.method === 'deploy') {
-      cli.log('deployment failed', headerStatus)
+    if (event.event === 'instance.deployment.failed') {
+      const header = `${d.toLocaleTimeString()} - ${event.instanceName} - deployment`
+      cli.logHeader(header)
+      cli.log('deployment failed')
+      cli.log(event.data.message)
+      cli.log(event.data.stack)
+      cli.status('Watching')
     }
 
     // Logs
-    const headerLogs = `${d.toLocaleTimeString()} - ${event.instanceName} - log`
     if (event.event === 'instance.log') {
-      cli.log(event.data.log, headerLogs)
+      const header = `${d.toLocaleTimeString()} - ${event.instanceName} - log`
+      cli.logHeader(header)
+      cli.log(event.data.log)
     }
 
     // Error
-    const headerError = `${d.toLocaleTimeString()} - ${event.instanceName} - error`
-    if (event.event === 'instance.failed') {
-      cli.log(event.data.message, headerError)
+    if (event.event === 'instance.error') {
+      const header = `${d.toLocaleTimeString()} - ${event.instanceName} - error`
+      cli.logHeader(header)
+      cli.logError(event.data.message)
       cli.log(event.data.stack)
+      cli.log()
     }
 
-    // Success - TODO: NOt sure what to do with this
-    // const headerSuccess = `${d.toLocaleTimeString()} - ${event.instanceName} - transaction`
-    // if (event.event === 'instance.succeeded') {
-    //   cli.log('successful transaction', headerSuccess)
-    // }
+    // Transaction
+    if (event.event === 'instance.transaction') {
+      let transactionType
+      // HTTP Request
+      if (event.data.path && event.data.httpMethod) transactionType = `${event.data.httpMethod.toUpperCase()} - ${event.data.path}`
+      // Default
+      else transactionType = 'transaction'
+      const header = `${d.toLocaleTimeString()} - ${event.instanceName} - ${transactionType}`
+      cli.logHeader(header)
+    }
   }
 
   // Establish connection with Serverless Platform
@@ -102,8 +114,8 @@ module.exports = async (config, cli) => {
   const watcher = chokidar.watch(process.cwd(), { ignored: /\.serverless/ })
 
   watcher.on('ready', async () => {
-    cli.status('Deploying')
-    await sdk.run('deploy', instanceYaml, instanceCredentials, { debug: true })
+    cli.status('Deploying', null, 'green')
+    await sdk.deploy(instanceYaml, instanceCredentials, { debug: true })
   })
 
   watcher.on('change', async () => {
@@ -114,14 +126,14 @@ module.exports = async (config, cli) => {
     } else if (!isProcessing) {
       // reload serverless component instance
       instanceYaml = await utils.loadInstanceConfig(process.cwd())
-      cli.status('Deploying')
-      await sdk.run('deploy', instanceYaml, instanceCredentials, { debug: true })
+      cli.status('Deploying', null, 'green')
+      await sdk.deploy(instanceYaml, instanceCredentials, { debug: true })
 
       if (queuedOperation) {
         // reload serverless component instance
         instanceYaml = await utils.loadInstanceConfig(process.cwd())
-        cli.status('Deploying')
-        await sdk.run('deploy', instanceYaml, instanceCredentials, { debug: true })
+        cli.status('Deploying', null, 'green')
+        await sdk.deploy(instanceYaml, instanceCredentials, { debug: true })
       }
 
       isProcessing = false

@@ -128,6 +128,7 @@ const loadInstanceConfig = (directoryPath) => {
   if (fileExistsSync(jsonFilePath)) {
     filePath = jsonFilePath
   }
+
   if (!filePath) {
     throw new Error(`The following file could not be found: ${filePath}`)
   }

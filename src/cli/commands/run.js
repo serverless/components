@@ -40,8 +40,18 @@ module.exports = async (config, cli, command) => {
   // connect if in debug mode
   if (options.debug) {
     await sdk.connect({
+      filter: {
+        stageName: instanceYaml.stage,
+        appName: instanceYaml.app,
+        instanceName: instanceYaml.name
+      },     
       onEvent: (evt) => {
-        console.log(evt) // eslint-disable-line
+        if (evt.event !== 'instance.run.log') return
+        if (evt.data.log && evt.data.log.length) {
+          evt.data.log.forEach((log) => {
+            console.log(log)
+          })
+        }
       }
     })
   }
@@ -60,5 +70,5 @@ module.exports = async (config, cli, command) => {
     cli.status('Running')
     await sdk.run(command, instanceYaml, instanceCredentials, options)
   }
-  cli.close('done', 'success')
+  cli.close('done', 'Success')
 }
