@@ -15,7 +15,7 @@ module.exports = async (config, cli) => {
   let instanceYaml = await utils.loadInstanceConfig(process.cwd())
 
   // Get or create access key for his org
-  const accessKey = await utils.getOrCreateAccessKey(instanceYaml.org)
+  const accessKey = await utils.getTokenId()
 
   // Check they are logged in
   if (!accessKey) {
@@ -39,8 +39,6 @@ module.exports = async (config, cli) => {
    */
 
   const onEvent = (event) => {
-    
-    // cli.log(event.event)
     const d = new Date()
 
     // Status
@@ -64,7 +62,9 @@ module.exports = async (config, cli) => {
       const header = `${d.toLocaleTimeString()} - ${event.instanceName} - log`
       cli.logHeader(header)
       if (event.data.log && Array.isArray(event.data.log)) {
-        event.data.log.forEach((log) => { cli.log(log) })
+        event.data.log.forEach((log) => {
+          cli.log(log)
+        })
       } else {
         cli.log(event.data.log)
       }
@@ -83,9 +83,13 @@ module.exports = async (config, cli) => {
     if (event.event === 'instance.transaction') {
       let transactionType
       // HTTP Request
-      if (event.data.path && event.data.httpMethod) transactionType = `${event.data.httpMethod.toUpperCase()} - ${event.data.path}`
+      if (event.data.path && event.data.httpMethod) {
+        transactionType = `${event.data.httpMethod.toUpperCase()} - ${event.data.path}`
+      }
       // Default
-      else transactionType = 'transaction'
+      else {
+        transactionType = 'transaction'
+      }
       const header = `${d.toLocaleTimeString()} - ${event.instanceName} - ${transactionType}`
       cli.logHeader(header)
     }

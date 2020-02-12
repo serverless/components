@@ -14,7 +14,7 @@ module.exports = async (config, cli) => {
   const componentYaml = await utils.loadComponentConfig(process.cwd())
 
   // Get access key
-  const accessKey = await utils.getOrCreateAccessKey(componentYaml.org)
+  const accessKey = await utils.getTokenId()
 
   // Check they are logged in
   if (!accessKey) {
