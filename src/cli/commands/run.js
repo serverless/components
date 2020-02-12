@@ -49,7 +49,7 @@ module.exports = async (config, cli, command) => {
         if (evt.event !== 'instance.run.log') return
         if (evt.data.log && evt.data.log.length) {
           evt.data.log.forEach((log) => {
-            console.log(log)
+            console.log(log + '...')
           })
         }
       }
