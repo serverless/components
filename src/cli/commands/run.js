@@ -6,14 +6,28 @@ const { ServerlessSDK } = require('@serverless/platform-client')
 const utils = require('../utils')
 
 module.exports = async (config, cli, command) => {
+
   // Start CLI persistance status
-  cli.start()
+  cli.start('Initializing')
+
+  // Ensure the user is logged in, or advertise
+  if (!utils.isLoggedIn()) { cli.advertise() }
 
   // Load YAML
   const instanceYaml = await utils.loadInstanceConfig(process.cwd())
 
-  // Set default stage
-  instanceYaml.stage = instanceYaml.stage || 'dev'
+  // Presentation
+  const meta = `Action: "${command}" - Stage: "${instanceYaml.stage}" - App: "${instanceYaml.app}" - Instance: "${instanceYaml.name}"`
+  if (!config.debug) {
+    cli.log()
+    cli.logLogo()
+    cli.log(meta, 'grey')
+  } else {
+    cli.log(meta)
+  }
+
+  cli.status('Initializing', instanceYaml.name)
+
   // Get access key
   const accessKey = await utils.getTokenId()
 
@@ -46,10 +60,14 @@ module.exports = async (config, cli, command) => {
         instanceName: instanceYaml.name
       },     
       onEvent: (evt) => {
-        if (evt.event !== 'instance.run.log') return
-        if (evt.data.log && evt.data.log.length) {
-          evt.data.log.forEach((log) => {
-            console.log(log + '...')
+        if (evt.event !== 'instance.run.logs') return
+        if (evt.data.logs && Array.isArray(evt.data.logs)) {
+          evt.data.logs.forEach((log) => {
+            if (typeof log.data === 'string' && !log.data.includes('...')) {
+              if (log.data.startsWith(`'`)) log.data = log.data.substring(1)
+              if (log.data.endsWith(`'`)) log.data  = log.data .substring(0, log.data .length - 1)
+            }
+            cli.log(log.data)
           })
         }
       }
@@ -58,17 +76,18 @@ module.exports = async (config, cli, command) => {
 
   if (command === 'deploy') {
     // run deploy
-    cli.status('Deploying')
+    cli.status('Deploying', null, 'white')
     const instance = await sdk.deploy(instanceYaml, instanceCredentials, options)
-    cli.outputs(instance.outputs)
+    cli.log()
+    cli.logOutputs(instance.outputs)
   } else if (command === 'remove') {
     // run remove
-    cli.status('Removing')
+    cli.status('Removing', null, 'white')
     await sdk.remove(instanceYaml, instanceCredentials, options)
   } else {
     // run a custom method
-    cli.status('Running')
+    cli.status('Running', null, 'white')
     await sdk.run(command, instanceYaml, instanceCredentials, options)
   }
-  cli.close('done', 'Success')
+  cli.close('success', 'Success')
 }

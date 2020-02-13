@@ -149,6 +149,9 @@ const loadInstanceConfig = (directoryPath) => {
     instanceFile = readFileSync(filePath)
   }
 
+  // Set default stage
+  if (!instanceFile.stage) instanceFile.stage = 'dev'
+
   return instanceFile
 }
 
@@ -241,6 +244,26 @@ const resolveInputVariables = (inputs) => {
     return resolveInputVariables(resolvedInputs)
   }
   return resolvedInputs
+}
+
+/**
+ * Check whether the user is logged in
+ */
+const getAdvertisement = () => {
+
+  const a = `serverless ⚡ framework`
+}
+
+/**
+ * Check whether the user is logged in
+ */
+const isLoggedIn = () => {
+
+  const userConfigFile = readConfigFile()
+  // If userId is null, they are not logged in.  They also might be a new user.
+  if (!userConfigFile.userId) return false
+  if (!userConfigFile.users[userConfigFile.userId]) return false
+  return true
 }
 
 /**
@@ -421,5 +444,7 @@ module.exports = {
   getDirSize,
   getOrCreateAccessKey,
   getTokenId,
-  pack
+  pack,
+  isLoggedIn,
+  getAdvertisement,
 }

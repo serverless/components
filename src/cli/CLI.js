@@ -11,8 +11,10 @@ const prettyoutput = require('prettyoutput')
 
 // CLI Colors
 const grey = chalk.dim
-const green = chalk.rgb(0, 253, 88)
-const red = chalk.rgb(255, 93, 93)
+const white = chalk.rgb(255, 255, 255)
+const green = chalk.rgb(99, 255, 115)
+const red = chalk.rgb(255, 99, 99)
+const blue = chalk.rgb(199, 232, 255)
 
 /**
  * Utility - Sleep
@@ -44,7 +46,7 @@ class CLI {
    * Start
    * - Starts the CLI process
    */
-  start() {
+  start(status, closeHandler) {
     // Hide cursor, to keep it clean
     process.stdout.write(ansiEscapes.cursorHide)
 
@@ -58,10 +60,17 @@ class CLI {
       this._.timerSeconds = Math.floor((Date.now() - this._.timerStarted) / 1000)
     }, 1000)
 
+    // Set default close handler, if one was not provided
+    if (!closeHandler) {
+      const self = this
+      closeHandler = async () => { return self.close('close') }
+    }
+
     // Set Event Handler: Control + C to cancel session
-    process.on('SIGINT', async () => {
-      return this.close('cancel')
-    })
+    process.on('SIGINT', closeHandler)
+
+
+    if (status) this.status(status)
 
     // Start render engine
     return this._renderEngine()
@@ -71,16 +80,13 @@ class CLI {
    * Close
    * - Closes the CLI process with relevant, clean information.
    */
-  close(reason, message) {
-    if (reason === 'error') {
-      message = red(message)
-    }
-    if (reason === 'cancel') {
-      message = red('Canceled')
-    }
-    if (reason === 'done') {
-      message = green(message || 'Done')
-    }
+  close(reason, message = 'Closed') {
+
+    // Set color
+    let color = white
+    if (reason === 'error' || reason === 'cancel') color = red
+    if (reason === 'close') color = white
+    if (reason === 'success') color = green
 
     // Clear any existing content
     process.stdout.write(ansiEscapes.cursorLeft)
@@ -90,12 +96,12 @@ class CLI {
     this.log()
     let content = ''
     if (this._.timer) {
-      content += `${grey(this._.timerSeconds + 's')}`
-      content += ` ${grey(figures.pointerSmall)} `
+      content += `${this._.timerSeconds + 's'}`
+      content += ` ${figures.pointerSmall} `
     }
     content += `${this._.entity} `
-    content += `${grey(figures.pointerSmall)} ${message}`
-    process.stdout.write(content)
+    content += `${figures.pointerSmall} ${message}`
+    process.stdout.write(color(content))
 
     // Put cursor to starting position for next view
     console.log(os.EOL) // eslint-disable-line
@@ -127,6 +133,8 @@ class CLI {
     this._.entity = entity || this._.entity
     if (statusColor === 'green') statusColor = green
     if (statusColor === 'red') statusColor = red
+    if (statusColor === 'blue') statusColor = blue
+    if (statusColor === 'white') statusColor = white
     this._.statusColor = statusColor || grey
   }
 
@@ -134,7 +142,7 @@ class CLI {
    * Log
    * - Render log statements cleanly
    */
-  log(msg) {
+  log(msg, color = null) {
     if (!msg || msg == '') {
       console.log() // eslint-disable-line
       return
@@ -144,46 +152,42 @@ class CLI {
     process.stdout.write(ansiEscapes.eraseDown)
 
     // Write log
-    if (typeof msg === 'string' && !msg.endsWith('\n')) {
+    if (typeof msg === 'string') {
+      msg = msg.trim()
       msg = `${msg}\n`
-      process.stdout.write(msg) // eslint-disable-line
+      if (!color || color === 'white') process.stdout.write(white(msg))
+      if (color === 'grey') process.stdout.write(grey(msg))
+      if (color === 'red') process.stdout.write(red(msg))
+      if (color === 'green') process.stdout.write(green(msg))
+      if (color === 'blue') process.stdout.write(blue(msg))
     } else {
       console.log(msg)
-      console.log('')
     }
 
     // Put cursor to starting position for next view
     process.stdout.write(ansiEscapes.cursorLeft)
   }
 
-  /**
-   * Logs grey stylized text
-   * @param {string} header 
-   */
-  logHeader(header) {
-    // Clear any existing content
-    process.stdout.write(ansiEscapes.eraseDown)
-
-    header = `${header}\n`
-    process.stdout.write(grey(header))
-
-    // Put cursor to starting position for next view
-    process.stdout.write(ansiEscapes.cursorLeft)
+  logLogo(text) {
+    let logo = os.EOL
+    logo = logo + white(`serverless`)
+    logo = logo + red(` ⚡ `)
+    logo = logo + white(`framework`)
+    if (text) logo = logo + text
+    this.log(logo)
   }
 
-  /**
-   * Logs red stylized text
-   * @param {string} header 
-   */
-  logError(header) {
-    // Clear any existing content
-    process.stdout.write(ansiEscapes.eraseDown)
-
-    header = `${header}\n`
-    process.stdout.write(red(header))
-
-    // Put cursor to starting position for next view
-    process.stdout.write(ansiEscapes.cursorLeft)
+  advertise() {
+    this.log()
+    this.logLogo()
+    let ad = grey(`This is a Serverless Framework Component.  Sign-in to use it for free with these features:`)
+    ad = ad + os.EOL
+    ad = ad + os.EOL + grey(`  • Registry Access`)
+    ad = ad + os.EOL + grey(`  • Instant Deployments & Logs`)
+    ad = ad + os.EOL + grey(`  • State Storage, Output Sharing & Secrets`)
+    ad = ad + os.EOL + grey(`  • And Much More: https://serverless.com/components`)
+    this.log(ad)
+    this.close('error', 'Please log in by running "serverless login"', true)
   }
 
   /**
@@ -226,7 +230,7 @@ class CLI {
       // Put cursor to starting position for next view
       process.stdout.write(ansiEscapes.cursorLeft)
 
-      return this.close('error', `Error: ${error.message}`)
+      return this.close('error', `${error.message}`)
     }
     console.log() // eslint-disable-line
     console.log(``, red(error.stack)) // eslint-disable-line
@@ -234,22 +238,21 @@ class CLI {
     // Put cursor to starting position for next view
     process.stdout.write(ansiEscapes.cursorLeft)
 
-    return this.close('error', `Error: ${error.message}`)
+    return this.close('error', `${error.message}`)
   }
 
   /**
    * Outputs
    * - Render outputs cleanly.
    */
-  outputs(outputs) {
+  logOutputs(outputs) {
     if (!outputs || typeof outputs !== 'object' || Object.keys(outputs).length === 0) {
       this.close('done', 'Success')
     }
     // Clear any existing content
     process.stdout.write(ansiEscapes.eraseDown)
-    console.log() // eslint-disable-line
     process.stdout.write(
-      prettyoutput(
+      white(prettyoutput(
         outputs,
         {
           colors: {
@@ -263,8 +266,7 @@ class CLI {
         },
         0
       )
-    )
-    console.log('')
+    ))
   }
 
   /**
@@ -309,11 +311,11 @@ class CLI {
       console.log() // eslint-disable-line
       let content = ''
       if (this._.timer) {
-        content += `${grey(this._.timerSeconds + 's')} `
-        content += `${grey(figures.pointerSmall)} `
+        content += `${this._.statusColor(this._.timerSeconds + 's')} `
+        content += `${this._.statusColor(figures.pointerSmall)} `
       }
-      content += `${this._.entity} `
-      content += `${grey(figures.pointerSmall)} ${this._.statusColor(this._.status)}`
+      content += `${this._.statusColor(this._.entity)} `
+      content += `${this._.statusColor(figures.pointerSmall)} ${this._.statusColor(this._.status)}`
       content += ` ${this._.statusColor(this._.loadingDots)}`
       process.stdout.write(content)
       console.log() // eslint-disable-line

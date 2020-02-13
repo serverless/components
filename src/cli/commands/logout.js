@@ -6,11 +6,11 @@ module.exports = async (config, cli, command) => {
   const user = getLoggedInUser()
 
   if (!user) {
-    cli.close('done', `You are already logged out`)
+    cli.close('error', `You are already logged out`)
   }
 
   await logout()
 
   cli.status('Logged Out')
-  cli.close('done', `Successfully logged out of "${user.username}"`)
+  cli.close('success', `Successfully logged out of "${user.username}"`)
 }

@@ -7,11 +7,20 @@ const { ServerlessSDK } = require('@serverless/platform-client')
 const utils = require('../utils')
 
 module.exports = async (config, cli) => {
+
   // Start CLI persistance status
-  cli.start()
+  cli.start('Initializing')
+
+  // Ensure the user is logged in, or advertise
+  if (!utils.isLoggedIn()) { cli.advertise() }
 
   // Load YAML
   const componentYaml = await utils.loadComponentConfig(process.cwd())
+
+  // Presentation
+  cli.log()
+  cli.logLogo()
+  cli.log(`Publishing "${componentYaml.name}@${componentYaml.version}" to the Registry...`, 'grey')
 
   // Get access key
   const accessKey = await utils.getTokenId()
@@ -39,7 +48,7 @@ module.exports = async (config, cli) => {
   }
 
   cli.close(
-    'done',
+    'success',
     `Successfully published ${component.component.componentName}@${component.component.version}`
   )
 }
