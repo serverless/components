@@ -8,7 +8,6 @@ const utils = require('../utils')
 const ansiEscapes = require('ansi-escapes')
 
 module.exports = async (config, cli) => {
-
   // Define a close handler, that removes any "dev" mode agents
   const closeHandler = async () => {
     // Set new close listener
@@ -26,14 +25,18 @@ module.exports = async (config, cli) => {
   cli.start('Initializing', closeHandler)
 
   // Ensure the user is logged in, or advertise
-  if (!utils.isLoggedIn()) { cli.advertise() }
+  if (!utils.isLoggedIn()) {
+    cli.advertise()
+  }
 
   // Presentation
   cli.log()
   cli.logLogo()
-  cli.log('Dev Mode: Watching your Component for changes and enabling streaming logs, if supported...', 'grey')
+  cli.log(
+    'Dev Mode: Watching your Component for changes and enabling streaming logs, if supported...',
+    'grey'
+  )
   cli.log()
-
 
   // Load serverless component instance.  Submit a directory where its config files should be.
   let instanceYaml = await utils.loadInstanceConfig(process.cwd())
@@ -63,6 +66,7 @@ module.exports = async (config, cli) => {
    */
 
   const onEvent = (event) => {
+    // console.log(event)
     const d = new Date()
 
     // Deployment
@@ -85,16 +89,38 @@ module.exports = async (config, cli) => {
         event.data.logs.forEach((log) => {
           const date = new Date(log.createdAt)
           let type
-          if (log.type === 'log') type = 'log'
-          if (log.type === 'debug') type = 'log - debug'
-          if (log.type === 'warn') type = 'log - warn'
-          if (log.type === 'error') type = 'log - error'
+          if (log.type === 'log' || log.type === 'stdout') {
+            type = 'log'
+          }
+          if (log.type === 'debug' || log.type === 'stderr') {
+            type = 'log - debug'
+          }
+          if (log.type === 'warn') {
+            type = 'log - warn'
+          }
+          if (log.type === 'error') {
+            type = 'log - error'
+          }
+          if (log.type === 'stdout') {
+            type = 'log - stdout'
+          }
+          if (log.type === 'stderr') {
+            type = 'log - stderr'
+          }
           const header = `${date.toLocaleTimeString()} - ${event.instanceName} - ${type}`
           cli.log(header, 'grey')
-          if (log.type === 'log') cli.log(log.data)
-          if (log.type === 'debug') cli.log(log.data)
-          if (log.type === 'warn') cli.log(log.data, 'grey')
-          if (log.type === 'error') cli.log(log.data, 'red')
+          if (log.type === 'log' || log.type === 'stdout') {
+            cli.log(log.data)
+          }
+          if (log.type === 'debug' || log.type === 'stderr') {
+            cli.log(log.data)
+          }
+          if (log.type === 'warn') {
+            cli.log(log.data, 'grey')
+          }
+          if (log.type === 'error') {
+            cli.log(log.data, 'red')
+          }
         })
       }
     }
@@ -112,12 +138,15 @@ module.exports = async (config, cli) => {
       let transactionType
       // HTTP Request
       if (event.data.path && event.data.httpMethod) {
-        transactionType = `transaction - ${event.data.httpMethod.toUpperCase()} - ${event.data.path}`
+        transactionType = `transaction - ${event.data.httpMethod.toUpperCase()} - ${
+          event.data.path
+        }`
       }
       // Default
       else {
         transactionType = 'transaction'
       }
+
       const header = `${d.toLocaleTimeString()} - ${event.instanceName} - ${transactionType}`
       cli.log(header, 'grey')
     }
@@ -155,16 +184,17 @@ module.exports = async (config, cli) => {
   })
 
   watcher.on('change', async () => {
-
     // Skip if processing already and there is a queued operation
-    if (isProcessing && queuedOperation) return
+    if (isProcessing && queuedOperation) {
+      return
+    }
 
     // If already deploying and user made more changes, queue another deploy operation to be run after the first one
     if (isProcessing && !queuedOperation) {
       queuedOperation = true
       return
     }
-    
+
     // If it's not processin and there is no queued operation
     if (!isProcessing) {
       isProcessing = true
