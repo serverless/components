@@ -33,7 +33,7 @@ module.exports = async (config, cli) => {
   cli.log()
   cli.logLogo()
   cli.log(
-    'Dev Mode: Watching your Component for changes and enabling streaming logs, if supported...',
+    'Dev Mode - Watching your Component for changes and enabling streaming logs, if supported...',
     'grey'
   )
   cli.log()
@@ -66,7 +66,7 @@ module.exports = async (config, cli) => {
    */
 
   const onEvent = (event) => {
-    // console.log(event)
+
     const d = new Date()
 
     // Deployment
@@ -87,7 +87,14 @@ module.exports = async (config, cli) => {
     if (event.event === 'instance.logs') {
       if (event.data.logs && Array.isArray(event.data.logs)) {
         event.data.logs.forEach((log) => {
+
           const date = new Date(log.createdAt)
+
+          // Remove strange formatting that comes from stderr
+          if (typeof log.data === 'string' && log.data.startsWith(`'`))  log.data = log.data.substr(1)
+          if (typeof log.data === 'string' && log.data.endsWith(`'`)) log.data = log.data.substring(0, log.data.length - 1)
+          if (typeof log.data === 'string' && log.data.endsWith(`\\n`)) log.data = log.data.substring(0, log.data.length - 2)
+
           let type
           if (log.type === 'log' || log.type === 'stdout') {
             type = 'log'
