@@ -1,5 +1,5 @@
 /*
- * SERVERLESS COMPONENTS: UTILITIES
+ * Serverless Components: Utilities
  */
 
 const { contains, isNil, last, split, merge, endsWith } = require('ramda')

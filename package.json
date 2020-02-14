@@ -1,6 +1,6 @@
 {
   "name": "@serverless/components",
-  "version": "2.13.0",
+  "version": "2.13.1",
   "description": "Serverless Components",
   "main": "./src/index.js",
   "bin": {
@@ -31,6 +31,7 @@
     "minimist": "^1.2.0",
     "prettyoutput": "^1.2.0",
     "ramda": "^0.26.1",
+    "serverless": "^1.59.3-components-v2-beta",
     "strip-ansi": "^5.2.0",
     "traverse": "^0.6.6",
     "uuid": "^3.4.0",
