@@ -63,10 +63,10 @@ module.exports = async (config, cli, command) => {
         if (evt.event !== 'instance.run.logs') return
         if (evt.data.logs && Array.isArray(evt.data.logs)) {
           evt.data.logs.forEach((log) => {
-            if (typeof log.data === 'string' && !log.data.includes('...')) {
-              if (log.data.startsWith(`'`)) log.data = log.data.substring(1)
-              if (log.data.endsWith(`'`)) log.data  = log.data .substring(0, log.data .length - 1)
-            }
+            // Remove strange formatting that comes from stderr
+            if (typeof log.data === 'string' && log.data.startsWith(`'`))  log.data = log.data.substr(1)
+            if (typeof log.data === 'string' && log.data.endsWith(`'`)) log.data = log.data.substring(0, log.data.length - 1)
+            if (typeof log.data === 'string' && log.data.endsWith(`\\n`)) log.data = log.data.substring(0, log.data.length - 2)
             cli.log(log.data)
           })
         }
