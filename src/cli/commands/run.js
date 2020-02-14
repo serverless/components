@@ -8,7 +8,7 @@ const utils = require('../utils')
 module.exports = async (config, cli, command) => {
 
   // Start CLI persistance status
-  cli.start('Initializing')
+  cli.start('Initializing', { timer: true })
 
   // Ensure the user is logged in, or advertise
   if (!utils.isLoggedIn()) { cli.advertise() }

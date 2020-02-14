@@ -13,6 +13,9 @@ const utils = require('../utils')
  */
 const publish = async (config, cli) => {
 
+  // Disable timer
+  config.timer = false
+
   // Start CLI persistance status
   cli.start('Initializing')
 

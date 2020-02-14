@@ -22,7 +22,6 @@ module.exports = async () => {
 
   config.platformStage = process.env.SERVERLESS_PLATFORM_STAGE || 'prod'
   config.debug = process.env.SLS_DEBUG || (args.debug ? true : false)
-  config.timer = command
 
   // Add stage environment variable
   if (args.stage && !process.env.SERVERLESS_STAGE) {

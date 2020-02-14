@@ -22,7 +22,7 @@ module.exports = async (config, cli) => {
   }
 
   // Start CLI persistance status
-  cli.start('Initializing', closeHandler)
+  cli.start('Initializing', { closeHandler })
 
   // Ensure the user is logged in, or advertise
   if (!utils.isLoggedIn()) {

@@ -46,7 +46,11 @@ class CLI {
    * Start
    * - Starts the CLI process
    */
-  start(status, closeHandler) {
+  start(status, options = {}) {
+
+    if (options.timer) this._.timer = true
+    else this._.timer = false
+
     // Hide cursor, to keep it clean
     process.stdout.write(ansiEscapes.cursorHide)
 
@@ -61,14 +65,13 @@ class CLI {
     }, 1000)
 
     // Set default close handler, if one was not provided
-    if (!closeHandler) {
+    if (!options.closeHandler) {
       const self = this
-      closeHandler = async () => { return self.close('close') }
+      options.closeHandler = async () => { return self.close('close') }
     }
 
     // Set Event Handler: Control + C to cancel session
-    process.on('SIGINT', closeHandler)
-
+    process.on('SIGINT', options.closeHandler)
 
     if (status) this.status(status)
 
