@@ -153,7 +153,6 @@ class CLI {
 
     // Write log
     if (typeof msg === 'string') {
-      msg = msg.trim()
       msg = `${msg}\n`
       if (!color || color === 'white') process.stdout.write(white(msg))
       if (color === 'grey') process.stdout.write(grey(msg))
@@ -173,6 +172,15 @@ class CLI {
     logo = logo + white(`serverless`)
     logo = logo + red(` ⚡ `)
     logo = logo + white(`framework`)
+    if (text) logo = logo + text
+    this.log(logo)
+  }
+
+  logRegistryLogo(text) {
+    let logo = os.EOL
+    logo = logo + white(`serverless`)
+    logo = logo + red(` ⚡ `)
+    logo = logo + white(`registry`)
     if (text) logo = logo + text
     this.log(logo)
   }

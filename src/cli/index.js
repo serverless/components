@@ -1,5 +1,5 @@
 /*
- * SERVERLESS COMPONENTS: CLI HANDLER
+ * Serverless Components: CLI Handler
  */
 
 const args = require('minimist')(process.argv.slice(2))
@@ -8,14 +8,20 @@ const commands = require('./commands')
 
 module.exports = async () => {
   const command = args._[0]
-  const config = { ...args }
+  const params = [ 
+    args._[1],
+    args._[2],
+    args._[3],
+    args._[4],
+    args._[5],
+  ]
+  const config = { ...args, params }
   if (config._) {
     delete config._
   }
 
   config.platformStage = process.env.SERVERLESS_PLATFORM_STAGE || 'prod'
   config.debug = process.env.SLS_DEBUG || (args.debug ? true : false)
-  config.timer = commands[command] ? false : true
 
   // Add stage environment variable
   if (args.stage && !process.env.SERVERLESS_STAGE) {
@@ -29,7 +35,7 @@ module.exports = async () => {
     if (commands[command]) {
       await commands[command](config, cli)
     } else {
-      await commands.run(config, cli, command)
+      cli.close('error', `Command "${command}" is not a valid command`)
     }
   } catch (e) {
     return cli.error(e)

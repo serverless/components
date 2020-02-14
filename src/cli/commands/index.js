@@ -1,13 +1,13 @@
-const publish = require('./publish')
 const login = require('./login')
 const logout = require('./logout')
 const run = require('./run')
 const dev = require('./dev')
+const registry = require('./registry')
 
 module.exports = {
-  publish,
   login,
   logout,
   run,
-  dev
+  dev,
+  registry,
 }
