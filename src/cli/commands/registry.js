@@ -81,21 +81,7 @@ const getComponent = async (config, cli) => {
   // Start CLI persistance status
   cli.start(`Fetching versions for: ${componentName}`)
 
-  // Ensure the user is logged in, or advertise
-  if (!utils.isLoggedIn()) { cli.advertise() }
-
-  // Get access key
-  const accessKey = await utils.getTokenId()
-
-  // Check they are logged in
-  if (!accessKey) {
-    cli.error(`Run 'serverless login' first to publish your serverless component.`, true)
-  }
-
-  const sdk = new ServerlessSDK({
-    accessKey
-  })
-
+  const sdk = new ServerlessSDK()
   const data = await sdk.getComponent(componentName)
 
   if (!data.component) {
@@ -120,9 +106,33 @@ const getComponent = async (config, cli) => {
 }
 
 /**
+ * List Featured
+ * @param {*} config 
+ * @param {*} cli 
+ */
+const listFeatured = async (config, cli) => {
+
+  cli.logRegistryLogo()
+  cli.log()
+
+  cli.log(`Featured Components:`)
+  cli.log()
+  cli.log(`  - express`)
+  cli.log(`  - website`)
+  cli.log(`  - aws-lambda`)
+  cli.log(`  - aws-dynamodb`)
+  cli.log(`  - aws-iam-role`)
+  cli.log(`  - aws-lambda-layer`)
+  cli.log()
+  cli.log(`Find more here: https://github.com/serverless-components`)
+  cli.log()
+}
+
+/**
  * Route Registry Command
  */
 module.exports = async (config, cli) => {
+  if (!config.params[0]) return await listFeatured(config, cli)
   if (config.params[0] === 'publish') return await publish(config, cli)
   else return await getComponent(config, cli)
 }
