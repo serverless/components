@@ -22,6 +22,7 @@ module.exports = async () => {
 
   config.platformStage = process.env.SERVERLESS_PLATFORM_STAGE || 'prod'
   config.debug = process.env.SLS_DEBUG || (args.debug ? true : false)
+  config.timer = command
 
   // Add stage environment variable
   if (args.stage && !process.env.SERVERLESS_STAGE) {
@@ -34,6 +35,8 @@ module.exports = async () => {
   try {
     if (commands[command]) {
       await commands[command](config, cli)
+    } else if (command === 'deploy' || command === 'remove') {
+      await commands.run(config, cli, command)
     } else {
       cli.close('error', `Command "${command}" is not a valid command`)
     }

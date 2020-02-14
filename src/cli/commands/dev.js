@@ -30,7 +30,6 @@ module.exports = async (config, cli) => {
   }
 
   // Presentation
-  cli.log()
   cli.logLogo()
   cli.log(
     'Dev Mode - Watching your Component for changes and enabling streaming logs, if supported...',

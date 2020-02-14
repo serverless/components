@@ -19,7 +19,6 @@ module.exports = async (config, cli, command) => {
   // Presentation
   const meta = `Action: "${command}" - Stage: "${instanceYaml.stage}" - App: "${instanceYaml.app}" - Instance: "${instanceYaml.name}"`
   if (!config.debug) {
-    cli.log()
     cli.logLogo()
     cli.log(meta, 'grey')
   } else {
