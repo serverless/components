@@ -5,9 +5,9 @@
 const chokidar = require('chokidar')
 const { ServerlessSDK } = require('@serverless/platform-client')
 const utils = require('../utils')
-const ansiEscapes = require('ansi-escapes')
 
 module.exports = async (config, cli) => {
+
   // Define a close handler, that removes any "dev" mode agents
   const closeHandler = async () => {
     // Set new close listener
@@ -158,16 +158,26 @@ module.exports = async (config, cli) => {
     }
   }
 
+  // Filter configuration
+  const filter = {
+    stageName: instanceYaml.stage,
+    appName: instanceYaml.app,
+    instanceName: instanceYaml.name,
+    events: []
+  }
+
+  // User wants to receive all messages at the app level
+  if (config.filter && config.filter === 'app' && filter.instanceName) {
+    delete filter.instanceName
+    cli.log('Enabling filtering at the activity at the application level', 'grey')
+    cli.log()
+  }
+
   // Establish connection with Serverless Platform
   try {
     await sdk.connect({
       org: instanceYaml.org,
-      filter: {
-        stageName: instanceYaml.stage,
-        appName: instanceYaml.app,
-        instanceName: instanceYaml.name,
-        events: []
-      },
+      filter: filter,
       onEvent
     })
   } catch (error) {

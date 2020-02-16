@@ -49,6 +49,7 @@ module.exports = async (config, cli, command) => {
   // Prepare Options
   const options = {}
   options.debug = config.debug
+  options.dev = config.dev
 
   // connect if in debug mode
   if (options.debug) {
@@ -74,6 +75,12 @@ module.exports = async (config, cli, command) => {
   }
 
   if (command === 'deploy') {
+    // Warn about dev agent
+    if (options.dev) {
+      cli.log()
+      cli.log('"--dev" option detected.  Dev Agent will be added to your code.  Do not deploy this in your production stage.', 'grey')
+    }
+
     // run deploy
     cli.status('Deploying', null, 'white')
     const instance = await sdk.deploy(instanceYaml, instanceCredentials, options)

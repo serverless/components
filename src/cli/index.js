@@ -8,13 +8,12 @@ const commands = require('./commands')
 
 module.exports = async () => {
   const command = args._[0]
-  const params = [ 
-    args._[1],
-    args._[2],
-    args._[3],
-    args._[4],
-    args._[5],
-  ]
+  const params = []
+  if (args._[1]) params.push(args._[1])
+  if (args._[2]) params.push(args._[2])
+  if (args._[3]) params.push(args._[3])
+  if (args._[4]) params.push(args._[4])
+  
   const config = { ...args, params }
   if (config._) {
     delete config._
