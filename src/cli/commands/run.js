@@ -51,7 +51,7 @@ module.exports = async (config, cli, command) => {
   options.debug = config.debug
   options.dev = config.dev
 
-  // connect if in debug mode
+  // Connect to Serverless Platform Events, if in debug mode
   if (options.debug) {
     await sdk.connect({
       filter: {

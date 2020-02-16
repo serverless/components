@@ -2,7 +2,6 @@
  * CLI: Command: Registry
  */
 
-const args = require('minimist')(process.argv.slice(2))
 const { ServerlessSDK } = require('@serverless/platform-client')
 const utils = require('../utils')
 
@@ -27,7 +26,7 @@ const publish = async (config, cli) => {
 
   // Presentation
   cli.logRegistryLogo()
-  cli.log(`Publishing "${componentYaml.name}@${componentYaml.version}"...`, 'grey')
+  cli.log(`Publishing "${componentYaml.name}@${config.dev ? 'dev' : componentYaml.version}"...`, 'grey')
 
   // Get access key
   const accessKey = await utils.getTokenId()
@@ -37,12 +36,10 @@ const publish = async (config, cli) => {
     cli.error(`Run 'serverless login' first to publish your serverless component.`, true)
   }
 
-  const sdk = new ServerlessSDK({
-    accessKey
-  })
+  const sdk = new ServerlessSDK({ accessKey })
 
-  // if using --dev flag, publish to the "dev" version
-  if (args.dev) {
+  // If "--dev" flag is used, set the version the API expects
+  if (config.dev) {
     componentYaml.version = '0.0.0-dev'
   }
 
