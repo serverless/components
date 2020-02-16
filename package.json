@@ -1,6 +1,6 @@
 {
   "name": "@serverless/components",
-  "version": "2.14.2",
+  "version": "2.14.3",
   "description": "Serverless Components",
   "main": "./src/index.js",
   "bin": {
