@@ -83,5 +83,5 @@ module.exports = async (config, cli) => {
   cli.log()
   cli.logOutputs(instance.outputs)
 
-  cli.close('success', 'Info loaded')
+  cli.close('success', 'Info successfully loaded')
 }
