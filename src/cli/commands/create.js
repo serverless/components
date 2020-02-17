@@ -34,13 +34,9 @@ module.exports = async (config, cli) => {
   // copy template content
   copySync(templatePath, destinationPath)
 
-  cli.log(
-    `- Successfully created "${templateName}" component instance in the current working directory.`
-  )
+  cli.log(`- Successfully created "${templateName}" instance in the currennt working directory.`)
 
-  cli.log(
-    `- Don't forget to update serverless.yml and .env files and install dependencies if needed.`
-  )
+  cli.log(`- Don't forget to update serverless.yml and install dependencies if needed.`)
 
   cli.log(`- Whenever you're ready, run "serverless deploy" to deploy your new instance.`)
 
