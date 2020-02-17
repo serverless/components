@@ -5,5 +5,5 @@ const cli = ServerlessCLI // Backwards compat
 module.exports = {
   ServerlessCLI,
   cli,
-  runningComponents,
+  runningComponents
 }

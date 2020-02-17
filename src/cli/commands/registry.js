@@ -7,11 +7,10 @@ const utils = require('../utils')
 
 /**
  * Publish a Component to the Serverless Registry
- * @param {*} config 
- * @param {*} cli 
+ * @param {*} config
+ * @param {*} cli
  */
 const publish = async (config, cli) => {
-
   // Disable timer
   config.timer = false
 
@@ -19,14 +18,19 @@ const publish = async (config, cli) => {
   cli.start('Initializing')
 
   // Ensure the user is logged in, or advertise
-  if (!utils.isLoggedIn()) { cli.advertise() }
+  if (!utils.isLoggedIn()) {
+    cli.advertise()
+  }
 
   // Load YAML
   const componentYaml = await utils.loadComponentConfig(process.cwd())
 
   // Presentation
   cli.logRegistryLogo()
-  cli.log(`Publishing "${componentYaml.name}@${config.dev ? 'dev' : componentYaml.version}"...`, 'grey')
+  cli.log(
+    `Publishing "${componentYaml.name}@${config.dev ? 'dev' : componentYaml.version}"...`,
+    'grey'
+  )
 
   // Get access key
   const accessKey = await utils.getTokenId()
@@ -49,7 +53,7 @@ const publish = async (config, cli) => {
   let component
   try {
     component = await sdk.publishComponent(componentYaml)
-  } catch(error) {
+  } catch (error) {
     if (error.message.includes('409')) {
       error.message = error.message.replace('409 - ', '')
       cli.error(error.message, true)
@@ -68,14 +72,12 @@ const publish = async (config, cli) => {
   )
 }
 
-
 /**
  * Get a Component from the Serverless Registry
- * @param {*} config 
- * @param {*} cli 
+ * @param {*} config
+ * @param {*} cli
  */
 const getComponent = async (config, cli) => {
-
   const componentName = config.params[0]
 
   // Start CLI persistance status
@@ -89,7 +91,7 @@ const getComponent = async (config, cli) => {
   }
 
   const devVersion = data.versions.indexOf('0.0.0-dev')
-  if (devVersion !== -1) data.versions.splice(devVersion, 1)
+  if (devVersion !== -1) {data.versions.splice(devVersion, 1)}
 
   cli.logRegistryLogo()
   cli.log()
@@ -107,11 +109,10 @@ const getComponent = async (config, cli) => {
 
 /**
  * List Featured
- * @param {*} config 
- * @param {*} cli 
+ * @param {*} config
+ * @param {*} cli
  */
 const listFeatured = async (config, cli) => {
-
   cli.logRegistryLogo()
   cli.log()
 
@@ -134,5 +135,5 @@ const listFeatured = async (config, cli) => {
 module.exports = async (config, cli) => {
   if (!config.params[0]) return await listFeatured(config, cli)
   if (config.params[0] === 'publish') return await publish(config, cli)
-  else return await getComponent(config, cli)
+  return await getComponent(config, cli)
 }

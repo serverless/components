@@ -7,7 +7,6 @@ const { ServerlessSDK } = require('@serverless/platform-client')
 const utils = require('../utils')
 
 module.exports = async (config, cli) => {
-
   // Define a close handler, that removes any "dev" mode agents
   const closeHandler = async () => {
     // Set new close listener
@@ -65,7 +64,6 @@ module.exports = async (config, cli) => {
    */
 
   const onEvent = (event) => {
-
     const d = new Date()
 
     // Deployment
@@ -86,13 +84,15 @@ module.exports = async (config, cli) => {
     if (event.event === 'instance.logs') {
       if (event.data.logs && Array.isArray(event.data.logs)) {
         event.data.logs.forEach((log) => {
-
           const date = new Date(log.createdAt)
 
           // Remove strange formatting that comes from stderr
-          if (typeof log.data === 'string' && log.data.startsWith(`'`))  log.data = log.data.substr(1)
-          if (typeof log.data === 'string' && log.data.endsWith(`'`)) log.data = log.data.substring(0, log.data.length - 1)
-          if (typeof log.data === 'string' && log.data.endsWith(`\\n`)) log.data = log.data.substring(0, log.data.length - 2)
+          if (typeof log.data === 'string' && log.data.startsWith(`'`))
+            {log.data = log.data.substr(1)}
+          if (typeof log.data === 'string' && log.data.endsWith(`'`))
+            {log.data = log.data.substring(0, log.data.length - 1)}
+          if (typeof log.data === 'string' && log.data.endsWith(`\\n`))
+            {log.data = log.data.substring(0, log.data.length - 2)}
 
           let type
           if (log.type === 'log' || log.type === 'stdout') {

@@ -1,8 +1,8 @@
-component: express@0.0.5
+component: express
 org: # Your Serverless Framework Org
 app: # Your Serverless Framework App
 name: express-api
-stage: prod
+stage: dev
 
 inputs:
   src: ./src

@@ -3,15 +3,17 @@
  */
 
 const { ServerlessSDK } = require('@serverless/platform-client')
+const chalk = require('chalk')
 const utils = require('../utils')
 
 module.exports = async (config, cli, command) => {
-
   // Start CLI persistance status
   cli.start('Initializing', { timer: true })
 
   // Ensure the user is logged in, or advertise
-  if (!utils.isLoggedIn()) { cli.advertise() }
+  if (!utils.isLoggedIn()) {
+    cli.advertise()
+  }
 
   // Load YAML
   const instanceYaml = await utils.loadInstanceConfig(process.cwd())
@@ -58,15 +60,23 @@ module.exports = async (config, cli, command) => {
         stageName: instanceYaml.stage,
         appName: instanceYaml.app,
         instanceName: instanceYaml.name
-      },     
+      },
       onEvent: (evt) => {
-        if (evt.event !== 'instance.run.logs') return
+        if (evt.event !== 'instance.run.logs') {
+          return
+        }
         if (evt.data.logs && Array.isArray(evt.data.logs)) {
           evt.data.logs.forEach((log) => {
             // Remove strange formatting that comes from stderr
-            if (typeof log.data === 'string' && log.data.startsWith(`'`))  log.data = log.data.substr(1)
-            if (typeof log.data === 'string' && log.data.endsWith(`'`)) log.data = log.data.substring(0, log.data.length - 1)
-            if (typeof log.data === 'string' && log.data.endsWith(`\\n`)) log.data = log.data.substring(0, log.data.length - 2)
+            if (typeof log.data === 'string' && log.data.startsWith(`'`)) {
+              log.data = log.data.substr(1)
+            }
+            if (typeof log.data === 'string' && log.data.endsWith(`'`)) {
+              log.data = log.data.substring(0, log.data.length - 1)
+            }
+            if (typeof log.data === 'string' && log.data.endsWith(`\\n`)) {
+              log.data = log.data.substring(0, log.data.length - 2)
+            }
             cli.log(log.data)
           })
         }
@@ -78,14 +88,21 @@ module.exports = async (config, cli, command) => {
     // Warn about dev agent
     if (options.dev) {
       cli.log()
-      cli.log('"--dev" option detected.  Dev Agent will be added to your code.  Do not deploy this in your production stage.', 'grey')
+      cli.log(
+        '"--dev" option detected.  Dev Agent will be added to your code.  Do not deploy this in your production stage.',
+        'grey'
+      )
     }
+
+    const dashboardUrl = utils.getInstanceDashboardUrl(instanceYaml)
 
     // run deploy
     cli.status('Deploying', null, 'white')
     const instance = await sdk.deploy(instanceYaml, instanceCredentials, options)
     cli.log()
     cli.logOutputs(instance.outputs)
+    cli.log()
+    cli.log(`${chalk.grey(`More instance info at ${dashboardUrl}`)}`)
   } else if (command === 'remove') {
     // run remove
     cli.status('Removing', null, 'white')

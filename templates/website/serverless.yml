@@ -2,6 +2,7 @@ component: website
 org: # Your Serverless Framework Org
 app: # Your Serverless Framework App
 name: landing-page
+stage: dev
 
 inputs:
   src:

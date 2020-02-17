@@ -9,11 +9,19 @@ const commands = require('./commands')
 module.exports = async () => {
   const command = args._[0]
   const params = []
-  if (args._[1]) params.push(args._[1])
-  if (args._[2]) params.push(args._[2])
-  if (args._[3]) params.push(args._[3])
-  if (args._[4]) params.push(args._[4])
-  
+  if (args._[1]) {
+    params.push(args._[1])
+  }
+  if (args._[2]) {
+    params.push(args._[2])
+  }
+  if (args._[3]) {
+    params.push(args._[3])
+  }
+  if (args._[4]) {
+    params.push(args._[4])
+  }
+
   const config = { ...args, params }
   if (config._) {
     delete config._
@@ -26,7 +34,6 @@ module.exports = async () => {
   if (args.stage && !process.env.SERVERLESS_STAGE) {
     process.env.SERVERLESS_STAGE = args.stage
   }
-
   // Start CLI process
   const cli = new CLI(config)
 

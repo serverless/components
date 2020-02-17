@@ -29,6 +29,7 @@
     "globby": "^10.0.2",
     "js-yaml": "^3.13.1",
     "minimist": "^1.2.0",
+    "moment": "^2.24.0",
     "prettyoutput": "^1.2.0",
     "ramda": "^0.26.1",
     "serverless": "^1.59.3-components-v2-beta",

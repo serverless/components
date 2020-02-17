@@ -150,7 +150,9 @@ const loadInstanceConfig = (directoryPath) => {
   }
 
   // Set default stage
-  if (!instanceFile.stage) instanceFile.stage = 'dev'
+  if (!instanceFile.stage) {
+    instanceFile.stage = 'dev'
+  }
 
   return instanceFile
 }
@@ -250,7 +252,6 @@ const resolveInputVariables = (inputs) => {
  * Check whether the user is logged in
  */
 const getAdvertisement = () => {
-
   const a = `serverless ⚡ framework`
 }
 
@@ -258,11 +259,14 @@ const getAdvertisement = () => {
  * Check whether the user is logged in
  */
 const isLoggedIn = () => {
-
   const userConfigFile = readConfigFile()
   // If userId is null, they are not logged in.  They also might be a new user.
-  if (!userConfigFile.userId) return false
-  if (!userConfigFile.users[userConfigFile.userId]) return false
+  if (!userConfigFile.userId) {
+    return false
+  }
+  if (!userConfigFile.users[userConfigFile.userId]) {
+    return false
+  }
   return true
 }
 
@@ -430,6 +434,17 @@ const loadInstanceCredentials = (stage) => {
   return credentials
 }
 
+const getInstanceDashboardUrl = (instanceYaml) => {
+  let dashboardRoot = `https://dashboard.serverless.com`
+  if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
+    dashboardRoot = `https://dashboard.serverless-dev.com`
+  }
+
+  const dashboardUrl = `${dashboardRoot}/tenants/${instanceYaml.org}/applications/${instanceYaml.app}/component/${instanceYaml.name}/stage/${instanceYaml.stage}/overview`
+
+  return dashboardUrl
+}
+
 module.exports = {
   sleep,
   request,
@@ -447,4 +462,5 @@ module.exports = {
   pack,
   isLoggedIn,
   getAdvertisement,
+  getInstanceDashboardUrl
 }
