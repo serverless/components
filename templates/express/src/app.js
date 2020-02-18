@@ -1,13 +1,15 @@
 const express = require('express')
 const app = express()
 
-// Express Routes
-app.get('/', function(req, res) {
-  res.send('Hello from Serverless Express!')
+// Routes
+app.get(`/*`, (req, res) => {
+  res.send(`Request received: ${req.method} - ${req.path}`)
 })
 
-app.get(`/*`, (req, res) => {
-  res.send(`Hello from ${req.path} and ${req.method}`)
+// Error handler
+app.use(function (err, req, res, next) {
+  console.error(err)
+  res.status(500).send('Internal Serverless Error')
 })
 
 module.exports = app
