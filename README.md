@@ -58,29 +58,21 @@ inputs: # The configuration the Component accepts according to its docs
 
 # Quick-Start
 
-While we are testing the latest updates of Serverless Components, we've made them available within the [Serverless Framework](https://www.github.com/serverless/serverless), via a special package on NPM:
+During testing, Serverless Components are currently available within a special version of the [Serverless Framework](https://www.github.com/serverless/serverless) titled `@components`.  Install it like this:
 
 ```console
 $ npm i -g serverless@components
 ```
 
-After installation, use the `create --template-url` command to install a [Serverless Components Template](./templates), which contains Components as well as boilerplate code, to get you started quickly.
-
-#### [Deploy A Serverless Express.js Application](https://github.com/serverless/components/tree/cloud/templates/express)
+After installation, use the `create --template-url` command to install a [Serverless Components Template](./templates), which contains Components as well as boilerplate code, to get you started quickly.  An easy starting point is the Express.js Component:
 
 ```shell
 serverless create --template-url https://github.com/serverless/components/tree/cloud/templates/express
 ```
 
-#### [Deploy A Website](https://github.com/serverless/components/tree/cloud/templates/website)
+Some Templates require running `npm i` to install its dependencies.  The `express` template above requires running `npm i` in its `src` directory, to install the Express framework.
 
-```shell
-serverless create --template-url https://github.com/serverless/components/tree/cloud/templates/website
-```
-
-Both templates feature `package.json` files. Be sure to run `npm i` to enable them to work.
-
-After that, within your template, log in to enable deployment and saving state in the cloud:
+Next, `cd` into your Template and log in to enable deployment and saving state in the cloud:
 
 ```bash
 $ serverless login
@@ -108,22 +100,31 @@ Deploy...
 $ serverless deploy
 ```
 
+Fetch the your Component Instance's info...
+
+```bash
+$ serverless info
+```
+
 Run the `serverless dev` command to auto-deploy on save, and have logs and errors stream in real-time to your console (if supported by the Component)...
 
 ```bash
 $ serverless dev
 ```
 
-See info about your Component Instance:
+Deploy other Components that you may want to use with your Express Component.  For example, you may want to give your Express application permissions to other resources on your AWS account via the `aws-iam-role` Component.  You may also want an AWS DynamoDB table to use with your Express Component, via the `aws-dynamodb` Component.  There are Templates for both of these in the [Serverless Components Template](./templates) folder.  You can then use them with your `express` Component, like this:
 
-```bash
-$ serverless info
-```
+```yaml
+org: # Your Org
+app: # Your App
+component: express
+name: express-api
 
-Run the remove command to remove your Component Instance and all of its cloud resources:
-
-```bash
-$ serverless remove
+inputs:
+  src: ./src
+  roleArn: ${output:${stage}:${app}:my-role.arn}
+  env:
+    dbTableName: ${outputs:${stage}:${app}:my-table.name}
 ```
 
 <br/>
