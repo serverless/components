@@ -1,0 +1,11 @@
+org: # Your Serverless Framework Org
+app: # Your Serverless Framework App
+component: aws-iam-role
+name: admin-role
+
+inputs:
+  name: ${org}-${stage}-${app}-${name}
+  service: lambda.amazonaws.com
+  policy:
+    arn: arn:aws:iam::aws:policy/AdministratorAccess
+  region: us-east-1

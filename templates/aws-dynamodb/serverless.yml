@@ -1,0 +1,14 @@
+org: # Your Serverless Framework Org
+app: # Your Serverless Framework App
+component: aws-dynamodb
+name: test-database
+
+inputs:
+  name: test-database-1
+  attributeDefinitions:
+    - AttributeName: id
+      AttributeType: S
+  keySchema:
+    - AttributeName: id
+      KeyType: HASH
+  region: us-east-1
