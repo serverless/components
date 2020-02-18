@@ -793,34 +793,34 @@ Because of this, we're designing all of our projects to be as approachable as po
 
 # CLI Commands
 
-### `serverless registry`
+#### `serverless registry`
 
 See available Components
 
-### `serverless registry publish`
+#### `serverless registry publish`
 
 Publish a Component to the Serverless Registry.
 
 `--dev` - Publishes to the `@dev` version of your Component, for testing purposes.
 
-### `serverless deploy`
+#### `serverless deploy`
 
 Deploys an Instance of a Component.
 
 `--debug` - Lists `console.log()` statements left in your Component upon `deploy` or any action.
 
-### `serverless remove`
+#### `serverless remove`
 
 Removes an Instance of a Component.
 
 `--debug` - Lists `console.log()` statements left in your Component upon `remove` or any action.
 
-### `serverless info`
+#### `serverless info`
 
 Fetches information of an Instance of a Component.
 
 `--verbose` - Lists `state`.
 
-### `serverless dev`
+#### `serverless dev`
 
 Starts DEV MODE, which watches the Component for changes, auto-deploys on changes, and (if supported by the Component) streams logs, errors and transactions to the terminal.
