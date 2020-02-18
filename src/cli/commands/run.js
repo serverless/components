@@ -102,7 +102,7 @@ module.exports = async (config, cli, command) => {
     cli.log()
     cli.logOutputs(instance.outputs)
     cli.log()
-    cli.log(`${chalk.grey(`More instance info at ${dashboardUrl}`)}`)
+    cli.log(`${chalk.grey(`Full details: ${dashboardUrl}`)}`)
   } else if (command === 'remove') {
     // run remove
     cli.status('Removing', null, 'white')
