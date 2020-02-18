@@ -46,11 +46,10 @@ inputs: # The configuration the Component accepts according to its docs
 - [Building Components](#building-components)
   - [Serverless.component.yml](#serverless.component.yml)
   - [Serverless.js](#serverless.js)
+  - [Working With Source Code](#Working-with-source-code)
+  - [Adding The Serverless Agent](#Adding-the-serverless-agent)
   - [Development Tips](#development-tips)
-- [Core API](#core-api)
-  - [Component](#component)
-  - [Instance](#instance)
-  - [Context](#context)
+- [CLI Commands](#cli-commands)
 - [Templates](./templates)
 - [Artwork](https://github.com/serverless/artwork)
 - [Join Us on Slack](https://serverless.com/slack)
@@ -113,6 +112,12 @@ Run the `serverless dev` command to auto-deploy on save, and have logs and error
 
 ```bash
 $ serverless dev
+```
+
+See info about your Component Instance:
+
+```bash
+$ serverless info
 ```
 
 Run the remove command to remove your Component Instance and all of its cloud resources:
@@ -645,7 +650,7 @@ class MyComponent extends Component {
 module.exports = MyComponent
 ```
 
-### Working with source code
+### Working With Source Code
 
 When working with a Component that requires source code (e.g. you are creating a Component that will run on AWS Lambda), if you make the `src` one of your inputs, anything specified there will be automatically uploaded and made available within the Component environment.
 
@@ -671,7 +676,7 @@ async deploy(inputs = {}) {
 }
 ```
 
-### Adding the Serverless Agent
+### Adding The Serverless Agent
 
 If your Component deals runs code, and you want to enable streaming logs, errors and transactions for you Component via Serverless Dev Mode (`serverless dev`), be sure to add the Serverless SDK into the deployed application/logic.  We offer some helpful utility methods to make this possible:
 
@@ -703,7 +708,7 @@ When you have added or updated the code of your Serverless Component and you wan
 Simply run the following command to publish your Serverless Component to the "dev" version:
 
 ```console
-$ serverless publish --dev
+$ serverless registry publish --dev
 ```
 
 You can test the "dev" version of your Component in `serverless.yml`, by including a `@dev` in your Component name, like this:
@@ -785,3 +790,37 @@ If you do need to store state, try to store it immediately after a successful op
 We believe serverless infrastructure and architectures will empower more people to develop software than ever before.
 
 Because of this, we're designing all of our projects to be as approachable as possible. Please try to use simple, vanilla Javascript. Additionally, to reduce security risks and general bloat, please try to use the least amount of NPM dependencies as possible.
+
+# CLI Commands
+
+### `serverless registry`
+
+See available Components
+
+### `serverless registry publish`
+
+Publish a Component to the Serverless Registry.
+
+`--dev` - Publishes to the `@dev` version of your Component, for testing purposes.
+
+### `serverless deploy`
+
+Deploys an Instance of a Component.
+
+`--debug` - Lists `console.log()` statements left in your Component upon `deploy` or any action.
+
+### `serverless remove`
+
+Removes an Instance of a Component.
+
+`--debug` - Lists `console.log()` statements left in your Component upon `remove` or any action.
+
+### `serverless info`
+
+Fetches information of an Instance of a Component.
+
+`--verbose` - Lists `state`.
+
+### `serverless dev`
+
+Starts DEV MODE, which watches the Component for changes, auto-deploys on changes, and (if supported by the Component) streams logs, errors and transactions to the terminal.
