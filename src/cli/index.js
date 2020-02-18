@@ -7,7 +7,7 @@ const CLI = require('./CLI')
 const commands = require('./commands')
 
 module.exports = async () => {
-  const command = args._[0]
+  const command = args._[0] || 'deploy'
   const params = []
   if (args._[1]) {
     params.push(args._[1])
