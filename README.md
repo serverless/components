@@ -16,9 +16,9 @@ Here's how easy it is to use Serverless Components with the Serverless Framework
 ```yaml
 # serverless.yml
 
-component: express@0.0.2 # The name of the Component in the Registry
 org: acme # Your Serverless Framework Org
 app: fullstack # Your Serverless Framework App
+component: express@0.0.2 # The name of the Component in the Registry
 name: rest-api # The name of your instance of this Component
 
 inputs: # The configuration the Component accepts according to its docs
@@ -109,10 +109,10 @@ Deploy...
 $ serverless deploy
 ```
 
-Use `--debug` to see what your Components are doing upon deployment.
+Run the `serverless dev` command to auto-deplyo on save, and get access to streaming logs and errors (if supported by the Component)
 
 ```bash
-$ serverless deploy --debug
+$ serverless dev
 ```
 
 Run the remove command to remove your Component Instance and all of its cloud resources:
