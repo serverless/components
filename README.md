@@ -1,13 +1,19 @@
 [![Serverless Components](https://s3.amazonaws.com/assets.github.serverless/readme-serverless-components-3.gif)](http://serverless.com)
 
+<br/>
+
 Serverless Components are simple abstractions that enable developers to deploy serverless applications and use-cases easily, via the [Serverless Framework](https://github.com/serverless/serverless).
+
+<br/>
 
 - [x] **Ease** - Deploy serverless infrastructure or entire serverless applications via Components.
 - [x] **Instant Deployments** - Components deploy in 2-4 seconds.
 - [x] **Build Your Own** - Components are easy to build.
 - [x] **Registry** - Share your Components with you, your team, and the world, via the Serverless Registry.
 
-Here's how to use a Serverless Component with the Serverless Framework:
+<br/>
+
+Here's how to use a Serverless Component:
 
 ```yaml
 # serverless.yml
