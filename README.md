@@ -1,4 +1,4 @@
-**IMPORTANT –** This branch features a large update to Serverless Components, which include _cloud deployments_, _remote state storage_, _stages_ and the _Serverless Registry_. The README has been updated with instructions. Only a few Serverless Components have been updated to support these changes and they can be found in this repository's [templates](./templates). You can read more about these changes here, or follow the README to get started!
+**IMPORTANT –** This branch features a large update to Serverless Components, which include _cloud deployments_, _remote state storage_, _stages_ and the _Serverless Registry_. The README has been updated with instructions. Only a few Serverless Components have been updated to support these changes and they can be found in this repository's [templates](./templates). You can read more about these changes here, or follow the README to get started.
 
 <br/>
 
@@ -6,7 +6,7 @@
 
 Serverless Components are simple abstractions that enable developers to deploy serverless applications and use-cases easily, via the [Serverless Framework](https://github.com/serverless/serverless).
 
-- [x] **Simplicity** - Easily deploy low-level infra, or higher-order serverless applications via Components.
+- [x] **Ease** - Easily deploy low-level infra, or higher-order serverless applications via Components.
 - [x] **Instant Deployments** - Components deploy in 2-4 seconds.
 - [x] **Build Your Own** - Components are easy to build.
 - [x] **Registry** - Share your Components with you, your team, and the world, via the Serverless Registry.
@@ -16,7 +16,7 @@ Here's how easy it is to use Serverless Components with the Serverless Framework
 ```yaml
 # serverless.yml
 
-component: express@0.0.6 # The name of the Component in the Registry
+component: express@0.0.2 # The name of the Component in the Registry
 org: acme # Your Serverless Framework Org
 app: fullstack # Your Serverless Framework App
 name: rest-api # The name of your instance of this Component
@@ -67,8 +67,6 @@ $ npm i -g serverless@components
 
 After installation, use the `create --template-url` command to install a [Serverless Components Template](./templates), which contains Components as well as boilerplate code, to get you started quickly.
 
-Currently, only the Components in the [templates](./templates) within this repository branch support the latest Serverless Component updates.
-
 #### [Deploy A Serverless Express.js Application](https://github.com/serverless/components/tree/cloud/templates/express)
 
 ```shell
@@ -81,7 +79,7 @@ serverless create --template-url https://github.com/serverless/components/tree/c
 serverless create --template-url https://github.com/serverless/components/tree/cloud/templates/website
 ```
 
-Next, both templates feaure `package.json` files. Be sure to run `npm i` to enable them to work.
+Both templates feature `package.json` files. Be sure to run `npm i` to enable them to work.
 
 After that, within your template, log in to enable deployment and saving state in the cloud:
 
@@ -105,7 +103,7 @@ AWS_ACCESS_KEY_ID=12345
 AWS_SECRET_ACCESS_KEY=5321
 ```
 
-Deploy!
+Deploy...
 
 ```bash
 $ serverless deploy
@@ -114,7 +112,7 @@ $ serverless deploy
 Use `--debug` to see what your Components are doing upon deployment.
 
 ```bash
-$ serverless deploy --dev
+$ serverless deploy --debug
 ```
 
 Run the remove command to remove your Component Instance and all of its cloud resources:
@@ -136,10 +134,10 @@ For example, here's what it looks like to provision a **serverless website** hos
 ```yaml
 # serverless.yml
 
-component: website # A Component in the Registry
 org: acme # Your Org
 app: ecommerce # Your App
-name: website # The name of your Component Instance
+component: website # A Component in the Registry
+name: my-website # The name of your Component Instance
 
 inputs: # The configuration the Component accepts
   src:
@@ -170,11 +168,8 @@ const { Component } = require('@serverless/core')
 
 class MyBlog extends Component {
   async deploy(inputs) {
-    await this.status('Deploying a serverless blog')
-    const website = this.load('website', 'website-1') // Load a component
-    const outputs = await website.deploy({ code: { src: inputs.src } }) // Deploy it
-    this.state.url = outputs.url
-    await this.save()
+    console.log('Deploying a serverless blog') // Leave a status update for users deploying your Component with --debug
+    this.state.url = outputs.url // Save state
     return outputs
   }
 }
@@ -188,9 +183,7 @@ Anyone can build a Serverless Component and share it in our Registry.
 
 ```bash
 
-$ serverless publish
-
-express: components publish
+$ serverless registry publish
 
 express@0.0.4 › Published
 
