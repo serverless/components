@@ -1,6 +1,6 @@
-component: website
 org: # Your Serverless Framework Org
 app: # Your Serverless Framework App
+component: website
 name: landing-page
 stage: dev
 
