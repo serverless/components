@@ -153,6 +153,15 @@ Check out these [templates](./templates) for more use-cases.
 
 Serverless Components that deploy instantly, removing the need to emulate cloud services locally for fast feedback during the development process.
 
+
+```bash
+
+$ serverless deploy
+
+4s > my-express-app › Successfully deployed
+
+```
+
 ### Build Your Own
 
 Serverless Components are easily written in Javascript (`serverless.js`), with simple syntax inspired by component-based frameworks, like React.
@@ -193,9 +202,7 @@ Serverless Components favor cloud infrastructure with serverless qualities.  The
 
 # Overview
 
-Serverless Components are libraries of code that know how to provision an outcome/use-case.  Anyone can use them for free, as well as create them, and publish them, to the Serverless Registry.
-
-They are focused primarily on use-cases built upon cloud infrastructure with serverless qualities, enabling you to deliver software with radically low operational cost. Serverless Components are to serverless back-end use-cases, what React Components are to front-end use-cases.
+Serverless Components are libraries of code that know how to provision an outcome/use-case.  They are focused primarily on use-cases built on cloud infrastructure with serverless qualities, enabling you to deliver functionality with radically low operational cost, without having to be very knowledgeable about the underlying infrastructure. Serverless Components are to serverless, back-end use-cases, what React Components are to front-end use-cases.
 
 A Component can be designed to provision low-level infrastructure (e.g. an AWS S3 bucket). However, they can also provision higher-order outcomes (which is when they are at their best). Examples of higher-order outcomes are:
 
@@ -203,7 +210,7 @@ A Component can be designed to provision low-level infrastructure (e.g. an AWS S
 2. A software feature, like user registration, comments, or a payment system.
 3. An entire application, like a blog, video streaming service, or landing page.
 
-Serverless Components are used **declaratively** (via the Serverless Framework's `serverless.yml` file).
+Serverless Components are used **declaratively** (via the Serverless Framework's `serverless.yml` file).  They are free to use, and anyone can make and share them by publishing their Component to the Serverless Registry.
 
 <br/>
 
@@ -211,9 +218,7 @@ Serverless Components are used **declaratively** (via the Serverless Framework's
 
 ### serverless.yml
 
-Serverless Components live exclusively in the cloud, where they await to deploy your serverless use-cases.
-
-They are discoverable and usable via the Serverless Registry. Please note, the Registry API exists today, but currently does not have a front-end with search functionality. Instead, run `serverless registry` for available components.
+Serverless Components live exclusively in the cloud.  They are discoverable and usable via the Serverless Registry. Please note, the Registry API exists today, but currently does not have a front-end with search functionality. Instead, run `serverless registry` for available components.
 
 To use a Serverless Component, declare the name of one that exists in the Serverless Registry in your `serverless.yml`. The syntax looks like this:
 
@@ -237,7 +242,7 @@ Please note that you can only have 1 Serverless Component in `serverless.yml`. W
 
 ### Inputs
 
-Every Serverless Component accepts parameters via an `inputs` property. You can see which `inputs` a Component accepts in its documentation.
+Every Serverless Component accepts arguments via an `inputs` property. You can see which `inputs` a Component accepts in its documentation.
 
 Some `inputs` have special types, starting with `src`. This input specifies a folder containing code or general files you wish to upload upon deployment, which the Component may need to provision a specific outcome. Before running the Component in the cloud, the Serverless Framework will first upload any files specified in `src`. Generally, you want to keep the package size of your serverless applications small (<5MB) in order to have the best performance in serverless compute services. Larger package sizes will also make deployments slower since the upload process is dependent on your internet connection bandwidth. Consider a tool to build and minify your code first. You can specify a build hook to run and a `dist` folder to upload, via the `src` property, like this:
 
@@ -248,6 +253,9 @@ inputs:
     hook: npm run build # Build hook to run on every "serverless deploy"
     dist: ./dist # Location of the distribution folder to upload
 ```
+
+Improving the Component Input Types system is one of our current big priorities.
+
 
 ### Deploying
 
@@ -289,6 +297,18 @@ When you add a version, only that Component version is used. When you don't add 
 When a Component is finished running, it returns an `outputs` object.
 
 Outputs contain the most important information you need to know from a deployed Component Instance, like the URL of the API or website, or all of the API endpoints.
+
+Outputs can be referenced easily in the `inputs` of other Components.  Just use this syntax:
+
+```yaml
+# Syntax
+${output:[stage]:[app]:[instance].[output]}
+
+# Examples
+${output:prod:ecommerce:products-api.url}
+${output:prod:ecommerce:role.arn}
+${output:prod:ecommerce:products-database.name}
+```
 
 ### Credentials
 
@@ -494,12 +514,12 @@ A useful feature of this is the ability to share resources easily, and even do s
 
 # Building Components
 
-If you want to build reusable Serverless Components, there are 2 essential files you need to be aware of:
+If you want to build your own Serverless Component, there are 2 essential files you need to be aware of:
 
 - `serverless.component.yml` - This contains the definition of your Serverless Component.
 - `serverelss.js` - This contains your Serverless Component's code.
 
-One of the most important things to note is that Serverless Components **only** run in the cloud and **do not** run locally. You must publish your Component first, to run it (it takes only few seconds to publish). Fortunately, we've made this process easy, as described below.
+One of the most important things to note is that Serverless Components **only** run in the cloud and **do not** run locally. That means, to run and test your Component, you must publish it first (it takes only few seconds to publish). We're continuing to improve this workflow.  Here's how to do it...
 
 ### serverless.component.yml
 
@@ -557,20 +577,18 @@ Here is what it looks like to add a `remove` method, as well as a custom method.
 const { Component } = require('@serverless/core')
 
 class MyComponent extends Component {
-  /*
-   * Deploy (Required)
-   * - The default functionality to run/provision/update your Component
-   * - You can run this function by running the "$ serverless deploy" command
-   */
 
+  /*
+   * The default functionality to run/provision/update your Component
+   * You can run this function by running the "$ serverless deploy" command
+   */
   async deploy(inputs = {}) {
     return {}
   }
 
   /*
-   * Remove (Optional)
-   * - If your Component removes infrastructure, this is recommended.
-   * - You can run this function by running "$ serverless remove"
+   * If your Component removes infrastructure, this is recommended.
+   * You can run this function by running "$ serverless remove"
    */
 
   async remove(inputs = {}) {
@@ -578,9 +596,8 @@ class MyComponent extends Component {
   }
 
   /*
-   * Anything (Optional)
-   * - If you want to ship your Component w/ extra functionality, put it in a method.
-   * - You can run this function by running "$ serverless anything"
+   * If you want to ship your Component w/ extra functionality, put it in a method.
+   * You can run this function by running "$ serverless anything"
    */
 
   async anything(inputs = {}) {
@@ -628,6 +645,55 @@ class MyComponent extends Component {
 module.exports = MyComponent
 ```
 
+### Working with source code
+
+When working with a Component that requires source code (e.g. you are creating a Component that will run on AWS Lambda), if you make the `src` one of your inputs, anything specified there will be automatically uploaded and made available within the Component environment.
+
+Within your Component, you the `inputs.src` will point to a zip file of the source files within your environment.  If you wish to unzip the source files, use this helpful utilty method:
+
+```javascript
+async deploy(inputs = {}) {
+  
+  // Unzip the source files...  
+  const sourceDirectory = await this.unzip(inputs.src)
+  
+}
+```
+
+Now, you are free to manipulate the source files.  When finished, you may want to use this utility method to zip up the source files again because in some circumstances you will next want to upload the code to a compute service (e.g. AWS Lambda).
+
+```javascript
+async deploy(inputs = {}) {
+  
+  // Zip up the source files...  
+  const zipPath = await instance.zip(sourceDirectory)
+  
+}
+```
+
+### Adding the Serverless Agent
+
+If your Component deals runs code, and you want to enable streaming logs, errors and transactions for you Component via Serverless Dev Mode (`serverless dev`), be sure to add the Serverless SDK into the deployed application/logic.  We offer some helpful utility methods to make this possible:
+
+```javascript
+
+  // unzip source zip file
+  console.log(`Unzipping ${inputs.src}...`)
+  const sourceDirectory = await instance.unzip(inputs.src)
+  console.log(`Files unzipped into ${sourceDirectory}...`)
+
+  // add sdk to the source directory, add original handler
+  console.log(`Installing Serverless Framework SDK...`)
+  instance.state.handler = await instance.addSDK(sourceDirectory, '_express/handler.handler')
+
+  // zip the source directory with the shim and the sdk
+  console.log(`Zipping files...`)
+  const zipPath = await instance.zip(sourceDirectory)
+  console.log(`Files zipped into ${zipPath}...`)
+```
+
+After this, you'll likely want to upload the code to a compute service (e.g. AWS Lambda).
+
 ### Development Workflow
 
 Serverless Components only run in the cloud and cannot be run locally. This presents some tremendous advantages to Component consumers, and we've added some workflow tricks to make the authoring workflow easier. Here they are...
@@ -640,14 +706,14 @@ Simply run the following command to publish your Serverless Component to the "de
 $ serverless publish --dev
 ```
 
-You can test the "dev" version of your Component in `serverless.yml`, by not including a `@version` in your Component name, like this:
+You can test the "dev" version of your Component in `serverless.yml`, by including a `@dev` in your Component name, like this:
 
 ```yaml
 # serverless.yml
 
 org: acme
 app: fullstack
-component: express # DO NOT ADD A @version HERE.  By keeping blank, it will use the "dev" version.
+component: express@dev # Add "dev" as the version
 name: rest-api
 
 inputs:
