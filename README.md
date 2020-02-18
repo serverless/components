@@ -27,7 +27,7 @@ inputs: # The configuration the Component accepts according to its docs
   src: ./src
 ```
 
-# Table Of Contents
+# Documentation
 
 - [Quick-Start](#quick-start)
 - [Features](#features)
