@@ -1,17 +1,13 @@
-**IMPORTANT –** This branch features a large update to Serverless Components, which include _cloud deployments_, _remote state storage_, _stages_ and the _Serverless Registry_. The README has been updated with instructions. Only a few Serverless Components have been updated to support these changes and they can be found in this repository's [templates](./templates). You can read more about these changes here, or follow the README to get started.
-
-<br/>
-
 [![Serverless Components](https://s3.amazonaws.com/assets.github.serverless/readme-serverless-components-3.gif)](http://serverless.com)
 
 Serverless Components are simple abstractions that enable developers to deploy serverless applications and use-cases easily, via the [Serverless Framework](https://github.com/serverless/serverless).
 
-- [x] **Ease** - Easily deploy low-level infra, or higher-order serverless applications via Components.
+- [x] **Ease** - Deploy serverless infrastructure or entire serverless applications via Components.
 - [x] **Instant Deployments** - Components deploy in 2-4 seconds.
 - [x] **Build Your Own** - Components are easy to build.
 - [x] **Registry** - Share your Components with you, your team, and the world, via the Serverless Registry.
 
-Here's how easy it is to use Serverless Components with the Serverless Framework:
+Here's how to use a Serverless Component with the Serverless Framework:
 
 ```yaml
 # serverless.yml
@@ -24,8 +20,6 @@ name: rest-api # The name of your instance of this Component
 inputs: # The configuration the Component accepts according to its docs
   src: ./src
 ```
-
-Read the [Quick-Start](#quick-start) to get started, or learn more via the documentation below!
 
 <br/>
 
@@ -109,7 +103,7 @@ Deploy...
 $ serverless deploy
 ```
 
-Run the `serverless dev` command to auto-deplyo on save, and get access to streaming logs and errors (if supported by the Component)
+Run the `serverless dev` command to auto-deploy on save, and have logs and errors stream in real-time to your console (if supported by the Component)...
 
 ```bash
 $ serverless dev
@@ -127,7 +121,7 @@ $ serverless remove
 
 ### Simplicity
 
-Serverless Components are built around higher-order use-cases (e.g. a website, blog, payment system). Irrelevant low-level infrastructure details are abstracted away, and simpler configuration is offered instead.
+Serverless Components are built around higher-order use-cases (e.g. a website, blog, payment system). Irrelevant low-level infrastructure details (that aren't necessary for the use-case) are abstracted away, and simpler configuration is offered instead.
 
 For example, here's what it looks like to provision a **serverless website** hosted on AWS S3, delivered globally and quickly w/ AWS Cloudfront, via a custom domain on AWS Route 53, secured by a free AWS ACM SSL Certificate:
 
@@ -151,11 +145,7 @@ Check out these [templates](./templates) for more use-cases.
 
 ### Instant Deployments
 
-Most Serverless Components deploy within 2-4 seconds, 30x faster than traditional cloud provisioning tools.
-
-Our goal is to design Serverless Components that deploy instantly, removing the need to emulate cloud services locally for fast feedback during the development process.
-
-Serverless Components offer the fastest serverless development experience available today.
+Serverless Components that deploy instantly, removing the need to emulate cloud services locally for fast feedback during the development process.
 
 ### Build Your Own
 
@@ -191,27 +181,23 @@ express@0.0.4 › Published
 
 ### Serverless
 
-Serverless Components favor cloud infrastructure with serverless qualities (shocker!). We also believe in order to deliver the best product, you must be free to use the best services.
-
-Serverless Components are being designed entirely vendor agnostic, enabling you to easily use services from different vendors, together. Like, AWS Lambda, AWS S3, Azure Functions, Google Big Query, Twilio, Stripe, Algolia, Cloudflare Workers and more.
+Serverless Components favor cloud infrastructure with serverless qualities.  They are also entirely vendor agnostic, enabling you to easily use services from different vendors, together. Like, AWS Lambda, AWS S3, Azure Functions, Google Big Query, Twilio, Stripe, Algolia, Cloudflare Workers and more.
 
 <br/>
 
 # Overview
 
-Serverless Components are merely Javascript libraries that provision something.
+Serverless Components are libraries of code that know how to provision an outcome/use-case.  Anyone can use them for free, as well as create them, and publish them, to the Serverless Registry.
 
-They are focused primarily on use-cases built upon cloud infrastructure with serverless qualities, enabling you to deliver software with radically less overhead and cost. Serverless Components are to serverless back-end use-cases, what React Components are to front-end use-cases.
+They are focused primarily on use-cases built upon cloud infrastructure with serverless qualities, enabling you to deliver software with radically low operational cost. Serverless Components are to serverless back-end use-cases, what React Components are to front-end use-cases.
 
-A Component can be designed to provision low-level infrastructure (e.g. an AWS S3 bucket). However, they can also provision higher-order outcomes — which is when they are at their best. Examples of a higher-order outcome are:
+A Component can be designed to provision low-level infrastructure (e.g. an AWS S3 bucket). However, they can also provision higher-order outcomes (which is when they are at their best). Examples of higher-order outcomes are:
 
 1. A group of infrastructure with a purpose, like a type of data processing pipeline.
 2. A software feature, like user registration, comments, or a payment system.
 3. An entire application, like a blog, video streaming service, or landing page.
 
 Serverless Components are used **declaratively** (via the Serverless Framework's `serverless.yml` file).
-
-If you want to create a Serverless Component, it's easy! It's also trivial to load child Components and deploy them, enabling you to lean on low-level Components to handle difficult infrastructure provisioning tasks, while you rapidly create a higher-order abstraction.
 
 <br/>
 
@@ -221,7 +207,7 @@ If you want to create a Serverless Component, it's easy! It's also trivial to lo
 
 Serverless Components live exclusively in the cloud, where they await to deploy your serverless use-cases.
 
-They are discoverable and usable via the Serverless Registry. Please note, the Registry API exists today, but currently does not have a front-end with search functionality until January 4th, 2020. Instead, reference the [templates](./templates) directory for available Components.
+They are discoverable and usable via the Serverless Registry. Please note, the Registry API exists today, but currently does not have a front-end with search functionality. Instead, run `serverless registry` for available components.
 
 To use a Serverless Component, declare the name of one that exists in the Serverless Registry in your `serverless.yml`. The syntax looks like this:
 
@@ -239,9 +225,9 @@ inputs: # The configuration the Component accepts according to its docs
 
 There is nothing to install when using Serverless Components. Instead, when you run deploy, the configuration you specify in `serverless.yml` will be sent to the Serverless Components Deployment Engine, along with any files or folders you specifiy in `inputs` that may be part of the outcome you are seeking to deploy.
 
-Please note that you can only have 1 Serverless Component in `serverless.yml`. We encourage this because we believe you should separate the resources in your Serverless Applications as much as possible, rather than put all of them in 1 infrastructure stack.
+Please note that you can only have 1 Serverless Component in `serverless.yml`. We encourage this because it's important to separate the resources in your Serverless Applications, rather than put all of them in 1 infrastructure stack.
 
-**Note:** You cannot use Serverless Components within an existing Serverless Framework project file (i.e. a project file that contains `functions`, `events`, `resources` and `plugins`).
+**Note:** You cannot yet use Serverless Components within an existing Serverless Framework project file (i.e. a project file that contains `functions`, `events`, `resources` and `plugins`).
 
 ### Inputs
 
@@ -265,16 +251,16 @@ You can deploy Components easily via the Serverless Framework with the `$ server
 $ serverless deploy
 ```
 
-While Serverless Components deploy incredibly fast, please note that first deployments can often be 10x slower because creating cloud resources takes a lot longer than updating them.
+While Serverless Components deploy incredibly fast, please note that first deployments can often be 5x slower because creating cloud resources takes a lot longer than updating them.
 
 ### State
 
 Serverless Components automatically save their state remotely. This means you can easily push your Components to Github, Gitlab, Bitbucket, etc., and collaborate on them with others as long as the `serverless.yml` contains an `org` which your collaboraters are added to:
 
 ```yaml
-component: my-component
 org: acme-team # Your collaboraters must be added at dashboard.serverless.com
 app: ecommerce
+component: my-component
 name: rest-api
 ```
 
@@ -287,10 +273,10 @@ You can add collaboraters and create access tokens in the [Serverless Framework 
 Serverless Components use semantic versioning.
 
 ```yaml
-component: express@0.0.4
+component: express@0.0.2
 ```
 
-When you add a version, only that Component version is used. When you don't add a version, upon every deployment, the Serverless Framework will use a "dev" stage of that Component, if it exists. We recommend to **always** pin your Component to a version.
+When you add a version, only that Component version is used. When you don't add a version, the Serverless Framework will use the latest version of that Component, if it exists. We recommend to **always** pin your Component to a version.
 
 ### Outputs
 
@@ -350,9 +336,9 @@ Serverless Components have a Stages concept, which enables you to deploy entirel
 The `dev` Stage is always used as the default stage. If you wish to change your stage, set it in `serverless.yml`, like this:
 
 ```yaml
-component: express@0.0.4
 org: my-org
 app: my-app
+component: express@0.0.2
 name: my-component-instance
 stage: prod # Enter the stage here
 ```
@@ -389,7 +375,8 @@ stage: prod
 inputs:
   name: ${org}-${stage}-${app}-${name} # Results in "acme-prod-ecommerce-rest-api"
   region: ${env.REGION} # Results in whatever your environment variable REGION= is set to.
-  roleArn: ${output:shared:prod:role.arn} # Fetches an output from another component instance that is already deployed
+  roleArn: ${output:prod:my-app:role.arn} # Fetches an output from another component instance that is already deployed
+  roleArn: ${output:${stage}:${app}:role.arn} # You can combine variables too
 ```
 
 #### Variables: Org
@@ -487,13 +474,13 @@ name: rest-api
 stage: prod
 
 inputs:
-  roleArn: ${output:shared:prod:role.arn} # Fetches an output from another component instance that is already deployed
+  roleArn: ${output:[STAGE]:[APP]:[INSTANCE].arn} # Fetches an output from another component instance that is already deployed
 
 ```
 
 You can access Outputs across any App, Instance, in an any Stage, within the same Org.
 
-A killer feature of this is the ability to share resources easily, and even do so across environments.  This is useful when developers want to deploy a Component Instance in their own personal Stage, but access shared resources within a common "development" Stage, like a database.  This way, the developers on your team do not have to recreate the entire development stage to perform their feature work or bug fix, only the Component Instance that needs changes.
+A useful feature of this is the ability to share resources easily, and even do so across environments.  This is useful when developers want to deploy a Component Instance in their own personal Stage, but access shared resources within a common "development" Stage, like a database.  This way, the developers on your team do not have to recreate the entire development stage to perform their feature work or bug fix, only the Component Instance that needs changes.
 
 
 <br/>
@@ -623,30 +610,11 @@ class MyComponent extends Component {
     // Components have built-in state storage.
     // Here is how to save state to your Component:
     this.state.name = 'myComponent'
-    await this.save()
 
-    // Here is how to load a child Component via its name in the Registry
-    // You can run a method on the child Component, like this:
-    let websiteOutputs = await website.deploy({ code: { src: './src' } })
+    // If you want to show a debug statement in the CLI, use console.log.
+    console.log('this is a debug statement')
 
-    // If you are deploying multiple instances of the same Component, include an instance id.
-    let website1 = this.load('website', 'website1')
-    let website2 = this.load('website', 'website2')
-    // Child Components save their state automatically.
-
-    // Here is how you can easily remove a Component.
-    let websiteRemoveOutputs = await website.remove({})
-
-    // Here is how you can call any custom method on a Component.
-    let websiteRemoveOutputs = await website.test({})
-
-    // If you want to show a status update to the CLI, use this.
-    await this.status('Uploading')
-
-    // If you want to show a debug statement in the CLI, use this.
-    await this.debug('this is a debug statement')
-
-    // Return your results
+    // Return your outputs
     return { url: websiteOutputs.url }
   }
 }
@@ -656,7 +624,7 @@ module.exports = MyComponent
 
 ### Development Workflow
 
-Serverless Components only run in the cloud and cannot be run locally. This presents some tremendous advantages to Component consumers, but the workflow can be a bit tedious for Component authors building and testing Serverless Components. Fortunately, we've added some workflow tricks to make the authoring workflow easier. Here they are...
+Serverless Components only run in the cloud and cannot be run locally. This presents some tremendous advantages to Component consumers, and we've added some workflow tricks to make the authoring workflow easier. Here they are...
 
 When you have added or updated the code of your Serverless Component and you want to test the change, you will need to publish it first. Since you don't want to publish your changes to a proper version of your Component just for testing (because people may be using it), we allow for you to publish a "dev" version of your Component.
 
@@ -671,9 +639,9 @@ You can test the "dev" version of your Component in `serverless.yml`, by not inc
 ```yaml
 # serverless.yml
 
-component: express # DO NOT ADD A @version HERE.  By keeping blank, it will use the "dev" version.
 org: acme
 app: fullstack
+component: express # DO NOT ADD A @version HERE.  By keeping blank, it will use the "dev" version.
 name: rest-api
 
 inputs:
@@ -686,15 +654,15 @@ Run your Component command to test your changes:
 $ serverless deploy --debug
 ```
 
-When writing a Component, we recomend to always use the `--debug` flag, so that the Component's `this.debug()` statements are sent to the CLI. These are handy to use in Serverless Components, since they describe what the Component is doing. We recommend you add `this.debug()` statements to your Component wherever you think they are necessary. Don't forget to add `await` as well!
+When writing a Component, we recomend to always use the `--debug` flag, so that the Component's `console.log()` statements are sent to the CLI. These are handy to use in Serverless Components, since they describe what the Component is doing. We recommend you add `console.log()` statements to your Component wherever you think they are necessary.
 
 ```javascript
 class MyComponent extends Component {
   async deploy(inputs) {
-    await this.debug(`Starting MyComponent.`)
-    await this.debug(`Creating resources.`)
-    await this.debug(`Waiting for resources to be provisioned.`)
-    await this.debug(`Finished MyComponent.`)
+    console.log(`Starting MyComponent.`)
+    console.log(`Creating resources.`)
+    console.log(`Waiting for resources to be provisioned.`)
+    console.log(`Finished MyComponent.`)
     return {}
   }
 }
@@ -705,13 +673,13 @@ When you're ready to publish a new version for others to use, update the version
 ```yaml
 # serverless.component.yml
 
-name: express@0.0.5
+name: express@0.0.1
 ```
 
 ```bash
 $ serverless publish
 
-Serverless: Successfully publish express@0.0.5
+Serverless: Successfully publish express@0.0.1
 ```
 
 ### Development Tips
@@ -720,15 +688,11 @@ Here are some development tips when it comes to writing Serverless Components:
 
 #### Start With The Outcome
 
-When making a Serverless Component, it can be tempting to break it down into several levels of child Components, to maintain separation of concerns and increase the ways your work could be re-used.
+We recommend starting with a focus on your desired outcome. Create a higher level Component that solves your problem first.  Consider breaking it down into child Components later, if necessary.
 
-However, we've learned over-optimizing for granular separation of concerns is a fast way to burn yourself out, and you'll often realize your Component will deploy faster and more reliably without relying on several child Components.
+#### Knowing The Outcome Is An Advantage
 
-We recommend starting with a focus on your desired outcome. Create one Serverless Component that solves that problem first. After you've achieved your initial goal, then start breaking it down into child Components, if you think there is value in that still.
-
-#### The Outcome Is Your Advantage
-
-Provisioning infrastructure can be quite complicated. However, Serverless Components have one powerful advantage over general infrastructure provision tools that seek to enable every possible option and combination (e.g. AWS Cloudformation) — Serverless Components know the specific use-case they are trying to deliver.
+Provisioning infrastructure can be quite complicated. However, Serverless Components have a powerful advantage over general infrastructure provision tools that seek to enable every possible option and combination (e.g. AWS Cloudformation) — Serverless Components know the specific use-case they are trying to deliver.
 
 One of the most important lessons we've learned about software development tools is that once you know the use-case, you can create a much better tool.
 
@@ -749,125 +713,3 @@ If you do need to store state, try to store it immediately after a successful op
 We believe serverless infrastructure and architectures will empower more people to develop software than ever before.
 
 Because of this, we're designing all of our projects to be as approachable as possible. Please try to use simple, vanilla Javascript. Additionally, to reduce security risks and general bloat, please try to use the least amount of NPM dependencies as possible.
-
-# Core API
-
-You could use components programatically and integrate them into your own application or CLI using a simple object-oriented abstraction. All you need is an `accessKey` from the Serverless Dashboard that you simply pass to one of the core classes.
-
-We export 3 main classes for working with components:
-
-1. The `Component` Class: This class represnets and manages components in the registry. You could use this class if you'd like to publish or unpublish components to the registry.
-
-2. The `Instance` Class: This class represents component instances of existing components that were previously published to the registry. You could use this class if you'd like to build, deploy, remove or run a particular component from the registry.
-
-3. The `Context` Class: This class represents the context components and instances are running within. You could use this class to control how you set the `accessKey` and `credentials`, how you consume logs and how you render your UI.
-
-## Component Class
-
-```js
-const { Component } = require('@serverless/components')
-
-// set the context properties
-const context = {
-  accessKey: 'xxx'
-}
-
-// your component properties
-const props = {
-  name: 'myComponent', // required
-  version: '0.1.0', // optional. default is dev
-  org: 'serverlessInc', // required
-  author: 'Austen Collins', // required
-  description: 'My Component', // optional
-  keywords: 'aws, serverless', // optional
-  repo: 'https://github.com/owner/repo', // optional
-  readme: 'README.md', // optional
-  license: 'MIT', // optional. default is MIT
-  main: './src' // optional. default is ./src
-}
-
-// intitialize a new instance of the Component class
-const myComponent = new Component(props, context)
-
-// publish a new component to the registry
-await myComponent.publish()
-```
-
-## Instance Class
-
-```js
-const { Instance } = require('@serverless/components')
-
-// set the context properties
-const context = {
-  accessKey: 'xxx',
-  credentials: { aws: {} }
-}
-
-// your component instance properties
-const props = {
-  name: 'myComponent', // required
-  component: 'express@1.0.0', // required. Version optional.
-  org: 'serverlessInc', // required
-  app: 'myApp', // required.
-  stage: 'dev', // optional. default is dev
-  inputs: {
-    foo: 'bar',
-    src: './src'
-  }
-}
-
-// intitialize a new instance of the Component Instance class
-const myInstance = new Instance(props, context)
-
-// optionally connect to the instance via WebSockets
-// this allows your context to process streaming logs
-await myInstance.connect()
-
-// build the src input if provided
-await myInstance.build()
-
-// upload the src input if provided
-await myInstance.upload()
-
-// run a method on the initialized instance. default is 'deploy'
-const outputs = await myInstance.run()
-
-// pass any other method you'd like to run...
-await myInstance.run('remove')
-```
-
-## Context Class
-
-```js
-const { Context, Instance } = require('@serverless/components')
-
-// you can overwite the core Context class methods
-// if you'd like to control the context & stream logs
-class myContext extends Context {
-  log() {
-    // do something...
-  }
-
-  debug() {
-    // do something...
-  }
-
-  status() {
-    // do something...
-  }
-}
-
-const props = {
-  // instance props here...
-}
-
-// initialize your new context here...
-const context = new myContext({ accessKey: 'xxx' })
-
-const myInstance = new Instance(props, context)
-
-await myInstance.connect()
-
-const outputs = await myInstance.run()
-```
