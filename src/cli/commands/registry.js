@@ -17,8 +17,11 @@ const publish = async (config, cli) => {
   // Start CLI persistance status
   cli.start('Initializing')
 
-  // Ensure the user is logged in, or advertise
-  if (!utils.isLoggedIn()) {
+  // Get access key
+  const accessKey = await utils.getAccessKey()
+
+  // Ensure the user is logged in or access key is available, or advertise
+  if (!accessKey && !utils.isLoggedIn()) {
     cli.advertise()
   }
 
@@ -31,14 +34,6 @@ const publish = async (config, cli) => {
     `Publishing "${componentYaml.name}@${config.dev ? 'dev' : componentYaml.version}"...`,
     'grey'
   )
-
-  // Get access key
-  const accessKey = await utils.getTokenId()
-
-  // Check they are logged in
-  if (!accessKey) {
-    cli.error(`Run 'serverless login' first to publish your serverless component.`, true)
-  }
 
   const sdk = new ServerlessSDK({ accessKey })
 
@@ -91,7 +86,9 @@ const getComponent = async (config, cli) => {
   }
 
   const devVersion = data.versions.indexOf('0.0.0-dev')
-  if (devVersion !== -1) {data.versions.splice(devVersion, 1)}
+  if (devVersion !== -1) {
+    data.versions.splice(devVersion, 1)
+  }
 
   cli.logRegistryLogo()
   cli.log()
@@ -133,7 +130,11 @@ const listFeatured = async (config, cli) => {
  * Route Registry Command
  */
 module.exports = async (config, cli) => {
-  if (!config.params[0]) return await listFeatured(config, cli)
-  if (config.params[0] === 'publish') return await publish(config, cli)
+  if (!config.params[0]) {
+    return await listFeatured(config, cli)
+  }
+  if (config.params[0] === 'publish') {
+    return await publish(config, cli)
+  }
   return await getComponent(config, cli)
 }

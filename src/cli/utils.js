@@ -271,9 +271,14 @@ const isLoggedIn = () => {
 }
 
 /**
- * Gets the logged in user's token id
+ * Gets the logged in user's token id, or access key if its in env
  */
-const getTokenId = async () => {
+const getAccessKey = async () => {
+  // if access key in env, use that for CI/CD
+  if (process.env.SERVERLESS_ACCESS_KEY) {
+    return process.env.SERVERLESS_ACCESS_KEY
+  }
+
   // refresh token if it's expired.
   // this platform-sdk method returns immediately if the idToken did not expire
   // if it did expire, it'll refresh it and update the config file
@@ -458,7 +463,7 @@ module.exports = {
   resolveInputVariables,
   getDirSize,
   getOrCreateAccessKey,
-  getTokenId,
+  getAccessKey,
   pack,
   isLoggedIn,
   getAdvertisement,

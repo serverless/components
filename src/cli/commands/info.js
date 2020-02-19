@@ -11,8 +11,11 @@ module.exports = async (config, cli) => {
   // Start CLI persistance status
   cli.start('Initializing', { timer: false })
 
-  // Ensure the user is logged in, or advertise
-  if (!utils.isLoggedIn()) {
+  // Get access key
+  const accessKey = await utils.getAccessKey()
+
+  // Ensure the user is logged in or access key is available, or advertise
+  if (!accessKey && !utils.isLoggedIn()) {
     cli.advertise()
   }
 
@@ -24,14 +27,6 @@ module.exports = async (config, cli) => {
   cli.log()
 
   cli.status('Initializing', instanceYaml.name)
-
-  // Get access key
-  const accessKey = await utils.getTokenId()
-
-  // Check they are logged in
-  if (!accessKey) {
-    cli.error(`Run 'serverless login' first to run your serverless component.`, true)
-  }
 
   // Load Instance Credentials
   const instanceCredentials = await utils.loadInstanceCredentials(instanceYaml.stage)

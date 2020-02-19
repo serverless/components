@@ -23,8 +23,11 @@ module.exports = async (config, cli) => {
   // Start CLI persistance status
   cli.start('Initializing', { closeHandler })
 
-  // Ensure the user is logged in, or advertise
-  if (!utils.isLoggedIn()) {
+  // Get access key
+  const accessKey = await utils.getAccessKey()
+
+  // Ensure the user is logged in or access key is available, or advertise
+  if (!accessKey && !utils.isLoggedIn()) {
     cli.advertise()
   }
 
@@ -38,14 +41,6 @@ module.exports = async (config, cli) => {
 
   // Load serverless component instance.  Submit a directory where its config files should be.
   let instanceYaml = await utils.loadInstanceConfig(process.cwd())
-
-  // Get or create access key for his org
-  const accessKey = await utils.getTokenId()
-
-  // Check they are logged in
-  if (!accessKey) {
-    cli.error(`Run 'serverless login' first to publish your serverless component.`, true)
-  }
 
   // Load Instance Credentials
   const instanceCredentials = await utils.loadInstanceCredentials(instanceYaml.stage)
@@ -87,12 +82,15 @@ module.exports = async (config, cli) => {
           const date = new Date(log.createdAt)
 
           // Remove strange formatting that comes from stderr
-          if (typeof log.data === 'string' && log.data.startsWith(`'`))
-            {log.data = log.data.substr(1)}
-          if (typeof log.data === 'string' && log.data.endsWith(`'`))
-            {log.data = log.data.substring(0, log.data.length - 1)}
-          if (typeof log.data === 'string' && log.data.endsWith(`\\n`))
-            {log.data = log.data.substring(0, log.data.length - 2)}
+          if (typeof log.data === 'string' && log.data.startsWith(`'`)) {
+            log.data = log.data.substr(1)
+          }
+          if (typeof log.data === 'string' && log.data.endsWith(`'`)) {
+            log.data = log.data.substring(0, log.data.length - 1)
+          }
+          if (typeof log.data === 'string' && log.data.endsWith(`\\n`)) {
+            log.data = log.data.substring(0, log.data.length - 2)
+          }
 
           let type
           if (log.type === 'log' || log.type === 'stdout') {
