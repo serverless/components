@@ -820,7 +820,7 @@ Removes an Instance of a Component.
 
 Fetches information of an Instance of a Component.
 
-`--verbose` - Lists `state`.
+`--debug` - Lists `state`.
 
 #### `serverless dev`
 
