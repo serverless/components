@@ -7,6 +7,10 @@ const semver = require('semver')
 const util = require('util')
 const exec = util.promisify(require('child_process').exec)
 const dirExists = require('./fs/dirExists')
+const globalTunnul = require('global-tunnel-ng')
+
+// Init global proxy
+globalTunnul.initialize()
 
 async function getComponentVersionToDownload(component) {
   let packageName
