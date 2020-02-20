@@ -1,7 +1,6 @@
 const { login } = require('@serverless/platform-sdk')
 
 module.exports = async (config, cli, command) => {
-
   // Offer a nice presentation
   cli.log()
   cli.logLogo()

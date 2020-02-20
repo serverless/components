@@ -279,6 +279,10 @@ const getAccessKey = async () => {
     return process.env.SERVERLESS_ACCESS_KEY
   }
 
+  if (!isLoggedIn()) {
+    return null
+  }
+
   // refresh token if it's expired.
   // this platform-sdk method returns immediately if the idToken did not expire
   // if it did expire, it'll refresh it and update the config file
