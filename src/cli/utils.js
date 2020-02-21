@@ -15,7 +15,8 @@ const {
   readConfigFile,
   writeConfigFile,
   createAccessKeyForTenant,
-  refreshToken
+  refreshToken,
+  listTenants
 } = require('@serverless/platform-sdk')
 
 /**
@@ -103,11 +104,39 @@ const readFileSync = (filePath, options = {}) => {
   return contents.toString().trim()
 }
 
+const getDefaultOrgName = async () => {
+  const res = readConfigFile()
+
+  if (!res.userId) {
+    return null
+  }
+
+  let { defaultOrgName } = res.users[res.userId].dashboard
+
+  // if defaultOrgName is not in RC file, fetch it from the platform
+  if (!defaultOrgName) {
+    await refreshToken()
+
+    const userConfigFile = readConfigFile()
+
+    const { username, dashboard } = userConfigFile.users[userConfigFile.userId]
+    const { idToken } = dashboard
+    const orgsList = await listTenants({ username, idToken })
+    defaultOrgName = orgsList[0].orgName
+
+    res.users[res.userId].dashboard.defaultOrgName = defaultOrgName
+
+    writeConfigFile(res)
+  }
+
+  return defaultOrgName
+}
+
 /**
  * Reads a serverless instance config file in a given directory path
  * @param {*} directoryPath
  */
-const loadInstanceConfig = (directoryPath) => {
+const loadInstanceConfig = async (directoryPath) => {
   directoryPath = path.resolve(directoryPath)
   const ymlFilePath = path.join(directoryPath, `serverless.yml`)
   const yamlFilePath = path.join(directoryPath, `serverless.yaml`)
@@ -149,9 +178,29 @@ const loadInstanceConfig = (directoryPath) => {
     instanceFile = readFileSync(filePath)
   }
 
+  if (!instanceFile.name) {
+    throw new Error(`Missing "name" property in serverless.yml`)
+  }
+
+  if (!instanceFile.component) {
+    throw new Error(`Missing "component" property in serverless.yml`)
+  }
+
   // Set default stage
   if (!instanceFile.stage) {
     instanceFile.stage = 'dev'
+  }
+
+  if (!instanceFile.org) {
+    instanceFile.org = await getDefaultOrgName()
+  }
+
+  if (!instanceFile.org) {
+    throw new Error(`Missing "org" property in serverless.yml`)
+  }
+
+  if (!instanceFile.app) {
+    instanceFile.app = instanceFile.name
   }
 
   return instanceFile
@@ -246,13 +295,6 @@ const resolveInputVariables = (inputs) => {
     return resolveInputVariables(resolvedInputs)
   }
   return resolvedInputs
-}
-
-/**
- * Check whether the user is logged in
- */
-const getAdvertisement = () => {
-  const a = `serverless ⚡ framework`
 }
 
 /**
@@ -470,6 +512,6 @@ module.exports = {
   getAccessKey,
   pack,
   isLoggedIn,
-  getAdvertisement,
-  getInstanceDashboardUrl
+  getInstanceDashboardUrl,
+  getDefaultOrgName
 }

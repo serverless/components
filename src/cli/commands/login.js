@@ -1,4 +1,5 @@
 const { login } = require('@serverless/platform-sdk')
+const utils = require('../utils')
 
 module.exports = async (config, cli, command) => {
   // Offer a nice presentation
@@ -11,6 +12,9 @@ module.exports = async (config, cli, command) => {
   process.env.DISPLAY = true
   const res = await login()
   const { username } = res.users[res.userId]
+
+  // make sure default org name is set in the rc file
+  await utils.getDefaultOrgName()
 
   cli.close('success', `Successfully logged in as "${username}"`)
 }
