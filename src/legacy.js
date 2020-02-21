@@ -14,6 +14,8 @@ const runningComponents = () => {
   if (instanceConfig && !instanceConfig.component) {
     return false
   }
+
+  return true
 }
 
 module.exports = { runningComponents }
