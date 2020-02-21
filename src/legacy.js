@@ -9,8 +9,10 @@ const runningComponents = () => {
 
   if (!componentConfig && !instanceConfig) {
     return false
-  } else {
-    return true
+  }
+
+  if (instanceConfig && !instanceConfig.component) {
+    return false
   }
 }
 
