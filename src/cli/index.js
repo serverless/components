@@ -40,10 +40,8 @@ module.exports = async () => {
   try {
     if (commands[command]) {
       await commands[command](config, cli)
-    } else if (command === 'deploy' || command === 'remove') {
-      await commands.run(config, cli, command)
     } else {
-      cli.close('error', `Command "${command}" is not a valid command`)
+      await commands.run(config, cli, command)
     }
   } catch (e) {
     return cli.error(e)
