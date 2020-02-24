@@ -33,24 +33,28 @@ module.exports = async (config, cli) => {
 
   // initialize SDK
   const sdk = new ServerlessSDK({
-    accessKey,
-    context: {
-      orgName: instanceYaml.org
-    }
+    accessKey
   })
 
   // don't show the status in debug mode due to formatting issues
   if (!config.debug) {
     cli.status('Loading Info', null, 'white')
   }
-
+  
   // Fetch info
-  const instance = await sdk.info(instanceYaml, instanceCredentials, {})
+  let instance = await sdk.getInstance(
+    instanceYaml.org,
+    instanceYaml.stage,
+    instanceYaml.app,
+    instanceYaml.name,
+  )
+
+  instance = instance.instance
 
   // Throw a helpful error if the instance was not deployed
   if (!instance) {
     throw new Error(
-      `Instance "${instanceYaml.name}" was never deployed. Please deploy the instance first, then run "serverless info" again.`
+      `Instance "${instanceYaml.name}" is not active. Please deploy the instance first, then run "serverless info" again.`
     )
   }
 
