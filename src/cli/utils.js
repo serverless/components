@@ -210,7 +210,7 @@ const loadInstanceConfig = async (directoryPath) => {
  * Reads a serverless component config file in a given directory path
  * @param {*} directoryPath
  */
-const loadComponentConfig = async (directoryPath) => {
+const loadComponentConfig = (directoryPath) => {
   directoryPath = path.resolve(directoryPath)
   const ymlFilePath = path.join(directoryPath, `serverless.component.yml`)
   const yamlFilePath = path.join(directoryPath, `serverless.component.yaml`)
@@ -496,6 +496,101 @@ const getInstanceDashboardUrl = (instanceYaml) => {
   return dashboardUrl
 }
 
+/**
+ * THIS IS USED BY SFV1.  DO NOT MODIFY OR DELETE
+ */
+const legacyLoadInstanceConfig = (directoryPath) => {
+  directoryPath = path.resolve(directoryPath)
+  const ymlFilePath = path.join(directoryPath, `serverless.yml`)
+  const yamlFilePath = path.join(directoryPath, `serverless.yaml`)
+  const jsonFilePath = path.join(directoryPath, `serverless.json`)
+  let filePath
+  let isYaml = false
+  let instanceFile
+
+  // Check to see if exists and is yaml or json file
+  if (fileExistsSync(ymlFilePath)) {
+    filePath = ymlFilePath
+    isYaml = true
+  }
+  if (fileExistsSync(yamlFilePath)) {
+    filePath = yamlFilePath
+    isYaml = true
+  }
+  if (fileExistsSync(jsonFilePath)) {
+    filePath = jsonFilePath
+  }
+
+  if (!filePath) {
+    throw new Error(`The following file could not be found: ${filePath}`)
+  }
+
+  // Read file
+  if (isYaml) {
+    try {
+      instanceFile = readFileSync(filePath)
+    } catch (e) {
+      // todo currently our YAML parser does not support
+      // CF schema (!Ref for example). So we silent that error
+      // because the framework can deal with that
+      if (e.name !== 'YAMLException') {
+        throw e
+      }
+    }
+  } else {
+    instanceFile = readFileSync(filePath)
+  }
+
+  return instanceFile
+}
+
+/**
+ * THIS IS USED BY SFV1.  DO NOT MODIFY OR DELETE
+ */
+const legacyLoadComponentConfig = (directoryPath) => {
+  directoryPath = path.resolve(directoryPath)
+  const ymlFilePath = path.join(directoryPath, `serverless.component.yml`)
+  const yamlFilePath = path.join(directoryPath, `serverless.component.yaml`)
+  const jsonFilePath = path.join(directoryPath, `serverless.component.json`)
+  let filePath
+  let isYaml = false
+  let componentFile
+
+  // Check to see if exists and is yaml or json file
+  if (fileExistsSync(ymlFilePath)) {
+    filePath = ymlFilePath
+    isYaml = true
+  }
+  if (fileExistsSync(yamlFilePath)) {
+    filePath = yamlFilePath
+    isYaml = true
+  }
+  if (fileExistsSync(jsonFilePath)) {
+    filePath = jsonFilePath
+  }
+  if (!filePath) {
+    throw new Error(`The serverless.component file could not be found in the current working directory.`)
+  }
+
+  // Read file
+  if (isYaml) {
+    try {
+      componentFile = readFileSync(filePath)
+    } catch (e) {
+      // todo currently our YAML parser does not support
+      // CF schema (!Ref for example). So we silent that error
+      // because the framework can deal with that
+      if (e.name !== 'YAMLException') {
+        throw e
+      }
+    }
+  } else {
+    componentFile = readFileSync(filePath)
+  }
+
+  return componentFile
+}
+
 module.exports = {
   sleep,
   request,
@@ -513,5 +608,7 @@ module.exports = {
   pack,
   isLoggedIn,
   getInstanceDashboardUrl,
-  getDefaultOrgName
+  getDefaultOrgName,
+  legacyLoadComponentConfig,
+  legacyLoadInstanceConfig,
 }
