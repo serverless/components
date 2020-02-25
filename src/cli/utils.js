@@ -232,7 +232,9 @@ const loadComponentConfig = (directoryPath) => {
     filePath = jsonFilePath
   }
   if (!filePath) {
-    throw new Error(`The serverless.component file could not be found in the current working directory.`)
+    throw new Error(
+      `The serverless.component file could not be found in the current working directory.`
+    )
   }
 
   // Read file
@@ -569,7 +571,9 @@ const legacyLoadComponentConfig = (directoryPath) => {
     filePath = jsonFilePath
   }
   if (!filePath) {
-    throw new Error(`The serverless.component file could not be found in the current working directory.`)
+    throw new Error(
+      `The serverless.component file could not be found in the current working directory.`
+    )
   }
 
   // Read file
@@ -610,5 +614,5 @@ module.exports = {
   getInstanceDashboardUrl,
   getDefaultOrgName,
   legacyLoadComponentConfig,
-  legacyLoadInstanceConfig,
+  legacyLoadInstanceConfig
 }

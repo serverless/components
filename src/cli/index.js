@@ -37,6 +37,13 @@ module.exports = async () => {
   // Start CLI process
   const cli = new CLI(config)
 
+  const checkingVersion = args._[0] === 'version' || args.version || args.v
+
+  // if the user is checking the version, just log it and exit
+  if (checkingVersion) {
+    return cli.logVersion()
+  }
+
   try {
     if (commands[command]) {
       await commands[command](config, cli)

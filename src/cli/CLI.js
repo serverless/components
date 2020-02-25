@@ -8,6 +8,7 @@ const ansiEscapes = require('ansi-escapes')
 const stripAnsi = require('strip-ansi')
 const figures = require('figures')
 const prettyoutput = require('prettyoutput')
+const { version } = require('../../package.json')
 
 // CLI Colors
 const grey = chalk.dim
@@ -47,9 +48,11 @@ class CLI {
    * - Starts the CLI process
    */
   start(status, options = {}) {
-
-    if (options.timer) this._.timer = true
-    else this._.timer = false
+    if (options.timer) {
+      this._.timer = true
+    } else {
+      this._.timer = false
+    }
 
     // Hide cursor, to keep it clean
     process.stdout.write(ansiEscapes.cursorHide)
@@ -67,13 +70,17 @@ class CLI {
     // Set default close handler, if one was not provided
     if (!options.closeHandler) {
       const self = this
-      options.closeHandler = async () => { return self.close('close') }
+      options.closeHandler = async () => {
+        return self.close('close')
+      }
     }
 
     // Set Event Handler: Control + C to cancel session
     process.on('SIGINT', options.closeHandler)
 
-    if (status) this.status(status)
+    if (status) {
+      this.status(status)
+    }
 
     // Start render engine
     return this._renderEngine()
@@ -84,12 +91,17 @@ class CLI {
    * - Closes the CLI process with relevant, clean information.
    */
   close(reason, message = 'Closed') {
-
     // Set color
     let color = white
-    if (reason === 'error' || reason === 'cancel') color = red
-    if (reason === 'close') color = white
-    if (reason === 'success') color = green
+    if (reason === 'error' || reason === 'cancel') {
+      color = red
+    }
+    if (reason === 'close') {
+      color = white
+    }
+    if (reason === 'success') {
+      color = green
+    }
 
     // Clear any existing content
     process.stdout.write(ansiEscapes.cursorLeft)
@@ -134,10 +146,18 @@ class CLI {
   status(status = null, entity = null, statusColor = null) {
     this._.status = status || this._.status
     this._.entity = entity || this._.entity
-    if (statusColor === 'green') statusColor = green
-    if (statusColor === 'red') statusColor = red
-    if (statusColor === 'blue') statusColor = blue
-    if (statusColor === 'white') statusColor = white
+    if (statusColor === 'green') {
+      statusColor = green
+    }
+    if (statusColor === 'red') {
+      statusColor = red
+    }
+    if (statusColor === 'blue') {
+      statusColor = blue
+    }
+    if (statusColor === 'white') {
+      statusColor = white
+    }
     this._.statusColor = statusColor || grey
   }
 
@@ -157,11 +177,21 @@ class CLI {
     // Write log
     if (typeof msg === 'string') {
       msg = `${msg}\n`
-      if (!color || color === 'white') process.stdout.write(white(msg))
-      if (color === 'grey') process.stdout.write(grey(msg))
-      if (color === 'red') process.stdout.write(red(msg))
-      if (color === 'green') process.stdout.write(green(msg))
-      if (color === 'blue') process.stdout.write(blue(msg))
+      if (!color || color === 'white') {
+        process.stdout.write(white(msg))
+      }
+      if (color === 'grey') {
+        process.stdout.write(grey(msg))
+      }
+      if (color === 'red') {
+        process.stdout.write(red(msg))
+      }
+      if (color === 'green') {
+        process.stdout.write(green(msg))
+      }
+      if (color === 'blue') {
+        process.stdout.write(blue(msg))
+      }
     } else {
       console.log(msg)
     }
@@ -175,7 +205,9 @@ class CLI {
     logo = logo + white(`serverless`)
     logo = logo + red(` ⚡ `)
     logo = logo + white(`framework`)
-    if (text) logo = logo + text
+    if (text) {
+      logo = logo + text
+    }
     this.log(logo)
   }
 
@@ -184,14 +216,25 @@ class CLI {
     logo = logo + white(`serverless`)
     logo = logo + red(` ⚡ `)
     logo = logo + white(`registry`)
-    if (text) logo = logo + text
+    if (text) {
+      logo = logo + text
+    }
     this.log(logo)
+  }
+
+  logVersion() {
+    this.logLogo()
+    this.log()
+    this.log(`       v${version}`)
+    this.log()
   }
 
   advertise() {
     this.log()
     this.logLogo()
-    let ad = grey(`This is a Serverless Framework Component.  Sign-in to use it for free with these features:`)
+    let ad = grey(
+      `This is a Serverless Framework Component.  Sign-in to use it for free with these features:`
+    )
     ad = ad + os.EOL
     ad = ad + os.EOL + grey(`  • Registry Access`)
     ad = ad + os.EOL + grey(`  • Instant Deployments & Logs`)
@@ -263,21 +306,23 @@ class CLI {
     // Clear any existing content
     process.stdout.write(ansiEscapes.eraseDown)
     process.stdout.write(
-      white(prettyoutput(
-        outputs,
-        {
-          colors: {
-            keys: 'bold',
-            dash: 'white',
-            number: 'white',
-            string: 'white',
-            true: 'white',
-            false: 'white',
-          }
-        },
-        0
+      white(
+        prettyoutput(
+          outputs,
+          {
+            colors: {
+              keys: 'bold',
+              dash: 'white',
+              number: 'white',
+              string: 'white',
+              true: 'white',
+              false: 'white'
+            }
+          },
+          0
+        )
       )
-    ))
+    )
   }
 
   /**
