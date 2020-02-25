@@ -210,7 +210,7 @@ const loadInstanceConfig = async (directoryPath) => {
  * Reads a serverless component config file in a given directory path
  * @param {*} directoryPath
  */
-const loadComponentConfig = (directoryPath) => {
+const loadComponentConfig = async (directoryPath) => {
   directoryPath = path.resolve(directoryPath)
   const ymlFilePath = path.join(directoryPath, `serverless.component.yml`)
   const yamlFilePath = path.join(directoryPath, `serverless.component.yaml`)
