@@ -4,8 +4,8 @@ const runningComponents = () => {
 
   let componentConfig, instanceConfig
 
-  try { componentConfig = utils.loadComponentConfig(process.cwd()) } catch (e) {}
-  try { instanceConfig = utils.loadInstanceConfig(process.cwd()) } catch (e) {}
+  try { componentConfig = await utils.loadComponentConfig(process.cwd()) } catch (e) {}
+  try { instanceConfig = await utils.loadInstanceConfig(process.cwd()) } catch (e) {}
 
   if (!componentConfig && !instanceConfig) {
     return false
