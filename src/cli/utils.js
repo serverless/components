@@ -122,7 +122,11 @@ const getDefaultOrgName = async () => {
     const { username, dashboard } = userConfigFile.users[userConfigFile.userId]
     const { idToken } = dashboard
     const orgsList = await listTenants({ username, idToken })
-    defaultOrgName = orgsList[0].orgName
+
+    // filter by owner
+    const filteredOrgsList = orgsList.filter((org) => org.role === 'owner')
+
+    defaultOrgName = filteredOrgsList[0].orgName
 
     res.users[res.userId].dashboard.defaultOrgName = defaultOrgName
 
