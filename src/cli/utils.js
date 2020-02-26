@@ -137,6 +137,40 @@ const getDefaultOrgName = async () => {
 }
 
 /**
+ * Resolves any variables that require resolving before the engine.
+ * This currently supports only ${env}.  All others should be resolved within the deployment engine.
+ * @param {*} inputs
+ */
+const resolveInputVariables = (inputs) => {
+  const regex = /\${(\w*:?[\w\d.-]+)}/g
+  let variableResolved = false
+  const resolvedInputs = traverse(inputs).forEach(function(value) {
+    const matches = typeof value === 'string' ? value.match(regex) : null
+    if (matches) {
+      let newValue = value
+      for (const match of matches) {
+        // Search for ${env:}
+        if (/\${env:(\w*[\w.-_]+)}/g.test(match)) {
+          const referencedPropertyPath = match.substring(2, match.length - 1).split(':')
+          newValue = process.env[referencedPropertyPath[1]]
+          variableResolved = true
+          if (match === value) {
+            newValue = process.env[referencedPropertyPath[1]]
+          } else {
+            newValue = value.replace(match, process.env[referencedPropertyPath[1]])
+          }
+        }
+      }
+      this.update(newValue)
+    }
+  })
+  if (variableResolved) {
+    return resolveInputVariables(resolvedInputs)
+  }
+  return resolvedInputs
+}
+
+/**
  * Reads a serverless instance config file in a given directory path
  * @param {*} directoryPath
  */
@@ -207,6 +241,10 @@ const loadInstanceConfig = async (directoryPath) => {
     instanceFile.app = instanceFile.name
   }
 
+  if (instanceFile.inputs) {
+    instanceFile.inputs = resolveInputVariables(instanceFile.inputs)
+  }
+
   return instanceFile
 }
 
@@ -272,35 +310,6 @@ const getDirSize = async (p) => {
     }
     return 0 // can't take size of a stream/symlink/socket/etc
   })
-}
-
-/**
- * Resolves any variables that require resolving before the engine.
- * This currently supports only ${env}.  All others should be resolved within the deployment engine.
- * @param {*} inputs
- */
-const resolveInputVariables = (inputs) => {
-  const regex = /\${(\w*:?[\w\d.-]+)}/g
-  let variableResolved = false
-  const resolvedInputs = traverse(inputs).forEach(function(value) {
-    const matches = typeof value === 'string' ? value.match(regex) : null
-    if (matches) {
-      let newValue = value
-      for (const match of matches) {
-        // Search for ${env:}
-        if (/\${env:(\w*[\w.-_]+)}/g.test(match)) {
-          const referencedPropertyPath = match.substring(2, match.length - 1).split(':')
-          newValue = process.env[referencedPropertyPath[1]]
-          variableResolved = true
-        }
-      }
-      this.update(newValue)
-    }
-  })
-  if (variableResolved) {
-    return resolveInputVariables(resolvedInputs)
-  }
-  return resolvedInputs
 }
 
 /**
