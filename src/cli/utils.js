@@ -197,7 +197,7 @@ const loadInstanceConfig = async (directoryPath) => {
   }
 
   if (!filePath) {
-    throw new Error(`The following file could not be found: ${filePath}`)
+    throw new Error(`serverless config file was not found`)
   }
 
   // Read file
