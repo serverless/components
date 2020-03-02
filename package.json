@@ -30,6 +30,7 @@
     "js-yaml": "^3.13.1",
     "minimist": "^1.2.0",
     "moment": "^2.24.0",
+    "open": "^7.0.2",
     "prettyoutput": "^1.2.0",
     "ramda": "^0.26.1",
     "strip-ansi": "^5.2.0",
