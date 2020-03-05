@@ -28,9 +28,6 @@ module.exports = async (config, cli) => {
 
   cli.status('Initializing', instanceYaml.name)
 
-  // Load Instance Credentials
-  const instanceCredentials = await utils.loadInstanceCredentials(instanceYaml.stage)
-
   // initialize SDK
   const sdk = new ServerlessSDK({
     accessKey
@@ -40,16 +37,16 @@ module.exports = async (config, cli) => {
   if (!config.debug) {
     cli.status('Loading Info', null, 'white')
   }
-  
+
   // Fetch info
   let instance = await sdk.getInstance(
     instanceYaml.org,
     instanceYaml.stage,
     instanceYaml.app,
-    instanceYaml.name,
+    instanceYaml.name
   )
 
-  instance = instance.instance
+  instance = instance.instance // eslint-disable-line
 
   // Throw a helpful error if the instance was not deployed
   if (!instance) {

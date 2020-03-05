@@ -12,8 +12,8 @@ const { version } = require('../../package.json')
 
 // CLI Colors
 const grey = chalk.dim
-const white = chalk.rgb(255, 255, 255)
-const green = chalk.rgb(99, 255, 115)
+const white = (str) => str // we wanna use the default terimanl color, so we just return the string as is with no color codes
+const { green } = chalk
 const red = chalk.rgb(255, 99, 99)
 const blue = chalk.rgb(199, 232, 255)
 
@@ -312,11 +312,11 @@ class CLI {
           {
             colors: {
               keys: 'bold',
-              dash: 'white',
-              number: 'white',
-              string: 'white',
-              true: 'white',
-              false: 'white'
+              dash: null,
+              number: null,
+              string: null,
+              true: null,
+              false: null
             }
           },
           0
