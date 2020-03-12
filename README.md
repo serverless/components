@@ -325,7 +325,6 @@ Upon deployment, the Serverless Framework looks for a `.env` file in the current
 ```bash
 AWS_ACCESS_KEY_ID=123456789
 AWS_SECRET_ACCESS_KEY=123456789
-AWS_REGION=us-east-1
 ```
 
 Components could access these AWS credentials using `this.credentials.aws`. This object would look like this:
@@ -334,7 +333,6 @@ Components could access these AWS credentials using `this.credentials.aws`. This
 {
   accessKeyId: '123456789',
   secretAccessKey: '123456789',
-  region: 'us-east-1'
 }
 ```
 
