@@ -58,10 +58,10 @@ inputs: # The configuration the Component accepts according to its docs
 
 # Quick-Start
 
-During testing, Serverless Components are currently available within a special version of the [Serverless Framework](https://www.github.com/serverless/serverless) titled `@components`.  Install it like this:
+To get started with Serverless Components, install the latest version of the [Serverless Framework](https://www.github.com/serverless/serverless):
 
 ```console
-$ npm i -g serverless@components
+$ npm i -g serverless
 ```
 
 After installation, use the `create --template-url` command to install a [Serverless Components Template](./templates), which contains Components as well as boilerplate code, to get you started quickly.  An easy starting point is the Express.js Component:
