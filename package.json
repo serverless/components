@@ -16,7 +16,7 @@
   "author": "Serverless, Inc.",
   "license": "MIT",
   "dependencies": {
-    "@serverless/platform-client": "latest",
+    "serverless-platform-client-tencent": "latest",
     "@serverless/platform-sdk": "^2.3.0",
     "adm-zip": "^0.4.14",
     "ansi-escapes": "^4.2.0",

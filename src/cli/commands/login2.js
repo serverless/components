@@ -1,4 +1,4 @@
-const { ServerlessSDK } = require('@serverless/platform-client')
+const { ServerlessSDK } = require('serverless-platform-client-tencent')
 const { urls } = require('@serverless/platform-sdk')
 const open = require('open')
 const utils = require('../utils')

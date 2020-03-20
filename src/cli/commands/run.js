@@ -2,7 +2,7 @@
  * CLI: Command: RUN
  */
 
-const { ServerlessSDK } = require('@serverless/platform-client')
+const { ServerlessSDK } = require('serverless-platform-client-tencent')
 const chalk = require('chalk')
 const utils = require('../utils')
 

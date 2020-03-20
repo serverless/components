@@ -3,7 +3,7 @@
  */
 
 const chokidar = require('chokidar')
-const { ServerlessSDK } = require('@serverless/platform-client')
+const { ServerlessSDK } = require('serverless-platform-client-tencent')
 const utils = require('../utils')
 
 module.exports = async (config, cli) => {
