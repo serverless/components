@@ -10,7 +10,7 @@ This template includes:
 
 - **A serverless monolithic backend** - powered by a single AWS Lambda function and a single AWS API Gateway endpoint, which sends all requests to the function, enabling you to do routing and logic all in your code.
 
-- **A serverless website with a React application\*** - powered by AWS S3, AWS Cloudfront, AWS Route 53 and an AWS ACM SSL Certificate. The backend API endpoint is already passed into the front-end, and the React application is already configured to use it.
+- **A serverless website with a React application\** - powered by AWS S3, AWS Cloudfront, AWS Route 53 and an AWS ACM SSL Certificate. The backend API endpoint is already passed into the front-end, and the React application is already configured to use it.
 
 - **An on-demand AWS DynamoDB auto-scaling table** - powered by AWS DynamoDB (shocker!).
 
