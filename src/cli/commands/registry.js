@@ -75,6 +75,9 @@ const publish = async (config, cli) => {
 const getComponent = async (config, cli) => {
   const componentName = config.params[0]
 
+  // this includes auto China user detection
+  await utils.isTencent()
+
   // Start CLI persistance status
   cli.start(`Fetching versions for: ${componentName}`)
 

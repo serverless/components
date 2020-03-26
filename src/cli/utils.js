@@ -4,6 +4,7 @@
 
 const { contains, isNil, last, split, merge, endsWith } = require('ramda')
 const path = require('path')
+const fs = require('fs')
 const axios = require('axios')
 const globby = require('globby')
 const AdmZip = require('adm-zip')
@@ -18,12 +19,48 @@ const {
   refreshToken,
   listTenants
 } = require('@serverless/platform-sdk')
+const { utils: platformUtils } = require('serverless-platform-client-tencent')
 
 /**
  * Wait for a number of miliseconds
  * @param {*} wait
  */
 const sleep = async (wait) => new Promise((resolve) => setTimeout(() => resolve(), wait))
+
+const initEnvs = (stage) => {
+  let envVars = {}
+  const defaultEnvFilePath = path.join(process.cwd(), `.env`)
+  const stageEnvFilePath = path.join(process.cwd(), `.env.${stage}`)
+
+  // Load environment variables via .env file
+  if (stage && fileExistsSync(stageEnvFilePath)) {
+    envVars = dotenv.config({ path: path.resolve(stageEnvFilePath) }).parsed || {}
+  } else if (fileExistsSync(defaultEnvFilePath)) {
+    envVars = dotenv.config({ path: path.resolve(defaultEnvFilePath) }).parsed || {}
+  }
+  return envVars
+}
+
+const updateEnvFile = (envs) => {
+  // update process.env
+  for (let [key, value] of Object.entries(envs)) {
+    process.env[key] = value
+  }
+  // write env file
+  const envFilePath = path.join(process.cwd(), '.env')
+
+  let envFileContent = ''
+  if (fs.existsSync(envFilePath)) {
+    envFileContent = fs.readFileSync(envFilePath)
+  }
+  fs.writeFileSync(
+    envFilePath,
+    `${envFileContent}\n${Object.entries(envs).reduce(
+      (a, [key, value]) => (a += `${key}=${value}\n`),
+      ''
+    )}`
+  )
+}
 
 /**
  * Make HTTP API requests, easily
@@ -105,6 +142,10 @@ const readFileSync = (filePath, options = {}) => {
 }
 
 const getDefaultOrgName = async () => {
+  if (await isTencent()) {
+    return await platformUtils.getOrgId()
+  }
+
   const res = readConfigFile()
 
   if (!res.userId) {
@@ -316,6 +357,10 @@ const getDirSize = async (p) => {
  * Check whether the user is logged in
  */
 const isLoggedIn = () => {
+  // China user doesn't need to login to serverless.com
+  if (process.env.SERVERLESS_PLATFORM_VENDOR === 'tencent') {
+    return true
+  }
   const userConfigFile = readConfigFile()
   // If userId is null, they are not logged in.  They also might be a new user.
   if (!userConfigFile.userId) {
@@ -331,6 +376,23 @@ const isLoggedIn = () => {
  * Gets the logged in user's token id, or access key if its in env
  */
 const getAccessKey = async () => {
+  const isChinaUser = await isTencent()
+  // tencent user don't need access key, and it will promot QR code to user to scan
+  if (isChinaUser) {
+    // we automatically login tencent user with QR code scan
+    if (!process.env.TENCENT_SECRET_ID || !process.env.TENCENT_SECRET_KEY) {
+      const { secret_id, secret_key, appid, token } = await platformUtils.loginWithTencent()
+      updateEnvFile({
+        TENCENT_APP_ID: appid,
+        TENCENT_SECRET_ID: secret_id,
+        TENCENT_SECRET_KEY: secret_key,
+        TENCENT_TOKEN: token
+      })
+    }
+
+    return null
+  }
+
   // if access key in env, use that for CI/CD
   if (process.env.SERVERLESS_ACCESS_KEY) {
     return process.env.SERVERLESS_ACCESS_KEY
@@ -441,16 +503,7 @@ const pack = async (inputDirPath, outputFilePath, include = [], exclude = []) =>
  */
 const loadInstanceCredentials = (stage) => {
   // Load env vars
-  let envVars = {}
-  const defaultEnvFilePath = path.join(process.cwd(), `.env`)
-  const stageEnvFilePath = path.join(process.cwd(), `.env.${stage}`)
-
-  // Load environment variables via .env file
-  if (stage && fileExistsSync(stageEnvFilePath)) {
-    envVars = dotenv.config({ path: path.resolve(stageEnvFilePath) }).parsed || {}
-  } else if (fileExistsSync(defaultEnvFilePath)) {
-    envVars = dotenv.config({ path: path.resolve(defaultEnvFilePath) }).parsed || {}
-  }
+  const envVars = initEnvs(stage)
 
   // Known Provider Environment Variables and their SDK configuration properties
   const providers = {}
@@ -473,6 +526,7 @@ const loadInstanceCredentials = (stage) => {
   providers.tencent.TENCENT_APP_ID = 'AppId'
   providers.tencent.TENCENT_SECRET_ID = 'SecretId'
   providers.tencent.TENCENT_SECRET_KEY = 'SecretKey'
+  providers.tencent.TENCENT_TOKEN = 'Token'
 
   // Docker
   providers.docker = {}
@@ -608,6 +662,25 @@ const legacyLoadComponentConfig = (directoryPath) => {
   return componentFile
 }
 
+const isTencent = async () => {
+  let isTencent = false
+  initEnvs()
+  const vendor = process.env.SERVERLESS_PLATFORM_VENDOR
+  if (vendor === undefined || vendor === null) {
+    const isChinaUser = await platformUtils.isChinaUser()
+    if (isChinaUser) {
+      isTencent = true
+      updateEnvFile({
+        SERVERLESS_PLATFORM_VENDOR: 'tencent'
+      })
+    }
+  } else {
+    isTencent = process.env.SERVERLESS_PLATFORM_VENDOR === 'tencent'
+  }
+
+  return isTencent
+}
+
 module.exports = {
   sleep,
   request,
@@ -627,5 +700,6 @@ module.exports = {
   getInstanceDashboardUrl,
   getDefaultOrgName,
   legacyLoadComponentConfig,
-  legacyLoadInstanceConfig
+  legacyLoadInstanceConfig,
+  isTencent
 }
