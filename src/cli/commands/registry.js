@@ -3,7 +3,8 @@
  */
 
 const { ServerlessSDK } = require('@serverless/platform-client')
-const utils = require('../utils')
+const { getAccessKey, isLoggedIn } = require('./utils')
+const { loadComponentConfig } = require('../utils')
 
 /**
  * Publish a Component to the Serverless Registry
@@ -18,15 +19,15 @@ const publish = async (config, cli) => {
   cli.start('Initializing')
 
   // Get access key
-  const accessKey = await utils.getAccessKey()
+  const accessKey = await getAccessKey()
 
   // Ensure the user is logged in or access key is available, or advertise
-  if (!accessKey && !utils.isLoggedIn()) {
+  if (!accessKey && !isLoggedIn()) {
     cli.advertise()
   }
 
   // Load YAML
-  const componentYaml = await utils.loadComponentConfig(process.cwd())
+  const componentYaml = await loadComponentConfig(process.cwd())
 
   // Presentation
   cli.logRegistryLogo()

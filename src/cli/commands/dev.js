@@ -4,7 +4,7 @@
 
 const chokidar = require('chokidar')
 const { ServerlessSDK } = require('@serverless/platform-client')
-const utils = require('../utils')
+const { getAccessKey, isLoggedIn, loadInstanceConfig, loadInstanceCredentials } = require('./utils')
 
 module.exports = async (config, cli) => {
   // Define a close handler, that removes any "dev" mode agents
@@ -24,10 +24,10 @@ module.exports = async (config, cli) => {
   cli.start('Initializing', { closeHandler })
 
   // Get access key
-  const accessKey = await utils.getAccessKey()
+  const accessKey = await getAccessKey()
 
   // Ensure the user is logged in or access key is available, or advertise
-  if (!accessKey && !utils.isLoggedIn()) {
+  if (!accessKey && !isLoggedIn()) {
     cli.advertise()
   }
 
@@ -40,10 +40,10 @@ module.exports = async (config, cli) => {
   cli.log()
 
   // Load serverless component instance.  Submit a directory where its config files should be.
-  let instanceYaml = await utils.loadInstanceConfig(process.cwd())
+  let instanceYaml = await loadInstanceConfig(process.cwd())
 
   // Load Instance Credentials
-  const instanceCredentials = await utils.loadInstanceCredentials(instanceYaml.stage)
+  const instanceCredentials = await loadInstanceCredentials(instanceYaml.stage)
 
   const sdk = new ServerlessSDK({
     accessKey,
@@ -214,12 +214,12 @@ module.exports = async (config, cli) => {
       isProcessing = true
       cli.status('Deploying', null, 'green')
       // reload serverless component instance
-      instanceYaml = await utils.loadInstanceConfig(process.cwd())
+      instanceYaml = await loadInstanceConfig(process.cwd())
       await sdk.deploy(instanceYaml, instanceCredentials, { dev: true })
       if (queuedOperation) {
         cli.status('Deploying', null, 'green')
         // reload serverless component instance
-        instanceYaml = await utils.loadInstanceConfig(process.cwd())
+        instanceYaml = await loadInstanceConfig(process.cwd())
         await sdk.deploy(instanceYaml, instanceCredentials, { dev: true })
       }
 
