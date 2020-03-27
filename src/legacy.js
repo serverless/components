@@ -3,6 +3,10 @@ const utils = require('./cli/utils')
 const runningComponents = () => {
   let componentConfig, instanceConfig
 
+  if (process.argv[2] === 'registry') {
+    return true
+  }
+
   try {
     componentConfig = utils.legacyLoadComponentConfig(process.cwd())
   } catch (e) {}
