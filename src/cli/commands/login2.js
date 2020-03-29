@@ -1,7 +1,8 @@
 const { ServerlessSDK } = require('@serverless/platform-client')
 const { urls } = require('@serverless/platform-sdk')
 const open = require('open')
-const utils = require('../utils')
+const { loadInstanceConfig } = require('./utils')
+const { loadComponentConfig } = require('../utils')
 
 module.exports = async (config, cli, command) => {
   // Offer a nice presentation
@@ -18,12 +19,12 @@ module.exports = async (config, cli, command) => {
   let componentVersion
   try {
     // load serverless.yml if available
-    instanceYaml = await utils.loadInstanceConfig(process.cwd())
+    instanceYaml = await loadInstanceConfig(process.cwd())
   } catch (e) {}
 
   try {
     // load serverless.component.yml if available
-    componentYaml = await utils.loadComponentConfig(process.cwd())
+    componentYaml = await loadComponentConfig(process.cwd())
   } catch (e) {}
 
   // parse component name and version if available

@@ -3,7 +3,8 @@
  */
 
 const { ServerlessSDK } = require('@serverless/platform-client')
-const utils = require('../utils')
+const { getAccessKey, isLoggedIn, loadInstanceConfig } = require('./utils')
+const { getInstanceDashboardUrl } = require('../utils')
 const chalk = require('chalk')
 const moment = require('moment')
 
@@ -12,15 +13,15 @@ module.exports = async (config, cli) => {
   cli.start('Initializing', { timer: false })
 
   // Get access key
-  const accessKey = await utils.getAccessKey()
+  const accessKey = await getAccessKey()
 
   // Ensure the user is logged in or access key is available, or advertise
-  if (!accessKey && !utils.isLoggedIn()) {
+  if (!accessKey && !isLoggedIn()) {
     cli.advertise()
   }
 
   // Load YAML
-  const instanceYaml = await utils.loadInstanceConfig(process.cwd())
+  const instanceYaml = await loadInstanceConfig(process.cwd())
 
   // Presentation
   cli.logLogo()
@@ -58,7 +59,7 @@ module.exports = async (config, cli) => {
   // format last action for better UX
   const lastActionAgo = moment(instance.lastActionAt).fromNow()
 
-  const dashboardUrl = utils.getInstanceDashboardUrl(instanceYaml)
+  const dashboardUrl = getInstanceDashboardUrl(instanceYaml)
 
   // show the most important information, and link to the dashboard
   cli.log(`${chalk.grey('Status:')}       ${instance.instanceStatus}`)

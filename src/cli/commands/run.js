@@ -4,22 +4,23 @@
 
 const { ServerlessSDK } = require('@serverless/platform-client')
 const chalk = require('chalk')
-const utils = require('../utils')
+const { getAccessKey, isLoggedIn, loadInstanceConfig, loadInstanceCredentials } = require('./utils')
+const { getInstanceDashboardUrl } = require('../utils')
 
 module.exports = async (config, cli, command) => {
   // Start CLI persistance status
   cli.start('Initializing', { timer: true })
 
   // Get access key
-  const accessKey = await utils.getAccessKey()
+  const accessKey = await getAccessKey()
 
   // Ensure the user is logged in or access key is available, or advertise
-  if (!accessKey && !utils.isLoggedIn()) {
+  if (!accessKey && !isLoggedIn()) {
     cli.advertise()
   }
 
   // Load YAML
-  const instanceYaml = await utils.loadInstanceConfig(process.cwd())
+  const instanceYaml = await loadInstanceConfig(process.cwd())
 
   // Presentation
   const meta = `Action: "${command}" - Stage: "${instanceYaml.stage}" - App: "${instanceYaml.app}" - Instance: "${instanceYaml.name}"`
@@ -33,7 +34,7 @@ module.exports = async (config, cli, command) => {
   cli.status('Initializing', instanceYaml.name)
 
   // Load Instance Credentials
-  const instanceCredentials = await utils.loadInstanceCredentials(instanceYaml.stage)
+  const instanceCredentials = await loadInstanceCredentials(instanceYaml.stage)
 
   // initialize SDK
   const sdk = new ServerlessSDK({
@@ -89,7 +90,7 @@ module.exports = async (config, cli, command) => {
       )
     }
 
-    const dashboardUrl = utils.getInstanceDashboardUrl(instanceYaml)
+    const dashboardUrl = getInstanceDashboardUrl(instanceYaml)
 
     // run deploy
     cli.status('Deploying', null, 'white')

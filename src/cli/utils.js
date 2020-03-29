@@ -10,14 +10,6 @@ const AdmZip = require('adm-zip')
 const fse = require('fs-extra')
 const YAML = require('js-yaml')
 const traverse = require('traverse')
-const dotenv = require('dotenv')
-const {
-  readConfigFile,
-  writeConfigFile,
-  createAccessKeyForTenant,
-  refreshToken,
-  listTenants
-} = require('@serverless/platform-sdk')
 
 /**
  * Wait for a number of miliseconds
@@ -104,38 +96,6 @@ const readFileSync = (filePath, options = {}) => {
   return contents.toString().trim()
 }
 
-const getDefaultOrgName = async () => {
-  const res = readConfigFile()
-
-  if (!res.userId) {
-    return null
-  }
-
-  let { defaultOrgName } = res.users[res.userId].dashboard
-
-  // if defaultOrgName is not in RC file, fetch it from the platform
-  if (!defaultOrgName) {
-    await refreshToken()
-
-    const userConfigFile = readConfigFile()
-
-    const { username, dashboard } = userConfigFile.users[userConfigFile.userId]
-    const { idToken } = dashboard
-    const orgsList = await listTenants({ username, idToken })
-
-    // filter by owner
-    const filteredOrgsList = orgsList.filter((org) => org.role === 'owner')
-
-    defaultOrgName = filteredOrgsList[0].orgName
-
-    res.users[res.userId].dashboard.defaultOrgName = defaultOrgName
-
-    writeConfigFile(res)
-  }
-
-  return defaultOrgName
-}
-
 /**
  * Resolves any variables that require resolving before the engine.
  * This currently supports only ${env}.  All others should be resolved within the deployment engine.
@@ -168,84 +128,6 @@ const resolveInputVariables = (inputs) => {
     return resolveInputVariables(resolvedInputs)
   }
   return resolvedInputs
-}
-
-/**
- * Reads a serverless instance config file in a given directory path
- * @param {*} directoryPath
- */
-const loadInstanceConfig = async (directoryPath) => {
-  directoryPath = path.resolve(directoryPath)
-  const ymlFilePath = path.join(directoryPath, `serverless.yml`)
-  const yamlFilePath = path.join(directoryPath, `serverless.yaml`)
-  const jsonFilePath = path.join(directoryPath, `serverless.json`)
-  let filePath
-  let isYaml = false
-  let instanceFile
-
-  // Check to see if exists and is yaml or json file
-  if (fileExistsSync(ymlFilePath)) {
-    filePath = ymlFilePath
-    isYaml = true
-  }
-  if (fileExistsSync(yamlFilePath)) {
-    filePath = yamlFilePath
-    isYaml = true
-  }
-  if (fileExistsSync(jsonFilePath)) {
-    filePath = jsonFilePath
-  }
-
-  if (!filePath) {
-    throw new Error(`serverless config file was not found`)
-  }
-
-  // Read file
-  if (isYaml) {
-    try {
-      instanceFile = readFileSync(filePath)
-    } catch (e) {
-      // todo currently our YAML parser does not support
-      // CF schema (!Ref for example). So we silent that error
-      // because the framework can deal with that
-      if (e.name !== 'YAMLException') {
-        throw e
-      }
-    }
-  } else {
-    instanceFile = readFileSync(filePath)
-  }
-
-  if (!instanceFile.name) {
-    throw new Error(`Missing "name" property in serverless.yml`)
-  }
-
-  if (!instanceFile.component) {
-    throw new Error(`Missing "component" property in serverless.yml`)
-  }
-
-  // Set default stage
-  if (!instanceFile.stage) {
-    instanceFile.stage = 'dev'
-  }
-
-  if (!instanceFile.org) {
-    instanceFile.org = await getDefaultOrgName()
-  }
-
-  if (!instanceFile.org) {
-    throw new Error(`Missing "org" property in serverless.yml`)
-  }
-
-  if (!instanceFile.app) {
-    instanceFile.app = instanceFile.name
-  }
-
-  if (instanceFile.inputs) {
-    instanceFile.inputs = resolveInputVariables(instanceFile.inputs)
-  }
-
-  return instanceFile
 }
 
 /**
@@ -313,84 +195,6 @@ const getDirSize = async (p) => {
 }
 
 /**
- * Check whether the user is logged in
- */
-const isLoggedIn = () => {
-  const userConfigFile = readConfigFile()
-  // If userId is null, they are not logged in.  They also might be a new user.
-  if (!userConfigFile.userId) {
-    return false
-  }
-  if (!userConfigFile.users[userConfigFile.userId]) {
-    return false
-  }
-  return true
-}
-
-/**
- * Gets the logged in user's token id, or access key if its in env
- */
-const getAccessKey = async () => {
-  // if access key in env, use that for CI/CD
-  if (process.env.SERVERLESS_ACCESS_KEY) {
-    return process.env.SERVERLESS_ACCESS_KEY
-  }
-
-  if (!isLoggedIn()) {
-    return null
-  }
-
-  // refresh token if it's expired.
-  // this platform-sdk method returns immediately if the idToken did not expire
-  // if it did expire, it'll refresh it and update the config file
-  await refreshToken()
-
-  // read config file from user machine
-  const userConfigFile = readConfigFile()
-
-  // Verify config file and that the user is logged in
-  if (!userConfigFile || !userConfigFile.users || !userConfigFile.users[userConfigFile.userId]) {
-    return null
-  }
-
-  const user = userConfigFile.users[userConfigFile.userId]
-
-  return user.dashboard.idToken
-}
-
-/**
- * Gets or creates an access key based on org
- * @param {*} org
- */
-const getOrCreateAccessKey = async (org) => {
-  if (process.env.SERVERLESS_ACCESS_KEY) {
-    return process.env.SERVERLESS_ACCESS_KEY
-  }
-
-  // read config file from the user machine
-  const userConfigFile = readConfigFile()
-
-  // Verify config file
-  if (!userConfigFile || !userConfigFile.users || !userConfigFile.users[userConfigFile.userId]) {
-    return null
-  }
-
-  const user = userConfigFile.users[userConfigFile.userId]
-
-  if (!user.dashboard.accessKeys[org]) {
-    // create access key and save it
-    const accessKey = await createAccessKeyForTenant(org)
-    userConfigFile.users[userConfigFile.userId].dashboard.accessKeys[org] = accessKey
-    writeConfigFile(userConfigFile)
-    return accessKey
-  }
-
-  // return the access key for the specified org
-  // return user.dashboard.accessKeys[org]
-  return user.dashboard.idToken
-}
-
-/**
  * Package files into a zip
  * @param {*} inputDirPath
  * @param {*} outputFilePath
@@ -433,71 +237,6 @@ const pack = async (inputDirPath, outputFilePath, include = [], exclude = []) =>
   zip.writeZip(outputFilePath)
 
   return outputFilePath
-}
-
-/**
- * Load credentials from a ".env" or ".env.[stage]" file
- * @param {*} stage
- */
-const loadInstanceCredentials = (stage) => {
-  // Load env vars
-  let envVars = {}
-  const defaultEnvFilePath = path.join(process.cwd(), `.env`)
-  const stageEnvFilePath = path.join(process.cwd(), `.env.${stage}`)
-
-  // Load environment variables via .env file
-  if (stage && fileExistsSync(stageEnvFilePath)) {
-    envVars = dotenv.config({ path: path.resolve(stageEnvFilePath) }).parsed || {}
-  } else if (fileExistsSync(defaultEnvFilePath)) {
-    envVars = dotenv.config({ path: path.resolve(defaultEnvFilePath) }).parsed || {}
-  }
-
-  // Known Provider Environment Variables and their SDK configuration properties
-  const providers = {}
-
-  // AWS
-  providers.aws = {}
-  providers.aws.AWS_ACCESS_KEY_ID = 'accessKeyId'
-  providers.aws.AWS_SECRET_ACCESS_KEY = 'secretAccessKey'
-  providers.aws.AWS_REGION = 'region'
-
-  // Google
-  providers.google = {}
-  providers.google.GOOGLE_APPLICATION_CREDENTIALS = 'applicationCredentials'
-  providers.google.GOOGLE_PROJECT_ID = 'projectId'
-  providers.google.GOOGLE_CLIENT_EMAIL = 'clientEmail'
-  providers.google.GOOGLE_PRIVATE_KEY = 'privateKey'
-
-  // Tencent
-  providers.tencent = {}
-  providers.tencent.TENCENT_APP_ID = 'AppId'
-  providers.tencent.TENCENT_SECRET_ID = 'SecretId'
-  providers.tencent.TENCENT_SECRET_KEY = 'SecretKey'
-
-  // Docker
-  providers.docker = {}
-  providers.docker.DOCKER_USERNAME = 'username'
-  providers.docker.DOCKER_PASSWORD = 'password'
-
-  const credentials = {}
-
-  for (const provider in providers) {
-    const providerEnvVars = providers[provider]
-    for (const providerEnvVar in providerEnvVars) {
-      if (!credentials[provider]) {
-        credentials[provider] = {}
-      }
-      // Proper environment variables override what's in the .env file
-      if (process.env.hasOwnProperty(providerEnvVar)) {
-        credentials[provider][providerEnvVars[providerEnvVar]] = process.env[providerEnvVar]
-      } else if (envVars.hasOwnProperty(providerEnvVar)) {
-        credentials[provider][providerEnvVars[providerEnvVar]] = envVars[providerEnvVar]
-      }
-      continue
-    }
-  }
-
-  return credentials
 }
 
 const getInstanceDashboardUrl = (instanceYaml) => {
@@ -608,6 +347,12 @@ const legacyLoadComponentConfig = (directoryPath) => {
   return componentFile
 }
 
+// Same as internal Tencent check:
+// https://github.com/serverless-tencent/serverless-tencent-tools/blob/3c1cabbdb21c0b3ba37248b9c2f609ec552bf8fc/sdk/others/isInChina.js#L12
+const IS_IN_CHINA = Boolean(
+  new Date().getTimezoneOffset() == -480 || String(process.env.LC_CTYPE).indexOf('zh_CN')
+)
+
 module.exports = {
   sleep,
   request,
@@ -616,16 +361,11 @@ module.exports = {
   isYamlPath,
   isJsonPath,
   loadComponentConfig,
-  loadInstanceConfig,
-  loadInstanceCredentials,
   resolveInputVariables,
   getDirSize,
-  getOrCreateAccessKey,
-  getAccessKey,
   pack,
-  isLoggedIn,
   getInstanceDashboardUrl,
-  getDefaultOrgName,
   legacyLoadComponentConfig,
-  legacyLoadInstanceConfig
+  legacyLoadInstanceConfig,
+  IS_IN_CHINA
 }

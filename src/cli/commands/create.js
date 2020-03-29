@@ -2,7 +2,7 @@
  * CLI: Command: CREATE
  */
 
-const utils = require('../utils')
+const { isLoggedIn } = require('./utils')
 const { existsSync, copySync } = require('fs-extra')
 const path = require('path')
 
@@ -11,7 +11,7 @@ module.exports = async (config, cli) => {
   cli.start('Initializing', { timer: false })
 
   // Ensure the user is logged in, or advertise
-  if (!utils.isLoggedIn()) {
+  if (!isLoggedIn()) {
     cli.advertise()
   }
 
