@@ -404,7 +404,7 @@ stage: prod
 
 inputs:
   name: ${org}-${stage}-${app}-${name} # Results in "acme-prod-ecommerce-rest-api"
-  region: ${env.REGION} # Results in whatever your environment variable REGION= is set to.
+  region: ${env:REGION} # Results in whatever your environment variable REGION= is set to.
   roleArn: ${output:prod:my-app:role.arn} # Fetches an output from another component instance that is already deployed
   roleArn: ${output:${stage}:${app}:role.arn} # You can combine variables too
 ```
@@ -477,7 +477,7 @@ inputs:
 
 You can reference Environment Variables (e.g. those that you defined in the `.env` file or that you've set in your environment manually) directly in `serverless.yml` by using the `${env}` Variable. 
 
-For example, if you want to reference the `REGION` environment variable, you could do that with `${env.REGION}`.
+For example, if you want to reference the `REGION` environment variable, you could do that with `${env:REGION}`.
 
 ```yml
 component: express
@@ -487,7 +487,7 @@ name: rest-api
 stage: prod
 
 inputs:
-  region: ${env.REGION}
+  region: ${env:REGION}
 ```
 
 #### Variables: Outputs
