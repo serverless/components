@@ -65,7 +65,7 @@ module.exports = async (config, cli) => {
   cli.log(`${chalk.grey('Status:')}       ${instance.instanceStatus}`)
   cli.log(`${chalk.grey('Last Action:')}  ${instance.lastAction} (${lastActionAgo})`)
   cli.log(`${chalk.grey('Deployments:')}  ${instance.instanceMetrics.deployments}`)
-  cli.log(`${chalk.grey('More Info:')}    ${dashboardUrl}`)
+  // cli.log(`${chalk.grey('More Info:')}    ${dashboardUrl}`)
 
   // show state only in debug mode
   if (config.debug) {
