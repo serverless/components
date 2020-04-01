@@ -2,4 +2,4 @@ component: express
 name: express-api
 
 inputs:
-  src: ./src
+  src: ./
