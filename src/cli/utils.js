@@ -405,15 +405,6 @@ const legacyLoadComponentConfig = (directoryPath) => {
   return componentFile
 }
 
-const IS_IN_CHINA = (() => {
-  if (process.env.SLS_GEO_LOCATION === 'cn') {
-    return true
-  }
-  return new Intl.DateTimeFormat('en', { timeZoneName: 'long' })
-    .format()
-    .includes('China Standard Time')
-})()
-
 module.exports = {
   sleep,
   request,
@@ -428,6 +419,5 @@ module.exports = {
   getInstanceDashboardUrl,
   loadInstanceConfig,
   legacyLoadComponentConfig,
-  legacyLoadInstanceConfig,
-  IS_IN_CHINA
+  legacyLoadInstanceConfig
 }

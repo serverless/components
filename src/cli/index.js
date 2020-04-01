@@ -18,8 +18,15 @@ if (stage && fileExistsSync(stageEnvFilePath)) {
   dotenv.config({ path: path.resolve(defaultEnvFilePath) })
 }
 
+const { utils: platformUtils } = require('@serverless/tencent-platform-client')
 const CLI = require('./CLI')
-const commands = require('./commands')
+
+let commands
+if (platformUtils.isChinaUser()) {
+  commands = require('./commands-cn')
+} else {
+  commands = require('./commands')
+}
 
 module.exports = async () => {
   const command = args._[0] || 'deploy'

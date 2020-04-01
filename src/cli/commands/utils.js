@@ -65,12 +65,6 @@ const loadInstanceCredentials = () => {
   providers.google.GOOGLE_CLIENT_EMAIL = 'clientEmail'
   providers.google.GOOGLE_PRIVATE_KEY = 'privateKey'
 
-  // Tencent
-  providers.tencent = {}
-  providers.tencent.TENCENT_APP_ID = 'AppId'
-  providers.tencent.TENCENT_SECRET_ID = 'SecretId'
-  providers.tencent.TENCENT_SECRET_KEY = 'SecretKey'
-
   // Docker
   providers.docker = {}
   providers.docker.DOCKER_USERNAME = 'username'
