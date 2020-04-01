@@ -4,6 +4,7 @@
 
 const path = require('path')
 const dotenv = require('dotenv')
+const args = require('minimist')(process.argv.slice(2))
 const {
   readConfigFile,
   writeConfigFile,
@@ -43,6 +44,71 @@ const getDefaultOrgName = async () => {
   }
 
   return defaultOrgName
+}
+
+/**
+ * Load credentials from a ".env" or ".env.[stage]" file
+ * @param {*} stage
+ */
+const loadInstanceCredentials = (stage) => {
+  // Load env vars
+  let envVars = {}
+  const defaultEnvFilePath = path.join(process.cwd(), `.env`)
+  const stageEnvFilePath = path.join(process.cwd(), `.env.${stage}`)
+
+  // Load environment variables via .env file
+  if (stage && fileExistsSync(stageEnvFilePath)) {
+    envVars = dotenv.config({ path: path.resolve(stageEnvFilePath) }).parsed || {}
+  } else if (fileExistsSync(defaultEnvFilePath)) {
+    envVars = dotenv.config({ path: path.resolve(defaultEnvFilePath) }).parsed || {}
+  }
+
+  // Known Provider Environment Variables and their SDK configuration properties
+  const providers = {}
+
+  // AWS
+  providers.aws = {}
+  providers.aws.AWS_ACCESS_KEY_ID = 'accessKeyId'
+  providers.aws.AWS_SECRET_ACCESS_KEY = 'secretAccessKey'
+  providers.aws.AWS_REGION = 'region'
+
+  // Google
+  providers.google = {}
+  providers.google.GOOGLE_APPLICATION_CREDENTIALS = 'applicationCredentials'
+  providers.google.GOOGLE_PROJECT_ID = 'projectId'
+  providers.google.GOOGLE_CLIENT_EMAIL = 'clientEmail'
+  providers.google.GOOGLE_PRIVATE_KEY = 'privateKey'
+
+  // Tencent
+  providers.tencent = {}
+  providers.tencent.TENCENT_APP_ID = 'AppId'
+  providers.tencent.TENCENT_SECRET_ID = 'SecretId'
+  providers.tencent.TENCENT_SECRET_KEY = 'SecretKey'
+
+  // Docker
+  providers.docker = {}
+  providers.docker.DOCKER_USERNAME = 'username'
+  providers.docker.DOCKER_PASSWORD = 'password'
+
+  const credentials = {}
+
+  for (const provider in providers) {
+    const providerEnvVars = providers[provider]
+    for (const providerEnvVar in providerEnvVars) {
+      if (!credentials[provider]) {
+        credentials[provider] = {}
+      }
+      // Proper environment variables override what's in the .env file
+      if (process.env.hasOwnProperty(providerEnvVar)) {
+        credentials[provider][providerEnvVars[providerEnvVar]] = process.env[providerEnvVar]
+      } else if (envVars.hasOwnProperty(providerEnvVar)) {
+        credentials[provider][providerEnvVars[providerEnvVar]] = envVars[providerEnvVar]
+      }
+      continue
+    }
+  }
+
+  return credentials
 }
 
 /**
@@ -104,8 +170,18 @@ const loadInstanceConfig = async (directoryPath) => {
     instanceFile.stage = 'dev'
   }
 
+  // if stage flag provided, overwrite
+  if (args.stage) {
+    instanceFile.stage = args.stage
+  }
+
   if (!instanceFile.org) {
     instanceFile.org = await getDefaultOrgName()
+  }
+
+  // if org flag provided, overwrite
+  if (args.org) {
+    instanceFile.org = args.org
   }
 
   if (!instanceFile.org) {
@@ -116,7 +192,14 @@ const loadInstanceConfig = async (directoryPath) => {
     instanceFile.app = instanceFile.name
   }
 
+  // if app flag provided, overwrite
+  if (args.app) {
+    instanceFile.app = args.app
+  }
+
   if (instanceFile.inputs) {
+    // load credentials to process .env files before resolving env variables
+    await loadInstanceCredentials(instanceFile.stage)
     instanceFile.inputs = resolveInputVariables(instanceFile.inputs)
   }
 
@@ -199,71 +282,6 @@ const getOrCreateAccessKey = async (org) => {
   // return the access key for the specified org
   // return user.dashboard.accessKeys[org]
   return user.dashboard.idToken
-}
-
-/**
- * Load credentials from a ".env" or ".env.[stage]" file
- * @param {*} stage
- */
-const loadInstanceCredentials = (stage) => {
-  // Load env vars
-  let envVars = {}
-  const defaultEnvFilePath = path.join(process.cwd(), `.env`)
-  const stageEnvFilePath = path.join(process.cwd(), `.env.${stage}`)
-
-  // Load environment variables via .env file
-  if (stage && fileExistsSync(stageEnvFilePath)) {
-    envVars = dotenv.config({ path: path.resolve(stageEnvFilePath) }).parsed || {}
-  } else if (fileExistsSync(defaultEnvFilePath)) {
-    envVars = dotenv.config({ path: path.resolve(defaultEnvFilePath) }).parsed || {}
-  }
-
-  // Known Provider Environment Variables and their SDK configuration properties
-  const providers = {}
-
-  // AWS
-  providers.aws = {}
-  providers.aws.AWS_ACCESS_KEY_ID = 'accessKeyId'
-  providers.aws.AWS_SECRET_ACCESS_KEY = 'secretAccessKey'
-  providers.aws.AWS_REGION = 'region'
-
-  // Google
-  providers.google = {}
-  providers.google.GOOGLE_APPLICATION_CREDENTIALS = 'applicationCredentials'
-  providers.google.GOOGLE_PROJECT_ID = 'projectId'
-  providers.google.GOOGLE_CLIENT_EMAIL = 'clientEmail'
-  providers.google.GOOGLE_PRIVATE_KEY = 'privateKey'
-
-  // Tencent
-  providers.tencent = {}
-  providers.tencent.TENCENT_APP_ID = 'AppId'
-  providers.tencent.TENCENT_SECRET_ID = 'SecretId'
-  providers.tencent.TENCENT_SECRET_KEY = 'SecretKey'
-
-  // Docker
-  providers.docker = {}
-  providers.docker.DOCKER_USERNAME = 'username'
-  providers.docker.DOCKER_PASSWORD = 'password'
-
-  const credentials = {}
-
-  for (const provider in providers) {
-    const providerEnvVars = providers[provider]
-    for (const providerEnvVar in providerEnvVars) {
-      if (!credentials[provider]) {
-        credentials[provider] = {}
-      }
-      // Proper environment variables override what's in the .env file
-      if (process.env.hasOwnProperty(providerEnvVar)) {
-        credentials[provider][providerEnvVars[providerEnvVar]] = process.env[providerEnvVar]
-      } else if (envVars.hasOwnProperty(providerEnvVar)) {
-        credentials[provider][providerEnvVars[providerEnvVar]] = envVars[providerEnvVar]
-      }
-      continue
-    }
-  }
-
-  return credentials
 }
 
 module.exports = {
