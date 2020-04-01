@@ -26,7 +26,7 @@ website:
     code:
       src: ./src
       hook: npm run build
-      domain: www.serverlesscomponents.com
+    domain: www.serverlesscomponents.com
 ```
 
 [^ Watch a video guide on using a Serverless Component here](https://www.youtube.com/watch?v=ts26BVuX3j0).
