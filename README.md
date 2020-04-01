@@ -73,7 +73,7 @@ $ npm i -g serverless
 After installation, use the `create --template-url` command to install a [Serverless Components Template](./templates), which contains Components as well as boilerplate code, to get you started quickly.  An easy starting point is the Express.js Component:
 
 ```shell
-serverless create --template-url https://github.com/serverless/components/tree/cloud/templates/express
+serverless create --template-url https://github.com/serverless/components/tree/master/templates/express
 ```
 
 Some Templates require running `npm i` to install its dependencies.  The `express` template above requires running `npm i` in its `src` directory, to install the Express framework.
