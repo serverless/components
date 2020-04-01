@@ -97,8 +97,10 @@ module.exports = async (config, cli, command) => {
     const instance = await sdk.deploy(instanceYaml, instanceCredentials, options)
     cli.log()
     cli.logOutputs(instance.outputs)
-    cli.log()
-    cli.log(`${chalk.grey(`Full details: ${dashboardUrl}`)}`)
+
+    // commenting out dashboard URL for now until the dashboard is usable
+    // cli.log()
+    // cli.log(`${chalk.grey(`Full details: ${dashboardUrl}`)}`)
   } else if (command === 'remove') {
     // run remove
     cli.status('Removing', null, 'white')
