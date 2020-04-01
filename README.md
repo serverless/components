@@ -379,13 +379,17 @@ You can also specify a Stage within the `SERVERLESS_STAGE` Environment Variable,
 SERVERLESS_STAGE=prod
 ```
 
-Lastly, you can specify a Stage upon deployment via a CLI flag, which overrides anything set in `serverless.yml` AND an Environment Variable, like this:
+And, you can specify a Stage upon deployment via a CLI flag, which overrides anything set in `serverless.yml` AND an Environment Variable, like this:
 
 ```bash
 $ serverless deploy --stage prod
 ```
 
 Again, the CLI flag overrides both a `stage` in `serverless.yml` and an Environment Variable.  Whereas an Environment Variable can only override the `stage` in `serverless.yml`.
+
+Lastly, you can set stage-specific environment variables using separate `.env` files. Each file must be named in the following format: `.env.STAGE`. For example, if you run in the prod stage, the environment variables in `.env.prod` would be loaded, otherwise the default `.env` file (without stage extension) would be loaded.
+
+A practical usage of this is if you want to have a separate AWS account for each stage. In that case you would keep separate AWS credentials for each stage you are targeting. Then based on the stage you're deploying to, the correct credentials would be picked up.
 
 <br/>
 
@@ -425,6 +429,12 @@ inputs:
 
 ```
 
+**Note:** If you didn't specify an `org`, the default `org` would be the first org you craeted when you first signed up. You can always overwrite the default `org` or the one specified in `serverless.yml` by passing the `--org` option on deploy:
+
+```
+$ serverless deploy --org my-other-org
+```
+
 #### Variables: Stage
 
 You can reference your `stage` value in the `inputs` of your YAML in `serverless.yml` by using the `${stage}` Variable, like this: 
@@ -441,6 +451,12 @@ inputs:
 
 ```
 
+**Note:** If you didn't specify a `stage`, the default stage would be `dev`. You can always overwrite the default `stage` or the one specified in `serverless.yml` by passing the `--stage` option on deploy:
+
+```
+$ serverless deploy --stage prod
+```
+
 #### Variables: App
 
 You can reference your `app` value in the `inputs` of your YAML in `serverless.yml` by using the `${app}` Variable, like this: 
@@ -455,6 +471,12 @@ stage: prod
 inputs:
   name: ${app}-api # Results in "ecommerce-api"
 
+```
+
+**Note:** If you didn't specify an app, the default app name would be the instance name (the `name` property in `serverless.yml`). You can always overwrite the default `app` or the one specified in `serverless.yml` by passing the `--app` option on deploy:
+
+```
+$ serverless deploy --app my-other-app
 ```
 
 #### Variables: Name
