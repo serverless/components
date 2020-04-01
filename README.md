@@ -2,6 +2,12 @@
 
 <br/>
 
+<p align="center">
+  <b><a href="https://github.com/serverless/components/tree/v1">Click Here for Version 1.0</a></b>
+</p>
+
+<br/>
+
 Serverless Components are simple abstractions that enable developers to deploy serverless applications and use-cases easily, via the [Serverless Framework](https://github.com/serverless/serverless).
 
 <br/>
