@@ -10,16 +10,21 @@ const semver = require('semver')
 const util = require('util')
 const exec = util.promisify(require('child_process').exec)
 const dirExists = require('./fs/dirExists')
-const globalTunnel = require('global-tunnel-ng')
+
+const MAJOR_NODEJS_VERSION = parseInt(process.version.slice(1).split('.')[0], 10)
+if (MAJOR_NODEJS_VERSION >= 10) {
+  // `global-agent` works with Node.js v10 and above.
+  require('global-agent').bootstrap()
+  http.globalAgent.keepAlive = true
+  https.globalAgent.keepAlive = true
+} else {
+  // `global-tunnel-ng` works only with Node.js v10 and below.
+  require('global-tunnel-ng').initialize()
+  http.globalAgent.keepAlive = true
+  https.globalAgent.keepAlive = true
+}
 
 async function getComponentVersionToDownload(component) {
-  // Init global proxy
-  try {
-    globalTunnel.initialize()
-    http.globalAgent.keepAlive = true
-    https.globalAgent.keepAlive = true
-  } catch (e) {}
-
   let packageName
   let specifiedVersion
   if (component.startsWith('@')) {
@@ -70,11 +75,6 @@ async function getComponentVersionToDownload(component) {
   if (!versionToInstall) {
     throw Error(`component version that satisfies the query ${component} was not found`)
   }
-
-  // Restore global proxy
-  try {
-    globalTunnel.end()
-  } catch (e) {}
 
   return {
     name: packageName,
