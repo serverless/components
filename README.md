@@ -46,7 +46,6 @@ inputs: # The configuration the Component accepts according to its docs
   - [Versioning](#versioning)
   - [Outputs](#outputs)
   - [Credentials](#credentials)
-  - [Environment Variables](#environment-variables)
   - [Stages](#stages)
   - [Variables](#variables)
 - [Building Components](#building-components)
