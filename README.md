@@ -83,15 +83,6 @@ Next, `cd` into your Template and log in to enable deployment and saving state i
 $ serverless login
 ```
 
-Be sure to copy your `org` and your `app` so that you can put these values into your `serverless.yml`. They are required to save your state.
-
-```yaml
-# serverless.yml
-
-org: my-org
-app: my-app
-```
-
 Lastly, enter your cloud provider credentials into a `.env` file within the folder that contains your `serverles.yml`.
 
 ```text
@@ -120,8 +111,8 @@ $ serverless dev
 Deploy other Components that you may want to use with your Express Component.  For example, you may want to give your Express application permissions to other resources on your AWS account via the `aws-iam-role` Component.  You may also want an AWS DynamoDB table to use with your Express Component, via the `aws-dynamodb` Component.  There are Templates for both of these in the [Serverless Components Template](./templates) folder.  You can then use them with your `express` Component, like this:
 
 ```yaml
-org: # Your Org
-app: # Your App
+org: your-org # Your Org
+app: your-app # Your App
 component: express
 name: express-api
 
