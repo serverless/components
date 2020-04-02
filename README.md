@@ -3,7 +3,7 @@
 <br/>
 
 <p align="center">
-  <b><a href="https://github.com/serverless/components/tree/v1">Click Here for Version 1.0</a></b>
+  <b>Serverless Components is now Generally Available.  <a href="https://github.com/serverless/components/tree/v1">Click Here for the old Beta Version</a></b>
 </p>
 
 <br/>
