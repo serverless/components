@@ -1,14 +1,25 @@
 const os = require('os')
 const path = require('path')
+const http = require('http')
+const https = require('https')
 const { ensureDir, remove } = require('fs-extra')
 const packageJson = require('package-json')
+const registryUrl = require('registry-url')
 const semver = require('semver')
 // const BbPromise = require('bluebird')
 const util = require('util')
 const exec = util.promisify(require('child_process').exec)
 const dirExists = require('./fs/dirExists')
+const globalTunnel = require('global-tunnel-ng')
 
 async function getComponentVersionToDownload(component) {
+  // Init global proxy
+  try {
+    globalTunnel.initialize()
+    http.globalAgent.keepAlive = true
+    https.globalAgent.keepAlive = true
+  } catch (e) {}
+
   let packageName
   let specifiedVersion
   if (component.startsWith('@')) {
@@ -39,7 +50,13 @@ async function getComponentVersionToDownload(component) {
     }
   }
 
-  const packageData = await packageJson(packageName, { allVersions: true })
+  const packageData = await packageJson(packageName, {
+    allVersions: true,
+    agent: {
+      http: http.globalAgent,
+      https: https.globalAgent
+    }
+  })
 
   const latestVersion = packageData['dist-tags'].latest
   const publishedVersions = Object.keys(packageData.versions)
@@ -53,6 +70,11 @@ async function getComponentVersionToDownload(component) {
   if (!versionToInstall) {
     throw Error(`component version that satisfies the query ${component} was not found`)
   }
+
+  // Restore global proxy
+  try {
+    globalTunnel.end()
+  } catch (e) {}
 
   return {
     name: packageName,
@@ -114,15 +136,16 @@ async function download(componentsToDownload) {
     // const shouldUpdate = true || process.argv.find((arg) => arg === '--update' || arg === '-u')
     const shouldUpdate = false
 
+    const registry = registryUrl()
     if (!(await dirExists(requirePath))) {
       try {
-        await exec(`npm install ${exactVersion} --prefix ${npmInstallPath}`)
+        await exec(`npm install ${exactVersion} --prefix ${npmInstallPath} --registry=${registry}`)
       } catch (e) {
         await remove(npmInstallPath)
         throw e
       }
     } else if (shouldUpdate) {
-      await exec(`npm update`, { cwd: requirePath })
+      await exec(`npm update --registry=${registry}`, { cwd: requirePath })
     }
 
     componentsPathsMap[component] = requirePath
