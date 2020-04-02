@@ -1,9 +1,6 @@
-org: # Your Serverless Framework Org
-app: # Your Serverless Framework App
 component: aws-lambda
-name: test-lambda
+name: my-lambda
 
 inputs:
-  name: ${name}
   src: ./src
   handler: handler.handler

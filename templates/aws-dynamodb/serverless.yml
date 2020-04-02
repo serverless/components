@@ -1,14 +1,16 @@
-org: # Your Serverless Framework Org
-app: # Your Serverless Framework App
 component: aws-dynamodb
-name: test-database
+name: my-table
 
 inputs:
-  name: test-database-1
+  deletionPolicy: delete # allows table to be removed. This property is a safe guard.
   attributeDefinitions:
-    - AttributeName: id
+    - AttributeName: attribute1
       AttributeType: S
+    - AttributeName: attribute2
+      AttributeType: N
   keySchema:
-    - AttributeName: id
+    - AttributeName: attribute1
       KeyType: HASH
+    - AttributeName: attribute2
+      KeyType: RANGE
   region: us-east-1

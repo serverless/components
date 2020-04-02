@@ -1,10 +1,7 @@
-org: # Your Serverless Framework Org
-app: # Your Serverless Framework App
 component: aws-lambda-layer
-name: test-lambda-layer
+name: my-lambda-layer
 
 inputs:
-  name: ${name}
   src: ./src
   runtimes:
     - nodejs10.x
