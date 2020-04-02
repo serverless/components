@@ -75,7 +75,7 @@ After installation, use the `create --template-url` command to install a [Server
 serverless create --template-url https://github.com/serverless/components/tree/master/templates/express
 ```
 
-The `express` template above requires running `npm i` in its root directory, to install the Express framework. So `cd` into your Template and run `npm i`.
+The `express` template above requires running `npm i` in its root directory, to install the Express framework. So `cd` into the generated `express` directory and run `npm i`.
 
 Next, log in to enable deployment and saving state in the cloud:
 
