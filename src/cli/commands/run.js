@@ -106,9 +106,14 @@ module.exports = async (config, cli, command) => {
     cli.status('Removing', null, 'white')
     await sdk.remove(instanceYaml, instanceCredentials, options)
   } else {
-    // run a custom method
+    // run a custom method synchronously to receive outputs directly
+    options.sync = true
+
     cli.status('Running', null, 'white')
-    await sdk.run(command, instanceYaml, instanceCredentials, options)
+    const instance = await sdk.run(command, instanceYaml, instanceCredentials, options)
+
+    cli.log()
+    cli.logOutputs(instance.outputs)
   }
   cli.close('success', 'Success')
 }
