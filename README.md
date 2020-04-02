@@ -95,6 +95,7 @@ Deploy...
 ```bash
 $ serverless deploy
 ```
+After few seconds, you should get a URL as an output. If you visit that URL you'll see a successful "Request Received" message.
 
 Fetch the your Component Instance's info...
 
