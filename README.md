@@ -83,7 +83,7 @@ Next, log in to enable deployment and saving state in the cloud:
 $ serverless login
 ```
 
-Lastly, enter your cloud provider credentials into a `.env` file within the folder that contains your `serverles.yml`.
+Lastly, enter your cloud provider credentials into a `.env` file within the folder that contains your `serverless.yml`.
 
 ```text
 AWS_ACCESS_KEY_ID=12345
@@ -412,7 +412,7 @@ inputs:
 
 #### Variables: Org
 
-You can reference your `org` value in the `inputs` of your YAML in `serverless.yml` by using the `${org}` Variable, like this: 
+You can reference your `org` value in the `inputs` of your YAML in `serverless.yml` by using the `${org}` Variable, like this:
 
 ```yml
 org: acme
@@ -434,7 +434,7 @@ $ serverless deploy --org my-other-org
 
 #### Variables: Stage
 
-You can reference your `stage` value in the `inputs` of your YAML in `serverless.yml` by using the `${stage}` Variable, like this: 
+You can reference your `stage` value in the `inputs` of your YAML in `serverless.yml` by using the `${stage}` Variable, like this:
 
 ```yml
 org: acme
@@ -456,7 +456,7 @@ $ serverless deploy --stage prod
 
 #### Variables: App
 
-You can reference your `app` value in the `inputs` of your YAML in `serverless.yml` by using the `${app}` Variable, like this: 
+You can reference your `app` value in the `inputs` of your YAML in `serverless.yml` by using the `${app}` Variable, like this:
 
 ```yml
 org: acme
@@ -478,7 +478,7 @@ $ serverless deploy --app my-other-app
 
 #### Variables: Name
 
-You can reference your `name` value in the `inputs` of your YAML in `serverless.yml` by using the `${name}` Variable, like this: 
+You can reference your `name` value in the `inputs` of your YAML in `serverless.yml` by using the `${name}` Variable, like this:
 
 ```yml
 org: acme
@@ -494,7 +494,7 @@ inputs:
 
 #### Variables: Environment Variables
 
-You can reference Environment Variables (e.g. those that you defined in the `.env` file or that you've set in your environment manually) directly in `serverless.yml` by using the `${env}` Variable. 
+You can reference Environment Variables (e.g. those that you defined in the `.env` file or that you've set in your environment manually) directly in `serverless.yml` by using the `${env}` Variable.
 
 For example, if you want to reference the `REGION` environment variable, you could do that with `${env:REGION}`.
 
@@ -676,10 +676,10 @@ Within your Component, the `inputs.src` will point to a zip file of the source f
 
 ```javascript
 async deploy(inputs = {}) {
-  
-  // Unzip the source files...  
+
+  // Unzip the source files...
   const sourceDirectory = await this.unzip(inputs.src)
-  
+
 }
 ```
 
@@ -687,10 +687,10 @@ Now, you are free to manipulate the source files.  When finished, you may want t
 
 ```javascript
 async deploy(inputs = {}) {
-  
-  // Zip up the source files...  
+
+  // Zip up the source files...
   const zipPath = await instance.zip(sourceDirectory)
-  
+
 }
 ```
 
