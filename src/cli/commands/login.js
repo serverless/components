@@ -6,7 +6,7 @@ const { loadComponentConfig } = require('../utils')
 
 module.exports = async (config, cli, command) => {
   // Offer a nice presentation
-  cli.log()
+
   cli.logLogo()
   cli.log('Logging you in via the Browser...', 'grey')
   cli.log()
@@ -46,8 +46,11 @@ module.exports = async (config, cli, command) => {
   process.env.DISPLAY = true
   let { loginUrl, loginData } = await sdk.login(loginConfig) // eslint-disable-line
 
-  // should we print the url to the terminal in case it didn't open?!
-  // console.log(loginUrl)
+  cli.log(
+    'If your browser did not open automatically, copy & paste this url into your browser:',
+    'grey'
+  )
+  cli.log(loginUrl, 'grey')
 
   open(loginUrl)
 
