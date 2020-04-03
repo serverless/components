@@ -672,7 +672,7 @@ module.exports = MyComponent
 
 When working with a Component that requires source code (e.g. you are creating a Component that will run on AWS Lambda), if you make the `src` one of your inputs, anything specified there will be automatically uploaded and made available within the Component environment.
 
-Within your Component, you the `inputs.src` will point to a zip file of the source files within your environment.  If you wish to unzip the source files, use this helpful utility method:
+Within your Component, the `inputs.src` will point to a zip file of the source files within your environment.  If you wish to unzip the source files, use this helpful utility method:
 
 ```javascript
 async deploy(inputs = {}) {
