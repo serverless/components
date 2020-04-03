@@ -24,13 +24,11 @@ Here's how to use a Serverless Component:
 ```yaml
 # serverless.yml
 
-org: acme # Your Serverless Framework Org
-app: fullstack # Your Serverless Framework App
-component: express@0.0.2 # The name of the Component in the Registry
-name: rest-api # The name of your instance of this Component
+component: express         # The name of the Component in the Registry
+name: rest-api             # The name of your instance of this Component
 
-inputs: # The configuration the Component accepts according to its docs
-  src: ./src
+inputs:                    # The configuration the Component accepts according to its docs
+  src: ./src               #     In that case the express component accepts source code      
 ```
 
 # Documentation
