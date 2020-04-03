@@ -45,7 +45,7 @@ $ npm install -g serverless
 通过如下命令初始化项目模板：
 
 ```shell
-$ serverless create --template-url https://github.com/serverless/components/tree/master/templates/tencent-laravel
+$ serverless create --template-url https://github.com/serverless/components/tree/v1/templates/tencent-laravel
 ```
 
 安装 PHP 依赖：

@@ -47,7 +47,7 @@ $ npm install -g serverless
 Create a template in a new folder, with the following command
 
 ```console
-$ serverless create --template-url https://github.com/serverless/components/tree/master/templates/tencent-python-rest-api
+$ serverless create --template-url https://github.com/serverless/components/tree/v1/templates/tencent-python-rest-api
 ```
 
 Here is the content of the template:

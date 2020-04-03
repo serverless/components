@@ -39,7 +39,7 @@ $ npm i -g serverless
 Next, use the `create --template-url` command to install a `tencent-fullstack-vue-application`.
 
 ```console
-$ serverless create --template-url https://github.com/serverless/components/tree/master/templates/tencent-fullstack-vue-application
+$ serverless create --template-url https://github.com/serverless/components/tree/v1/templates/tencent-fullstack-vue-application
 ```
 
 ### 2. Create

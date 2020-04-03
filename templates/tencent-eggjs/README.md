@@ -45,7 +45,7 @@ $ npm install -g serverless
 通过如下命令直接下载该例子，目录结构如下：
 
 ```shell
-$ serverless create --template-url https://github.com/serverless/components/tree/master/templates/tencent-eggjs
+$ serverless create --template-url https://github.com/serverless/components/tree/v1/templates/tencent-eggjs
 ```
 
 ### 3. 部署
