@@ -672,7 +672,7 @@ module.exports = MyComponent
 
 When working with a Component that requires source code (e.g. you are creating a Component that will run on AWS Lambda), if you make the `src` one of your inputs, anything specified there will be automatically uploaded and made available within the Component environment.
 
-Within your Component, you the `inputs.src` will point to a zip file of the source files within your environment.  If you wish to unzip the source files, use this helpful utilty method:
+Within your Component, you the `inputs.src` will point to a zip file of the source files within your environment.  If you wish to unzip the source files, use this helpful utility method:
 
 ```javascript
 async deploy(inputs = {}) {
@@ -696,7 +696,7 @@ async deploy(inputs = {}) {
 
 ### Adding The Serverless Agent
 
-If your Component deals runs code, and you want to enable streaming logs, errors and transactions for you Component via Serverless Dev Mode (`serverless dev`), be sure to add the Serverless SDK into the deployed application/logic.  We offer some helpful utility methods to make this possible:
+If your Component runs code, and you want to enable streaming logs, errors and transactions for you Component via Serverless Dev Mode (`serverless dev`), be sure to add the Serverless SDK into the deployed application/logic.  We offer some helpful utility methods to make this possible:
 
 ```javascript
 
@@ -787,7 +787,7 @@ We recommend starting with a focus on your desired outcome. Create a higher leve
 
 #### Knowing The Outcome Is An Advantage
 
-Provisioning infrastructure can be quite complicated. However, Serverless Components have a powerful advantage over general infrastructure provision tools that seek to enable every possible option and combination (e.g. AWS Cloudformation) — Serverless Components know the specific use-case they are trying to deliver.
+Provisioning infrastructure can be quite complicated. However, Serverless Components have a powerful advantage over general infrastructure provisioning tools that seek to enable every possible option and combination (e.g. AWS Cloudformation) — Serverless Components know the specific use-case they are trying to deliver.
 
 One of the most important lessons we've learned about software development tools is that once you know the use-case, you can create a much better tool.
 
