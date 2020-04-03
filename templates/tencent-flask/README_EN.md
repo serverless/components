@@ -45,7 +45,7 @@ $ npm install -g serverless
 Create a template in a new folder with the following command
 
 ```shell
-$ serverless create --template-url https://github.com/serverless/components/tree/master/templates/tencent-flask
+$ serverless create --template-url https://github.com/serverless/components/tree/v1/templates/tencent-flask
 ```
 
 You can find the API definitions in `app.py`:

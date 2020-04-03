@@ -45,7 +45,7 @@ $ npm install -g serverless
 Create the template in a new folder with the following command
 
 ```shell
-$ serverless create --template-url https://github.com/serverless/components/tree/master/templates/tencent-eggjs
+$ serverless create --template-url https://github.com/serverless/components/tree/v1/templates/tencent-eggjs
 ```
 
 ### 3. Deploy
