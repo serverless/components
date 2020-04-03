@@ -54,7 +54,7 @@ inputs:             # The configuration the Component accepts according to its d
   - [Development Tips](#development-tips)
 - [Available Components](https://github.com/serverless-components/)
   - [express](https://github.com/serverless-components/express)
-  - [website](https://github.com/serverless-components/)
+  - [website](https://github.com/serverless-components/website)
   - [aws-dynamodb](https://github.com/serverless-components/aws-dynamodb)
   - [aws-lambda](https://github.com/serverless-components/aws-lambda)
   - [aws-lambda-layer](https://github.com/serverless-components/aws-lambda-layer)
