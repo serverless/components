@@ -175,13 +175,13 @@ const loadInstanceConfig = async (directoryPath) => {
     instanceFile.stage = args.stage
   }
 
-  if (!instanceFile.org) {
-    instanceFile.org = await getDefaultOrgName()
-  }
-
   // if org flag provided, overwrite
   if (args.org) {
     instanceFile.org = args.org
+  }
+
+  if (!instanceFile.org) {
+    instanceFile.org = await getDefaultOrgName()
   }
 
   if (!instanceFile.org) {
