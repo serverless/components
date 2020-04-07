@@ -2,7 +2,7 @@
  * Serverless Components: Utilities
  */
 
-const { contains, isNil, last, split, merge, endsWith } = require('ramda')
+const { contains, isNil, last, split, merge, endsWith, memoizeWith, identity } = require('ramda')
 const path = require('path')
 const axios = require('axios')
 const globby = require('globby')
@@ -254,7 +254,7 @@ const getInstanceDashboardUrl = (instanceYaml) => {
  * Reads a serverless instance config file in a given directory path
  * @param {*} directoryPath
  */
-const loadInstanceConfig = (directoryPath) => {
+const loadInstanceConfig = memoizeWith(identity, (directoryPath) => {
   directoryPath = path.resolve(directoryPath)
   const ymlFilePath = path.join(directoryPath, `serverless.yml`)
   const yamlFilePath = path.join(directoryPath, `serverless.yaml`)
@@ -306,7 +306,7 @@ const loadInstanceConfig = (directoryPath) => {
   }
 
   return instanceFile
-}
+})
 
 /**
  * THIS IS USED BY SFV1.  DO NOT MODIFY OR DELETE
