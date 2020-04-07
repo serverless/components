@@ -8,6 +8,11 @@
 
 <br/>
 
+<p align="center">
+  <span>English</span> |
+  <a href="./README.cn.md">简体中文</a>
+</p>
+
 Serverless Components are simple abstractions that enable developers to deploy serverless applications and use-cases easily, via the [Serverless Framework](https://github.com/serverless/serverless).
 
 <br/>
