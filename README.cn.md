@@ -26,7 +26,7 @@ Here's how to use a Serverless Component:
 ```yaml
 # serverless.yml
 
-component: tencent-express  # 注册中心的组件名称
+component: express  # 注册中心的组件名称
 name: express-api      # 组件实例的名称
 
 inputs:             # 对应的组件配置
@@ -47,7 +47,7 @@ inputs:             # 对应的组件配置
   - [输出](#输出)
   - [账号配置](#账号配置)
   - [环境](#环境)
-  - [环境变量](#环境变量)
+  - [变量](#变量)
 - [开发 Components](#开发-Components)
   - [Serverless.component.yml](#serverlesscomponentyml)
   - [Serverless.js 介绍](#Serverless.js-介绍)
@@ -106,7 +106,7 @@ $ serverless dev
 ```yaml
 org: your-org # Your Org
 app: your-app # Your App
-component: tencent-express
+component: express
 name: express-api
 
 inputs:
@@ -184,7 +184,7 @@ module.exports = MyBlog
 
 $ serverless registry publish
 
-tencent-express@0.0.4 › Published
+express@0.0.4 › Published
 
 ```
 
@@ -229,7 +229,7 @@ Serverless Components 完全借助云资源进行部署，可以通过注册中�
 ```yaml
 # serverless.yml
 
-component: tencent-express # The name of the Component in the Registry
+component: express # The name of the Component in the Registry
 org: tencent # Your Serverless Framework Org
 app: fullstack # Your Serverless Framework App
 name: rest-api # The name of your instance of this Component
@@ -287,7 +287,7 @@ name: rest-api
 Serverless Components 通过如下配置指定版本信息：
 
 ```yaml
-component: tencent-express@0.0.2
+component: express@0.0.2
 ```
 
 当你在配置中指定版本时，则会在项目中固定使用该版本的 Component。当不指定版本信息时，Serverless Framework 就会自动获取最新版本的组件。在正式项目中，建议指定 Component 为固定的版本号。
@@ -366,17 +366,15 @@ $ serverless deploy --stage prod
 
 注： CLI 中配置参数的方式会覆盖 `serverless.yml` 和环境变量中的 `stage` 配置，但环境变量中的配置只会覆盖  `serverless.yml` 中的 `stage` 字段
 
-Lastly, you can set stage-specific environment variables using separate `.env` files. Each file must be named in the following format: `.env.STAGE`. For example, if you run in the prod stage, the environment variables in `.env.prod` would be loaded, otherwise the default `.env` file (without stage extension) would be loaded.
+近期 Serverless Component 已经支持通过不同的 `.env` 指定不同环境中的参数配置。其中，每个文件必须采用如下命名规范：`.env.STAGE`。例如，如果你希望运行 prod 生成环境中的配置，则环境变量文件需要命名为 `.env.prod` 才可以被加载，否则会默认读取 `.env` 文件中的配置。
 
-A practical usage of this is if you want to have a separate AWS account for each stage. In that case you would keep separate AWS credentials for each stage you are targeting. Then based on the stage you're deploying to, the correct credentials would be picked up.
+该使用方式的一个最佳实践为，如果希望通过不同的云账户来区分不同的环境，则需要在 `.env` 配置文件中填写不同账户的秘钥，从而在部署时读取不同环境的配置文件。
 
 <br/>
 
-### Variables
+### 变量
 
-You can use Variables within your Component Instances `serverless.yml` to reference Environment Variables, values from within `serverless.yml` and Outputs from other Serverless Component Instances that you've already deployed.
-
-Here is a quick preview of possibilities:
+你可以直接通过变量的方式在 `serverless.yml` 中引用环境变量，`serverless.yml` 中的值，或者其他 Component 中已经部署的实例中的输出信息，配置如下所示：
 
 ```yaml
 org: acme
@@ -386,15 +384,15 @@ name: rest-api
 stage: prod
 
 inputs:
-  name: ${org}-${stage}-${app}-${name} # Results in "acme-prod-ecommerce-rest-api"
-  region: ${env:REGION} # Results in whatever your environment variable REGION= is set to.
-  roleArn: ${output:prod:my-app:role.arn} # Fetches an output from another component instance that is already deployed
-  roleArn: ${output:${stage}:${app}:role.arn} # You can combine variables too
+  name: ${org}-${stage}-${app}-${name} # 命名最终为 "acme-prod-ecommerce-rest-api"
+  region: ${env:REGION} # 环境变量中指定的 REGION= 信息
+  vpcName: ${output:prod:my-app:vpc.name} # 获取其他组件中的输出信息
+  vpcName: ${output:${stage}:${app}:vpc.name} # 上述方式也可以组合使用
 ```
 
-#### Variables: Org
+#### 变量：Org
 
-You can reference your `org` value in the `inputs` of your YAML in `serverless.yml` by using the `${org}` Variable, like this:
+当前支持通过 `${org}` 的方式，在 `serverless.yml` 的 `inputs` 字段中引用 `org` 的信息，如下所示：
 
 ```yml
 org: acme
@@ -404,19 +402,19 @@ name: rest-api
 stage: prod
 
 inputs:
-  name: ${org}-api # Results in "acme-api"
+  name: ${org}-api # 该例子中的 name 值为 "acme-api"
 
 ```
 
-**Note:** If you didn't specify an `org`, the default `org` would be the first org you craeted when you first signed up. You can always overwrite the default `org` or the one specified in `serverless.yml` by passing the `--org` option on deploy:
+**注：** 如果未指定 `org` 参数，则默认的值为登录后腾讯云的 appid 信息。当前支持通过如下命令修改 `org` 参数：
 
 ```
 $ serverless deploy --org my-other-org
 ```
 
-#### Variables: Stage
+#### 变量：Stage
 
-You can reference your `stage` value in the `inputs` of your YAML in `serverless.yml` by using the `${stage}` Variable, like this:
+当前支持通过 `${stage}` 的方式，在 `serverless.yml` 的 `inputs` 字段中引用 `stage` 的信息，如下所示：
 
 ```yml
 org: acme
@@ -426,19 +424,19 @@ name: rest-api
 stage: prod
 
 inputs:
-  name: ${stage}-api # Results in "prod-api"
+  name: ${stage}-api # 该例子中的 name 值为 "prod-api"
 
 ```
 
-**Note:** If you didn't specify a `stage`, the default stage would be `dev`. You can always overwrite the default `stage` or the one specified in `serverless.yml` by passing the `--stage` option on deploy:
+**注：** 如果未指定 `stage` 参数，则默认的值为 `dev` 。当前支持通过 `--stage` 参数修改 `stage` 的值：
 
 ```
 $ serverless deploy --stage prod
 ```
 
-#### Variables: App
+#### 变量：App
 
-You can reference your `app` value in the `inputs` of your YAML in `serverless.yml` by using the `${app}` Variable, like this:
+当前支持通过 `${app}` 的方式，在 `serverless.yml` 的 `inputs` 字段中引用 `app` 的信息，如下所示：
 
 ```yml
 org: acme
@@ -448,19 +446,19 @@ name: rest-api
 stage: prod
 
 inputs:
-  name: ${app}-api # Results in "ecommerce-api"
+  name: ${app}-api # 该例子中的 name 值为 "ecommerce-api"
 
 ```
 
-**Note:** If you didn't specify an app, the default app name would be the instance name (the `name` property in `serverless.yml`). You can always overwrite the default `app` or the one specified in `serverless.yml` by passing the `--app` option on deploy:
+**注：** 如果未指定 `app` 参数，则默认的 app 值会和 `serverless.yml` 中的 name 保持一致，当前支持通过 `--app` 参数修改 `app` 的值：
 
 ```
 $ serverless deploy --app my-other-app
 ```
 
-#### Variables: Name
+#### 变量：Name
 
-You can reference your `name` value in the `inputs` of your YAML in `serverless.yml` by using the `${name}` Variable, like this:
+当前支持通过 `${name}` 的方式，在 `serverless.yml` 的 `inputs` 字段中引用 `name` 的信息，如下所示：
 
 ```yml
 org: acme
@@ -470,15 +468,15 @@ name: rest-api
 stage: prod
 
 inputs:
-  name: ${name} # Results in "rest-api"
+  name: ${name} # 该例子中的 name 值为 "rest-api"
 
 ```
 
-#### Variables: Environment Variables
+#### 变量：环境变量 Environment Variables
 
-You can reference Environment Variables (e.g. those that you defined in the `.env` file or that you've set in your environment manually) directly in `serverless.yml` by using the `${env}` Variable.
+你可以直接在 `serverless.yml` 中通过 `${env}` 的方式，直接引用环境变量配置（包含 `.env` 文件中的环境变量配置，以及手动配置在环境中的变量参数）
 
-For example, if you want to reference the `REGION` environment variable, you could do that with `${env:REGION}`.
+例如，如果你希望引用环境变量 `REGION`，可以直接这样引用 `{env:REGION}`  
 
 ```yml
 component: express
@@ -491,11 +489,11 @@ inputs:
   region: ${env:REGION}
 ```
 
-#### Variables: Outputs
+#### 变量：输出 Outputs
 
-Perhaps one of the most useful Variables is the ability to reference Outputs from other Component Instances that you have already deployed.  This allows you to share configuration/data easily across as many Component Instances as you'd like.
+将其他 Component 部署完成后的输出作为变量进行传递是变量引用最重要的功能之一。该能力支持在不同的 Component 方便的共享配置信息，对于构建 Serverless 架构不可或缺。
 
-If you want to reference an Output of another Component Instance, use the `${output:[app]:[stage]:[instance name].[output]}` syntax, like this:
+如果你希望在 Component 中引用其他 Component 的输出信息，可以通过如下语法进行配置：`${output:[app]:[stage]:[instance name].[output]}` 
 
 ```yml
 component: express
@@ -505,14 +503,13 @@ name: rest-api
 stage: prod
 
 inputs:
-  roleArn: ${output:[STAGE]:[APP]:[INSTANCE].arn} # Fetches an output from another component instance that is already deployed
+  roleArn: ${output:[STAGE]:[APP]:[INSTANCE].arn} # 获取已经部署的其他 Component 中的 output 信息
 
 ```
 
-You can access Outputs across any App, Instance, in an any Stage, within the same Org.
+当前支持获取相同组织(Org)下，不同 App，实例以及不同环境(Stage）中的输出信息。 
 
-A useful feature of this is the ability to share resources easily, and even do so across environments.  This is useful when developers want to deploy a Component Instance in their own personal Stage, but access shared resources within a common "development" Stage, like a database.  This way, the developers on your team do not have to recreate the entire development stage to perform their feature work or bug fix, only the Component Instance that needs changes.
-
+该能力的一个应用场景是可以支持横跨不同环境(Stage）共享资源信息，当一个开发者在个人的环境中开发一个 Component 实例时，如果他希望获取公共的 “dev” 环境中的配置信息时，即可采用该方式引用。例如获取 DB 的参数配置等。用这种方式团队中的开发者无需重新为个人环境部署一套全新资源即可完成特性开发、bug修复等工作，只需要部署一个新的 Component 实例并且复用公共配置即可。
 
 <br/>
 
@@ -819,11 +816,11 @@ Components 依赖云服务作为状态的来源，并用其存储状态信息。
 
 `--debug` - 列出组件移除过程中 `console.log()` 输出的移除操作和状态等日志信息。
 
-<!-- #### `serverless info`
+#### `serverless info`
 
-Fetches information of an Instance of a Component.
+获取并展示一个 Component 实例的相关信息
 
-`--debug` - Lists `state`. -->
+`--debug` - 列出更多 `state`. 
 
 #### `serverless dev`
 
