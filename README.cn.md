@@ -516,36 +516,37 @@ inputs:
 
 # 开发 Components
 
-<!-- If you want to build your own Serverless Component, there are 2 essential files you need to be aware of:
+如果你希望开发自己的 Serverless Component，那么必须要关注一下两个文件：
 
-- `serverless.component.yml` - This contains the definition of your Serverless Component.
-- `serverelss.js` - This contains your Serverless Component's code.
+- `serverless.component.yml` - 该文件包含了你的 Serverless Component 的定义
 
-One of the most important things to note is that Serverless Components **only** run in the cloud and **do not** run locally. That means, to run and test your Component, you must publish it first (it takes only few seconds to publish). We're continuing to improve this workflow.  Here's how to do it...
+- `serverelss.js` - 该文件包含你的 Serverless Component 的代码
+
+有一点需要特别注意，Serverless Component **只能**运行在云端，**不支持**在本地运行。也就是说，如果你要运行或者测试你的 Component，你必须先将该组件发布到云端注册中心上（通常只需要几秒钟的时间）。当前对 Component 的开发体验在持续优化中，当前的开发原理如下：
 
 ### serverless.component.yml
 
-To declare a Serverless Component and make it available within the Serverless Registry, you must create a `serverless.component.yml` file with the following properties:
+为了声明一个新的 Serverless Component 并且将他发布在 Serverless 注册中心上，必须要创建一个包含如下属性的 `serverless.component.yml` 文件：
 
 ```yaml
 # serverless.component.yml
 
-name: express # Required. The name of the Component
-version: 0.0.4 # Required. The version of the Component
-author: eahefnawy # Required. The author of the Component
-org: serverlessinc # Required. The Serverless Framework org which owns this Component
-description: Deploys Serverless Express.js Apps # Optional. The description of the Component
-keywords: aws, serverless, express # Optional. The keywords of the Component to make it easier to find at registry.serverless.com
-repo: https://github.com/owner/project # Optional. The code repository of the Component
-license: MIT # Optional. The license of the Component code
-main: ./src # Optional. The directory which contains the Component code
+name: express # 必填，Component 名称
+version: 0.0.4 # 必填，Component 版本
+author: eahefnawy # 必填，Component 作者
+org: serverlessinc # 必填，展示开发这个 Component 的组织信息
+description: Deploys Serverless Express.js Apps # 选填，Component 的描述
+keywords: tencent, serverless, express # 选填，Component 的关键词可以让它更容易在 registry.serverless.com 中被搜到
+repo: https://github.com/owner/project # 选填，Component 的项目代码
+license: MIT # 选填，Component 代码所遵循的协议
+main: ./src # 选填，Component 的代码路径
 ```
 
 ### serverless.js
 
-A `serverless.js` file contains the Serverless Component's code.
+`serverless.js` 文件包含了 Serverless Component 的代码。
 
-To make a bare minimum Serverless Component, create a `serverless.js` file, extend the Component class and add a `deploy` method like this:
+如果要实现一个最基本的 Serverless Component，只需创建一个 `serverless.js` 文件，扩展 Component 类并且增加一个 `deploy` 方法即可，如下所示
 
 ```javascript
 // serverless.js
@@ -560,18 +561,17 @@ class MyComponent extends Component {
 
 module.exports = MyComponent
 ```
+`deploy()` 方法是必须的，Component 的操作逻辑都会包含在其中。当客户运行 `$ serverless deploy` 命令时，就会调用 `deploy()` 方法。  
 
-`deploy()` is always required. It is where the logic resides in order for your Component to _make_ something. Whenever you run the `$ serverless deploy` command, it's always calling the `deploy()` method.
+你也可以在类中增加其他的方法，例如 `remove()` 方法一般是第二步要实现的逻辑，该方法支持通过 `$ serverless remove` 命令移除你的 Serverless Component 创建的项目资源。
 
-You can also add other methods to this class. A `remove()` method is often the next logical choice, if you want your Serverless Component to remove the things it creates, via `$ serverless remove`.
+除了 `deploy()` 和 `remove()` 之外，Serverless Component 也支持更多的自定义方法，来完成更多的自动化操作。 
 
-You can add as many methods as you want. This is interesting because it enables you to ship more automation with your Component, than logic that merely _deploys_ and _removes_ something.
+Serverless Components 当前还在较为初期的阶段，但已经逐步在支持 `test()` 方法，或者 `logs()` 和 `metrics()` 方法。甚至是 `seed()` 方法用于建立数据库 Component 的初始化值。总的来说，Component 将会支持更多的能力，来更好的实现 Serverless 应用的开发、部署和调试等能力。
 
-It's still early days for Serverless Components, but we are starting to work on Components that ship with their own `test()` function, or their own `logs()` and `metrics()` functions, or `seed()` for establishing initial values in a database Component. Overall, there is a lot of opportunity here to deliver Components that are loaded with useful automation.
+除了 `deploy()` 方法必须实现之外，其他的都是可选的。所有的方法都会输入 `inputs` 对象，之后返回 `outputs` 对象。 
 
-All methods other than the `deploy()` method are optional. All methods take a single `inputs` object, not individual arguments, and return a single `outputs` object.
-
-Here is what it looks like to add a `remove` method, as well as a custom method.
+下面是一个增加了 `remove` 方法的例子，以及一个自定义方法的例子：
 
 ```javascript
 // serverless.js
@@ -609,8 +609,10 @@ class MyComponent extends Component {
 
 module.exports = MyComponent
 ```
-
+在
 When inside a Component method, `this` comes with utilities which you can use. Here is a guide to what's available to you within the context of a Component.
+
+在 Component 方法里，通过 this 方法指定当前的运行环境，包含了一些可用的工具。下面有一些指南可以展示出在 Component 方法中哪些语法是可用的。
 
 ```javascript
 // serverless.js
@@ -647,11 +649,11 @@ class MyComponent extends Component {
 module.exports = MyComponent
 ```
 
-### Working With Source Code
+### Component 中涉及源代码的场景
 
-When working with a Component that requires source code (e.g. you are creating a Component that will run on AWS Lambda), if you make the `src` one of your inputs, anything specified there will be automatically uploaded and made available within the Component environment.
+当开发 Component 的时候涉及到需要附源代码的场景时（例如，创建了一个需要运行在腾讯云 SCF 平台上的 Component），如果你在 inputs 中指定了 `src` 字段，则在这个目录下的所有文件会被自动打包上传，从而可以被 Component 环境所使用。
 
-Within your Component, the `inputs.src` will point to a zip file of the source files within your environment.  If you wish to unzip the source files, use this helpful utility method:
+在你的 Component 中， `inputs.src` 将会指向你环境中源文件的一个 zip 包，如果希望解压这个源文件，可以通过如下方法来实现：
 
 ```javascript
 async deploy(inputs = {}) {
@@ -662,7 +664,7 @@ async deploy(inputs = {}) {
 }
 ```
 
-Now, you are free to manipulate the source files.  When finished, you may want to use this utility method to zip up the source files again because in some circumstances you will next want to upload the code to a compute service (e.g. AWS Lambda).
+解压完毕后，可以很方便的操作这些源文件了。操作完毕后，如果希望再次打包，也可以通过如下方法来实现（例如在某些场景下，需要再次压缩源文件并且上传到云函数等计算平台上）：
 
 ```javascript
 async deploy(inputs = {}) {
@@ -673,9 +675,9 @@ async deploy(inputs = {}) {
 }
 ```
 
-### Adding The Serverless Agent
+### 增加 Serverless Agent
 
-If your Component runs code, and you want to enable streaming logs, errors and transactions for you Component via Serverless Dev Mode (`serverless dev`), be sure to add the Serverless SDK into the deployed application/logic.  We offer some helpful utility methods to make this possible:
+如果你的 Component 运行代码时，你希望可以通过开发模式 (`serverless dev`) 支持实时的流日志输出，或者错误信息等信息的打印等，则需要将 Serverless SDK 增加到部署的逻辑中，可以参考如下实现方式：
 
 ```javascript
 
@@ -694,21 +696,21 @@ If your Component runs code, and you want to enable streaming logs, errors and t
   console.log(`Files zipped into ${zipPath}...`)
 ```
 
-After this, you'll likely want to upload the code to a compute service (e.g. AWS Lambda).
+增加 SDK 之后，可能需要再次将代码答辩上传到云服务中（例如云函数 SCF）
 
-### Development Workflow
+### 开发流程
 
-Serverless Components only run in the cloud and cannot be run locally. This presents some tremendous advantages to Component consumers, and we've added some workflow tricks to make the authoring workflow easier. Here they are...
+Serverless Components 仅能在云端运行，而不支持在本地运行。这对 Component 的用户而已有巨大的优势。同时我们也通过下面的开发流程让开发一个 Component 变得更加容易。
 
-When you have added or updated the code of your Serverless Component and you want to test the change, you will need to publish it first. Since you don't want to publish your changes to a proper version of your Component just for testing (because people may be using it), we allow for you to publish a "dev" version of your Component.
+当你新增或者更新 Serverless Components 的代码时，如果希望测试变化的部分，那么需要先发布该 Component 到云端。由于我们不希望发布的测试版本会影响到正式版本的 Component（可能有用户正在使用这些正式版本），因此当前支持直接发布 "dev" 版本的 Component，用于隔离正式环境和开发环境。
 
-Simply run the following command to publish your Serverless Component to the "dev" version:
+运行下面的命令即可发布 Serverless Component 到 "dev" 版本中。
 
 ```console
 $ serverless registry publish --dev
 ```
 
-You can test the "dev" version of your Component in `serverless.yml`, by including a `@dev` in your Component name, like this:
+在 `serverless.yml` 中，你同样可以指定 "dev" 版本进行测试，只需在 Component 名称后面增加 `@dev` 即可，如下所示： 
 
 ```yaml
 # serverless.yml
@@ -722,13 +724,12 @@ inputs:
   src: ./src
 ```
 
-Run your Component command to test your changes:
+运行如下命令来检测项目变化：
 
 ```shell
 $ serverless deploy --debug
 ```
-
-When writing a Component, we recomend to always use the `--debug` flag, so that the Component's `console.log()` statements are sent to the CLI. These are handy to use in Serverless Components, since they describe what the Component is doing. We recommend you add `console.log()` statements to your Component wherever you think they are necessary.
+在开发 Component 时，我们推荐通过 `--debug` 来获取 `console.log()` 日志信息，这样可以更清晰的看到 Component 的部署阶段和流程，推荐在你认为需要的地方都增加 `console.log()` 来记录部署状态，从而更好地开发和排查问题。
 
 ```javascript
 class MyComponent extends Component {
@@ -742,7 +743,7 @@ class MyComponent extends Component {
 }
 ```
 
-When you're ready to publish a new version for others to use, update the version in `serverless.component.yml`, then run publish without the `--dev` flag.
+当你准备好发布一个正式版本的 Component 时，更新 `serverless.component.yml` 中的版本号，之后直接运行 publish 命令，不需要加 `--dev` 参数。
 
 ```yaml
 # serverless.component.yml
@@ -754,12 +755,9 @@ name: express@0.0.1
 $ serverless publish
 
 Serverless: Successfully publish express@0.0.1
-``` -->
+```
 
 ### 开发建议
-
-当你开始开发 Serverless Components 的时候，这里有一些实用的开发建议：
-
 
 #### 结果导向/自上而下
 
