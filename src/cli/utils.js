@@ -251,6 +251,64 @@ const getInstanceDashboardUrl = (instanceYaml) => {
 }
 
 /**
+ * Reads a serverless instance config file in a given directory path
+ * @param {*} directoryPath
+ */
+const loadInstanceConfig = (directoryPath) => {
+  directoryPath = path.resolve(directoryPath)
+  const ymlFilePath = path.join(directoryPath, `serverless.yml`)
+  const yamlFilePath = path.join(directoryPath, `serverless.yaml`)
+  const jsonFilePath = path.join(directoryPath, `serverless.json`)
+  let filePath
+  let isYaml = false
+  let instanceFile
+
+  // Check to see if exists and is yaml or json file
+  if (fileExistsSync(ymlFilePath)) {
+    filePath = ymlFilePath
+    isYaml = true
+  }
+  if (fileExistsSync(yamlFilePath)) {
+    filePath = yamlFilePath
+    isYaml = true
+  }
+  if (fileExistsSync(jsonFilePath)) {
+    filePath = jsonFilePath
+  }
+
+  if (!filePath) {
+    return null
+  }
+
+  // Read file
+  if (isYaml) {
+    try {
+      instanceFile = readFileSync(filePath)
+    } catch (e) {
+      // todo currently our YAML parser does not support
+      // CF schema (!Ref for example). So we silent that error
+      // because the framework can deal with that
+      if (e.name !== 'YAMLException') {
+        throw e
+      }
+    }
+  } else {
+    instanceFile = readFileSync(filePath)
+  }
+
+  // Set default stage
+  if (!instanceFile.stage) {
+    instanceFile.stage = 'dev'
+  }
+
+  if (!instanceFile.app) {
+    instanceFile.app = instanceFile.name
+  }
+
+  return instanceFile
+}
+
+/**
  * THIS IS USED BY SFV1.  DO NOT MODIFY OR DELETE
  */
 const legacyLoadInstanceConfig = (directoryPath) => {
@@ -368,6 +426,7 @@ module.exports = {
   getDirSize,
   pack,
   getInstanceDashboardUrl,
+  loadInstanceConfig,
   legacyLoadComponentConfig,
   legacyLoadInstanceConfig,
   IS_IN_CHINA

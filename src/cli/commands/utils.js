@@ -12,7 +12,7 @@ const {
   refreshToken,
   listTenants
 } = require('@serverless/platform-sdk')
-const { fileExistsSync, readFileSync, resolveInputVariables } = require('../utils')
+const { fileExistsSync, loadInstanceConfig, resolveInputVariables } = require('../utils')
 
 const getDefaultOrgName = async () => {
   const res = readConfigFile()
@@ -115,46 +115,11 @@ const loadInstanceCredentials = (stage) => {
  * Reads a serverless instance config file in a given directory path
  * @param {*} directoryPath
  */
-const loadInstanceConfig = async (directoryPath) => {
-  directoryPath = path.resolve(directoryPath)
-  const ymlFilePath = path.join(directoryPath, `serverless.yml`)
-  const yamlFilePath = path.join(directoryPath, `serverless.yaml`)
-  const jsonFilePath = path.join(directoryPath, `serverless.json`)
-  let filePath
-  let isYaml = false
-  let instanceFile
+const loadAwsInstanceConfig = async (directoryPath) => {
+  const instanceFile = loadInstanceConfig(directoryPath)
 
-  // Check to see if exists and is yaml or json file
-  if (fileExistsSync(ymlFilePath)) {
-    filePath = ymlFilePath
-    isYaml = true
-  }
-  if (fileExistsSync(yamlFilePath)) {
-    filePath = yamlFilePath
-    isYaml = true
-  }
-  if (fileExistsSync(jsonFilePath)) {
-    filePath = jsonFilePath
-  }
-
-  if (!filePath) {
+  if (!instanceFile) {
     throw new Error(`serverless config file was not found`)
-  }
-
-  // Read file
-  if (isYaml) {
-    try {
-      instanceFile = readFileSync(filePath)
-    } catch (e) {
-      // todo currently our YAML parser does not support
-      // CF schema (!Ref for example). So we silent that error
-      // because the framework can deal with that
-      if (e.name !== 'YAMLException') {
-        throw e
-      }
-    }
-  } else {
-    instanceFile = readFileSync(filePath)
   }
 
   if (!instanceFile.name) {
@@ -163,11 +128,6 @@ const loadInstanceConfig = async (directoryPath) => {
 
   if (!instanceFile.component) {
     throw new Error(`Missing "component" property in serverless.yml`)
-  }
-
-  // Set default stage
-  if (!instanceFile.stage) {
-    instanceFile.stage = 'dev'
   }
 
   // if stage flag provided, overwrite
@@ -186,10 +146,6 @@ const loadInstanceConfig = async (directoryPath) => {
 
   if (!instanceFile.org) {
     throw new Error(`Missing "org" property in serverless.yml`)
-  }
-
-  if (!instanceFile.app) {
-    instanceFile.app = instanceFile.name
   }
 
   // if app flag provided, overwrite
@@ -285,7 +241,7 @@ const getOrCreateAccessKey = async (org) => {
 }
 
 module.exports = {
-  loadInstanceConfig,
+  loadInstanceConfig: loadAwsInstanceConfig,
   loadInstanceCredentials,
   getOrCreateAccessKey,
   getAccessKey,
