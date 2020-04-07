@@ -10,7 +10,6 @@
 
 Serverless Components 是 [Serverless Framework](https://github.com/serverless/serverless) 重磅推出的基础设置编排能力，支持开发者通过 Serverless Components 构建，组合并部署你的 Serverless 应用。
 
-
 <br/>
 
 - [x] **全面覆盖** - 既能支持基础设施的 Components，也可以支持更高维度的，场景级别的 Components。
@@ -26,11 +25,11 @@ Here's how to use a Serverless Component:
 ```yaml
 # serverless.yml
 
-component: express  # 注册中心的组件名称
-name: express-api      # 组件实例的名称
+component: express # 注册中心的组件名称
+name: express-api # 组件实例的名称
 
-inputs:             # 对应的组件配置
-  src: ./src        # 代码路径，在此处代码路径指定为 src    
+inputs: # 对应的组件配置
+  src: ./src # 代码路径，在此处代码路径指定为 src
 ```
 
 # 文档说明
@@ -57,7 +56,7 @@ inputs:             # 对应的组件配置
 - [目前支持的 Components](https://github.com/serverless-components)
   - [express](https://github.com/serverless-components/tencent-express/tree/v2)
   - [website](https://github.com/serverless-components/tencent-website/tree/v2)
-  - [tencent-scf](https://github.com/serverless-components/tencent-scf/tree/v2)  
+  - [tencent-scf](https://github.com/serverless-components/tencent-scf/tree/v2)
 - [CLI 命令列表](#cli-命令列表)
 - [模板](https://github.com/serverless/components/tree/master/templates)
 - [中文技术社区](https://china.serverless.com/)
@@ -260,7 +259,6 @@ inputs:
 
 提升 Component 的 Input 类型是我们当前高优先级在解决的问题。
 
-
 ### 部署
 
 当前 Serverless Framework 框架可以通过 `serverless deploy` 命令方便的对 component 进行部署。
@@ -364,7 +362,7 @@ SERVERLESS_STAGE=prod
 $ serverless deploy --stage prod
 ```
 
-注： CLI 中配置参数的方式会覆盖 `serverless.yml` 和环境变量中的 `stage` 配置，但环境变量中的配置只会覆盖  `serverless.yml` 中的 `stage` 字段
+注： CLI 中配置参数的方式会覆盖 `serverless.yml` 和环境变量中的 `stage` 配置，但环境变量中的配置只会覆盖 `serverless.yml` 中的 `stage` 字段
 
 近期 Serverless Component 已经支持通过不同的 `.env` 指定不同环境中的参数配置。其中，每个文件必须采用如下命名规范：`.env.STAGE`。例如，如果你希望运行 prod 生成环境中的配置，则环境变量文件需要命名为 `.env.prod` 才可以被加载，否则会默认读取 `.env` 文件中的配置。
 
@@ -403,7 +401,6 @@ stage: prod
 
 inputs:
   name: ${org}-api # 该例子中的 name 值为 "acme-api"
-
 ```
 
 **注：** 如果未指定 `org` 参数，则默认的值为登录后腾讯云的 appid 信息。当前支持通过如下命令修改 `org` 参数：
@@ -425,7 +422,6 @@ stage: prod
 
 inputs:
   name: ${stage}-api # 该例子中的 name 值为 "prod-api"
-
 ```
 
 **注：** 如果未指定 `stage` 参数，则默认的值为 `dev` 。当前支持通过 `--stage` 参数修改 `stage` 的值：
@@ -447,7 +443,6 @@ stage: prod
 
 inputs:
   name: ${app}-api # 该例子中的 name 值为 "ecommerce-api"
-
 ```
 
 **注：** 如果未指定 `app` 参数，则默认的 app 值会和 `serverless.yml` 中的 name 保持一致，当前支持通过 `--app` 参数修改 `app` 的值：
@@ -469,14 +464,13 @@ stage: prod
 
 inputs:
   name: ${name} # 该例子中的 name 值为 "rest-api"
-
 ```
 
 #### 变量：环境变量 Environment Variables
 
 你可以直接在 `serverless.yml` 中通过 `${env}` 的方式，直接引用环境变量配置（包含 `.env` 文件中的环境变量配置，以及手动配置在环境中的变量参数）
 
-例如，如果你希望引用环境变量 `REGION`，可以直接这样引用 `{env:REGION}`  
+例如，如果你希望引用环境变量 `REGION`，可以直接这样引用 `{env:REGION}`
 
 ```yml
 component: express
@@ -493,7 +487,7 @@ inputs:
 
 将其他 Component 部署完成后的输出作为变量进行传递是变量引用最重要的功能之一。该能力支持在不同的 Component 方便的共享配置信息，对于构建 Serverless 架构不可或缺。
 
-如果你希望在 Component 中引用其他 Component 的输出信息，可以通过如下语法进行配置：`${output:[app]:[stage]:[instance name].[output]}` 
+如果你希望在 Component 中引用其他 Component 的输出信息，可以通过如下语法进行配置：`${output:[app]:[stage]:[instance name].[output]}`
 
 ```yml
 component: express
@@ -504,15 +498,13 @@ stage: prod
 
 inputs:
   roleArn: ${output:[STAGE]:[APP]:[INSTANCE].arn} # 获取已经部署的其他 Component 中的 output 信息
-
 ```
 
-当前支持获取相同组织(Org)下，不同 App，实例以及不同环境(Stage）中的输出信息。 
+当前支持获取相同组织(Org)下，不同 App，实例以及不同环境(Stage）中的输出信息。
 
-该能力的一个应用场景是可以支持横跨不同环境(Stage）共享资源信息，当一个开发者在个人的环境中开发一个 Component 实例时，如果他希望获取公共的 “dev” 环境中的配置信息时，即可采用该方式引用。例如获取 DB 的参数配置等。用这种方式团队中的开发者无需重新为个人环境部署一套全新资源即可完成特性开发、bug修复等工作，只需要部署一个新的 Component 实例并且复用公共配置即可。
+该能力的一个应用场景是可以支持横跨不同环境(Stage）共享资源信息，当一个开发者在个人的环境中开发一个 Component 实例时，如果他希望获取公共的 “dev” 环境中的配置信息时，即可采用该方式引用。例如获取 DB 的参数配置等。用这种方式团队中的开发者无需重新为个人环境部署一套全新资源即可完成特性开发、bug 修复等工作，只需要部署一个新的 Component 实例并且复用公共配置即可。
 
 <br/>
-
 
 # 开发 Components
 
@@ -561,15 +553,16 @@ class MyComponent extends Component {
 
 module.exports = MyComponent
 ```
-`deploy()` 方法是必须的，Component 的操作逻辑都会包含在其中。当客户运行 `$ serverless deploy` 命令时，就会调用 `deploy()` 方法。  
+
+`deploy()` 方法是必须的，Component 的操作逻辑都会包含在其中。当客户运行 `$ serverless deploy` 命令时，就会调用 `deploy()` 方法。
 
 你也可以在类中增加其他的方法，例如 `remove()` 方法一般是第二步要实现的逻辑，该方法支持通过 `$ serverless remove` 命令移除你的 Serverless Component 创建的项目资源。
 
-除了 `deploy()` 和 `remove()` 之外，Serverless Component 也支持更多的自定义方法，来完成更多的自动化操作。 
+除了 `deploy()` 和 `remove()` 之外，Serverless Component 也支持更多的自定义方法，来完成更多的自动化操作。
 
 Serverless Components 当前还在较为初期的阶段，但已经逐步在支持 `test()` 方法，或者 `logs()` 和 `metrics()` 方法。甚至是 `seed()` 方法用于建立数据库 Component 的初始化值。总的来说，Component 将会支持更多的能力，来更好的实现 Serverless 应用的开发、部署和调试等能力。
 
-除了 `deploy()` 方法必须实现之外，其他的都是可选的。所有的方法都会输入 `inputs` 对象，之后返回 `outputs` 对象。 
+除了 `deploy()` 方法必须实现之外，其他的都是可选的。所有的方法都会输入 `inputs` 对象，之后返回 `outputs` 对象。
 
 下面是一个增加了 `remove` 方法的例子，以及一个自定义方法的例子：
 
@@ -579,7 +572,6 @@ Serverless Components 当前还在较为初期的阶段，但已经逐步在支�
 const { Component } = require('@serverless/core')
 
 class MyComponent extends Component {
-
   /*
    * The default functionality to run/provision/update your Component
    * You can run this function by running the "$ serverless deploy" command
@@ -609,6 +601,7 @@ class MyComponent extends Component {
 
 module.exports = MyComponent
 ```
+
 在
 When inside a Component method, `this` comes with utilities which you can use. Here is a guide to what's available to you within the context of a Component.
 
@@ -680,20 +673,19 @@ async deploy(inputs = {}) {
 如果你的 Component 运行代码时，你希望可以通过开发模式 (`serverless dev`) 支持实时的流日志输出，或者错误信息等信息的打印等，则需要将 Serverless SDK 增加到部署的逻辑中，可以参考如下实现方式：
 
 ```javascript
+// unzip source zip file
+console.log(`Unzipping ${inputs.src}...`)
+const sourceDirectory = await instance.unzip(inputs.src)
+console.log(`Files unzipped into ${sourceDirectory}...`)
 
-  // unzip source zip file
-  console.log(`Unzipping ${inputs.src}...`)
-  const sourceDirectory = await instance.unzip(inputs.src)
-  console.log(`Files unzipped into ${sourceDirectory}...`)
+// add sdk to the source directory, add original handler
+console.log(`Installing Serverless Framework SDK...`)
+instance.state.handler = await instance.addSDK(sourceDirectory, '_express/handler.handler')
 
-  // add sdk to the source directory, add original handler
-  console.log(`Installing Serverless Framework SDK...`)
-  instance.state.handler = await instance.addSDK(sourceDirectory, '_express/handler.handler')
-
-  // zip the source directory with the shim and the sdk
-  console.log(`Zipping files...`)
-  const zipPath = await instance.zip(sourceDirectory)
-  console.log(`Files zipped into ${zipPath}...`)
+// zip the source directory with the shim and the sdk
+console.log(`Zipping files...`)
+const zipPath = await instance.zip(sourceDirectory)
+console.log(`Files zipped into ${zipPath}...`)
 ```
 
 增加 SDK 之后，可能需要再次将代码答辩上传到云服务中（例如云函数 SCF）
@@ -710,7 +702,7 @@ Serverless Components 仅能在云端运行，而不支持在本地运行。这�
 $ serverless registry publish --dev
 ```
 
-在 `serverless.yml` 中，你同样可以指定 "dev" 版本进行测试，只需在 Component 名称后面增加 `@dev` 即可，如下所示： 
+在 `serverless.yml` 中，你同样可以指定 "dev" 版本进行测试，只需在 Component 名称后面增加 `@dev` 即可，如下所示：
 
 ```yaml
 # serverless.yml
@@ -729,6 +721,7 @@ inputs:
 ```shell
 $ serverless deploy --debug
 ```
+
 在开发 Component 时，我们推荐通过 `--debug` 来获取 `console.log()` 日志信息，这样可以更清晰的看到 Component 的部署阶段和流程，推荐在你认为需要的地方都增加 `console.log()` 来记录部署状态，从而更好地开发和排查问题。
 
 ```javascript
@@ -818,7 +811,7 @@ Components 依赖云服务作为状态的来源，并用其存储状态信息。
 
 获取并展示一个 Component 实例的相关信息
 
-`--debug` - 列出更多 `state`. 
+`--debug` - 列出更多 `state`.
 
 #### `serverless dev`
 
