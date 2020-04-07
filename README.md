@@ -8,6 +8,11 @@
 
 <br/>
 
+<p align="center">
+  <span>English</span> |
+  <a href="./README.cn.md">简体中文</a>
+</p>
+
 Serverless Components are simple abstractions that enable developers to deploy serverless applications and use-cases easily, via the [Serverless Framework](https://github.com/serverless/serverless).
 
 <br/>
@@ -24,11 +29,11 @@ Here's how to use a Serverless Component:
 ```yaml
 # serverless.yml
 
-component: express  # The name of the Component in the Registry
-name: rest-api      # The name of your instance of this Component
+component: express # The name of the Component in the Registry
+name: rest-api # The name of your instance of this Component
 
-inputs:             # The configuration the Component accepts according to its docs
-  src: ./src        #     In that case the express component accepts source code      
+inputs: # The configuration the Component accepts according to its docs
+  src: ./src #     In that case the express component accepts source code
 ```
 
 # Documentation
@@ -74,7 +79,7 @@ To get started with Serverless Components, install the latest version of the [Se
 $ npm i -g serverless
 ```
 
-After installation, use the `create --template-url` command to install a [Serverless Components Template](./templates), which contains Components as well as boilerplate code, to get you started quickly.  An easy starting point is the Express.js Component:
+After installation, use the `create --template-url` command to install a [Serverless Components Template](./templates), which contains Components as well as boilerplate code, to get you started quickly. An easy starting point is the Express.js Component:
 
 ```shell
 serverless create --template-url https://github.com/serverless/components/tree/master/templates/express
@@ -100,6 +105,7 @@ Deploy...
 ```bash
 $ serverless deploy
 ```
+
 After few seconds, you should get a URL as an output. If you visit that URL you'll see a successful "Request Received" message.
 
 Fetch the your Component Instance's info...
@@ -114,7 +120,7 @@ Run the `serverless dev` command to auto-deploy on save, and have logs and error
 $ serverless dev
 ```
 
-Deploy other Components that you may want to use with your Express Component.  For example, you may want to give your Express application permissions to other resources on your AWS account via the `aws-iam-role` Component.  You may also want an AWS DynamoDB table to use with your Express Component, via the `aws-dynamodb` Component.  There are Templates for both of these in the [Serverless Components Template](./templates) folder.  You can then use them with your `express` Component, like this:
+Deploy other Components that you may want to use with your Express Component. For example, you may want to give your Express application permissions to other resources on your AWS account via the `aws-iam-role` Component. You may also want an AWS DynamoDB table to use with your Express Component, via the `aws-dynamodb` Component. There are Templates for both of these in the [Serverless Components Template](./templates) folder. You can then use them with your `express` Component, like this:
 
 ```yaml
 org: your-org # Your Org
@@ -161,7 +167,6 @@ Check out these [templates](./templates) for more use-cases.
 
 Serverless Components that deploy instantly, removing the need to emulate cloud services locally for fast feedback during the development process.
 
-
 ```bash
 
 $ serverless deploy
@@ -204,13 +209,13 @@ express@0.0.4 › Published
 
 ### Serverless
 
-Serverless Components favor cloud infrastructure with serverless qualities.  They are also entirely vendor agnostic, enabling you to easily use services from different vendors, together. Like, AWS Lambda, AWS S3, Azure Functions, Google Big Query, Twilio, Stripe, Algolia, Cloudflare Workers and more.
+Serverless Components favor cloud infrastructure with serverless qualities. They are also entirely vendor agnostic, enabling you to easily use services from different vendors, together. Like, AWS Lambda, AWS S3, Azure Functions, Google Big Query, Twilio, Stripe, Algolia, Cloudflare Workers and more.
 
 <br/>
 
 # Overview
 
-Serverless Components are libraries of code that know how to provision an outcome/use-case.  They are focused primarily on use-cases built on cloud infrastructure with serverless qualities, enabling you to deliver functionality with radically low operational cost, without having to be very knowledgeable about the underlying infrastructure. Serverless Components are to serverless, back-end use-cases, what React Components are to front-end use-cases.
+Serverless Components are libraries of code that know how to provision an outcome/use-case. They are focused primarily on use-cases built on cloud infrastructure with serverless qualities, enabling you to deliver functionality with radically low operational cost, without having to be very knowledgeable about the underlying infrastructure. Serverless Components are to serverless, back-end use-cases, what React Components are to front-end use-cases.
 
 A Component can be designed to provision low-level infrastructure (e.g. an AWS S3 bucket). However, they can also provision higher-order outcomes (which is when they are at their best). Examples of higher-order outcomes are:
 
@@ -218,7 +223,7 @@ A Component can be designed to provision low-level infrastructure (e.g. an AWS S
 2. A software feature, like user registration, comments, or a payment system.
 3. An entire application, like a blog, video streaming service, or landing page.
 
-Serverless Components are used **declaratively** (via the Serverless Framework's `serverless.yml` file).  They are free to use, and anyone can make and share them by publishing their Component to the Serverless Registry.
+Serverless Components are used **declaratively** (via the Serverless Framework's `serverless.yml` file). They are free to use, and anyone can make and share them by publishing their Component to the Serverless Registry.
 
 <br/>
 
@@ -226,7 +231,7 @@ Serverless Components are used **declaratively** (via the Serverless Framework's
 
 ### serverless.yml
 
-Serverless Components live exclusively in the cloud.  They are discoverable and usable via the Serverless Registry. Please note, the Registry API exists today, but currently does not have a front-end with search functionality. Instead, run `serverless registry` for available components.
+Serverless Components live exclusively in the cloud. They are discoverable and usable via the Serverless Registry. Please note, the Registry API exists today, but currently does not have a front-end with search functionality. Instead, run `serverless registry` for available components.
 
 To use a Serverless Component, declare the name of one that exists in the Serverless Registry in your `serverless.yml`. The syntax looks like this:
 
@@ -263,7 +268,6 @@ inputs:
 ```
 
 Improving the Component Input Types system is one of our current big priorities.
-
 
 ### Deploying
 
@@ -306,7 +310,7 @@ When a Component is finished running, it returns an `outputs` object.
 
 Outputs contain the most important information you need to know from a deployed Component Instance, like the URL of the API or website, or all of the API endpoints.
 
-Outputs can be referenced easily in the `inputs` of other Components.  Just use this syntax:
+Outputs can be referenced easily in the `inputs` of other Components. Just use this syntax:
 
 ```yaml
 # Syntax
@@ -387,7 +391,7 @@ And, you can specify a Stage upon deployment via a CLI flag, which overrides any
 $ serverless deploy --stage prod
 ```
 
-Again, the CLI flag overrides both a `stage` in `serverless.yml` and an Environment Variable.  Whereas an Environment Variable can only override the `stage` in `serverless.yml`.
+Again, the CLI flag overrides both a `stage` in `serverless.yml` and an Environment Variable. Whereas an Environment Variable can only override the `stage` in `serverless.yml`.
 
 Lastly, you can set stage-specific environment variables using separate `.env` files. Each file must be named in the following format: `.env.STAGE`. For example, if you run in the prod stage, the environment variables in `.env.prod` would be loaded, otherwise the default `.env` file (without stage extension) would be loaded.
 
@@ -428,7 +432,6 @@ stage: prod
 
 inputs:
   name: ${org}-api # Results in "acme-api"
-
 ```
 
 **Note:** If you didn't specify an `org`, the default `org` would be the first org you craeted when you first signed up. You can always overwrite the default `org` or the one specified in `serverless.yml` by passing the `--org` option on deploy:
@@ -450,7 +453,6 @@ stage: prod
 
 inputs:
   name: ${stage}-api # Results in "prod-api"
-
 ```
 
 **Note:** If you didn't specify a `stage`, the default stage would be `dev`. You can always overwrite the default `stage` or the one specified in `serverless.yml` by passing the `--stage` option on deploy:
@@ -472,7 +474,6 @@ stage: prod
 
 inputs:
   name: ${app}-api # Results in "ecommerce-api"
-
 ```
 
 **Note:** If you didn't specify an app, the default app name would be the instance name (the `name` property in `serverless.yml`). You can always overwrite the default `app` or the one specified in `serverless.yml` by passing the `--app` option on deploy:
@@ -494,7 +495,6 @@ stage: prod
 
 inputs:
   name: ${name} # Results in "rest-api"
-
 ```
 
 #### Variables: Environment Variables
@@ -516,7 +516,7 @@ inputs:
 
 #### Variables: Outputs
 
-Perhaps one of the most useful Variables is the ability to reference Outputs from other Component Instances that you have already deployed.  This allows you to share configuration/data easily across as many Component Instances as you'd like.
+Perhaps one of the most useful Variables is the ability to reference Outputs from other Component Instances that you have already deployed. This allows you to share configuration/data easily across as many Component Instances as you'd like.
 
 If you want to reference an Output of another Component Instance, use the `${output:[app]:[stage]:[instance name].[output]}` syntax, like this:
 
@@ -529,16 +529,13 @@ stage: prod
 
 inputs:
   roleArn: ${output:[STAGE]:[APP]:[INSTANCE].arn} # Fetches an output from another component instance that is already deployed
-
 ```
 
 You can access Outputs across any App, Instance, in an any Stage, within the same Org.
 
-A useful feature of this is the ability to share resources easily, and even do so across environments.  This is useful when developers want to deploy a Component Instance in their own personal Stage, but access shared resources within a common "development" Stage, like a database.  This way, the developers on your team do not have to recreate the entire development stage to perform their feature work or bug fix, only the Component Instance that needs changes.
-
+A useful feature of this is the ability to share resources easily, and even do so across environments. This is useful when developers want to deploy a Component Instance in their own personal Stage, but access shared resources within a common "development" Stage, like a database. This way, the developers on your team do not have to recreate the entire development stage to perform their feature work or bug fix, only the Component Instance that needs changes.
 
 <br/>
-
 
 # Building Components
 
@@ -547,7 +544,7 @@ If you want to build your own Serverless Component, there are 2 essential files 
 - `serverless.component.yml` - This contains the definition of your Serverless Component.
 - `serverelss.js` - This contains your Serverless Component's code.
 
-One of the most important things to note is that Serverless Components **only** run in the cloud and **do not** run locally. That means, to run and test your Component, you must publish it first (it takes only few seconds to publish). We're continuing to improve this workflow.  Here's how to do it...
+One of the most important things to note is that Serverless Components **only** run in the cloud and **do not** run locally. That means, to run and test your Component, you must publish it first (it takes only few seconds to publish). We're continuing to improve this workflow. Here's how to do it...
 
 ### serverless.component.yml
 
@@ -605,7 +602,6 @@ Here is what it looks like to add a `remove` method, as well as a custom method.
 const { Component } = require('@serverless/core')
 
 class MyComponent extends Component {
-
   /*
    * The default functionality to run/provision/update your Component
    * You can run this function by running the "$ serverless deploy" command
@@ -677,7 +673,7 @@ module.exports = MyComponent
 
 When working with a Component that requires source code (e.g. you are creating a Component that will run on AWS Lambda), if you make the `src` one of your inputs, anything specified there will be automatically uploaded and made available within the Component environment.
 
-Within your Component, the `inputs.src` will point to a zip file of the source files within your environment.  If you wish to unzip the source files, use this helpful utility method:
+Within your Component, the `inputs.src` will point to a zip file of the source files within your environment. If you wish to unzip the source files, use this helpful utility method:
 
 ```javascript
 async deploy(inputs = {}) {
@@ -688,7 +684,7 @@ async deploy(inputs = {}) {
 }
 ```
 
-Now, you are free to manipulate the source files.  When finished, you may want to use this utility method to zip up the source files again because in some circumstances you will next want to upload the code to a compute service (e.g. AWS Lambda).
+Now, you are free to manipulate the source files. When finished, you may want to use this utility method to zip up the source files again because in some circumstances you will next want to upload the code to a compute service (e.g. AWS Lambda).
 
 ```javascript
 async deploy(inputs = {}) {
@@ -701,23 +697,22 @@ async deploy(inputs = {}) {
 
 ### Adding The Serverless Agent
 
-If your Component runs code, and you want to enable streaming logs, errors and transactions for you Component via Serverless Dev Mode (`serverless dev`), be sure to add the Serverless SDK into the deployed application/logic.  We offer some helpful utility methods to make this possible:
+If your Component runs code, and you want to enable streaming logs, errors and transactions for you Component via Serverless Dev Mode (`serverless dev`), be sure to add the Serverless SDK into the deployed application/logic. We offer some helpful utility methods to make this possible:
 
 ```javascript
+// unzip source zip file
+console.log(`Unzipping ${inputs.src}...`)
+const sourceDirectory = await instance.unzip(inputs.src)
+console.log(`Files unzipped into ${sourceDirectory}...`)
 
-  // unzip source zip file
-  console.log(`Unzipping ${inputs.src}...`)
-  const sourceDirectory = await instance.unzip(inputs.src)
-  console.log(`Files unzipped into ${sourceDirectory}...`)
+// add sdk to the source directory, add original handler
+console.log(`Installing Serverless Framework SDK...`)
+instance.state.handler = await instance.addSDK(sourceDirectory, '_express/handler.handler')
 
-  // add sdk to the source directory, add original handler
-  console.log(`Installing Serverless Framework SDK...`)
-  instance.state.handler = await instance.addSDK(sourceDirectory, '_express/handler.handler')
-
-  // zip the source directory with the shim and the sdk
-  console.log(`Zipping files...`)
-  const zipPath = await instance.zip(sourceDirectory)
-  console.log(`Files zipped into ${zipPath}...`)
+// zip the source directory with the shim and the sdk
+console.log(`Zipping files...`)
+const zipPath = await instance.zip(sourceDirectory)
+console.log(`Files zipped into ${zipPath}...`)
 ```
 
 After this, you'll likely want to upload the code to a compute service (e.g. AWS Lambda).
@@ -788,7 +783,7 @@ Here are some development tips when it comes to writing Serverless Components:
 
 #### Start With The Outcome
 
-We recommend starting with a focus on your desired outcome. Create a higher level Component that solves your problem first.  Consider breaking it down into child Components later, if necessary.
+We recommend starting with a focus on your desired outcome. Create a higher level Component that solves your problem first. Consider breaking it down into child Components later, if necessary.
 
 #### Knowing The Outcome Is An Advantage
 
