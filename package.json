@@ -16,6 +16,7 @@
   "author": "Serverless, Inc.",
   "license": "MIT",
   "dependencies": {
+    "@serverless/inquirer": "^1.1.0",
     "@serverless/platform-client": "latest",
     "@serverless/tencent-platform-client": "latest",
     "@serverless/platform-sdk": "^2.3.0",

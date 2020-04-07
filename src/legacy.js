@@ -1,7 +1,14 @@
 const utils = require('./cli/utils')
+const {
+  utils: { isChinaUser }
+} = require('@serverless/tencent-platform-client')
 
 const runningComponents = () => {
   let componentConfig, instanceConfig
+
+  if (process.argv[2] === 'registry') {
+    return true
+  }
 
   try {
     componentConfig = utils.legacyLoadComponentConfig(process.cwd())
@@ -11,7 +18,9 @@ const runningComponents = () => {
   } catch (e) {}
 
   if (!componentConfig && !instanceConfig) {
-    return false
+    // When no in service context and plain `serverless` command, return true when user in China
+    // It's to enable interactive CLI components onboarding for Chinese users
+    return process.argv.length === 2 && isChinaUser()
   }
 
   if (instanceConfig && !instanceConfig.component) {
