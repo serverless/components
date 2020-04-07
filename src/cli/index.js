@@ -2,7 +2,22 @@
  * Serverless Components: CLI Handler
  */
 
+const path = require('path')
 const args = require('minimist')(process.argv.slice(2))
+const { loadInstanceConfig, fileExistsSync } = require('./utils')
+const instanceConfig = loadInstanceConfig(process.cwd())
+const stage = args.stage || (instanceConfig && instanceConfig.stage) || 'dev'
+
+// Load environment variables from eventual .env files
+const dotenv = require('dotenv')
+const defaultEnvFilePath = path.join(process.cwd(), `.env`)
+const stageEnvFilePath = path.join(process.cwd(), `.env.${stage}`)
+if (stage && fileExistsSync(stageEnvFilePath)) {
+  dotenv.config({ path: path.resolve(stageEnvFilePath) })
+} else if (fileExistsSync(defaultEnvFilePath)) {
+  dotenv.config({ path: path.resolve(defaultEnvFilePath) })
+}
+
 const CLI = require('./CLI')
 const commands = require('./commands')
 
