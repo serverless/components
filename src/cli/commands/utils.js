@@ -2,8 +2,6 @@
  * Serverless Components: Utilities
  */
 
-const path = require('path')
-const dotenv = require('dotenv')
 const args = require('minimist')(process.argv.slice(2))
 const {
   readConfigFile,
@@ -12,7 +10,7 @@ const {
   refreshToken,
   listTenants
 } = require('@serverless/platform-sdk')
-const { fileExistsSync, loadInstanceConfig, resolveInputVariables } = require('../utils')
+const { loadInstanceConfig, resolveInputVariables } = require('../utils')
 
 const getDefaultOrgName = async () => {
   const res = readConfigFile()
@@ -50,19 +48,7 @@ const getDefaultOrgName = async () => {
  * Load credentials from a ".env" or ".env.[stage]" file
  * @param {*} stage
  */
-const loadInstanceCredentials = (stage) => {
-  // Load env vars
-  let envVars = {}
-  const defaultEnvFilePath = path.join(process.cwd(), `.env`)
-  const stageEnvFilePath = path.join(process.cwd(), `.env.${stage}`)
-
-  // Load environment variables via .env file
-  if (stage && fileExistsSync(stageEnvFilePath)) {
-    envVars = dotenv.config({ path: path.resolve(stageEnvFilePath) }).parsed || {}
-  } else if (fileExistsSync(defaultEnvFilePath)) {
-    envVars = dotenv.config({ path: path.resolve(defaultEnvFilePath) }).parsed || {}
-  }
-
+const loadInstanceCredentials = () => {
   // Known Provider Environment Variables and their SDK configuration properties
   const providers = {}
 
@@ -101,8 +87,6 @@ const loadInstanceCredentials = (stage) => {
       // Proper environment variables override what's in the .env file
       if (process.env.hasOwnProperty(providerEnvVar)) {
         credentials[provider][providerEnvVars[providerEnvVar]] = process.env[providerEnvVar]
-      } else if (envVars.hasOwnProperty(providerEnvVar)) {
-        credentials[provider][providerEnvVars[providerEnvVar]] = envVars[providerEnvVar]
       }
       continue
     }
@@ -115,7 +99,7 @@ const loadInstanceCredentials = (stage) => {
  * Reads a serverless instance config file in a given directory path
  * @param {*} directoryPath
  */
-const loadAwsInstanceConfig = async (directoryPath) => {
+const loadVendorInstanceConfig = async (directoryPath) => {
   const instanceFile = loadInstanceConfig(directoryPath)
 
   if (!instanceFile) {
@@ -241,7 +225,7 @@ const getOrCreateAccessKey = async (org) => {
 }
 
 module.exports = {
-  loadInstanceConfig: loadAwsInstanceConfig,
+  loadInstanceConfig: loadVendorInstanceConfig,
   loadInstanceCredentials,
   getOrCreateAccessKey,
   getAccessKey,
