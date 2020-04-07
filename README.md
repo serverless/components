@@ -24,13 +24,11 @@ Here's how to use a Serverless Component:
 ```yaml
 # serverless.yml
 
-org: acme # Your Serverless Framework Org
-app: fullstack # Your Serverless Framework App
-component: express@0.0.2 # The name of the Component in the Registry
-name: rest-api # The name of your instance of this Component
+component: express  # The name of the Component in the Registry
+name: rest-api      # The name of your instance of this Component
 
-inputs: # The configuration the Component accepts according to its docs
-  src: ./src
+inputs:             # The configuration the Component accepts according to its docs
+  src: ./src        #     In that case the express component accepts source code      
 ```
 
 # Documentation
@@ -54,6 +52,13 @@ inputs: # The configuration the Component accepts according to its docs
   - [Working With Source Code](#Working-with-source-code)
   - [Adding The Serverless Agent](#Adding-the-serverless-agent)
   - [Development Tips](#development-tips)
+- [Available Components](https://github.com/serverless-components/)
+  - [express](https://github.com/serverless-components/express)
+  - [website](https://github.com/serverless-components/website)
+  - [aws-dynamodb](https://github.com/serverless-components/aws-dynamodb)
+  - [aws-lambda](https://github.com/serverless-components/aws-lambda)
+  - [aws-lambda-layer](https://github.com/serverless-components/aws-lambda-layer)
+  - [aws-iam-role](https://github.com/serverless-components/aws-iam-role)
 - [CLI Commands](#cli-commands)
 - [Templates](./templates)
 - [Artwork](https://github.com/serverless/artwork)
@@ -83,7 +88,7 @@ Next, log in to enable deployment and saving state in the cloud:
 $ serverless login
 ```
 
-Lastly, enter your cloud provider credentials into a `.env` file within the folder that contains your `serverles.yml`.
+Lastly, enter your cloud provider credentials into a `.env` file within the folder that contains your `serverless.yml`.
 
 ```text
 AWS_ACCESS_KEY_ID=12345
@@ -412,7 +417,7 @@ inputs:
 
 #### Variables: Org
 
-You can reference your `org` value in the `inputs` of your YAML in `serverless.yml` by using the `${org}` Variable, like this: 
+You can reference your `org` value in the `inputs` of your YAML in `serverless.yml` by using the `${org}` Variable, like this:
 
 ```yml
 org: acme
@@ -434,7 +439,7 @@ $ serverless deploy --org my-other-org
 
 #### Variables: Stage
 
-You can reference your `stage` value in the `inputs` of your YAML in `serverless.yml` by using the `${stage}` Variable, like this: 
+You can reference your `stage` value in the `inputs` of your YAML in `serverless.yml` by using the `${stage}` Variable, like this:
 
 ```yml
 org: acme
@@ -456,7 +461,7 @@ $ serverless deploy --stage prod
 
 #### Variables: App
 
-You can reference your `app` value in the `inputs` of your YAML in `serverless.yml` by using the `${app}` Variable, like this: 
+You can reference your `app` value in the `inputs` of your YAML in `serverless.yml` by using the `${app}` Variable, like this:
 
 ```yml
 org: acme
@@ -478,7 +483,7 @@ $ serverless deploy --app my-other-app
 
 #### Variables: Name
 
-You can reference your `name` value in the `inputs` of your YAML in `serverless.yml` by using the `${name}` Variable, like this: 
+You can reference your `name` value in the `inputs` of your YAML in `serverless.yml` by using the `${name}` Variable, like this:
 
 ```yml
 org: acme
@@ -494,7 +499,7 @@ inputs:
 
 #### Variables: Environment Variables
 
-You can reference Environment Variables (e.g. those that you defined in the `.env` file or that you've set in your environment manually) directly in `serverless.yml` by using the `${env}` Variable. 
+You can reference Environment Variables (e.g. those that you defined in the `.env` file or that you've set in your environment manually) directly in `serverless.yml` by using the `${env}` Variable.
 
 For example, if you want to reference the `REGION` environment variable, you could do that with `${env:REGION}`.
 
@@ -672,14 +677,14 @@ module.exports = MyComponent
 
 When working with a Component that requires source code (e.g. you are creating a Component that will run on AWS Lambda), if you make the `src` one of your inputs, anything specified there will be automatically uploaded and made available within the Component environment.
 
-Within your Component, you the `inputs.src` will point to a zip file of the source files within your environment.  If you wish to unzip the source files, use this helpful utilty method:
+Within your Component, the `inputs.src` will point to a zip file of the source files within your environment.  If you wish to unzip the source files, use this helpful utility method:
 
 ```javascript
 async deploy(inputs = {}) {
-  
-  // Unzip the source files...  
+
+  // Unzip the source files...
   const sourceDirectory = await this.unzip(inputs.src)
-  
+
 }
 ```
 
@@ -687,16 +692,16 @@ Now, you are free to manipulate the source files.  When finished, you may want t
 
 ```javascript
 async deploy(inputs = {}) {
-  
-  // Zip up the source files...  
+
+  // Zip up the source files...
   const zipPath = await instance.zip(sourceDirectory)
-  
+
 }
 ```
 
 ### Adding The Serverless Agent
 
-If your Component deals runs code, and you want to enable streaming logs, errors and transactions for you Component via Serverless Dev Mode (`serverless dev`), be sure to add the Serverless SDK into the deployed application/logic.  We offer some helpful utility methods to make this possible:
+If your Component runs code, and you want to enable streaming logs, errors and transactions for you Component via Serverless Dev Mode (`serverless dev`), be sure to add the Serverless SDK into the deployed application/logic.  We offer some helpful utility methods to make this possible:
 
 ```javascript
 
@@ -787,7 +792,7 @@ We recommend starting with a focus on your desired outcome. Create a higher leve
 
 #### Knowing The Outcome Is An Advantage
 
-Provisioning infrastructure can be quite complicated. However, Serverless Components have a powerful advantage over general infrastructure provision tools that seek to enable every possible option and combination (e.g. AWS Cloudformation) — Serverless Components know the specific use-case they are trying to deliver.
+Provisioning infrastructure can be quite complicated. However, Serverless Components have a powerful advantage over general infrastructure provisioning tools that seek to enable every possible option and combination (e.g. AWS Cloudformation) — Serverless Components know the specific use-case they are trying to deliver.
 
 One of the most important lessons we've learned about software development tools is that once you know the use-case, you can create a much better tool.
 

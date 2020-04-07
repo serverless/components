@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import lib from './lib'
 import imageHero from './images/hero.png'
 
 export default class App extends Component {
@@ -16,35 +15,14 @@ export default class App extends Component {
    * Component Did Mount
    */
 
-  async componentDidMount() {
-    const self = this
-    await self.getVotes()
-  }
-
-  /**
-   * Get Votes
-   */
-
-  async getVotes() {
-    const self = this
-    if (self.timer) clearInterval(self.timer)
-    const votes = await lib.getVotes()
-    self.setState({ votes: votes.votes || 0 }, () => {
-      self.timer = setInterval(async () => {
-        await self.getVotes()
-      }, 3000)
-    })
-  }
+  async componentDidMount() {}
 
   /**
    * Save Vote
    */
 
   async saveVote() {
-    const self = this
-    this.setState({ votes: this.state.votes + 1 }, async () => {
-      await lib.saveVote()
-    })
+    this.setState({ votes: this.state.votes + 1 })
   }
 
   /**
@@ -61,7 +39,7 @@ export default class App extends Component {
         </div>
 
         <div className='tagline'>
-          a fullstack app built on serverless components via the serverless framework
+          a website built on serverless components via the serverless framework
         </div>
 
         <div className='buttonContainer'>

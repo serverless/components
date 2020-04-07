@@ -208,7 +208,7 @@ const pack = async (inputDirPath, outputFilePath, include = [], exclude = []) =>
     throw new Error('Please provide a valid format. Either a "zip" or a "tar"')
   }
 
-  const patterns = ['**']
+  const patterns = ['**/*']
 
   if (!isNil(exclude)) {
     exclude.forEach((excludedItem) => patterns.push(`!${excludedItem}`))
@@ -347,10 +347,14 @@ const legacyLoadComponentConfig = (directoryPath) => {
   return componentFile
 }
 
-// Same as internal Tencent check:
-// https://github.com/serverless-tencent/serverless-tencent-tools/blob/3c1cabbdb21c0b3ba37248b9c2f609ec552bf8fc/sdk/others/isInChina.js#L12
-const IS_IN_CHINA =
-  new Date().getTimezoneOffset() == -480 || String(process.env.LC_CTYPE).includes('zh_CN')
+const IS_IN_CHINA = (() => {
+  if (process.env.SLS_GEO_LOCATION === 'cn') {
+    return true
+  }
+  return new Intl.DateTimeFormat('en', { timeZoneName: 'long' })
+    .format()
+    .includes('China Standard Time')
+})()
 
 module.exports = {
   sleep,
