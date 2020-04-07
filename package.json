@@ -1,6 +1,6 @@
 {
   "name": "@serverless/components",
-  "version": "2.28.0",
+  "version": "2.28.1",
   "description": "Serverless Components",
   "main": "./src/index.js",
   "bin": {
@@ -28,7 +28,7 @@
     "fs-extra": "^8.1.0",
     "globby": "^10.0.2",
     "js-yaml": "^3.13.1",
-    "minimist": "^1.2.0",
+    "minimist": ">=1.2.3",
     "moment": "^2.24.0",
     "open": "^7.0.2",
     "prettyoutput": "^1.2.0",
