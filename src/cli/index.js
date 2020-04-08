@@ -2,11 +2,42 @@
  * Serverless Components: CLI Handler
  */
 
-const args = require('minimist')(process.argv.slice(2))
+const path = require('path')
+const minimist = require('minimist')
+const dotenv = require('dotenv')
+const { loadInstanceConfig, fileExistsSync } = require('./utils')
+const {
+  utils: { isChinaUser }
+} = require('@serverless/tencent-platform-client')
 const CLI = require('./CLI')
-const commands = require('./commands')
+const { isProjectPath } = require('./utils')
 
 module.exports = async () => {
+  const args = minimist(process.argv.slice(2))
+  const instanceConfig = loadInstanceConfig(process.cwd())
+  const stage = args.stage || (instanceConfig && instanceConfig.stage) || 'dev'
+
+  // Load environment variables from eventual .env files
+  const defaultEnvFilePath = path.join(process.cwd(), `.env`)
+  const stageEnvFilePath = path.join(process.cwd(), `.env.${stage}`)
+  if (stage && fileExistsSync(stageEnvFilePath)) {
+    dotenv.config({ path: path.resolve(stageEnvFilePath) })
+  } else if (fileExistsSync(defaultEnvFilePath)) {
+    dotenv.config({ path: path.resolve(defaultEnvFilePath) })
+  }
+
+  if (process.argv.length === 2 && isChinaUser() && !(await isProjectPath(process.cwd()))) {
+    // Interactive onboarding
+    return require('./interactive-onboarding/cn')()
+  }
+
+  let commands
+  if (isChinaUser()) {
+    commands = require('./commands-cn')
+  } else {
+    commands = require('./commands')
+  }
+
   const command = args._[0] || 'deploy'
   const params = []
   if (args._[1]) {
