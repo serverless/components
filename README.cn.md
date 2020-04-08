@@ -3,7 +3,7 @@
 <br/>
 
 <p align="center">
-  <b>Serverless Components 当前已正式发布上线  <a href="https://github.com/serverless/components/blob/v1/README_CN.md">点击这里查看旧版本 Component </a></b>
+  <b>Serverless Components 当前已正式发布上线  <a href="https://github.com/serverless/components/blob/v1/README_CN.md"> 查看旧版本 Component </a></b>
 </p>
 
 <br/>
@@ -20,7 +20,6 @@ Serverless Components 是 [Serverless Framework](https://github.com/serverless/s
 <br/>
 
 下面通过一个 Serverless Framework Component 的例子，可以看出 Component 多么易用：
-Here's how to use a Serverless Component:
 
 ```yaml
 # serverless.yml
@@ -34,6 +33,7 @@ inputs: # 对应的组件配置
 
 # 文档说明
 
+- [一键部署](#一键部署)
 - [快速开始](#快速开始)
 - [特点](#特点)
 - [概述](#概述)
@@ -49,9 +49,10 @@ inputs: # 对应的组件配置
   - [变量](#变量)
 - [开发 Components](#开发-Components)
   - [Serverless.component.yml](#serverlesscomponentyml)
-  - [Serverless.js 介绍](#Serverless.js-介绍)
-  - [Working With Source Code](#Working-with-source-code)
-  - [Adding The Serverless Agent](#Adding-the-serverless-agent)
+  - [Serverless.js](#serverlessjs)
+  - [Component 中涉及源代码的场景](#component-中涉及源代码的场景)
+  - [增加 Serverless Agent](#增加-serverless-agent)
+  - [开发流程](#开发流程)
   - [开发建议](#开发建议)
 - [目前支持的 Components](https://github.com/serverless-components)
   - [express](https://github.com/serverless-components/tencent-express/tree/v2)
@@ -62,6 +63,52 @@ inputs: # 对应的组件配置
 - [中文技术社区](https://china.serverless.com/)
 
 <br/>
+
+# 一键部署
+
+通过 NPM 安装最新版本的 [Serverless Framework](https://www.github.com/serverless/serverless) ：
+
+```console
+$ npm i -g serverless
+```
+
+之后在命令行中输入 `serverless`，按照引导进行操作，即可部署一个 SCF、Express.js 或者静态网站托管应用。交互流程如下所示：
+
+```
+$ serverless
+
+Serverless: 当前未检测到 Serverless 项目，是否希望新建一个项目？ (Y/n) y
+Serverless: 请选择你希望创建的 Serverless 应用 (Use arrow keys)
+❯ Express.js app
+  SCF Function
+  Website app
+Serverless: 请输入项目名称 tinatest
+
+tinatest 项目已成功创建！
+Serverless: 是否希望立即将该项目部署到云端？ (Y/n) y
+Please scan QR code login from wechat.
+Wait login...
+Login successful for TencentCloud.
+
+serverless ⚡ framework
+Action: "deploy" - Stage: "dev" - App: "scfApp" - Instance: "scfdemo"
+
+FunctionName: scfFunctionName
+Description:
+Namespace:    default
+Runtime:      Nodejs10.15
+Handler:      index.main_handler
+MemorySize:   128
+Triggers:
+  apigw:
+    - https://service-9k0ggfbe-1250000000.gz.apigw.tencentcs.com/release/index
+
+23s › scfdemo › Success
+```
+
+部署完毕后，访问命令行中输出的网页链接，即可访问已经部署成功的应用。
+
+> 如果希望查看部署过程中的详细信息，可以增加 --debug 参数进行查看。
 
 # 快速开始
 
@@ -98,7 +145,7 @@ $ serverless deploy
 $ serverless dev
 ```
 
-除了实时日志输出之外，针对 Node.js 应用，当前也支持云端调试能力。在开启 serverless dev 命令之后，将会自动监听远端端口，并将函数的超时时间临时配置为 900s。此时你可以通过访问 chrome://inspect/#devices 查找远端的调试路径，并直接对云端代码进行断点等调试。在调试模式结束后，需要再次部署从而将代码更新并将超时时间设置为原来的值。
+除了实时日志输出之外，针对 Node.js 应用，当前也支持云端调试能力。在开启 serverless dev 命令之后，将会自动监听远端端口，并将函数的超时时间临时配置为 900s。此时你可以通过访问 chrome://inspect/#devices 查找远端的调试路径，并直接对云端代码进行断点等调试。在调试模式结束后，需要再次部署从而将代码更新并将超时时间设置为原来的值。 详情参考[开发模式和云端调试](https://cloud.tencent.com/document/product/1154/43220)。
 
 当前支持在 Express 组件中引用其他的组件联合进行部署。例如，如果希望引用 `website` 组件中的静态地址，可以直接使用 [Serverless Component 模板](https://github.com/serverless/components/tree/master/templates) 部署其它组件并用如下方式引用。
 
@@ -309,9 +356,9 @@ ${output:prod:ecommerce:products-database.name}
 
 ### 账号配置
 
-在部署时，无论是使用 `serverless.yml` 还是 `serverless.js`，Serverless Components 会在当前目录寻找 `.env` 或者 `.env_temp` 文件。
+在部署时，无论是使用 `serverless.yml` 还是 `serverless.js`，Serverless Components 会在当前目录寻找 `.env` 文件。
 
-部署过程中，如果 `.env` 或者 `.env_temp` 文件存在，Serverless Components 会将其作为环境变量上传。如果你使用的和各云厂商提供的 `secretId` 和 `secretKey` 字段一致的环境变量名，Serverless Components 在部署期间会自动将其注入到需要该秘钥的组件中，用来创建基础设施服务。
+部署过程中，如果 `.env` 文件存在，Serverless Components 会将其作为环境变量上传。如果你使用的和各云厂商提供的 `secretId` 和 `secretKey` 字段一致的环境变量名，Serverless Components 在部署期间会自动将其注入到需要该秘钥的组件中，用来创建基础设施服务。
 
 如果你按照如下方式配置，这些秘钥可以被 `serverless.yml` 以及 `serverless.js` 中的所有 Serverless Components 使用，也包括其中引用到的基础组件。
 
@@ -319,7 +366,7 @@ ${output:prod:ecommerce:products-database.name}
 
 #### 腾讯云账号配置
 
-> 注：当前腾讯云支持通过`微信`扫描二维码一键授权登录/注册，扫码生成的临时秘钥文件为 `.env_temp` ，但目前该秘钥最长可以支持 30 天有效期授权，过期需要重新授权。如果需要持久秘钥或者在角色中提供了其他权限控制，也可以通过下面方式填写 `.env` 文件进行持久授权。
+> 注：当前腾讯云支持通过`微信`扫描二维码一键授权登录/注册，扫码生成的临时秘钥文件为 `.env` ，但目前该秘钥最长可以支持 30 天有效期授权，过期需要重新授权。如果需要持久秘钥或者在角色中提供了其他权限控制，也可以通过下面方式填写 `.env` 文件进行持久授权。
 
 ```bash
 TENCENT_SECRET_ID=123456789
@@ -328,11 +375,11 @@ TENCENT_SECRET_KEY=123456789
 
 组件也可以通过 `this.context.credentials.tencent` 来获取腾讯云的秘钥配置，返回的格式如下所示：
 
-```js
+```json
 {
-  secret_id: '123456789',
-	secret_key: '123456789',
-  region: 'ap-guangzhou'
+  "secret_id": "123456789",
+  "secret_key": "123456789",
+  "region": "ap-guangzhou"
 }
 ```
 
@@ -816,3 +863,7 @@ Components 依赖云服务作为状态的来源，并用其存储状态信息。
 #### `serverless dev`
 
 启动 DEV MODE 开发者模式，通过检测 Component 的状态变化，自动部署变更信息。同时支持在命令行中实时输出运行日志，调用信息和错误等。此外，支持对 Node.js 应用进行云端调试。
+
+#### `serverless login`
+
+支持通过 login 命令，通过微信扫描二维码的方式，登录腾讯云账号并授权对关联资源进行操作。
