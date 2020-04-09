@@ -3,7 +3,7 @@
  */
 
 const path = require('path')
-const { ServerlessSDK } = require('@serverless/tencent-platform-client')
+const { ServerlessSDK } = require('@serverless/platform-client-china')
 const utils = require('./utils')
 
 module.exports = async (config, cli, command) => {
