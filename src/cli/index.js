@@ -8,7 +8,7 @@ const dotenv = require('dotenv')
 const { loadInstanceConfig, fileExistsSync } = require('./utils')
 const {
   utils: { isChinaUser }
-} = require('@serverless/tencent-platform-client')
+} = require('@serverless/platform-client-china')
 const CLI = require('./CLI')
 const { isProjectPath } = require('./utils')
 

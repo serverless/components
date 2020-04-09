@@ -1,7 +1,7 @@
 const utils = require('./cli/utils')
 const {
   utils: { isChinaUser }
-} = require('@serverless/tencent-platform-client')
+} = require('@serverless/platform-client-china')
 
 const runningComponents = () => {
   let componentConfig, instanceConfig

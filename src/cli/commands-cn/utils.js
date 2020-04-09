@@ -5,7 +5,7 @@
 const path = require('path')
 const fs = require('fs')
 const args = require('minimist')(process.argv.slice(2))
-const { utils: platformUtils } = require('@serverless/tencent-platform-client')
+const { utils: platformUtils } = require('@serverless/platform-client-china')
 const { loadInstanceConfig, resolveInputVariables } = require('../utils')
 
 const updateEnvFile = (envs) => {
