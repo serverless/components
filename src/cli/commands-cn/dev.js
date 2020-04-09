@@ -6,7 +6,7 @@ const path = require('path')
 const { Writable } = require('stream')
 const ansiEscapes = require('ansi-escapes')
 const chokidar = require('chokidar')
-const { ServerlessSDK, utils: tencentUtils } = require('@serverless/tencent-platform-client')
+const { ServerlessSDK, utils: chinaUtils } = require('@serverless/platform-client-china')
 const utils = require('./utils')
 
 class LogForwardingOutput extends Writable {
@@ -84,9 +84,9 @@ async function updateDeploymentStatus(cli, instanceInfo, startDebug) {
         state: { lambdaArn, region }
       } = instanceInfo
       if (lambdaArn && region) {
-        await tencentUtils.stopTencentRemoteLogAndDebug(lambdaArn, region, cliEventCallback)
+        await chinaUtils.stopTencentRemoteLogAndDebug(lambdaArn, region, cliEventCallback)
         if (startDebug) {
-          await tencentUtils.startTencentRemoteLogAndDebug(lambdaArn, region, cliEventCallback)
+          await chinaUtils.startTencentRemoteLogAndDebug(lambdaArn, region, cliEventCallback)
         }
       }
       cli.log(header, 'grey')

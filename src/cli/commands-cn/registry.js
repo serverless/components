@@ -2,7 +2,7 @@
  * CLI: Command: Registry
  */
 
-const { ServerlessSDK } = require('@serverless/tencent-platform-client')
+const { ServerlessSDK } = require('@serverless/platform-client-china')
 const utils = require('./utils')
 const { loadComponentConfig } = require('../utils')
 

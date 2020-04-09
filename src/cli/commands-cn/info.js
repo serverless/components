@@ -3,7 +3,7 @@
  */
 
 const path = require('path')
-const { ServerlessSDK } = require('@serverless/tencent-platform-client')
+const { ServerlessSDK } = require('@serverless/platform-client-china')
 const utils = require('./utils')
 const chalk = require('chalk')
 const moment = require('moment')
