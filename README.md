@@ -324,7 +324,7 @@ ${output:prod:ecommerce:products-database.name}
 
 ### Credentials
 
-Upon deployment, the Serverless Framework looks for a `.env` file in the current working directory. If a `.env` file exists, the Serverless Framework will send those credentials to the Component and the Component can access them within the `this.credentials` object. However, you must use the following Environment Variable keys:
+Upon deployment, the Serverless Framework looks for a `.env` file in the current working directory. Components can find these credentials within the `this.credentials` object. However, you must use the following Environment Variable keys:
 
 #### AWS Credentials
 
