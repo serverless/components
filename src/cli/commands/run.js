@@ -23,11 +23,14 @@ module.exports = async (config, cli, command) => {
   const instanceYaml = await loadInstanceConfig(process.cwd())
 
   // Presentation
-  const meta = `Action: "${command}" - Stage: "${instanceYaml.stage}" - App: "${instanceYaml.app}" - Instance: "${instanceYaml.name}"`
+  const meta = `Action: "${command}" - Stage: "${instanceYaml.stage}" - Org: "${instanceYaml.org}" - App: "${instanceYaml.app}" - Instance: "${instanceYaml.name}"`
   if (!config.debug) {
     cli.logLogo()
-    cli.log(meta, 'grey')
+    // cli.log(meta, 'grey')
   } else {
+    if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
+      cli.log(`Running in Platform Dev stage`)
+    }
     cli.log(meta)
   }
 
