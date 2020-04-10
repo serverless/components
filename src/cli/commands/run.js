@@ -28,6 +28,9 @@ module.exports = async (config, cli, command) => {
     cli.logLogo()
     // cli.log(meta, 'grey')
   } else {
+    if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
+      cli.log(`Running in Platform Dev stage`)
+    }
     cli.log(meta)
   }
 
