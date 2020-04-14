@@ -48,6 +48,7 @@ const getDefaultOrgName = async () => {
  * Load credentials from a ".env" or ".env.[stage]" file
  * @param {*} stage
  */
+
 const loadInstanceCredentials = () => {
   // Known Provider Environment Variables and their SDK configuration properties
   const providers = {}
@@ -65,10 +66,18 @@ const loadInstanceCredentials = () => {
   providers.google.GOOGLE_CLIENT_EMAIL = 'clientEmail'
   providers.google.GOOGLE_PRIVATE_KEY = 'privateKey'
 
+  // Kubernetes
+  providers.kubernetes = {}
+  providers.kubernetes.KUBERNETES_ENDPOINT = 'endpoint'
+  providers.kubernetes.KUBERNETES_PORT = 'port'
+  providers.kubernetes.KUBERNETES_SERVICE_ACCOUNT_TOKEN = 'serviceAccountToken'
+  providers.kubernetes.KUBERNETES_SKIP_TLS_VERIFY = 'skipTlsVerify'
+
   // Docker
   providers.docker = {}
   providers.docker.DOCKER_USERNAME = 'username'
   providers.docker.DOCKER_PASSWORD = 'password'
+  providers.docker.DOCKER_AUTH = 'auth'
 
   const credentials = {}
 
