@@ -105,12 +105,18 @@ module.exports = async (config, cli, command) => {
     // cli.log()
     // cli.log(`${chalk.grey(`Full details: ${dashboardUrl}`)}`)
   } else if (command === 'remove') {
-    // run remove
     cli.status('Removing', null, 'white')
+
+    // The "inputs" in serverless.yml are only for deploy.  Remove them for all other commands
+    instanceYaml.inputs = {}
+
     await sdk.remove(instanceYaml, instanceCredentials, options)
   } else {
     // run a custom method synchronously to receive outputs directly
     options.sync = true
+
+    // The "inputs" in serverless.yml are only for deploy.  Remove them for all other commands
+    instanceYaml.inputs = {}
 
     cli.status('Running', null, 'white')
     const instance = await sdk.run(command, instanceYaml, instanceCredentials, options)
