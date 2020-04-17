@@ -11,6 +11,8 @@ const {
   listTenants
 } = require('@serverless/platform-sdk')
 const { loadInstanceConfig, resolveInputVariables } = require('../utils')
+const { readdirSync, statSync } = require('fs')
+const { join, basename } = require('path')
 
 const getDefaultOrgName = async () => {
   const res = readConfigFile()
@@ -227,8 +229,67 @@ const getOrCreateAccessKey = async (org) => {
   return user.dashboard.idToken
 }
 
+const getTemplate = async (root) => {
+  const directories = readdirSync(root).filter((f) => statSync(join(root, f)).isDirectory())
+
+  const template = {
+    name: basename(process.cwd()),
+    org: null,
+    app: null, // all components must explicitly set app property
+    stage: null
+  }
+
+  let componentDirectoryFound = false
+  for (const directory of directories) {
+    const directoryPath = join(root, directory)
+
+    const instanceYml = loadInstanceConfig(directoryPath)
+
+    if (instanceYml) {
+      componentDirectoryFound = true
+      const instanceYaml = await loadVendorInstanceConfig(directoryPath)
+
+      if (template.org !== null && template.org !== instanceYaml.org) {
+        throw new Error('Attempting to deploy multiple instances to multiple orgs')
+      }
+
+      if (template.app !== null && template.app !== instanceYaml.app) {
+        throw new Error('Attempting to deploy multiple instances to multiple apps')
+      }
+
+      if (template.stage !== null && template.stage !== instanceYaml.stage) {
+        throw new Error('Attempting to deploy multiple instances to multiple stages')
+      }
+
+      template.org = instanceYaml.org // eslint-disable-line
+      template.app = instanceYaml.app // eslint-disable-line
+      template.stage = instanceYaml.stage // eslint-disable-line
+
+      // update paths in inputs
+      if (instanceYaml.inputs.src) {
+        if (typeof instanceYaml.inputs.src === 'string') {
+          instanceYaml.inputs.src = join(directoryPath, instanceYaml.inputs.src)
+        } else if (typeof instanceYaml.inputs.src === 'object') {
+          if (instanceYaml.inputs.src.src) {
+            instanceYaml.inputs.src.src = join(directoryPath, instanceYaml.inputs.src.src)
+          }
+
+          if (instanceYaml.inputs.src.dist) {
+            instanceYaml.inputs.src.dist = join(directoryPath, instanceYaml.inputs.src.dist)
+          }
+        }
+      }
+
+      template[instanceYml.name] = instanceYaml
+    }
+  }
+
+  return componentDirectoryFound ? template : null
+}
+
 module.exports = {
   loadInstanceConfig: loadVendorInstanceConfig,
+  getTemplate,
   loadInstanceCredentials,
   getOrCreateAccessKey,
   getAccessKey,

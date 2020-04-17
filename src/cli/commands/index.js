@@ -5,6 +5,7 @@ const info = require('./info')
 const create = require('./create')
 const dev = require('./dev')
 const registry = require('./registry')
+const template = require('./template')
 
 module.exports = {
   login,
@@ -13,5 +14,6 @@ module.exports = {
   info,
   create,
   dev,
-  registry
+  registry,
+  template
 }
