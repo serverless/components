@@ -5,11 +5,11 @@
 const { ServerlessSDK } = require('@serverless/platform-client')
 const { getAccessKey, isLoggedIn, loadInstanceConfig, loadInstanceCredentials } = require('./utils')
 const { getInstanceDashboardUrl } = require('../utils')
-const runTemplate = require('./template')
+const runAll = require('./runAll')
 
 module.exports = async (config, cli, command) => {
   if (config.all) {
-    return runTemplate(config, cli, command)
+    return runAll(config, cli, command)
   }
   // Start CLI persistance status
   cli.start('Initializing', { timer: true })

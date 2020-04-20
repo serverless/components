@@ -2,7 +2,17 @@
  * Serverless Components: Utilities
  */
 
-const { contains, isNil, last, split, merge, endsWith, memoizeWith, identity } = require('ramda')
+const {
+  contains,
+  isNil,
+  last,
+  split,
+  merge,
+  endsWith,
+  memoizeWith,
+  identity,
+  isEmpty
+} = require('ramda')
 const path = require('path')
 const axios = require('axios')
 const globby = require('globby')
@@ -10,6 +20,7 @@ const AdmZip = require('adm-zip')
 const fse = require('fs-extra')
 const YAML = require('js-yaml')
 const traverse = require('traverse')
+const { Graph, alg } = require('graphlib')
 
 /**
  * Wait for a number of miliseconds
@@ -424,6 +435,161 @@ const isProjectPath = async (inputPath) => {
   return false
 }
 
+const runningTemplate = (config, command) => {
+  if (config.all && ['deploy', 'remove'].includes(command)) {
+    return true
+  }
+  return false
+}
+
+const getOutputs = (allComponentsWithOutputs) => {
+  const outputs = {}
+
+  for (const instanceName in allComponentsWithOutputs) {
+    outputs[instanceName] = allComponentsWithOutputs[instanceName].outputs
+  }
+
+  return outputs
+}
+
+const validateGraph = (graph) => {
+  const isAcyclic = alg.isAcyclic(graph)
+  if (!isAcyclic) {
+    const cycles = alg.findCycles(graph)
+    let msg = ['Your template has circular dependencies:']
+    cycles.forEach((cycle, index) => {
+      let fromAToB = cycle.join(' --> ')
+      fromAToB = `${(index += 1)}. ${fromAToB}`
+      const fromBToA = cycle.reverse().join(' <-- ')
+      const padLength = fromAToB.length + 4
+      msg.push(fromAToB.padStart(padLength))
+      msg.push(fromBToA.padStart(padLength))
+    }, cycles)
+    msg = msg.join('\n')
+    throw new Error(msg)
+  }
+}
+
+const getAllComponents = (template = {}) => {
+  const { org, app, stage } = template
+  // todo specify org, app, stage...etc
+  const allComponents = {}
+
+  for (const key in template) {
+    if (template[key] && template[key].component) {
+      allComponents[key] = {
+        name: key,
+        component: template[key].component,
+        org,
+        app,
+        stage,
+        inputs: template[key].inputs || {}
+      }
+    }
+  }
+
+  return allComponents
+}
+
+const setDependencies = (allComponents) => {
+  const regex = /\${output:(\w*[\w.-_]+)}/g
+
+  for (const instanceName in allComponents) {
+    const dependencies = traverse(allComponents[instanceName].inputs).reduce(function(
+      accum,
+      value
+    ) {
+      const matches = typeof value === 'string' ? value.match(regex) : null
+      if (matches) {
+        for (const match of matches) {
+          const splittedVariableString = match.substring(2, match.length - 1).split(':')
+          const referencedInstanceString = splittedVariableString[splittedVariableString.length - 1]
+
+          const referencedInstanceName = referencedInstanceString.split('.')[0]
+
+          if (allComponents[referencedInstanceName] && !accum.includes(referencedInstanceName)) {
+            accum.push(referencedInstanceName)
+          }
+        }
+      }
+      return accum
+    },
+    [])
+
+    allComponents[instanceName].dependencies = dependencies
+  }
+
+  return allComponents
+}
+
+const createGraph = (allComponents, command) => {
+  const graph = new Graph()
+
+  for (const instanceName in allComponents) {
+    graph.setNode(instanceName, allComponents[instanceName])
+  }
+
+  for (const instanceName in allComponents) {
+    const { dependencies } = allComponents[instanceName]
+    if (!isEmpty(dependencies)) {
+      for (const dependency of dependencies) {
+        if (command === 'remove') {
+          graph.setEdge(dependency, instanceName)
+        } else {
+          graph.setEdge(instanceName, dependency)
+        }
+      }
+    }
+  }
+
+  validateGraph(graph)
+
+  return graph
+}
+
+const executeGraph = async (allComponents, command, graph, cli, sdk, credentials, options) => {
+  const leaves = graph.sinks()
+
+  if (isEmpty(leaves)) {
+    return allComponents
+  }
+
+  const promises = []
+
+  for (const instanceName of leaves) {
+    const fn = async () => {
+      const instanceYaml = allComponents[instanceName]
+
+      if (command === 'remove') {
+        const instance = await sdk.remove(instanceYaml, credentials, options)
+        allComponents[instanceName].outputs = instance.outputs || {}
+      } else {
+        const instance = await sdk.deploy(instanceYaml, credentials, options)
+
+        const outputs = {}
+        outputs[instanceName] = instance.outputs
+
+        if (!options.debug) {
+          cli.log()
+          cli.logOutputs(outputs)
+        }
+
+        allComponents[instanceName].outputs = instance.outputs || {}
+      }
+    }
+
+    promises.push(fn())
+  }
+
+  await Promise.all(promises)
+
+  for (const instanceName of leaves) {
+    graph.removeNode(instanceName)
+  }
+
+  return executeGraph(allComponents, command, graph, cli, sdk, credentials, options)
+}
+
 module.exports = {
   sleep,
   request,
@@ -439,5 +605,12 @@ module.exports = {
   loadInstanceConfig,
   legacyLoadComponentConfig,
   legacyLoadInstanceConfig,
-  isProjectPath
+  isProjectPath,
+  runningTemplate,
+  getOutputs,
+  getAllComponents,
+  setDependencies,
+  validateGraph,
+  createGraph,
+  executeGraph
 }
