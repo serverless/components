@@ -197,21 +197,6 @@ const getTemplate = async (root) => {
       template.app = instanceYaml.app // eslint-disable-line
       template.stage = instanceYaml.stage // eslint-disable-line
 
-      // update paths in inputs
-      if (instanceYaml.inputs.src) {
-        if (typeof instanceYaml.inputs.src === 'string') {
-          instanceYaml.inputs.src = path.join(directoryPath, instanceYaml.inputs.src)
-        } else if (typeof instanceYaml.inputs.src === 'object') {
-          if (instanceYaml.inputs.src.src) {
-            instanceYaml.inputs.src.src = path.join(directoryPath, instanceYaml.inputs.src.src)
-          }
-
-          if (instanceYaml.inputs.src.dist) {
-            instanceYaml.inputs.src.dist = path.join(directoryPath, instanceYaml.inputs.src.dist)
-          }
-        }
-      }
-
       template[instanceYml.name] = instanceYaml
     }
   }

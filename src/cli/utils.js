@@ -492,7 +492,7 @@ const getAllComponents = (template = {}) => {
 }
 
 const setDependencies = (allComponents) => {
-  const regex = /\${output:(\w*[\w.-_]+)}/g
+  const regex = /\${output:(\w*[-_\${}:\w.]+)}/g
 
   for (const instanceName in allComponents) {
     const dependencies = traverse(allComponents[instanceName].inputs).reduce(function(
