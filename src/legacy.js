@@ -1,12 +1,16 @@
 const utils = require('./cli/utils')
+const minimist = require('minimist')
 const {
   utils: { isChinaUser }
 } = require('@serverless/platform-client-china')
 
 const runningComponents = () => {
+  const args = minimist(process.argv.slice(2))
+
   let componentConfig, instanceConfig
 
-  if (process.argv[2] === 'registry') {
+  // load components if user runs "sls registry" or "sls --all" or "sls --target" (that last one for china)
+  if (process.argv[2] === 'registry' || args.all || args.target) {
     return true
   }
 
