@@ -3,11 +3,14 @@
  */
 
 const { ServerlessSDK } = require('@serverless/platform-client')
-const chalk = require('chalk')
 const { getAccessKey, isLoggedIn, loadInstanceConfig, loadInstanceCredentials } = require('./utils')
 const { getInstanceDashboardUrl } = require('../utils')
+const runAll = require('./runAll')
 
 module.exports = async (config, cli, command) => {
+  if (config.all) {
+    return runAll(config, cli, command)
+  }
   // Start CLI persistance status
   cli.start('Initializing', { timer: true })
 
@@ -23,7 +26,7 @@ module.exports = async (config, cli, command) => {
   const instanceYaml = await loadInstanceConfig(process.cwd())
 
   // Presentation
-  const meta = `Action: "${command}" - Stage: "${instanceYaml.stage}" - Org: "${instanceYaml.org}" - App: "${instanceYaml.app}" - Instance: "${instanceYaml.name}"`
+  const meta = `Action: "${command}" - Stage: "${instanceYaml.stage}" - Org: "${instanceYaml.org}" - App: "${instanceYaml.app}" - Name: "${instanceYaml.name}"`
   if (!config.debug) {
     cli.logLogo()
     // cli.log(meta, 'grey')
