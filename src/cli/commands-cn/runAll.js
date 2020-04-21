@@ -41,38 +41,11 @@ module.exports = async (config, cli, command) => {
 
   // Prepare Options
   const options = {}
-  options.debug = config.debug
   options.dev = config.dev
 
+  // TODO not support for tencent yet
   // Connect to Serverless Platform Events, if in debug mode
-  if (options.debug) {
-    await sdk.connect({
-      filter: {
-        stageName: templateYaml.stage,
-        appName: templateYaml.app
-      },
-      onEvent: (evt) => {
-        if (evt.event !== 'instance.run.logs') {
-          return
-        }
-        if (evt.data.logs && Array.isArray(evt.data.logs)) {
-          evt.data.logs.forEach((log) => {
-            // Remove strange formatting that comes from stderr
-            if (typeof log.data === 'string' && log.data.startsWith(`'`)) {
-              log.data = log.data.substr(1)
-            }
-            if (typeof log.data === 'string' && log.data.endsWith(`'`)) {
-              log.data = log.data.substring(0, log.data.length - 1)
-            }
-            if (typeof log.data === 'string' && log.data.endsWith(`\\n`)) {
-              log.data = log.data.substring(0, log.data.length - 2)
-            }
-            cli.log(log.data)
-          })
-        }
-      }
-    })
-  }
+  // options.debug = config.debug
 
   if (command === 'remove') {
     cli.status('Removing', null, 'white')
@@ -101,7 +74,7 @@ module.exports = async (config, cli, command) => {
   } else {
     const outputs = getOutputs(allComponentsWithOutputs)
 
-    if (options.debug) {
+    if (config.debug) {
       cli.log()
       cli.logOutputs(outputs)
     }
