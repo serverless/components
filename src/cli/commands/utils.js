@@ -3,6 +3,8 @@
  */
 
 const args = require('minimist')(process.argv.slice(2))
+const path = require('path')
+const os = require('os')
 const {
   readConfigFile,
   writeConfigFile,
@@ -10,9 +12,13 @@ const {
   refreshToken,
   listTenants
 } = require('@serverless/platform-sdk')
-const { loadInstanceConfig, resolveInputVariables } = require('../utils')
+
 const { readdirSync, statSync } = require('fs')
 const { join, basename } = require('path')
+
+const { readFileSync } = require('fs')
+const ini = require('ini')
+const { fileExistsSync, loadInstanceConfig, resolveInputVariables } = require('../utils')
 
 const getDefaultOrgName = async () => {
   const res = readConfigFile()
@@ -46,12 +52,53 @@ const getDefaultOrgName = async () => {
   return defaultOrgName
 }
 
+const loadAwsCredentials = () => {
+  const awsCredsInEnv = process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY
+  if (awsCredsInEnv) {
+    // exit if the user already has aws credentials in env or .env file
+    return
+  }
+
+  // fetch the credentials file path
+  const awsCredentialsPath =
+    process.env.AWS_CREDENTIALS_PATH || path.resolve(os.homedir(), './.aws/credentials')
+
+  const awsCredsFileExists = fileExistsSync(awsCredentialsPath)
+
+  if (!awsCredsFileExists) {
+    // exit if the user has no aws credentials file
+    return
+  }
+
+  // read the credentials file
+  const credentialsFile = readFileSync(awsCredentialsPath, 'utf8')
+
+  // parse the credentials file
+  const parsedCredentialsFile = ini.parse(credentialsFile)
+
+  // get the configured profile
+  const awsCredentialsProfile =
+    process.env.AWS_PROFILE || process.env.AWS_DEFAULT_PROFILE || 'default'
+
+  // get the credentials for that profile
+  const credentials = parsedCredentialsFile[awsCredentialsProfile]
+
+  // set the credentials in the env to pass it to the sdk
+  process.env.AWS_ACCESS_KEY_ID = credentials.aws_access_key_id
+  process.env.AWS_SECRET_ACCESS_KEY = credentials.aws_secret_access_key
+
+  return
+}
+
 /**
  * Load credentials from a ".env" or ".env.[stage]" file
  * @param {*} stage
  */
 
 const loadInstanceCredentials = () => {
+  // load aws credentials if found
+  loadAwsCredentials()
+
   // Known Provider Environment Variables and their SDK configuration properties
   const providers = {}
 
