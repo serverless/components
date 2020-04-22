@@ -52,8 +52,12 @@ const getDefaultOrgName = async () => {
   return defaultOrgName
 }
 
+/**
+ * Load AWS credentials from the aws credentials file
+ */
 const loadAwsCredentials = () => {
   const awsCredsInEnv = process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY
+
   if (awsCredsInEnv) {
     // exit if the user already has aws credentials in env or .env file
     return
