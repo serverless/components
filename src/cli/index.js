@@ -77,7 +77,7 @@ module.exports = async () => {
 
   try {
     if (commands[command]) {
-      await commands[command](config, cli)
+      await commands[command](config, cli, command)
     } else {
       await commands.run(config, cli, command)
     }

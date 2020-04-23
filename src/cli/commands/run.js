@@ -3,11 +3,14 @@
  */
 
 const { ServerlessSDK } = require('@serverless/platform-client')
-const chalk = require('chalk')
 const { getAccessKey, isLoggedIn, loadInstanceConfig, loadInstanceCredentials } = require('./utils')
 const { getInstanceDashboardUrl } = require('../utils')
+const runAll = require('./runAll')
 
 module.exports = async (config, cli, command) => {
+  if (config.all) {
+    return runAll(config, cli, command)
+  }
   // Start CLI persistance status
   cli.start('Initializing', { timer: true })
 
@@ -23,11 +26,14 @@ module.exports = async (config, cli, command) => {
   const instanceYaml = await loadInstanceConfig(process.cwd())
 
   // Presentation
-  const meta = `Action: "${command}" - Stage: "${instanceYaml.stage}" - App: "${instanceYaml.app}" - Instance: "${instanceYaml.name}"`
+  const meta = `Action: "${command}" - Stage: "${instanceYaml.stage}" - Org: "${instanceYaml.org}" - App: "${instanceYaml.app}" - Name: "${instanceYaml.name}"`
   if (!config.debug) {
     cli.logLogo()
-    cli.log(meta, 'grey')
+    // cli.log(meta, 'grey')
   } else {
+    if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
+      cli.log(`Running in Platform Dev stage`)
+    }
     cli.log(meta)
   }
 
@@ -102,12 +108,18 @@ module.exports = async (config, cli, command) => {
     // cli.log()
     // cli.log(`${chalk.grey(`Full details: ${dashboardUrl}`)}`)
   } else if (command === 'remove') {
-    // run remove
     cli.status('Removing', null, 'white')
+
+    // The "inputs" in serverless.yml are only for deploy.  Remove them for all other commands
+    instanceYaml.inputs = {}
+
     await sdk.remove(instanceYaml, instanceCredentials, options)
   } else {
     // run a custom method synchronously to receive outputs directly
     options.sync = true
+
+    // The "inputs" in serverless.yml are only for deploy.  Remove them for all other commands
+    instanceYaml.inputs = {}
 
     cli.status('Running', null, 'white')
     const instance = await sdk.run(command, instanceYaml, instanceCredentials, options)

@@ -5,8 +5,13 @@
 const path = require('path')
 const { ServerlessSDK } = require('@serverless/platform-client-china')
 const utils = require('./utils')
+const runAll = require('./runAll')
 
 module.exports = async (config, cli, command) => {
+  if (config.all) {
+    return runAll(config, cli, command)
+  }
+
   // Start CLI persistance status
   cli.start('Initializing', { timer: true })
 

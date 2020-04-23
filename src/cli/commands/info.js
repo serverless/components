@@ -25,7 +25,6 @@ module.exports = async (config, cli) => {
 
   // Presentation
   cli.logLogo()
-  cli.log()
 
   cli.status('Initializing', instanceYaml.name)
 
@@ -62,6 +61,7 @@ module.exports = async (config, cli) => {
   const dashboardUrl = getInstanceDashboardUrl(instanceYaml)
 
   // show the most important information, and link to the dashboard
+  cli.log()
   cli.log(`${chalk.grey('Status:')}       ${instance.instanceStatus}`)
   cli.log(`${chalk.grey('Last Action:')}  ${instance.lastAction} (${lastActionAgo})`)
   cli.log(`${chalk.grey('Deployments:')}  ${instance.instanceMetrics.deployments}`)

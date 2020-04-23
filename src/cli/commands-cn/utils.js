@@ -18,7 +18,7 @@ const updateEnvFile = (envs) => {
   }
 
   // update process.env and existing key in .env file
-  for (let [key, value] of Object.entries(envs)) {
+  for (const [key, value] of Object.entries(envs)) {
     process.env[key] = value
     const regex = new RegExp(`${key}=[^\n]+(\n|$)`)
     envFileContent = envFileContent.replace(regex, '')
@@ -90,8 +90,13 @@ const loadTencentInstanceConfig = async (directoryPath) => {
     if (instanceFile.inputs.src) {
       if (typeof instanceFile.inputs.src === 'string') {
         instanceFile.inputs.src = path.resolve(directoryPath, instanceFile.inputs.src)
-      } else if (typeof instanceFile.inputs.src === 'object' && instanceFile.inputs.src.src) {
-        instanceFile.inputs.src.src = path.resolve(directoryPath, instanceFile.inputs.src.src)
+      } else if (typeof instanceFile.inputs.src === 'object') {
+        if (instanceFile.inputs.src.src) {
+          instanceFile.inputs.src.src = path.resolve(directoryPath, instanceFile.inputs.src.src)
+        }
+        if (instanceFile.inputs.src.dist) {
+          instanceFile.inputs.src.dist = path.resolve(directoryPath, instanceFile.inputs.src.dist)
+        }
       }
     }
   }
@@ -154,9 +159,55 @@ const loadInstanceCredentials = (stage) => {
   return credentials
 }
 
+const getTemplate = async (root) => {
+  const directories = fs
+    .readdirSync(root)
+    .filter((f) => fs.statSync(path.join(root, f)).isDirectory())
+
+  const template = {
+    name: path.basename(process.cwd()),
+    org: null,
+    app: null, // all components must explicitly set app property
+    stage: null
+  }
+
+  let componentDirectoryFound = false
+  for (const directory of directories) {
+    const directoryPath = path.join(root, directory)
+
+    const instanceYml = loadInstanceConfig(directoryPath)
+
+    if (instanceYml) {
+      componentDirectoryFound = true
+      const instanceYaml = await loadTencentInstanceConfig(directoryPath)
+
+      if (template.org !== null && template.org !== instanceYaml.org) {
+        throw new Error('Attempting to deploy multiple instances to multiple orgs')
+      }
+
+      if (template.app !== null && template.app !== instanceYaml.app) {
+        throw new Error('Attempting to deploy multiple instances to multiple apps')
+      }
+
+      if (template.stage !== null && template.stage !== instanceYaml.stage) {
+        throw new Error('Attempting to deploy multiple instances to multiple stages')
+      }
+
+      template.org = instanceYaml.org // eslint-disable-line
+      template.app = instanceYaml.app // eslint-disable-line
+      template.stage = instanceYaml.stage // eslint-disable-line
+
+      template[instanceYml.name] = instanceYaml
+    }
+  }
+
+  return componentDirectoryFound ? template : null
+}
+
 module.exports = {
   loadInstanceConfig: loadTencentInstanceConfig,
   loadInstanceCredentials,
   login,
-  getDefaultOrgName
+  getDefaultOrgName,
+  getTemplate
 }

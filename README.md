@@ -324,7 +324,7 @@ ${output:prod:ecommerce:products-database.name}
 
 ### Credentials
 
-Upon deployment, the Serverless Framework looks for a `.env` file in the current working directory. If a `.env` file exists, the Serverless Framework will send those credentials to the Component and the Component can access them within the `this.credentials` object. However, you must use the following Environment Variable keys:
+Upon deployment, the Serverless Framework looks for a `.env` file in the current working directory. Components can find these credentials within the `this.credentials` object. However, you must use the following Environment Variable keys:
 
 #### AWS Credentials
 
@@ -783,13 +783,13 @@ Here are some development tips when it comes to writing Serverless Components:
 
 #### Start With The Outcome
 
-We recommend starting with a focus on your desired outcome. Create a higher level Component that solves your problem first. Consider breaking it down into child Components later, if necessary.
+We recommend starting with a focus on your desired outcome, rather than try to break things down into multiple smaller Components from the start.  Trying to break things down into multiple Components most often ends up as a distraction.  Create a higher level Component that solves your problem first.  Use it.  Learn from it.  Then consider breaking things down into smaller Components if necessary.  At the same time, high-level solutions are what Serverless Components are meant for.  They are outcomes—with the lowest operational overhead.
 
 #### Knowing The Outcome Is An Advantage
 
-Provisioning infrastructure can be quite complicated. However, Serverless Components have a powerful advantage over general infrastructure provisioning tools that seek to enable every possible option and combination (e.g. AWS Cloudformation) — Serverless Components know the specific use-case they are trying to deliver.
+Provisioning infrastructure safely and reliably can be quite complicated. However, Serverless Components have a powerful advantage over general infrastructure provisioning tools that seek to enable every possible option and combination (e.g. AWS Cloudformation, Terraform) — Serverless Components know the specific use-case they are trying to deliver.
 
-One of the most important lessons we've learned about software development tools is that once you know the use-case, you can create a much better tool.
+One of the most important lessons we've learned about software development tools is that once you know the use-case or specific goal, you can create a much better tool.
 
 Components know their use-case. You can use that knowledge to: 1) provision infrastructure more reliably, because you have a clear provisioning path and you can program around the pitfalls. 2) provision infrastructure more quickly 3) add use-case specific automation to your Component in the form of custom methods.
 
@@ -801,13 +801,39 @@ Components rely on the state saved within the cloud services they use as the sou
 
 #### Store State Immediately After A Successful Operation
 
-If you do need to store state, try to store it immediately after a successful operation. This way, if anything after that operation fails, your Serverless Component can pick up where it left off, when the end user tries to deploy it again.
+If you do need to store state, try to store it immediately after a successful operation.
+
+```javascript
+// Do something
+this.state.id = 'updated or new id'
+// Do something else
+this.state.url = 'updated or new url'
+```
+
+This way, if anything after that operation fails, your Serverless Component can pick up where it left off, when the end user tries to deploy it again.
 
 #### Optimize For Accessibility
 
 We believe serverless infrastructure and architectures will empower more people to develop software than ever before.
 
 Because of this, we're designing all of our projects to be as approachable as possible. Please try to use simple, vanilla Javascript. Additionally, to reduce security risks and general bloat, please try to use the least amount of NPM dependencies as possible.
+
+
+#### No Surprise Removals
+
+Never surprise the user by deleting or fundamentally changing infrastructure within your Serverless Component, based on a configuration change in `serverless.yml`.
+
+For example, if a user is changing their region, **NEVER** remove their infrastructure in one region and automatically recreate it in the new region upon their next `$ serverless deploy`.
+
+Instead, throw an error with a warning about this:
+
+```text
+$ serverless deploy
+Error: Changing the region from us-east-1 to us-east-2 will remove your infrastructure. Please remove it manually, change the region, then re-deploy.
+$
+```
+
+We have measured this user experience and so far 100% of the time the user will remove their existing Component Instance and deploy another one.  This works extremely well.
 
 # CLI Commands
 

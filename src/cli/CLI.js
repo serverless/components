@@ -205,6 +205,10 @@ class CLI {
     logo = logo + white(`serverless`)
     logo = logo + red(` ⚡ `)
     logo = logo + white(`framework`)
+
+    if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
+      logo = logo + grey(` (dev)`)
+    }
     if (text) {
       logo = logo + text
     }
@@ -216,6 +220,11 @@ class CLI {
     logo = logo + white(`serverless`)
     logo = logo + red(` ⚡ `)
     logo = logo + white(`registry`)
+
+    if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
+      logo = logo + grey(` (dev)`)
+    }
+
     if (text) {
       logo = logo + text
     }
@@ -230,7 +239,6 @@ class CLI {
   }
 
   advertise() {
-    this.log()
     this.logLogo()
     let ad = grey(
       `This is a Serverless Framework Component.  Sign-in to use it for free with these features:`

@@ -1,6 +1,8 @@
 const { getLoggedInUser, logout } = require('@serverless/platform-sdk')
 
 module.exports = async (config, cli, command) => {
+  cli.logLogo()
+
   cli.status('Logging out')
 
   const user = getLoggedInUser()
