@@ -8,12 +8,12 @@
 
 <br/>
 
-Serverless Components 是 [Serverless Framework](https://github.com/serverless/serverless) 重磅推出的基础设置编排能力，支持开发者通过 Serverless Components 构建，组合并部署你的 Serverless 应用。
+Serverless Components 是 [Serverless Framework](https://github.com/serverless/serverless) 重磅推出的基础设施编排能力，支持开发者通过 Serverless Components 构建，组合并部署你的 Serverless 应用。
 
 <br/>
 
 - [x] **全面覆盖** - 既能支持基础设施的 Components，也可以支持更高维度的，场景级别的 Components。
-- [x] **快速部署** - Components 支持在 4-6s 内极速部署 Serverless 应用。deploy in 2-4 seconds.
+- [x] **快速部署** - Components 支持在 4-6s 内极速部署 Serverless 应用。
 - [x] **灵活配置** - Components 支持灵活配置和方便的部署
 - [x] **注册中心** - 通过注册中心，支持将你构建的 Component 分享给团队或公开支持他人复用。
 
@@ -107,6 +107,8 @@ Triggers:
 ```
 
 部署完毕后，访问命令行中输出的网页链接，即可访问已经部署成功的应用。
+
+访问 [Serverless Framework 控制台](https://serverless.cloud.tencent.com/)，查看你的 Serverless 应用的状态和监控信息。
 
 > 如果希望查看部署过程中的详细信息，可以增加 --debug 参数进行查看。
 
