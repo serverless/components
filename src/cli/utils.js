@@ -301,6 +301,8 @@ const loadInstanceConfig = memoizeWith(identity, (directoryPath) => {
       // because the framework can deal with that
       if (e.name !== 'YAMLException') {
         throw e
+      } else {
+        throw new Error(`The serverless.yml file has icorrect format. Details: ${e.message}`)
       }
     }
   } else {
