@@ -342,6 +342,8 @@ Components could access these AWS credentials using `this.credentials.aws`. This
 }
 ```
 
+**Note:** For AWS, if no `.env` file was found in the current working directory, the CLI will attempt to get the credentials from AWS's shared credentials file (typically at `~/.aws/credentials`) as a fallback according to the default or your AWS credentials setup.
+
 #### Google Credentials
 
 ```bash
