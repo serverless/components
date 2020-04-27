@@ -4,5 +4,15 @@ name: admin-role
 inputs:
   service: lambda.amazonaws.com
   policy:
-    arn: arn:aws:iam::aws:policy/AdministratorAccess
-  region: us-east-1
+    Version: '2012-10-17'
+    Statement:
+      - Effect: Allow
+        Action:
+          - sts:AssumeRole
+        Resource: '*'
+      - Effect: Allow
+        Action:
+          - logs:CreateLogGroup
+          - logs:CreateLogStream
+          - logs:PutLogEvents
+        Resource: '*'
