@@ -77,11 +77,24 @@ module.exports = async (config, cli, command) => {
   } else if (command === 'remove') {
     // run remove
     cli.status('Removing', null, 'white')
+
+    // The "inputs" in serverless.yml are only for deploy.  Remove them for all other commands
+    instanceYaml.inputs = {}
+
     await sdk.remove(instanceYaml, instanceCredentials, options)
   } else {
+    // run a custom method synchronously to receive outputs directly
+    options.sync = true
+
+    // The "inputs" in serverless.yml are only for deploy.  Remove them for all other commands
+    instanceYaml.inputs = {}
+
     // run a custom method
     cli.status('Running', null, 'white')
-    await sdk.run(command, instanceYaml, instanceCredentials, options)
+    const instance = await sdk.run(command, instanceYaml, instanceCredentials, options)
+
+    cli.log()
+    cli.logOutputs(instance.outputs)
   }
   cli.close('success', 'Success')
 }
