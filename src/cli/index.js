@@ -5,6 +5,7 @@
 const path = require('path')
 const minimist = require('minimist')
 const dotenv = require('dotenv')
+const { bootstrap: proxyBootstrap } = require('global-agent')
 const { loadInstanceConfig, fileExistsSync } = require('./utils')
 const {
   utils: { isChinaUser }
@@ -31,6 +32,15 @@ module.exports = async () => {
     dotenv.config({ path: path.resolve(parentStageEnvFilePath) })
   } else if (fileExistsSync(parentDefaultEnvFilePath)) {
     dotenv.config({ path: path.resolve(parentDefaultEnvFilePath) })
+  }
+
+  // set global proxy agent if it's configured in environment variable
+  if (process.env.HTTP_PROXY || process.env.HTTPS_PROXY) {
+    // set GLOBAL_AGENT_ENVIRONMENT_VARIABLE_NAMESPACE to empty, so the
+    // global-agent will use HTTP_PROXY/HTTPS_PROXY environment variables
+    // without GLOBAL_AGENT_ prefix.
+    process.env.GLOBAL_AGENT_ENVIRONMENT_VARIABLE_NAMESPACE = ''
+    proxyBootstrap()
   }
 
   if (process.argv.length === 2 && isChinaUser() && !(await isProjectPath(process.cwd()))) {
