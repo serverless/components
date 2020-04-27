@@ -854,6 +854,7 @@ Publish a Component to the Serverless Registry.
 Deploys an Instance of a Component.
 
 `--all` - Deploys all components found in sub directories. Very useful when working with multiple components.
+
 `--debug` - Lists `console.log()` statements left in your Component upon `deploy` or any action.
 
 #### `serverless remove`
@@ -861,6 +862,7 @@ Deploys an Instance of a Component.
 Removes an Instance of a Component.
 
 `--all` - Removes all components found in sub directories. Very useful when working with multiple components.
+
 `--debug` - Lists `console.log()` statements left in your Component upon `remove` or any action.
 
 #### `serverless info`
