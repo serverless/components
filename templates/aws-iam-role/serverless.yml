@@ -1,18 +1,16 @@
 component: aws-iam-role
-name: admin-role
+name: my-role
 
 inputs:
   service: lambda.amazonaws.com
   policy:
-    Version: '2012-10-17'
-    Statement:
-      - Effect: Allow
-        Action:
-          - sts:AssumeRole
-        Resource: '*'
-      - Effect: Allow
-        Action:
-          - logs:CreateLogGroup
-          - logs:CreateLogStream
-          - logs:PutLogEvents
-        Resource: '*'
+    - Effect: Allow
+      Action:
+        - sts:AssumeRole
+      Resource: '*'
+    - Effect: Allow
+      Action:
+        - logs:CreateLogGroup
+        - logs:CreateLogStream
+        - logs:PutLogEvents
+      Resource: '*'
