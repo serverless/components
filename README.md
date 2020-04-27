@@ -843,6 +843,15 @@ $
 
 We have measured this user experience and so far 100% of the time the user will remove their existing Component Instance and deploy another one.  This works extremely well.
 
+#### Write Integration Tests
+
+We write integration tests in the `tests/integration.tests.js` file in each component repo. We run these tests on every push/merge to master with Github Actions. We recommend you do the same. As an example, here are the tests for the website component:
+
+- [Test File](https://github.com/serverless-components/website/blob/master/tests/integration.test.js)
+- [Test Run](https://github.com/serverless-components/website/runs/622852865?check_suite_focus=true)
+
+Running these integration tests will most likely require AWS keys, which are stored as Github Secrets. So you'll most likely need write access to the repo to accomplish this.
+
 # CLI Commands
 
 #### `serverless registry`
