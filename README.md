@@ -277,6 +277,12 @@ You can deploy Components easily via the Serverless Framework with the `$ server
 $ serverless deploy
 ```
 
+If you have multiple components in sub-directories, you can deploy them all in one go with the `--all` flag:
+
+```
+$ serverless deploy --all
+```
+
 While Serverless Components deploy incredibly fast, please note that first deployments can often be 5x slower because creating cloud resources takes a lot longer than updating them.
 
 ### State
