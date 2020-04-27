@@ -93,7 +93,7 @@ Next, log in to enable deployment and saving state in the cloud:
 $ serverless login
 ```
 
-Lastly, enter your cloud provider credentials into a `.env` file within the folder that contains your `serverless.yml`.
+Lastly, enter your cloud provider credentials into a `.env` file within the folder that contains your `serverless.yml`, or its immediate parent folder.
 
 ```text
 AWS_ACCESS_KEY_ID=12345
@@ -324,7 +324,7 @@ ${output:prod:ecommerce:products-database.name}
 
 ### Credentials
 
-Upon deployment, the Serverless Framework looks for a `.env` file in the current working directory. Components can find these credentials within the `this.credentials` object. However, you must use the following Environment Variable keys:
+Upon deployment, the Serverless Framework looks for a `.env` file in the current working directory, as well as the immediate parent directory. Components can find these credentials within the `this.credentials` object. However, you must use the following Environment Variable keys:
 
 #### AWS Credentials
 
@@ -342,7 +342,7 @@ Components could access these AWS credentials using `this.credentials.aws`. This
 }
 ```
 
-**Note:** For AWS, if no `.env` file was found in the current working directory, the CLI will attempt to get the credentials from AWS's shared credentials file (typically at `~/.aws/credentials`) as a fallback according to the default or your AWS credentials setup.
+**Note:** For AWS, if no `.env` file was found in the current working directory or immediate parent directory, the CLI will attempt to get the credentials from AWS's shared credentials file (typically at `~/.aws/credentials`) as a fallback according to the default or your AWS credentials setup.
 
 #### Google Credentials
 
@@ -395,7 +395,7 @@ $ serverless deploy --stage prod
 
 Again, the CLI flag overrides both a `stage` in `serverless.yml` and an Environment Variable. Whereas an Environment Variable can only override the `stage` in `serverless.yml`.
 
-Lastly, you can set stage-specific environment variables using separate `.env` files. Each file must be named in the following format: `.env.STAGE`. For example, if you run in the prod stage, the environment variables in `.env.prod` would be loaded, otherwise the default `.env` file (without stage extension) would be loaded.
+Lastly, you can set stage-specific environment variables using separate `.env` files. Each file must be named in the following format: `.env.STAGE`. For example, if you run in the prod stage, the environment variables in `.env.prod` would be loaded, otherwise the default `.env` file (without stage extension) would be loaded.  You can also put the `.env.STAGE` file in the immediate parent directory, in the case that you have a parent folder containing many Component Instances.
 
 A practical usage of this is if you want to have a separate AWS account for each stage. In that case you would keep separate AWS credentials for each stage you are targeting. Then based on the stage you're deploying to, the correct credentials would be picked up.
 

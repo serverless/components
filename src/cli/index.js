@@ -18,12 +18,19 @@ module.exports = async () => {
   const stage = args.stage || (instanceConfig && instanceConfig.stage) || 'dev'
 
   // Load environment variables from eventual .env files
+  // Look in current working directory first, and the parent directory second
   const defaultEnvFilePath = path.join(process.cwd(), `.env`)
   const stageEnvFilePath = path.join(process.cwd(), `.env.${stage}`)
+  const parentDefaultEnvFilePath = path.join(process.cwd(), '..', `.env`)
+  const parentStageEnvFilePath = path.join(process.cwd(), '..', `.env.${stage}`)
   if (stage && fileExistsSync(stageEnvFilePath)) {
     dotenv.config({ path: path.resolve(stageEnvFilePath) })
   } else if (fileExistsSync(defaultEnvFilePath)) {
     dotenv.config({ path: path.resolve(defaultEnvFilePath) })
+  } else if (fileExistsSync(parentStageEnvFilePath)) {
+    dotenv.config({ path: path.resolve(parentStageEnvFilePath) })
+  } else if (fileExistsSync(parentDefaultEnvFilePath)) {
+    dotenv.config({ path: path.resolve(parentDefaultEnvFilePath) })
   }
 
   if (process.argv.length === 2 && isChinaUser() && !(await isProjectPath(process.cwd()))) {
