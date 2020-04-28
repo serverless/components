@@ -12,9 +12,6 @@ const { ServerlessSDK, utils: chinaUtils } = require('@serverless/platform-clien
 const utils = require('./utils')
 
 class LogForwardingOutput extends Writable {
-  constructor(options) {
-    super(options)
-  }
 
   _write(chunk, encoding, callback) {
     process.stdout.write(ansiEscapes.eraseDown)
@@ -81,7 +78,7 @@ async function updateDeploymentStatus(cli, instanceInfo, startDebug) {
   cliEventCallback.stdout = logForwardingOutput
 
   switch (instanceStatus) {
-    case 'active':
+    case 'active': {
       const {
         state: { lambdaArn, region }
       } = instanceInfo
@@ -95,6 +92,7 @@ async function updateDeploymentStatus(cli, instanceInfo, startDebug) {
       cli.logOutputs(instanceInfo.outputs)
       cli.status('Watching')
       return true
+    }
     case 'error':
       cli.log(`${header} error`, 'grey')
       cli.log(deploymentErrorStack || deploymentError, 'red')

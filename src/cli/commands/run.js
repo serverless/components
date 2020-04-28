@@ -6,7 +6,6 @@
 
 const { ServerlessSDK } = require('@serverless/platform-client')
 const { getAccessKey, isLoggedIn, loadInstanceConfig, loadInstanceCredentials } = require('./utils')
-const { getInstanceDashboardUrl } = require('../utils')
 const runAll = require('./runAll')
 
 module.exports = async (config, cli, command) => {
@@ -98,8 +97,6 @@ module.exports = async (config, cli, command) => {
       )
     }
 
-    const dashboardUrl = getInstanceDashboardUrl(instanceYaml)
-
     // run deploy
     cli.status('Deploying', null, 'white')
     const instance = await sdk.deploy(instanceYaml, instanceCredentials, options)
@@ -130,4 +127,6 @@ module.exports = async (config, cli, command) => {
     cli.logOutputs(instance.outputs)
   }
   cli.close('success', 'Success')
+
+  return null
 }

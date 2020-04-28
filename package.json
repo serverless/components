@@ -16,8 +16,13 @@
   "license": "MIT",
   "eslintConfig": {
     "extends": "@serverless/eslint-config/node",
-    "root": true
+    "root": true,
+    "rules": {
+      "no-console": "off",
+      "no-underscore-dangle": "off"
+    }
   },
+  "eslintIgnore": ["/templates"],
   "dependencies": {
     "@serverless/inquirer": "^1.1.0",
     "@serverless/platform-client": "^0.25.4",

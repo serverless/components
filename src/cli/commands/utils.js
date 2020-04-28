@@ -136,15 +136,15 @@ const loadInstanceCredentials = () => {
 
   const credentials = {}
 
-  for (const provider in providers) {
-    const providerEnvVars = providers[provider]
-    for (const providerEnvVar in providerEnvVars) {
-      if (!credentials[provider]) {
-        credentials[provider] = {}
+  for (const [providerName, provider] of Object.entries(providers)) {
+    const providerEnvVars = provider
+    for (const [envVarName, envVarValue] of Object.entries(providerEnvVars)) {
+      if (!credentials[providerName]) {
+        credentials[providerName] = {}
       }
       // Proper environment variables override what's in the .env file
-      if (process.env.hasOwnProperty(providerEnvVar)) {
-        credentials[provider][providerEnvVars[providerEnvVar]] = process.env[providerEnvVar]
+      if (process.env[envVarName] != null) {
+        credentials[providerName][envVarValue] = process.env[envVarName]
       }
       continue
     }

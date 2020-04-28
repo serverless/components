@@ -6,7 +6,7 @@ const open = require('open')
 const { loadInstanceConfig } = require('./utils')
 const { loadComponentConfig } = require('../utils')
 
-module.exports = async (config, cli, command) => {
+module.exports = async (config, cli) => {
   // Offer a nice presentation
 
   cli.logLogo()
@@ -22,12 +22,16 @@ module.exports = async (config, cli, command) => {
   try {
     // load serverless.yml if available
     instanceYaml = await loadInstanceConfig(process.cwd())
-  } catch (e) {}
+  } catch (e) {
+    // ignore
+  }
 
   try {
     // load serverless.component.yml if available
     componentYaml = await loadComponentConfig(process.cwd())
-  } catch (e) {}
+  } catch (e) {
+    // ignore
+  }
 
   // parse component name and version if available
   if (instanceYaml) {

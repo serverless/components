@@ -121,7 +121,7 @@ class CLI {
     process.stdout.write(color(content))
 
     // Put cursor to starting position for next view
-    console.log(os.EOL) // eslint-disable-line
+    console.log(os.EOL)
     process.stdout.write(ansiEscapes.cursorLeft)
     process.stdout.write(ansiEscapes.cursorShow)
 
@@ -168,8 +168,8 @@ class CLI {
    * - Render log statements cleanly
    */
   log(msg, color = null) {
-    if (!msg || msg == '') {
-      console.log() // eslint-disable-line
+    if (!msg) {
+      console.log()
       return
     }
 
@@ -259,14 +259,14 @@ class CLI {
    * - Render debug statements cleanly
    */
   debug(msg) {
-    if (!this._.debug || !msg || msg == '') {
+    if (!this._.debug || !msg) {
       return
     }
 
     // Clear any existing content
     process.stdout.write(ansiEscapes.eraseDown)
 
-    console.log(`${msg}`) // eslint-disable-line
+    console.log(`${msg}`)
 
     // Put cursor to starting position for next view
     process.stdout.write(ansiEscapes.cursorLeft)
@@ -279,7 +279,7 @@ class CLI {
   error(error, simple = false) {
     // If no argument, skip
     if (!error || error === '') {
-      return
+      return null
     }
 
     if (typeof error === 'string') {
@@ -296,8 +296,8 @@ class CLI {
 
       return this.close('error', `${error.message}`)
     }
-    console.log() // eslint-disable-line
-    console.log(``, red(error.stack)) // eslint-disable-line
+    console.log()
+    console.log('', red(error.stack))
 
     // Put cursor to starting position for next view
     process.stdout.write(ansiEscapes.cursorLeft)
@@ -374,7 +374,7 @@ class CLI {
       process.stdout.write(ansiEscapes.eraseDown)
 
       // Write status content
-      console.log() // eslint-disable-line
+      console.log()
       let content = ''
       if (this._.timer) {
         content += `${this._.statusColor(`${this._.timerSeconds  }s`)} `
@@ -384,7 +384,7 @@ class CLI {
       content += `${this._.statusColor(figures.pointerSmall)} ${this._.statusColor(this._.status)}`
       content += ` ${this._.statusColor(this._.loadingDots)}`
       process.stdout.write(content)
-      console.log() // eslint-disable-line
+      console.log()
 
       // Put cursor to starting position for next view
       const startingPosition = this._getRelativeVerticalCursorPosition(content)

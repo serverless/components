@@ -108,7 +108,7 @@ module.exports = async () => {
       name: 'shouldCreateNewProject'
     }))
   ) {
-    return
+    return null
   }
 
   const projectType = await projectTypeChoice()
@@ -125,7 +125,7 @@ module.exports = async () => {
       name: 'shouldDeployNewProject'
     }))
   ) {
-    return
+    return null
   }
   process.chdir(projectDir)
 

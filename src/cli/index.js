@@ -103,4 +103,5 @@ module.exports = async () => {
   } catch (e) {
     return cli.error(e)
   }
+  return null
 }

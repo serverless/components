@@ -235,7 +235,7 @@ const pack = async (inputDirPath, outputFilePath, include = [], exclude = []) =>
     throw new Error('The provided directory is empty and cannot be packaged')
   }
 
-  files.map((file) => {
+  files.forEach((file) => {
     if (file === path.basename(file)) {
       zip.addLocalFile(path.join(inputDirPath, file))
     } else {
@@ -449,8 +449,8 @@ const runningTemplate = (config, command) => {
 const getOutputs = (allComponentsWithOutputs) => {
   const outputs = {}
 
-  for (const instanceName in allComponentsWithOutputs) {
-    outputs[instanceName] = allComponentsWithOutputs[instanceName].outputs
+  for (const [instanceName, component] of Object.entries(allComponentsWithOutputs)) {
+    outputs[instanceName] = component.outputs
   }
 
   return outputs
@@ -479,15 +479,15 @@ const getAllComponents = (template = {}) => {
   // todo specify org, app, stage...etc
   const allComponents = {}
 
-  for (const key in template) {
-    if (template[key] && template[key].component) {
+  for (const [key, value] of Object.entries(template)) {
+    if (value && value.component) {
       allComponents[key] = {
         name: key,
-        component: template[key].component,
+        component: value.component,
         org,
         app,
         stage,
-        inputs: template[key].inputs || {}
+        inputs: value.inputs || {}
       }
     }
   }
@@ -496,10 +496,10 @@ const getAllComponents = (template = {}) => {
 }
 
 const setDependencies = (allComponents) => {
-  const regex = /\${output:(\w*[-_\${}:\w.]+)}/g
+  const regex = /\${output:(\w*[-_${}:\w.]+)}/g
 
-  for (const instanceName in allComponents) {
-    const dependencies = traverse(allComponents[instanceName].inputs).reduce((
+  for (const component of Object.values(allComponents)) {
+    const dependencies = traverse(component.inputs).reduce((
       accum,
       value
     ) => {
@@ -520,7 +520,7 @@ const setDependencies = (allComponents) => {
     },
     [])
 
-    allComponents[instanceName].dependencies = dependencies
+    component.dependencies = dependencies
   }
 
   return allComponents
@@ -529,12 +529,12 @@ const setDependencies = (allComponents) => {
 const createGraph = (allComponents, command) => {
   const graph = new Graph()
 
-  for (const instanceName in allComponents) {
-    graph.setNode(instanceName, allComponents[instanceName])
+  for (const [instanceName, component] of Object.entries(allComponents)) {
+    graph.setNode(instanceName, component)
   }
 
-  for (const instanceName in allComponents) {
-    const { dependencies } = allComponents[instanceName]
+  for (const [instanceName, component] of Object.entries(allComponents)) {
+    const { dependencies } = component
     if (!isEmpty(dependencies)) {
       for (const dependency of dependencies) {
         if (command === 'remove') {

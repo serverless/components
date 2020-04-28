@@ -112,11 +112,11 @@ const loadTencentInstanceConfig = async (directoryPath) => {
 const login = async () => {
   const [reLoggedIn, credentials] = await platformUtils.loginWithTencent()
   if (reLoggedIn) {
-    const { secret_id, secret_key, appid, token } = credentials
+    const { secret_id: secretId, secret_key: secretKey, appid, token } = credentials
     updateEnvFile({
       TENCENT_APP_ID: appid,
-      TENCENT_SECRET_ID: secret_id,
-      TENCENT_SECRET_KEY: secret_key,
+      TENCENT_SECRET_ID: secretId,
+      TENCENT_SECRET_KEY: secretKey,
       TENCENT_TOKEN: token
     })
   }
@@ -126,7 +126,7 @@ const login = async () => {
  * Load credentials from a ".env" or ".env.[stage]" file
  * @param {*} stage
  */
-const loadInstanceCredentials = (stage) => {
+const loadInstanceCredentials = () => {
   // Load env vars TODO
   const envVars = {}
 
@@ -142,17 +142,17 @@ const loadInstanceCredentials = (stage) => {
 
   const credentials = {}
 
-  for (const provider in providers) {
-    const providerEnvVars = providers[provider]
-    for (const providerEnvVar in providerEnvVars) {
-      if (!credentials[provider]) {
-        credentials[provider] = {}
+  for (const [providerName, provider] of Object.entries(providers)) {
+    const providerEnvVars = provider
+    for (const [envVarName, envVarValue] of Object.entries(providerEnvVars)) {
+      if (!credentials[providerName]) {
+        credentials[providerName] = {}
       }
       // Proper environment variables override what's in the .env file
-      if (process.env.hasOwnProperty(providerEnvVar)) {
-        credentials[provider][providerEnvVars[providerEnvVar]] = process.env[providerEnvVar]
-      } else if (envVars.hasOwnProperty(providerEnvVar)) {
-        credentials[provider][providerEnvVars[providerEnvVar]] = envVars[providerEnvVar]
+      if (process.env[envVarName] != null) {
+        credentials[providerName][envVarValue] = process.env[envVarName]
+      } else if (envVars[envVarName] != null) {
+        credentials[providerName][envVarValue] = envVars[envVarName]
       }
       continue
     }

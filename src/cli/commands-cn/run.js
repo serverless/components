@@ -99,4 +99,6 @@ module.exports = async (config, cli, command) => {
     cli.logOutputs(instance.outputs)
   }
   cli.close('success', 'Success')
+
+  return null
 }

@@ -18,10 +18,14 @@ const runningComponents = () => {
 
   try {
     componentConfig = utils.legacyLoadComponentConfig(process.cwd())
-  } catch (e) {}
+  } catch (e) {
+    // ignore
+  }
   try {
     instanceConfig = utils.legacyLoadInstanceConfig(process.cwd())
-  } catch (e) {}
+  } catch (e) {
+    // ignore
+  }
 
   if (!componentConfig && !instanceConfig) {
     // When no in service context and plain `serverless` command, return true when user in China

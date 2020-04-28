@@ -6,7 +6,6 @@
 
 const { ServerlessSDK } = require('@serverless/platform-client')
 const { getAccessKey, isLoggedIn, loadInstanceConfig } = require('./utils')
-const { getInstanceDashboardUrl } = require('../utils')
 const chalk = require('chalk')
 const moment = require('moment')
 
@@ -59,8 +58,6 @@ module.exports = async (config, cli) => {
 
   // format last action for better UX
   const lastActionAgo = moment(instance.lastActionAt).fromNow()
-
-  const dashboardUrl = getInstanceDashboardUrl(instanceYaml)
 
   // show the most important information, and link to the dashboard
   cli.log()
