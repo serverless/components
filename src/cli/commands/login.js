@@ -1,72 +1,72 @@
 'use strict';
 
-const { ServerlessSDK } = require('@serverless/platform-client')
-const { urls, readConfigFile, writeConfigFile } = require('@serverless/platform-sdk')
-const open = require('open')
-const { loadInstanceConfig } = require('./utils')
-const { loadComponentConfig } = require('../utils')
+const { ServerlessSDK } = require('@serverless/platform-client');
+const { urls, readConfigFile, writeConfigFile } = require('@serverless/platform-sdk');
+const open = require('open');
+const { loadInstanceConfig } = require('./utils');
+const { loadComponentConfig } = require('../utils');
 
 module.exports = async (config, cli) => {
   // Offer a nice presentation
 
-  cli.logLogo()
-  cli.log('Logging you in via the Browser...', 'grey')
-  cli.log()
+  cli.logLogo();
+  cli.log('Logging you in via the Browser...', 'grey');
+  cli.log();
 
-  const sdk = new ServerlessSDK()
+  const sdk = new ServerlessSDK();
 
-  let instanceYaml
-  let componentYaml
-  let componentName
-  let componentVersion
+  let instanceYaml;
+  let componentYaml;
+  let componentName;
+  let componentVersion;
   try {
     // load serverless.yml if available
-    instanceYaml = await loadInstanceConfig(process.cwd())
+    instanceYaml = await loadInstanceConfig(process.cwd());
   } catch (e) {
     // ignore
   }
 
   try {
     // load serverless.component.yml if available
-    componentYaml = await loadComponentConfig(process.cwd())
+    componentYaml = await loadComponentConfig(process.cwd());
   } catch (e) {
     // ignore
   }
 
   // parse component name and version if available
   if (instanceYaml) {
-    componentName = instanceYaml.component.split('@')[0]
-    componentVersion = instanceYaml.component.split('@')[1]
+    componentName = instanceYaml.component.split('@')[0];
+    componentVersion = instanceYaml.component.split('@')[1];
   } else if (componentYaml) {
-    componentName = componentYaml.name
-    componentVersion = componentYaml.version
+    componentName = componentYaml.name;
+    componentVersion = componentYaml.version;
   }
 
   const loginConfig = {
     ...urls,
     componentName,
-    componentVersion
-  }
+    componentVersion,
+  };
 
   // for some reason this env var is required by the SDK in order to open the browser
-  process.env.DISPLAY = true
-  const { loginUrl, loginDataDeferred } = await sdk.login(loginConfig)
+  process.env.DISPLAY = true;
+  const { loginUrl, loginDataDeferred } = await sdk.login(loginConfig);
 
   cli.log(
     'If your browser did not open automatically, copy & paste this url into your browser:',
     'grey'
-  )
-  cli.log(loginUrl, 'grey')
+  );
+  cli.log(loginUrl, 'grey');
 
-  open(loginUrl)
+  open(loginUrl);
 
-  const loginData = await loginDataDeferred
+  const loginData = await loginDataDeferred;
 
-  const configFile = readConfigFile()
+  const configFile = readConfigFile();
 
   // prepare login data to save it in the FS
-  configFile.userId = loginData.id
-  configFile.users = configFile.users || {}
+  configFile.userId = loginData.id;
+  configFile.users = configFile.users || {};
   configFile.users[loginData.id] = {
     userId: loginData.id,
     name: loginData.name,
@@ -77,12 +77,12 @@ module.exports = async (config, cli) => {
       accessToken: loginData.accessToken,
       idToken: loginData.idToken,
       expiresAt: loginData.expiresAt,
-      username: loginData.username
-    }
-  }
+      username: loginData.username,
+    },
+  };
 
   // save the login data in the rc file
-  writeConfigFile(configFile)
+  writeConfigFile(configFile);
 
-  cli.close('success', `Successfully logged in as "${loginData.username}"`)
-}
+  cli.close('success', `Successfully logged in as "${loginData.username}"`);
+};

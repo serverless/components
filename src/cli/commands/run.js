@@ -4,57 +4,62 @@
  * CLI: Command: RUN
  */
 
-const { ServerlessSDK } = require('@serverless/platform-client')
-const { getAccessKey, isLoggedIn, loadInstanceConfig, loadInstanceCredentials } = require('./utils')
-const runAll = require('./runAll')
+const { ServerlessSDK } = require('@serverless/platform-client');
+const {
+  getAccessKey,
+  isLoggedIn,
+  loadInstanceConfig,
+  loadInstanceCredentials,
+} = require('./utils');
+const runAll = require('./runAll');
 
 module.exports = async (config, cli, command) => {
   if (config.all) {
-    return runAll(config, cli, command)
+    return runAll(config, cli, command);
   }
   // Start CLI persistance status
-  cli.start('Initializing', { timer: true })
+  cli.start('Initializing', { timer: true });
 
   // Get access key
-  const accessKey = await getAccessKey()
+  const accessKey = await getAccessKey();
 
   // Ensure the user is logged in or access key is available, or advertise
   if (!accessKey && !isLoggedIn()) {
-    cli.advertise()
+    cli.advertise();
   }
 
   // Load YAML
-  const instanceYaml = await loadInstanceConfig(process.cwd())
+  const instanceYaml = await loadInstanceConfig(process.cwd());
 
   // Presentation
-  const meta = `Action: "${command}" - Stage: "${instanceYaml.stage}" - Org: "${instanceYaml.org}" - App: "${instanceYaml.app}" - Name: "${instanceYaml.name}"`
+  const meta = `Action: "${command}" - Stage: "${instanceYaml.stage}" - Org: "${instanceYaml.org}" - App: "${instanceYaml.app}" - Name: "${instanceYaml.name}"`;
   if (!config.debug) {
-    cli.logLogo()
+    cli.logLogo();
     // cli.log(meta, 'grey')
   } else {
     if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
-      cli.log('Running in Platform Dev stage')
+      cli.log('Running in Platform Dev stage');
     }
-    cli.log(meta)
+    cli.log(meta);
   }
 
-  cli.status('Initializing', instanceYaml.name)
+  cli.status('Initializing', instanceYaml.name);
 
   // Load Instance Credentials
-  const instanceCredentials = await loadInstanceCredentials(instanceYaml.stage)
+  const instanceCredentials = await loadInstanceCredentials(instanceYaml.stage);
 
   // initialize SDK
   const sdk = new ServerlessSDK({
     accessKey,
     context: {
-      orgName: instanceYaml.org
-    }
-  })
+      orgName: instanceYaml.org,
+    },
+  });
 
   // Prepare Options
-  const options = {}
-  options.debug = config.debug
-  options.dev = config.dev
+  const options = {};
+  options.debug = config.debug;
+  options.dev = config.dev;
 
   // Connect to Serverless Platform Events, if in debug mode
   if (options.debug) {
@@ -62,71 +67,71 @@ module.exports = async (config, cli, command) => {
       filter: {
         stageName: instanceYaml.stage,
         appName: instanceYaml.app,
-        instanceName: instanceYaml.name
+        instanceName: instanceYaml.name,
       },
       onEvent: (evt) => {
         if (evt.event !== 'instance.run.logs') {
-          return
+          return;
         }
         if (evt.data.logs && Array.isArray(evt.data.logs)) {
           evt.data.logs.forEach((log) => {
             // Remove strange formatting that comes from stderr
-            if (typeof log.data === 'string' && log.data.startsWith('\'')) {
-              log.data = log.data.substr(1)
+            if (typeof log.data === 'string' && log.data.startsWith("'")) {
+              log.data = log.data.substr(1);
             }
-            if (typeof log.data === 'string' && log.data.endsWith('\'')) {
-              log.data = log.data.substring(0, log.data.length - 1)
+            if (typeof log.data === 'string' && log.data.endsWith("'")) {
+              log.data = log.data.substring(0, log.data.length - 1);
             }
             if (typeof log.data === 'string' && log.data.endsWith('\\n')) {
-              log.data = log.data.substring(0, log.data.length - 2)
+              log.data = log.data.substring(0, log.data.length - 2);
             }
-            cli.log(log.data)
-          })
+            cli.log(log.data);
+          });
         }
-      }
-    })
+      },
+    });
   }
 
   if (command === 'deploy') {
     // Warn about dev agent
     if (options.dev) {
-      cli.log()
+      cli.log();
       cli.log(
         '"--dev" option detected.  Dev Agent will be added to your code.  Do not deploy this in your production stage.',
         'grey'
-      )
+      );
     }
 
     // run deploy
-    cli.status('Deploying', null, 'white')
-    const instance = await sdk.deploy(instanceYaml, instanceCredentials, options)
-    cli.log()
-    cli.logOutputs(instance.outputs)
+    cli.status('Deploying', null, 'white');
+    const instance = await sdk.deploy(instanceYaml, instanceCredentials, options);
+    cli.log();
+    cli.logOutputs(instance.outputs);
 
     // commenting out dashboard URL for now until the dashboard is usable
     // cli.log()
     // cli.log(`${chalk.grey(`Full details: ${dashboardUrl}`)}`)
   } else if (command === 'remove') {
-    cli.status('Removing', null, 'white')
+    cli.status('Removing', null, 'white');
 
     // The "inputs" in serverless.yml are only for deploy.  Remove them for all other commands
-    instanceYaml.inputs = {}
+    instanceYaml.inputs = {};
 
-    await sdk.remove(instanceYaml, instanceCredentials, options)
+    await sdk.remove(instanceYaml, instanceCredentials, options);
   } else {
     // run a custom method synchronously to receive outputs directly
-    options.sync = true
+    options.sync = true;
 
     // The "inputs" in serverless.yml are only for deploy.  Remove them for all other commands
-    instanceYaml.inputs = {}
+    instanceYaml.inputs = {};
 
-    cli.status('Running', null, 'white')
-    const instance = await sdk.run(command, instanceYaml, instanceCredentials, options)
+    cli.status('Running', null, 'white');
+    const instance = await sdk.run(command, instanceYaml, instanceCredentials, options);
 
-    cli.log()
-    cli.logOutputs(instance.outputs)
+    cli.log();
+    cli.logOutputs(instance.outputs);
   }
-  cli.close('success', 'Success')
+  cli.close('success', 'Success');
 
-  return null
-}
+  return null;
+};
