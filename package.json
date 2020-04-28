@@ -10,10 +10,14 @@
     "access": "public"
   },
   "scripts": {
-    "lint": "eslint . --fix --cache"
+    "lint": "eslint . --cache"
   },
   "author": "Serverless, Inc.",
   "license": "MIT",
+  "eslintConfig": {
+    "extends": "@serverless/eslint-config/node",
+    "root": true
+  },
   "dependencies": {
     "@serverless/inquirer": "^1.1.0",
     "@serverless/platform-client": "^0.25.4",
@@ -43,11 +47,9 @@
     "ws": "^7.2.3"
   },
   "devDependencies": {
-    "babel-eslint": "9.0.0",
-    "eslint": "5.6.0",
-    "eslint-config-prettier": "^3.6.0",
+    "@serverless/eslint-config": "^2.0.0",
+    "eslint": "^6.8.0",
     "eslint-plugin-import": "^2.20.2",
-    "eslint-plugin-prettier": "^3.1.2",
     "prettier": "^1.19.1"
   }
 }
