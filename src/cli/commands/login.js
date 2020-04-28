@@ -50,7 +50,7 @@ module.exports = async (config, cli) => {
 
   // for some reason this env var is required by the SDK in order to open the browser
   process.env.DISPLAY = true
-  let { loginUrl, loginData } = await sdk.login(loginConfig) // eslint-disable-line
+  const { loginUrl, loginDataDeferred } = await sdk.login(loginConfig)
 
   cli.log(
     'If your browser did not open automatically, copy & paste this url into your browser:',
@@ -60,7 +60,7 @@ module.exports = async (config, cli) => {
 
   open(loginUrl)
 
-  loginData = await loginData
+  const loginData = await loginDataDeferred
 
   const configFile = readConfigFile()
 

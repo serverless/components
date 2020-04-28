@@ -45,7 +45,7 @@ module.exports = async (config, cli) => {
     instanceYaml.name
   )
 
-  instance = instance.instance // eslint-disable-line
+  instance = instance.instance
 
   // Throw a helpful error if the instance was not deployed
   if (!instance) {

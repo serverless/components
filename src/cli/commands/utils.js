@@ -314,9 +314,9 @@ const getTemplate = async (root) => {
         throw new Error('Attempting to deploy multiple instances to multiple stages')
       }
 
-      template.org = instanceYaml.org // eslint-disable-line
-      template.app = instanceYaml.app // eslint-disable-line
-      template.stage = instanceYaml.stage // eslint-disable-line
+      template.org = instanceYaml.org
+      template.app = instanceYaml.app
+      template.stage = instanceYaml.stage
 
       // update paths in inputs
       if (instanceYaml.inputs.src) {
