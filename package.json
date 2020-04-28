@@ -10,7 +10,9 @@
     "access": "public"
   },
   "scripts": {
-    "lint": "eslint . --cache"
+    "lint": "eslint . --cache",
+    "prettier-check": "prettier -c --ignore-path .gitignore \"**/*.{css,html,js,json,md,yaml,yml}\"",
+    "prettify": "prettier --write --ignore-path .gitignore \"**/*.{css,html,js,json,md,yaml,yml}\""
   },
   "author": "Serverless, Inc.",
   "license": "MIT",
@@ -55,6 +57,6 @@
     "@serverless/eslint-config": "^2.0.0",
     "eslint": "^6.8.0",
     "eslint-plugin-import": "^2.20.2",
-    "prettier": "^1.19.1"
+    "prettier": "^2.0.5"
   }
 }
