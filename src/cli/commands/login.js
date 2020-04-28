@@ -1,3 +1,5 @@
+'use strict';
+
 const { ServerlessSDK } = require('@serverless/platform-client')
 const { urls, readConfigFile, writeConfigFile } = require('@serverless/platform-sdk')
 const open = require('open')

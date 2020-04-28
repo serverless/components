@@ -1,3 +1,5 @@
+'use strict';
+
 const { ServerlessSDK } = require('@serverless/platform-client')
 const {
   getOutputs,
@@ -20,16 +22,14 @@ module.exports = async (config, cli, command) => {
 
   if (!config.debug) {
     cli.logLogo()
-  } else {
-    if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
-      cli.log(`Running in Platform Dev stage`)
+  } else if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
+      cli.log('Running in Platform Dev stage')
     }
-  }
 
   const templateYaml = await getTemplate(process.cwd())
 
   if (!templateYaml) {
-    throw new Error(`No components found in sub directories.`)
+    throw new Error('No components found in sub directories.')
   }
 
   // Load Instance Credentials
@@ -64,13 +64,13 @@ module.exports = async (config, cli, command) => {
         if (evt.data.logs && Array.isArray(evt.data.logs)) {
           evt.data.logs.forEach((log) => {
             // Remove strange formatting that comes from stderr
-            if (typeof log.data === 'string' && log.data.startsWith(`'`)) {
+            if (typeof log.data === 'string' && log.data.startsWith('\'')) {
               log.data = log.data.substr(1)
             }
-            if (typeof log.data === 'string' && log.data.endsWith(`'`)) {
+            if (typeof log.data === 'string' && log.data.endsWith('\'')) {
               log.data = log.data.substring(0, log.data.length - 1)
             }
-            if (typeof log.data === 'string' && log.data.endsWith(`\\n`)) {
+            if (typeof log.data === 'string' && log.data.endsWith('\\n')) {
               log.data = log.data.substring(0, log.data.length - 2)
             }
             cli.log(log.data)

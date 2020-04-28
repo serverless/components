@@ -1,3 +1,5 @@
+'use strict';
+
 /*
  * CLI: Command: Dev
  */
@@ -82,13 +84,13 @@ module.exports = async (config, cli) => {
           const date = new Date(log.createdAt)
 
           // Remove strange formatting that comes from stderr
-          if (typeof log.data === 'string' && log.data.startsWith(`'`)) {
+          if (typeof log.data === 'string' && log.data.startsWith('\'')) {
             log.data = log.data.substr(1)
           }
-          if (typeof log.data === 'string' && log.data.endsWith(`'`)) {
+          if (typeof log.data === 'string' && log.data.endsWith('\'')) {
             log.data = log.data.substring(0, log.data.length - 1)
           }
-          if (typeof log.data === 'string' && log.data.endsWith(`\\n`)) {
+          if (typeof log.data === 'string' && log.data.endsWith('\\n')) {
             log.data = log.data.substring(0, log.data.length - 2)
           }
 
@@ -175,7 +177,7 @@ module.exports = async (config, cli) => {
   try {
     await sdk.connect({
       org: instanceYaml.org,
-      filter: filter,
+      filter,
       onEvent
     })
   } catch (error) {

@@ -1,3 +1,5 @@
+'use strict';
+
 /*
  * CLI: Command: RUN
  */

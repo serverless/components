@@ -1,3 +1,5 @@
+'use strict';
+
 const run = require('./run')
 const info = require('./info')
 const create = require('./create')

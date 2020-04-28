@@ -1,3 +1,5 @@
+'use strict';
+
 /*
  * Serverless Components: CLI Handler
  */
@@ -20,9 +22,9 @@ module.exports = async () => {
 
   // Load environment variables from eventual .env files
   // Look in current working directory first, and the parent directory second
-  const defaultEnvFilePath = path.join(process.cwd(), `.env`)
+  const defaultEnvFilePath = path.join(process.cwd(), '.env')
   const stageEnvFilePath = path.join(process.cwd(), `.env.${stage}`)
-  const parentDefaultEnvFilePath = path.join(process.cwd(), '..', `.env`)
+  const parentDefaultEnvFilePath = path.join(process.cwd(), '..', '.env')
   const parentStageEnvFilePath = path.join(process.cwd(), '..', `.env.${stage}`)
   if (stage && fileExistsSync(stageEnvFilePath)) {
     dotenv.config({ path: path.resolve(stageEnvFilePath) })
@@ -76,7 +78,7 @@ module.exports = async () => {
   }
 
   config.platformStage = process.env.SERVERLESS_PLATFORM_STAGE || 'prod'
-  config.debug = process.env.SLS_DEBUG || (args.debug ? true : false)
+  config.debug = process.env.SLS_DEBUG || (!!args.debug)
 
   // Add stage environment variable
   if (args.stage && !process.env.SERVERLESS_STAGE) {

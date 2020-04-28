@@ -1,3 +1,5 @@
+'use strict';
+
 const { ServerlessSDK } = require('@serverless/platform-client-china')
 const {
   getOutputs,
@@ -15,16 +17,14 @@ module.exports = async (config, cli, command) => {
 
   if (!config.debug) {
     cli.logLogo()
-  } else {
-    if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
-      cli.log(`Running in Platform Dev stage`)
+  } else if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
+      cli.log('Running in Platform Dev stage')
     }
-  }
 
   const templateYaml = await getTemplate(process.cwd())
 
   if (!templateYaml) {
-    throw new Error(`No components found in sub directories.`)
+    throw new Error('No components found in sub directories.')
   }
 
   // Load Instance Credentials

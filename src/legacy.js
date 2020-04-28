@@ -1,3 +1,5 @@
+'use strict';
+
 const utils = require('./cli/utils')
 const minimist = require('minimist')
 const {
@@ -7,7 +9,7 @@ const {
 const runningComponents = () => {
   const args = minimist(process.argv.slice(2))
 
-  let componentConfig, instanceConfig
+  let componentConfig; let instanceConfig
 
   // load components if user runs "sls registry" or "sls --all" or "sls --target" (that last one for china)
   if (process.argv[2] === 'registry' || args.all || args.target) {

@@ -1,3 +1,5 @@
+'use strict';
+
 const login = require('./login')
 const logout = require('./logout')
 const run = require('./run')

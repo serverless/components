@@ -1,3 +1,5 @@
+'use strict';
+
 /*
  * CLI: Command: Registry
  */
@@ -99,7 +101,7 @@ const getComponent = async (config, cli) => {
   cli.log(`Author: ${data.component.author}`)
   cli.log(`Repo: ${data.component.repo}`)
   cli.log()
-  cli.log(`Available Versions:`)
+  cli.log('Available Versions:')
   cli.log(`${data.versions.join(', ')}`)
 
   cli.close('success', `Component information listed for "${componentName}"`)
@@ -114,16 +116,16 @@ const listFeatured = async (config, cli) => {
   cli.logRegistryLogo()
   cli.log()
 
-  cli.log(`Featured Components:`)
+  cli.log('Featured Components:')
   cli.log()
-  cli.log(`  express - https://github.com/serverless-components/express`)
-  cli.log(`  website - https://github.com/serverless-components/website`)
-  cli.log(`  aws-lambda - https://github.com/serverless-components/aws-lambda`)
-  cli.log(`  aws-dynamodb - https://github.com/serverless-components/aws-dynamodb`)
-  cli.log(`  aws-iam-role - https://github.com/serverless-components/aws-iam-role`)
-  cli.log(`  aws-lambda-layer - https://github.com/serverless-components/aws-lambda-layer`)
+  cli.log('  express - https://github.com/serverless-components/express')
+  cli.log('  website - https://github.com/serverless-components/website')
+  cli.log('  aws-lambda - https://github.com/serverless-components/aws-lambda')
+  cli.log('  aws-dynamodb - https://github.com/serverless-components/aws-dynamodb')
+  cli.log('  aws-iam-role - https://github.com/serverless-components/aws-iam-role')
+  cli.log('  aws-lambda-layer - https://github.com/serverless-components/aws-lambda-layer')
   cli.log()
-  cli.log(`Find more here: https://github.com/serverless-components`)
+  cli.log('Find more here: https://github.com/serverless-components')
   cli.log()
 }
 

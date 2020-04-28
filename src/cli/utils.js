@@ -1,3 +1,5 @@
+'use strict';
+
 /*
  * Serverless Components: Utilities
  */
@@ -46,7 +48,7 @@ const request = async (options) => {
   }
 
   if (options.accessKey) {
-    requestOptions.headers['authorization'] = `Bearer ${options.accessKey}`
+    requestOptions.headers.authorization = `Bearer ${options.accessKey}`
   }
 
   let res
@@ -147,9 +149,9 @@ const resolveInputVariables = (inputs) => {
  */
 const loadComponentConfig = (directoryPath) => {
   directoryPath = path.resolve(directoryPath)
-  const ymlFilePath = path.join(directoryPath, `serverless.component.yml`)
-  const yamlFilePath = path.join(directoryPath, `serverless.component.yaml`)
-  const jsonFilePath = path.join(directoryPath, `serverless.component.json`)
+  const ymlFilePath = path.join(directoryPath, 'serverless.component.yml')
+  const yamlFilePath = path.join(directoryPath, 'serverless.component.yaml')
+  const jsonFilePath = path.join(directoryPath, 'serverless.component.json')
   let filePath
   let isYaml = false
   let componentFile
@@ -168,7 +170,7 @@ const loadComponentConfig = (directoryPath) => {
   }
   if (!filePath) {
     throw new Error(
-      `The serverless.component file could not be found in the current working directory.`
+      'The serverless.component file could not be found in the current working directory.'
     )
   }
 
@@ -230,7 +232,7 @@ const pack = async (inputDirPath, outputFilePath, include = [], exclude = []) =>
   const files = (await globby(patterns, { cwd: inputDirPath })).sort()
 
   if (files.length === 0) {
-    throw new Error(`The provided directory is empty and cannot be packaged`)
+    throw new Error('The provided directory is empty and cannot be packaged')
   }
 
   files.map((file) => {
@@ -251,9 +253,9 @@ const pack = async (inputDirPath, outputFilePath, include = [], exclude = []) =>
 }
 
 const getInstanceDashboardUrl = (instanceYaml) => {
-  let dashboardRoot = `https://dashboard.serverless.com`
+  let dashboardRoot = 'https://dashboard.serverless.com'
   if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
-    dashboardRoot = `https://dashboard.serverless-dev.com`
+    dashboardRoot = 'https://dashboard.serverless-dev.com'
   }
 
   const dashboardUrl = `${dashboardRoot}/tenants/${instanceYaml.org}/applications/${instanceYaml.app}/component/${instanceYaml.name}/stage/${instanceYaml.stage}/overview`
@@ -267,9 +269,9 @@ const getInstanceDashboardUrl = (instanceYaml) => {
  */
 const loadInstanceConfig = memoizeWith(identity, (directoryPath) => {
   directoryPath = path.resolve(directoryPath)
-  const ymlFilePath = path.join(directoryPath, `serverless.yml`)
-  const yamlFilePath = path.join(directoryPath, `serverless.yaml`)
-  const jsonFilePath = path.join(directoryPath, `serverless.json`)
+  const ymlFilePath = path.join(directoryPath, 'serverless.yml')
+  const yamlFilePath = path.join(directoryPath, 'serverless.yaml')
+  const jsonFilePath = path.join(directoryPath, 'serverless.json')
   let filePath
   let isYaml = false
   let instanceFile
@@ -326,9 +328,9 @@ const loadInstanceConfig = memoizeWith(identity, (directoryPath) => {
  */
 const legacyLoadInstanceConfig = (directoryPath) => {
   directoryPath = path.resolve(directoryPath)
-  const ymlFilePath = path.join(directoryPath, `serverless.yml`)
-  const yamlFilePath = path.join(directoryPath, `serverless.yaml`)
-  const jsonFilePath = path.join(directoryPath, `serverless.json`)
+  const ymlFilePath = path.join(directoryPath, 'serverless.yml')
+  const yamlFilePath = path.join(directoryPath, 'serverless.yaml')
+  const jsonFilePath = path.join(directoryPath, 'serverless.json')
   let filePath
   let isYaml = false
   let instanceFile
@@ -374,9 +376,9 @@ const legacyLoadInstanceConfig = (directoryPath) => {
  */
 const legacyLoadComponentConfig = (directoryPath) => {
   directoryPath = path.resolve(directoryPath)
-  const ymlFilePath = path.join(directoryPath, `serverless.component.yml`)
-  const yamlFilePath = path.join(directoryPath, `serverless.component.yaml`)
-  const jsonFilePath = path.join(directoryPath, `serverless.component.json`)
+  const ymlFilePath = path.join(directoryPath, 'serverless.component.yml')
+  const yamlFilePath = path.join(directoryPath, 'serverless.component.yaml')
+  const jsonFilePath = path.join(directoryPath, 'serverless.component.json')
   let filePath
   let isYaml = false
   let componentFile
@@ -395,7 +397,7 @@ const legacyLoadComponentConfig = (directoryPath) => {
   }
   if (!filePath) {
     throw new Error(
-      `The serverless.component file could not be found in the current working directory.`
+      'The serverless.component file could not be found in the current working directory.'
     )
   }
 
@@ -497,10 +499,10 @@ const setDependencies = (allComponents) => {
   const regex = /\${output:(\w*[-_\${}:\w.]+)}/g
 
   for (const instanceName in allComponents) {
-    const dependencies = traverse(allComponents[instanceName].inputs).reduce(function(
+    const dependencies = traverse(allComponents[instanceName].inputs).reduce((
       accum,
       value
-    ) {
+    ) => {
       const matches = typeof value === 'string' ? value.match(regex) : null
       if (matches) {
         for (const match of matches) {

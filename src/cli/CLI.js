@@ -1,3 +1,5 @@
+'use strict';
+
 /*
  * SERVERLESS COMPONENTS: CLI
  */
@@ -111,7 +113,7 @@ class CLI {
     this.log()
     let content = ''
     if (this._.timer) {
-      content += `${this._.timerSeconds + 's'}`
+      content += `${`${this._.timerSeconds  }s`}`
       content += ` ${figures.pointerSmall} `
     }
     content += `${this._.entity} `
@@ -202,31 +204,31 @@ class CLI {
 
   logLogo(text) {
     let logo = os.EOL
-    logo = logo + white(`serverless`)
-    logo = logo + red(` ⚡ `)
-    logo = logo + white(`framework`)
+    logo += white('serverless')
+    logo += red(' ⚡ ')
+    logo += white('framework')
 
     if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
-      logo = logo + grey(` (dev)`)
+      logo += grey(' (dev)')
     }
     if (text) {
-      logo = logo + text
+      logo += text
     }
     this.log(logo)
   }
 
   logRegistryLogo(text) {
     let logo = os.EOL
-    logo = logo + white(`serverless`)
-    logo = logo + red(` ⚡ `)
-    logo = logo + white(`registry`)
+    logo += white('serverless')
+    logo += red(' ⚡ ')
+    logo += white('registry')
 
     if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
-      logo = logo + grey(` (dev)`)
+      logo += grey(' (dev)')
     }
 
     if (text) {
-      logo = logo + text
+      logo += text
     }
     this.log(logo)
   }
@@ -241,13 +243,13 @@ class CLI {
   advertise() {
     this.logLogo()
     let ad = grey(
-      `This is a Serverless Framework Component.  Sign-in to use it for free with these features:`
+      'This is a Serverless Framework Component.  Sign-in to use it for free with these features:'
     )
-    ad = ad + os.EOL
-    ad = ad + os.EOL + grey(`  • Registry Access`)
-    ad = ad + os.EOL + grey(`  • Instant Deployments & Logs`)
-    ad = ad + os.EOL + grey(`  • State Storage, Output Sharing & Secrets`)
-    ad = ad + os.EOL + grey(`  • And Much More: https://serverless.com/components`)
+    ad += os.EOL
+    ad = ad + os.EOL + grey('  • Registry Access')
+    ad = ad + os.EOL + grey('  • Instant Deployments & Logs')
+    ad = ad + os.EOL + grey('  • State Storage, Output Sharing & Secrets')
+    ad = ad + os.EOL + grey('  • And Much More: https://serverless.com/components')
     this.log(ad)
     this.close('error', 'Please log in by running "serverless login"', true)
   }
@@ -344,8 +346,8 @@ class CLI {
     if (this._.debug) {
       // Print Status
       if (this._.status !== this._.lastStatus) {
-        this.log(this._.status + '...')
-        this._.lastStatus = '' + this._.status
+        this.log(`${this._.status  }...`)
+        this._.lastStatus = `${  this._.status}`
       }
     }
 
@@ -355,11 +357,11 @@ class CLI {
     if (!this._.debug) {
       // Update active dots
       if (this._.loadingDotCount === 0) {
-        this._.loadingDots = `.`
+        this._.loadingDots = '.'
       } else if (this._.loadingDotCount === 2) {
-        this._.loadingDots = `..`
+        this._.loadingDots = '..'
       } else if (this._.loadingDotCount === 4) {
-        this._.loadingDots = `...`
+        this._.loadingDots = '...'
       } else if (this._.loadingDotCount === 6) {
         this._.loadingDots = ''
       }
@@ -375,7 +377,7 @@ class CLI {
       console.log() // eslint-disable-line
       let content = ''
       if (this._.timer) {
-        content += `${this._.statusColor(this._.timerSeconds + 's')} `
+        content += `${this._.statusColor(`${this._.timerSeconds  }s`)} `
         content += `${this._.statusColor(figures.pointerSmall)} `
       }
       content += `${this._.statusColor(this._.entity)} `

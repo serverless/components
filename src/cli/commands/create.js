@@ -1,3 +1,5 @@
+'use strict';
+
 /*
  * CLI: Command: CREATE
  */
@@ -36,9 +38,9 @@ module.exports = async (config, cli) => {
 
   cli.log(`- Successfully created "${templateName}" instance in the currennt working directory.`)
 
-  cli.log(`- Don't forget to update serverless.yml and install dependencies if needed.`)
+  cli.log('- Don\'t forget to update serverless.yml and install dependencies if needed.')
 
-  cli.log(`- Whenever you're ready, run "serverless deploy" to deploy your new instance.`)
+  cli.log('- Whenever you\'re ready, run "serverless deploy" to deploy your new instance.')
 
   cli.close('success', 'Created')
 }
