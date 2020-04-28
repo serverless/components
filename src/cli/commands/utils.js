@@ -197,6 +197,19 @@ const loadVendorInstanceConfig = async (directoryPath) => {
     // load credentials to process .env files before resolving env variables
     await loadInstanceCredentials(instanceFile.stage)
     instanceFile.inputs = resolveInputVariables(instanceFile.inputs)
+
+    if (instanceFile.inputs.src) {
+      if (typeof instanceFile.inputs.src === 'string') {
+        instanceFile.inputs.src = path.resolve(directoryPath, instanceFile.inputs.src)
+      } else if (typeof instanceFile.inputs.src === 'object') {
+        if (instanceFile.inputs.src.src) {
+          instanceFile.inputs.src.src = path.resolve(directoryPath, instanceFile.inputs.src.src)
+        }
+        if (instanceFile.inputs.src.dist) {
+          instanceFile.inputs.src.dist = path.resolve(directoryPath, instanceFile.inputs.src.dist)
+        }
+      }
+    }
   }
 
   return instanceFile
@@ -315,21 +328,6 @@ const getTemplate = async (root) => {
       template.org = instanceYaml.org // eslint-disable-line
       template.app = instanceYaml.app // eslint-disable-line
       template.stage = instanceYaml.stage // eslint-disable-line
-
-      // update paths in inputs
-      if (instanceYaml.inputs.src) {
-        if (typeof instanceYaml.inputs.src === 'string') {
-          instanceYaml.inputs.src = join(directoryPath, instanceYaml.inputs.src)
-        } else if (typeof instanceYaml.inputs.src === 'object') {
-          if (instanceYaml.inputs.src.src) {
-            instanceYaml.inputs.src.src = join(directoryPath, instanceYaml.inputs.src.src)
-          }
-
-          if (instanceYaml.inputs.src.dist) {
-            instanceYaml.inputs.src.dist = join(directoryPath, instanceYaml.inputs.src.dist)
-          }
-        }
-      }
 
       template[instanceYml.name] = instanceYaml
     }

@@ -7,10 +7,9 @@ app.get(`/*`, (req, res) => {
 })
 
 // Error handler
-app.use(function (err, req, res, next) {
+app.use(function(err, req, res, next) {
   console.error(err)
   res.status(500).send('Internal Serverless Error')
 })
 
 module.exports = app
-
