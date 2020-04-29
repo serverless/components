@@ -199,6 +199,19 @@ const loadVendorInstanceConfig = async (directoryPath) => {
     // load credentials to process .env files before resolving env variables
     await loadInstanceCredentials(instanceFile.stage);
     instanceFile.inputs = resolveInputVariables(instanceFile.inputs);
+
+    if (instanceFile.inputs.src) {
+      if (typeof instanceFile.inputs.src === 'object') {
+        if (instanceFile.inputs.src.src) {
+          instanceFile.inputs.src.src = path.resolve(directoryPath, instanceFile.inputs.src.src);
+        }
+        if (instanceFile.inputs.src.dist) {
+          instanceFile.inputs.src.dist = path.resolve(directoryPath, instanceFile.inputs.src.dist);
+        }
+      } else {
+        instanceFile.inputs.src = path.resolve(directoryPath, instanceFile.inputs.src);
+      }
+    }
   }
 
   return instanceFile;
