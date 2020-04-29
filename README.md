@@ -182,17 +182,17 @@ Serverless Components are easily written in Javascript (`serverless.js`), with s
 ```javascript
 // serverless.js
 
-const { Component } = require('@serverless/core')
+const { Component } = require('@serverless/core');
 
 class MyBlog extends Component {
   async deploy(inputs) {
-    console.log('Deploying a serverless blog') // Leave a status update for users deploying your Component with --debug
-    this.state.url = outputs.url // Save state
-    return outputs
+    console.log('Deploying a serverless blog'); // Leave a status update for users deploying your Component with --debug
+    this.state.url = outputs.url; // Save state
+    return outputs;
   }
 }
 
-module.exports = MyBlog
+module.exports = MyBlog;
 ```
 
 ### Registry
@@ -401,7 +401,7 @@ $ serverless deploy --stage prod
 
 Again, the CLI flag overrides both a `stage` in `serverless.yml` and an Environment Variable. Whereas an Environment Variable can only override the `stage` in `serverless.yml`.
 
-Lastly, you can set stage-specific environment variables using separate `.env` files. Each file must be named in the following format: `.env.STAGE`. For example, if you run in the prod stage, the environment variables in `.env.prod` would be loaded, otherwise the default `.env` file (without stage extension) would be loaded.  You can also put the `.env.STAGE` file in the immediate parent directory, in the case that you have a parent folder containing many Component Instances.
+Lastly, you can set stage-specific environment variables using separate `.env` files. Each file must be named in the following format: `.env.STAGE`. For example, if you run in the prod stage, the environment variables in `.env.prod` would be loaded, otherwise the default `.env` file (without stage extension) would be loaded. You can also put the `.env.STAGE` file in the immediate parent directory, in the case that you have a parent folder containing many Component Instances.
 
 A practical usage of this is if you want to have a separate AWS account for each stage. In that case you would keep separate AWS credentials for each stage you are targeting. Then based on the stage you're deploying to, the correct credentials would be picked up.
 
@@ -581,15 +581,15 @@ To make a bare minimum Serverless Component, create a `serverless.js` file, exte
 ```javascript
 // serverless.js
 
-const { Component } = require('@serverless/core')
+const { Component } = require('@serverless/core');
 
 class MyComponent extends Component {
   async deploy(inputs = {}) {
-    return {}
+    return {};
   } // The default functionality to run/provision/update your Component
 }
 
-module.exports = MyComponent
+module.exports = MyComponent;
 ```
 
 `deploy()` is always required. It is where the logic resides in order for your Component to _make_ something. Whenever you run the `$ serverless deploy` command, it's always calling the `deploy()` method.
@@ -607,7 +607,7 @@ Here is what it looks like to add a `remove` method, as well as a custom method.
 ```javascript
 // serverless.js
 
-const { Component } = require('@serverless/core')
+const { Component } = require('@serverless/core');
 
 class MyComponent extends Component {
   /*
@@ -615,7 +615,7 @@ class MyComponent extends Component {
    * You can run this function by running the "$ serverless deploy" command
    */
   async deploy(inputs = {}) {
-    return {}
+    return {};
   }
 
   /*
@@ -624,7 +624,7 @@ class MyComponent extends Component {
    */
 
   async remove(inputs = {}) {
-    return {}
+    return {};
   }
 
   /*
@@ -633,11 +633,11 @@ class MyComponent extends Component {
    */
 
   async anything(inputs = {}) {
-    return {}
+    return {};
   }
 }
 
-module.exports = MyComponent
+module.exports = MyComponent;
 ```
 
 When inside a Component method, `this` comes with utilities which you can use. Here is a guide to what's available to you within the context of a Component.
@@ -645,36 +645,36 @@ When inside a Component method, `this` comes with utilities which you can use. H
 ```javascript
 // serverless.js
 
-const { Component } = require('@serverless/core')
+const { Component } = require('@serverless/core');
 
 class MyComponent extends Component {
   async deploy(inputs = {}) {
     // this features useful information
-    console.log(this)
+    console.log(this);
 
     // Common provider credentials are identified in the environment or .env file and added to this.context.credentials
     // when you run "serverless deploy", then the credentials in .env will be used
     // when you run "serverless deploy --stage prod", then the credentials in .env.prod will be used...etc
     // if you don't have any .env files, then global aws credentials will be used
-    const dynamodb = new AWS.DynamoDB({ credentials: this.credentials.aws })
+    const dynamodb = new AWS.DynamoDB({ credentials: this.credentials.aws });
 
     // You can easily create a random ID to name cloud infrastructure resources with using this utility.
-    const s3BucketName = `my-bucket-${this.resourceId()}`
+    const s3BucketName = `my-bucket-${this.resourceId()}`;
     // This prevents name collisions.
 
     // Components have built-in state storage.
     // Here is how to save state to your Component:
-    this.state.name = 'myComponent'
+    this.state.name = 'myComponent';
 
     // If you want to show a debug statement in the CLI, use console.log.
-    console.log('this is a debug statement')
+    console.log('this is a debug statement');
 
     // Return your outputs
-    return { url: websiteOutputs.url }
+    return { url: websiteOutputs.url };
   }
 }
 
-module.exports = MyComponent
+module.exports = MyComponent;
 ```
 
 ### Working With Source Code
@@ -709,18 +709,18 @@ If your Component runs code, and you want to enable streaming logs, errors and t
 
 ```javascript
 // unzip source zip file
-console.log(`Unzipping ${inputs.src}...`)
-const sourceDirectory = await instance.unzip(inputs.src)
-console.log(`Files unzipped into ${sourceDirectory}...`)
+console.log(`Unzipping ${inputs.src}...`);
+const sourceDirectory = await instance.unzip(inputs.src);
+console.log(`Files unzipped into ${sourceDirectory}...`);
 
 // add sdk to the source directory, add original handler
-console.log(`Installing Serverless Framework SDK...`)
-instance.state.handler = await instance.addSDK(sourceDirectory, '_express/handler.handler')
+console.log(`Installing Serverless Framework SDK...`);
+instance.state.handler = await instance.addSDK(sourceDirectory, '_express/handler.handler');
 
 // zip the source directory with the shim and the sdk
-console.log(`Zipping files...`)
-const zipPath = await instance.zip(sourceDirectory)
-console.log(`Files zipped into ${zipPath}...`)
+console.log(`Zipping files...`);
+const zipPath = await instance.zip(sourceDirectory);
+console.log(`Files zipped into ${zipPath}...`);
 ```
 
 After this, you'll likely want to upload the code to a compute service (e.g. AWS Lambda).
@@ -762,11 +762,11 @@ When writing a Component, we recomend to always use the `--debug` flag, so that 
 ```javascript
 class MyComponent extends Component {
   async deploy(inputs) {
-    console.log(`Starting MyComponent.`)
-    console.log(`Creating resources.`)
-    console.log(`Waiting for resources to be provisioned.`)
-    console.log(`Finished MyComponent.`)
-    return {}
+    console.log(`Starting MyComponent.`);
+    console.log(`Creating resources.`);
+    console.log(`Waiting for resources to be provisioned.`);
+    console.log(`Finished MyComponent.`);
+    return {};
   }
 }
 ```
@@ -791,7 +791,7 @@ Here are some development tips when it comes to writing Serverless Components:
 
 #### Start With The Outcome
 
-We recommend starting with a focus on your desired outcome, rather than try to break things down into multiple smaller Components from the start.  Trying to break things down into multiple Components most often ends up as a distraction.  Create a higher level Component that solves your problem first.  Use it.  Learn from it.  Then consider breaking things down into smaller Components if necessary.  At the same time, high-level solutions are what Serverless Components are meant for.  They are outcomes—with the lowest operational overhead.
+We recommend starting with a focus on your desired outcome, rather than try to break things down into multiple smaller Components from the start. Trying to break things down into multiple Components most often ends up as a distraction. Create a higher level Component that solves your problem first. Use it. Learn from it. Then consider breaking things down into smaller Components if necessary. At the same time, high-level solutions are what Serverless Components are meant for. They are outcomes—with the lowest operational overhead.
 
 #### Knowing The Outcome Is An Advantage
 
@@ -813,9 +813,9 @@ If you do need to store state, try to store it immediately after a successful op
 
 ```javascript
 // Do something
-this.state.id = 'updated or new id'
+this.state.id = 'updated or new id';
 // Do something else
-this.state.url = 'updated or new url'
+this.state.url = 'updated or new url';
 ```
 
 This way, if anything after that operation fails, your Serverless Component can pick up where it left off, when the end user tries to deploy it again.
@@ -825,7 +825,6 @@ This way, if anything after that operation fails, your Serverless Component can 
 We believe serverless infrastructure and architectures will empower more people to develop software than ever before.
 
 Because of this, we're designing all of our projects to be as approachable as possible. Please try to use simple, vanilla Javascript. Additionally, to reduce security risks and general bloat, please try to use the least amount of NPM dependencies as possible.
-
 
 #### No Surprise Removals
 
@@ -841,7 +840,7 @@ Error: Changing the region from us-east-1 to us-east-2 will remove your infrastr
 $
 ```
 
-We have measured this user experience and so far 100% of the time the user will remove their existing Component Instance and deploy another one.  This works extremely well.
+We have measured this user experience and so far 100% of the time the user will remove their existing Component Instance and deploy another one. This works extremely well.
 
 #### Write Integration Tests
 

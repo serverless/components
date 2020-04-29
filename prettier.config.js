@@ -1,8 +1,3 @@
-module.exports = {
-  arrowParens: 'always',
-  printWidth: 100,
-  semi: false,
-  singleQuote: true,
-  tabWidth: 2,
-  trailingComma: 'none'
-}
+'use strict';
+
+module.exports = require('@serverless/eslint-config/prettier.config');

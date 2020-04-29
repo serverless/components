@@ -1,18 +1,20 @@
-const { getLoggedInUser, logout } = require('@serverless/platform-sdk')
+'use strict';
 
-module.exports = async (config, cli, command) => {
-  cli.logLogo()
+const { getLoggedInUser, logout } = require('@serverless/platform-sdk');
 
-  cli.status('Logging out')
+module.exports = async (config, cli) => {
+  cli.logLogo();
 
-  const user = getLoggedInUser()
+  cli.status('Logging out');
+
+  const user = getLoggedInUser();
 
   if (!user) {
-    cli.close('error', `You are already logged out`)
+    cli.close('error', 'You are already logged out');
   }
 
-  await logout()
+  await logout();
 
-  cli.status('Logged Out')
-  cli.close('success', `Successfully logged out of "${user.username}"`)
-}
+  cli.status('Logged Out');
+  cli.close('success', `Successfully logged out of "${user.username}"`);
+};

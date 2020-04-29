@@ -211,17 +211,17 @@ Serverless Components 可以通过 YAML 中的配置灵活组合 (serverless.yml
 ```javascript
 // serverless.js
 
-const { Component } = require('@serverless/core')
+const { Component } = require('@serverless/core');
 
 class MyBlog extends Component {
   async deploy(inputs) {
-    console.log('Deploying a serverless blog') // Leave a status update for users deploying your Component with --debug
-    this.state.url = outputs.url // Save state
-    return outputs
+    console.log('Deploying a serverless blog'); // Leave a status update for users deploying your Component with --debug
+    this.state.url = outputs.url; // Save state
+    return outputs;
   }
 }
 
-module.exports = MyBlog
+module.exports = MyBlog;
 ```
 
 ### 注册中心 Registry
@@ -592,15 +592,15 @@ main: ./src # 选填，Component 的代码路径
 ```javascript
 // serverless.js
 
-const { Component } = require('@serverless/core')
+const { Component } = require('@serverless/core');
 
 class MyComponent extends Component {
   async deploy(inputs = {}) {
-    return {}
+    return {};
   } // The default functionality to run/provision/update your Component
 }
 
-module.exports = MyComponent
+module.exports = MyComponent;
 ```
 
 `deploy()` 方法是必须的，Component 的操作逻辑都会包含在其中。当客户运行 `$ serverless deploy` 命令时，就会调用 `deploy()` 方法。
@@ -618,7 +618,7 @@ Serverless Components 当前还在较为初期的阶段，但已经逐步在支�
 ```javascript
 // serverless.js
 
-const { Component } = require('@serverless/core')
+const { Component } = require('@serverless/core');
 
 class MyComponent extends Component {
   /*
@@ -626,7 +626,7 @@ class MyComponent extends Component {
    * You can run this function by running the "$ serverless deploy" command
    */
   async deploy(inputs = {}) {
-    return {}
+    return {};
   }
 
   /*
@@ -635,7 +635,7 @@ class MyComponent extends Component {
    */
 
   async remove(inputs = {}) {
-    return {}
+    return {};
   }
 
   /*
@@ -644,11 +644,11 @@ class MyComponent extends Component {
    */
 
   async anything(inputs = {}) {
-    return {}
+    return {};
   }
 }
 
-module.exports = MyComponent
+module.exports = MyComponent;
 ```
 
 在
@@ -659,36 +659,36 @@ When inside a Component method, `this` comes with utilities which you can use. H
 ```javascript
 // serverless.js
 
-const { Component } = require('@serverless/core')
+const { Component } = require('@serverless/core');
 
 class MyComponent extends Component {
   async deploy(inputs = {}) {
     // this features useful information
-    console.log(this)
+    console.log(this);
 
     // Common provider credentials are identified in the environment or .env file and added to this.context.credentials
     // when you run "serverless deploy", then the credentials in .env will be used
     // when you run "serverless deploy --stage prod", then the credentials in .env.prod will be used...etc
     // if you don't have any .env files, then global aws credentials will be used
-    const dynamodb = new AWS.DynamoDB({ credentials: this.credentials.aws })
+    const dynamodb = new AWS.DynamoDB({ credentials: this.credentials.aws });
 
     // You can easily create a random ID to name cloud infrastructure resources with using this utility.
-    const s3BucketName = `my-bucket-${this.resourceId()}`
+    const s3BucketName = `my-bucket-${this.resourceId()}`;
     // This prevents name collisions.
 
     // Components have built-in state storage.
     // Here is how to save state to your Component:
-    this.state.name = 'myComponent'
+    this.state.name = 'myComponent';
 
     // If you want to show a debug statement in the CLI, use console.log.
-    console.log('this is a debug statement')
+    console.log('this is a debug statement');
 
     // Return your outputs
-    return { url: websiteOutputs.url }
+    return { url: websiteOutputs.url };
   }
 }
 
-module.exports = MyComponent
+module.exports = MyComponent;
 ```
 
 ### Component 中涉及源代码的场景
@@ -723,18 +723,18 @@ async deploy(inputs = {}) {
 
 ```javascript
 // unzip source zip file
-console.log(`Unzipping ${inputs.src}...`)
-const sourceDirectory = await instance.unzip(inputs.src)
-console.log(`Files unzipped into ${sourceDirectory}...`)
+console.log(`Unzipping ${inputs.src}...`);
+const sourceDirectory = await instance.unzip(inputs.src);
+console.log(`Files unzipped into ${sourceDirectory}...`);
 
 // add sdk to the source directory, add original handler
-console.log(`Installing Serverless Framework SDK...`)
-instance.state.handler = await instance.addSDK(sourceDirectory, '_express/handler.handler')
+console.log(`Installing Serverless Framework SDK...`);
+instance.state.handler = await instance.addSDK(sourceDirectory, '_express/handler.handler');
 
 // zip the source directory with the shim and the sdk
-console.log(`Zipping files...`)
-const zipPath = await instance.zip(sourceDirectory)
-console.log(`Files zipped into ${zipPath}...`)
+console.log(`Zipping files...`);
+const zipPath = await instance.zip(sourceDirectory);
+console.log(`Files zipped into ${zipPath}...`);
 ```
 
 增加 SDK 之后，可能需要再次将代码答辩上传到云服务中（例如云函数 SCF）
@@ -776,11 +776,11 @@ $ serverless deploy --debug
 ```javascript
 class MyComponent extends Component {
   async deploy(inputs) {
-    console.log(`Starting MyComponent.`)
-    console.log(`Creating resources.`)
-    console.log(`Waiting for resources to be provisioned.`)
-    console.log(`Finished MyComponent.`)
-    return {}
+    console.log(`Starting MyComponent.`);
+    console.log(`Creating resources.`);
+    console.log(`Waiting for resources to be provisioned.`);
+    console.log(`Finished MyComponent.`);
+    return {};
   }
 }
 ```
