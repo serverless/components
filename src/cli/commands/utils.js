@@ -331,21 +331,6 @@ const getTemplate = async (root) => {
       template.app = instanceYaml.app;
       template.stage = instanceYaml.stage;
 
-      // update paths in inputs
-      if (instanceYaml.inputs.src) {
-        if (typeof instanceYaml.inputs.src === 'string') {
-          instanceYaml.inputs.src = join(directoryPath, instanceYaml.inputs.src);
-        } else if (typeof instanceYaml.inputs.src === 'object') {
-          if (instanceYaml.inputs.src.src) {
-            instanceYaml.inputs.src.src = join(directoryPath, instanceYaml.inputs.src.src);
-          }
-
-          if (instanceYaml.inputs.src.dist) {
-            instanceYaml.inputs.src.dist = join(directoryPath, instanceYaml.inputs.src.dist);
-          }
-        }
-      }
-
       template[instanceYml.name] = instanceYaml;
     }
   }

@@ -1,7 +1,7 @@
 {
   "name": "@serverless/components",
-  "version": "2.30.2",
-  "description": "Serverless Components",
+  "version": "2.30.3",
+  "description": "The Serverless Framework's new infrastructure provisioning technology — Build, compose, & deploy serverless apps in seconds...",
   "main": "./src/index.js",
   "bin": {
     "components": "./bin/bin"
