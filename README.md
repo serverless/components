@@ -565,11 +565,11 @@ name: express # Required. The name of the Component
 version: 0.0.4 # Required. The version of the Component
 author: eahefnawy # Required. The author of the Component
 org: serverlessinc # Required. The Serverless Framework org which owns this Component
+main: ./src # Required. The directory which contains the Component code
 description: Deploys Serverless Express.js Apps # Optional. The description of the Component
 keywords: aws, serverless, express # Optional. The keywords of the Component to make it easier to find at registry.serverless.com
 repo: https://github.com/owner/project # Optional. The code repository of the Component
 license: MIT # Optional. The license of the Component code
-main: ./src # Optional. The directory which contains the Component code
 ```
 
 ### serverless.js
