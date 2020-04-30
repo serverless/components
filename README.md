@@ -130,7 +130,7 @@ name: express-api
 
 inputs:
   src: ./src
-  roleArn: ${output:${stage}:${app}:my-role.arn}
+  roleName: ${output:my-role.name}
   env:
     dbTableName: ${outputs:${stage}:${app}:my-table.name}
 ```
