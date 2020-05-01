@@ -439,11 +439,23 @@ const isProjectPath = async (inputPath) => {
   return false;
 };
 
-const runningTemplate = (config, command) => {
-  if (config.all && ['deploy', 'remove'].includes(command)) {
-    return true;
+const runningTemplate = (root) => {
+  const directories = fse
+    .readdirSync(root)
+    .filter((f) => fse.statSync(path.join(root, f)).isDirectory());
+
+  let componentDirectoryFound = false;
+  for (const directory of directories) {
+    const directoryPath = path.join(root, directory);
+
+    const instanceYml = loadInstanceConfig(directoryPath);
+
+    if (instanceYml && instanceYml.component) {
+      componentDirectoryFound = true;
+    }
   }
-  return false;
+
+  return componentDirectoryFound;
 };
 
 const getOutputs = (allComponentsWithOutputs) => {
