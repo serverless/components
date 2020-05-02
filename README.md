@@ -49,6 +49,8 @@ inputs: # The configuration the Component accepts according to its docs
   - [Versioning](#versioning)
   - [Outputs](#outputs)
   - [Credentials](#credentials)
+    - [AWS Credentials](#aws-credentials)
+    - [Google Credentials](#google-credentials)
   - [Stages](#stages)
   - [Variables](#variables)
 - [Building Components](#building-components)
@@ -265,6 +267,18 @@ inputs:
     src: ./src # Source files
     hook: npm run build # Build hook to run on every "serverless deploy"
     dist: ./dist # Location of the distribution folder to upload
+```
+
+You can also exclude certain files being upload by using `exclude` in the `src` inputs. You can use glob syntax to describe which file or folder you want to exclude. For example:
+
+```yaml
+inputs:
+  src:
+    src: ./src # Source files
+    exclude:
+      - .env # exclude .env file in ./src
+      - '.git/**' # exclude .git folder and all subfolders and files inside it
+      - '**/*.log' # exclude all files with .log extension in any folder under the ./src
 ```
 
 Improving the Component Input Types system is one of our current big priorities.

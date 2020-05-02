@@ -306,6 +306,18 @@ inputs:
     dist: ./dist # Location of the distribution folder to upload
 ```
 
+你也可以使用支持 glob 语法的 exclude 表达式来排除特定的文件或者文件夹被上传，如下所示：
+
+```yaml
+inputs:
+  src:
+    src: ./src # Source files
+    exclude:
+      - .env # exclude .env file in ./src
+      - '.git/**' # exclude .git folder and all subfolders and files inside it
+      - '**/*.log' # exclude all files with .log extension in any folder under the ./src
+```
+
 提升 Component 的 Input 类型是我们当前高优先级在解决的问题。
 
 ### 部署
