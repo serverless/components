@@ -12,6 +12,11 @@ const runningComponents = () => {
   let componentConfig;
   let instanceConfig;
 
+  // load components if trying to login inside a template directory
+  if (utils.runningTemplate(process.cwd()) && process.argv[2] === 'login') {
+    return true;
+  }
+
   // load components if user runs "sls registry" or "sls --all" or "sls --target" (that last one for china)
   if (process.argv[2] === 'registry' || args.all || args.target) {
     return true;
