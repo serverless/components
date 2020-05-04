@@ -12,8 +12,8 @@ const runningComponents = () => {
   let componentConfig;
   let instanceConfig;
 
-  // if running a directory containing component instances
-  if (utils.runningTemplate(process.cwd())) {
+  // load components if trying to login inside a template directory
+  if (utils.runningTemplate(process.cwd()) && process.argv[2] === 'login') {
     return true;
   }
 
