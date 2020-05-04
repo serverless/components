@@ -77,6 +77,19 @@ const fileExistsSync = (filePath) => {
 };
 
 /**
+ * Checks if a file exists
+ * @param {*} filePath
+ */
+const fileExists = async (filePath) => {
+  try {
+    const stats = await fse.lstat(filePath);
+    return stats.isFile();
+  } catch (error) {
+    return false;
+  }
+};
+
+/**
  * Determines if a given file path is a YAML file
  * @param {*} filePath
  */
@@ -594,6 +607,7 @@ const executeGraph = async (allComponents, command, graph, cli, sdk, credentials
 module.exports = {
   sleep,
   request,
+  fileExists,
   fileExistsSync,
   readFileSync,
   isYamlPath,

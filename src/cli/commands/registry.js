@@ -7,7 +7,7 @@
 const { ServerlessSDK } = require('@serverless/platform-client');
 const path = require('path');
 const { getAccessKey, isLoggedIn } = require('./utils');
-const { loadComponentConfig, fileExistsSync } = require('../utils');
+const { loadComponentConfig, fileExists } = require('../utils');
 
 /**
  * Publish a Component to the Serverless Registry
@@ -38,7 +38,7 @@ const publish = async (config, cli) => {
 
   const serverlessJsFilePath = path.resolve(process.cwd(), componentYaml.main, 'serverless.js');
 
-  if (!fileExistsSync(serverlessJsFilePath)) {
+  if (!(await fileExists(serverlessJsFilePath))) {
     throw new Error('no serverless.js file was found in the "main" directory you specified.');
   }
 
