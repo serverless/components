@@ -5,8 +5,9 @@
  */
 
 const { ServerlessSDK } = require('@serverless/platform-client');
+const path = require('path');
 const { getAccessKey, isLoggedIn } = require('./utils');
-const { loadComponentConfig } = require('../utils');
+const { loadComponentConfig, fileExists } = require('../utils');
 
 /**
  * Publish a Component to the Serverless Registry
@@ -30,6 +31,16 @@ const publish = async (config, cli) => {
 
   // Load YAML
   const componentYaml = await loadComponentConfig(process.cwd());
+
+  if (!componentYaml.main) {
+    throw new Error("The 'main' property is required in serverless.component.yml");
+  }
+
+  const serverlessJsFilePath = path.resolve(process.cwd(), componentYaml.main, 'serverless.js');
+
+  if (!(await fileExists(serverlessJsFilePath))) {
+    throw new Error('no serverless.js file was found in the "main" directory you specified.');
+  }
 
   // Presentation
   cli.logRegistryLogo();
