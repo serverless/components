@@ -7,13 +7,17 @@
 const path = require('path');
 const minimist = require('minimist');
 const dotenv = require('dotenv');
-const { bootstrap: proxyBootstrap } = require('global-agent');
 const { loadInstanceConfig, fileExistsSync } = require('./utils');
 const {
   utils: { isChinaUser },
 } = require('@serverless/platform-client-china');
 const CLI = require('./CLI');
 const { isProjectPath } = require('./utils');
+const http = require('http');
+const https = require('https');
+const semver = require('semver');
+const chalk = require('chalk');
+const HttpsProxyAgent = require('https-proxy-agent');
 
 module.exports = async () => {
   const args = minimist(process.argv.slice(2));
@@ -38,11 +42,16 @@ module.exports = async () => {
 
   // set global proxy agent if it's configured in environment variable
   if (process.env.HTTP_PROXY || process.env.HTTPS_PROXY) {
-    // set GLOBAL_AGENT_ENVIRONMENT_VARIABLE_NAMESPACE to empty, so the
-    // global-agent will use HTTP_PROXY/HTTPS_PROXY environment variables
-    // without GLOBAL_AGENT_ prefix.
-    process.env.GLOBAL_AGENT_ENVIRONMENT_VARIABLE_NAMESPACE = '';
-    proxyBootstrap();
+    if (semver.gte(process.version, 'v11.7.0')) {
+      http.globalAgent = new HttpsProxyAgent(process.env.HTTP_PROXY || process.env.HTTPS_PROXY);
+      https.globalAgent = new HttpsProxyAgent(process.env.HTTPS_PROXY || process.env.HTTP_PROXY);
+    } else {
+      process.stdout.write(
+        `Serverless: ${chalk.yellow(
+          'you need to upgrade the NodeJS in order to use http/https proxy.'
+        )}\n`
+      );
+    }
   }
 
   if (process.argv.length === 2 && isChinaUser() && !(await isProjectPath(process.cwd()))) {
