@@ -61,9 +61,15 @@ module.exports = async (config, cli) => {
 
   // show the most important information, and link to the dashboard
   cli.log();
-  cli.log(`${chalk.grey('Status:')}       ${instance.instanceStatus}`);
   cli.log(`${chalk.grey('Last Action:')}  ${instance.lastAction} (${lastActionAgo})`);
   cli.log(`${chalk.grey('Deployments:')}  ${instance.instanceMetrics.deployments}`);
+  cli.log(`${chalk.grey('Status:')}       ${instance.instanceStatus}`);
+
+  // show error stack if available
+  if (instance.deploymentErrorStack) {
+    cli.log();
+    cli.log(chalk.red(instance.deploymentErrorStack));
+  }
   // cli.log(`${chalk.grey('More Info:')}    ${dashboardUrl}`)
 
   // show state only in debug mode
