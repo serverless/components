@@ -455,6 +455,7 @@ const isProjectPath = async (inputPath) => {
 const runningTemplate = (root) => {
   try {
     return fse.readdirSync(root).every((fileName) => {
+      if (fileName.startsWith('.')) return true;
       const filePath = path.join(root, fileName);
       if (!fse.statSync(filePath).isDirectory()) return true;
 
