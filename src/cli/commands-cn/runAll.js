@@ -45,7 +45,7 @@ module.exports = async (config, cli, command) => {
 
   // TODO not support for tencent yet
   // Connect to Serverless Platform Events, if in debug mode
-  // options.debug = config.debug
+  options.debug = config.debug;
 
   if (command === 'remove') {
     cli.status('Removing', null, 'white');
