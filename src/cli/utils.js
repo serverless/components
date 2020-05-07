@@ -452,17 +452,22 @@ const isProjectPath = async (inputPath) => {
   return false;
 };
 
-const runningTemplate = (root) =>
-  fse.readdirSync(root).every((fileName) => {
-    const filePath = path.join(root, fileName);
-    if (!fse.statSync(filePath).isDirectory()) return true;
+const runningTemplate = (root) => {
+  try {
+    return fse.readdirSync(root).every((fileName) => {
+      const filePath = path.join(root, fileName);
+      if (!fse.statSync(filePath).isDirectory()) return true;
 
-    const instanceYml = loadInstanceConfig(filePath);
+      const instanceYml = loadInstanceConfig(filePath);
 
-    // if no yaml file found, or not a component yaml file
-    // then it's not a template directory
-    return instanceYml && instanceYml.component;
-  });
+      // if no yaml file found, or not a component yaml file
+      // then it's not a template directory
+      return instanceYml && instanceYml.component;
+    });
+  } catch (error) {
+    return false;
+  }
+};
 
 const getOutputs = (allComponentsWithOutputs) => {
   const outputs = {};
