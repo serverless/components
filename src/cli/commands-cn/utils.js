@@ -8,7 +8,7 @@ const path = require('path');
 const fs = require('fs');
 const args = require('minimist')(process.argv.slice(2));
 const { utils: platformUtils } = require('@serverless/platform-client-china');
-const { loadInstanceConfig, resolveInputVariables } = require('../utils');
+const { loadInstanceConfig, resolveVariables } = require('../utils');
 
 const updateEnvFile = (envs) => {
   // write env file
@@ -44,7 +44,7 @@ const getDefaultOrgName = async () => {
  * @param {*} directoryPath
  */
 const loadTencentInstanceConfig = async (directoryPath) => {
-  const instanceFile = loadInstanceConfig(directoryPath);
+  let instanceFile = loadInstanceConfig(directoryPath);
 
   if (!instanceFile) {
     throw new Error('serverless config file was not found');
@@ -88,7 +88,7 @@ const loadTencentInstanceConfig = async (directoryPath) => {
   if (instanceFile.inputs) {
     // load credentials to process .env files before resolving env variables
     await loadInstanceCredentials(instanceFile.stage);
-    instanceFile.inputs = resolveInputVariables(instanceFile.inputs);
+    instanceFile = resolveVariables(instanceFile);
     if (instanceFile.inputs.src) {
       if (typeof instanceFile.inputs.src === 'string') {
         instanceFile.inputs.src = path.resolve(directoryPath, instanceFile.inputs.src);

@@ -52,12 +52,6 @@ module.exports = async (config, cli, command) => {
   options.debug = config.debug;
   options.dev = config.dev;
 
-  // Connect to Serverless Platform Events, if in debug mode
-  if (options.debug) {
-    // TODO: to be implement for tencent
-    delete options.debug;
-  }
-
   if (command === 'deploy') {
     // Warn about dev agent
     if (options.dev) {

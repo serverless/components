@@ -127,7 +127,7 @@ const readFileSync = (filePath, options = {}) => {
  * This currently supports only ${env}.  All others should be resolved within the deployment engine.
  * @param {*} inputs
  */
-const resolveInputVariables = (inputs) => {
+const resolveVariables = (inputs) => {
   const regex = /\${(\w*:?[\w\d.-]+)}/g;
   let variableResolved = false;
   const resolvedInputs = traverse(inputs).forEach(function (value) {
@@ -151,7 +151,7 @@ const resolveInputVariables = (inputs) => {
     }
   });
   if (variableResolved) {
-    return resolveInputVariables(resolvedInputs);
+    return resolveVariables(resolvedInputs);
   }
   return resolvedInputs;
 };
@@ -633,7 +633,7 @@ module.exports = {
   isYamlPath,
   isJsonPath,
   loadComponentConfig,
-  resolveInputVariables,
+  resolveVariables,
   getDirSize,
   pack,
   getInstanceDashboardUrl,
