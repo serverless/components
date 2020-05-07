@@ -12,11 +12,6 @@ const runningComponents = () => {
   let componentConfig;
   let instanceConfig;
 
-  // load components if trying to login inside a template directory
-  if (utils.runningTemplate(process.cwd()) && process.argv[2] === 'login') {
-    return true;
-  }
-
   // load components if user runs "sls registry" or "sls --all" or "sls --target" (that last one for china)
   if (process.argv[2] === 'registry' || args.all || args.target) {
     return true;
@@ -34,6 +29,14 @@ const runningComponents = () => {
   }
 
   if (!componentConfig && !instanceConfig) {
+    // load components if trying to login inside a template directory
+    if (
+      process.argv.length === 3 &&
+      process.argv[2] === 'login' &&
+      utils.runningTemplate(process.cwd())
+    ) {
+      return true;
+    }
     // When no in service context and plain `serverless` command, return true when user in China
     // It's to enable interactive CLI components onboarding for Chinese users
     return process.argv.length === 2 && isChinaUser();
