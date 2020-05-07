@@ -59,11 +59,28 @@ module.exports = async (config, cli) => {
   // format last action for better UX
   const lastActionAgo = moment(instance.lastActionAt).fromNow();
 
-  // show the most important information, and link to the dashboard
+  // color status based on...status
+  let statusLog;
+  if (instance.instanceStatus === 'error') {
+    statusLog = chalk.red(instance.instanceStatus);
+  } else if (instance.instanceStatus === 'active') {
+    statusLog = chalk.green(instance.instanceStatus);
+  } else if (instance.instanceStatus === 'inactive') {
+    statusLog = chalk.yellow(instance.instanceStatus);
+  } else {
+    statusLog = instance.instanceStatus;
+  }
+
   cli.log();
-  cli.log(`${chalk.grey('Status:')}       ${instance.instanceStatus}`);
   cli.log(`${chalk.grey('Last Action:')}  ${instance.lastAction} (${lastActionAgo})`);
   cli.log(`${chalk.grey('Deployments:')}  ${instance.instanceMetrics.deployments}`);
+  cli.log(`${chalk.grey('Status:')}       ${statusLog}`);
+
+  // show error stack if available
+  if (instance.deploymentErrorStack) {
+    cli.log();
+    cli.log(chalk.red(instance.deploymentErrorStack));
+  }
   // cli.log(`${chalk.grey('More Info:')}    ${dashboardUrl}`)
 
   // show state only in debug mode
