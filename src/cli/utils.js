@@ -452,32 +452,17 @@ const isProjectPath = async (inputPath) => {
   return false;
 };
 
-const runningTemplate = (root) => {
-  const directories = fse
-    .readdirSync(root)
-    .filter((f) => fse.statSync(path.join(root, f)).isDirectory());
+const runningTemplate = (root) =>
+  fse.readdirSync(root).every((fileName) => {
+    const filePath = path.join(root, fileName);
+    if (!fse.statSync(filePath).isDirectory()) return true;
 
-  let isTemplateDirectory = true;
-
-  for (const directory of directories) {
-    const directoryPath = path.join(root, directory);
-
-    const instanceYml = loadInstanceConfig(directoryPath);
+    const instanceYml = loadInstanceConfig(filePath);
 
     // if no yaml file found, or not a component yaml file
     // then it's not a template directory
-    if (!instanceYml || !instanceYml.component) {
-      isTemplateDirectory = false;
-    }
-  }
-
-  // if cwd does not have subdirectories, then it's not a temlate directory
-  if (directories.length === 0) {
-    isTemplateDirectory = false;
-  }
-
-  return isTemplateDirectory;
-};
+    return instanceYml && instanceYml.component;
+  });
 
 const getOutputs = (allComponentsWithOutputs) => {
   const outputs = {};
