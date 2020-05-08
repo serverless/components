@@ -162,9 +162,9 @@ const loadInstanceCredentials = () => {
  * Reads a serverless instance config file in a given directory path
  * @param {*} directoryPath
  */
-const loadVendorInstanceConfig = async (directoryPath, cached = true) => {
+const loadVendorInstanceConfig = async (directoryPath, options = { disableCache: false }) => {
   let instanceFile;
-  if (cached) {
+  if (!options.disableCache && options.disableCache !== null) {
     instanceFile = loadInstanceConfig(directoryPath);
   } else {
     instanceFile = loadInstanceConfigUncached(directoryPath);
