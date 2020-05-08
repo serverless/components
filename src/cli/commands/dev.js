@@ -47,7 +47,7 @@ module.exports = async (config, cli) => {
   cli.log();
 
   // Load serverless component instance.  Submit a directory where its config files should be.
-  let instanceYaml = await loadInstanceConfig(process.cwd());
+  let instanceYaml = await loadInstanceConfig(process.cwd(), false);
 
   // Load Instance Credentials
   const instanceCredentials = await loadInstanceCredentials(instanceYaml.stage);
@@ -221,12 +221,12 @@ module.exports = async (config, cli) => {
       isProcessing = true;
       cli.status('Deploying', null, 'green');
       // reload serverless component instance
-      instanceYaml = await loadInstanceConfig(process.cwd());
+      instanceYaml = await loadInstanceConfig(process.cwd(), false);
       await sdk.deploy(instanceYaml, instanceCredentials, { dev: true });
       if (queuedOperation) {
         cli.status('Deploying', null, 'green');
         // reload serverless component instance
-        instanceYaml = await loadInstanceConfig(process.cwd());
+        instanceYaml = await loadInstanceConfig(process.cwd(), false);
         await sdk.deploy(instanceYaml, instanceCredentials, { dev: true });
       }
 

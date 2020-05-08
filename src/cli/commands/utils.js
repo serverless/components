@@ -20,7 +20,12 @@ const { join, basename } = require('path');
 
 const { readFileSync } = require('fs');
 const ini = require('ini');
-const { fileExistsSync, loadInstanceConfig, resolveVariables } = require('../utils');
+const {
+  fileExistsSync,
+  loadInstanceConfig,
+  loadInstanceConfigUncached,
+  resolveVariables,
+} = require('../utils');
 
 const getDefaultOrgName = async () => {
   const res = readConfigFile();
@@ -157,8 +162,13 @@ const loadInstanceCredentials = () => {
  * Reads a serverless instance config file in a given directory path
  * @param {*} directoryPath
  */
-const loadVendorInstanceConfig = async (directoryPath) => {
-  let instanceFile = loadInstanceConfig(directoryPath);
+const loadVendorInstanceConfig = async (directoryPath, cached = true) => {
+  let instanceFile;
+  if (cached) {
+    instanceFile = loadInstanceConfig(directoryPath);
+  } else {
+    instanceFile = loadInstanceConfigUncached(directoryPath);
+  }
 
   if (!instanceFile) {
     throw new Error('serverless config file was not found');

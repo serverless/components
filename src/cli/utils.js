@@ -4,7 +4,17 @@
  * Serverless Components: Utilities
  */
 
-const { contains, isNil, last, split, merge, endsWith, isEmpty } = require('ramda');
+const {
+  contains,
+  isNil,
+  last,
+  split,
+  merge,
+  endsWith,
+  isEmpty,
+  memoizeWith,
+  identity,
+} = require('ramda');
 const path = require('path');
 const axios = require('axios');
 const globby = require('globby');
@@ -270,7 +280,7 @@ const getInstanceDashboardUrl = (instanceYaml) => {
  * Reads a serverless instance config file in a given directory path
  * @param {*} directoryPath
  */
-const loadInstanceConfig = (directoryPath) => {
+const loadInstanceConfigUncached = (directoryPath) => {
   directoryPath = path.resolve(directoryPath);
   const ymlFilePath = path.join(directoryPath, 'serverless.yml');
   const yamlFilePath = path.join(directoryPath, 'serverless.yaml');
@@ -325,6 +335,13 @@ const loadInstanceConfig = (directoryPath) => {
 
   return instanceFile;
 };
+
+/**
+ * Reads a serverless instance config file in a given directory path
+ * and caches for subsequent calls
+ * @param {*} directoryPath
+ */
+const loadInstanceConfig = memoizeWith(identity, loadInstanceConfigUncached);
 
 /**
  * THIS IS USED BY SFV1.  DO NOT MODIFY OR DELETE
@@ -619,6 +636,7 @@ module.exports = {
   pack,
   getInstanceDashboardUrl,
   loadInstanceConfig,
+  loadInstanceConfigUncached,
   legacyLoadComponentConfig,
   legacyLoadInstanceConfig,
   isProjectPath,
