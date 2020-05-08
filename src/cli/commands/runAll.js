@@ -28,10 +28,8 @@ module.exports = async (config, cli, command) => {
 
   const templateYaml = await getTemplate(process.cwd());
 
-  if (config.debug) {
-    const meta = `Action: "${command} --all" - Stage: "${templateYaml.stage}" - Org: "${templateYaml.org}" - App: "${templateYaml.app}" - Name: "${templateYaml.name}"`;
-    cli.log(meta);
-  }
+  const meta = `Action: "${command} --all" - Stage: "${templateYaml.stage}" - Org: "${templateYaml.org}" - App: "${templateYaml.app}" - Name: "${templateYaml.name}"`;
+  cli.log(meta);
 
   if (!templateYaml) {
     throw new Error('No components found in sub directories.');
