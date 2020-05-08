@@ -163,12 +163,9 @@ const loadInstanceCredentials = () => {
  * @param {*} directoryPath
  */
 const loadVendorInstanceConfig = async (directoryPath, options = { disableCache: false }) => {
-  let instanceFile;
-  if (!options.disableCache && options.disableCache !== null) {
-    instanceFile = loadInstanceConfig(directoryPath);
-  } else {
-    instanceFile = loadInstanceConfigUncached(directoryPath);
-  }
+  const instanceFile = options.disableCache
+    ? loadInstanceConfigUncached(directoryPath)
+    : loadInstanceConfig(directoryPath);
 
   if (!instanceFile) {
     throw new Error('serverless config file was not found');
