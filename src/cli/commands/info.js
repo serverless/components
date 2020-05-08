@@ -29,6 +29,9 @@ module.exports = async (config, cli) => {
 
   cli.status('Initializing', instanceYaml.name);
 
+  const meta = `Action: "info" - Stage: "${instanceYaml.stage}" - Org: "${instanceYaml.org}" - App: "${instanceYaml.app}" - Name: "${instanceYaml.name}"`;
+  cli.log(meta, 'grey');
+
   // initialize SDK
   const sdk = new ServerlessSDK({
     accessKey,
