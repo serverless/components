@@ -1,0 +1,5 @@
+component: graphql
+name: graphql-api
+
+inputs:
+  src: ./
