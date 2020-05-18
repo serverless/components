@@ -198,7 +198,7 @@ module.exports = async (config, cli) => {
 
   const ignored = [];
 
-  if (instanceYaml.inputs.src && instanceYaml.inputs.src.dist) {
+  if (instanceYaml.inputs && instanceYaml.inputs.src && instanceYaml.inputs.src.dist) {
     // dont trigger a redeploy on dist changes
     // the src changes is enough to trigger the
     // build which updates dist
