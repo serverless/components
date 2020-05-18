@@ -107,17 +107,21 @@ const getComponent = async (config, cli) => {
  * @param {*} cli
  */
 const listFeatured = async (config, cli) => {
+  cli.start('Loading');
   cli.logRegistryLogo();
-  cli.log();
 
+  const sdk = new ServerlessSDK();
+  const { components: featuredComponents } = await sdk.listComponents(null, { isFeatured: true });
+
+  cli.log();
   cli.log('Featured Components:');
   cli.log();
-  cli.log('  express - https://github.com/serverless-components/tencent-express/tree/v2');
-  cli.log('  website - https://github.com/serverless-components/tencent-website/tree/v2');
-  cli.log('  scf - https://github.com/serverless-components/tencent-scf/tree/v2');
-  cli.log();
-  cli.log('Find more here: https://github.com/serverless-components');
-  cli.log();
+
+  for (const featuredComponent of featuredComponents) {
+    cli.log(`  ${featuredComponent.componentName} - ${featuredComponent.repo}`);
+  }
+
+  cli.close('close', 'Find more here: https://github.com/serverless-components');
 };
 
 /**
