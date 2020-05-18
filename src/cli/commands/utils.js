@@ -163,7 +163,7 @@ const loadInstanceCredentials = () => {
  * @param {*} directoryPath
  */
 const loadVendorInstanceConfig = async (directoryPath, options = { disableCache: false }) => {
-  const instanceFile = options.disableCache
+  let instanceFile = options.disableCache
     ? loadInstanceConfigUncached(directoryPath)
     : loadInstanceConfig(directoryPath);
 
