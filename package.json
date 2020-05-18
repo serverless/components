@@ -11,8 +11,11 @@
   },
   "scripts": {
     "lint": "eslint .",
+    "lint:updated": "pipe-git-updated --ext=js -- eslint",
     "prettier-check": "prettier -c --ignore-path .gitignore \"**/*.{css,html,js,json,md,yaml,yml}\"",
-    "prettify": "prettier --write --ignore-path .gitignore \"**/*.{css,html,js,json,md,yaml,yml}\""
+    "prettier-check:updated": "pipe-git-updated --ext=css --ext=html --ext=js --ext=json --ext=md --ext=yaml --ext=yml -- prettier -c",
+    "prettify": "prettier --write --ignore-path .gitignore \"**/*.{css,html,js,json,md,yaml,yml}\"",
+    "prettify:updated": "pipe-git-updated --ext=css --ext=html --ext=js --ext=json --ext=md --ext=yaml --ext=yml -- prettier --write"
   },
   "author": "Serverless, Inc.",
   "license": "MIT",
@@ -62,6 +65,7 @@
     "@serverless/eslint-config": "^2.1.0",
     "eslint": "^6.8.0",
     "eslint-plugin-import": "^2.21.2",
+    "git-list-updated": "^1.2.1",
     "prettier": "^2.0.5"
   }
 }
