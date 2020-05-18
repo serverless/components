@@ -196,8 +196,17 @@ module.exports = async (config, cli) => {
   let isProcessing = false; // whether there's already a deployment in progress
   let queuedOperation = false; // whether there's another deployment queued
 
+  const ignored = [];
+
+  if (instanceYaml.inputs.src && instanceYaml.inputs.src.dist) {
+    // dont trigger a redeploy on dist changes
+    // the src changes is enough to trigger the
+    // build which updates dist
+    ignored.push(instanceYaml.inputs.src.dist);
+  }
+
   // Set watcher
-  const watcher = chokidar.watch(process.cwd(), { ignored: /\.serverless/ });
+  const watcher = chokidar.watch(process.cwd(), { ignored });
 
   watcher.on('ready', async () => {
     cli.status('Enabling Dev Mode', null, 'green');
