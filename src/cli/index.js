@@ -7,11 +7,7 @@
 const path = require('path');
 const minimist = require('minimist');
 const dotenv = require('dotenv');
-const {
-  loadInstanceConfig,
-  fileExistsSync,
-  isInChina,
-} = require('./utils');
+const { loadInstanceConfig, fileExistsSync, isInChina } = require('./utils');
 const CLI = require('./CLI');
 const { isProjectPath } = require('./utils');
 const http = require('http');
