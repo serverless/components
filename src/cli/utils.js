@@ -622,6 +622,28 @@ const executeGraph = async (allComponents, command, graph, cli, sdk, credentials
   return executeGraph(allComponents, command, graph, cli, sdk, credentials, options);
 };
 
+/**
+ * Detect if the user is in China.
+ * We offer a different experience for China-based users if so.
+ */
+const isInChina = () => {
+  let result
+  if (
+    process.env.SERVERLESS_PLATFORM_VENDOR === 'tencent' ||
+    process.env.SLS_GEO_LOCATION === 'cn'
+  ) {
+    result = true
+  } else if (process.env.SERVERLESS_PLATFORM_VENDOR === 'aws') {
+    result = false
+  } else {
+    result = new Intl.DateTimeFormat('en', { timeZoneName: 'long' })
+      .format()
+      .includes('China Standard Time')
+  }
+
+  return result
+};
+
 module.exports = {
   sleep,
   request,
@@ -647,4 +669,5 @@ module.exports = {
   validateGraph,
   createGraph,
   executeGraph,
+  isInChina,
 };

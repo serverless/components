@@ -7,10 +7,11 @@
 const path = require('path');
 const minimist = require('minimist');
 const dotenv = require('dotenv');
-const { loadInstanceConfig, fileExistsSync } = require('./utils');
 const {
-  utils: { isChinaUser },
-} = require('@serverless/platform-client-china');
+  loadInstanceConfig,
+  fileExistsSync,
+  isInChina,
+} = require('./utils');
 const CLI = require('./CLI');
 const { isProjectPath } = require('./utils');
 const http = require('http');
@@ -54,13 +55,13 @@ module.exports = async () => {
     }
   }
 
-  if (process.argv.length === 2 && isChinaUser() && !(await isProjectPath(process.cwd()))) {
+  if (process.argv.length === 2 && isInChina() && !(await isProjectPath(process.cwd()))) {
     // Interactive onboarding
     return require('./interactive-onboarding/cn')();
   }
 
   let commands;
-  if (isChinaUser()) {
+  if (isInChina()) {
     commands = require('./commands-cn');
   } else {
     commands = require('./commands');

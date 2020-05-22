@@ -2,9 +2,6 @@
 
 const utils = require('./cli/utils');
 const minimist = require('minimist');
-const {
-  utils: { isChinaUser },
-} = require('@serverless/platform-client-china');
 
 const runningComponents = () => {
   const args = minimist(process.argv.slice(2));
@@ -39,7 +36,7 @@ const runningComponents = () => {
     }
     // When no in service context and plain `serverless` command, return true when user in China
     // It's to enable interactive CLI components onboarding for Chinese users
-    return process.argv.length === 2 && isChinaUser();
+    return process.argv.length === 2 && utils.isInChina();
   }
 
   if (instanceConfig && !instanceConfig.component) {
