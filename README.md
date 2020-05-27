@@ -564,7 +564,7 @@ A useful feature of this is the ability to share resources easily, and even do s
 If you want to build your own Serverless Component, there are 2 essential files you need to be aware of:
 
 - `serverless.component.yml` - This contains the definition of your Serverless Component.
-- `serverelss.js` - This contains your Serverless Component's code.
+- `serverless.js` - This contains your Serverless Component's code.
 
 One of the most important things to note is that Serverless Components **only** run in the cloud and **do not** run locally. That means, to run and test your Component, you must publish it first (it takes only few seconds to publish). We're continuing to improve this workflow. Here's how to do it...
 
