@@ -64,6 +64,13 @@ module.exports = async (config, cli, command) => {
 
     // run deploy
     cli.status('Deploying', null, 'white');
+    options.statusReceiver = (statusMsg) => {
+      if (statusMsg) {
+        cli.status(statusMsg, null, 'white');
+      } else {
+        cli.status('Deploying', null, 'white');
+      }
+    };
     const instance = await sdk.deploy(instanceYaml, instanceCredentials, options);
     cli.log();
     cli.logOutputs(instance.outputs);
