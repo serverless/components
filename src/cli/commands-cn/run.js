@@ -8,6 +8,7 @@ const path = require('path');
 const { ServerlessSDK } = require('@serverless/platform-client-china');
 const utils = require('./utils');
 const runAll = require('./runAll');
+const chalk = require('chalk');
 
 module.exports = async (config, cli, command) => {
   if (config.all) {
@@ -75,8 +76,7 @@ module.exports = async (config, cli, command) => {
     cli.log();
     cli.logOutputs(instance.outputs);
     cli.log();
-    // const dashboardUrl = utils.getInstanceDashboardUrl(instanceYaml)
-    // cli.log(`${chalk.grey(`Full details: ${dashboardUrl}`)}`)
+    cli.log(`${chalk.grey(utils.getInstanceDashboardUrl(instanceYaml))}`);
   } else if (command === 'remove') {
     // run remove
     cli.status('Removing', null, 'white');
