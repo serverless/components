@@ -206,10 +206,17 @@ const getTemplate = async (root) => {
   return componentDirectoryFound ? template : null;
 };
 
+const getInstanceDashboardUrl = (instanceYaml) => {
+  return `Full details: https://sls.cloud.tencent.com/instances/${encodeURIComponent(
+    `${instanceYaml.app}:${instanceYaml.stage}:${instanceYaml.name}`
+  )}`;
+};
+
 module.exports = {
   loadInstanceConfig: loadTencentInstanceConfig,
   loadInstanceCredentials,
   login,
   getDefaultOrgName,
   getTemplate,
+  getInstanceDashboardUrl,
 };

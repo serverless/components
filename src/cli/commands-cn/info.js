@@ -79,7 +79,7 @@ module.exports = async (config, cli) => {
     cli.log();
     cli.log(chalk.red(instance.deploymentErrorStack));
   }
-  // cli.log(`${chalk.grey('More Info:')}    ${dashboardUrl}`)
+  cli.log(`${chalk.grey('More Info:')}    ${utils.getInstanceDashboardUrl(instanceYaml)}`);
 
   // show state only in debug mode
   if (config.debug) {
