@@ -99,8 +99,6 @@ const loadAwsCredentials = () => {
   // set the credentials in the env to pass it to the sdk
   process.env.AWS_ACCESS_KEY_ID = credentials.aws_access_key_id;
   process.env.AWS_SECRET_ACCESS_KEY = credentials.aws_secret_access_key;
-
-  return;
 };
 
 /**
