@@ -67,7 +67,7 @@ class CLI {
     // Start counting seconds
     setInterval(() => {
       this._.timerSeconds = Math.floor((Date.now() - this._.timerStarted) / 1000);
-    }, 1000);
+    }, 1000).unref();
 
     // Set default close handler, if one was not provided
     if (!options.closeHandler) {
@@ -125,11 +125,8 @@ class CLI {
     process.stdout.write(ansiEscapes.cursorLeft);
     process.stdout.write(ansiEscapes.cursorShow);
 
-    if (reason === 'error') {
-      process.exit(1);
-    } else {
-      process.exit(0);
-    }
+    if (reason === 'error') process.exitCode = 1;
+    this._isClosed = true;
   }
 
   /**
@@ -340,6 +337,7 @@ class CLI {
    * Repetitively renders status and more on a regular interval
    */
   async _renderEngine() {
+    if (this._isClosed) return null;
     /**
      * Debug Mode
      */
