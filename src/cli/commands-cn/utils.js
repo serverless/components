@@ -9,6 +9,7 @@ const fs = require('fs');
 const args = require('minimist')(process.argv.slice(2));
 const { utils: platformUtils } = require('@serverless/platform-client-china');
 const { loadInstanceConfig, resolveVariables } = require('../utils');
+const { mergeDeepRight } = require('ramda');
 
 const updateEnvFile = (envs) => {
   // write env file
@@ -212,6 +213,20 @@ const getInstanceDashboardUrl = (instanceYaml) => {
   )}`;
 };
 
+const setInputsForCommand = (instanceYaml, command, config) => {
+  if (instanceYaml.commandInputs) {
+    const defaultInputs = command === 'deploy' ? instanceYaml.inputs : {};
+    instanceYaml.inputs = instanceYaml.commandInputs[command] || defaultInputs;
+    // merging inputs from command args, e.g. slcc deploy --inputs.src="./new-src"
+    // will be merged into inputs.src
+    if (config.inputs) {
+      instanceYaml.inputs = mergeDeepRight(instanceYaml.inputs, config.inputs);
+    }
+  } else if (command !== 'deploy') {
+    instanceYaml.inputs = {};
+  }
+};
+
 module.exports = {
   loadInstanceConfig: loadTencentInstanceConfig,
   loadInstanceCredentials,
@@ -219,4 +234,5 @@ module.exports = {
   getDefaultOrgName,
   getTemplate,
   getInstanceDashboardUrl,
+  setInputsForCommand,
 };
