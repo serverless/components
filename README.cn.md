@@ -294,7 +294,7 @@ inputs: # The configuration the Component accepts according to its docs
 
 ### 输入
 
-每个 Serverless Component 都支持通过 `inputs` 参数来传递变量，在具体的 Component 文档中可以查看到 `inputs` 支持哪些参数。
+每个 Serverless Component 都支持通过 `inputs` 参数来传递在通过`serverless deploy`执行部署时的所需变量，在具体的 Component 文档中可以查看到 `inputs` 支持哪些参数。
 
 有一些 `inputs` 是比较特殊的类型，比如 `src` 这个参数，指定的是你希望部署到云端的代码和文件的路径，因此 Component 会对该参数做特殊的处理：在云端运行 Component 之前，Serverless Framework 会先识别并将 `src` 中的文件传到云端。为了保证最佳的部署性能，通常我们建议 `src` 目录中的包最好小于 5MB。文件包过大的时候回导致上传时间变长，部署也会变慢。因此也建议首先在通过 hook 的方式构建你的代码，并将构建完成的 `dist` 用于上传，如下配置所示：
 
@@ -319,6 +319,20 @@ inputs:
 ```
 
 提升 Component 的 Input 类型是我们当前高优先级在解决的问题。
+
+除了部署动作支持通过 inputs 传递变量外，其他的动作（比如 remove，或者其他 Component 的自定义动作）也可以支持配置 inputs，如下所示：
+
+```yaml
+commandInputs:
+  remove:
+    keepResource: true
+  myComponentMethod:
+    message: hello
+```
+
+一旦配置了自定义动作的 inputs 参数，Component 开发者可以在相关的自定义方法中通过传入的第一个参数接收到这些输入。例如上面的配置中，当 Component 用户使用`sls myComponentMethod`执行自定义动作时，Component 中的`myComponentMethod`方法便可以接收到一个`{ message: "hello" }`这样的输入参数。
+
+此外，所有的 inputs 参数都可以使用命令行的方式进行覆盖，例如上例中如果用户执行`sls myComponentMethod --inputs.anotherMsg=world`，Component 中的`myComponentMethod`方法便会接收到一个`{ message: "hello", anotherMsg: "world" }`这样的输入参数。
 
 ### 部署
 
