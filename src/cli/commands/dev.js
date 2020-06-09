@@ -30,7 +30,6 @@ module.exports = async (config, cli) => {
   // Start CLI persistance status
   cli.start('Initializing', { closeHandler });
 
-
   // Load serverless component instance.  Submit a directory where its config files should be.
   let instanceYaml = await loadInstanceConfig(process.cwd(), { disableCache: true });
 

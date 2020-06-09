@@ -268,7 +268,7 @@ const getAccessKey = async (org = null) => {
   const user = userConfigFile.users[userConfigFile.userId];
 
   if (user.dashboard.accessKeys[org]) {
-    return user.dashboard.accessKeys[org]
+    return user.dashboard.accessKeys[org];
   }
   return user.dashboard.idToken;
 };
