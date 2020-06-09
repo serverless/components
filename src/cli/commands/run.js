@@ -20,17 +20,16 @@ module.exports = async (config, cli, command) => {
   // Start CLI persistance status
   cli.start('Initializing', { timer: true });
 
+  // Load YAML
+  const instanceYaml = await loadInstanceConfig(process.cwd());
+
   // Get access key
-  const accessKey = await getAccessKey();
+  const accessKey = await getAccessKey(instanceYaml.org);
 
   // Ensure the user is logged in or access key is available, or advertise
   if (!accessKey && !isLoggedIn()) {
     cli.advertise();
   }
-
-  // Load YAML
-  const instanceYaml = await loadInstanceConfig(process.cwd());
-
   // Presentation
   if (!config.debug) {
     cli.logLogo();

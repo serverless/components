@@ -30,8 +30,15 @@ module.exports = async (config, cli) => {
   // Start CLI persistance status
   cli.start('Initializing', { closeHandler });
 
+
+  // Load serverless component instance.  Submit a directory where its config files should be.
+  let instanceYaml = await loadInstanceConfig(process.cwd(), { disableCache: true });
+
+  // Load Instance Credentials
+  const instanceCredentials = await loadInstanceCredentials(instanceYaml.stage);
+
   // Get access key
-  const accessKey = await getAccessKey();
+  const accessKey = await getAccessKey(instanceYaml.org);
 
   // Ensure the user is logged in or access key is available, or advertise
   if (!accessKey && !isLoggedIn()) {
@@ -44,14 +51,8 @@ module.exports = async (config, cli) => {
     'Dev Mode - Watching your Component for changes and enabling streaming logs, if supported...',
     'grey'
   );
+
   cli.log();
-
-  // Load serverless component instance.  Submit a directory where its config files should be.
-  let instanceYaml = await loadInstanceConfig(process.cwd(), { disableCache: true });
-
-  // Load Instance Credentials
-  const instanceCredentials = await loadInstanceCredentials(instanceYaml.stage);
-
   const sdk = new ServerlessSDK({
     accessKey,
     context: {

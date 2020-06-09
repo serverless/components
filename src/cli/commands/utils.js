@@ -242,7 +242,7 @@ const isLoggedIn = () => {
 /**
  * Gets the logged in user's token id, or access key if its in env
  */
-const getAccessKey = async () => {
+const getAccessKey = async (org = null) => {
   // if access key in env, use that for CI/CD
   if (process.env.SERVERLESS_ACCESS_KEY) {
     return process.env.SERVERLESS_ACCESS_KEY;
@@ -267,6 +267,9 @@ const getAccessKey = async () => {
 
   const user = userConfigFile.users[userConfigFile.userId];
 
+  if (user.dashboard.accessKeys[org]) {
+    return user.dashboard.accessKeys[org]
+  }
   return user.dashboard.idToken;
 };
 
