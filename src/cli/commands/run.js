@@ -129,9 +129,9 @@ module.exports = async (config, cli, command) => {
     cli.log();
     cli.logOutputs(instance.outputs);
   }
-  cli.close('success', 'Success');
 
   sdk.disconnect();
+  cli.close('success', 'Success');
 
   return null;
 };
