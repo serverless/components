@@ -10,6 +10,7 @@ const ansiEscapes = require('ansi-escapes');
 const stripAnsi = require('strip-ansi');
 const figures = require('figures');
 const prettyoutput = require('prettyoutput');
+const chokidar = require('chokidar');
 const { version } = require('../../package.json');
 
 // CLI Colors
@@ -86,6 +87,14 @@ class CLI {
 
     // Start render engine
     return this._renderEngine();
+  }
+
+  /**
+   * Watch
+   * - Watches the specified directory with the given options
+   */
+  watch(dir, opts) {
+    this.watcher = chokidar.watch(dir, opts);
   }
 
   /**

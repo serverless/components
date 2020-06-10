@@ -116,5 +116,6 @@ module.exports = async (config, cli, command) => {
     }
   }
 
+  sdk.disconnect();
   cli.close('success', 'Success');
 };
