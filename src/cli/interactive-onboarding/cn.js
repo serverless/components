@@ -1,12 +1,13 @@
 'use strict';
 
 const path = require('path');
+const https = require('https');
+const urlUtils = require('url');
 const fs = require('fs');
 const os = require('os');
 const crypto = require('crypto');
 const { mkdir } = require('fs-extra');
 const chalk = require('chalk');
-const axios = require('axios');
 const AdmZip = require('adm-zip');
 const inquirer = require('@serverless/inquirer');
 const confirm = require('@serverless/inquirer/utils/confirm');
@@ -81,16 +82,24 @@ const createProject = async (projectType, projectDir) => {
   await Promise.all([
     mkdir(projectDir),
     (async () => {
-      const response = await axios({
-        method: 'get',
-        url: `${cosUrl}${projectType.id}-demo.zip`,
-        responseType: 'stream',
-      });
+      const url = urlUtils.parse(`${cosUrl}${projectType.id}-demo.zip`);
 
       await new Promise((resolve, reject) => {
-        const stream = response.data.pipe(fs.createWriteStream(tmpFilename));
-        stream.on('error', reject);
-        stream.on('finish', resolve);
+        const req = https.request(
+          {
+            protocol: url.protocol,
+            hostname: url.hostname,
+            port: url.port,
+            path: url.path,
+            method: 'GET',
+          },
+          (res) => {
+            const stream = res.pipe(fs.createWriteStream(tmpFilename));
+            stream.on('error', reject);
+            stream.on('finish', resolve);
+          }
+        );
+        req.end();
       });
     })(),
   ]);

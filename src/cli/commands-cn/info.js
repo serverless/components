@@ -91,8 +91,10 @@ module.exports = async (config, cli) => {
     cli.log(`${chalk.grey('Outputs:')}`);
   }
 
-  cli.log();
-  cli.logOutputs(instance.outputs);
+  if (instance.outputs) {
+    cli.log();
+    cli.logOutputs(instance.outputs);
+  }
 
   cli.close('success', 'Info successfully loaded');
 };
