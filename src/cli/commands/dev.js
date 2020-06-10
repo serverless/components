@@ -4,7 +4,6 @@
  * CLI: Command: Dev
  */
 
-const chokidar = require('chokidar');
 const { ServerlessSDK } = require('@serverless/platform-client');
 const {
   getAccessKey,
@@ -24,6 +23,8 @@ module.exports = async (config, cli) => {
     sdk.disconnect();
     cli.status('Disabling Dev Mode & Closing', null, 'green');
     await sdk.deploy(instanceYaml, instanceCredentials);
+
+    await cli.watcher.close();
     cli.close('success', 'Dev Mode Closed');
   };
 
@@ -206,14 +207,14 @@ module.exports = async (config, cli) => {
   }
 
   // Set watcher
-  const watcher = chokidar.watch(process.cwd(), { ignored });
+  cli.watch(process.cwd(), { ignored });
 
-  watcher.on('ready', async () => {
+  cli.watcher.on('ready', async () => {
     cli.status('Enabling Dev Mode', null, 'green');
     await sdk.deploy(instanceYaml, instanceCredentials, { dev: true });
   });
 
-  watcher.on('change', async () => {
+  cli.watcher.on('change', async () => {
     // Skip if processing already and there is a queued operation
     if (isProcessing && queuedOperation) {
       return;

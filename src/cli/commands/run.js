@@ -39,7 +39,7 @@ module.exports = async (config, cli, command) => {
   }
 
   const meta = `Action: "${command}" - Stage: "${instanceYaml.stage}" - Org: "${instanceYaml.org}" - App: "${instanceYaml.app}" - Name: "${instanceYaml.name}"`;
-  cli.log(meta, 'grey');
+  cli.log(meta);
 
   cli.status('Initializing', instanceYaml.name);
 
@@ -129,6 +129,8 @@ module.exports = async (config, cli, command) => {
     cli.log();
     cli.logOutputs(instance.outputs);
   }
+
+  sdk.disconnect();
   cli.close('success', 'Success');
 
   return null;
