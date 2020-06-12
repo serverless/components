@@ -12,13 +12,6 @@ const { getAccessKey, isLoggedIn, loadInstanceCredentials, getTemplate } = requi
 
 module.exports = async (config, cli, command) => {
   cli.start('Initializing', { timer: true });
-  // Get access key
-  const accessKey = await getAccessKey();
-
-  // Ensure the user is logged in or access key is available, or advertise
-  if (!accessKey && !isLoggedIn()) {
-    cli.advertise();
-  }
 
   if (!config.debug) {
     cli.logLogo();
@@ -27,6 +20,14 @@ module.exports = async (config, cli, command) => {
   }
 
   const templateYaml = await getTemplate(process.cwd());
+
+  // Get access key
+  const accessKey = await getAccessKey(templateYaml.org);
+
+  // Ensure the user is logged in or access key is available, or advertise
+  if (!accessKey && !isLoggedIn()) {
+    cli.advertise();
+  }
 
   const meta = `Action: "${command} --all" - Stage: "${templateYaml.stage}" - Org: "${templateYaml.org}" - App: "${templateYaml.app}" - Name: "${templateYaml.name}"`;
   cli.log(meta);
