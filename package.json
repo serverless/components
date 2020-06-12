@@ -32,6 +32,7 @@
     "@serverless/platform-client": "^0.25.7",
     "@serverless/platform-client-china": "^1.0.12",
     "@serverless/platform-sdk": "^2.3.0",
+    "@serverless/utils": "^1.1.0",
     "adm-zip": "^0.4.14",
     "ansi-escapes": "^4.3.1",
     "axios": "^0.19.2",
