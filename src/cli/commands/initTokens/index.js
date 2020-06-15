@@ -3,7 +3,6 @@
 const { ServerlessSDK } = require('@serverless/platform-client');
 const { get, set } = require('@serverless/utils/config');
 const { copyDirContentsSync, parseGitHubURL, downloadTemplate } = require('./utils');
-const v1Resolver = require('./v1Resolver');
 const componentsResolver = require('./componentResolver');
 
 const spawn = require('child-process-ext/spawn');
@@ -67,8 +66,6 @@ module.exports = {
       cli.status(`${newServiceName} successfully created in '${template.directory}' folder.`)
       if (template.projectType === 'components') {
         await componentsResolver(cli, tenantName, newServiceName, servicePath);
-      } else {
-       // await v1Resolver(serverless, tenantName, newServiceName, servicePath, secretAccessKey);
       }
     }
     return Promise.resolve();
