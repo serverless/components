@@ -12,7 +12,7 @@ const fileExists = async (filename) => {
   }
 };
 
-module.exports = async function getServerlessFilePath(filename, servicePath) {
+module.exports = async function getServerlessFilePath(servicePath, filename) {
   if (filename) {
     const filePath = path.join(servicePath, filename);
     const customExists = await fileExists(filePath);
