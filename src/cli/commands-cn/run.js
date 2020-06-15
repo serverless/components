@@ -76,10 +76,16 @@ module.exports = async (config, cli, command) => {
       }
     };
     const instance = await sdk.deploy(instanceYaml, instanceCredentials, options);
+    const vendorMessage = instance.outputs.vendorMessage;
+    delete instance.outputs.vendorMessage;
     cli.log();
     cli.logOutputs(instance.outputs);
     cli.log();
     cli.log(`${chalk.grey(utils.getInstanceDashboardUrl(instanceYaml))}`);
+    if (vendorMessage) {
+      cli.log();
+      cli.log(`${chalk.green(vendorMessage)}`);
+    }
   } else if (command === 'remove') {
     // run remove
     cli.status('Removing', null, 'white');
