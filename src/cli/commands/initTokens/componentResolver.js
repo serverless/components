@@ -1,7 +1,8 @@
 'use strict';
-const writeAttrs = require('./writeAttrs');
+const { writeMainAttrs, removeTemplateAttrs } = require('../../serverlessFile');
 
 module.exports = async (cli, tenantName, newServiceName, servicePath) => {
-  await writeAttrs(cli, servicePath, tenantName, newServiceName);
+  await writeMainAttrs(cli, servicePath, tenantName, newServiceName);
+  await removeTemplateAttrs(cli, servicePath)
   cli.close('success', `cd to '${servicePath}' and run 'serverless dev' to get started developing!`)
 };
