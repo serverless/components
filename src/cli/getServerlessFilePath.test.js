@@ -2,6 +2,7 @@
 
 const proxyquire = require('proxyquire');
 const sinon = require('sinon');
+const { expect } = require('chai');
 
 const lstat = sinon.stub().resolves({ isFile: () => true });
 const getServerlessFilePath = proxyquire('./getServerlessFilePath', {

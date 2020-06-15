@@ -12,7 +12,8 @@
   "scripts": {
     "lint": "eslint . --cache",
     "prettier-check": "prettier -c --ignore-path .gitignore \"**/*.{css,html,js,json,md,yaml,yml}\"",
-    "prettify": "prettier --write --ignore-path .gitignore \"**/*.{css,html,js,json,md,yaml,yml}\""
+    "prettify": "prettier --write --ignore-path .gitignore \"**/*.{css,html,js,json,md,yaml,yml}\"",
+    "test": "mocha \"src/**/*.test.js\""
   },
   "author": "Serverless, Inc.",
   "license": "MIT",
@@ -60,6 +61,7 @@
   },
   "devDependencies": {
     "@serverless/eslint-config": "^2.0.0",
+    "chai": "^4.2.0",
     "eslint": "^6.8.0",
     "eslint-plugin-import": "^2.20.2",
     "mocha": "^8.0.1",
