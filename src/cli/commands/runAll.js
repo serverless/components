@@ -11,46 +11,45 @@ const {
 const { getAccessKey, isLoggedIn, loadInstanceCredentials, getTemplate } = require('./utils');
 
 module.exports = async (config, cli, command) => {
-  let sdk;
+  cli.start('Initializing', { timer: true });
+
+  if (!config.debug) {
+    cli.logLogo();
+  } else if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
+    cli.log('Running in Platform Dev stage');
+  }
+
+  const templateYaml = await getTemplate(process.cwd());
+
+  // Get access key
+  const accessKey = await getAccessKey(templateYaml.org);
+
+  // Ensure the user is logged in or access key is available, or advertise
+  if (!accessKey && !isLoggedIn()) {
+    cli.advertise();
+  }
+
+  const meta = `Action: "${command} --all" - Stage: "${templateYaml.stage}" - Org: "${templateYaml.org}" - App: "${templateYaml.app}" - Name: "${templateYaml.name}"`;
+  cli.log(meta);
+
+  if (!templateYaml) {
+    throw new Error('No components found in sub directories.');
+  }
+
+  // Load Instance Credentials
+  const credentials = await loadInstanceCredentials(templateYaml.stage);
+
+  cli.status('Initializing', templateYaml.name);
+
+  // initialize SDK
+  const sdk = new ServerlessSDK({
+    accessKey,
+    context: {
+      orgName: templateYaml.org,
+    },
+  });
+
   try {
-    cli.start('Initializing', { timer: true });
-
-    if (!config.debug) {
-      cli.logLogo();
-    } else if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
-      cli.log('Running in Platform Dev stage');
-    }
-
-    const templateYaml = await getTemplate(process.cwd());
-
-    // Get access key
-    const accessKey = await getAccessKey(templateYaml.org);
-
-    // Ensure the user is logged in or access key is available, or advertise
-    if (!accessKey && !isLoggedIn()) {
-      cli.advertise();
-    }
-
-    const meta = `Action: "${command} --all" - Stage: "${templateYaml.stage}" - Org: "${templateYaml.org}" - App: "${templateYaml.app}" - Name: "${templateYaml.name}"`;
-    cli.log(meta);
-
-    if (!templateYaml) {
-      throw new Error('No components found in sub directories.');
-    }
-
-    // Load Instance Credentials
-    const credentials = await loadInstanceCredentials(templateYaml.stage);
-
-    cli.status('Initializing', templateYaml.name);
-
-    // initialize SDK
-    sdk = new ServerlessSDK({
-      accessKey,
-      context: {
-        orgName: templateYaml.org,
-      },
-    });
-
     // Prepare Options
     const options = {};
     options.debug = config.debug;

@@ -14,48 +14,46 @@ const {
 const runAll = require('./runAll');
 
 module.exports = async (config, cli, command) => {
-  let sdk;
+  if (config.all) {
+    return runAll(config, cli, command);
+  }
+
+  // Start CLI persistance status
+  cli.start('Initializing', { timer: true });
+  // Load YAML
+  const instanceYaml = await loadInstanceConfig(process.cwd());
+
+  // Get access key
+  const accessKey = await getAccessKey(instanceYaml.org);
+
+  // Ensure the user is logged in or access key is available, or advertise
+  if (!accessKey && !isLoggedIn()) {
+    cli.advertise();
+  }
+  // Presentation
+  if (!config.debug) {
+    cli.logLogo();
+  } else if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
+    cli.log('Running in Platform Dev stage');
+  }
+
+  const meta = `Action: "${command}" - Stage: "${instanceYaml.stage}" - Org: "${instanceYaml.org}" - App: "${instanceYaml.app}" - Name: "${instanceYaml.name}"`;
+  cli.log(meta);
+
+  cli.status('Initializing', instanceYaml.name);
+
+  // Load Instance Credentials
+  const instanceCredentials = await loadInstanceCredentials(instanceYaml.stage);
+
+  // initialize SDK
+  const sdk = new ServerlessSDK({
+    accessKey,
+    context: {
+      orgName: instanceYaml.org,
+    },
+  });
 
   try {
-    if (config.all) {
-      return runAll(config, cli, command);
-    }
-
-    // Start CLI persistance status
-    cli.start('Initializing', { timer: true });
-    // Load YAML
-    const instanceYaml = await loadInstanceConfig(process.cwd());
-
-    // Get access key
-    const accessKey = await getAccessKey(instanceYaml.org);
-
-    // Ensure the user is logged in or access key is available, or advertise
-    if (!accessKey && !isLoggedIn()) {
-      cli.advertise();
-    }
-    // Presentation
-    if (!config.debug) {
-      cli.logLogo();
-    } else if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
-      cli.log('Running in Platform Dev stage');
-    }
-
-    const meta = `Action: "${command}" - Stage: "${instanceYaml.stage}" - Org: "${instanceYaml.org}" - App: "${instanceYaml.app}" - Name: "${instanceYaml.name}"`;
-    cli.log(meta);
-
-    cli.status('Initializing', instanceYaml.name);
-
-    // Load Instance Credentials
-    const instanceCredentials = await loadInstanceCredentials(instanceYaml.stage);
-
-    // initialize SDK
-    sdk = new ServerlessSDK({
-      accessKey,
-      context: {
-        orgName: instanceYaml.org,
-      },
-    });
-
     // Prepare Options
     const options = {};
     options.debug = config.debug;
