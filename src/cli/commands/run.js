@@ -14,123 +14,132 @@ const {
 const runAll = require('./runAll');
 
 module.exports = async (config, cli, command) => {
-  if (config.all) {
-    return runAll(config, cli, command);
-  }
-  // Start CLI persistance status
-  cli.start('Initializing', { timer: true });
+  let sdk;
 
-  // Load YAML
-  const instanceYaml = await loadInstanceConfig(process.cwd());
-
-  // Get access key
-  const accessKey = await getAccessKey(instanceYaml.org);
-
-  // Ensure the user is logged in or access key is available, or advertise
-  if (!accessKey && !isLoggedIn()) {
-    cli.advertise();
-  }
-  // Presentation
-  if (!config.debug) {
-    cli.logLogo();
-  } else if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
-    cli.log('Running in Platform Dev stage');
-  }
-
-  const meta = `Action: "${command}" - Stage: "${instanceYaml.stage}" - Org: "${instanceYaml.org}" - App: "${instanceYaml.app}" - Name: "${instanceYaml.name}"`;
-  cli.log(meta);
-
-  cli.status('Initializing', instanceYaml.name);
-
-  // Load Instance Credentials
-  const instanceCredentials = await loadInstanceCredentials(instanceYaml.stage);
-
-  // initialize SDK
-  const sdk = new ServerlessSDK({
-    accessKey,
-    context: {
-      orgName: instanceYaml.org,
-    },
-  });
-
-  // Prepare Options
-  const options = {};
-  options.debug = config.debug;
-  options.dev = config.dev;
-
-  // Connect to Serverless Platform Events, if in debug mode
-  if (options.debug) {
-    await sdk.connect({
-      filter: {
-        stageName: instanceYaml.stage,
-        appName: instanceYaml.app,
-        instanceName: instanceYaml.name,
-      },
-      onEvent: (evt) => {
-        if (evt.event !== 'instance.run.logs') {
-          return;
-        }
-        if (evt.data.logs && Array.isArray(evt.data.logs)) {
-          evt.data.logs.forEach((log) => {
-            // Remove strange formatting that comes from stderr
-            if (typeof log.data === 'string' && log.data.startsWith("'")) {
-              log.data = log.data.substr(1);
-            }
-            if (typeof log.data === 'string' && log.data.endsWith("'")) {
-              log.data = log.data.substring(0, log.data.length - 1);
-            }
-            if (typeof log.data === 'string' && log.data.endsWith('\\n')) {
-              log.data = log.data.substring(0, log.data.length - 2);
-            }
-            cli.log(log.data);
-          });
-        }
-      },
-    });
-  }
-
-  if (command === 'deploy') {
-    // Warn about dev agent
-    if (options.dev) {
-      cli.log();
-      cli.log(
-        '"--dev" option detected.  Dev Agent will be added to your code.  Do not deploy this in your production stage.',
-        'grey'
-      );
+  try {
+    if (config.all) {
+      return runAll(config, cli, command);
     }
 
-    // run deploy
-    cli.status('Deploying', null, 'white');
-    const instance = await sdk.deploy(instanceYaml, instanceCredentials, options);
-    cli.log();
-    cli.logOutputs(instance.outputs);
+    // Start CLI persistance status
+    cli.start('Initializing', { timer: true });
+    // Load YAML
+    const instanceYaml = await loadInstanceConfig(process.cwd());
 
-    // commenting out dashboard URL for now until the dashboard is usable
-    // cli.log()
-    // cli.log(`${chalk.grey(`Full details: ${dashboardUrl}`)}`)
-  } else if (command === 'remove') {
-    cli.status('Removing', null, 'white');
+    // Get access key
+    const accessKey = await getAccessKey(instanceYaml.org);
 
-    // The "inputs" in serverless.yml are only for deploy.  Remove them for all other commands
-    instanceYaml.inputs = {};
+    // Ensure the user is logged in or access key is available, or advertise
+    if (!accessKey && !isLoggedIn()) {
+      cli.advertise();
+    }
+    // Presentation
+    if (!config.debug) {
+      cli.logLogo();
+    } else if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
+      cli.log('Running in Platform Dev stage');
+    }
 
-    await sdk.remove(instanceYaml, instanceCredentials, options);
-  } else {
-    // run a custom method synchronously to receive outputs directly
-    options.sync = true;
+    const meta = `Action: "${command}" - Stage: "${instanceYaml.stage}" - Org: "${instanceYaml.org}" - App: "${instanceYaml.app}" - Name: "${instanceYaml.name}"`;
+    cli.log(meta);
 
-    // The "inputs" in serverless.yml are only for deploy.  Remove them for all other commands
-    instanceYaml.inputs = {};
+    cli.status('Initializing', instanceYaml.name);
 
-    cli.status('Running', null, 'white');
-    const instance = await sdk.run(command, instanceYaml, instanceCredentials, options);
+    // Load Instance Credentials
+    const instanceCredentials = await loadInstanceCredentials(instanceYaml.stage);
 
-    cli.log();
-    cli.logOutputs(instance.outputs);
+    // initialize SDK
+    sdk = new ServerlessSDK({
+      accessKey,
+      context: {
+        orgName: instanceYaml.org,
+      },
+    });
+
+    // Prepare Options
+    const options = {};
+    options.debug = config.debug;
+    options.dev = config.dev;
+
+    // Connect to Serverless Platform Events, if in debug mode
+    if (options.debug) {
+      await sdk.connect({
+        filter: {
+          stageName: instanceYaml.stage,
+          appName: instanceYaml.app,
+          instanceName: instanceYaml.name,
+        },
+        onEvent: (evt) => {
+          if (evt.event !== 'instance.run.logs') {
+            return;
+          }
+          if (evt.data.logs && Array.isArray(evt.data.logs)) {
+            evt.data.logs.forEach((log) => {
+              // Remove strange formatting that comes from stderr
+              if (typeof log.data === 'string' && log.data.startsWith("'")) {
+                log.data = log.data.substr(1);
+              }
+              if (typeof log.data === 'string' && log.data.endsWith("'")) {
+                log.data = log.data.substring(0, log.data.length - 1);
+              }
+              if (typeof log.data === 'string' && log.data.endsWith('\\n')) {
+                log.data = log.data.substring(0, log.data.length - 2);
+              }
+              cli.log(log.data);
+            });
+          }
+        },
+      });
+    }
+
+    if (command === 'deploy') {
+      // Warn about dev agent
+      if (options.dev) {
+        cli.log();
+        cli.log(
+          '"--dev" option detected.  Dev Agent will be added to your code.  Do not deploy this in your production stage.',
+          'grey'
+        );
+      }
+
+      // run deploy
+      cli.status('Deploying', null, 'white');
+      const instance = await sdk.deploy(instanceYaml, instanceCredentials, options);
+      cli.log();
+      cli.logOutputs(instance.outputs);
+
+      // commenting out dashboard URL for now until the dashboard is usable
+      // cli.log()
+      // cli.log(`${chalk.grey(`Full details: ${dashboardUrl}`)}`)
+    } else if (command === 'remove') {
+      cli.status('Removing', null, 'white');
+
+      // The "inputs" in serverless.yml are only for deploy.  Remove them for all other commands
+      instanceYaml.inputs = {};
+
+      await sdk.remove(instanceYaml, instanceCredentials, options);
+    } else {
+      // run a custom method synchronously to receive outputs directly
+      options.sync = true;
+
+      // The "inputs" in serverless.yml are only for deploy.  Remove them for all other commands
+      instanceYaml.inputs = {};
+
+      cli.status('Running', null, 'white');
+      const instance = await sdk.run(command, instanceYaml, instanceCredentials, options);
+
+      cli.log();
+      cli.logOutputs(instance.outputs);
+    }
+
+    sdk.disconnect();
+    cli.close('success', 'Success');
+  } catch (e) {
+    if (sdk) {
+      sdk.disconnect();
+    }
+
+    throw e;
   }
-
-  sdk.disconnect();
-  cli.close('success', 'Success');
-
   return null;
 };
