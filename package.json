@@ -50,7 +50,7 @@
     "js-yaml": "^3.13.1",
     "minimist": "^1.2.5",
     "moment": "^2.24.0",
-    "open": "^7.0.3",
+    "open": "^7.0.4",
     "prettyoutput": "^1.2.0",
     "ramda": "^0.26.1",
     "semver": "^7.3.2",

@@ -1,5 +1,6 @@
 'use strict';
-const initToken = require('./initTokens')
+const initToken = require('./initTokens');
+const setupAws = require('./setupAws');
 
 const proTemplateMatch = /[a-zA-Z0-9]{8}/;
 
@@ -10,7 +11,11 @@ module.exports = async (config, cli) => {
   }
 
   if (maybeToken.match(proTemplateMatch)) {
-    return await initToken.run(cli, config.params[0])
+    const serviceDir = await initToken.run(cli, config.params[0])
+    await setupAws(config, cli)
+    cli.close('success', `cd to '${serviceDir}' and run 'serverless dev' to get started developing!`)
+  } else {
+    cli.close('Registry initialization coming soon!')
   }
   return false
 }

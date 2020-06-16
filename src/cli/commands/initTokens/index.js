@@ -24,8 +24,8 @@ module.exports = {
     cli.status('Logging you in')
     set('userId', auth0Id);
     if (secretAccessKey) {
-      if (!get(`configFile.users.${auth0Id}`)) {
-        set(`configFile.users.${auth0Id}`, {
+      if (!get(`users.${auth0Id}`)) {
+        set(`users.${auth0Id}`, {
           username: userName,
           userId: auth0Id,
           dashboard: {
@@ -34,7 +34,7 @@ module.exports = {
           },
         })
       }
-      set(`configFile.users.${auth0Id}.dashboard.accessKeys.${tenantName}`, secretAccessKey);
+      set(`users.${auth0Id}.dashboard.accessKeys.${tenantName}`, secretAccessKey);
     }
 
     if (template.url && template.directory) {
@@ -59,15 +59,22 @@ module.exports = {
       fs.removeSync(tempPath);
       // CD
       process.chdir(servicePath);
-
-      for (const { command, options } of template.commands) {
-        await spawn(command, options);
+      if (fs.existsSync('package.json')) {
+        await spawn('npm', ['install'])
+      }
+      if (fs.existsSync('yarn.lock')) {
+        await spawn('yarn', ['install'])
+      }
+      if (template.commands) {
+        for (const { command, options } of template.commands) {
+          await spawn(command, options);
+        }
       }
       cli.status(`${newServiceName} successfully created in '${template.directory}' folder.`)
       if (template.projectType === 'components') {
         await componentsResolver(cli, tenantName, newServiceName, servicePath);
       }
     }
-    return Promise.resolve();
+    return Promise.resolve(template.directory);
   },
 };
