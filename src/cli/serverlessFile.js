@@ -56,5 +56,7 @@ const writeMainAttrs = async (cli, servicePath, orgName, appName, serviceName = 
 
 module.exports = {
   writeMainAttrs,
-  removeTemplateAttrs
+  removeTemplateAttrs,
+  loadServerlessFile,
+  writeServerlessFile
 }
