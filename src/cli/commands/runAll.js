@@ -119,12 +119,8 @@ module.exports = async (config, cli, command) => {
       }
     }
 
-    sdk.disconnect();
     cli.close('success', 'Success');
-  } catch (e) {
-    if (sdk) {
-      sdk.disconnect();
-    }
-    throw e;
+  } finally {
+    sdk.disconnect();
   }
 };
