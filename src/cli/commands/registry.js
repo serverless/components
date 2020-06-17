@@ -6,9 +6,11 @@
 
 const { ServerlessSDK } = require('@serverless/platform-client');
 const path = require('path');
+const {
+  promises: { readFile },
+} = require('fs');
 const { getAccessKey, isLoggedIn } = require('./utils');
-const { loadServerlessFile, fileExists } = require('../utils');
-const { getAgent } = require('@serverless/platform-client/src/utils');
+const { loadServerlessFile, fileExists, loadComponentConfig } = require('../utils');
 
 /**
  * Publish a Component to the Serverless Registry
@@ -30,8 +32,13 @@ const publish = async (config, cli) => {
     cli.advertise();
   }
 
-  // Load serverless file
-  const serverlessFile = await loadServerlessFile(process.cwd());
+  let serverlessFile = await loadServerlessFile(process.cwd());
+
+  if (!serverlessFile) {
+    const serverlessComponentFile = await loadComponentConfig(process.cwd());
+    serverlessFile = serverlessComponentFile;
+    serverlessFile.src = serverlessComponentFile.main;
+  }
 
   if (serverlessFile.type === 'template' || (!serverlessFile.type && !serverlessFile.version)) {
     // if the user did not specify a type nor a version, it's a temlate
@@ -60,11 +67,11 @@ const publish = async (config, cli) => {
   }
 
   // log message in case of component
-  let progressLogMsg = `Publishing component "${serverlessFile.name}@${serverlessFile.version}"...`;
+  let progressLogMsg = `Publishing "${serverlessFile.name}@${serverlessFile.version}"...`;
 
   // log message in case of template
   if (serverlessFile.type === 'template') {
-    progressLogMsg = `Publishing template "${serverlessFile.name}"...`;
+    progressLogMsg = `Publishing "${serverlessFile.name}"...`;
   }
 
   // Presentation
@@ -73,11 +80,25 @@ const publish = async (config, cli) => {
 
   const sdk = new ServerlessSDK({ accessKey });
 
+  const readmeFilePath = path.join(process.cwd(), 'README.md');
+  if (await fileExists(readmeFilePath)) {
+    serverlessFile.readme = await readFile(readmeFilePath, 'utf-8');
+  }
+
   // Publish
   cli.status('Publishing');
 
   try {
     await sdk.publishToRegistry(serverlessFile);
+    // log message in case of component
+    let successLogMsg = `Successfully published "${serverlessFile.name}@${serverlessFile.version}".`;
+
+    // log message in case of template
+    if (serverlessFile.type === 'template') {
+      successLogMsg = `Successfully published "${serverlessFile.name}"...`;
+    }
+
+    cli.close('success', successLogMsg);
   } catch (error) {
     if (error.message.includes('409')) {
       error.message = error.message.replace('409 - ', '');
@@ -86,16 +107,6 @@ const publish = async (config, cli) => {
       throw error;
     }
   }
-
-  // log message in case of component
-  let successLogMsg = `Successfully published component "${serverlessFile.name}@${serverlessFile.version}".`;
-
-  // log message in case of template
-  if (serverlessFile.type === 'template') {
-    successLogMsg = `Successfully published template "${serverlessFile.name}"...`;
-  }
-
-  cli.close('success', successLogMsg);
 };
 
 /**
@@ -110,57 +121,53 @@ const get = async (config, cli) => {
   cli.start(`Fetching data for: ${packageName}`);
 
   const sdk = new ServerlessSDK();
-  const {
-    type,
-    description,
-    author,
-    repo,
-    license,
-    keywords,
-    latestVersion,
-    downloadUrl,
-    versions,
-  } = await sdk.getFromRegistry(packageName);
+  let data = await sdk.getFromRegistry(packageName);
 
-  if (type === 'component') {
-    const devVersion = versions.indexOf('0.0.0-dev');
+  // for backward compatability
+  if (data.componentDefinition) {
+    data = { ...data, ...data.componentDefinition };
+    data.type = 'component';
+  }
+
+  if (data.type === 'component') {
+    const devVersion = data.versions.indexOf('0.0.0-dev');
     if (devVersion !== -1) {
-      versions.splice(devVersion, 1);
+      data.versions.splice(devVersion, 1);
     }
   }
 
   cli.logRegistryLogo();
   cli.log();
   cli.log(`Name: ${packageName}`);
-  cli.log(`Type: ${type}`);
+  cli.log(`Type: ${data.type}`);
 
-  if (description) {
-    cli.log(`Description: ${description}`);
+  if (data.description) {
+    cli.log(`Description: ${data.description}`);
   }
 
-  if (keywords) {
-    cli.log(`Keywords: ${keywords}`);
+  if (data.keywords) {
+    cli.log(`Keywords: ${data.keywords}`);
   }
 
-  if (author) {
-    cli.log(`Author: ${author}`);
+  if (data.author) {
+    cli.log(`Author: ${data.author}`);
   }
 
-  if (license) {
-    cli.log(`License: ${license}`);
+  if (data.license) {
+    cli.log(`License: ${data.license}`);
   }
 
-  if (repo) {
-    cli.log(`Repo: ${repo}`);
+  if (data.repo) {
+    cli.log(`Repo: ${data.repo}`);
   }
 
-  if (type === 'component') {
-    cli.log(`Latest Version: ${latestVersion}`);
+  if (data.type === 'component') {
+    cli.log(`Latest Version: ${data.latestVersion}`);
 
-    if (versions.length > 0) {
+    if (data.versions.length > 0) {
       cli.log();
       cli.log('Available Versions:');
-      cli.log(`${versions.join(', ')}`);
+      cli.log(`${data.versions.join(', ')}`);
     }
   }
 
