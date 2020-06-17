@@ -9,7 +9,7 @@ const path = require('path');
 const {
   promises: { readFile },
 } = require('fs');
-const { getAccessKey, isLoggedIn } = require('./utils');
+const { getAccessKey, isLoggedIn, getDefaultOrgName } = require('./utils');
 const { loadServerlessFile, fileExists, loadComponentConfig } = require('../utils');
 
 /**
@@ -48,9 +48,18 @@ const publish = async (config, cli) => {
     serverlessFile.type = 'component';
   }
 
+  // fall back to service name for framework v1
+  serverlessFile.name = serverlessFile.name || serverlessFile.service;
+
   // default version is dev
   if (!serverlessFile.version || config.dev) {
     serverlessFile.version = 'dev';
+  }
+
+  serverlessFile.org = serverlessFile.org || (await getDefaultOrgName());
+
+  if (!serverlessFile.org) {
+    throw new Error('The "org" property is required');
   }
 
   // cwd is the default src
@@ -123,6 +132,8 @@ const get = async (config, cli) => {
 
   const sdk = new ServerlessSDK();
   let data = await sdk.getFromRegistry(packageName);
+
+  console.log(data);
 
   // for backward compatability
   if (data.componentDefinition) {
