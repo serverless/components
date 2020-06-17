@@ -46,11 +46,10 @@ const removeTemplateAttrs = async (cli, servicePath) => {
 
 const writeMainAttrs = async (cli, servicePath, orgName, appName, serviceName = null) => {
   const ymlObject = await loadServerlessFile(cli, servicePath)
-  ymlObject.org = orgName
-  ymlObject.app = appName
-  if (serviceName) {
-    ymlObject.service = serviceName
-  }
+  if (orgName) ymlObject.org = orgName;
+  if (appName) ymlObject.app = appName;
+  if (serviceName) ymlObject.service = serviceName;
+  
   await writeServerlessFile(cli, servicePath, ymlObject);
 }
 
