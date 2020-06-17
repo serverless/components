@@ -18,6 +18,7 @@ module.exports = async (config, cli) => {
     // Set new close listener
     process.on('SIGINT', () => {
       cli.close('error', 'Dev Mode Canceled.  Run "serverless deploy" To Remove Dev Mode Agent.');
+      process.exit();
     });
 
     sdk.disconnect();
