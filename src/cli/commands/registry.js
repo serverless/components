@@ -35,13 +35,14 @@ const publish = async (config, cli) => {
   let serverlessFile = await loadServerlessFile(process.cwd());
 
   if (!serverlessFile) {
+    // keeping serverless.component.yml for backward compatability
     const serverlessComponentFile = await loadComponentConfig(process.cwd());
     serverlessFile = serverlessComponentFile;
     serverlessFile.src = serverlessComponentFile.main;
   }
 
   if (serverlessFile.type === 'template' || (!serverlessFile.type && !serverlessFile.version)) {
-    // if the user did not specify a type nor a version, it's a temlate
+    // if the user did not specify a type nor a version, it's a template
     serverlessFile.type = 'template';
   } else {
     serverlessFile.type = 'component';
