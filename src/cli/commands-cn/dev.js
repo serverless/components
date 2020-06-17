@@ -109,7 +109,8 @@ module.exports = async (config, cli) => {
   const closeHandler = async () => {
     // Set new close listener
     process.on('SIGINT', () => {
-      cli.close('error', 'Dev Mode Canceled.  Run "serverless deploy" To Remove Dev Mode Agent.');
+      cli.close('error', 'Dev Mode Canceled.');
+      process.exit(1);
     });
 
     cli.status('Disabling Dev Mode & Closing', null, 'green');
@@ -117,6 +118,9 @@ module.exports = async (config, cli) => {
     if (await updateDeploymentStatus(cli, deployedInstance, false)) {
       cli.close('success', 'Dev Mode Closed');
       process.exit(0);
+    } else {
+      cli.close('error', 'Last deployment fail. Run "serverless deploy" to deploy again.');
+      process.exit(1);
     }
   };
 
