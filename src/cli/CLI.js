@@ -79,8 +79,8 @@ class CLI {
     }
 
     // Set Event Handler: Control + C to cancel session
-    process.on('SIGINT', () => {
-      options.closeHandler();
+    process.on('SIGINT', async () => {
+      await options.closeHandler();
       process.exit();
     });
 
