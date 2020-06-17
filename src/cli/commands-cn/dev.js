@@ -88,6 +88,7 @@ async function updateDeploymentStatus(cli, instanceInfo, startDebug) {
         }
       }
       cli.log(header, 'grey');
+      delete instanceInfo.outputs.vendorMessage;
       cli.logOutputs(instanceInfo.outputs);
       cli.status('Watching');
       return true;
@@ -115,6 +116,7 @@ module.exports = async (config, cli) => {
     const deployedInstance = await deploy(sdk, instanceYaml, instanceCredentials);
     if (await updateDeploymentStatus(cli, deployedInstance, false)) {
       cli.close('success', 'Dev Mode Closed');
+      process.exit(0);
     }
   };
 
