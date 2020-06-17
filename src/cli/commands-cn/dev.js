@@ -112,6 +112,7 @@ module.exports = async (config, cli) => {
     // Set new close listener
     process.on('SIGINT', () => {
       cli.close('error', 'Dev Mode Canceled.');
+      process.exit();
     });
 
     if (watcher) {
