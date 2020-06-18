@@ -40,7 +40,11 @@ const writeServerlessFile = async (cli, servicePath, ymlObject) => {
 
 const removeTemplateAttrs = async (cli, servicePath) => {
   const ymlObject = await loadServerlessFile(cli, servicePath)
-  delete(ymlObject.template)
+  delete(ymlObject.author)
+  delete(ymlObject.description)
+  delete(ymlObject.keywords)
+  delete(ymlObject.repo)
+  delete(ymlObject.license)
   await writeServerlessFile(cli, servicePath, ymlObject);
 }
 
