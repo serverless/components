@@ -9,6 +9,9 @@ const {
   executeGraph,
 } = require('../utils');
 const { getAccessKey, isLoggedIn, loadInstanceCredentials, getTemplate } = require('./utils');
+const generateNotificationsPayload = require('../notifications/generate-payload');
+const requestNotification = require('../notifications/request');
+const printNotification = require('../notifications/print-notification');
 
 module.exports = async (config, cli, command) => {
   cli.start('Initializing', { timer: true });
@@ -85,6 +88,13 @@ module.exports = async (config, cli, command) => {
       });
     }
 
+    const deferredNotificationsData =
+      command === 'deploy'
+        ? requestNotification(
+            Object.assign(generateNotificationsPayload(templateYaml), { command: 'deploy' })
+          )
+        : null;
+
     if (command === 'remove') {
       cli.status('Removing', null, 'white');
     } else {
@@ -119,6 +129,7 @@ module.exports = async (config, cli, command) => {
     }
 
     cli.close('success', 'Success');
+    if (deferredNotificationsData) printNotification(cli, await deferredNotificationsData);
   } finally {
     sdk.disconnect();
   }

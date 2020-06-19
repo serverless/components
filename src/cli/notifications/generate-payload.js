@@ -2,15 +2,25 @@
 
 const { version } = require('../../../package');
 
-module.exports = (instanceConfig) => {
+module.exports = (serviceConfig) => {
+  const config = {};
+
+  if (serviceConfig.component) {
+    config.component = serviceConfig.component;
+  } else {
+    config.components = [];
+    for (const componentConfig of Object.values(serviceConfig)) {
+      if (componentConfig.component) {
+        config.components.push({ component: componentConfig.component });
+      }
+    }
+  }
   return {
     cliName: '@serverless/components',
-    config: {
-      component: instanceConfig.component,
-    },
+    config,
     versions: {
       '@serverless/components': version,
     },
-    isDashboardEnabled: Boolean(instanceConfig.org),
+    isDashboardEnabled: Boolean(serviceConfig.org),
   };
 };
