@@ -28,16 +28,16 @@
     "/templates"
   ],
   "dependencies": {
-    "@serverless/inquirer": "^1.1.0",
-    "@serverless/platform-client": "^0.25.7",
-    "@serverless/platform-client-china": "^1.0.12",
-    "@serverless/platform-sdk": "^2.3.0",
+    "@serverless/inquirer": "^1.1.2",
+    "@serverless/platform-client": "^0.25.14",
+    "@serverless/platform-client-china": "^1.0.18",
+    "@serverless/platform-sdk": "^2.3.1",
     "@serverless/utils": "^1.1.0",
     "adm-zip": "^0.4.14",
     "ansi-escapes": "^4.3.1",
     "axios": "^0.19.2",
     "chalk": "^2.4.2",
-    "chokidar": "^3.3.1",
+    "chokidar": "^3.4.0",
     "dotenv": "^8.2.0",
     "figures": "^3.2.0",
     "fs-extra": "^8.1.0",
@@ -45,22 +45,22 @@
     "graphlib": "^2.1.8",
     "https-proxy-agent": "^5.0.0",
     "ini": "^1.3.5",
-    "js-yaml": "^3.13.1",
+    "js-yaml": "^3.14.0",
     "minimist": "^1.2.5",
-    "moment": "^2.24.0",
-    "open": "^7.0.3",
+    "moment": "^2.27.0",
+    "open": "^7.0.4",
     "prettyoutput": "^1.2.0",
     "ramda": "^0.26.1",
     "semver": "^7.3.2",
     "strip-ansi": "^5.2.0",
     "traverse": "^0.6.6",
     "uuid": "^3.4.0",
-    "ws": "^7.2.3"
+    "ws": "^7.3.0"
   },
   "devDependencies": {
-    "@serverless/eslint-config": "^2.0.0",
+    "@serverless/eslint-config": "^2.1.0",
     "eslint": "^6.8.0",
-    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-import": "^2.21.2",
     "prettier": "^2.0.5"
   }
 }
