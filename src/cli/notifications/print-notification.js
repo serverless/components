@@ -3,7 +3,7 @@
 const chalk = require('chalk');
 const processBackendNotificationRequest = require('@serverless/utils/process-backend-notification-request');
 
-module.epxorts = async (cli, notifications) => {
+module.exports = async (cli, notifications) => {
   const notification = processBackendNotificationRequest(notifications);
   if (notification) {
     const borderLength = Math.min(notification.message.length, process.stdout.columns) || 10;
