@@ -9,6 +9,9 @@ const { ServerlessSDK } = require('@serverless/platform-client-china');
 const utils = require('./utils');
 const runAll = require('./runAll');
 const chalk = require('chalk');
+const generateNotificationsPayload = require('../notifications/generate-payload');
+const requestNotification = require('../notifications/request');
+const printNotification = require('../notifications/print-notification');
 
 module.exports = async (config, cli, command) => {
   if (config.all) {
@@ -56,7 +59,12 @@ module.exports = async (config, cli, command) => {
   options.debug = config.debug;
   options.dev = config.dev;
 
+  let deferredNotificationsData;
   if (command === 'deploy') {
+    deferredNotificationsData = requestNotification(
+      Object.assign(generateNotificationsPayload(instanceYaml), { command: 'deploy' })
+    );
+
     // Warn about dev agent
     if (options.dev) {
       cli.log();
@@ -103,5 +111,6 @@ module.exports = async (config, cli, command) => {
   }
   cli.close('success', 'Success');
 
+  if (deferredNotificationsData) printNotification(cli, await deferredNotificationsData);
   return null;
 };

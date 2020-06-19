@@ -18,9 +18,6 @@ const https = require('https');
 const semver = require('semver');
 const chalk = require('chalk');
 const HttpsProxyAgent = require('https-proxy-agent');
-const processBackendNotificationRequest = require('@serverless/utils/process-backend-notification-request');
-const generateNotifiationsPayload = require('./notifications/generate-payload');
-const requestNotification = require('./notifications/request');
 
 module.exports = async () => {
   const args = minimist(process.argv.slice(2));
@@ -106,13 +103,6 @@ module.exports = async () => {
     return cli.logVersion();
   }
 
-  const deferredNotificationsData =
-    command === 'deploy'
-      ? requestNotification(
-          Object.assign(generateNotifiationsPayload(instanceConfig), { command: 'deploy' })
-        )
-      : null;
-
   try {
     if (commands[command]) {
       await commands[command](config, cli, command);
@@ -121,18 +111,6 @@ module.exports = async () => {
     }
   } catch (e) {
     return cli.error(e);
-  }
-
-  if (deferredNotificationsData) {
-    const notification = processBackendNotificationRequest(await deferredNotificationsData);
-    if (notification) {
-      const borderLength = notification.message.length;
-      cli.log(
-        `${'*'.repeat(borderLength)}\n${chalk.bold(notification.message)}\n${'*'.repeat(
-          borderLength
-        )}\n`
-      );
-    }
   }
 
   return null;
