@@ -38,16 +38,6 @@ const writeServerlessFile = async (cli, servicePath, ymlObject) => {
   }
 }
 
-const removeTemplateAttrs = async (cli, servicePath) => {
-  const ymlObject = await loadServerlessFile(cli, servicePath)
-  delete(ymlObject.author)
-  delete(ymlObject.description)
-  delete(ymlObject.keywords)
-  delete(ymlObject.repo)
-  delete(ymlObject.license)
-  await writeServerlessFile(cli, servicePath, ymlObject);
-}
-
 const writeMainAttrs = async (cli, servicePath, orgName, appName, serviceName = null) => {
   const ymlObject = await loadServerlessFile(cli, servicePath)
   if (orgName) ymlObject.org = orgName;
@@ -59,7 +49,6 @@ const writeMainAttrs = async (cli, servicePath, orgName, appName, serviceName = 
 
 module.exports = {
   writeMainAttrs,
-  removeTemplateAttrs,
   loadServerlessFile,
   writeServerlessFile
 }
