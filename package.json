@@ -1,6 +1,6 @@
 {
   "name": "@serverless/components",
-  "version": "2.30.16",
+  "version": "2.31.0",
   "description": "The Serverless Framework's new infrastructure provisioning technology — Build, compose, & deploy serverless apps in seconds...",
   "main": "./src/index.js",
   "bin": {
@@ -29,7 +29,7 @@
   ],
   "dependencies": {
     "@serverless/inquirer": "^1.1.0",
-    "@serverless/platform-client": "^0.25.7",
+    "@serverless/platform-client": "^1.0.0",
     "@serverless/platform-client-china": "^1.0.12",
     "@serverless/platform-sdk": "^2.3.0",
     "@serverless/utils": "^1.1.0",
