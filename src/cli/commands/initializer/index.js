@@ -65,11 +65,6 @@ module.exports = {
       if (fs.existsSync('yarn.lock')) {
         await spawn('yarn', ['install'])
       }
-      if (commands) {
-        for (const { command, options } of commands) {
-          await spawn(command, options);
-        }
-      }
       cli.status(`${newServiceName} successfully created in '${directory}' folder.`)
       if (projectType === 'components') {
         await componentsResolver(cli, tenantName, newServiceName, servicePath);
