@@ -66,7 +66,15 @@ module.exports = async () => {
     commands = require('./commands');
   }
 
-  const command = args._[0] || 'deploy';
+  let command = args._[0] || 'deploy';
+
+  // publish is just an alias for registry publish
+  // we also wanna keep the other registry functionality
+  if (command === 'publish') {
+    command = 'registry';
+    args._[1] = 'publish';
+  }
+
   const params = [];
   if (args._[1]) {
     params.push(args._[1]);

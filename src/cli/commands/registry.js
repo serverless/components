@@ -6,8 +6,11 @@
 
 const { ServerlessSDK } = require('@serverless/platform-client');
 const path = require('path');
-const { getAccessKey, isLoggedIn } = require('./utils');
-const { loadComponentConfig, fileExists } = require('../utils');
+const {
+  promises: { readFile },
+} = require('fs');
+const { getAccessKey, isLoggedIn, getDefaultOrgName } = require('./utils');
+const { loadServerlessFile, fileExists, loadComponentConfig } = require('../utils');
 
 /**
  * Publish a Component to the Serverless Registry
@@ -29,39 +32,83 @@ const publish = async (config, cli) => {
     cli.advertise();
   }
 
-  // Load YAML
-  const componentYaml = await loadComponentConfig(process.cwd());
+  let serverlessFile = await loadServerlessFile(process.cwd());
 
-  if (!componentYaml.main) {
-    throw new Error("The 'main' property is required in serverless.component.yml");
+  if (!serverlessFile) {
+    // keeping serverless.component.yml for backward compatability
+    const serverlessComponentFile = await loadComponentConfig(process.cwd());
+    serverlessFile = serverlessComponentFile;
+    serverlessFile.src = serverlessComponentFile.main;
   }
 
-  const serverlessJsFilePath = path.resolve(process.cwd(), componentYaml.main, 'serverless.js');
+  if (serverlessFile.type === 'template' || (!serverlessFile.type && !serverlessFile.version)) {
+    // if the user did not specify a type nor a version, it's a template
+    serverlessFile.type = 'template';
+  } else {
+    serverlessFile.type = 'component';
+  }
 
-  if (!(await fileExists(serverlessJsFilePath))) {
-    throw new Error('no serverless.js file was found in the "main" directory you specified.');
+  // fall back to service name for framework v1
+  serverlessFile.name = serverlessFile.name || serverlessFile.service;
+
+  // default version is dev
+  if (!serverlessFile.version || config.dev) {
+    serverlessFile.version = 'dev';
+  }
+
+  serverlessFile.org = serverlessFile.org || (await getDefaultOrgName());
+
+  if (!serverlessFile.org) {
+    throw new Error('The "org" property is required');
+  }
+
+  // cwd is the default src
+  if (!serverlessFile.src) {
+    serverlessFile.src = process.cwd();
+  }
+
+  // validate serverless.js if component
+  if (serverlessFile.type === 'component') {
+    const serverlessJsFilePath = path.resolve(process.cwd(), serverlessFile.src, 'serverless.js');
+
+    if (!(await fileExists(serverlessJsFilePath))) {
+      throw new Error('no serverless.js file was found in the "src" directory you specified.');
+    }
+  }
+
+  // log message in case of component
+  let progressLogMsg = `Publishing "${serverlessFile.name}@${serverlessFile.version}"...`;
+
+  // log message in case of template
+  if (serverlessFile.type === 'template') {
+    progressLogMsg = `Publishing "${serverlessFile.name}"...`;
   }
 
   // Presentation
   cli.logRegistryLogo();
-  cli.log(
-    `Publishing "${componentYaml.name}@${config.dev ? 'dev' : componentYaml.version}"...`,
-    'grey'
-  );
+  cli.log(progressLogMsg, 'grey');
 
   const sdk = new ServerlessSDK({ accessKey });
 
-  // If "--dev" flag is used, set the version the API expects
-  if (config.dev) {
-    componentYaml.version = '0.0.0-dev';
+  const readmeFilePath = path.join(process.cwd(), 'README.md');
+  if (await fileExists(readmeFilePath)) {
+    serverlessFile.readme = await readFile(readmeFilePath, 'utf-8');
   }
 
   // Publish
   cli.status('Publishing');
 
-  let component;
   try {
-    component = await sdk.publishComponent(componentYaml);
+    await sdk.publishToRegistry(serverlessFile);
+    // log message in case of component
+    let successLogMsg = `Successfully published "${serverlessFile.name}@${serverlessFile.version}".`;
+
+    // log message in case of template
+    if (serverlessFile.type === 'template') {
+      successLogMsg = `Successfully published "${serverlessFile.name}"...`;
+    }
+
+    cli.close('success', successLogMsg);
   } catch (error) {
     if (error.message.includes('409')) {
       error.message = error.message.replace('409 - ', '');
@@ -70,15 +117,6 @@ const publish = async (config, cli) => {
       throw error;
     }
   }
-
-  if (component.component && component.component.version === '0.0.0-dev') {
-    component.component.version = 'dev';
-  }
-
-  cli.close(
-    'success',
-    `Successfully published ${component.component.componentName}@${component.component.version}`
-  );
 };
 
 /**
@@ -86,36 +124,60 @@ const publish = async (config, cli) => {
  * @param {*} config
  * @param {*} cli
  */
-const getComponent = async (config, cli) => {
-  const componentName = config.params[0];
+const get = async (config, cli) => {
+  const packageName = config.params[0];
 
   // Start CLI persistance status
-  cli.start(`Fetching versions for: ${componentName}`);
+  cli.start(`Fetching data for: ${packageName}`);
 
   const sdk = new ServerlessSDK();
-  const data = await sdk.getComponent(componentName);
+  let data = await sdk.getFromRegistry(packageName);
 
-  if (!data.component) {
-    cli.error(`Component "${componentName}" not found in the Serverless Registry.`, true);
+  // for backward compatability
+  if (data.componentDefinition) {
+    data = { ...data, ...data.componentDefinition };
+    data.type = 'component';
   }
 
-  const devVersion = data.versions.indexOf('0.0.0-dev');
-  if (devVersion !== -1) {
-    data.versions.splice(devVersion, 1);
+  if (data.type === 'component') {
+    const devVersion = data.versions.indexOf('0.0.0-dev');
+    if (devVersion !== -1) {
+      data.versions.splice(devVersion, 1);
+    }
   }
 
   cli.logRegistryLogo();
   cli.log();
-  cli.log(`Component: ${componentName}`);
-  cli.log(`Description: ${data.component.description}`);
-  cli.log(`Latest Version: ${data.component.version}`);
-  cli.log(`Author: ${data.component.author}`);
-  cli.log(`Repo: ${data.component.repo}`);
-  cli.log();
-  cli.log('Available Versions:');
-  cli.log(`${data.versions.join(', ')}`);
+  cli.log(`Name: ${packageName}`);
+  cli.log(`Type: ${data.type}`);
 
-  cli.close('success', `Component information listed for "${componentName}"`);
+  if (data.description) {
+    cli.log(`Description: ${data.description}`);
+  }
+
+  if (data.keywords) {
+    cli.log(`Keywords: ${data.keywords}`);
+  }
+
+  if (data.license) {
+    cli.log(`License: ${data.license}`);
+  }
+
+  if (data.repo) {
+    cli.log(`Repo: ${data.repo}`);
+  }
+
+  if (data.type === 'component') {
+    cli.log(`Latest Version: ${data.version}`);
+
+    if (data.versions.length > 0) {
+      cli.log();
+      cli.log('Available Versions:');
+      cli.log(`${data.versions.join(', ')}`);
+    }
+  }
+
+  cli.close('success', `Package data listed for "${packageName}"`);
 };
 
 /**
@@ -150,5 +212,5 @@ module.exports = async (config, cli) => {
   if (config.params[0] === 'publish') {
     return await publish(config, cli);
   }
-  return await getComponent(config, cli);
+  return await get(config, cli);
 };
