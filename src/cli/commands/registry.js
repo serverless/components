@@ -159,10 +159,6 @@ const get = async (config, cli) => {
     cli.log(`Keywords: ${data.keywords}`);
   }
 
-  if (data.author) {
-    cli.log(`Author: ${data.author}`);
-  }
-
   if (data.license) {
     cli.log(`License: ${data.license}`);
   }
