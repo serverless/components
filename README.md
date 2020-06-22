@@ -351,7 +351,14 @@ Outputs can be referenced easily in the `inputs` of other Components. Just use t
 ```yaml
 # Syntax
 ${output:[stage]:[app]:[instance].[output]}
+```
 
+- `stage` - The stage that the referenced component instance was deployed to. It is the `stage` property in that component instance `serverless.yml` file.
+- `app` - The app that the referenced component instance was deployed to. It is the `app` property in that component instance `serverelss.yml` file, which falls back to the `name` property if you did not specify it.
+- `instance` - The name of the component instance you are referencing. It is the `name` property in that component instance `serverless.yml` file.
+- `output` - One of the outputs of the component instance you are referencing. They are displayed in the CLI after deploying.
+
+```yaml
 # Examples
 ${output:prod:ecommerce:products-api.url}
 ${output:prod:ecommerce:role.arn}
