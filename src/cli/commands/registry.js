@@ -133,8 +133,6 @@ const get = async (config, cli) => {
   const sdk = new ServerlessSDK();
   let data = await sdk.getFromRegistry(packageName);
 
-  console.log(data);
-
   // for backward compatability
   if (data.componentDefinition) {
     data = { ...data, ...data.componentDefinition };
