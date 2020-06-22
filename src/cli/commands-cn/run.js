@@ -9,6 +9,9 @@ const { ServerlessSDK } = require('@serverless/platform-client-china');
 const utils = require('./utils');
 const runAll = require('./runAll');
 const chalk = require('chalk');
+const generateNotificationsPayload = require('../notifications/generate-payload');
+const requestNotification = require('../notifications/request');
+const printNotification = require('../notifications/print-notification');
 
 module.exports = async (config, cli, command) => {
   if (config.all) {
@@ -56,7 +59,12 @@ module.exports = async (config, cli, command) => {
   options.debug = config.debug;
   options.dev = config.dev;
 
+  let deferredNotificationsData;
   if (command === 'deploy') {
+    deferredNotificationsData = requestNotification(
+      Object.assign(generateNotificationsPayload(instanceYaml), { command: 'deploy' })
+    );
+
     // Warn about dev agent
     if (options.dev) {
       cli.log();
@@ -76,10 +84,16 @@ module.exports = async (config, cli, command) => {
       }
     };
     const instance = await sdk.deploy(instanceYaml, instanceCredentials, options);
+    const vendorMessage = instance.outputs.vendorMessage;
+    delete instance.outputs.vendorMessage;
     cli.log();
     cli.logOutputs(instance.outputs);
     cli.log();
     cli.log(`${chalk.grey(utils.getInstanceDashboardUrl(instanceYaml))}`);
+    if (vendorMessage) {
+      cli.log();
+      cli.log(`${chalk.green(vendorMessage)}`);
+    }
   } else if (command === 'remove') {
     // run remove
     cli.status('Removing', null, 'white');
@@ -97,5 +111,6 @@ module.exports = async (config, cli, command) => {
   }
   cli.close('success', 'Success');
 
+  if (deferredNotificationsData) printNotification(cli, await deferredNotificationsData);
   return null;
 };

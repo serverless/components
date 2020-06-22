@@ -88,6 +88,7 @@ async function updateDeploymentStatus(cli, instanceInfo, startDebug) {
         }
       }
       cli.log(header, 'grey');
+      delete instanceInfo.outputs.vendorMessage;
       cli.logOutputs(instanceInfo.outputs);
       cli.status('Watching');
       return true;
@@ -104,17 +105,25 @@ async function updateDeploymentStatus(cli, instanceInfo, startDebug) {
 }
 
 module.exports = async (config, cli) => {
+  let watcher;
+
   // Define a close handler, that removes any "dev" mode agents
   const closeHandler = async () => {
     // Set new close listener
     process.on('SIGINT', () => {
-      cli.close('error', 'Dev Mode Canceled.  Run "serverless deploy" To Remove Dev Mode Agent.');
+      cli.close('error', 'Dev Mode Canceled.');
+      process.exit();
     });
 
+    if (watcher) {
+      await watcher.close();
+    }
     cli.status('Disabling Dev Mode & Closing', null, 'green');
     const deployedInstance = await deploy(sdk, instanceYaml, instanceCredentials);
     if (await updateDeploymentStatus(cli, deployedInstance, false)) {
       cli.close('success', 'Dev Mode Closed');
+    } else {
+      cli.close('error', 'Last deployment fail. Run "serverless deploy" to deploy again.');
     }
   };
 
@@ -172,7 +181,7 @@ module.exports = async (config, cli) => {
   let queuedOperation = false; // whether there's another deployment queued
 
   // Set watcher
-  const watcher = chokidar.watch(process.cwd(), { ignored: /\.serverless/ });
+  watcher = chokidar.watch(process.cwd(), { ignored: /\.serverless/ });
 
   watcher.on('ready', async () => {
     cli.status('Enabling Dev Mode', null, 'green');

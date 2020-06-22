@@ -92,6 +92,7 @@ module.exports = async (config, cli) => {
   }
 
   if (instance.outputs) {
+    delete instance.outputs.vendorMessage;
     cli.log();
     cli.logOutputs(instance.outputs);
   }
