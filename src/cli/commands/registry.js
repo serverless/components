@@ -168,7 +168,7 @@ const get = async (config, cli) => {
   }
 
   if (data.type === 'component') {
-    cli.log(`Latest Version: ${data.latestVersion}`);
+    cli.log(`Latest Version: ${data.version}`);
 
     if (data.versions.length > 0) {
       cli.log();
