@@ -1,11 +1,10 @@
 'use strict';
 
 const { ServerlessSDK } = require('@serverless/platform-client');
-const { downloadTemplate, copyDirContentsSync } = require('./utils');
-const componentsResolver = require('./componentResolver');
+const { downloadTemplate } = require('./utils');
 const initTokenHandler = require('./initTokenHandler');
+const Unpacker = require('./unpacker');
 
-const spawn = require('child-process-ext/spawn');
 const fs = require('fs-extra');
 const AdmZip = require('adm-zip');
 const path = require('path');
@@ -18,12 +17,12 @@ const initTokenFormat = /[a-zA-Z0-9]{8}/;
 module.exports = {
   async run(cli, cliParam) {
     cli.start('Fetching project configuration')
-    let templateUrl; let directory; let projectType; let serviceName; let tenantName; let tempDir;
+    let templateUrl; let directory; let serviceName; let tenantName;
     
     // If the user has a token, log them in, and fetch the template details
     if (cliParam.match(initTokenFormat)) {
       cli.status('Logging you in')
-      ;({ templateUrl, directory, projectType, serviceName, tenantName, tempDir } = await initTokenHandler(sdk, cliParam));
+      ;({ templateUrl, directory, serviceName, tenantName } = await initTokenHandler(sdk, cliParam));
     } else {
       // Otherwise, just fetch the template by name from the registry.
       cli.status('Fetching template from registry')
@@ -46,29 +45,14 @@ module.exports = {
       const zip = new AdmZip(zipFile);
       zip.extractAllTo(servicePath);
 
-      // Github zips have a top-level directory and a subdirectory
-      // with the actual code, prefixed by the branch name.
-      // This cleans that up
-      if (tempDir){
-        // Move unzipped template to destination
-        copyDirContentsSync(tempDir, servicePath);
-        fs.removeSync(tempDir)
-      }
-
       // Remove zip file
       fs.removeSync(zipFile);
-      // CD
-      process.chdir(servicePath);
-      if (fs.existsSync('package.json')) {
-        await spawn('npm', ['install'])
-      }
-      if (fs.existsSync('yarn.lock')) {
-        await spawn('yarn', ['install'])
-      }
+      const unpacker = new Unpacker(cli, tenantName, serviceName)
+      cli.status('Setting up your new project')
+      // Recursively unpack each directory in a template
+      // Set org attr in sls.yml for each
+      await unpacker.unpack(servicePath)
       cli.status(`${newServiceName} successfully created in '${directory}' folder.`)
-      if (projectType === 'components') {
-        await componentsResolver(cli, tenantName, newServiceName, servicePath);
-      }
     }
     return Promise.resolve(directory);
   },

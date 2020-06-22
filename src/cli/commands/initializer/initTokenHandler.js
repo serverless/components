@@ -1,7 +1,5 @@
 'use strict'
 const { get, set } = require('@serverless/utils/config');
-const path = require('path');
-const { parseGitHubURL }= require('./utils');
 
 module.exports = async (sdk, initToken) => {
   const { auth0Id, tenantName, secretAccessKey, userName, template } = await sdk.getInitToken(
@@ -9,18 +7,12 @@ module.exports = async (sdk, initToken) => {
   );
   sdk.accessKey = secretAccessKey;
 
-  const { projectType, directory, serviceName, type } = template;
-  let templateUrl; let tempDir;
+  const { projectType, directory, serviceName } = template;
 
-  if (type === 'registry') {
-    // Registry data doesn't have a link, we need to fetch the signed URL
-    const registryData = await sdk.getFromRegistry(template.packageName)
-    templateUrl = registryData.downloadUrl;
-  } else if (type === 'github') {
-    const { url, repo, branch } = parseGitHubURL(template.url);
-    templateUrl = url;
-    tempDir = path.resolve(process.cwd(), directory, `${repo}-${branch}`);
-  }
+  // Registry data doesn't have a link, we need to fetch the signed URL
+  const registryData = await sdk.getFromRegistry(template.packageName)
+  const templateUrl = registryData.downloadUrl;
+  
 
   set('userId', auth0Id);
   if (secretAccessKey) {
@@ -36,5 +28,5 @@ module.exports = async (sdk, initToken) => {
     }
     set(`users.${auth0Id}.dashboard.accessKeys.${tenantName}`, secretAccessKey);
   }
-  return { templateUrl, projectType, directory, serviceName, tenantName, tempDir }
+  return { templateUrl, projectType, directory, serviceName, tenantName }
 }

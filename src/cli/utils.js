@@ -206,54 +206,6 @@ const loadComponentConfig = (directoryPath) => {
   return componentFile;
 };
 
-/**
- * Reads a serverless config file in a given directory path
- * @param {*} directoryPath
- */
-const loadServerlessFile = (directoryPath) => {
-  directoryPath = path.resolve(directoryPath);
-  const ymlFilePath = path.join(directoryPath, 'serverless.yml');
-  const yamlFilePath = path.join(directoryPath, 'serverless.yaml');
-  const jsonFilePath = path.join(directoryPath, 'serverless.json');
-  let filePath;
-  let isYaml = false;
-  let configFile;
-
-  // Check to see if exists and is yaml or json file
-  if (fileExistsSync(ymlFilePath)) {
-    filePath = ymlFilePath;
-    isYaml = true;
-  }
-  if (fileExistsSync(yamlFilePath)) {
-    filePath = yamlFilePath;
-    isYaml = true;
-  }
-  if (fileExistsSync(jsonFilePath)) {
-    filePath = jsonFilePath;
-  }
-  if (!filePath) {
-    return null;
-  }
-
-  // Read file
-  if (isYaml) {
-    try {
-      configFile = readFileSync(filePath);
-    } catch (e) {
-      // todo currently our YAML parser does not support
-      // CF schema (!Ref for example). So we silent that error
-      // because the framework can deal with that
-      if (e.name !== 'YAMLException') {
-        throw e;
-      }
-    }
-  } else {
-    configFile = readFileSync(filePath);
-  }
-
-  return configFile;
-};
-
 const getDirSize = async (p) => {
   return fse.stat(p).then((stat) => {
     if (stat.isFile()) {
@@ -682,7 +634,6 @@ module.exports = {
   getDirSize,
   pack,
   getInstanceDashboardUrl,
-  loadServerlessFile,
   loadComponentConfig,
   loadInstanceConfig,
   loadInstanceConfigUncached,
