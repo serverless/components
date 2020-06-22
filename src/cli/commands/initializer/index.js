@@ -18,12 +18,12 @@ const initTokenFormat = /[a-zA-Z0-9]{8}/;
 module.exports = {
   async run(cli, cliParam) {
     cli.start('Fetching project configuration')
-    let templateUrl; let directory; let projectType; let serviceName; let commands; let tenantName; let tempDir;
+    let templateUrl; let directory; let projectType; let serviceName; let tenantName; let tempDir;
     
     // If the user has a token, log them in, and fetch the template details
     if (cliParam.match(initTokenFormat)) {
       cli.status('Logging you in')
-      ;({ templateUrl, directory, projectType, serviceName, commands, tenantName, tempDir } = await initTokenHandler(sdk, cliParam));
+      ;({ templateUrl, directory, projectType, serviceName, tenantName, tempDir } = await initTokenHandler(sdk, cliParam));
     } else {
       // Otherwise, just fetch the template by name from the registry.
       cli.status('Fetching template from registry')

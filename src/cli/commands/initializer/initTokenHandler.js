@@ -9,7 +9,7 @@ module.exports = async (sdk, initToken) => {
   );
   sdk.accessKey = secretAccessKey;
 
-  const { projectType, directory, serviceName, commands, type } = template;
+  const { projectType, directory, serviceName, type } = template;
   let templateUrl; let tempDir;
 
   if (type === 'registry') {
@@ -36,5 +36,5 @@ module.exports = async (sdk, initToken) => {
     }
     set(`users.${auth0Id}.dashboard.accessKeys.${tenantName}`, secretAccessKey);
   }
-  return { templateUrl, projectType, directory, serviceName, commands, tenantName, tempDir }
+  return { templateUrl, projectType, directory, serviceName, tenantName, tempDir }
 }
