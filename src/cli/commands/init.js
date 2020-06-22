@@ -8,6 +8,10 @@ module.exports = async (config, cli) => {
   }
 
   const serviceDir = await initializer.run(cli, config.params[0])
-  cli.close('success', `cd to '${serviceDir}' and run 'serverless dev' to get started developing!`)
+  if (serviceDir) {
+    cli.close('success', `cd to '${serviceDir}' and run 'serverless dev' to get started developing!`)
+  } else {
+    cli.error('Something went wrong, please try again')
+  }
   return
 }
