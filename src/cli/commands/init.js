@@ -1,7 +1,5 @@
 'use strict';
 const initializer = require('./initializer');
-const setupAws = require('./setupAws');
-
 
 module.exports = async (config, cli) => {
   const maybeToken = config.params[0]
@@ -10,7 +8,6 @@ module.exports = async (config, cli) => {
   }
 
   const serviceDir = await initializer.run(cli, config.params[0])
-  await setupAws(config, cli)
   cli.close('success', `cd to '${serviceDir}' and run 'serverless dev' to get started developing!`)
   return
 }

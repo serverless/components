@@ -38,6 +38,7 @@
     "ansi-escapes": "^4.3.1",
     "axios": "^0.19.2",
     "chalk": "^2.4.2",
+    "child-process-ext": "^2.1.1",
     "chokidar": "^3.4.0",
     "dotenv": "^8.2.0",
     "figures": "^3.2.0",
