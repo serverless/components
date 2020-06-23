@@ -28,6 +28,7 @@
     }
   },
   "eslintIgnore": [
+    "!/.github",
     "/templates"
   ],
   "dependencies": {

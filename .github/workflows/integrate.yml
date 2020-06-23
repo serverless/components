@@ -1,0 +1,62 @@
+# master only
+
+name: Integrate
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  publishCanaaryAndTagIfNewVersion:
+    name: Publish canary & tag if new version
+    runs-on: ubuntu-latest
+    env:
+      # See https://github.com/serverlessinc/setup-cicd-resources
+      GET_LAST_VALIDATED_COMMIT_HASH_URL: ${{ secrets.GET_LAST_VALIDATED_COMMIT_HASH_URL }}
+      PUT_LAST_VALIDATED_COMMIT_HASH_URL: ${{ secrets.PUT_LAST_VALIDATED_COMMIT_HASH_URL }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          # Ensure to have complete history of commits pushed with given push operation
+          # It's loose and imperfect assumption that no more than 30 commits will be pushed at once
+          fetch-depth: 30
+          # Tag needs to be pushed with real user token
+          # (hence we're not relying on actions secrets.GITHUB_TOKEN)
+          # Otherwise pushed tag won't trigger the actions workflow
+          token: ${{ secrets.USER_GITHUB_TOKEN }}
+
+      - name: Resolve last validated commit hash (for `git diff` purposes)
+        run: |
+          curl -f "$GET_LAST_VALIDATED_COMMIT_HASH_URL" -o /home/runner/last-validated-commit-hash || :
+          curl -v -X PUT -H "User-Agent:" -H "Accept:" -H "Content-Type:" -d "$GITHUB_SHA" "$PUT_LAST_VALIDATED_COMMIT_HASH_URL"
+
+      - name: Install Node.js and npm
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+          registry-url: https://registry.npmjs.org
+
+      - name: Publish canary
+        run: |
+          ./.github/prepare-canary.js
+          npm publish --tag canary
+          git checkout .
+
+        # Note: Setting NODE_AUTH_TOKEN as job|workspace wide env var won't work
+        #       as it appears actions/setup-node sets own value
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }} # 01dd......71cc
+
+      - name: Tag if new version
+        run: |
+          LAST_VALIDATED_COMMIT_HASH=`cat /home/runner/last-validated-commit-hash` || :
+          if [ -n "$LAST_VALIDATED_COMMIT_HASH" ];
+          then
+            NEW_VERSION=`git diff -U0 $LAST_VALIDATED_COMMIT_HASH package.json | grep '"version": "' | tail -n 1 | grep -oE "[0-9]+\.[0-9]+\.[0-9]+"` || :
+            if [ -n "$NEW_VERSION" ];
+            then
+              git tag v$NEW_VERSION
+              git push --tags
+            fi
+          fi
