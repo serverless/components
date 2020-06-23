@@ -13,7 +13,13 @@ const runningComponents = () => {
   let instanceConfig;
 
   // load components if user runs "sls registry" or "sls --all" or "sls --target" (that last one for china)
-  if (process.argv[2] === 'publish' || process.argv[2] === 'registry' || args.all || args.target) {
+  if (
+    process.argv[2] === 'publish' ||
+    process.argv[2] === 'registry' ||
+    process.argv[2] === 'init' ||
+    args.all ||
+    args.target
+  ) {
     return true;
   }
 
