@@ -6,6 +6,10 @@ const yaml = require('js-yaml');
 const { writeFile } = require('fs-extra');
 const { fileExistsSync, readAndParseSync } = require('./utils');
 
+const isYaml = (filename) => {
+  return filename && filename.endsWith('yaml') || filename && filename.endsWith('yml')
+}
+
 const getServerlessFilePath = (directoryPath) => {
   directoryPath = path.resolve(directoryPath);
   const ymlFilePath = path.join(directoryPath, 'serverless.yml');
@@ -42,7 +46,7 @@ const loadServerlessFile = (directoryPath) => {
   let configFile
   const filePath = getServerlessFilePath(directoryPath)
   // Read file, if it's yaml/yml
-  if (filePath && filePath.endsWith('yaml') || filePath && filePath.endsWith('yml')) {
+  if (isYaml(filePath)) {
     try {
       configFile = readAndParseSync(filePath);
     } catch (e) {
@@ -62,7 +66,7 @@ const loadServerlessFile = (directoryPath) => {
 
 const writeServerlessFile = async (cli, servicePath, ymlObject) => {
   const serverlessFileName = await getServerlessFilePath(servicePath);
-  if (serverlessFileName) {
+  if (isYaml(serverlessFileName)) {
     try {
       await writeFile(serverlessFileName, yaml.safeDump(ymlObject))
     } catch (error) {
