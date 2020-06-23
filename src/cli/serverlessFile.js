@@ -42,12 +42,18 @@ const getServerlessFilePath = (directoryPath) => {
 };
 
 /**
- * Reads a serverless config file in a given directory path
+ * Reads a serverless config file (serverless.yml) in any format (yml, yaml, json), in a given directory path
  * @param {*} directoryPath
  */
 const loadServerlessFile = (directoryPath) => {
   let configFile;
   const filePath = getServerlessFilePath(directoryPath);
+
+  // If no filePath, the serverless config file does not exist
+  if (!filePath) {
+    throw new Error('No serverless file (e.g. serverless.yml) exists in the current directory.');
+  }
+
   // Read file, if it's yaml/yml
   if (isYaml(filePath)) {
     try {
