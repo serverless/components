@@ -14,6 +14,12 @@ const sdk = new ServerlessSDK({
 });
 
 module.exports = {
+  /**
+   * Ingests an initToken code or a package name, fetches it,
+   * unpacks it, and installs its dependencies
+   * @param {*} cli
+   * @param {*} cliParams
+   */
   async run(cli, cliParam) {
     cli.start('Fetching project configuration')
     let templateUrl; let directory; let serviceName; let tenantName;
