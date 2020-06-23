@@ -1,6 +1,12 @@
 'use strict';
 const initializer = require('./initializer');
 
+/**
+ * Init command can ingest either a initToken (SaaS onboarding)
+ * or the name of a template in the registry
+ * @param {*} config
+ * @param {*} cli
+ */
 module.exports = async (config, cli) => {
   const maybeToken = config.params[0]
   if (!maybeToken) {

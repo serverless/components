@@ -1,6 +1,13 @@
 'use strict'
 const { get, set } = require('@serverless/utils/config');
 
+/**
+ * Fetches initToken from the backend
+ * sets user information and accessKey
+ * in ~/.serverlessrc
+ * @param {*} sdk 
+ * @param {*} initToken 
+ */
 module.exports = async (sdk, initToken) => {
   const { auth0Id, tenantName, secretAccessKey, userName, template } = await sdk.getInitToken(
     initToken

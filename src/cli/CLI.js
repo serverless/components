@@ -121,6 +121,7 @@ class CLI {
     process.stdout.write(ansiEscapes.cursorLeft);
     process.stdout.write(ansiEscapes.eraseDown);
 
+    // Silent is used to skip the "Done" message
     if (reason !== 'silent') {
       // Write content
       this.log();

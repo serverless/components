@@ -5,12 +5,23 @@ const { writeMainAttrs, getServerlessFilePath } = require('../../serverlessFile'
 const path = require('path');
 
 class Unpacker {
+  /**
+   * Recusively unpacks a template, running npm i
+   * or yarn install for each project
+   * @param {*} cli
+   * @param {*} tenantName
+   * @param {*} serviceName
+   */
   constructor(cli, tenantName, serviceName) {
     this.cli = cli
     this.tenantName = tenantName
     this.serviceName = serviceName
   }
 
+  /**
+   * Recursive method
+   * @param {*} dir
+   */
   async unpack(dir) {
     process.chdir(dir);
     // Check if the directory contains a serverless.yml/yaml/json/js.
@@ -24,6 +35,7 @@ class Unpacker {
         await spawn('yarn', ['install']);
       }
 
+      // Writes the tenantName and serviceName to the serverless.y(a)ml file
       await writeMainAttrs(this.cli, dir, this.tenantName, this.serviceName);
       const files = fs.readdirSync(dir);
       const promises = []
