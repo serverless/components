@@ -19,8 +19,6 @@ module.exports = async (config, cli) => {
       'success',
       `cd to '${serviceDir}' and run 'serverless dev' to get started developing!`
     );
-  } else {
-    cli.error('Something went wrong, please try again');
   }
   return;
 };
