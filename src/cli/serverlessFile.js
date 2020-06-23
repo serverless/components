@@ -5,7 +5,11 @@ const yaml = require('js-yaml');
 
 const { writeFile } = require('fs-extra');
 const { fileExistsSync, readAndParseSync } = require('./utils');
-
+/**
+ * 
+ * Checks if a filename ends with yaml or yml
+ * @param {*} filename 
+ */
 const isYaml = (filename) => {
   return filename && filename.endsWith('yaml') || filename && filename.endsWith('yml')
 }
@@ -64,6 +68,12 @@ const loadServerlessFile = (directoryPath) => {
   return configFile;
 };
 
+/**
+ * Writes an object to a sls file
+ * @param {*} cli 
+ * @param {*} servicePath 
+ * @param {*} ymlObject 
+ */
 const writeServerlessFile = async (cli, servicePath, ymlObject) => {
   const serverlessFileName = await getServerlessFilePath(servicePath);
   if (isYaml(serverlessFileName)) {
@@ -76,14 +86,25 @@ const writeServerlessFile = async (cli, servicePath, ymlObject) => {
   }
 }
 
+/**
+ * Util function to simply write service, app, and org. Service name optional for components.
+ * @param {*} cli 
+ * @param {*} servicePath 
+ * @param {*} orgName 
+ * @param {*} appName 
+ * @param {*} serviceName 
+ */
 const writeMainAttrs = async (cli, servicePath, orgName, appName, serviceName = null) => {
-  const ymlObject = await loadServerlessFile(servicePath)
-  if (ymlObject) {
-    if (orgName) ymlObject.org = orgName;
-    if (appName) ymlObject.app = appName;
-    if (serviceName) ymlObject.service = serviceName;
-    
-    await writeServerlessFile(cli, servicePath, ymlObject);
+  const slsConfig = await getServerlessFilePath(servicePath)
+  if (isYaml(slsConfig)) {
+    const ymlObject = await loadServerlessFile(servicePath)
+    if (ymlObject) {
+      if (orgName) ymlObject.org = orgName;
+      if (appName) ymlObject.app = appName;
+      if (serviceName) ymlObject.service = serviceName;
+      
+      await writeServerlessFile(cli, servicePath, ymlObject);
+    }
   }
 }
 
