@@ -12,24 +12,32 @@ const path = require('path');
 const sdk = new ServerlessSDK({
   platformStage: process.env.SERVERLESS_PLATFORM_STAGE || 'prod',
 });
-const initTokenFormat = /[a-zA-Z0-9]{8}/;
 
 module.exports = {
   async run(cli, cliParam) {
     cli.start('Fetching project configuration')
     let templateUrl; let directory; let serviceName; let tenantName;
     
-    // If the user has a token, log them in, and fetch the template details
-    if (cliParam.match(initTokenFormat)) {
-      cli.status('Logging you in')
+    // packages and tokens are both strings. First see if the arg is a token
+    // Then see if it's a package name in the registry
+    try {
+      cli.status('Logging you in');
       ;({ templateUrl, directory, serviceName, tenantName } = await initTokenHandler(sdk, cliParam));
-    } else {
+    } catch (error){
+      if (error.response && error.response.status === 404) {
       // Otherwise, just fetch the template by name from the registry.
       cli.status('Fetching template from registry')
-      const data = await sdk.getFromRegistry(cliParam);
+      let data;
+      try {
+        data = await sdk.getFromRegistry(cliParam);
+      } catch (sdkError) {
+        cli.error(`Can't find template: ${cliParam}, run 'sls registry' to see available templates.`)
+        return Promise.resolve(false)
+      }
       directory = cliParam
       serviceName = cliParam
       templateUrl = data.downloadUrl
+      }
     }
 
     if (templateUrl) {
