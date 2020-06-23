@@ -132,7 +132,18 @@ const get = async (config, cli) => {
   cli.start(`Fetching data for: ${packageName}`);
 
   const sdk = new ServerlessSDK();
-  let data = await sdk.getFromRegistry(packageName);
+
+  let data
+
+  try {
+    data = await sdk.getFromRegistry(packageName);
+  } catch (error) {
+    if (error.message && error.message.includes('404')) {
+      return cli.error(error.message, true);
+    } else {
+      throw error
+    }
+  }
 
   // for backward compatability
   if (data.componentDefinition) {
