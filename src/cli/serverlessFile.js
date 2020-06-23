@@ -6,13 +6,13 @@ const yaml = require('js-yaml');
 const { writeFile } = require('fs-extra');
 const { fileExistsSync, readAndParseSync } = require('./utils');
 /**
- * 
+ *
  * Checks if a filename ends with yaml or yml
- * @param {*} filename 
+ * @param {*} filename
  */
 const isYaml = (filename) => {
-  return filename && filename.endsWith('yaml') || filename && filename.endsWith('yml')
-}
+  return (filename && filename.endsWith('yaml')) || (filename && filename.endsWith('yml'));
+};
 
 const getServerlessFilePath = (directoryPath) => {
   directoryPath = path.resolve(directoryPath);
@@ -38,17 +38,16 @@ const getServerlessFilePath = (directoryPath) => {
   if (!filePath) {
     return null;
   }
-  return filePath
-}
+  return filePath;
+};
 
 /**
  * Reads a serverless config file in a given directory path
  * @param {*} directoryPath
  */
 const loadServerlessFile = (directoryPath) => {
-
-  let configFile
-  const filePath = getServerlessFilePath(directoryPath)
+  let configFile;
+  const filePath = getServerlessFilePath(directoryPath);
   // Read file, if it's yaml/yml
   if (isYaml(filePath)) {
     try {
@@ -70,47 +69,47 @@ const loadServerlessFile = (directoryPath) => {
 
 /**
  * Writes an object to a sls file
- * @param {*} cli 
- * @param {*} servicePath 
- * @param {*} ymlObject 
+ * @param {*} cli
+ * @param {*} servicePath
+ * @param {*} ymlObject
  */
 const writeServerlessFile = async (cli, servicePath, ymlObject) => {
   const serverlessFileName = await getServerlessFilePath(servicePath);
   if (isYaml(serverlessFileName)) {
     try {
-      await writeFile(serverlessFileName, yaml.safeDump(ymlObject))
+      await writeFile(serverlessFileName, yaml.safeDump(ymlObject));
     } catch (error) {
       cli.error(`Cannot write serverless.yml file in ${servicePath}`);
       throw error;
     }
   }
-}
+};
 
 /**
  * Util function to simply write service, app, and org. Service name optional for components.
- * @param {*} cli 
- * @param {*} servicePath 
- * @param {*} orgName 
- * @param {*} appName 
- * @param {*} serviceName 
+ * @param {*} cli
+ * @param {*} servicePath
+ * @param {*} orgName
+ * @param {*} appName
+ * @param {*} serviceName
  */
 const writeMainAttrs = async (cli, servicePath, orgName, appName, serviceName = null) => {
-  const slsConfig = await getServerlessFilePath(servicePath)
+  const slsConfig = await getServerlessFilePath(servicePath);
   if (isYaml(slsConfig)) {
-    const ymlObject = await loadServerlessFile(servicePath)
+    const ymlObject = await loadServerlessFile(servicePath);
     if (ymlObject) {
       if (orgName) ymlObject.org = orgName;
       if (appName) ymlObject.app = appName;
       if (serviceName) ymlObject.service = serviceName;
-      
+
       await writeServerlessFile(cli, servicePath, ymlObject);
     }
   }
-}
+};
 
 module.exports = {
   writeMainAttrs,
   loadServerlessFile,
   writeServerlessFile,
   getServerlessFilePath,
-}
+};

@@ -11,7 +11,7 @@ const {
 } = require('fs');
 const { getAccessKey, isLoggedIn, getDefaultOrgName } = require('./utils');
 const { fileExists, loadComponentConfig } = require('../utils');
-const { loadServerlessFile } = require('../serverlessFile')
+const { loadServerlessFile } = require('../serverlessFile');
 
 /**
  * Publish a Component to the Serverless Registry

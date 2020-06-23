@@ -7,7 +7,7 @@ const {
 } = require('@serverless/platform-client-china');
 
 // These keywords should route to components CLI, not sls cli.
-const componentKeywords = [ 'registry', 'init', 'publish'];
+const componentKeywords = ['registry', 'init', 'publish'];
 
 const runningComponents = () => {
   const args = minimist(process.argv.slice(2));

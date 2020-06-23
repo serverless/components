@@ -4,7 +4,7 @@ const axios = require('axios');
 const path = require('path');
 /**
  * Downloads a zip file into `template.zip`
- * 
+ *
  * @param {*} url
  * @param {*} dir
  */

@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 const fs = require('fs-extra');
 const spawn = require('child-process-ext/spawn');
 const { writeMainAttrs, getServerlessFilePath } = require('../../serverlessFile');
@@ -13,9 +13,9 @@ class Unpacker {
    * @param {*} serviceName
    */
   constructor(cli, tenantName, serviceName) {
-    this.cli = cli
-    this.tenantName = tenantName
-    this.serviceName = serviceName
+    this.cli = cli;
+    this.tenantName = tenantName;
+    this.serviceName = serviceName;
   }
 
   /**
@@ -38,17 +38,17 @@ class Unpacker {
       // Writes the tenantName and serviceName to the serverless.y(a)ml file
       await writeMainAttrs(this.cli, dir, this.tenantName, this.serviceName);
       const files = fs.readdirSync(dir);
-      const promises = []
+      const promises = [];
       files.forEach(async (file) => {
         // Check if the file is a directory, or a file
         if (fs.statSync(`${dir}/${file}`).isDirectory()) {
           promises.push(this.unpack(path.resolve(dir, file)));
         }
-      })
-      return Promise.all(promises)
+      });
+      return Promise.all(promises);
     }
-    return true
+    return true;
   }
 }
 
-module.exports = Unpacker
+module.exports = Unpacker;
