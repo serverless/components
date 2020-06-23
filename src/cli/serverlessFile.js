@@ -3,8 +3,8 @@
 const path = require('path');
 const yaml = require('js-yaml');
 
-const { writeFile, readFileSync } = require('fs-extra');
-const { fileExistsSync } = require('./utils');
+const { writeFile } = require('fs-extra');
+const { fileExistsSync, readAndParseSync } = require('./utils');
 
 const getServerlessFilePath = (directoryPath) => {
   directoryPath = path.resolve(directoryPath);
@@ -44,7 +44,7 @@ const loadServerlessFile = (directoryPath) => {
   // Read file, if it's yaml/yml
   if (filePath && filePath.endsWith('yaml') || filePath && filePath.endsWith('yml')) {
     try {
-      configFile = readFileSync(filePath);
+      configFile = readAndParseSync(filePath);
     } catch (e) {
       // todo currently our YAML parser does not support
       // CF schema (!Ref for example). So we silent that error
@@ -54,7 +54,7 @@ const loadServerlessFile = (directoryPath) => {
       }
     }
   } else {
-    configFile = readFileSync(filePath);
+    configFile = readAndParseSync(filePath);
   }
 
   return configFile;

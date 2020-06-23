@@ -16,6 +16,7 @@ class Unpacker {
     // Check if the directory contains a serverless.yml/yaml/json/js.
     // If it does, we need to unpack it
     if (getServerlessFilePath(dir)) {
+      this.cli.status(`Unpacking service ${dir}`);
       if (fs.existsSync('package.json')) {
         await spawn('npm', ['install']);
       }
@@ -25,14 +26,16 @@ class Unpacker {
 
       await writeMainAttrs(this.cli, dir, this.tenantName, this.serviceName);
       const files = fs.readdirSync(dir);
+      const promises = []
       files.forEach(async (file) => {
         // Check if the file is a directory, or a file
         if (fs.statSync(`${dir}/${file}`).isDirectory()) {
-          return this.unpack(path.resolve(dir, file));
+          promises.push(this.unpack(path.resolve(dir, file)));
         }
-        return true;
       })
+      return Promise.all(promises)
     }
+    return true
   }
 }
 

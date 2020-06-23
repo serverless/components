@@ -42,7 +42,6 @@ module.exports = {
 
     if (templateUrl) {
       cli.status('Unpacking your new project')
-      const newServiceName = serviceName;
       // Create template directory
       fs.mkdirSync(directory);
       const servicePath = path.resolve(process.cwd(), directory);
@@ -60,7 +59,6 @@ module.exports = {
       // Recursively unpack each directory in a template
       // Set org attr in sls.yml for each
       await unpacker.unpack(servicePath)
-      cli.status(`${newServiceName} successfully created in '${directory}' folder.`)
     }
     return Promise.resolve(directory);
   },

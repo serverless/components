@@ -106,7 +106,7 @@ const isJsonPath = (filePath) => endsWith('.json', filePath);
  * @param {*} filePath
  * @param {*} options
  */
-const readFileSync = (filePath, options = {}) => {
+const readAndParseSync = (filePath, options = {}) => {
   if (!fileExistsSync(filePath)) {
     throw new Error(`File does not exist at this path ${filePath}`);
   }
@@ -190,7 +190,7 @@ const loadComponentConfig = (directoryPath) => {
   // Read file
   if (isYaml) {
     try {
-      componentFile = readFileSync(filePath);
+      componentFile = readAndParseSync(filePath);
     } catch (e) {
       // todo currently our YAML parser does not support
       // CF schema (!Ref for example). So we silent that error
@@ -200,7 +200,7 @@ const loadComponentConfig = (directoryPath) => {
       }
     }
   } else {
-    componentFile = readFileSync(filePath);
+    componentFile = readAndParseSync(filePath);
   }
 
   return componentFile;
@@ -309,7 +309,7 @@ const loadInstanceConfigUncached = (directoryPath) => {
   // Read file
   if (isYaml) {
     try {
-      instanceFile = readFileSync(filePath);
+      instanceFile = readAndParseSync(filePath);
     } catch (e) {
       // todo currently our YAML parser does not support
       // CF schema (!Ref for example). So we silent that error
@@ -317,11 +317,11 @@ const loadInstanceConfigUncached = (directoryPath) => {
       if (e.name !== 'YAMLException') {
         throw e;
       } else {
-        throw new Error(`The serverless.yml file has icorrect format. Details: ${e.message}`);
+        throw new Error(`The serverless.yml file has incorrect format. Details: ${e.message}`);
       }
     }
   } else {
-    instanceFile = readFileSync(filePath);
+    instanceFile = readAndParseSync(filePath);
   }
 
   // Set default stage
@@ -375,7 +375,7 @@ const legacyLoadInstanceConfig = (directoryPath) => {
   // Read file
   if (isYaml) {
     try {
-      instanceFile = readFileSync(filePath);
+      instanceFile = readAndParseSync(filePath);
     } catch (e) {
       // todo currently our YAML parser does not support
       // CF schema (!Ref for example). So we silent that error
@@ -385,7 +385,7 @@ const legacyLoadInstanceConfig = (directoryPath) => {
       }
     }
   } else {
-    instanceFile = readFileSync(filePath);
+    instanceFile = readAndParseSync(filePath);
   }
 
   return instanceFile;
@@ -424,7 +424,7 @@ const legacyLoadComponentConfig = (directoryPath) => {
   // Read file
   if (isYaml) {
     try {
-      componentFile = readFileSync(filePath);
+      componentFile = readAndParseSync(filePath);
     } catch (e) {
       // todo currently our YAML parser does not support
       // CF schema (!Ref for example). So we silent that error
@@ -434,7 +434,7 @@ const legacyLoadComponentConfig = (directoryPath) => {
       }
     }
   } else {
-    componentFile = readFileSync(filePath);
+    componentFile = readAndParseSync(filePath);
   }
 
   return componentFile;
@@ -627,7 +627,7 @@ module.exports = {
   request,
   fileExists,
   fileExistsSync,
-  readFileSync,
+  readAndParseSync,
   isYamlPath,
   isJsonPath,
   resolveVariables,
