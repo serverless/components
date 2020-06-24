@@ -16,10 +16,7 @@ module.exports = async (config, cli) => {
   cli.log();
   const serviceDir = await initializer.run(cli, config.params[0]);
   if (serviceDir) {
-    cli.close(
-      'success',
-      `cd to '${serviceDir}' and run 'serverless deploy' to get started!`
-    );
+    cli.close('close', `cd to '${serviceDir}' and run 'serverless deploy' to get started!`);
   }
   return;
 };

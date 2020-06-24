@@ -27,21 +27,24 @@ class Unpacker {
     // If it does, we need to unpack it
     if (getServerlessFilePath(dir)) {
       this.cli.status(`Installing node_modules via npm in ${dir}`, null, 'green');
-      if (fs.existsSync(path.resolve(dir, 'package.json'))) {
+      if (await fs.exists(path.resolve(dir, 'package.json'))) {
         await spawn('npm', ['install'], { cwd: dir });
       }
 
       // Writes the tenantName and serviceName to the serverless.y(a)ml file
       await writeMainAttrs(this.cli, dir, this.tenantName, this.serviceName);
-      const files = fs.readdirSync(dir);
-      const promises = [];
-      files.forEach(async (file) => {
-        // Check if the file is a directory, or a file
-        if (fs.statSync(`${dir}/${file}`).isDirectory()) {
-          promises.push(this.unpack(path.resolve(dir, file)));
-        }
-      });
-      return Promise.all(promises);
+      const files = await fs.readdir(dir);
+      const result = await Promise.all(
+        files.map(async (file) => {
+          // Check if the file is a directory, or a file
+          const stat = await fs.stat(`${dir}/${file}`);
+          if (stat.isDirectory()) {
+            return this.unpack(path.resolve(dir, file));
+          }
+          return true;
+        })
+      );
+      return result.filter(Boolean);
     }
     return true;
   }
