@@ -16,6 +16,15 @@ const printNotification = require('../notifications/print-notification');
 module.exports = async (config, cli, command) => {
   cli.start('Initializing', { timer: true });
 
+  // get any access key stored in env
+  let accessKey = await getAccessKey();
+
+  // Ensure the user is logged in or access key is available, or advertise
+  if (!accessKey && !isLoggedIn()) {
+    cli.advertise();
+    return;
+  }
+
   if (!config.debug) {
     cli.logLogo();
   } else if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
@@ -24,12 +33,9 @@ module.exports = async (config, cli, command) => {
 
   const templateYaml = await getTemplate(process.cwd());
 
-  // Get access key
-  const accessKey = await getAccessKey(templateYaml.org);
-
-  // Ensure the user is logged in or access key is available, or advertise
-  if (!accessKey && !isLoggedIn()) {
-    cli.advertise();
+  // if no access key in env, get access key from rc file by passing org
+  if (!accessKey) {
+    accessKey = await getAccessKey(templateYaml.org);
   }
 
   const meta = `Action: "${command} --all" - Stage: "${templateYaml.stage}" - Org: "${templateYaml.org}" - App: "${templateYaml.app}" - Name: "${templateYaml.name}"`;
