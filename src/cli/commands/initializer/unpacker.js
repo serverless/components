@@ -23,16 +23,12 @@ class Unpacker {
    * @param {*} dir
    */
   async unpack(dir) {
-    process.chdir(dir);
     // Check if the directory contains a serverless.yml/yaml/json/js.
     // If it does, we need to unpack it
     if (getServerlessFilePath(dir)) {
       this.cli.status(`Unpacking service ${dir}`);
-      if (fs.existsSync('package.json')) {
-        await spawn('npm', ['install']);
-      }
-      if (fs.existsSync('yarn.lock')) {
-        await spawn('yarn', ['install']);
+      if (fs.existsSync(path.resolve(dir, 'package.json'))) {
+        await spawn('npm', ['install'], { cwd: dir });
       }
 
       // Writes the tenantName and serviceName to the serverless.y(a)ml file

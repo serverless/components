@@ -12,12 +12,13 @@ module.exports = async (config, cli) => {
   if (!maybeToken) {
     cli.error('init command requires either a token or template URL');
   }
-
+  cli.logLogo();
+  cli.log();
   const serviceDir = await initializer.run(cli, config.params[0]);
   if (serviceDir) {
     cli.close(
       'success',
-      `cd to '${serviceDir}' and run 'serverless dev' to get started developing!`
+      `cd to '${serviceDir}' and run 'serverless deploy' to get started!`
     );
   }
   return;
