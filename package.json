@@ -39,7 +39,6 @@
     "@serverless/utils": "^1.1.0",
     "adm-zip": "^0.4.14",
     "ansi-escapes": "^4.3.1",
-    "axios": "^0.19.2",
     "chalk": "^2.4.2",
     "child-process-ext": "^2.1.1",
     "chokidar": "^3.4.0",

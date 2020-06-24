@@ -53,7 +53,7 @@ const run = async(cli, cliParam) => {
   if (templateUrl) {
     cli.status('Unpacking your new app');
     // Create template directory
-    fs.mkdirSync(directory);
+    await fs.mkdir(directory);
     const servicePath = path.resolve(process.cwd(), directory);
 
     // Fetch template zip
@@ -63,14 +63,14 @@ const run = async(cli, cliParam) => {
     zip.extractAllTo(servicePath);
 
     // Remove zip file
-    fs.removeSync(zipFile);
+    await fs.remove(zipFile);
     const unpacker = new Unpacker(cli, tenantName, serviceName);
     cli.status('Setting up your new app');
     // Recursively unpack each directory in a template
     // Set org attr in sls.yml for each
     await unpacker.unpack(servicePath);
   }
-  return Promise.resolve(directory);
+  return directory;
 }
 
 const init = async (config, cli) => {

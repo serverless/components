@@ -1,7 +1,12 @@
 'use strict';
+const { promisify } = require('util');
+const stream = require('stream');
 const fs = require('fs-extra');
-const axios = require('axios');
+const got = require('got');
 const path = require('path');
+
+const pipeline = promisify(stream.pipeline);
+
 /**
  * Downloads a zip file into `template.zip`
  *
@@ -12,22 +17,8 @@ const downloadTemplate = async (url, dir) => {
   const zipDestination = path.resolve(dir, 'template.zip');
   const writer = fs.createWriteStream(zipDestination);
 
-  const response = await axios({
-    url,
-    method: 'GET',
-    responseType: 'stream',
-  });
-
-  response.data.pipe(writer);
-
-  return new Promise((resolve, reject) => {
-    writer.on('finish', () => {
-      resolve(zipDestination);
-    });
-    writer.on('error', (error) => {
-      reject(error);
-    });
-  });
+  await pipeline(got.stream(url), writer);
+  return path.resolve(process.cwd(), zipDestination);
 };
 
 module.exports = {
