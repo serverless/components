@@ -1,5 +1,5 @@
 'use strict';
-const initializer = require('./initializer');
+const init = require('./init/');
 
 /**
  * Init command can ingest either a initToken (SaaS onboarding)
@@ -14,7 +14,7 @@ module.exports = async (config, cli) => {
   }
   cli.logLogo();
   cli.log();
-  const serviceDir = await initializer.run(cli, config.params[0]);
+  const serviceDir = await init.run(cli, config.params[0]);
   if (serviceDir) {
     cli.close('close', `cd to '${serviceDir}' and run 'serverless deploy' to get started!`);
   }
