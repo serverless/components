@@ -42,7 +42,7 @@ const run = async(cli, cliParam) => {
         cli.error(
           `Can't find template: ${cliParam}, run 'sls registry' to see available templates.`
         );
-        return Promise.resolve(false);
+        return false;
       }
       directory = cliParam;
       serviceName = cliParam;
@@ -82,7 +82,7 @@ const init = async (config, cli) => {
   cli.log();
   const serviceDir = await run(cli, config.params[0]);
   if (serviceDir) {
-    cli.close('close', `cd to '${serviceDir}' and run 'serverless deploy' to get started!`);
+    cli.close('close', `run 'cd ${serviceDir} && serverless deploy' to get started!`);
   }
   return;
 };
