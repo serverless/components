@@ -27,11 +27,13 @@ class Unpacker {
     // Check if the directory contains a serverless.yml/yaml/json/js.
     // If it does, we need to unpack it
     if (getServerlessFilePath(dir)) {
-      this.cli.status(`Unpacking service ${dir}`);
+      this.cli.status(`Unpacking '${dir}'`);
       if (fs.existsSync('package.json')) {
+        this.cli.status(`Installing node_modules via npm in ${dir}`);
         await spawn('npm', ['install']);
       }
       if (fs.existsSync('yarn.lock')) {
+        this.cli.status(`Installing node_modules via yarn in ${dir}`);
         await spawn('yarn', ['install']);
       }
 
