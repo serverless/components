@@ -21,7 +21,7 @@ module.exports = {
    * @param {*} cliParams
    */
   async run(cli, cliParam) {
-    cli.start('Fetching project configuration');
+    cli.start('Fetching app configuration');
     let templateUrl;
     let directory;
     let serviceName;
@@ -52,7 +52,7 @@ module.exports = {
     }
 
     if (templateUrl) {
-      cli.status('Unpacking your new project');
+      cli.status('Unpacking your new app');
       // Create template directory
       fs.mkdirSync(directory);
       const servicePath = path.resolve(process.cwd(), directory);
@@ -66,7 +66,7 @@ module.exports = {
       // Remove zip file
       fs.removeSync(zipFile);
       const unpacker = new Unpacker(cli, tenantName, serviceName);
-      cli.status('Setting up your new project');
+      cli.status('Setting up your new app');
       // Recursively unpack each directory in a template
       // Set org attr in sls.yml for each
       await unpacker.unpack(servicePath);

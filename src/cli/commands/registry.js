@@ -33,7 +33,12 @@ const publish = async (config, cli) => {
     cli.advertise();
   }
 
-  let serverlessFile = await loadServerlessFile(process.cwd());
+  let serverlessFile;
+  try {
+    serverlessFile = await loadServerlessFile(process.cwd());
+  } catch (error) {
+    return cli.error(error.message, true);
+  }
 
   if (!serverlessFile) {
     // keeping serverless.component.yml for backward compatability
@@ -118,6 +123,8 @@ const publish = async (config, cli) => {
       throw error;
     }
   }
+
+  return null;
 };
 
 /**
@@ -132,7 +139,17 @@ const get = async (config, cli) => {
   cli.start(`Fetching data for: ${packageName}`);
 
   const sdk = new ServerlessSDK();
-  let data = await sdk.getFromRegistry(packageName);
+
+  let data;
+
+  try {
+    data = await sdk.getFromRegistry(packageName);
+  } catch (error) {
+    if (error.message && error.message.includes('404')) {
+      return cli.error(error.message, true);
+    }
+    throw error;
+  }
 
   // for backward compatability
   if (data.componentDefinition) {
@@ -179,6 +196,8 @@ const get = async (config, cli) => {
   }
 
   cli.close('success', `Package data listed for "${packageName}"`);
+
+  return null;
 };
 
 /**
