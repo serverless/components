@@ -19,7 +19,7 @@ const sdk = new ServerlessSDK({
  * @param {*} cli
  * @param {*} cliParams
  */
-const run = async(cli, cliParam) => {
+const run = async (cli, cliParam) => {
   cli.start('Fetching app configuration');
   let templateUrl;
   let directory;
@@ -36,8 +36,11 @@ const run = async(cli, cliParam) => {
     } catch (error) {
       // Code doesn't exist
       if (error.response && error.response.status === 404) {
-        cli.close('error', `App token '${cliParam}' doesn't exist
-          \nGo to https://app.serverless.com to generate a new app token`);
+        cli.close(
+          'error',
+          `App token '${cliParam}' doesn't exist
+          \nGo to https://app.serverless.com to generate a new app token`
+        );
       }
     }
   } else {
@@ -46,9 +49,7 @@ const run = async(cli, cliParam) => {
     try {
       data = await sdk.getFromRegistry(cliParam);
     } catch (sdkError) {
-      cli.error(
-        `Can't find template: ${cliParam}, run 'sls registry' to see available templates.`
-      );
+      cli.error(`Can't find template: ${cliParam}, run 'sls registry' to see available templates.`);
       return false;
     }
     directory = cliParam;
@@ -77,7 +78,7 @@ const run = async(cli, cliParam) => {
     await unpacker.unpack(servicePath);
   }
   return directory;
-}
+};
 
 const init = async (config, cli) => {
   const maybeToken = config.params[0];
@@ -94,4 +95,4 @@ const init = async (config, cli) => {
   return;
 };
 
-module.exports = init
+module.exports = init;
