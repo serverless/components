@@ -6,7 +6,8 @@
 
 const { ServerlessSDK } = require('@serverless/platform-client-china');
 const utils = require('./utils');
-const { loadComponentConfig, loadServerlessFile, getDefaultOrgName } = require('../utils');
+const { loadComponentConfig, getDefaultOrgName } = require('../utils');
+const { loadServerlessFile } = require('../serverlessFile');
 
 /**
  * Publish a Package(Component or Template) to the Serverless Registry
