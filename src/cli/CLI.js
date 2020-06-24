@@ -133,14 +133,13 @@ class CLI {
       content += `${this._.entity} `;
       content += `${figures.pointerSmall} ${message}`;
       process.stdout.write(color(content));
-
-      // Put cursor to starting position for next view
-      console.log(os.EOL);
-      process.stdout.write(ansiEscapes.cursorLeft);
-      process.stdout.write(ansiEscapes.cursorShow);
-
-      if (reason === 'error') process.exitCode = 1;
     }
+    // Put cursor to starting position for next view
+    console.log(os.EOL);
+    process.stdout.write(ansiEscapes.cursorLeft);
+    process.stdout.write(ansiEscapes.cursorShow);
+
+    if (reason === 'error') process.exitCode = 1;
     this._isClosed = true;
   }
 

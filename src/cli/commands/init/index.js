@@ -26,28 +26,34 @@ const run = async(cli, cliParam) => {
   let serviceName;
   let tenantName;
 
-  // packages and tokens are both strings. First see if the arg is a token
-  // Then see if it's a package name in the registry
-  try {
+  // Tokens are prefixed with 'sf_'
+  // If the string doesn't start with that,
+  // look in the registry for a package
+  if (cliParam.startsWith('sf_')) {
     cli.status('Logging you in');
-    ({ templateUrl, directory, serviceName, tenantName } = await initTokenHandler(sdk, cliParam));
-  } catch (error) {
-    if (error.response && error.response.status === 404) {
-      // Otherwise, just fetch the template by name from the registry.
-      cli.status('Fetching template from registry');
-      let data;
-      try {
-        data = await sdk.getFromRegistry(cliParam);
-      } catch (sdkError) {
-        cli.error(
-          `Can't find template: ${cliParam}, run 'sls registry' to see available templates.`
-        );
-        return false;
+    try {
+      ({ templateUrl, directory, serviceName, tenantName } = await initTokenHandler(sdk, cliParam));
+    } catch (error) {
+      // Code doesn't exist
+      if (error.response && error.response.status === 404) {
+        cli.close('error', `App token '${cliParam}' doesn't exist
+          \nGo to https://app.serverless.com to generate a new app token`);
       }
-      directory = cliParam;
-      serviceName = cliParam;
-      templateUrl = data.downloadUrl;
     }
+  } else {
+    cli.status('Fetching template from registry');
+    let data;
+    try {
+      data = await sdk.getFromRegistry(cliParam);
+    } catch (sdkError) {
+      cli.error(
+        `Can't find template: ${cliParam}, run 'sls registry' to see available templates.`
+      );
+      return false;
+    }
+    directory = cliParam;
+    serviceName = cliParam;
+    templateUrl = data.downloadUrl;
   }
 
   if (templateUrl) {
@@ -82,7 +88,8 @@ const init = async (config, cli) => {
   cli.log();
   const serviceDir = await run(cli, config.params[0]);
   if (serviceDir) {
-    cli.close('close', `run 'cd ${serviceDir} && serverless deploy' to get started!`);
+    cli.close('silent');
+    cli.log(`run 'cd ${serviceDir} && serverless deploy' to get started!\n`);
   }
   return;
 };
