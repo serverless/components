@@ -7,7 +7,7 @@ const {
 } = require('@serverless/platform-client-china');
 
 // These keywords should route to components CLI, not sls cli.
-const componentKeywords = ['registry', 'init', 'publish'];
+const componentKeywords = new Set(['registry', 'init', 'publish']);
 
 const runningComponents = () => {
   const args = minimist(process.argv.slice(2));
@@ -16,7 +16,7 @@ const runningComponents = () => {
   let instanceConfig;
 
   // load components if user runs a keyword command, or "sls --all" or "sls --target" (that last one for china)
-  if (componentKeywords.includes(process.argv[2]) || args.all || args.target) {
+  if (componentKeywords.has(process.argv[2]) || args.all || args.target) {
     return true;
   }
 
