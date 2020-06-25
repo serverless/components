@@ -16,7 +16,7 @@ const {
   identity,
 } = require('ramda');
 const path = require('path');
-const axios = require('axios');
+const got = require('got');
 const globby = require('globby');
 const AdmZip = require('adm-zip');
 const fse = require('fs-extra');
@@ -39,12 +39,10 @@ const sleep = async (wait) => new Promise((resolve) => setTimeout(() => resolve(
  */
 const request = async (options) => {
   const requestOptions = {
-    url: options.endpoint,
-    method: options.method || 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    data: options.data,
+    json: options.data,
   };
 
   if (options.accessKey) {
@@ -53,7 +51,7 @@ const request = async (options) => {
 
   let res;
   try {
-    res = await axios(requestOptions);
+    res = await got.post(options.endpoint, requestOptions);
   } catch (error) {
     if (error.response && error.response.status && error.response.data.message) {
       throw new Error(`${error.response.status} - ${error.response.data.message}`);
