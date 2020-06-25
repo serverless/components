@@ -5,14 +5,13 @@
  */
 
 const fs = require('fs');
-const stream = require('stream');
 const { promisify } = require('util');
 const path = require('path');
 const AdmZip = require('adm-zip');
 const got = require('got');
 const { ServerlessSDK } = require('@serverless/platform-client-china');
 
-const pipeline = promisify(stream.pipeline);
+const pipeline = promisify(require('stream.pipeline-shim'));
 
 module.exports = async (config, cli) => {
   // Start CLI persistance status

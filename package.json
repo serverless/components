@@ -1,6 +1,6 @@
 {
   "name": "@serverless/components",
-  "version": "2.31.3",
+  "version": "2.31.4",
   "description": "The Serverless Framework's new infrastructure provisioning technology — Build, compose, & deploy serverless apps in seconds...",
   "main": "./src/index.js",
   "bin": {
@@ -57,6 +57,7 @@
     "prettyoutput": "^1.2.0",
     "ramda": "^0.26.1",
     "semver": "^7.3.2",
+    "stream.pipeline-shim": "^1.1.0",
     "strip-ansi": "^5.2.0",
     "traverse": "^0.6.6",
     "uuid": "^3.4.0",
