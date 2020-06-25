@@ -5,14 +5,15 @@
  */
 
 const fs = require('fs');
-const stream = require('stream');
-const { promisify } = require('util');
 const path = require('path');
 const AdmZip = require('adm-zip');
 const got = require('got');
+const { promisify } = require('util');
 const { ServerlessSDK } = require('@serverless/platform-client-china');
 
-const pipeline = promisify(stream.pipeline);
+const pipelineShim = require('stream.pipeline-shim');
+
+const pipeline = promisify(pipelineShim);
 
 module.exports = async (config, cli) => {
   // Start CLI persistance status
@@ -43,7 +44,7 @@ module.exports = async (config, cli) => {
   zip.extractAllTo(path.resolve(process.cwd(), template.name));
   await fs.promises.unlink(tmpFilename);
 
-  cli.log(`- Successfully created "${templateName}" instance in the currennt working directory.`);
+  cli.log(`- Successfully created "${templateName}" instance in the current working directory.`);
 
   cli.log("- Don't forget to update serverless.yml and install dependencies if needed.");
 

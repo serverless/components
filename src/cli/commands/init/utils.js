@@ -1,11 +1,11 @@
 'use strict';
-const { promisify } = require('util');
-const stream = require('stream');
 const fs = require('fs-extra');
 const got = require('got');
+const { promisify } = require('util')
 const path = require('path');
+const pipelineShim = require('stream.pipeline-shim');
 
-const pipeline = promisify(stream.pipeline);
+const pipeline = promisify(pipelineShim);
 
 /**
  * Downloads a zip file into `template.zip`
