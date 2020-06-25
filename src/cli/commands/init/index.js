@@ -41,7 +41,9 @@ const run = async (cli, cliParam) => {
           `App token '${cliParam}' doesn't exist
           \nGo to https://app.serverless.com to generate a new app token`
         );
+        return;
       }
+      throw error;
     }
   } else {
     cli.status('Fetching template from registry');
@@ -84,6 +86,7 @@ const init = async (config, cli) => {
   const maybeToken = config.params[0];
   if (!maybeToken) {
     cli.error('init command requires either a token or template URL');
+    return;
   }
   cli.logLogo();
   cli.log();

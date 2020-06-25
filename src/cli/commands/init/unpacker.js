@@ -37,16 +37,16 @@ class Unpacker {
       const result = await Promise.all(
         files.map(async (file) => {
           // Check if the file is a directory, or a file
-          const stat = await fs.stat(`${dir}/${file}`);
-          if (stat.isDirectory()) {
+          const stats = await fs.stat(`${dir}/${file}`);
+          if (stats.isDirectory()) {
             return this.unpack(path.resolve(dir, file));
           }
-          return true;
+          return null;
         })
       );
       return result.filter(Boolean);
     }
-    return true;
+    return null;
   }
 }
 
