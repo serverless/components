@@ -44,7 +44,7 @@ const publish = async (config, cli) => {
   if (config.dev && serverlessFile.type === 'template') {
     serverlessFile.version = '0.0.0-dev';
   }
-  serverlessFile.org = serverlessFile.org || (await getDefaultOrgName());
+  serverlessFile.org = serverlessFile.org || (await utils.getDefaultOrgName());
 
   // Presentation
   cli.logRegistryLogo();
@@ -99,6 +99,7 @@ const getPackage = async (config, cli) => {
 
   if (Object.keys(data).length === 0) {
     cli.error(`Registry package "${packageName}" not found in the Serverless Registry.`, true);
+    return cli.close();
   }
 
   const devVersion = data.versions.indexOf('0.0.0-dev');
@@ -127,7 +128,7 @@ const getPackage = async (config, cli) => {
     cli.log(`Download Link: ${data.downloadUrl}`);
   }
 
-  cli.close('success', `Registry Package information listed for "${packageName}"`);
+  return cli.close('success', `Registry Package information listed for "${packageName}"`);
 };
 
 /**
