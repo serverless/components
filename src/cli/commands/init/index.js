@@ -41,7 +41,7 @@ const run = async (cli, cliParam) => {
           `App token '${cliParam}' doesn't exist
           \nGo to https://app.serverless.com to generate a new app token`
         );
-        return;
+        return null;
       }
       throw error;
     }
@@ -52,7 +52,7 @@ const run = async (cli, cliParam) => {
       data = await sdk.getFromRegistry(cliParam);
     } catch (sdkError) {
       cli.error(`Can't find template: ${cliParam}, run 'sls registry' to see available templates.`);
-      return false;
+      return null;
     }
     directory = cliParam;
     serviceName = cliParam;
