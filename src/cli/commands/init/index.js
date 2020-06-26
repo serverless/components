@@ -93,7 +93,7 @@ const init = async (config, cli) => {
   if (serviceDir) {
     cli.close(
       'close',
-      `Template successfully installed. Run 'cd ${serviceDir} && serverless deploy' to get started!\n`
+      `Template successfully installed. Run 'cd ${serviceDir} && serverless deploy' to get started`
     );
   }
   return;
