@@ -9,10 +9,8 @@ const { get, set } = require('@serverless/utils/config');
  * @param {*} initToken
  */
 module.exports = async (sdk, initToken) => {
-  const { auth0Id, tenantName, secretAccessKey, userName, template } = await sdk.getInitToken(
-    initToken
-  );
-  sdk.accessKey = secretAccessKey;
+  const { auth0Id, tenantName, idToken, userName, template } = await sdk.getInitToken(initToken);
+  sdk.accessKey = idToken;
 
   const { projectType, directory, serviceName } = template;
 
@@ -21,18 +19,17 @@ module.exports = async (sdk, initToken) => {
   const templateUrl = registryData.downloadUrl;
 
   set('userId', auth0Id);
-  if (secretAccessKey) {
+  if (idToken) {
     if (!get(`users.${auth0Id}`)) {
       set(`users.${auth0Id}`, {
         username: userName,
         userId: auth0Id,
         dashboard: {
           username: userName,
-          accessKeys: {},
+          idToken,
         },
       });
     }
-    set(`users.${auth0Id}.dashboard.accessKeys.${tenantName}`, secretAccessKey);
   }
   return { templateUrl, projectType, directory, serviceName, tenantName };
 };
