@@ -89,11 +89,12 @@ const init = async (config, cli) => {
     return;
   }
   cli.logLogo();
-  cli.log();
   const serviceDir = await run(cli, config.params[0]);
   if (serviceDir) {
-    cli.close('silent');
-    cli.log(`run 'cd ${serviceDir} && serverless deploy' to get started!\n`);
+    cli.close(
+      'close',
+      `Template successfully installed. Run 'cd ${serviceDir} && serverless deploy' to get started!\n`
+    );
   }
   return;
 };
