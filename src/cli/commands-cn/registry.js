@@ -77,7 +77,7 @@ const publish = async (config, cli) => {
   cli.close(
     'success',
     `Successfully published ${registryPackage.name}${
-      registryPackage.type === 'template' ? '' : `@${registryPackage.version}`
+    registryPackage.type === 'template' ? '' : `@${registryPackage.version}`
     }`
   );
 };

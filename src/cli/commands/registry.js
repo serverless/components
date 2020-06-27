@@ -33,16 +33,17 @@ const publish = async (config, cli) => {
     cli.advertise();
   }
 
-  let serverlessFile;
-  try {
-    serverlessFile = await loadServerlessFile(process.cwd());
-  } catch (error) {
-    return cli.error(error.message, true);
-  }
+  let serverlessFile = await loadServerlessFile(process.cwd());
 
   if (!serverlessFile) {
     // keeping serverless.component.yml for backward compatability
     const serverlessComponentFile = await loadComponentConfig(process.cwd());
+
+    // If no serverless.yml and no serverless.component.yml, there is nothing to publish in this cwd
+    if (!serverlessFile && !serverlessComponentFile) {
+      return cli.error(`Publish failed. The current working directory does not contain a 'serverless.yml' or 'serverless.component.yml'`, true);
+    }
+
     serverlessFile = serverlessComponentFile;
     serverlessFile.src = serverlessComponentFile.main;
   }
