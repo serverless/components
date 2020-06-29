@@ -38,7 +38,7 @@ module.exports = async (config, cli, command) => {
     accessKey = await getAccessKey(templateYaml.org);
   }
 
-  const meta = `Action: "${command} --all" - Stage: "${templateYaml.stage}" - Org: "${templateYaml.org}" - App: "${templateYaml.app}" - Name: "${templateYaml.name}"`;
+  const meta = `Action: "${command}" - Stage: "${templateYaml.stage}" - Org: "${templateYaml.org}" - App: "${templateYaml.app}" - Name: "${templateYaml.name}"`;
   cli.log(meta);
 
   if (!templateYaml) {
