@@ -43,6 +43,10 @@ module.exports = async () => {
   // set global proxy agent if it's configured in environment variable
   if (process.env.HTTP_PROXY || process.env.HTTPS_PROXY) {
     if (semver.gte(process.version, 'v11.7.0')) {
+      // save default global agent in case we want to restore them
+      // and hand proxy handling to other libs
+      http.defaultGlobalAgent = http.globalAgent;
+      https.defaultGlobalAgent = https.globalAgent;
       http.globalAgent = new HttpsProxyAgent(process.env.HTTP_PROXY || process.env.HTTPS_PROXY);
       https.globalAgent = new HttpsProxyAgent(process.env.HTTPS_PROXY || process.env.HTTP_PROXY);
     } else {
