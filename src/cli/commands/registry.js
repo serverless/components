@@ -41,7 +41,10 @@ const publish = async (config, cli) => {
 
     // If no serverless.yml and no serverless.component.yml, there is nothing to publish in this cwd
     if (!serverlessFile && !serverlessComponentFile) {
-      return cli.error(`Publish failed. The current working directory does not contain a 'serverless.yml' or 'serverless.component.yml'`, true);
+      return cli.error(
+        "Publish failed. The current working directory does not contain a 'serverless.yml' or 'serverless.component.yml'",
+        true
+      );
     }
 
     serverlessFile = serverlessComponentFile;

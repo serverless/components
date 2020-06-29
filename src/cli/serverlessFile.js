@@ -50,7 +50,9 @@ const loadServerlessFile = (directoryPath) => {
   const filePath = getServerlessFilePath(directoryPath);
 
   // If no filePath, the serverless config file does not exist
-  if (!filePath) { return null }
+  if (!filePath) {
+    return null;
+  }
 
   // Read file, if it's yaml/yml
   if (isYaml(filePath)) {

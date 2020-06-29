@@ -180,7 +180,7 @@ const loadComponentConfig = (directoryPath) => {
     filePath = jsonFilePath;
   }
 
-  if (!filePath) return null
+  if (!filePath) return null;
 
   // Read file
   if (isYaml) {
