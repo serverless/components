@@ -1,7 +1,7 @@
 'use strict';
 
 const { ServerlessSDK } = require('@serverless/platform-client');
-const { downloadTemplate } = require('./utils');
+const { downloadTemplate, writeEnvFile } = require('./utils');
 const initTokenHandler = require('./initTokenHandler');
 const Unpacker = require('./unpacker');
 
@@ -73,6 +73,7 @@ const run = async (cli, cliParam) => {
 
     // Remove zip file
     await fs.remove(zipFile);
+    await writeEnvFile(directory);
     const unpacker = new Unpacker(cli, tenantName, serviceName);
     cli.status('Setting up your new app');
     // Recursively unpack each directory in a template
