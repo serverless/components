@@ -179,11 +179,8 @@ const loadComponentConfig = (directoryPath) => {
   if (fileExistsSync(jsonFilePath)) {
     filePath = jsonFilePath;
   }
-  if (!filePath) {
-    throw new Error(
-      'The serverless.component file could not be found in the current working directory.'
-    );
-  }
+
+  if (!filePath) return null
 
   // Read file
   if (isYaml) {
