@@ -79,17 +79,20 @@ module.exports = async (config, cli, command) => {
     options
   );
 
-  if (command === 'remove') {
-    cli.close('success', 'Success');
-  } else {
+  // don't show outputs if removing
+  if (command !== 'remove') {
     const outputs = getOutputs(allComponentsWithOutputs);
 
-    if (config.debug) {
+    // log all outputs at once at the end only on debug mode
+    // when not in debug, the graph handles logging outputs
+    // of each deployed instance in realtime
+    if (options.debug) {
       cli.log();
       cli.logOutputs(outputs);
     }
   }
 
   cli.close('success', 'Success');
+
   if (deferredNotificationsData) printNotification(cli, await deferredNotificationsData);
 };

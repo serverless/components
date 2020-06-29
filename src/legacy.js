@@ -17,7 +17,7 @@ const runningComponents = () => {
     process.argv[2] === 'publish' ||
     process.argv[2] === 'registry' ||
     process.argv[2] === 'init' ||
-    args.all ||
+    utils.runningTemplate(process.cwd()) ||
     args.target
   ) {
     return true;
@@ -35,14 +35,6 @@ const runningComponents = () => {
   }
 
   if (!componentConfig && !instanceConfig) {
-    // load components if trying to login inside a template directory
-    if (
-      process.argv.length === 3 &&
-      process.argv[2] === 'login' &&
-      utils.runningTemplate(process.cwd())
-    ) {
-      return true;
-    }
     // When no in service context and plain `serverless` command, return true when user in China
     // It's to enable interactive CLI components onboarding for Chinese users
     return process.argv.length === 2 && isChinaUser();
