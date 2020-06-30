@@ -182,9 +182,7 @@ const loadComponentConfig = (directoryPath) => {
     filePath = jsonFilePath;
   }
   if (!filePath) {
-    throw new Error(
-      'The serverless.component file could not be found in the current working directory.'
-    );
+    throw new Error('No serverless config file was found in the current working directory.');
   }
 
   // Read file
@@ -517,12 +515,12 @@ const isProjectPathSync = (inputPath) => {
 };
 
 const runningTemplate = (root) => {
-  if (isProjectPathSync(root)) {
-    // if cwd contains a serverless.yml file we return immediately
-    // to let users deploy their projects in cwd (v1 or component instance)
-    return false;
-  }
   try {
+    if (isProjectPathSync(root)) {
+      // if cwd contains a serverless.yml file we return immediately
+      // to let users deploy their projects in cwd (v1 or component instance)
+      return false;
+    }
     return fse.readdirSync(root).every((fileOrDirName) => {
       if (fileOrDirName.startsWith('.')) return true;
       const fileOrDirPath = path.join(root, fileOrDirName);
