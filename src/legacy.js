@@ -9,6 +9,18 @@ const {
 const runningComponents = () => {
   const args = minimist(process.argv.slice(2));
 
+  const isRunningHelpOrVersion =
+    process.argv[2] === 'version' ||
+    process.argv[2] === 'help' ||
+    args.v ||
+    args.version ||
+    args.help;
+
+  // don't load components CLI if running version or help
+  if (isRunningHelpOrVersion) {
+    return false;
+  }
+
   let componentConfig;
   let instanceConfig;
 

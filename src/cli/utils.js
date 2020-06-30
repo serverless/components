@@ -507,14 +507,27 @@ const isProjectPath = async (inputPath) => {
   return false;
 };
 
-const runningTemplate = (root) => {
-  try {
-    return fse.readdirSync(root).every((fileName) => {
-      if (fileName.startsWith('.')) return true;
-      const filePath = path.join(root, fileName);
-      if (!fse.statSync(filePath).isDirectory()) return true;
+const isProjectPathSync = (inputPath) => {
+  for (const configurationFile of possibleConfigurationFiles) {
+    if (fileExistsSync(path.join(inputPath, configurationFile))) {
+      return true;
+    }
+  }
+  return false;
+};
 
-      const instanceYml = loadInstanceConfig(filePath);
+const runningTemplate = (root) => {
+  if (isProjectPathSync(root)) {
+    // if cwd contains a serverless.yml file we return immediately
+    // to let users deploy their projects in cwd (v1 or component instance)
+    return false;
+  }
+  try {
+    return fse.readdirSync(root).every((fileOrDirName) => {
+      if (fileOrDirName.startsWith('.')) return true;
+      const fileOrDirPath = path.join(root, fileOrDirName);
+      if (!fse.statSync(fileOrDirPath).isDirectory()) return true;
+      const instanceYml = loadInstanceConfig(fileOrDirPath);
 
       // if no yaml file found, or not a component yaml file
       // then it's not a template directory
