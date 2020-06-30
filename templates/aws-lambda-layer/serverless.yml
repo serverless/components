@@ -1,5 +1,10 @@
+name: aws-lambda-layer-starter
 component: aws-lambda-layer
-name: my-lambda-layer
+org: serverlessinc
+description: Deploys an AWS Lambda Layer
+keywords: aws, serverless, faas, lambda, layer
+repo: https://github.com/serverless-components/aws-lambda-layer
+license: MIT
 
 inputs:
   src: ./src
