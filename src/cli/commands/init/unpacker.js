@@ -34,19 +34,19 @@ class Unpacker {
       // Writes the tenantName and serviceName to the serverless.y(a)ml file
       await writeMainAttrs(this.cli, dir, this.tenantName, this.serviceName);
       const files = await fs.readdir(dir);
-      const result = await Promise.all(
+      await Promise.all(
         files.map(async (file) => {
           // Check if the file is a directory, or a file
           const stats = await fs.stat(`${dir}/${file}`);
           if (stats.isDirectory()) {
             return this.unpack(path.resolve(dir, file));
           }
-          return true;
+          return null;
         })
       );
-      return result.filter(Boolean);
+      return null;
     }
-    return true;
+    return null;
   }
 }
 
