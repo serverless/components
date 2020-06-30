@@ -36,7 +36,14 @@ const writeEnvFile = async (dir) => {
     '# AWS_SECRET_ACCESS_KEY<your secret access key>\n';
   await fs.writeFile(envDestination, envConfig);
 };
+
+const createSlsFile = async (dir, componentName) => {
+  const envDestination = path.resolve(dir, 'serverless.yml');
+  const envConfig = `component: ${componentName}\ninputs:\n`;
+  await fs.writeFile(envDestination, envConfig);
+};
 module.exports = {
   downloadTemplate,
   writeEnvFile,
+  createSlsFile,
 };

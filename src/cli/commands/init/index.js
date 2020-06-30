@@ -1,7 +1,7 @@
 'use strict';
 
 const { ServerlessSDK } = require('@serverless/platform-client');
-const { downloadTemplate, writeEnvFile } = require('./utils');
+const { downloadTemplate, writeEnvFile, createSlsFile } = require('./utils');
 const initTokenHandler = require('./initTokenHandler');
 const Unpacker = require('./unpacker');
 
@@ -25,6 +25,7 @@ const run = async (cli, cliParam) => {
   let directory;
   let serviceName;
   let tenantName;
+  let type;
 
   // Tokens are prefixed with 'sf_'
   // If the string doesn't start with that,
@@ -32,7 +33,10 @@ const run = async (cli, cliParam) => {
   if (cliParam.startsWith('sf_')) {
     cli.status('Logging you in');
     try {
-      ({ templateUrl, directory, serviceName, tenantName } = await initTokenHandler(sdk, cliParam));
+      ({ templateUrl, directory, serviceName, tenantName, type } = await initTokenHandler(
+        sdk,
+        cliParam
+      ));
     } catch (error) {
       // Code doesn't exist
       if (error.response && error.response.status === 404) {
@@ -51,20 +55,41 @@ const run = async (cli, cliParam) => {
     try {
       data = await sdk.getFromRegistry(cliParam);
     } catch (sdkError) {
-      cli.error(`Can't find template: ${cliParam}, run 'sls registry' to see available templates.`);
+      cli.close(
+        'error',
+        `Can't find template: ${cliParam}, run 'sls registry' to see available templates.`
+      );
       return null;
     }
     directory = cliParam;
     serviceName = cliParam;
     templateUrl = data.downloadUrl;
+    type = data.type;
   }
-
-  if (templateUrl) {
-    cli.status('Unpacking your new app');
-    // Create template directory
+  cli.status('Unpacking your new app');
+  // Create template directory
+  try {
     await fs.mkdir(directory);
-    const servicePath = path.resolve(process.cwd(), directory);
-
+  } catch (error) {
+    if (error.code === 'EEXIST') {
+      cli.close(
+        'error',
+        `Directory ${directory} already exists. Please re-run init in a different directory`
+      );
+      return null;
+    }
+    throw error;
+  }
+  const servicePath = path.resolve(process.cwd(), directory);
+  await writeEnvFile(directory);
+  /**
+   * If the package is a component, don't pull the source code
+   * Instead, create an empty sls.yml (with component filled out)
+   * Otherwise, fetch and extract the package
+   */
+  if (type === 'component') {
+    await createSlsFile(directory, cliParam);
+  } else {
     // Fetch template zip
     const zipFile = await downloadTemplate(templateUrl, servicePath);
     // Unzip
@@ -73,7 +98,7 @@ const run = async (cli, cliParam) => {
 
     // Remove zip file
     await fs.remove(zipFile);
-    await writeEnvFile(directory);
+
     const unpacker = new Unpacker(cli, tenantName, serviceName);
     cli.status('Setting up your new app');
     // Recursively unpack each directory in a template
@@ -86,7 +111,7 @@ const run = async (cli, cliParam) => {
 const init = async (config, cli) => {
   const maybeToken = config.params[0];
   if (!maybeToken) {
-    cli.error('init command requires either a token or template URL');
+    cli.close('error', 'init command requires either a token or template URL');
     return;
   }
   cli.logLogo();

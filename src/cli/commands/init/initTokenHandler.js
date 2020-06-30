@@ -17,6 +17,7 @@ module.exports = async (sdk, initToken) => {
   // Registry data doesn't have a link, we need to fetch the signed URL
   const registryData = await sdk.getFromRegistry(template.packageName);
   const templateUrl = registryData.downloadUrl;
+  const type = registryData.type;
 
   set('userId', auth0Id);
   if (idToken) {
@@ -31,5 +32,5 @@ module.exports = async (sdk, initToken) => {
       });
     }
   }
-  return { templateUrl, projectType, directory, serviceName, tenantName };
+  return { templateUrl, projectType, directory, serviceName, tenantName, type };
 };
