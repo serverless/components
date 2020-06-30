@@ -82,9 +82,13 @@ async function updateDeploymentStatus(cli, instanceInfo, startDebug) {
         state: { lambdaArn, region },
       } = instanceInfo;
       if (lambdaArn && region) {
-        await chinaUtils.stopTencentRemoteLogAndDebug(lambdaArn, region, cliEventCallback);
+        const functionInfo = {
+          functionName: lambdaArn,
+          runtime: instanceInfo.state[region].runtime,
+        };
+        await chinaUtils.stopTencentRemoteLogAndDebug(functionInfo, region, cliEventCallback);
         if (startDebug) {
-          await chinaUtils.startTencentRemoteLogAndDebug(lambdaArn, region, cliEventCallback);
+          await chinaUtils.startTencentRemoteLogAndDebug(functionInfo, region, cliEventCallback);
         }
       }
       cli.log(header, 'grey');
