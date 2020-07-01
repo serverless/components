@@ -1,6 +1,10 @@
-component: website
 name: landing-page
-stage: dev
+component: website
+org: serverlessinc
+description: Deploys a serverless website on AWS
+keywords: aws, serverless, website, frontend
+repo: https://github.com/serverless-components/website
+license: MIT
 
 inputs:
   src:

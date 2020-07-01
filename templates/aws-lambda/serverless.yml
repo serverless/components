@@ -1,5 +1,10 @@
+name: aws-lambda-starter
 component: aws-lambda
-name: my-lambda
+org: serverlessinc
+description: Deploys an AWS Lambda function
+keywords: aws, serverless, faas, lambda
+repo: https://github.com/serverless-components/aws-lambda
+license: MIT
 
 inputs:
   src: ./src

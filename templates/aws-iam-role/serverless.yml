@@ -1,5 +1,10 @@
+name: aws-iam-role-starter
 component: aws-iam-role
-name: my-role
+org: serverlessinc
+description: Deploys an AWS IAM role
+keywords: aws, serverless, iam, permissions
+repo: https://github.com/serverless-components/aws-iam-role
+license: MIT
 
 inputs:
   service: lambda.amazonaws.com
