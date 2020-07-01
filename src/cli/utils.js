@@ -31,37 +31,6 @@ const { Graph, alg } = require('graphlib');
 const sleep = async (wait) => new Promise((resolve) => setTimeout(() => resolve(), wait));
 
 /**
- * Make HTTP API requests, easily
- * @param {*} options.endpoint
- * @param {*} options.data
- * @param {*} options.accessKey
- * @param {*} options.method
- */
-const request = async (options) => {
-  const requestOptions = {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    json: options.data,
-  };
-
-  if (options.accessKey) {
-    requestOptions.headers.authorization = `Bearer ${options.accessKey}`;
-  }
-
-  let res;
-  try {
-    res = await got.post(options.endpoint, requestOptions);
-  } catch (error) {
-    if (error.response && error.response.status && error.response.data.message) {
-      throw new Error(`${error.response.status} - ${error.response.data.message}`);
-    }
-    throw error;
-  }
-  return res.data;
-};
-
-/**
  * Checks if a file exists
  * @param {*} filePath
  */
@@ -619,7 +588,6 @@ const executeGraph = async (allComponents, command, graph, cli, sdk, credentials
 
 module.exports = {
   sleep,
-  request,
   fileExists,
   fileExistsSync,
   readAndParseSync,
