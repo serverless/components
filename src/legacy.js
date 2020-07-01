@@ -14,6 +14,7 @@ const runningComponents = () => {
     process.argv[2] === 'help' ||
     args.v ||
     args.version ||
+    args.h ||
     args.help;
 
   // don't load components CLI if running version or help
