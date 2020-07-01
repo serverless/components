@@ -5,6 +5,7 @@ const yaml = require('js-yaml');
 
 const { writeFile } = require('fs-extra');
 const { fileExistsSync, readAndParseSync } = require('./utils');
+const { CLIError } = require('./errors');
 /**
  *
  * Checks if a filename ends with yaml or yml
@@ -85,7 +86,7 @@ const writeServerlessFile = async (cli, servicePath, ymlObject) => {
     try {
       await writeFile(serverlessFileName, yaml.safeDump(ymlObject));
     } catch (error) {
-      return cli.error(`Cannot write serverless.yml file in ${servicePath}`, true);
+      throw new CLIError(`Cannot write serverless.yml file in ${servicePath}`);
     }
   }
 };
