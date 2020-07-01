@@ -16,7 +16,6 @@ const {
   identity,
 } = require('ramda');
 const path = require('path');
-const axios = require('axios');
 const globby = require('globby');
 const AdmZip = require('adm-zip');
 const fse = require('fs-extra');
@@ -29,39 +28,6 @@ const { Graph, alg } = require('graphlib');
  * @param {*} wait
  */
 const sleep = async (wait) => new Promise((resolve) => setTimeout(() => resolve(), wait));
-
-/**
- * Make HTTP API requests, easily
- * @param {*} options.endpoint
- * @param {*} options.data
- * @param {*} options.accessKey
- * @param {*} options.method
- */
-const request = async (options) => {
-  const requestOptions = {
-    url: options.endpoint,
-    method: options.method || 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    data: options.data,
-  };
-
-  if (options.accessKey) {
-    requestOptions.headers.authorization = `Bearer ${options.accessKey}`;
-  }
-
-  let res;
-  try {
-    res = await axios(requestOptions);
-  } catch (error) {
-    if (error.response && error.response.status && error.response.data.message) {
-      throw new Error(`${error.response.status} - ${error.response.data.message}`);
-    }
-    throw error;
-  }
-  return res.data;
-};
 
 /**
  * Checks if a file exists
@@ -106,7 +72,7 @@ const isJsonPath = (filePath) => endsWith('.json', filePath);
  * @param {*} filePath
  * @param {*} options
  */
-const readFileSync = (filePath, options = {}) => {
+const readAndParseSync = (filePath, options = {}) => {
   if (!fileExistsSync(filePath)) {
     throw new Error(`File does not exist at this path ${filePath}`);
   }
@@ -181,16 +147,13 @@ const loadComponentConfig = (directoryPath) => {
   if (fileExistsSync(jsonFilePath)) {
     filePath = jsonFilePath;
   }
-  if (!filePath) {
-    throw new Error(
-      'The serverless.component file could not be found in the current working directory.'
-    );
-  }
+
+  if (!filePath) return null;
 
   // Read file
   if (isYaml) {
     try {
-      componentFile = readFileSync(filePath);
+      componentFile = readAndParseSync(filePath);
     } catch (e) {
       // todo currently our YAML parser does not support
       // CF schema (!Ref for example). So we silent that error
@@ -200,58 +163,10 @@ const loadComponentConfig = (directoryPath) => {
       }
     }
   } else {
-    componentFile = readFileSync(filePath);
+    componentFile = readAndParseSync(filePath);
   }
 
   return componentFile;
-};
-
-/**
- * Reads a serverless config file in a given directory path
- * @param {*} directoryPath
- */
-const loadServerlessFile = (directoryPath) => {
-  directoryPath = path.resolve(directoryPath);
-  const ymlFilePath = path.join(directoryPath, 'serverless.yml');
-  const yamlFilePath = path.join(directoryPath, 'serverless.yaml');
-  const jsonFilePath = path.join(directoryPath, 'serverless.json');
-  let filePath;
-  let isYaml = false;
-  let configFile;
-
-  // Check to see if exists and is yaml or json file
-  if (fileExistsSync(ymlFilePath)) {
-    filePath = ymlFilePath;
-    isYaml = true;
-  }
-  if (fileExistsSync(yamlFilePath)) {
-    filePath = yamlFilePath;
-    isYaml = true;
-  }
-  if (fileExistsSync(jsonFilePath)) {
-    filePath = jsonFilePath;
-  }
-  if (!filePath) {
-    return null;
-  }
-
-  // Read file
-  if (isYaml) {
-    try {
-      configFile = readFileSync(filePath);
-    } catch (e) {
-      // todo currently our YAML parser does not support
-      // CF schema (!Ref for example). So we silent that error
-      // because the framework can deal with that
-      if (e.name !== 'YAMLException') {
-        throw e;
-      }
-    }
-  } else {
-    configFile = readFileSync(filePath);
-  }
-
-  return configFile;
 };
 
 const getDirSize = async (p) => {
@@ -357,7 +272,7 @@ const loadInstanceConfigUncached = (directoryPath) => {
   // Read file
   if (isYaml) {
     try {
-      instanceFile = readFileSync(filePath);
+      instanceFile = readAndParseSync(filePath);
     } catch (e) {
       // todo currently our YAML parser does not support
       // CF schema (!Ref for example). So we silent that error
@@ -365,11 +280,11 @@ const loadInstanceConfigUncached = (directoryPath) => {
       if (e.name !== 'YAMLException') {
         throw e;
       } else {
-        throw new Error(`The serverless.yml file has icorrect format. Details: ${e.message}`);
+        throw new Error(`The serverless.yml file has incorrect format. Details: ${e.message}`);
       }
     }
   } else {
-    instanceFile = readFileSync(filePath);
+    instanceFile = readAndParseSync(filePath);
   }
 
   // Set default stage
@@ -423,7 +338,7 @@ const legacyLoadInstanceConfig = (directoryPath) => {
   // Read file
   if (isYaml) {
     try {
-      instanceFile = readFileSync(filePath);
+      instanceFile = readAndParseSync(filePath);
     } catch (e) {
       // todo currently our YAML parser does not support
       // CF schema (!Ref for example). So we silent that error
@@ -433,7 +348,7 @@ const legacyLoadInstanceConfig = (directoryPath) => {
       }
     }
   } else {
-    instanceFile = readFileSync(filePath);
+    instanceFile = readAndParseSync(filePath);
   }
 
   return instanceFile;
@@ -472,7 +387,7 @@ const legacyLoadComponentConfig = (directoryPath) => {
   // Read file
   if (isYaml) {
     try {
-      componentFile = readFileSync(filePath);
+      componentFile = readAndParseSync(filePath);
     } catch (e) {
       // todo currently our YAML parser does not support
       // CF schema (!Ref for example). So we silent that error
@@ -482,7 +397,7 @@ const legacyLoadComponentConfig = (directoryPath) => {
       }
     }
   } else {
-    componentFile = readFileSync(filePath);
+    componentFile = readAndParseSync(filePath);
   }
 
   return componentFile;
@@ -672,17 +587,15 @@ const executeGraph = async (allComponents, command, graph, cli, sdk, credentials
 
 module.exports = {
   sleep,
-  request,
   fileExists,
   fileExistsSync,
-  readFileSync,
+  readAndParseSync,
   isYamlPath,
   isJsonPath,
   resolveVariables,
   getDirSize,
   pack,
   getInstanceDashboardUrl,
-  loadServerlessFile,
   loadComponentConfig,
   loadInstanceConfig,
   loadInstanceConfigUncached,

@@ -41,52 +41,46 @@ inputs: # The configuration the Component accepts according to its docs
 - [Documentation](#documentation)
 - [Quick-Start](#quick-start)
 - [Features](#features)
-    - [Simplicity](#simplicity)
-    - [Instant Deployments](#instant-deployments)
-    - [Build Your Own](#build-your-own)
-    - [Registry](#registry)
-    - [Serverless](#serverless)
+  - [Simplicity](#simplicity)
+  - [Instant Deployments](#instant-deployments)
+  - [Build Your Own](#build-your-own)
+  - [Registry](#registry)
+  - [Serverless](#serverless)
 - [Overview](#overview)
 - [Using Components](#using-components)
-    - [serverless.yml](#serverlessyml)
-    - [Inputs](#inputs)
-    - [Deploying](#deploying)
-    - [State](#state)
-    - [Versioning](#versioning)
-    - [Outputs](#outputs)
-    - [Credentials](#credentials)
-      - [AWS Credentials](#aws-credentials)
-      - [Google Credentials](#google-credentials)
-    - [Stages](#stages)
-    - [Variables](#variables)
-      - [Variables: Org](#variables-org)
-      - [Variables: Stage](#variables-stage)
-      - [Variables: App](#variables-app)
-      - [Variables: Name](#variables-name)
-      - [Variables: Environment Variables](#variables-environment-variables)
-      - [Variables: Outputs](#variables-outputs)
+  - [serverless.yml](#serverlessyml)
+  - [Inputs](#inputs)
+  - [Deploying](#deploying)
+  - [State](#state)
+  - [Versioning](#versioning)
+  - [Outputs](#outputs)
+  - [Credentials](#credentials)
+    - [AWS Credentials](#aws-credentials)
+    - [Google Credentials](#google-credentials)
+  - [Stages](#stages)
+  - [Variables](#variables)
+    - [Variables: Org](#variables-org)
+    - [Variables: Stage](#variables-stage)
+    - [Variables: App](#variables-app)
+    - [Variables: Name](#variables-name)
+    - [Variables: Environment Variables](#variables-environment-variables)
+    - [Variables: Outputs](#variables-outputs)
 - [Building Components](#building-components)
-    - [serverless.component.yml](#serverlesscomponentyml)
-    - [serverless.js](#serverlessjs)
-    - [Working With Source Code](#working-with-source-code)
-    - [Adding The Serverless Agent](#adding-the-serverless-agent)
-    - [Development Workflow](#development-workflow)
-    - [Type System](#components-type-system)
-    - [Development Tips](#development-tips)
-      - [Start With The Outcome](#start-with-the-outcome)
-      - [Knowing The Outcome Is An Advantage](#knowing-the-outcome-is-an-advantage)
-      - [Keep Most State On The Cloud Provider](#keep-most-state-on-the-cloud-provider)
-      - [Store State Immediately After A Successful Operation](#store-state-immediately-after-a-successful-operation)
-      - [Optimize For Accessibility](#optimize-for-accessibility)
-      - [No Surprise Removals](#no-surprise-removals)
-      - [Write Integration Tests](#write-integration-tests)
-- [CLI Commands](#cli-commands)
-      - [`serverless registry`](#serverless-registry)
-      - [`serverless registry publish`](#serverless-registry-publish)
-      - [`serverless deploy`](#serverless-deploy)
-      - [`serverless remove`](#serverless-remove)
-      - [`serverless info`](#serverless-info)
-      - [`serverless dev`](#serverless-dev)
+  - [serverless.component.yml](#serverlesscomponentyml)
+  - [serverless.js](#serverlessjs)
+  - [Working With Source Code](#working-with-source-code)
+  - [Adding The Serverless Agent](#adding-the-serverless-agent)
+  - [Development Workflow](#development-workflow)
+  - [Type System](#components-type-system)
+  - [Development Tips](#development-tips)
+    - [Start With The Outcome](#start-with-the-outcome)
+    - [Knowing The Outcome Is An Advantage](#knowing-the-outcome-is-an-advantage)
+    - [Keep Most State On The Cloud Provider](#keep-most-state-on-the-cloud-provider)
+    - [Store State Immediately After A Successful Operation](#store-state-immediately-after-a-successful-operation)
+    - [Optimize For Accessibility](#optimize-for-accessibility)
+    - [No Surprise Removals](#no-surprise-removals)
+    - [Write Integration Tests](#write-integration-tests)
+- [CLI Commands](#cli-commands) - [`serverless registry`](#serverless-registry) - [`serverless registry publish`](#serverless-registry-publish) - [`serverless deploy`](#serverless-deploy) - [`serverless remove`](#serverless-remove) - [`serverless info`](#serverless-info) - [`serverless dev`](#serverless-dev)
 
 <br/>
 
@@ -829,9 +823,9 @@ Serverless: Successfully publish express@0.0.1
 
 There is a type system in progress for Components which specifically covers:
 
-* Inputs
-* Outputs
-* Providers
+- Inputs
+- Outputs
+- Providers
 
 #### Input Types
 
@@ -839,7 +833,7 @@ There is a type system in progress for Components which specifically covers:
 
 ##### `metrics`
 
-These are metrics from the Component used to display infrastructure, product and business metrics from the Component.  If you use this output type, the Serverless Framework Dashboard and more can render charts and other useful widgets.
+These are metrics from the Component used to display infrastructure, product and business metrics from the Component. If you use this output type, the Serverless Framework Dashboard and more can render charts and other useful widgets.
 
 These are the inputs supported currently:
 
@@ -862,7 +856,7 @@ This are the standard response returned as the `metrics` output:
 }
 ```
 
-There are a handful of Metrics that Components support.  Here they are and how they work...
+There are a handful of Metrics that Components support. Here they are and how they work...
 
 ###### `type: 'bar-v1'`
 
@@ -885,16 +879,17 @@ This is for displaying a bar chart.
     "2021-07-01T19:00:00.999Z",
     "2021-07-01T20:00:00.999Z",
     "2021-07-01T21:00:00.999Z",
-    "2021-07-01T22:00:00.999Z",
+    "2021-07-01T22:00:00.999Z"
   ],
   // yDataSets: An array of 1 or more items to include in order to stack the bar charts (not yet supported).
-  "yDataSets": [{
-    // yData: An array of the values that correspond to the xData values
-    "yData": [ 3, 43, 31, 65 ],
-    // Color of bar chart.  Must be a hex value.
-    "color": "#000000",
-  }]
-
+  "yDataSets": [
+    {
+      // yData: An array of the values that correspond to the xData values
+      "yData": [3, 43, 31, 65],
+      // Color of bar chart.  Must be a hex value.
+      "color": "#000000"
+    }
+  ]
 }
 ```
 

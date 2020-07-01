@@ -10,7 +10,8 @@ const {
   promises: { readFile },
 } = require('fs');
 const { getAccessKey, isLoggedIn, getDefaultOrgName } = require('./utils');
-const { loadServerlessFile, fileExists, loadComponentConfig } = require('../utils');
+const { fileExists, loadComponentConfig } = require('../utils');
+const { loadServerlessFile } = require('../serverlessFile');
 
 /**
  * Publish a Component to the Serverless Registry
@@ -37,6 +38,15 @@ const publish = async (config, cli) => {
   if (!serverlessFile) {
     // keeping serverless.component.yml for backward compatability
     const serverlessComponentFile = await loadComponentConfig(process.cwd());
+
+    // If no serverless.yml and no serverless.component.yml, there is nothing to publish in this cwd
+    if (!serverlessFile && !serverlessComponentFile) {
+      return cli.error(
+        "Publish failed. The current working directory does not contain a 'serverless.yml' or 'serverless.component.yml'",
+        true
+      );
+    }
+
     serverlessFile = serverlessComponentFile;
     serverlessFile.src = serverlessComponentFile.main;
   }
@@ -117,6 +127,8 @@ const publish = async (config, cli) => {
       throw error;
     }
   }
+
+  return null;
 };
 
 /**
@@ -131,7 +143,17 @@ const get = async (config, cli) => {
   cli.start(`Fetching data for: ${packageName}`);
 
   const sdk = new ServerlessSDK();
-  let data = await sdk.getFromRegistry(packageName);
+
+  let data;
+
+  try {
+    data = await sdk.getFromRegistry(packageName);
+  } catch (error) {
+    if (error.message && error.message.includes('404')) {
+      return cli.error(error.message, true);
+    }
+    throw error;
+  }
 
   // for backward compatability
   if (data.componentDefinition) {
@@ -178,6 +200,8 @@ const get = async (config, cli) => {
   }
 
   cli.close('success', `Package data listed for "${packageName}"`);
+
+  return null;
 };
 
 /**
