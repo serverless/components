@@ -16,7 +16,6 @@ const {
   identity,
 } = require('ramda');
 const path = require('path');
-const got = require('got');
 const globby = require('globby');
 const AdmZip = require('adm-zip');
 const fse = require('fs-extra');
