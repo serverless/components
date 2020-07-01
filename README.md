@@ -862,7 +862,7 @@ There are a handful of Metrics that Components support. Here they are and how th
 
 This is for displaying a bar chart.
 
-```json
+```javascript
 {
   // Type: Name and version of chart.
   "type": "bar-v1",
