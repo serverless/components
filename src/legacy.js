@@ -29,8 +29,8 @@ const runningComponents = () => {
     process.argv[2] === 'publish' ||
     process.argv[2] === 'registry' ||
     process.argv[2] === 'init' ||
-    utils.runningTemplate(process.cwd()) ||
-    args.target
+    args.target ||
+    (process.argv[2] === 'deploy' && utils.runningTemplate(process.cwd()))
   ) {
     return true;
   }
