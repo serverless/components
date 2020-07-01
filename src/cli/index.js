@@ -122,7 +122,7 @@ module.exports = async () => {
       await commands.run(config, cli, command);
     }
   } catch (e) {
-    return cli.error(e);
+    return cli.error(e, e.hideStackTrace || false);
   }
 
   return null;

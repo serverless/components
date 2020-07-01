@@ -10,6 +10,7 @@ const args = require('minimist')(process.argv.slice(2));
 const { utils: platformUtils } = require('@serverless/platform-client-china');
 const { loadInstanceConfig, resolveVariables } = require('../utils');
 const { mergeDeepRight } = require('ramda');
+const { CLIError } = require('../errors');
 
 const updateEnvFile = (envs) => {
   // write env file
@@ -48,15 +49,15 @@ const loadTencentInstanceConfig = async (directoryPath) => {
   let instanceFile = loadInstanceConfig(directoryPath);
 
   if (!instanceFile) {
-    throw new Error('serverless config file was not found');
+    throw new CLIError('serverless config file was not found');
   }
 
   if (!instanceFile.name) {
-    throw new Error('Missing "name" property in serverless.yml');
+    throw new CLIError('Missing "name" property in serverless.yml');
   }
 
   if (!instanceFile.component) {
-    throw new Error('Missing "component" property in serverless.yml');
+    throw new CLIError('Missing "component" property in serverless.yml');
   }
 
   // if stage flag provided, overwrite
@@ -74,7 +75,7 @@ const loadTencentInstanceConfig = async (directoryPath) => {
   }
 
   if (!instanceFile.org) {
-    throw new Error('Missing "org" property in serverless.yml');
+    throw new CLIError('Missing "org" property in serverless.yml');
   }
 
   // if app flag provided, overwrite

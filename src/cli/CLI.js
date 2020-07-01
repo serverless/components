@@ -12,6 +12,7 @@ const figures = require('figures');
 const prettyoutput = require('prettyoutput');
 const chokidar = require('chokidar');
 const { version } = require('../../package.json');
+const { CLIError } = require('./errors');
 
 // CLI Colors
 const grey = chalk.dim;
@@ -262,7 +263,7 @@ class CLI {
     ad = ad + os.EOL + grey('  • State Storage, Output Sharing & Secrets');
     ad = ad + os.EOL + grey('  • And Much More: https://serverless.com/components');
     this.log(ad);
-    this.close('error', 'Please log in by running "serverless login"', true);
+    throw new CLIError('Please log in by running "serverless login"');
   }
 
   /**
@@ -313,7 +314,7 @@ class CLI {
     // Put cursor to starting position for next view
     process.stdout.write(ansiEscapes.cursorLeft);
 
-    return this.close('error', `${error.message}`);
+    return this.close('silent');
   }
 
   /**

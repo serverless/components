@@ -85,8 +85,7 @@ const writeServerlessFile = async (cli, servicePath, ymlObject) => {
     try {
       await writeFile(serverlessFileName, yaml.safeDump(ymlObject));
     } catch (error) {
-      cli.error(`Cannot write serverless.yml file in ${servicePath}`);
-      throw error;
+      return cli.error(`Cannot write serverless.yml file in ${servicePath}`, true);
     }
   }
 };
