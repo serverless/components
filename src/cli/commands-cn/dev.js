@@ -80,11 +80,20 @@ async function updateDeploymentStatus(cli, instanceInfo, startDebug) {
     case 'active': {
       const {
         state: { lambdaArn, region },
+        outputs: { scf, runtime },
       } = instanceInfo;
-      if (lambdaArn && region) {
-        await chinaUtils.stopTencentRemoteLogAndDebug(lambdaArn, region, cliEventCallback);
+      let runtimeInfo = runtime;
+      if (!runtimeInfo && scf) {
+        runtimeInfo = scf.runtime;
+      }
+      if (lambdaArn && runtimeInfo && region) {
+        const functionInfo = {
+          functionName: lambdaArn,
+          runtime: runtimeInfo,
+        };
+        await chinaUtils.stopTencentRemoteLogAndDebug(functionInfo, region, cliEventCallback);
         if (startDebug) {
-          await chinaUtils.startTencentRemoteLogAndDebug(lambdaArn, region, cliEventCallback);
+          await chinaUtils.startTencentRemoteLogAndDebug(functionInfo, region, cliEventCallback);
         }
       }
       cli.log(header, 'grey');

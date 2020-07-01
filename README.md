@@ -71,6 +71,7 @@ inputs: # The configuration the Component accepts according to its docs
   - [Working With Source Code](#working-with-source-code)
   - [Adding The Serverless Agent](#adding-the-serverless-agent)
   - [Development Workflow](#development-workflow)
+  - [Type System](#components-type-system)
   - [Development Tips](#development-tips)
     - [Start With The Outcome](#start-with-the-outcome)
     - [Knowing The Outcome Is An Advantage](#knowing-the-outcome-is-an-advantage)
@@ -814,6 +815,82 @@ name: express@0.0.1
 $ serverless publish
 
 Serverless: Successfully publish express@0.0.1
+```
+
+### Components Type System
+
+**Warning: Easly & Experimental**
+
+There is a type system in progress for Components which specifically covers:
+
+- Inputs
+- Outputs
+- Providers
+
+#### Input Types
+
+#### Output Types
+
+##### `metrics`
+
+These are metrics from the Component used to display infrastructure, product and business metrics from the Component. If you use this output type, the Serverless Framework Dashboard and more can render charts and other useful widgets.
+
+These are the inputs supported currently:
+
+```json
+{
+  "rangeStart": "2021-07-01T23:59:59.999Z",
+  "rangeEnd": "2021-07-02T23:59:59.999Z"
+}
+```
+
+This are the standard response returned as the `metrics` output:
+
+```json
+{
+  "metrics": {
+    "rangeStart": "2021-07-01T23:59:59.999Z",
+    "rangeEnd": "2021-07-02T23:59:59.999Z",
+    "metrics": [{...}]
+  }
+}
+```
+
+There are a handful of Metrics that Components support. Here they are and how they work...
+
+###### `type: 'bar-v1'`
+
+This is for displaying a bar chart.
+
+```json
+{
+  // Type: Name and version of chart.
+  "type": "bar-v1",
+  // Title: Name of the chart
+  "title": "API Requests",
+  // Stat: A large number to show at the top.  E.g., total api requests
+  "stat": 812,
+  // Stat Text: Shows next to the large number.  E.g., ms, seconds, requests, etc.  Default is null.
+  "statText": "ms",
+  // StatColor: The color of the main statistic.  Defaults to black.
+  "statColor": "#000000",
+  // xData: The values along the bottom of the chart.  Must have the same quantity as yValues.
+  "xData": [
+    "2021-07-01T19:00:00.999Z",
+    "2021-07-01T20:00:00.999Z",
+    "2021-07-01T21:00:00.999Z",
+    "2021-07-01T22:00:00.999Z"
+  ],
+  // yDataSets: An array of 1 or more items to include in order to stack the bar charts (not yet supported).
+  "yDataSets": [
+    {
+      // yData: An array of the values that correspond to the xData values
+      "yData": [3, 43, 31, 65],
+      // Color of bar chart.  Must be a hex value.
+      "color": "#000000"
+    }
+  ]
+}
 ```
 
 ### Development Tips
