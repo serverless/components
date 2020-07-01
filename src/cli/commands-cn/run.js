@@ -98,6 +98,9 @@ module.exports = async (config, cli, command) => {
     // run remove
     cli.status('Removing', null, 'white');
     await sdk.remove(instanceYaml, instanceCredentials, options);
+  } else if (command === 'login') {
+    // we have do login upside, so if command is login, do nothing here
+    // no op
   } else {
     // run a custom method synchronously to receive outputs directly
     options.sync = true;
