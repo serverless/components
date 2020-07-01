@@ -505,10 +505,17 @@ const isProjectPath = async (inputPath) => {
   return false;
 };
 
-const isProjectPathSync = (inputPath) => {
+const isDeployableProjectExists = (inputPath) => {
   for (const configurationFile of possibleConfigurationFiles) {
-    if (fileExistsSync(path.join(inputPath, configurationFile))) {
-      return true;
+    const configurationFilePath = path.join(inputPath, configurationFile);
+    if (fileExistsSync(configurationFilePath)) {
+      const content = readFileSync(configurationFilePath);
+      if (content.component || content.service) {
+        // if component instance or framework project
+        return true;
+      }
+      // anything
+      return false;
     }
   }
   return false;
@@ -516,8 +523,8 @@ const isProjectPathSync = (inputPath) => {
 
 const runningTemplate = (root) => {
   try {
-    if (isProjectPathSync(root)) {
-      // if cwd contains a serverless.yml file we return immediately
+    if (isDeployableProjectExists(root)) {
+      // if cwd contains a serverless.yml file that can be deployed we return immediately
       // to let users deploy their projects in cwd (v1 or component instance)
       return false;
     }
