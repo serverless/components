@@ -6,6 +6,9 @@ const {
   utils: { isChinaUser },
 } = require('@serverless/platform-client-china');
 
+// These keywords should route to components CLI, not sls cli.
+const componentKeywords = new Set(['registry', 'init', 'publish']);
+
 const runningComponents = () => {
   const args = minimist(process.argv.slice(2));
 
@@ -25,13 +28,11 @@ const runningComponents = () => {
   let componentConfig;
   let instanceConfig;
 
-  // load components if user runs "sls registry" or "sls publish" or "sls --target" (that last one for china)
+  // load components if user runs a keyword command, or "sls --all" or "sls --target" (that last one for china)
   if (
-    process.argv[2] === 'publish' ||
-    process.argv[2] === 'registry' ||
-    process.argv[2] === 'init' ||
-    args.target ||
-    (process.argv[2] === 'deploy' && utils.runningTemplate(process.cwd()))
+    componentKeywords.has(process.argv[2]) ||
+    (process.argv[2] === 'deploy' && utils.runningTemplate(process.cwd())) ||
+    args.target
   ) {
     return true;
   }

@@ -42,7 +42,7 @@ module.exports = async (config, cli) => {
   zip.extractAllTo(path.resolve(process.cwd(), template.name));
   await fs.promises.unlink(tmpFilename);
 
-  cli.log(`- Successfully created "${templateName}" instance in the currennt working directory.`);
+  cli.log(`- Successfully created "${templateName}" instance in the current working directory.`);
 
   cli.log("- Don't forget to update serverless.yml and install dependencies if needed.");
 

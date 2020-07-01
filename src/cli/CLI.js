@@ -121,17 +121,19 @@ class CLI {
     process.stdout.write(ansiEscapes.cursorLeft);
     process.stdout.write(ansiEscapes.eraseDown);
 
-    // Write content
-    this.log();
-    let content = '';
-    if (this._.timer) {
-      content += `${`${this._.timerSeconds}s`}`;
-      content += ` ${figures.pointerSmall} `;
+    // Silent is used to skip the "Done" message
+    if (reason !== 'silent') {
+      // Write content
+      this.log();
+      let content = '';
+      if (this._.timer) {
+        content += `${`${this._.timerSeconds}s`}`;
+        content += ` ${figures.pointerSmall} `;
+      }
+      content += `${this._.entity} `;
+      content += `${figures.pointerSmall} ${message}`;
+      process.stdout.write(color(content));
     }
-    content += `${this._.entity} `;
-    content += `${figures.pointerSmall} ${message}`;
-    process.stdout.write(color(content));
-
     // Put cursor to starting position for next view
     console.log(os.EOL);
     process.stdout.write(ansiEscapes.cursorLeft);
