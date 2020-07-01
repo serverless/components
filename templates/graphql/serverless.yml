@@ -1,5 +1,10 @@
 component: graphql
 name: graphql-api
+org: serverlessinc
+description: Deploys an serverless GraphQL API with AWS AppSync
+keywords: aws, serverless, graphql, appsync
+repo: https://github.com/serverless-components/graphql
+license: MIT
 
 inputs:
   src: ./
