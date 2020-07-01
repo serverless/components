@@ -22,10 +22,10 @@ class Unpacker {
    * Recursive method
    * @param {*} dir
    */
-  async unpack(dir) {
+  async unpack(dir, isTopLevel = false) {
     // Check if the directory contains a serverless.yml/yaml/json/js.
     // If it does, we need to unpack it
-    if (getServerlessFilePath(dir)) {
+    if (getServerlessFilePath(dir) || isTopLevel) {
       this.cli.status(`Installing node_modules via npm in ${dir}`);
       if (await fs.exists(path.resolve(dir, 'package.json'))) {
         await spawn('npm', ['install'], { cwd: dir });
@@ -39,7 +39,7 @@ class Unpacker {
           // Check if the file is a directory, or a file
           const stats = await fs.stat(`${dir}/${file}`);
           if (stats.isDirectory()) {
-            return this.unpack(path.resolve(dir, file));
+            return this.unpack(path.resolve(dir, file), false);
           }
           return null;
         })

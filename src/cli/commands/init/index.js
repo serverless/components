@@ -103,7 +103,7 @@ const run = async (cli, cliParam) => {
     cli.status('Setting up your new app');
     // Recursively unpack each directory in a template
     // Set org attr in sls.yml for each
-    await unpacker.unpack(servicePath);
+    await unpacker.unpack(servicePath, true);
   }
   return directory;
 };
