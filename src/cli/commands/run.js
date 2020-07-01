@@ -5,6 +5,7 @@
  */
 
 const { ServerlessSDK } = require('@serverless/platform-client');
+const { runningTemplate } = require('../utils');
 const {
   getAccessKey,
   isLoggedIn,
@@ -17,7 +18,7 @@ const requestNotification = require('../notifications/request');
 const printNotification = require('../notifications/print-notification');
 
 module.exports = async (config, cli, command) => {
-  if (config.all) {
+  if (runningTemplate(process.cwd())) {
     return runAll(config, cli, command);
   }
 

@@ -302,12 +302,6 @@ You can deploy Components easily via the Serverless Framework with the `$ server
 $ serverless deploy
 ```
 
-If you have multiple components in sub-directories, you can deploy them all in one go with the `--all` flag:
-
-```
-$ serverless deploy --all
-```
-
 While Serverless Components deploy incredibly fast, please note that first deployments can often be 5x slower because creating cloud resources takes a lot longer than updating them.
 
 ### State
@@ -975,15 +969,11 @@ Publish a Component to the Serverless Registry.
 
 Deploys an Instance of a Component.
 
-`--all` - Deploys all components found in sub directories. Very useful when working with multiple components.
-
 `--debug` - Lists `console.log()` statements left in your Component upon `deploy` or any action.
 
 #### `serverless remove`
 
 Removes an Instance of a Component.
-
-`--all` - Removes all components found in sub directories. Very useful when working with multiple components.
 
 `--debug` - Lists `console.log()` statements left in your Component upon `remove` or any action.
 

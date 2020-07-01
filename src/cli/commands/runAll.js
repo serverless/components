@@ -38,7 +38,7 @@ module.exports = async (config, cli, command) => {
     accessKey = await getAccessKey(templateYaml.org);
   }
 
-  const meta = `Action: "${command} --all" - Stage: "${templateYaml.stage}" - Org: "${templateYaml.org}" - App: "${templateYaml.app}" - Name: "${templateYaml.name}"`;
+  const meta = `Action: "${command}" - Stage: "${templateYaml.stage}" - Org: "${templateYaml.org}" - App: "${templateYaml.app}" - Name: "${templateYaml.name}"`;
   cli.log(meta);
 
   if (!templateYaml) {
@@ -123,11 +123,13 @@ module.exports = async (config, cli, command) => {
       options
     );
 
-    if (command === 'remove') {
-      cli.close('success', 'Success');
-    } else {
+    // don't show outputs if removing
+    if (command !== 'remove') {
       const outputs = getOutputs(allComponentsWithOutputs);
 
+      // log all outputs at once at the end only on debug mode
+      // when not in debug, the graph handles logging outputs
+      // of each deployed instance in realtime
       if (options.debug) {
         cli.log();
         cli.logOutputs(outputs);
@@ -135,6 +137,7 @@ module.exports = async (config, cli, command) => {
     }
 
     cli.close('success', 'Success');
+
     if (deferredNotificationsData) printNotification(cli, await deferredNotificationsData);
   } finally {
     sdk.disconnect();

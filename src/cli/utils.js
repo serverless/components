@@ -147,8 +147,9 @@ const loadComponentConfig = (directoryPath) => {
   if (fileExistsSync(jsonFilePath)) {
     filePath = jsonFilePath;
   }
-
-  if (!filePath) return null;
+  if (!filePath) {
+    throw new Error('No serverless config file was found in the current working directory.');
+  }
 
   // Read file
   if (isYaml) {
@@ -422,14 +423,34 @@ const isProjectPath = async (inputPath) => {
   return false;
 };
 
+const isDeployableProjectExists = (inputPath) => {
+  for (const configurationFile of possibleConfigurationFiles) {
+    const configurationFilePath = path.join(inputPath, configurationFile);
+    if (fileExistsSync(configurationFilePath)) {
+      const content = readAndParseSync(configurationFilePath);
+      if (content.component || content.service) {
+        // if component instance or framework project
+        return true;
+      }
+      // anything
+      return false;
+    }
+  }
+  return false;
+};
+
 const runningTemplate = (root) => {
   try {
-    return fse.readdirSync(root).every((fileName) => {
-      if (fileName.startsWith('.')) return true;
-      const filePath = path.join(root, fileName);
-      if (!fse.statSync(filePath).isDirectory()) return true;
-
-      const instanceYml = loadInstanceConfig(filePath);
+    if (isDeployableProjectExists(root)) {
+      // if cwd contains a serverless.yml file that can be deployed we return immediately
+      // to let users deploy their projects in cwd (v1 or component instance)
+      return false;
+    }
+    return fse.readdirSync(root).every((fileOrDirName) => {
+      if (fileOrDirName.startsWith('.')) return true;
+      const fileOrDirPath = path.join(root, fileOrDirName);
+      if (!fse.statSync(fileOrDirPath).isDirectory()) return true;
+      const instanceYml = loadInstanceConfig(fileOrDirPath);
 
       // if no yaml file found, or not a component yaml file
       // then it's not a template directory

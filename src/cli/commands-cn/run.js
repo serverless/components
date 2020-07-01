@@ -5,6 +5,7 @@
  */
 
 const path = require('path');
+const { runningTemplate } = require('../utils');
 const { ServerlessSDK } = require('@serverless/platform-client-china');
 const utils = require('./utils');
 const runAll = require('./runAll');
@@ -14,7 +15,7 @@ const requestNotification = require('../notifications/request');
 const printNotification = require('../notifications/print-notification');
 
 module.exports = async (config, cli, command) => {
-  if (config.all) {
+  if (runningTemplate(process.cwd())) {
     return runAll(config, cli, command);
   }
 

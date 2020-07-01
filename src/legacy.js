@@ -12,11 +12,28 @@ const componentKeywords = new Set(['registry', 'init', 'publish']);
 const runningComponents = () => {
   const args = minimist(process.argv.slice(2));
 
+  const isRunningHelpOrVersion =
+    process.argv[2] === 'version' ||
+    process.argv[2] === 'help' ||
+    args.v ||
+    args.version ||
+    args.h ||
+    args.help;
+
+  // don't load components CLI if running version or help
+  if (isRunningHelpOrVersion) {
+    return false;
+  }
+
   let componentConfig;
   let instanceConfig;
 
   // load components if user runs a keyword command, or "sls --all" or "sls --target" (that last one for china)
-  if (componentKeywords.has(process.argv[2]) || args.all || args.target) {
+  if (
+    componentKeywords.has(process.argv[2]) ||
+    (process.argv[2] === 'deploy' && utils.runningTemplate(process.cwd())) ||
+    args.target
+  ) {
     return true;
   }
 
@@ -32,14 +49,6 @@ const runningComponents = () => {
   }
 
   if (!componentConfig && !instanceConfig) {
-    // load components if trying to login inside a template directory
-    if (
-      process.argv.length === 3 &&
-      process.argv[2] === 'login' &&
-      utils.runningTemplate(process.cwd())
-    ) {
-      return true;
-    }
     // When no in service context and plain `serverless` command, return true when user in China
     // It's to enable interactive CLI components onboarding for Chinese users
     return process.argv.length === 2 && isChinaUser();

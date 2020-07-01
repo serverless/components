@@ -9,7 +9,7 @@ const path = require('path');
 const {
   promises: { readFile },
 } = require('fs');
-const { getAccessKey, isLoggedIn, getDefaultOrgName } = require('./utils');
+const { getAccessKey, isLoggedIn, getDefaultOrgName, getTemplate } = require('./utils');
 const { fileExists, loadComponentConfig } = require('../utils');
 const { loadServerlessFile } = require('../serverlessFile');
 
@@ -84,6 +84,9 @@ const publish = async (config, cli) => {
     if (!(await fileExists(serverlessJsFilePath))) {
       throw new Error('no serverless.js file was found in the "src" directory you specified.');
     }
+  } else {
+    // validate the template
+    await getTemplate(process.cwd());
   }
 
   // log message in case of component
