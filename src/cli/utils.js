@@ -446,16 +446,24 @@ const runningTemplate = (root) => {
       // to let users deploy their projects in cwd (v1 or component instance)
       return false;
     }
-    return fse.readdirSync(root).every((fileOrDirName) => {
-      if (fileOrDirName.startsWith('.')) return true;
-      const fileOrDirPath = path.join(root, fileOrDirName);
-      if (!fse.statSync(fileOrDirPath).isDirectory()) return true;
-      const instanceYml = loadInstanceConfig(fileOrDirPath);
+    const itemNames = fse.readdirSync(root);
 
-      // if no yaml file found, or not a component yaml file
-      // then it's not a template directory
-      return instanceYml && instanceYml.component;
-    });
+    let hasComponentProject = false;
+    for (const itemName of itemNames) {
+      const itemPath = path.join(root, itemName);
+      if (!itemName.startsWith('.') && fse.statSync(itemPath).isDirectory()) {
+        const instanceYml = loadInstanceConfig(itemPath);
+        if (instanceYml) {
+          if (instanceYml.component) {
+            hasComponentProject = true;
+          } else {
+            // has other version(e.g. v1) of serverless.yml
+            return false;
+          }
+        }
+      }
+    }
+    return hasComponentProject;
   } catch (error) {
     return false;
   }

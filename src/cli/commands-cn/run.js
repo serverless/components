@@ -15,7 +15,7 @@ const requestNotification = require('../notifications/request');
 const printNotification = require('../notifications/print-notification');
 
 module.exports = async (config, cli, command) => {
-  if (runningTemplate(process.cwd())) {
+  if (!config.target && runningTemplate(process.cwd())) {
     return runAll(config, cli, command);
   }
 
