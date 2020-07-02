@@ -37,9 +37,9 @@ const getDashboardUrl = (urlPath) => {
   }
 
   if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
-    return `https://app.serverless-dev.com${path || ''}`;
+    return `https://app.serverless-dev.com${urlPath || ''}`;
   }
-  return `https://app.serverless.com${path || ''}`;
+  return `https://app.serverless.com${urlPath || ''}`;
 };
 
 /**

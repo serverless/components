@@ -108,7 +108,7 @@ const init = async (config, cli) => {
   const serviceDir = await run(cli, config.params[0]);
   if (serviceDir) {
     cli.sessionStop(
-      'close',
+      'success',
       `Template successfully installed. Run "cd ${serviceDir} && serverless deploy" to get started...`
     );
   }
