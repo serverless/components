@@ -50,7 +50,9 @@ module.exports = async () => {
     dotenv.config({ path: path.resolve(secondParentStageEnvFilePath) });
   }
 
-  // set global proxy agent if it's configured in environment variable
+  /**
+   * Set global proxy agent if it's configured in environment variable
+   */
   if (process.env.HTTP_PROXY || process.env.HTTPS_PROXY) {
     if (semver.gte(process.version, 'v11.7.0')) {
       // save default global agent in case we want to restore them
@@ -68,6 +70,9 @@ module.exports = async () => {
     }
   }
 
+  /**
+   * Handle interactive onboarding when using the "serverless" command for China-based users
+   */
   if (process.argv.length === 2 && isChinaUser() && !(await isProjectPath(process.cwd()))) {
     // Interactive onboarding
     return require('./interactive-onboarding/cn')();
@@ -82,8 +87,11 @@ module.exports = async () => {
 
   let command = args._[0] || 'deploy';
 
-  // publish is just an alias for registry publish
-  // we also wanna keep the other registry functionality
+  /**
+   * Intercept "publish" command.  Any "registry" command is also intercepted.
+   * publish is just an alias for registry publish
+   * we also wanna keep the other registry functionality
+   */
   if (command === 'publish') {
     command = 'registry';
     args._[1] = 'publish';

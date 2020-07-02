@@ -1,10 +1,19 @@
 'use strict';
 
-const minimist = require('minimist');
-const utils = require('./cli/utils');
-const { isChinaUser } = require('./utils');
+/**
+ * This logic intercepts ALL Serverless Framework commands, before the V.1 core starts. 
+ * This checks to see if the Components CLI should take over.
+ */
 
-// These keywords should route to components CLI, not sls cli.
+const minimist = require('minimist');
+const {
+  runningTemplate,
+  legacyLoadComponentConfig,
+  legacyLoadInstanceConfig,
+  isChinaUser,
+} = require('./cli/utils');
+
+// These keywords are intercepted by the Serverless Components CLI
 const componentKeywords = new Set(['registry', 'init', 'publish']);
 
 const runningComponents = () => {
@@ -29,19 +38,19 @@ const runningComponents = () => {
   // load components if user runs a keyword command, or "sls --all" or "sls --target" (that last one for china)
   if (
     componentKeywords.has(process.argv[2]) ||
-    (process.argv[2] === 'deploy' && utils.runningTemplate(process.cwd())) ||
+    (process.argv[2] === 'deploy' && runningTemplate(process.cwd())) ||
     args.target
   ) {
     return true;
   }
 
   try {
-    componentConfig = utils.legacyLoadComponentConfig(process.cwd());
+    componentConfig = legacyLoadComponentConfig(process.cwd());
   } catch (e) {
     // ignore
   }
   try {
-    instanceConfig = utils.legacyLoadInstanceConfig(process.cwd());
+    instanceConfig = legacyLoadInstanceConfig(process.cwd());
   } catch (e) {
     // ignore
   }

@@ -18,6 +18,7 @@ const requestNotification = require('../notifications/request');
 const printNotification = require('../notifications/print-notification');
 
 module.exports = async (config, cli, command) => {
+  // Check to see if the cwd is a template containing multiple templates
   if (runningTemplate(process.cwd())) {
     return runAll(config, cli, command);
   }
