@@ -31,7 +31,10 @@ const runningComponents = () => {
   // load components if user runs a keyword command, or "sls --all" or "sls --target" (that last one for china)
   if (
     componentKeywords.has(process.argv[2]) ||
-    (process.argv[2] === 'deploy' && utils.runningTemplate(process.cwd())) ||
+    // only allow deploy & remove commands for nested templates
+    // to save up on extensive FS operations for all the other possible framework v1 commands
+    ((process.argv[2] === 'deploy' || process.argv[2] === 'remove') &&
+      utils.runningTemplate(process.cwd())) ||
     args.target
   ) {
     return true;
