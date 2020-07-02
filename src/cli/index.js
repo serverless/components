@@ -12,15 +12,12 @@ const dotenv = require('dotenv');
 const semver = require('semver');
 const chalk = require('chalk');
 const HttpsProxyAgent = require('https-proxy-agent');
-// TODO: Don't require all of this to do china-based user detection.  Put in our own utils.
-const {
-  utils: { isChinaUser },
-} = require('@serverless/platform-client-china');
 const CLI = require('./CLI');
 const {
   loadInstanceConfig,
   fileExistsSync,
-  isProjectPath
+  isProjectPath,
+  isChinaUser,
 } = require('./utils');
 
 module.exports = async () => {

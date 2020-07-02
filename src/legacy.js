@@ -1,10 +1,8 @@
 'use strict';
 
-const utils = require('./cli/utils');
 const minimist = require('minimist');
-const {
-  utils: { isChinaUser },
-} = require('@serverless/platform-client-china');
+const utils = require('./cli/utils');
+const { isChinaUser } = require('./utils');
 
 // These keywords should route to components CLI, not sls cli.
 const componentKeywords = new Set(['registry', 'init', 'publish']);
