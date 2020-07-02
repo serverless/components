@@ -8,22 +8,24 @@ const {
   createGraph,
   executeGraph,
 } = require('../utils');
-const { getAccessKey, isLoggedIn, loadInstanceCredentials, getTemplate } = require('./utils');
+const { getAccessKey, loadInstanceCredentials, getTemplate, isLoggedInOrHasAccessKey } = require('./utils');
 const generateNotificationsPayload = require('../notifications/generate-payload');
 const requestNotification = require('../notifications/request');
 const printNotification = require('../notifications/print-notification');
 
 module.exports = async (config, cli, command) => {
-  cli.start('Initializing', { timer: true });
+
+  // Ensure the user is logged in or access key is available, or advertise
+  if (!isLoggedInOrHasAccessKey()) {
+    cli.logAdvertisement();
+    cli.sessionStop('error', 'Please log in by running "serverless login"');
+    return null;
+  }
+
+  cli.sessionStart('Initializing', { timer: true });
 
   // get any access key stored in env
   let accessKey = await getAccessKey();
-
-  // Ensure the user is logged in or access key is available, or advertise
-  if (!accessKey && !isLoggedIn()) {
-    cli.advertise();
-    return;
-  }
 
   if (!config.debug) {
     cli.logLogo();
@@ -39,16 +41,16 @@ module.exports = async (config, cli, command) => {
   }
 
   const meta = `Action: "${command}" - Stage: "${templateYaml.stage}" - Org: "${templateYaml.org}" - App: "${templateYaml.app}" - Name: "${templateYaml.name}"`;
-  cli.log(meta);
+  cli.log(meta, 'grey');
 
   if (!templateYaml) {
-    return cli.error('No components found in sub directories.', true);
+    throw new Error('No apps found in sub directories.');
   }
 
   // Load Instance Credentials
   const credentials = await loadInstanceCredentials(templateYaml.stage);
 
-  cli.status('Initializing', templateYaml.name);
+  cli.sessionStatus('Initializing');
 
   // initialize SDK
   const sdk = new ServerlessSDK({
@@ -102,21 +104,16 @@ module.exports = async (config, cli, command) => {
         : null;
 
     if (command === 'remove') {
-      cli.status('Removing', null, 'white');
+      cli.sessionStatus('Removing');
     } else {
-      cli.status('Deploying', null, 'white');
+      cli.sessionStatus('Deploying');
     }
 
     const allComponents = await getAllComponents(templateYaml);
 
     const allComponentsWithDependencies = setDependencies(allComponents);
 
-    let graph
-    try {
-      graph = createGraph(allComponentsWithDependencies, command);
-    } catch (error) {
-      return cli.error(error.message, true)
-    }
+    let graph = createGraph(allComponentsWithDependencies, command);
 
     const allComponentsWithOutputs = await executeGraph(
       allComponentsWithDependencies,
@@ -127,6 +124,20 @@ module.exports = async (config, cli, command) => {
       credentials,
       options
     );
+
+    // Check for errors
+    const succeeded = []
+    const failed = []
+    for (let component in allComponentsWithOutputs) {
+      const c = allComponentsWithOutputs[component]
+      if (c.error) { failed.push(c.name) }
+      if (c.outputs) { succeeded.push(c.name) }
+    }
+
+    if (failed.length) {
+      cli.sessionStop('error', `Errors: "${command}" ran for ${succeeded.length} apps successfully. ${failed.length} failed.`)
+      return null
+    }
 
     // don't show outputs if removing
     if (command !== 'remove') {
@@ -141,7 +152,7 @@ module.exports = async (config, cli, command) => {
       }
     }
 
-    cli.close('success', 'Success');
+    cli.sessionStop('success', `"${command}" ran for ${succeeded.length} apps successfully.`)
 
     if (deferredNotificationsData) printNotification(cli, await deferredNotificationsData);
   } finally {

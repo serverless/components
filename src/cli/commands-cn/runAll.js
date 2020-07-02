@@ -14,7 +14,7 @@ const requestNotification = require('../notifications/request');
 const printNotification = require('../notifications/print-notification');
 
 module.exports = async (config, cli, command) => {
-  cli.start('Initializing', { timer: true });
+  cli.sessionStart('Initializing', { timer: true });
 
   await login();
 
@@ -33,7 +33,7 @@ module.exports = async (config, cli, command) => {
   // Load Instance Credentials
   const credentials = await loadInstanceCredentials(templateYaml.stage);
 
-  cli.status('Initializing', templateYaml.name);
+  cli.sessionStatus('Initializing', templateYaml.name);
 
   // initialize SDK
   const sdk = new ServerlessSDK({
@@ -53,14 +53,14 @@ module.exports = async (config, cli, command) => {
   const deferredNotificationsData =
     command === 'deploy'
       ? requestNotification(
-          Object.assign(generateNotificationsPayload(templateYaml), { command: 'deploy' })
-        )
+        Object.assign(generateNotificationsPayload(templateYaml), { command: 'deploy' })
+      )
       : null;
 
   if (command === 'remove') {
-    cli.status('Removing', null, 'white');
+    cli.sessionStatus('Removing', null, 'white');
   } else {
-    cli.status('Deploying', null, 'white');
+    cli.sessionStatus('Deploying', null, 'white');
   }
 
   const allComponents = await getAllComponents(templateYaml);
@@ -92,7 +92,7 @@ module.exports = async (config, cli, command) => {
     }
   }
 
-  cli.close('success', 'Success');
+  cli.sessionStop('success', 'Success');
 
   if (deferredNotificationsData) printNotification(cli, await deferredNotificationsData);
 };

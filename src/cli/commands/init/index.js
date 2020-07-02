@@ -20,7 +20,7 @@ const sdk = new ServerlessSDK({
  * @param {*} cliParams
  */
 const run = async (cli, cliParam) => {
-  cli.start('Fetching app configuration');
+  cli.sessionStart('Fetching app configuration');
   let templateUrl;
   let directory;
   let serviceName;
@@ -31,7 +31,7 @@ const run = async (cli, cliParam) => {
   // If the string doesn't start with that,
   // look in the registry for a package
   if (cliParam.startsWith('sf_')) {
-    cli.status('Logging you in');
+    cli.sessionStatus('Logging you in');
     try {
       ({ templateUrl, directory, serviceName, tenantName, type } = await initTokenHandler(
         sdk,
@@ -40,43 +40,32 @@ const run = async (cli, cliParam) => {
     } catch (error) {
       // Code doesn't exist
       if (error.response && error.response.status === 404) {
-        cli.close(
-          'error',
-          `App token '${cliParam}' doesn't exist
-          \nGo to https://app.serverless.com to generate a new app token`
-        );
-        return null;
+        throw new Error(`App token "${cliParam}" doesn't exist
+        \nGo to https://app.serverless.com to generate a new app token`)
       }
       throw error;
     }
   } else {
-    cli.status('Fetching template from registry');
+    cli.sessionStatus('Fetching template from registry');
     let data;
     try {
       data = await sdk.getFromRegistry(cliParam);
     } catch (sdkError) {
-      cli.close(
-        'error',
-        `Can't find template: ${cliParam}, run 'sls registry' to see available templates.`
-      );
-      return null;
+      throw new Error(`Can't find package: "${cliParam}" in the Serverless Registry 
+      \nRun "sls registry" to see featured packages...`)
     }
     directory = cliParam;
     serviceName = cliParam;
     templateUrl = data.downloadUrl;
     type = data.type;
   }
-  cli.status('Unpacking your new app');
+  cli.sessionStatus('Unpacking your new app');
   // Create template directory
   try {
     await fs.mkdir(directory);
   } catch (error) {
     if (error.code === 'EEXIST') {
-      cli.close(
-        'error',
-        `Directory ${directory} already exists. Please re-run init in a different directory`
-      );
-      return null;
+      throw new Error(`Directory "${directory}" already exists. Please re-run init in a different directory`)
     }
     throw error;
   }
@@ -100,7 +89,7 @@ const run = async (cli, cliParam) => {
     await fs.remove(zipFile);
 
     const unpacker = new Unpacker(cli, tenantName, serviceName);
-    cli.status('Setting up your new app');
+    cli.sessionStatus('Setting up your new app');
     // Recursively unpack each directory in a template
     // Set org attr in sls.yml for each
     await unpacker.unpack(servicePath, true);
@@ -111,15 +100,14 @@ const run = async (cli, cliParam) => {
 const init = async (config, cli) => {
   const maybeToken = config.params[0];
   if (!maybeToken) {
-    cli.close('error', 'init command requires either a token or template URL');
-    return;
+    throw new Error('"init" command requires either a token or package name from the Registry')
   }
   cli.logLogo();
   const serviceDir = await run(cli, config.params[0]);
   if (serviceDir) {
-    cli.close(
+    cli.sessionStop(
       'close',
-      `Template successfully installed. Run 'cd ${serviceDir} && serverless deploy' to get started`
+      `Template successfully installed. Run "cd ${serviceDir} && serverless deploy" to get started...`
     );
   }
   return;

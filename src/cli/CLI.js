@@ -47,10 +47,17 @@ class CLI {
   }
 
   /**
-   * Start
-   * - Starts the CLI process
+   * Renders a persistent, animated status bar in the CLI which remains visible until 'sessionClose()' is called.  Useful for deployments and other long-running processes where the user needs to know something is happening and what that is.
+   * @param {string} status Update the status text in the status bar.
+   * @param {string} options.timer Shows a timer for how long the session has been running.
+   * @param {function} options.closeHandler A function to call when the session is closed.
    */
-  start(status, options = {}) {
+  sessionStart(status, options = {}) {
+    // Prevent commands from accidently starting multiple sessions
+    if (this._.sessionActive) {
+      return null;
+    }
+
     if (options.timer) {
       this._.timer = true;
     } else {
@@ -74,7 +81,7 @@ class CLI {
     if (!options.closeHandler) {
       const self = this;
       options.closeHandler = async () => {
-        return self.close('close');
+        return self.sessionStop('cancel', 'Canceled');
       };
     }
 
@@ -85,18 +92,21 @@ class CLI {
     });
 
     if (status) {
-      this.status(status);
+      this.sessionStatus(status);
     }
+
+    this._.sessionActive = true;
 
     // Start render engine
     return this._renderEngine();
   }
 
   /**
-   * Close
-   * - Closes the CLI process with relevant, clean information.
+   * Stops rendering the persistent status bar in the CLI with a final status message.
+   * @param {string} reason This tells the status bar how to display its final message. Can be 'error', 'cancel', 'close', 'success', 'silent'.
+   * @param {string || error} message Can be a final message to the user (string) or an error.
    */
-  close(reason, message = 'Closed') {
+  sessionStop(reason, message = 'Closed') {
     // Set color
     let color = white;
     if (reason === 'error' || reason === 'cancel') {
@@ -112,6 +122,11 @@ class CLI {
     // Clear any existing content
     process.stdout.write(ansiEscapes.cursorLeft);
     process.stdout.write(ansiEscapes.eraseDown);
+
+    // Render stack trace (if debug is on)
+    if (reason === 'error') {
+      this.logErrorStackTrace(message)
+    }
 
     // Silent is used to skip the "Done" message
     if (reason !== 'silent') {
@@ -131,32 +146,23 @@ class CLI {
     process.stdout.write(ansiEscapes.cursorLeft);
     process.stdout.write(ansiEscapes.cursorShow);
 
-    if (reason === 'error') process.exitCode = 1;
-    this._isClosed = true;
+    this._.sessionActive = false;
   }
 
   /**
-   * Watch
-   * - Watches the specified directory with the given options
+   * Is the persistent status bar in the CLI active
    */
-  watch(dir, opts) {
-    this.watcher = chokidar.watch(dir, opts);
+  isSessionActive() {
+    return this._.sessionActive;
   }
 
   /**
-   * Debug Mode
-   * - Is debug mode enabled
+   * Set the status of the persistent status display.
+   * @param {string} status The text the status should show.  Keep this short.
+   * @param {string} entity The entitiy (e.g. Serverless) that is sending the message.
+   * @param {string} statusColor 'green', 'white', 'red', 'grey'
    */
-  debugMode() {
-    return this._.debug;
-  }
-
-  /**
-   * Status
-   * - Update status in the CLI session
-   * - Renders every 100ms
-   */
-  status(status = null, entity = null, statusColor = null) {
+  sessionStatus(status = null, entity = null, statusColor = null) {
     this._.status = status || this._.status;
     this._.entity = entity || this._.entity;
     if (statusColor === 'green') {
@@ -165,13 +171,83 @@ class CLI {
     if (statusColor === 'red') {
       statusColor = red;
     }
-    if (statusColor === 'blue') {
-      statusColor = blue;
-    }
     if (statusColor === 'white') {
       statusColor = white;
     }
     this._.statusColor = statusColor || grey;
+  }
+
+  /**
+   * Log an error and optionally a stacktrace
+   * @param {error} error An instance of the Error class
+   */
+  logError(error) {
+    // If no argument, skip
+    if (!error || error === '') {
+      return null;
+    }
+
+    if (typeof error === 'string') {
+      error = new Error(error);
+    }
+
+    // Clear any existing content
+    process.stdout.write(ansiEscapes.eraseDown);
+
+    // Render stack trace (if debug is on)
+    this.logErrorStackTrace(error)
+
+    let content = `${this._.entity} `;
+    content += `${figures.pointerSmall} ${error.message}`;
+    process.stdout.write(red(content));
+    // Put cursor to starting position for next view
+    console.log(os.EOL);
+    process.stdout.write(ansiEscapes.cursorLeft);
+  }
+
+  /**
+   * Log an error's stack trace
+   * @param {error} error An instance of the Error class
+   */
+  logErrorStackTrace(error) {
+
+    if (!this._.debug || !error.stack) {
+      return null;
+    }
+
+    // If no argument, skip
+    if (!error || error === '') {
+      return null;
+    }
+
+    if (!error instanceof Error) {
+      error = new Error(error);
+    }
+
+    // Clear any existing content
+    process.stdout.write(ansiEscapes.eraseDown);
+
+    // Render stack trace
+    console.log();
+    console.log('', red(error.stack));
+    // Put cursor to starting position for next view
+    process.stdout.write(ansiEscapes.cursorLeft);
+  }
+
+  /**
+   * TODO: REMOVE THIS.  SHOULD NOT BE IN HERE.  THIS IS NOT A GENERAL UTILS LIBRARY
+   * Watch
+   * - Watches the specified directory with the given options
+   */
+  watch(dir, opts) {
+    this.watcher = chokidar.watch(dir, opts);
+  }
+
+  /**
+   * TODO: REMOVE THIS.  SHOULD NOT BE IN HERE.  THIS IS NOT A GENERAL UTILS LIBRARY
+   */
+  debugMode() {
+    return this._.debug;
   }
 
   /**
@@ -213,7 +289,10 @@ class CLI {
     process.stdout.write(ansiEscapes.cursorLeft);
   }
 
-  logLogo(text) {
+  /**
+   * Log Serverless Framework Logo
+   */
+  logLogo() {
     let logo = os.EOL;
     logo += 'serverless';
     logo += red(' ⚡');
@@ -222,16 +301,17 @@ class CLI {
     if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
       logo += grey(' (dev)');
     }
-    if (text) {
-      logo += text;
-    }
+
     this.log(logo);
   }
 
+  /**
+   * Log Serverless Framework Registry Logo
+   */
   logRegistryLogo(text) {
     let logo = os.EOL;
     logo += white('serverless');
-    logo += red(' ⚡ ');
+    logo += red(' ⚡');
     logo += white('registry');
 
     if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
@@ -244,6 +324,9 @@ class CLI {
     this.log(logo);
   }
 
+  /**
+   * Log Serverless Framework Components Version
+   */
   logVersion() {
     this.logLogo();
     this.log();
@@ -251,7 +334,7 @@ class CLI {
     this.log();
   }
 
-  advertise() {
+  logAdvertisement() {
     this.logLogo();
     let ad = grey(
       'This is a Serverless Framework Component.  Sign-in to use it for free with these features:'
@@ -262,7 +345,6 @@ class CLI {
     ad = ad + os.EOL + grey('  • State Storage, Output Sharing & Secrets');
     ad = ad + os.EOL + grey('  • And Much More: https://serverless.com/components');
     this.log(ad);
-    this.close('error', 'Please log in by running "serverless login"', true);
   }
 
   /**
@@ -284,45 +366,12 @@ class CLI {
   }
 
   /**
-   * Error
-   * - Render and error and close a long-running CLI process.
-   */
-  error(error) {
-    // If no argument, skip
-    if (!error || error === '') {
-      return null;
-    }
-
-    if (typeof error === 'string') {
-      error = new Error(error);
-    }
-
-    // Clear any existing content
-    process.stdout.write(ansiEscapes.eraseDown);
-
-    // Render stack trace
-    if (!this._.debug) {
-      // Put cursor to starting position for next view
-      process.stdout.write(ansiEscapes.cursorLeft);
-      this.close('error', `${error.message}`);
-    } else {
-      // Show stack trace
-      console.log();
-      console.log('', red(error.stack));
-      // Put cursor to starting position for next view
-      process.stdout.write(ansiEscapes.cursorLeft);
-
-      this.close('error', `${error.message}`);
-    }
-  }
-
-  /**
    * Outputs
    * - Render outputs cleanly.
    */
   logOutputs(outputs) {
     if (!outputs || typeof outputs !== 'object' || Object.keys(outputs).length === 0) {
-      this.close('done', 'Success');
+      this.sessionStop('done', 'Success');
     }
     // Clear any existing content
     process.stdout.write(ansiEscapes.eraseDown);
@@ -347,11 +396,10 @@ class CLI {
   }
 
   /**
-   * Render Engine
-   * Repetitively renders status and more on a regular interval
+   * Handles the rendering of the the persistent status bar in the CLI. Repetitively updates the CLI view on a regular interval
    */
   async _renderEngine() {
-    if (this._isClosed) return null;
+    if (!this._.sessionActive) return null;
     /**
      * Debug Mode
      */

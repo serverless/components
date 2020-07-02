@@ -99,13 +99,13 @@ async function updateDeploymentStatus(cli, instanceInfo, startDebug) {
       cli.log(header, 'grey');
       delete instanceInfo.outputs.vendorMessage;
       cli.logOutputs(instanceInfo.outputs);
-      cli.status('Watching');
+      cli.sessionStatus('Watching');
       return true;
     }
     case 'error':
       cli.log(`${header} error`, 'grey');
       cli.log(deploymentErrorStack || deploymentError, 'red');
-      cli.status('Watching');
+      cli.sessionStatus('Watching');
       break;
     default:
       cli.log(`Deployment failed due to unknown deployment status: ${instanceStatus}`, 'red');
@@ -120,24 +120,26 @@ module.exports = async (config, cli) => {
   const closeHandler = async () => {
     // Set new close listener
     process.on('SIGINT', () => {
-      cli.close('error', 'Dev Mode Canceled.');
+      cli.sessionStop('error', 'Dev Mode Canceled.');
       process.exit();
     });
 
     if (watcher) {
       await watcher.close();
     }
-    cli.status('Disabling Dev Mode & Closing', null, 'green');
+    cli.sessionStatus('Disabling Dev Mode & Closing', null, 'green');
     const deployedInstance = await deploy(sdk, instanceYaml, instanceCredentials);
     if (await updateDeploymentStatus(cli, deployedInstance, false)) {
-      cli.close('success', 'Dev Mode Closed');
+      cli.sessionStop('success', 'Dev Mode Closed');
+      return null;
     } else {
-      cli.close('error', 'Last deployment fail. Run "serverless deploy" to deploy again.');
+      cli.sessionStop('error', 'Deployment failed. Run "serverless deploy" to deploy again.');
+      return null;
     }
   };
 
   // Start CLI persistance status
-  cli.start('Initializing', { closeHandler });
+  cli.sessionStart('Initializing', { closeHandler });
 
   await utils.login();
 
@@ -165,7 +167,7 @@ module.exports = async (config, cli) => {
     },
   });
 
-  cli.status('Initializing', instanceYaml.name);
+  cli.sessionStatus('Initializing', instanceYaml.name);
 
   // Filter configuration
   const filter = {
@@ -193,7 +195,7 @@ module.exports = async (config, cli) => {
   watcher = chokidar.watch(process.cwd(), { ignored: /\.serverless/ });
 
   watcher.on('ready', async () => {
-    cli.status('Enabling Dev Mode', null, 'green');
+    cli.sessionStatus('Enabling Dev Mode', null, 'green');
     const deployedInstance = await deploy(sdk, instanceYaml, instanceCredentials);
     await updateDeploymentStatus(cli, deployedInstance, true);
   });
@@ -214,12 +216,12 @@ module.exports = async (config, cli) => {
     if (!isProcessing) {
       let deployedInstance;
       isProcessing = true;
-      cli.status('Deploying', null, 'green');
+      cli.sessionStatus('Deploying', null, 'green');
       // reload serverless component instance
       instanceYaml = await utils.loadInstanceConfig(instanceDir);
       deployedInstance = await deploy(sdk, instanceYaml, instanceCredentials);
       if (queuedOperation) {
-        cli.status('Deploying', null, 'green');
+        cli.sessionStatus('Deploying', null, 'green');
         // reload serverless component instance
         instanceYaml = await utils.loadInstanceConfig(instanceDir);
         deployedInstance = await deploy(sdk, instanceYaml, instanceCredentials);

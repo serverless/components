@@ -565,6 +565,7 @@ const createGraph = (allComponents, command) => {
 };
 
 const executeGraph = async (allComponents, command, graph, cli, sdk, credentials, options) => {
+
   const leaves = graph.sinks();
 
   if (isEmpty(leaves)) {
@@ -578,16 +579,31 @@ const executeGraph = async (allComponents, command, graph, cli, sdk, credentials
       const instanceYaml = allComponents[instanceName];
 
       if (command === 'remove') {
-        const instance = await sdk.remove(instanceYaml, credentials, options);
+        let instance
+        try {
+          instance = await sdk.remove(instanceYaml, credentials, options);
+        } catch (error) {
+          error.message = `${instanceYaml.name}: ${error.message}`
+          if (!options.debug) {
+            cli.log();
+          }
+          cli.log(error.message, 'red');
+          allComponents[instanceName].error = error
+          return null;
+        }
         allComponents[instanceName].outputs = instance.outputs || {};
       } else {
-        // Capture errors and change them to indicate which Component generated it
         let instance
         try {
           instance = await sdk.deploy(instanceYaml, credentials, options);
         } catch (error) {
-          error.message = `App "${instanceYaml.name}" reported the following error: ${error.message}`
-          throw error
+          error.message = `${instanceYaml.name}: ${error.message}`
+          if (!options.debug) {
+            cli.log();
+          }
+          cli.log(error.message, 'red');
+          allComponents[instanceName].error = error
+          return null;
         }
 
         const outputs = {};

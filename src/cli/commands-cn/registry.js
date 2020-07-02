@@ -19,7 +19,7 @@ const publish = async (config, cli) => {
   config.timer = false;
 
   // Start CLI persistance status
-  cli.start('Initializing');
+  cli.sessionStart('Initializing');
 
   await utils.login();
 
@@ -56,7 +56,7 @@ const publish = async (config, cli) => {
   const sdk = new ServerlessSDK();
 
   // Publish
-  cli.status('Publishing');
+  cli.sessionStatus('Publishing');
 
   let registryPackage;
   try {
@@ -74,12 +74,13 @@ const publish = async (config, cli) => {
     registryPackage.version = 'dev';
   }
 
-  cli.close(
+  cli.sessionStop(
     'success',
     `Successfully published ${registryPackage.name}${
-      registryPackage.type === 'template' ? '' : `@${registryPackage.version}`
+    registryPackage.type === 'template' ? '' : `@${registryPackage.version}`
     }`
   );
+  return null;
 };
 
 /**
@@ -91,15 +92,14 @@ const getPackage = async (config, cli) => {
   const packageName = config.params[0];
 
   // Start CLI persistance status
-  cli.start(`Fetching versions for: ${packageName}`);
+  cli.sessionStart(`Fetching versions for: ${packageName}`);
 
   const sdk = new ServerlessSDK();
   const data = await sdk.getPackage(packageName);
   delete data.component;
 
   if (Object.keys(data).length === 0) {
-    cli.error(`Registry package "${packageName}" not found in the Serverless Registry.`, true);
-    return cli.close();
+    throw new Error(`Registry package "${packageName}" not found in the Serverless Framework Registry.`)
   }
 
   const devVersion = data.versions.indexOf('0.0.0-dev');
@@ -128,7 +128,8 @@ const getPackage = async (config, cli) => {
     cli.log(`Download Link: ${data.downloadUrl}`);
   }
 
-  return cli.close('success', `Registry Package information listed for "${packageName}"`);
+  cli.sessionStop('success', `Registry Package information listed for "${packageName}"`);
+  return null;
 };
 
 /**
@@ -137,7 +138,7 @@ const getPackage = async (config, cli) => {
  * @param {*} cli
  */
 const listFeatured = async (config, cli) => {
-  cli.start('Loading');
+  cli.sessionStart('Loading');
   cli.logRegistryLogo();
 
   const sdk = new ServerlessSDK();
@@ -166,7 +167,8 @@ const listFeatured = async (config, cli) => {
     }
   }
 
-  cli.close('close', 'Find more here: https://registry.serverless.com');
+  cli.sessionStop('close', 'Find more here: https://registry.serverless.com');
+  return null;
 };
 
 /**

@@ -26,7 +26,7 @@ class Unpacker {
     // Check if the directory contains a serverless.yml/yaml/json/js.
     // If it does, we need to unpack it
     if (getServerlessFilePath(dir) || isTopLevel) {
-      this.cli.status(`Installing node_modules via npm in ${dir}`);
+      this.cli.sessionStatus(`Installing node_modules via npm in ${dir}`);
       if (await fs.exists(path.resolve(dir, 'package.json'))) {
         await spawn('npm', ['install'], { cwd: dir });
       }
