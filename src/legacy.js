@@ -1,12 +1,19 @@
 'use strict';
 
-const utils = require('./cli/utils');
+/**
+ * This logic intercepts ALL Serverless Framework commands, before the V.1 core starts.
+ * This checks to see if the Components CLI should take over.
+ */
+
 const minimist = require('minimist');
 const {
-  utils: { isChinaUser },
-} = require('@serverless/platform-client-china');
+  runningTemplate,
+  legacyLoadComponentConfig,
+  legacyLoadInstanceConfig,
+  isChinaUser,
+} = require('./cli/utils');
 
-// These keywords should route to components CLI, not sls cli.
+// These keywords are intercepted by the Serverless Components CLI
 const componentKeywords = new Set(['registry', 'init', 'publish']);
 
 const runningComponents = () => {
@@ -34,19 +41,19 @@ const runningComponents = () => {
     // only allow deploy & remove commands for nested templates
     // to save up on extensive FS operations for all the other possible framework v1 commands
     ((process.argv[2] === 'deploy' || process.argv[2] === 'remove') &&
-      utils.runningTemplate(process.cwd())) ||
+      runningTemplate(process.cwd())) ||
     args.target
   ) {
     return true;
   }
 
   try {
-    componentConfig = utils.legacyLoadComponentConfig(process.cwd());
+    componentConfig = legacyLoadComponentConfig(process.cwd());
   } catch (e) {
     // ignore
   }
   try {
-    instanceConfig = utils.legacyLoadInstanceConfig(process.cwd());
+    instanceConfig = legacyLoadInstanceConfig(process.cwd());
   } catch (e) {
     // ignore
   }

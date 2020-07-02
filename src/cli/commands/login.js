@@ -7,11 +7,9 @@ const { loadInstanceConfig } = require('./utils');
 const { loadComponentConfig } = require('../utils');
 
 module.exports = async (config, cli) => {
-  // Offer a nice presentation
-
+  // Offer nice presentation
   cli.logLogo();
-  cli.log('Logging you in via the Browser...', 'grey');
-  cli.log();
+  cli.sessionStart('Logging you in via your web browser');
 
   const sdk = new ServerlessSDK();
 
@@ -52,6 +50,7 @@ module.exports = async (config, cli) => {
   process.env.DISPLAY = true;
   let { loginUrl, loginData } = await sdk.login(loginConfig); // eslint-disable-line
 
+  cli.log();
   cli.log(
     'If your browser did not open automatically, copy & paste this url into your browser:',
     'grey'
@@ -59,6 +58,8 @@ module.exports = async (config, cli) => {
   cli.log(loginUrl, 'grey');
 
   open(loginUrl);
+
+  cli.sessionStatus('Awaiting successful login in your browser');
 
   loginData = await loginData;
 
@@ -84,5 +85,7 @@ module.exports = async (config, cli) => {
   // save the login data in the rc file
   writeConfigFile(configFile);
 
-  cli.close('success', `Successfully logged in as "${loginData.username}"`);
+  cli.sessionStop('success', `Successfully logged in as "${loginData.username}"`);
+
+  return null;
 };

@@ -7,8 +7,9 @@
 const { ServerlessSDK } = require('@serverless/platform-client');
 const { runningTemplate } = require('../utils');
 const {
+  getDashboardUrl,
   getAccessKey,
-  isLoggedIn,
+  isLoggedInOrHasAccessKey,
   loadInstanceConfig,
   loadInstanceCredentials,
 } = require('./utils');
@@ -18,33 +19,40 @@ const requestNotification = require('../notifications/request');
 const printNotification = require('../notifications/print-notification');
 
 module.exports = async (config, cli, command) => {
-  if (runningTemplate(process.cwd())) {
+  // Ensure the user is logged in or access key is available, or advertise
+  if (!isLoggedInOrHasAccessKey()) {
+    cli.logAdvertisement();
+    cli.sessionStop('error', 'Please log in by running "serverless login"');
+    return null;
+  }
+
+  // Check to see if the cwd is a template containing multiple templates
+  if (['deploy', 'remove'].includes(command) && runningTemplate(process.cwd())) {
     return runAll(config, cli, command);
   }
 
   // Start CLI persistance status
-  cli.start('Initializing', { timer: true });
+  cli.sessionStart('Initializing', { timer: true });
+
   // Load YAML
   const instanceYaml = await loadInstanceConfig(process.cwd());
 
   // Get access key
   const accessKey = await getAccessKey(instanceYaml.org);
 
-  // Ensure the user is logged in or access key is available, or advertise
-  if (!accessKey && !isLoggedIn()) {
-    cli.advertise();
-  }
+  const meta = `Action: "${command}" - Stage: "${instanceYaml.stage}" - Org: "${instanceYaml.org}" - App: "${instanceYaml.app}" - Name: "${instanceYaml.name}"`;
+
   // Presentation
   if (!config.debug) {
     cli.logLogo();
-  } else if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
-    cli.log('Running in Platform Dev stage');
+    cli.log(meta, 'grey');
+  } else {
+    cli.log(meta);
   }
 
-  const meta = `Action: "${command}" - Stage: "${instanceYaml.stage}" - Org: "${instanceYaml.org}" - App: "${instanceYaml.app}" - Name: "${instanceYaml.name}"`;
-  cli.log(meta);
-
-  cli.status('Initializing', instanceYaml.name);
+  if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
+    cli.log('Running in Platform Dev stage');
+  }
 
   // Load Instance Credentials
   const instanceCredentials = await loadInstanceCredentials(instanceYaml.stage);
@@ -94,6 +102,9 @@ module.exports = async (config, cli, command) => {
       });
     }
 
+    /**
+     * Prepare notification promise
+     */
     let deferredNotificationsData;
     if (command === 'deploy') {
       deferredNotificationsData = requestNotification(
@@ -110,16 +121,21 @@ module.exports = async (config, cli, command) => {
       }
 
       // run deploy
-      cli.status('Deploying', null, 'white');
+      cli.sessionStatus('Deploying');
       const instance = await sdk.deploy(instanceYaml, instanceCredentials, options);
       cli.log();
       cli.logOutputs(instance.outputs);
 
-      // commenting out dashboard URL for now until the dashboard is usable
-      // cli.log()
-      // cli.log(`${chalk.grey(`Full details: ${dashboardUrl}`)}`)
+      cli.log();
+      cli.log(
+        `Full details: ${getDashboardUrl(
+          `/${instanceYaml.org}/apps/${instanceYaml.app || instanceYaml.name}/${
+            instanceYaml.name
+          }/${instanceYaml.stage}`
+        )}`
+      );
     } else if (command === 'remove') {
-      cli.status('Removing', null, 'white');
+      cli.sessionStatus('Removing', null, 'white');
 
       // The "inputs" in serverless.yml are only for deploy.  Remove them for all other commands
       instanceYaml.inputs = {};
@@ -132,14 +148,14 @@ module.exports = async (config, cli, command) => {
       // The "inputs" in serverless.yml are only for deploy.  Remove them for all other commands
       instanceYaml.inputs = {};
 
-      cli.status('Running', null, 'white');
+      cli.sessionStatus('Running', null, 'white');
       const instance = await sdk.run(command, instanceYaml, instanceCredentials, options);
 
       cli.log();
       cli.logOutputs(instance.outputs);
     }
 
-    cli.close('success', 'Success');
+    cli.sessionStop('success', 'Success');
     if (deferredNotificationsData) printNotification(cli, await deferredNotificationsData);
   } finally {
     sdk.disconnect();

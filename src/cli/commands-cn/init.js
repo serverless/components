@@ -15,7 +15,7 @@ const pipeline = promisify(require('stream.pipeline-shim'));
 
 module.exports = async (config, cli) => {
   // Start CLI persistance status
-  cli.start('Initializing', { timer: false });
+  cli.sessionStart('Initializing', { timer: false });
 
   // Presentation
   cli.logLogo();
@@ -32,12 +32,12 @@ module.exports = async (config, cli) => {
     throw new Error(`Template "${templateName}" does not exist.`);
   }
 
-  cli.status('Downloading', templateName);
+  cli.sessionStatus('Downloading', templateName);
 
   const tmpFilename = path.resolve(process.cwd(), path.basename(template.downloadKey));
   await pipeline(got.stream(template.downloadUrl), fs.createWriteStream(tmpFilename));
 
-  cli.status('Creating', templateName);
+  cli.sessionStatus('Creating', templateName);
   const zip = new AdmZip(tmpFilename);
   zip.extractAllTo(path.resolve(process.cwd(), template.name));
   await fs.promises.unlink(tmpFilename);
@@ -48,5 +48,6 @@ module.exports = async (config, cli) => {
 
   cli.log('- Whenever you\'re ready, run "serverless deploy" to deploy your new instance.');
 
-  cli.close('success', 'Created');
+  cli.sessionStop('success', 'Created');
+  return null;
 };

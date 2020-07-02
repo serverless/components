@@ -12,7 +12,7 @@ const moment = require('moment');
 
 module.exports = async (config, cli) => {
   // Start CLI persistance status
-  cli.start('Initializing', { timer: false });
+  cli.sessionStart('Initializing', { timer: false });
 
   await utils.login();
 
@@ -27,14 +27,14 @@ module.exports = async (config, cli) => {
   cli.logLogo();
   cli.log();
 
-  cli.status('Initializing', instanceYaml.name);
+  cli.sessionStatus('Initializing', instanceYaml.name);
 
   // initialize SDK
   const sdk = new ServerlessSDK();
 
   // don't show the status in debug mode due to formatting issues
   if (!config.debug) {
-    cli.status('Loading Info', null, 'white');
+    cli.sessionStatus('Loading Info', null, 'white');
   }
 
   // Fetch info
@@ -97,5 +97,6 @@ module.exports = async (config, cli) => {
     cli.logOutputs(instance.outputs);
   }
 
-  cli.close('success', 'Info successfully loaded');
+  cli.sessionStop('success', 'Info successfully loaded');
+  return null;
 };

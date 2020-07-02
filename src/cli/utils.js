@@ -293,6 +293,7 @@ const loadInstanceConfigUncached = (directoryPath) => {
     instanceFile.stage = 'dev';
   }
 
+  // If no app, set it from the "name" property
   if (!instanceFile.app) {
     instanceFile.app = instanceFile.name;
   }
@@ -585,10 +586,32 @@ const executeGraph = async (allComponents, command, graph, cli, sdk, credentials
       const instanceYaml = allComponents[instanceName];
 
       if (command === 'remove') {
-        const instance = await sdk.remove(instanceYaml, credentials, options);
+        let instance;
+        try {
+          instance = await sdk.remove(instanceYaml, credentials, options);
+        } catch (error) {
+          error.message = `${instanceYaml.name}: ${error.message}`;
+          if (!options.debug) {
+            cli.log();
+          }
+          cli.log(error.message, 'red');
+          allComponents[instanceName].error = error;
+          return null;
+        }
         allComponents[instanceName].outputs = instance.outputs || {};
       } else {
-        const instance = await sdk.deploy(instanceYaml, credentials, options);
+        let instance;
+        try {
+          instance = await sdk.deploy(instanceYaml, credentials, options);
+        } catch (error) {
+          error.message = `${instanceYaml.name}: ${error.message}`;
+          if (!options.debug) {
+            cli.log();
+          }
+          cli.log(error.message, 'red');
+          allComponents[instanceName].error = error;
+          return null;
+        }
 
         const outputs = {};
         outputs[instanceName] = instance.outputs;
@@ -600,6 +623,7 @@ const executeGraph = async (allComponents, command, graph, cli, sdk, credentials
 
         allComponents[instanceName].outputs = instance.outputs || {};
       }
+      return null;
     };
 
     promises.push(fn());
@@ -612,6 +636,27 @@ const executeGraph = async (allComponents, command, graph, cli, sdk, credentials
   }
 
   return executeGraph(allComponents, command, graph, cli, sdk, credentials, options);
+};
+
+/**
+ * Detect if the user is located in China by looking at their settings
+ */
+const isChinaUser = () => {
+  let result;
+  if (
+    process.env.SERVERLESS_PLATFORM_VENDOR === 'tencent' ||
+    process.env.SLS_GEO_LOCATION === 'cn'
+  ) {
+    result = true;
+  } else if (process.env.SERVERLESS_PLATFORM_VENDOR === 'aws') {
+    result = false;
+  } else {
+    result = new Intl.DateTimeFormat('en', { timeZoneName: 'long' })
+      .format()
+      .includes('China Standard Time');
+  }
+
+  return result;
 };
 
 module.exports = {
@@ -638,4 +683,5 @@ module.exports = {
   validateGraph,
   createGraph,
   executeGraph,
+  isChinaUser,
 };

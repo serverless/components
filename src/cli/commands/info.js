@@ -5,28 +5,33 @@
  */
 
 const { ServerlessSDK } = require('@serverless/platform-client');
-const { getAccessKey, isLoggedIn, loadInstanceConfig } = require('./utils');
+const {
+  getAccessKey,
+  loadInstanceConfig,
+  isLoggedInOrHasAccessKey,
+  getDashboardUrl,
+} = require('./utils');
 const chalk = require('chalk');
 const moment = require('moment');
 
 module.exports = async (config, cli) => {
+  // Ensure the user is logged in or access key is available, or advertise
+  if (!isLoggedInOrHasAccessKey()) {
+    cli.logAdvertisement();
+    cli.sessionStop('error', 'Please log in by running "serverless login"');
+    return null;
+  }
+
   // Start CLI persistance status
-  cli.start('Initializing', { timer: false });
+  cli.sessionStart('Fetching App Info', { timer: false });
 
   // Load YAML
   const instanceYaml = await loadInstanceConfig(process.cwd());
   // Get access key
   const accessKey = await getAccessKey(instanceYaml.org);
 
-  // Ensure the user is logged in or access key is available, or advertise
-  if (!accessKey && !isLoggedIn()) {
-    cli.advertise();
-  }
-
   // Presentation
   cli.logLogo();
-
-  cli.status('Initializing', instanceYaml.name);
 
   const meta = `Action: "info" - Stage: "${instanceYaml.stage}" - Org: "${instanceYaml.org}" - App: "${instanceYaml.app}" - Name: "${instanceYaml.name}"`;
   cli.log(meta, 'grey');
@@ -35,11 +40,6 @@ module.exports = async (config, cli) => {
   const sdk = new ServerlessSDK({
     accessKey,
   });
-
-  // don't show the status in debug mode due to formatting issues
-  if (!config.debug) {
-    cli.status('Loading Info', null, 'white');
-  }
 
   // Fetch info
   let instance = await sdk.getInstance(
@@ -74,29 +74,40 @@ module.exports = async (config, cli) => {
   }
 
   cli.log();
-  cli.log(`${chalk.grey('Last Action:')}  ${instance.lastAction} (${lastActionAgo})`);
-  cli.log(`${chalk.grey('Deployments:')}  ${instance.instanceMetrics.deployments}`);
-  cli.log(`${chalk.grey('Status:')}       ${statusLog}`);
+  cli.log(`${'Last Action:'}  ${instance.lastAction} (${lastActionAgo})`);
+  cli.log(`${'Deployments:'}  ${instance.instanceMetrics.deployments}`);
+  cli.log(`${'Status:'}       ${statusLog}`);
 
   // show error stack if available
   if (instance.deploymentErrorStack) {
     cli.log();
-    cli.log(chalk.red(instance.deploymentErrorStack));
+    cli.log(instance.deploymentErrorStack, 'red');
   }
-  // cli.log(`${chalk.grey('More Info:')}    ${dashboardUrl}`)
 
   // show state only in debug mode
   if (config.debug) {
     cli.log();
-    cli.log(`${chalk.grey('State:')}`);
+    cli.log(`${'State:'}`);
     cli.log();
     cli.logOutputs(instance.state);
-    cli.log();
-    cli.log(`${chalk.grey('Outputs:')}`);
   }
 
+  // Outputs
+  cli.log();
+  cli.log(`${'Outputs:'}`);
   cli.log();
   cli.logOutputs(instance.outputs);
 
-  cli.close('success', 'Info successfully loaded');
+  cli.log();
+  cli.log(
+    `Full details: ${getDashboardUrl(
+      `/${instance.orgName}/apps/${instance.appName || instance.instanceName}/${
+        instance.instanceName
+      }/${instance.stageName}`
+    )}`
+  );
+
+  cli.sessionStop('success', 'App info fetched');
+
+  return null;
 };

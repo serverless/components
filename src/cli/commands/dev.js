@@ -7,9 +7,9 @@
 const { ServerlessSDK } = require('@serverless/platform-client');
 const {
   getAccessKey,
-  isLoggedIn,
   loadInstanceConfig,
   loadInstanceCredentials,
+  isLoggedInOrHasAccessKey,
 } = require('./utils');
 
 module.exports = async (config, cli) => {
@@ -17,20 +17,38 @@ module.exports = async (config, cli) => {
   const closeHandler = async () => {
     // Set new close listener
     process.on('SIGINT', () => {
-      cli.close('error', 'Dev Mode Canceled.  Run "serverless deploy" To Remove Dev Mode Agent.');
+      cli.sessionStop(
+        'error',
+        'Dev Mode canceled.  Run "serverless deploy" to remove dev mode agent.'
+      );
       process.exit();
     });
 
     sdk.disconnect();
-    cli.status('Disabling Dev Mode & Closing', null, 'green');
-    await sdk.deploy(instanceYaml, instanceCredentials);
+    cli.sessionStatus('Disabling Dev Mode & closing', null, 'green');
+
+    // Remove agent from application
+    try {
+      await sdk.deploy(instanceYaml, instanceCredentials);
+    } catch (error) {
+      cli.logError(error.message);
+    }
 
     await cli.watcher.close();
-    cli.close('success', 'Dev Mode Closed');
+    cli.sessionStop('success', 'Dev Mode closed');
+
+    return null;
   };
 
+  // Ensure the user is logged in or access key is available, or advertise
+  if (!isLoggedInOrHasAccessKey()) {
+    cli.logAdvertisement();
+    cli.sessionStop('error', 'Please log in by running "serverless login"');
+    return null;
+  }
+
   // Start CLI persistance status
-  cli.start('Initializing', { closeHandler });
+  cli.sessionStart('Initializing', { closeHandler });
 
   // Load serverless component instance.  Submit a directory where its config files should be.
   let instanceYaml = await loadInstanceConfig(process.cwd(), { disableCache: true });
@@ -40,11 +58,6 @@ module.exports = async (config, cli) => {
 
   // Get access key
   const accessKey = await getAccessKey(instanceYaml.org);
-
-  // Ensure the user is logged in or access key is available, or advertise
-  if (!accessKey && !isLoggedIn()) {
-    cli.advertise();
-  }
 
   // Presentation
   cli.logLogo();
@@ -61,7 +74,7 @@ module.exports = async (config, cli) => {
     },
   });
 
-  cli.status('Initializing', instanceYaml.name);
+  cli.sessionStatus('Initializing');
 
   /**
    * Event Handler tells this client what to do with Serverless Platform Events received via websockets
@@ -75,13 +88,13 @@ module.exports = async (config, cli) => {
       const header = `${d.toLocaleTimeString()} - ${event.instanceName} - deployment`;
       cli.log(header, 'grey');
       cli.logOutputs(event.data.outputs);
-      cli.status('Watching');
+      cli.sessionStatus('Watching');
     }
     if (event.event === 'instance.deployment.failed') {
       const header = `${d.toLocaleTimeString()} - ${event.instanceName} - deployment error`;
       cli.log(header, 'grey');
       cli.log(event.data.stack, 'red');
-      cli.status('Watching');
+      cli.sessionStatus('Watching');
     }
 
     // Logs
@@ -211,8 +224,14 @@ module.exports = async (config, cli) => {
   cli.watch(process.cwd(), { ignored });
 
   cli.watcher.on('ready', async () => {
-    cli.status('Enabling Dev Mode', null, 'green');
-    await sdk.deploy(instanceYaml, instanceCredentials, { dev: true });
+    cli.sessionStatus('Initializing Dev Mode', null, 'green');
+
+    try {
+      await sdk.deploy(instanceYaml, instanceCredentials, { dev: true });
+    } catch (error) {
+      cli.logError(error.message);
+      cli.sessionStatus('Watching');
+    }
   });
 
   cli.watcher.on('change', async () => {
@@ -230,19 +249,33 @@ module.exports = async (config, cli) => {
     // If it's not processin and there is no queued operation
     if (!isProcessing) {
       isProcessing = true;
-      cli.status('Deploying', null, 'green');
+      cli.sessionStatus('Deploying', null, 'green');
       // reload serverless component instance
       instanceYaml = await loadInstanceConfig(process.cwd(), { disableCache: true });
-      await sdk.deploy(instanceYaml, instanceCredentials, { dev: true });
+
+      try {
+        await sdk.deploy(instanceYaml, instanceCredentials, { dev: true });
+      } catch (error) {
+        cli.logError(error.message);
+        cli.sessionStatus('Watching');
+      }
+
       if (queuedOperation) {
-        cli.status('Deploying', null, 'green');
+        cli.sessionStatus('Deploying', null, 'green');
         // reload serverless component instance
         instanceYaml = await loadInstanceConfig(process.cwd(), { disableCache: true });
-        await sdk.deploy(instanceYaml, instanceCredentials, { dev: true });
+        try {
+          await sdk.deploy(instanceYaml, instanceCredentials, { dev: true });
+        } catch (error) {
+          cli.logError(error.message);
+          cli.sessionStatus('Watching');
+        }
       }
 
       isProcessing = false;
       queuedOperation = false;
     }
   });
+
+  return null;
 };

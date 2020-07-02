@@ -5,42 +5,49 @@
  */
 
 const path = require('path');
-const minimist = require('minimist');
-const dotenv = require('dotenv');
-const { loadInstanceConfig, fileExistsSync } = require('./utils');
-const {
-  utils: { isChinaUser },
-} = require('@serverless/platform-client-china');
-const CLI = require('./CLI');
-const { isProjectPath } = require('./utils');
 const http = require('http');
 const https = require('https');
+const minimist = require('minimist');
+const dotenv = require('dotenv');
 const semver = require('semver');
 const chalk = require('chalk');
 const HttpsProxyAgent = require('https-proxy-agent');
+const CLI = require('./CLI');
+const { loadInstanceConfig, fileExistsSync, isProjectPath, isChinaUser } = require('./utils');
 
 module.exports = async () => {
   const args = minimist(process.argv.slice(2));
   const instanceConfig = loadInstanceConfig(process.cwd());
   const stage = args.stage || (instanceConfig && instanceConfig.stage) || 'dev';
 
-  // Load environment variables from eventual .env files
-  // Look in current working directory first, and the parent directory second
+  /**
+   * Load environment variables from .env files, 2 directories up
+   * Nearest to current working directory is preferred
+   */
   const defaultEnvFilePath = path.join(process.cwd(), '.env');
   const stageEnvFilePath = path.join(process.cwd(), `.env.${stage}`);
-  const parentDefaultEnvFilePath = path.join(process.cwd(), '..', '.env');
-  const parentStageEnvFilePath = path.join(process.cwd(), '..', `.env.${stage}`);
+  const firstParentDefaultEnvFilePath = path.join(process.cwd(), '..', '.env');
+  const firstParentStageEnvFilePath = path.join(process.cwd(), '..', `.env.${stage}`);
+  const secondParentDefaultEnvFilePath = path.join(process.cwd(), '../..', '.env');
+  const secondParentStageEnvFilePath = path.join(process.cwd(), '../..', `.env.${stage}`);
+
   if (stage && fileExistsSync(stageEnvFilePath)) {
     dotenv.config({ path: path.resolve(stageEnvFilePath) });
   } else if (fileExistsSync(defaultEnvFilePath)) {
     dotenv.config({ path: path.resolve(defaultEnvFilePath) });
-  } else if (fileExistsSync(parentStageEnvFilePath)) {
-    dotenv.config({ path: path.resolve(parentStageEnvFilePath) });
-  } else if (fileExistsSync(parentDefaultEnvFilePath)) {
-    dotenv.config({ path: path.resolve(parentDefaultEnvFilePath) });
+  } else if (fileExistsSync(firstParentStageEnvFilePath)) {
+    dotenv.config({ path: path.resolve(firstParentStageEnvFilePath) });
+  } else if (fileExistsSync(firstParentDefaultEnvFilePath)) {
+    dotenv.config({ path: path.resolve(firstParentDefaultEnvFilePath) });
+  } else if (fileExistsSync(secondParentDefaultEnvFilePath)) {
+    dotenv.config({ path: path.resolve(secondParentDefaultEnvFilePath) });
+  } else if (fileExistsSync(secondParentStageEnvFilePath)) {
+    dotenv.config({ path: path.resolve(secondParentStageEnvFilePath) });
   }
 
-  // set global proxy agent if it's configured in environment variable
+  /**
+   * Set global proxy agent if it's configured in environment variable
+   */
   if (process.env.HTTP_PROXY || process.env.HTTPS_PROXY) {
     if (semver.gte(process.version, 'v11.7.0')) {
       // save default global agent in case we want to restore them
@@ -58,6 +65,9 @@ module.exports = async () => {
     }
   }
 
+  /**
+   * Handle interactive onboarding when using the "serverless" command for China-based users
+   */
   if (process.argv.length === 2 && isChinaUser() && !(await isProjectPath(process.cwd()))) {
     // Interactive onboarding
     return require('./interactive-onboarding/cn')();
@@ -72,8 +82,11 @@ module.exports = async () => {
 
   let command = args._[0] || 'deploy';
 
-  // publish is just an alias for registry publish
-  // we also wanna keep the other registry functionality
+  /**
+   * Intercept "publish" command.  Any "registry" command is also intercepted.
+   * publish is just an alias for registry publish
+   * we also wanna keep the other registry functionality
+   */
   if (command === 'publish') {
     command = 'registry';
     args._[1] = 'publish';
@@ -105,12 +118,13 @@ module.exports = async () => {
   if (args.stage && !process.env.SERVERLESS_STAGE) {
     process.env.SERVERLESS_STAGE = args.stage;
   }
-  // Start CLI process
+
+  // Initialize CLI utilities
   const cli = new CLI(config);
 
+  // Handle version command. Log and exit.
+  // TODO: Move this to a command file like all others. Don't handle this here.
   const checkingVersion = args._[0] === 'version' || args.version || args.v;
-
-  // if the user is checking the version, just log it and exit
   if (checkingVersion) {
     return cli.logVersion();
   }
@@ -122,7 +136,14 @@ module.exports = async () => {
       await commands.run(config, cli, command);
     }
   } catch (e) {
-    return cli.error(e);
+    process.exitCode = 1;
+
+    if (cli.isSessionActive()) {
+      cli.sessionStop('error', e);
+    } else {
+      cli.log();
+      cli.logError(e);
+    }
   }
 
   return null;

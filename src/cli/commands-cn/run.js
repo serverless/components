@@ -20,7 +20,7 @@ module.exports = async (config, cli, command) => {
   }
 
   // Start CLI persistance status
-  cli.start('Initializing', { timer: true });
+  cli.sessionStart('Initializing', { timer: true });
 
   await utils.login();
 
@@ -40,7 +40,7 @@ module.exports = async (config, cli, command) => {
     cli.log(meta);
   }
 
-  cli.status('Initializing', instanceYaml.name);
+  cli.sessionStatus('Initializing', instanceYaml.name);
 
   // Load Instance Credentials
   const instanceCredentials = await utils.loadInstanceCredentials(instanceYaml.stage);
@@ -76,12 +76,12 @@ module.exports = async (config, cli, command) => {
     }
 
     // run deploy
-    cli.status('Initializing', null, 'white');
+    cli.sessionStatus('Initializing', null, 'white');
     options.statusReceiver = (statusMsg) => {
       if (statusMsg) {
-        cli.status(statusMsg, null, 'white');
+        cli.sessionStatus(statusMsg, null, 'white');
       } else {
-        cli.status('Deploying', null, 'white');
+        cli.sessionStatus('Deploying', null, 'white');
       }
     };
     const instance = await sdk.deploy(instanceYaml, instanceCredentials, options);
@@ -97,7 +97,7 @@ module.exports = async (config, cli, command) => {
     }
   } else if (command === 'remove') {
     // run remove
-    cli.status('Removing', null, 'white');
+    cli.sessionStatus('Removing', null, 'white');
     await sdk.remove(instanceYaml, instanceCredentials, options);
   } else if (command === 'login') {
     // we have do login upside, so if command is login, do nothing here
@@ -107,13 +107,13 @@ module.exports = async (config, cli, command) => {
     options.sync = true;
 
     // run a custom method
-    cli.status('Running', null, 'white');
+    cli.sessionStatus('Running', null, 'white');
     const instance = await sdk.run(command, instanceYaml, instanceCredentials, options);
 
     cli.log();
     cli.logOutputs(instance.outputs);
   }
-  cli.close('success', 'Success');
+  cli.sessionStop('success', 'Success');
 
   if (deferredNotificationsData) printNotification(cli, await deferredNotificationsData);
   return null;

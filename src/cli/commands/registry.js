@@ -2,6 +2,7 @@
 
 /*
  * CLI: Command: Registry
+ * - Handles multiple commands related to the Registry.
  */
 
 const { ServerlessSDK } = require('@serverless/platform-client');
@@ -9,7 +10,12 @@ const path = require('path');
 const {
   promises: { readFile },
 } = require('fs');
-const { getAccessKey, isLoggedIn, getDefaultOrgName, getTemplate } = require('./utils');
+const {
+  getAccessKey,
+  getDefaultOrgName,
+  getTemplate,
+  isLoggedInOrHasAccessKey,
+} = require('./utils');
 const { fileExists, loadComponentConfig } = require('../utils');
 const { loadServerlessFile } = require('../serverlessFile');
 
@@ -19,19 +25,21 @@ const { loadServerlessFile } = require('../serverlessFile');
  * @param {*} cli
  */
 const publish = async (config, cli) => {
+  // Ensure the user is logged in or access key is available, or advertise
+  if (!isLoggedInOrHasAccessKey()) {
+    cli.logAdvertisement();
+    cli.sessionStop('error', 'Please log in by running "serverless login"');
+    return null;
+  }
+
   // Disable timer
   config.timer = false;
 
   // Start CLI persistance status
-  cli.start('Initializing');
+  cli.sessionStart('Initializing');
 
   // Get access key
   const accessKey = await getAccessKey();
-
-  // Ensure the user is logged in or access key is available, or advertise
-  if (!accessKey && !isLoggedIn()) {
-    cli.advertise();
-  }
 
   let serverlessFile = await loadServerlessFile(process.cwd());
 
@@ -41,9 +49,8 @@ const publish = async (config, cli) => {
 
     // If no serverless.yml and no serverless.component.yml, there is nothing to publish in this cwd
     if (!serverlessFile && !serverlessComponentFile) {
-      return cli.error(
-        "Publish failed. The current working directory does not contain a 'serverless.yml' or 'serverless.component.yml'",
-        true
+      throw new Error(
+        'Publish failed. The current working directory does not contain a "serverless.yml" or "serverless.component.yml"'
       );
     }
 
@@ -69,7 +76,7 @@ const publish = async (config, cli) => {
   serverlessFile.org = serverlessFile.org || (await getDefaultOrgName());
 
   if (!serverlessFile.org) {
-    throw new Error('The "org" property is required');
+    throw new Error('"org" property is required in serverless.yml');
   }
 
   // cwd is the default src
@@ -82,7 +89,7 @@ const publish = async (config, cli) => {
     const serverlessJsFilePath = path.resolve(process.cwd(), serverlessFile.src, 'serverless.js');
 
     if (!(await fileExists(serverlessJsFilePath))) {
-      throw new Error('no serverless.js file was found in the "src" directory you specified.');
+      throw new Error('no "serverless.js" file was found in the "src" directory you specified.');
     }
   } else {
     // validate the template
@@ -90,16 +97,15 @@ const publish = async (config, cli) => {
   }
 
   // log message in case of component
-  let progressLogMsg = `Publishing "${serverlessFile.name}@${serverlessFile.version}"...`;
+  let initialStatus = `Publishing "${serverlessFile.name}@${serverlessFile.version}" to the Serverless Framework Registry`;
 
   // log message in case of template
   if (serverlessFile.type === 'template') {
-    progressLogMsg = `Publishing "${serverlessFile.name}"...`;
+    initialStatus = `Publishing "${serverlessFile.name}" to the Serverless Framework Registry`;
   }
 
   // Presentation
   cli.logRegistryLogo();
-  cli.log(progressLogMsg, 'grey');
 
   const sdk = new ServerlessSDK({ accessKey });
 
@@ -109,23 +115,23 @@ const publish = async (config, cli) => {
   }
 
   // Publish
-  cli.status('Publishing');
+  cli.sessionStatus(initialStatus);
 
   try {
     await sdk.publishToRegistry(serverlessFile);
     // log message in case of component
-    let successLogMsg = `Successfully published "${serverlessFile.name}@${serverlessFile.version}".`;
+    let successLogMsg = `Successfully published "${serverlessFile.name}@${serverlessFile.version}" to the Serverless Framework Registry.`;
 
     // log message in case of template
     if (serverlessFile.type === 'template') {
-      successLogMsg = `Successfully published "${serverlessFile.name}"...`;
+      successLogMsg = `Successfully published "${serverlessFile.name}" to the Serverless Framework Registry`;
     }
 
-    cli.close('success', successLogMsg);
+    cli.sessionStop('success', successLogMsg);
   } catch (error) {
     if (error.message.includes('409')) {
       error.message = error.message.replace('409 - ', '');
-      cli.error(error.message, true);
+      throw new Error(error.message);
     } else {
       throw error;
     }
@@ -143,7 +149,7 @@ const get = async (config, cli) => {
   const packageName = config.params[0];
 
   // Start CLI persistance status
-  cli.start(`Fetching data for: ${packageName}`);
+  cli.sessionStart(`Fetching "${packageName}" from the Serverless Framework Registry`);
 
   const sdk = new ServerlessSDK();
 
@@ -153,7 +159,7 @@ const get = async (config, cli) => {
     data = await sdk.getFromRegistry(packageName);
   } catch (error) {
     if (error.message && error.message.includes('404')) {
-      return cli.error(error.message, true);
+      throw new Error(`"${packageName}" is not published in the Serverless Framework Registry`);
     }
     throw error;
   }
@@ -202,7 +208,7 @@ const get = async (config, cli) => {
     }
   }
 
-  cli.close('success', `Package data listed for "${packageName}"`);
+  cli.sessionStop('success', `"${packageName}" fetched from the Serverless Framework Registry`);
 
   return null;
 };
@@ -216,16 +222,20 @@ const listFeatured = async (config, cli) => {
   cli.logRegistryLogo();
   cli.log();
 
-  cli.log('Featured Components:');
-  cli.log();
-  cli.log('  express - https://github.com/serverless-components/express');
-  cli.log('  website - https://github.com/serverless-components/website');
-  cli.log('  aws-lambda - https://github.com/serverless-components/aws-lambda');
-  cli.log('  aws-dynamodb - https://github.com/serverless-components/aws-dynamodb');
-  cli.log('  aws-iam-role - https://github.com/serverless-components/aws-iam-role');
-  cli.log('  aws-lambda-layer - https://github.com/serverless-components/aws-lambda-layer');
+  cli.log('Featured:');
+  // cli.log();
+  cli.log('• fullstack-app - https://github.com/serverless-components/fullstack-app');
+  cli.log('• express - https://github.com/serverless-components/express');
+  cli.log('• website - https://github.com/serverless-components/website');
+  cli.log('• graphql - https://github.com/serverless-components/graphql');
+  cli.log('• aws-lambda - https://github.com/serverless-components/aws-lambda');
+  cli.log('• aws-dynamodb - https://github.com/serverless-components/aws-dynamodb');
+  cli.log('• aws-iam-role - https://github.com/serverless-components/aws-iam-role');
+  cli.log('• aws-lambda-layer - https://github.com/serverless-components/aws-lambda-layer');
   cli.log();
   cli.log('Find more here: https://github.com/serverless-components');
+  cli.log();
+  cli.log('Run "serverless init <package>" to install');
   cli.log();
 };
 
