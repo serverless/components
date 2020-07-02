@@ -77,7 +77,7 @@ const publish = async (config, cli) => {
   cli.sessionStop(
     'success',
     `Successfully published ${registryPackage.name}${
-    registryPackage.type === 'template' ? '' : `@${registryPackage.version}`
+      registryPackage.type === 'template' ? '' : `@${registryPackage.version}`
     }`
   );
   return null;
@@ -99,7 +99,9 @@ const getPackage = async (config, cli) => {
   delete data.component;
 
   if (Object.keys(data).length === 0) {
-    throw new Error(`Registry package "${packageName}" not found in the Serverless Framework Registry.`)
+    throw new Error(
+      `Registry package "${packageName}" not found in the Serverless Framework Registry.`
+    );
   }
 
   const devVersion = data.versions.indexOf('0.0.0-dev');

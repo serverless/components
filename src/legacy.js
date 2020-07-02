@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * This logic intercepts ALL Serverless Framework commands, before the V.1 core starts. 
+ * This logic intercepts ALL Serverless Framework commands, before the V.1 core starts.
  * This checks to see if the Components CLI should take over.
  */
 

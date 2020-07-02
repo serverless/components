@@ -125,7 +125,7 @@ class CLI {
 
     // Render stack trace (if debug is on)
     if (reason === 'error') {
-      this.logErrorStackTrace(message)
+      this.logErrorStackTrace(message);
     }
 
     // Silent is used to skip the "Done" message
@@ -195,7 +195,7 @@ class CLI {
     process.stdout.write(ansiEscapes.eraseDown);
 
     // Render stack trace (if debug is on)
-    this.logErrorStackTrace(error)
+    this.logErrorStackTrace(error);
 
     let content = `${this._.entity} `;
     content += `${figures.pointerSmall} ${error.message}`;
@@ -203,6 +203,8 @@ class CLI {
     // Put cursor to starting position for next view
     console.log(os.EOL);
     process.stdout.write(ansiEscapes.cursorLeft);
+
+    return null;
   }
 
   /**
@@ -210,7 +212,6 @@ class CLI {
    * @param {error} error An instance of the Error class
    */
   logErrorStackTrace(error) {
-
     if (!this._.debug || !error.stack) {
       return null;
     }
@@ -220,7 +221,7 @@ class CLI {
       return null;
     }
 
-    if (!error instanceof Error) {
+    if (!(error instanceof Error)) {
       error = new Error(error);
     }
 
@@ -232,6 +233,8 @@ class CLI {
     console.log('', red(error.stack));
     // Put cursor to starting position for next view
     process.stdout.write(ansiEscapes.cursorLeft);
+
+    return null;
   }
 
   /**

@@ -53,8 +53,8 @@ module.exports = async (config, cli, command) => {
   const deferredNotificationsData =
     command === 'deploy'
       ? requestNotification(
-        Object.assign(generateNotificationsPayload(templateYaml), { command: 'deploy' })
-      )
+          Object.assign(generateNotificationsPayload(templateYaml), { command: 'deploy' })
+        )
       : null;
 
   if (command === 'remove') {

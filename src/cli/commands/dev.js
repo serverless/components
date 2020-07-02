@@ -17,7 +17,10 @@ module.exports = async (config, cli) => {
   const closeHandler = async () => {
     // Set new close listener
     process.on('SIGINT', () => {
-      cli.sessionStop('error', 'Dev Mode canceled.  Run "serverless deploy" to remove dev mode agent.');
+      cli.sessionStop(
+        'error',
+        'Dev Mode canceled.  Run "serverless deploy" to remove dev mode agent.'
+      );
       process.exit();
     });
 
@@ -28,13 +31,13 @@ module.exports = async (config, cli) => {
     try {
       await sdk.deploy(instanceYaml, instanceCredentials);
     } catch (error) {
-      cli.logError(error.message)
+      cli.logError(error.message);
     }
 
     await cli.watcher.close();
     cli.sessionStop('success', 'Dev Mode closed');
 
-    return null
+    return null;
   };
 
   // Ensure the user is logged in or access key is available, or advertise
@@ -163,7 +166,7 @@ module.exports = async (config, cli) => {
       if (event.data.path && event.data.httpMethod) {
         transactionType = `transaction - ${event.data.httpMethod.toUpperCase()} - ${
           event.data.path
-          }`;
+        }`;
       }
       // Default
       else {
@@ -226,7 +229,7 @@ module.exports = async (config, cli) => {
     try {
       await sdk.deploy(instanceYaml, instanceCredentials, { dev: true });
     } catch (error) {
-      cli.logError(error.message)
+      cli.logError(error.message);
       cli.sessionStatus('Watching');
     }
   });
@@ -253,7 +256,7 @@ module.exports = async (config, cli) => {
       try {
         await sdk.deploy(instanceYaml, instanceCredentials, { dev: true });
       } catch (error) {
-        cli.logError(error.message)
+        cli.logError(error.message);
         cli.sessionStatus('Watching');
       }
 
@@ -264,7 +267,7 @@ module.exports = async (config, cli) => {
         try {
           await sdk.deploy(instanceYaml, instanceCredentials, { dev: true });
         } catch (error) {
-          cli.logError(error.message)
+          cli.logError(error.message);
           cli.sessionStatus('Watching');
         }
       }

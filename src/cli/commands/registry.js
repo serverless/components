@@ -10,7 +10,12 @@ const path = require('path');
 const {
   promises: { readFile },
 } = require('fs');
-const { getAccessKey, getDefaultOrgName, getTemplate, isLoggedInOrHasAccessKey } = require('./utils');
+const {
+  getAccessKey,
+  getDefaultOrgName,
+  getTemplate,
+  isLoggedInOrHasAccessKey,
+} = require('./utils');
 const { fileExists, loadComponentConfig } = require('../utils');
 const { loadServerlessFile } = require('../serverlessFile');
 
@@ -20,7 +25,6 @@ const { loadServerlessFile } = require('../serverlessFile');
  * @param {*} cli
  */
 const publish = async (config, cli) => {
-
   // Ensure the user is logged in or access key is available, or advertise
   if (!isLoggedInOrHasAccessKey()) {
     cli.logAdvertisement();
@@ -45,7 +49,9 @@ const publish = async (config, cli) => {
 
     // If no serverless.yml and no serverless.component.yml, there is nothing to publish in this cwd
     if (!serverlessFile && !serverlessComponentFile) {
-      throw new Error('Publish failed. The current working directory does not contain a "serverless.yml" or "serverless.component.yml"');
+      throw new Error(
+        'Publish failed. The current working directory does not contain a "serverless.yml" or "serverless.component.yml"'
+      );
     }
 
     serverlessFile = serverlessComponentFile;
@@ -125,7 +131,7 @@ const publish = async (config, cli) => {
   } catch (error) {
     if (error.message.includes('409')) {
       error.message = error.message.replace('409 - ', '');
-      throw new Error(error.message)
+      throw new Error(error.message);
     } else {
       throw error;
     }

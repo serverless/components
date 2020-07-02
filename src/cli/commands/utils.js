@@ -29,20 +29,18 @@ const {
 
 /**
  * Get the URL of the Serverless Framework Dashboard
- * @param {string} path a url path to add to the hostname
+ * @param {string} urlPath a url path to add to the hostname
  */
-const getDashboardUrl = (path) => {
-
-  if (path && path.charAt(0) !== '/') {
-    path = `/${path}`
+const getDashboardUrl = (urlPath) => {
+  if (urlPath && urlPath.charAt(0) !== '/') {
+    urlPath = `/${urlPath}`;
   }
 
   if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
-    return `https://app.serverless-dev.com${path || ''}`
-  } else {
-    return `https://app.serverless.com${path || ''}`
+    return `https://app.serverless-dev.com${path || ''}`;
   }
-}
+  return `https://app.serverless.com${path || ''}`;
+};
 
 /**
  * Get default org name by fetching all Orgs and picking the first one which the user is the owner of
@@ -248,15 +246,14 @@ const loadVendorInstanceConfig = async (directoryPath, options = { disableCache:
  * Check whether the user is logged in or has an Access Key as an environment variable.  Returns true or false.
  */
 const isLoggedInOrHasAccessKey = () => {
-  let result = isLoggedIn()
+  let result = isLoggedIn();
   if (!result) {
     if (process.env.SERVERLESS_ACCESS_KEY) {
-      result = true
+      result = true;
     }
   }
   return result;
 };
-
 
 /**
  * Check whether the user is logged in

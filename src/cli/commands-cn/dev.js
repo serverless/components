@@ -132,10 +132,9 @@ module.exports = async (config, cli) => {
     if (await updateDeploymentStatus(cli, deployedInstance, false)) {
       cli.sessionStop('success', 'Dev Mode Closed');
       return null;
-    } else {
-      cli.sessionStop('error', 'Deployment failed. Run "serverless deploy" to deploy again.');
-      return null;
     }
+    cli.sessionStop('error', 'Deployment failed. Run "serverless deploy" to deploy again.');
+    return null;
   };
 
   // Start CLI persistance status

@@ -5,7 +5,12 @@
  */
 
 const { ServerlessSDK } = require('@serverless/platform-client');
-const { getAccessKey, loadInstanceConfig, isLoggedInOrHasAccessKey, getDashboardUrl } = require('./utils');
+const {
+  getAccessKey,
+  loadInstanceConfig,
+  isLoggedInOrHasAccessKey,
+  getDashboardUrl,
+} = require('./utils');
 const chalk = require('chalk');
 const moment = require('moment');
 
@@ -69,9 +74,9 @@ module.exports = async (config, cli) => {
   }
 
   cli.log();
-  cli.log(`${('Last Action:')}  ${instance.lastAction} (${lastActionAgo})`);
-  cli.log(`${('Deployments:')}  ${instance.instanceMetrics.deployments}`);
-  cli.log(`${('Status:')}       ${statusLog}`);
+  cli.log(`${'Last Action:'}  ${instance.lastAction} (${lastActionAgo})`);
+  cli.log(`${'Deployments:'}  ${instance.instanceMetrics.deployments}`);
+  cli.log(`${'Status:'}       ${statusLog}`);
 
   // show error stack if available
   if (instance.deploymentErrorStack) {
@@ -82,19 +87,25 @@ module.exports = async (config, cli) => {
   // show state only in debug mode
   if (config.debug) {
     cli.log();
-    cli.log(`${('State:')}`);
+    cli.log(`${'State:'}`);
     cli.log();
     cli.logOutputs(instance.state);
   }
 
   // Outputs
   cli.log();
-  cli.log(`${('Outputs:')}`);
+  cli.log(`${'Outputs:'}`);
   cli.log();
   cli.logOutputs(instance.outputs);
 
-  cli.log()
-  cli.log(`Full details: ${getDashboardUrl(`/${instance.orgName}/apps/${instance.appName || instance.instanceName}/${instance.instanceName}/${instance.stageName}`)}`)
+  cli.log();
+  cli.log(
+    `Full details: ${getDashboardUrl(
+      `/${instance.orgName}/apps/${instance.appName || instance.instanceName}/${
+        instance.instanceName
+      }/${instance.stageName}`
+    )}`
+  );
 
   cli.sessionStop('success', 'App info fetched');
 

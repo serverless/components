@@ -41,7 +41,7 @@ const run = async (cli, cliParam) => {
       // Code doesn't exist
       if (error.response && error.response.status === 404) {
         throw new Error(`App token "${cliParam}" doesn't exist
-        \nGo to https://app.serverless.com to generate a new app token`)
+        \nGo to https://app.serverless.com to generate a new app token`);
       }
       throw error;
     }
@@ -52,7 +52,7 @@ const run = async (cli, cliParam) => {
       data = await sdk.getFromRegistry(cliParam);
     } catch (sdkError) {
       throw new Error(`Can't find package: "${cliParam}" in the Serverless Registry 
-      \nRun "sls registry" to see featured packages...`)
+      \nRun "sls registry" to see featured packages...`);
     }
     directory = cliParam;
     serviceName = cliParam;
@@ -65,7 +65,9 @@ const run = async (cli, cliParam) => {
     await fs.mkdir(directory);
   } catch (error) {
     if (error.code === 'EEXIST') {
-      throw new Error(`Directory "${directory}" already exists. Please re-run init in a different directory`)
+      throw new Error(
+        `Directory "${directory}" already exists. Please re-run init in a different directory`
+      );
     }
     throw error;
   }
@@ -100,7 +102,7 @@ const run = async (cli, cliParam) => {
 const init = async (config, cli) => {
   const maybeToken = config.params[0];
   if (!maybeToken) {
-    throw new Error('"init" command requires either a token or package name from the Registry')
+    throw new Error('"init" command requires either a token or package name from the Registry');
   }
   cli.logLogo();
   const serviceDir = await run(cli, config.params[0]);

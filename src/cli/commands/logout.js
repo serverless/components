@@ -18,4 +18,6 @@ module.exports = async (config, cli) => {
 
   cli.sessionStatus('Logged Out');
   cli.sessionStop('success', `Successfully logged out "${user.username}"`);
+
+  return null;
 };

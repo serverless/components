@@ -1,3 +1,5 @@
+/* eslint no-restricted-syntax: 0 */
+
 'use strict';
 
 const { ServerlessSDK } = require('@serverless/platform-client');
@@ -8,13 +10,17 @@ const {
   createGraph,
   executeGraph,
 } = require('../utils');
-const { getAccessKey, loadInstanceCredentials, getTemplate, isLoggedInOrHasAccessKey } = require('./utils');
+const {
+  getAccessKey,
+  loadInstanceCredentials,
+  getTemplate,
+  isLoggedInOrHasAccessKey,
+} = require('./utils');
 const generateNotificationsPayload = require('../notifications/generate-payload');
 const requestNotification = require('../notifications/request');
 const printNotification = require('../notifications/print-notification');
 
 module.exports = async (config, cli, command) => {
-
   // Ensure the user is logged in or access key is available, or advertise
   if (!isLoggedInOrHasAccessKey()) {
     cli.logAdvertisement();
@@ -99,8 +105,8 @@ module.exports = async (config, cli, command) => {
     const deferredNotificationsData =
       command === 'deploy'
         ? requestNotification(
-          Object.assign(generateNotificationsPayload(templateYaml), { command: 'deploy' })
-        )
+            Object.assign(generateNotificationsPayload(templateYaml), { command: 'deploy' })
+          )
         : null;
 
     if (command === 'remove') {
@@ -113,7 +119,7 @@ module.exports = async (config, cli, command) => {
 
     const allComponentsWithDependencies = setDependencies(allComponents);
 
-    let graph = createGraph(allComponentsWithDependencies, command);
+    const graph = createGraph(allComponentsWithDependencies, command);
 
     const allComponentsWithOutputs = await executeGraph(
       allComponentsWithDependencies,
@@ -126,17 +132,26 @@ module.exports = async (config, cli, command) => {
     );
 
     // Check for errors
-    const succeeded = []
-    const failed = []
-    for (let component in allComponentsWithOutputs) {
-      const c = allComponentsWithOutputs[component]
-      if (c.error) { failed.push(c.name) }
-      if (c.outputs) { succeeded.push(c.name) }
+    const succeeded = [];
+    const failed = [];
+    for (const component in allComponentsWithOutputs) {
+      if (Object.prototype.hasOwnProperty.call(allComponentsWithOutputs, component)) {
+        const c = allComponentsWithOutputs[component];
+        if (c.error) {
+          failed.push(c.name);
+        }
+        if (c.outputs) {
+          succeeded.push(c.name);
+        }
+      }
     }
 
     if (failed.length) {
-      cli.sessionStop('error', `Errors: "${command}" ran for ${succeeded.length} apps successfully. ${failed.length} failed.`)
-      return null
+      cli.sessionStop(
+        'error',
+        `Errors: "${command}" ran for ${succeeded.length} apps successfully. ${failed.length} failed.`
+      );
+      return null;
     }
 
     // don't show outputs if removing
@@ -152,10 +167,12 @@ module.exports = async (config, cli, command) => {
       }
     }
 
-    cli.sessionStop('success', `"${command}" ran for ${succeeded.length} apps successfully.`)
+    cli.sessionStop('success', `"${command}" ran for ${succeeded.length} apps successfully.`);
 
     if (deferredNotificationsData) printNotification(cli, await deferredNotificationsData);
   } finally {
     sdk.disconnect();
   }
+
+  return null;
 };

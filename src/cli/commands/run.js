@@ -126,8 +126,14 @@ module.exports = async (config, cli, command) => {
       cli.log();
       cli.logOutputs(instance.outputs);
 
-      cli.log()
-      cli.log(`Full details: ${getDashboardUrl(`/${instanceYaml.org}/apps/${instanceYaml.app || instanceYaml.name}/${instanceYaml.name}/${instanceYaml.stage}`)}`)
+      cli.log();
+      cli.log(
+        `Full details: ${getDashboardUrl(
+          `/${instanceYaml.org}/apps/${instanceYaml.app || instanceYaml.name}/${
+            instanceYaml.name
+          }/${instanceYaml.stage}`
+        )}`
+      );
     } else if (command === 'remove') {
       cli.sessionStatus('Removing', null, 'white');
 
