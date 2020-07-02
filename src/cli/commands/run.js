@@ -43,7 +43,7 @@ module.exports = async (config, cli, command) => {
   }
 
   const meta = `Action: "${command}" - Stage: "${instanceYaml.stage}" - Org: "${instanceYaml.org}" - App: "${instanceYaml.app}" - Name: "${instanceYaml.name}"`;
-  cli.log(meta);
+  cli.log(meta, 'grey');
 
   cli.status('Initializing', instanceYaml.name);
 
