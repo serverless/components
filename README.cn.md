@@ -15,7 +15,7 @@ Serverless Components 是 [Serverless Framework](https://github.com/serverless/s
 - [x] **全面覆盖** - 既能支持基础设施的 Components，也可以支持更高维度的，场景级别的 Components。
 - [x] **快速部署** - Components 支持在 4-6s 内极速部署 Serverless 应用。
 - [x] **灵活配置** - Components 支持灵活配置和方便的部署
-- [x] **注册中心** - 通过注册中心，支持将你构建的 Component 分享给团队或公开支持他人复用。
+- [x] **注册中心** - 通过注册中心，支持将你构建的组件（Component）或者模板(Template) 分享给团队或公开支持他人复用。
 
 <br/>
 
@@ -47,6 +47,9 @@ inputs: # 对应的组件配置
   - [账号配置](#账号配置)
   - [环境](#环境)
   - [变量](#变量)
+- [使用模板（Template）](#使用模板template)
+  - [查看可使用的模板](#查看可使用的模板)
+  - [从模板初始化项目](#从模板初始化项目)
 - [开发 Components](#开发-Components)
   - [Serverless.component.yml](#serverlesscomponentyml)
   - [Serverless.js](#serverlessjs)
@@ -54,12 +57,11 @@ inputs: # 对应的组件配置
   - [增加 Serverless Agent](#增加-serverless-agent)
   - [开发流程](#开发流程)
   - [开发建议](#开发建议)
-- [目前支持的 Components](https://github.com/serverless-components)
-  - [express](https://github.com/serverless-components/tencent-express/tree/v2)
-  - [website](https://github.com/serverless-components/tencent-website/tree/v2)
-  - [tencent-scf](https://github.com/serverless-components/tencent-scf/tree/v2)
+- [开发模板 Templates](#开发模板-templates)
+  - [什么是项目模板](#什么是项目模板)
+  - [如何分享（发布）项目模板](#如何分享发布项目模板)
+- [目前支持的 Components 以及 Templates](https://registry.serverless.com)
 - [CLI 命令列表](#cli-命令列表)
-- [模板](https://github.com/serverless/components/tree/master/templates)
 - [中文技术社区](https://china.serverless.com/)
 
 <br/>
@@ -226,7 +228,7 @@ module.exports = MyBlog;
 
 ### 注册中心 Registry
 
-任何人都能构建自己的 Serverless Component 并且将其发布在注册中心中，提供团队和他人使用。
+任何人都能构建自己的 Serverless 组件（Component） 或者 Serverless 项目模板（Template）， 并且将其发布在注册中心中，提供团队和他人使用。关于如何开发组件和项目模板请参看此文档中对应的[开发 Components](#开发-components) 和[开发模板](#开发模板-templates)章节。
 
 ```bash
 
@@ -581,6 +583,43 @@ inputs:
 
 <br/>
 
+# 使用模板（Template）
+
+模板（Template）是由其他开发者通过 Serverless 注册中心共享的项目模板，提供了比组件更傻瓜化的使用场景。因为分享模板的开发者已经提前配置好项目以及相关的`serverless.yml`，模板的使用者只需要通过 Serverless 初始化命令选择从某个模板初始化项目，即可获得一个可以立即部署的 Serverless 项目。模板甚至会包含多个已经预先配置的组件实例，例如 Fullstack 项目模板中已经预置了数据库，API 层，前端等组件实例，用户只需要加入自己的业务逻辑代码即可立即部署一个 Serverless Fullstack 应用。
+
+### 查看可使用的模板
+
+你可以使用以下两种方式查看可供使用的模板：
+
+1. 访问 Serverless 注册中心页面：https://registry.serverless.com
+2. 使用`sls registry`命令列出所有推荐的组件或者项目模板：
+
+```bash
+serverless ⚡ registry
+
+...
+
+Featured Templates:
+
+  fullstack - Deploy a full stack application.
+  fullstack-nosql - Deploy a nosql full stack application.
+  ocr-app - Deploy a serverless OCR application.
+
+Serverless › Find more here: https://registry.serverless.com
+```
+
+### 从模板初始化项目
+
+一旦你决定了所要使用的项目模板，你就可以使用内置的`init`命令初始化你的项目。此命令将会自动从注册中心下载你所选择的模板，并为你创建好项目文件夹。例如：
+
+```bash
+sls init -t fullstack # 使用fullstack项目模板创建项目
+
+cd  fullstack # 进入到项目文件夹
+
+sls deploy --all # 部署整个fullstack项目
+```
+
 # 开发 Components
 
 如果你希望开发自己的 Serverless Component，那么必须要关注一下两个文件：
@@ -858,17 +897,54 @@ Components 依赖云服务作为状态的来源，并用其存储状态信息。
 
 正因如此，我们将我们所有的项目设计的尽可能的易于理解和学习。请尝试使用简单的，原始的 Javascript 语法。此外，为了减少安全风险和依赖的复杂度，请您尽可能少的使用 NPM 依赖。
 
+# 开发模板 Templates
+
+### 什么是项目模板
+
+项目模板（Template）就是一个正常的基于 Serverless Component 进行部署的项目，你可以使用 Serverless 注册中心发布命令`sls publish`将你的项目发布到 Serverless 注册中心。一旦你发布了你的项目到注册中心，这个项目便成为了一个项目模板，可以被其他开发者所使用，所以项目模板其实是一种分享你的 Serverless 项目的方式。例如作为一个开发者你可能开发了一个很棒的基于 Serverless Component 进行部署的博客项目，你可以将该博客项目作为项目模板发布到注册中心，这样其他开发者只需要选择使用你的博客模板初始化项目，稍作改动变可以很快的部署一个自己的基于 Serverless 的博客。腾讯云的开发团队已经预先做好了一些很棒的项目模板，比如 fullstack 模板，其中包含了 Serverless 数据库，Serverless 后端 API，SSR 前端页面以及相关的网络配置，你只需要选择使用 fullstack 模板初始化项目，加入自己的业务逻辑，便可以立即部署一个完全基于 Serverless 的整个 Web 应用程序架构。
+
+### 如何分享（发布）项目模板
+
+要将你的基于 Serverless Component 部署的项目作为模板发布非常简单，你不需要对项目进行任何改造，只需要添加一个`serverless.yml`文件（或者修改已有的`serverless.yml`文件），在其中添加一些需要告诉注册中心的模板元信息即可。详细说明如下：
+
+```yaml
+name: fullstack # 项目模板的名字
+author: Tencent Cloud, Inc. # 作者的名字
+org: Tencent Cloud, Inc. # 组织名称，可选
+description: Deploy a full stack application. # 描述你的项目模板
+keywords: tencent, serverless, express, website, fullstack # 关键字
+repo: https://github.com/serverless-components/tencent-fullstack # 源代码
+readme: https://github.com/serverless-components/tencent-fullstack/tree/master/README.md # 详细的说明文件
+license: MIT # 版权声明
+src: # 描述项目中的哪些文件需要作为模板发布
+  src: ./ # 指定具体的相对目录，此目录下的文件将作为模板发布
+  exclude: #描述在指定的目录内哪些文件应该被排除
+    # 通常你希望排除
+    # 1. 包含secrets的文件
+    # 2. .git git源代码管理的相关文件
+    # 3. node_modules等第三方依赖文件
+    - .env
+    - '**/node_modules'
+    - '**/package-lock.json'
+```
+
+一旦你准备好了描述项目模板元信息的`serverless.yml`文件，便可以使用发布命令`sls publish`将此项目作为模板发布到注册中心。
+
 # CLI 命令列表
 
 #### `serverless registry`
 
-查看可用的 Components 列表
+查看可用的 组件（Components）以及模板（Template） 列表
 
 #### `serverless registry publish`
 
-发布 Component 到 Serverless 注册中心
+发布组件（Components）或者模板（Template） 到 Serverless 注册中心
 
-`--dev` - 支持 dev 参数用于发布 `@dev` 版本的 Component，用于开发或测试。
+`--dev` - 支持 dev 参数用于发布 `@dev` 版本的 Component，用于开发或测试，此参数仅对组件有效，对模板无效，模板没有版本的概念。
+
+### `serverless init`
+
+选择一个模板初始化项目。使用`-t`参数指定所要使用的模板。
 
 #### `serverless deploy`
 
