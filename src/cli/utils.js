@@ -293,6 +293,7 @@ const loadInstanceConfigUncached = (directoryPath) => {
     instanceFile.stage = 'dev';
   }
 
+  // If no app, set it from the "name" property
   if (!instanceFile.app) {
     instanceFile.app = instanceFile.name;
   }
@@ -580,7 +581,14 @@ const executeGraph = async (allComponents, command, graph, cli, sdk, credentials
         const instance = await sdk.remove(instanceYaml, credentials, options);
         allComponents[instanceName].outputs = instance.outputs || {};
       } else {
-        const instance = await sdk.deploy(instanceYaml, credentials, options);
+        // Capture errors and change them to indicate which Component generated it
+        let instance
+        try {
+          instance = await sdk.deploy(instanceYaml, credentials, options);
+        } catch (error) {
+          error.message = `App "${instanceYaml.name}" reported the following error: ${error.message}`
+          throw error
+        }
 
         const outputs = {};
         outputs[instanceName] = instance.outputs;

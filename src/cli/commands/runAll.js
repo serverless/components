@@ -42,7 +42,7 @@ module.exports = async (config, cli, command) => {
   cli.log(meta);
 
   if (!templateYaml) {
-    throw new Error('No components found in sub directories.');
+    return cli.error('No components found in sub directories.', true);
   }
 
   // Load Instance Credentials
@@ -97,8 +97,8 @@ module.exports = async (config, cli, command) => {
     const deferredNotificationsData =
       command === 'deploy'
         ? requestNotification(
-            Object.assign(generateNotificationsPayload(templateYaml), { command: 'deploy' })
-          )
+          Object.assign(generateNotificationsPayload(templateYaml), { command: 'deploy' })
+        )
         : null;
 
     if (command === 'remove') {
@@ -111,7 +111,12 @@ module.exports = async (config, cli, command) => {
 
     const allComponentsWithDependencies = setDependencies(allComponents);
 
-    const graph = createGraph(allComponentsWithDependencies, command);
+    let graph
+    try {
+      graph = createGraph(allComponentsWithDependencies, command);
+    } catch (error) {
+      return cli.error(error.message, true)
+    }
 
     const allComponentsWithOutputs = await executeGraph(
       allComponentsWithDependencies,

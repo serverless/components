@@ -93,14 +93,6 @@ class CLI {
   }
 
   /**
-   * Watch
-   * - Watches the specified directory with the given options
-   */
-  watch(dir, opts) {
-    this.watcher = chokidar.watch(dir, opts);
-  }
-
-  /**
    * Close
    * - Closes the CLI process with relevant, clean information.
    */
@@ -141,6 +133,14 @@ class CLI {
 
     if (reason === 'error') process.exitCode = 1;
     this._isClosed = true;
+  }
+
+  /**
+   * Watch
+   * - Watches the specified directory with the given options
+   */
+  watch(dir, opts) {
+    this.watcher = chokidar.watch(dir, opts);
   }
 
   /**
@@ -215,9 +215,9 @@ class CLI {
 
   logLogo(text) {
     let logo = os.EOL;
-    logo += white('serverless');
-    logo += red(' ⚡ ');
-    logo += white('framework');
+    logo += 'serverless';
+    logo += red(' ⚡');
+    logo += 'framework';
 
     if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
       logo += grey(' (dev)');
@@ -247,7 +247,7 @@ class CLI {
   logVersion() {
     this.logLogo();
     this.log();
-    this.log(`       v${version}`);
+    this.log(`components version: ${version}`);
     this.log();
   }
 
@@ -287,7 +287,7 @@ class CLI {
    * Error
    * - Render and error and close a long-running CLI process.
    */
-  error(error, simple = false) {
+  error(error) {
     // If no argument, skip
     if (!error || error === '') {
       return null;
@@ -301,19 +301,19 @@ class CLI {
     process.stdout.write(ansiEscapes.eraseDown);
 
     // Render stack trace
-    if (!this._.debug && simple) {
+    if (!this._.debug) {
+      // Put cursor to starting position for next view
+      process.stdout.write(ansiEscapes.cursorLeft);
+      this.close('error', `${error.message}`);
+    } else {
+      // Show stack trace
+      console.log();
+      console.log('', red(error.stack));
       // Put cursor to starting position for next view
       process.stdout.write(ansiEscapes.cursorLeft);
 
-      return this.close('error', `${error.message}`);
+      this.close('error', `${error.message}`);
     }
-    console.log();
-    console.log('', red(error.stack));
-
-    // Put cursor to starting position for next view
-    process.stdout.write(ansiEscapes.cursorLeft);
-
-    return this.close('error', `${error.message}`);
   }
 
   /**

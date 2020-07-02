@@ -5,39 +5,52 @@
  */
 
 const path = require('path');
+const http = require('http');
+const https = require('https');
 const minimist = require('minimist');
 const dotenv = require('dotenv');
-const { loadInstanceConfig, fileExistsSync } = require('./utils');
+const semver = require('semver');
+const chalk = require('chalk');
+const HttpsProxyAgent = require('https-proxy-agent');
+// TODO: Don't require all of this to do china-based user detection.  Put in our own utils.
 const {
   utils: { isChinaUser },
 } = require('@serverless/platform-client-china');
 const CLI = require('./CLI');
-const { isProjectPath } = require('./utils');
-const http = require('http');
-const https = require('https');
-const semver = require('semver');
-const chalk = require('chalk');
-const HttpsProxyAgent = require('https-proxy-agent');
+const {
+  loadInstanceConfig,
+  fileExistsSync,
+  isProjectPath
+} = require('./utils');
 
 module.exports = async () => {
   const args = minimist(process.argv.slice(2));
   const instanceConfig = loadInstanceConfig(process.cwd());
   const stage = args.stage || (instanceConfig && instanceConfig.stage) || 'dev';
 
-  // Load environment variables from eventual .env files
-  // Look in current working directory first, and the parent directory second
+  /**
+   * Load environment variables from .env files, 2 directories up
+   * Nearest to current working directory is preferred
+   */
   const defaultEnvFilePath = path.join(process.cwd(), '.env');
   const stageEnvFilePath = path.join(process.cwd(), `.env.${stage}`);
-  const parentDefaultEnvFilePath = path.join(process.cwd(), '..', '.env');
-  const parentStageEnvFilePath = path.join(process.cwd(), '..', `.env.${stage}`);
+  const firstParentDefaultEnvFilePath = path.join(process.cwd(), '..', '.env');
+  const firstParentStageEnvFilePath = path.join(process.cwd(), '..', `.env.${stage}`);
+  const secondParentDefaultEnvFilePath = path.join(process.cwd(), '../..', '.env');
+  const secondParentStageEnvFilePath = path.join(process.cwd(), '../..', `.env.${stage}`);
+
   if (stage && fileExistsSync(stageEnvFilePath)) {
     dotenv.config({ path: path.resolve(stageEnvFilePath) });
   } else if (fileExistsSync(defaultEnvFilePath)) {
     dotenv.config({ path: path.resolve(defaultEnvFilePath) });
-  } else if (fileExistsSync(parentStageEnvFilePath)) {
-    dotenv.config({ path: path.resolve(parentStageEnvFilePath) });
-  } else if (fileExistsSync(parentDefaultEnvFilePath)) {
-    dotenv.config({ path: path.resolve(parentDefaultEnvFilePath) });
+  } else if (fileExistsSync(firstParentStageEnvFilePath)) {
+    dotenv.config({ path: path.resolve(firstParentStageEnvFilePath) });
+  } else if (fileExistsSync(firstParentDefaultEnvFilePath)) {
+    dotenv.config({ path: path.resolve(firstParentDefaultEnvFilePath) });
+  } else if (fileExistsSync(secondParentDefaultEnvFilePath)) {
+    dotenv.config({ path: path.resolve(secondParentDefaultEnvFilePath) });
+  } else if (fileExistsSync(secondParentStageEnvFilePath)) {
+    dotenv.config({ path: path.resolve(secondParentStageEnvFilePath) });
   }
 
   // set global proxy agent if it's configured in environment variable
@@ -105,12 +118,13 @@ module.exports = async () => {
   if (args.stage && !process.env.SERVERLESS_STAGE) {
     process.env.SERVERLESS_STAGE = args.stage;
   }
-  // Start CLI process
+
+  // Initialize CLI utilities
   const cli = new CLI(config);
 
+  // Handle version command. Log and exit.
+  // TODO: Move this to a command file like all others. Don't handle this here.
   const checkingVersion = args._[0] === 'version' || args.version || args.v;
-
-  // if the user is checking the version, just log it and exit
   if (checkingVersion) {
     return cli.logVersion();
   }
