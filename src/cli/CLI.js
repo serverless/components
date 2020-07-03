@@ -258,9 +258,21 @@ class CLI {
    * - Render log statements cleanly
    */
   log(msg, color = null) {
+
+    // If no message and debug mode is enabled, do nothing.
+    if (!msg && this._.debug) {
+      return null
+    }
+
+    // Render line break if "msg" is blank
     if (!msg) {
       console.log();
       return;
+    }
+
+    // Don't use colors in debug mode
+    if (color && this._.debug) {
+      color = null
     }
 
     // Clear any existing content
