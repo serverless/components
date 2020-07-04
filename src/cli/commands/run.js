@@ -156,6 +156,7 @@ module.exports = async (config, cli, command) => {
         cli.log();
         cli.logOutputs(instance.outputs);
       } else {
+        cli.log();
         cli.log('No outputs available', 'grey');
       }
     }
