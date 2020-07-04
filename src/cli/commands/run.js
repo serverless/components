@@ -130,7 +130,7 @@ module.exports = async (config, cli, command) => {
       cli.log(
         `Full details: ${getDashboardUrl(
           `/${instanceYaml.org}/apps/${instanceYaml.app || instanceYaml.name}/${
-          instanceYaml.name
+            instanceYaml.name
           }/${instanceYaml.stage}`
         )}`
       );
@@ -150,7 +150,7 @@ module.exports = async (config, cli, command) => {
 
       cli.sessionStatus('Running', null, 'white');
 
-      let instance = await sdk.run(command, instanceYaml, instanceCredentials, options);
+      const instance = await sdk.run(command, instanceYaml, instanceCredentials, options);
 
       if (instance && instance.outputs) {
         cli.log();
