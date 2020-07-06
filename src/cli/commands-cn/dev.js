@@ -80,15 +80,20 @@ async function updateDeploymentStatus(cli, instanceInfo, startDebug) {
     case 'active': {
       const {
         state: { lambdaArn, region },
-        outputs: { scf, runtime },
+        outputs: { scf, runtime, namespace },
       } = instanceInfo;
       let runtimeInfo = runtime;
+      let namespaceInfo = namespace;
       if (!runtimeInfo && scf) {
         runtimeInfo = scf.runtime;
+      }
+      if (!namespaceInfo && scf) {
+        namespaceInfo = scf.namespace;
       }
       if (lambdaArn && runtimeInfo && region) {
         const functionInfo = {
           functionName: lambdaArn,
+          namespace: namespaceInfo,
           runtime: runtimeInfo,
         };
         await chinaUtils.stopTencentRemoteLogAndDebug(functionInfo, region, cliEventCallback);
