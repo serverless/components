@@ -225,13 +225,27 @@ const listFeatured = async (config, cli) => {
   cli.log('Featured:');
   // cli.log();
   cli.log('• fullstack-app - https://github.com/serverless-components/fullstack-app');
-  cli.log('• express-starter - https://github.com/serverless-components/express/tree/move-templates/templates/express-starter');
-  cli.log('• website-starter - https://github.com/serverless-components/website/tree/move-templates/templates/website-starter');
-  cli.log('• graphql-starter - https://github.com/serverless-components/graphql/tree/master/templates/graphql-starter');
-  cli.log('• aws-lambda-starter - https://github.com/serverless-components/aws-lambda/tree/master/templates/aws-lambda-starter');
-  cli.log('• aws-dynamodb-starter - https://github.com/serverless-components/aws-dynamodb/tree/master/templates/aws-dynamodb-starter');
-  cli.log('• aws-iam-role-starter - https://github.com/serverless-components/aws-iam-role/tree/master/templates/aws-iam-role-starter');
-  cli.log('• aws-lambda-layer-starter - https://github.com/serverless-components/aws-lambda-layer/tree/master/templates/aws-lambda-layer-starter');
+  cli.log(
+    '• express-starter - https://github.com/serverless-components/express/tree/move-templates/templates/express-starter'
+  );
+  cli.log(
+    '• website-starter - https://github.com/serverless-components/website/tree/move-templates/templates/website-starter'
+  );
+  cli.log(
+    '• graphql-starter - https://github.com/serverless-components/graphql/tree/master/templates/graphql-starter'
+  );
+  cli.log(
+    '• aws-lambda-starter - https://github.com/serverless-components/aws-lambda/tree/master/templates/aws-lambda-starter'
+  );
+  cli.log(
+    '• aws-dynamodb-starter - https://github.com/serverless-components/aws-dynamodb/tree/master/templates/aws-dynamodb-starter'
+  );
+  cli.log(
+    '• aws-iam-role-starter - https://github.com/serverless-components/aws-iam-role/tree/master/templates/aws-iam-role-starter'
+  );
+  cli.log(
+    '• aws-lambda-layer-starter - https://github.com/serverless-components/aws-lambda-layer/tree/master/templates/aws-lambda-layer-starter'
+  );
   cli.log();
   cli.log('Find more here: https://github.com/serverless-components');
   cli.log();
