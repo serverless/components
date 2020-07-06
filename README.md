@@ -92,7 +92,8 @@ To get started with Serverless Components, install the latest version of the [Se
 $ npm i -g serverless
 ```
 
-After installation, use the `init` command to install a Serverless Components Template, which contains Components as well as boilerplate code, to get you started quickly. An easy starting point is the Express.js Component:
+After installation, use the `init` command to install a Serverless Components Template, which contains Components as well as boilerplate code, to get you started quickly. User `serverless registry` to see the
+available feature components. An easy starting point is the Express.js Component:
 
 ```shell
 serverless init express-starter
