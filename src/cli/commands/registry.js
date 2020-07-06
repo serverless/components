@@ -56,7 +56,6 @@ const publish = async (config, cli) => {
 
     serverlessFile = serverlessComponentFile;
     serverlessFile.src = serverlessComponentFile.main;
-    console.log(serverlessFile);
   }
 
   if (serverlessFile.type === 'template' || (!serverlessFile.type && !serverlessFile.version)) {
