@@ -226,10 +226,10 @@ const listFeatured = async (config, cli) => {
   // cli.log();
   cli.log('• fullstack-app - https://github.com/serverless-components/fullstack-app');
   cli.log(
-    '• express-starter - https://github.com/serverless-components/express/tree/move-templates/templates/express-starter'
+    '• express-starter - https://github.com/serverless-components/express/tree/master/templates/express-starter'
   );
   cli.log(
-    '• website-starter - https://github.com/serverless-components/website/tree/move-templates/templates/website-starter'
+    '• react-starter - https://github.com/serverless-components/website/tree/master/templates/react-starter'
   );
   cli.log(
     '• graphql-starter - https://github.com/serverless-components/graphql/tree/master/templates/graphql-starter'
