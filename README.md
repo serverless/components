@@ -99,12 +99,6 @@ available feature components. An easy starting point is the Express.js Component
 serverless init express-starter
 ```
 
-Next, log in to enable deployment and saving state in the cloud:
-
-```bash
-$ serverless login
-```
-
 Lastly, enter your cloud provider credentials into a `.env` file within the folder that contains your `serverless.yml`, or its immediate parent folder.
 
 ```text
