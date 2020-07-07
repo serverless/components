@@ -65,8 +65,9 @@ inputs: # The configuration the Component accepts according to its docs
     - [Variables: Name](#variables-name)
     - [Variables: Environment Variables](#variables-environment-variables)
     - [Variables: Outputs](#variables-outputs)
+    - [Variables: Parameters](#variables-parameters)
 - [Building Components](#building-components)
-  - [serverless.component.yml](#serverlesscomponentyml)
+  - [serverless.yml](#serverlessyml)
   - [serverless.js](#serverlessjs)
   - [Working With Source Code](#working-with-source-code)
   - [Adding The Serverless Agent](#adding-the-serverless-agent)
@@ -333,17 +334,7 @@ Outputs can be referenced easily in the `inputs` of other Components. Just use t
 ${output:[stage]:[app]:[instance].[output]}
 ```
 
-- `stage` - The stage that the referenced component instance was deployed to. It is the `stage` property in that component instance `serverless.yml` file.
-- `app` - The app that the referenced component instance was deployed to. It is the `app` property in that component instance `serverelss.yml` file, which falls back to the `name` property if you did not specify it.
-- `instance` - The name of the component instance you are referencing. It is the `name` property in that component instance `serverless.yml` file.
-- `output` - One of the outputs of the component instance you are referencing. They are displayed in the CLI after deploying.
-
-```yaml
-# Examples
-${output:prod:ecommerce:products-api.url}
-${output:prod:ecommerce:role.arn}
-${output:prod:ecommerce:products-database.name}
-```
+Take a look at the [variables documentation](#variables-outputs) for more information on the Output variable.
 
 ### Credentials
 
@@ -556,9 +547,68 @@ inputs:
   roleArn: ${output:[STAGE]:[APP]:[INSTANCE].arn} # Fetches an output from another component instance that is already deployed
 ```
 
+- `stage` - The stage that the referenced component instance was deployed to. It is the `stage` property in that component instance `serverless.yml` file.
+- `app` - The app that the referenced component instance was deployed to. It is the `app` property in that component instance `serverelss.yml` file, which falls back to the `name` property if you did not specify it.
+- `instance` - The name of the component instance you are referencing. It is the `name` property in that component instance `serverless.yml` file.
+- `output` - One of the outputs of the component instance you are referencing. They are displayed in the CLI after deploying.
+
+```yaml
+# Examples
+${output:prod:ecommerce:products-api.url}
+${output:prod:ecommerce:role.arn}
+${output:prod:ecommerce:products-database.name}
+```
+
 You can access Outputs across any App, Instance, in an any Stage, within the same Org.
 
 A useful feature of this is the ability to share resources easily, and even do so across environments. This is useful when developers want to deploy a Component Instance in their own personal Stage, but access shared resources within a common "development" Stage, like a database. This way, the developers on your team do not have to recreate the entire development stage to perform their feature work or bug fix, only the Component Instance that needs changes.
+
+#### Variables: Parameters
+
+Serverless Components supports Serverless Parameters that you setup and share across your organization on the [Serverless Dashboard](https://app.serverless.com). After you add a parameter for a stage, in your desired app, you can reference it in inputs with the following syntax:
+
+```yml
+component: express
+org: acme
+app: ecommerce
+name: rest-api
+stage: prod
+
+inputs:
+  env:
+    INTERNAL_ACCESS_KEY: ${param:STAGE:APP:PARAM}
+```
+
+For example:
+
+```yml
+component: express
+org: acme
+app: ecommerce
+name: rest-api
+stage: prod
+
+inputs:
+  env:
+    INTERNAL_ACCESS_KEY: ${param:prod:acme-internal:internalAccessKey} # referencing a param in the acme-internal app
+```
+
+If you are referencing a parameter in the same stage/app as your component instance, you can omit the stage/app part as a shortform:
+
+
+```yml
+component: express
+org: acme
+app: ecommerce
+name: rest-api
+stage: prod
+
+inputs:
+  env:
+    INTERNAL_ACCESS_KEY: ${param:internalAccessKey} # this inherits the stage "prod" and app "ecommerce" from the properties above
+```
+
+You can reference any parameter in any stage and any app in your organization. If the specified stage was not found, the `default` stage in the Serverless Dashboard would be used instead
 
 <br/>
 
@@ -566,27 +616,27 @@ A useful feature of this is the ability to share resources easily, and even do s
 
 If you want to build your own Serverless Component, there are 2 essential files you need to be aware of:
 
-- `serverless.component.yml` - This contains the definition of your Serverless Component.
+- `serverless.yml` - This contains the definition of your Serverless Component.
 - `serverless.js` - This contains your Serverless Component's code.
 
 One of the most important things to note is that Serverless Components **only** run in the cloud and **do not** run locally. That means, to run and test your Component, you must publish it first (it takes only few seconds to publish). We're continuing to improve this workflow. Here's how to do it...
 
-### serverless.component.yml
+### serverless.yml
 
-To declare a Serverless Component and make it available within the Serverless Registry, you must create a `serverless.component.yml` file with the following properties:
+To declare a Serverless Component and make it available within the Serverless Registry, you must create a `serverless.yml` file with the following properties:
 
 ```yaml
 # serverless.component.yml
 
 name: express # Required. The name of the Component
 version: 0.0.4 # Required. The version of the Component
-author: eahefnawy # Required. The author of the Component
 org: serverlessinc # Required. The Serverless Framework org which owns this Component
-main: ./src # Required. The directory which contains the Component code
 description: Deploys Serverless Express.js Apps # Optional. The description of the Component
 keywords: aws, serverless, express # Optional. The keywords of the Component to make it easier to find at registry.serverless.com
 repo: https://github.com/owner/project # Optional. The code repository of the Component
 license: MIT # Optional. The license of the Component code
+
+src: ./src # Required. The directory which contains the Component code
 ```
 
 ### serverless.js
@@ -788,10 +838,10 @@ class MyComponent extends Component {
 }
 ```
 
-When you're ready to publish a new version for others to use, update the version in `serverless.component.yml`, then run publish without the `--dev` flag.
+When you're ready to publish a new version for others to use, update the version in `serverless.yml`, then run publish without the `--dev` flag.
 
 ```yaml
-# serverless.component.yml
+# serverless.yml
 
 name: express@0.0.1
 ```
@@ -948,13 +998,22 @@ Running these integration tests will most likely require AWS keys, which are sto
 
 #### `serverless registry`
 
-See available Components
+See available templates
 
-#### `serverless registry publish`
+#### `serverless registry <package-name>`
+
+You can pass the package name (component or template) to view detailed information for that package.
+
+#### `serverless publish`
 
 Publish a Component to the Serverless Registry.
 
 `--dev` - Publishes to the `@dev` version of your Component, for testing purposes.
+
+
+#### `serverless init <package-name>`
+
+Initializes the specified package (component or template) locally to get you started quickly.
 
 #### `serverless deploy`
 
