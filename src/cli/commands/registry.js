@@ -89,7 +89,9 @@ const publish = async (config, cli) => {
     const serverlessJsFilePath = path.resolve(process.cwd(), serverlessFile.src, 'serverless.js');
 
     if (!(await fileExists(serverlessJsFilePath))) {
-      throw new Error('no "serverless.js" file was found in the "src" directory you specified.');
+      throw new Error(
+        'no "serverless.js" file was found in the current working directory, or the "src" directory you specified.'
+      );
     }
   } else {
     // validate the template
