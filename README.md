@@ -205,9 +205,9 @@ Anyone can build a Serverless Component and share it in our Registry.
 
 ```bash
 
-$ serverless registry publish
+$ serverless publish
 
-express@0.0.4 › Published
+Serverless › Successfully published "serverless@1.0.0"...
 
 ```
 
