@@ -92,13 +92,12 @@ To get started with Serverless Components, install the latest version of the [Se
 $ npm i -g serverless
 ```
 
-After installation, use the `create --template-url` command to install a [Serverless Components Template](./templates), which contains Components as well as boilerplate code, to get you started quickly. An easy starting point is the Express.js Component:
+After installation, use the `init` command to install a Serverless Components Template, which contains Components as well as boilerplate code, to get you started quickly. User `serverless registry` to see the
+available feature components. An easy starting point is the Express.js Component:
 
 ```shell
-serverless create --template-url https://github.com/serverless/components/tree/master/templates/express
+serverless init express-starter
 ```
-
-The `express` template above requires running `npm i` in its root directory, to install the Express framework. So `cd` into the generated `express` directory and run `npm i`.
 
 Next, log in to enable deployment and saving state in the cloud:
 
@@ -133,7 +132,7 @@ Run the `serverless dev` command to auto-deploy on save, and have logs and error
 $ serverless dev
 ```
 
-Deploy other Components that you may want to use with your Express Component. For example, you may want to give your Express application permissions to other resources on your AWS account via the `aws-iam-role` Component. You may also want an AWS DynamoDB table to use with your Express Component, via the `aws-dynamodb` Component. There are Templates for both of these in the [Serverless Components Template](./templates) folder. You can then use them with your `express` Component, like this:
+Deploy other Components that you may want to use with your Express Component. For example, you may want to give your Express application permissions to other resources on your AWS account via the [aws-iam-role Component](https://github.com/serverless-components/aws-iam-role). You may also want an AWS DynamoDB table to use with your Express Component, via the [aws-dynamodb Component](https://github.com/serverless-components/aws-dynamodb). There are Templates for both of these in the `./templates` folder. You can then use them with your `express` Component, like this:
 
 ```yaml
 org: your-org # Your Org
@@ -173,8 +172,6 @@ inputs: # The configuration the Component accepts
     dist: ./dist
   domain: mystore.com
 ```
-
-Check out these [templates](./templates) for more use-cases.
 
 ### Instant Deployments
 

@@ -225,13 +225,27 @@ const listFeatured = async (config, cli) => {
   cli.log('Featured:');
   // cli.log();
   cli.log('• fullstack-app - https://github.com/serverless-components/fullstack-app');
-  cli.log('• express - https://github.com/serverless-components/express');
-  cli.log('• website - https://github.com/serverless-components/website');
-  cli.log('• graphql - https://github.com/serverless-components/graphql');
-  cli.log('• aws-lambda - https://github.com/serverless-components/aws-lambda');
-  cli.log('• aws-dynamodb - https://github.com/serverless-components/aws-dynamodb');
-  cli.log('• aws-iam-role - https://github.com/serverless-components/aws-iam-role');
-  cli.log('• aws-lambda-layer - https://github.com/serverless-components/aws-lambda-layer');
+  cli.log(
+    '• express-starter - https://github.com/serverless-components/express/tree/master/templates/express-starter'
+  );
+  cli.log(
+    '• react-starter - https://github.com/serverless-components/website/tree/master/templates/react-starter'
+  );
+  cli.log(
+    '• graphql-starter - https://github.com/serverless-components/graphql/tree/master/templates/graphql-starter'
+  );
+  cli.log(
+    '• aws-lambda-starter - https://github.com/serverless-components/aws-lambda/tree/master/templates/aws-lambda-starter'
+  );
+  cli.log(
+    '• aws-dynamodb-starter - https://github.com/serverless-components/aws-dynamodb/tree/master/templates/aws-dynamodb-starter'
+  );
+  cli.log(
+    '• aws-iam-role-starter - https://github.com/serverless-components/aws-iam-role/tree/master/templates/aws-iam-role-starter'
+  );
+  cli.log(
+    '• aws-lambda-layer-starter - https://github.com/serverless-components/aws-lambda-layer/tree/master/templates/aws-lambda-layer-starter'
+  );
   cli.log();
   cli.log('Find more here: https://github.com/serverless-components');
   cli.log();
