@@ -20,8 +20,8 @@ async function unpack(cli, dir, isTopLevel = false) {
   // Check if the directory contains a serverless.yml/yaml/json/js.
   // If it does, we need to unpack it
   if (getServerlessFilePath(dir) || isTopLevel) {
-    cli.sessionStatus(`Installing node_modules via npm in ${dir}`);
     if (await fse.exists(path.resolve(dir, 'package.json'))) {
+      cli.sessionStatus(`Installing node_modules via npm in ${dir}`);
       try {
         await spawn('npm', ['install'], { cwd: dir });
       } catch (error) {
@@ -75,11 +75,8 @@ module.exports = async (config, cli) => {
     throw new Error(`Serverless Registry Package "${packageName}" does not exist.`);
   }
 
-  let targetName = registryPackage.name;
-  if (config.params && config.params.length > 1) {
-    targetName = config.params[1];
-  }
-  const targetPath = path.resolve(process.cwd(), targetName);
+  const targetName = config.name || registryPackage.name;
+  const targetPath = path.resolve(targetName);
 
   if (registryPackage.type !== 'template') {
     await fse.mkdir(targetPath);
@@ -88,7 +85,7 @@ module.exports = async (config, cli) => {
     await fse.writeFile(envDestination, envConfig);
   } else {
     cli.sessionStatus('Fetching template from registry', packageName);
-    const tmpFilename = path.resolve(process.cwd(), path.basename(registryPackage.downloadKey));
+    const tmpFilename = path.resolve(path.basename(registryPackage.downloadKey));
     await pipeline(got.stream(registryPackage.downloadUrl), fs.createWriteStream(tmpFilename));
 
     cli.sessionStatus('Unpacking your new app', packageName);
