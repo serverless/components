@@ -22,7 +22,14 @@ async function unpack(cli, dir, isTopLevel = false) {
   if (getServerlessFilePath(dir) || isTopLevel) {
     cli.sessionStatus(`Installing node_modules via npm in ${dir}`);
     if (await fse.exists(path.resolve(dir, 'package.json'))) {
-      await spawn('npm', ['install'], { cwd: dir });
+      try {
+        await spawn('npm', ['install'], { cwd: dir });
+      } catch (error) {
+        cli.logError(
+          'Failed install dependencies, make sure install dependencies manually before deploy.'
+        );
+        return null;
+      }
     }
 
     const files = await fse.readdir(dir);
