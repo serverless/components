@@ -52,37 +52,56 @@ module.exports = async (config, cli) => {
   cli.logLogo();
   cli.log();
 
-  let templateName = config.t || config.template;
-  if (!templateName) {
+  let packageName = config.t || config.template;
+  if (!packageName) {
     if (config.params && config.params.length > 0) {
-      templateName = config.params[0];
+      packageName = config.params[0];
     } else {
-      throw new Error('Need to specify template name. e.g. "serverless init some-template".');
+      throw new Error(
+        'Need to specify component or template name. e.g. "serverless init some-template".'
+      );
     }
   }
 
   const sdk = new ServerlessSDK();
-  const template = await sdk.getPackage(templateName);
-  if (!template || template.type !== 'template') {
-    throw new Error(`Template "${templateName}" does not exist.`);
+  const registryPackage = await sdk.getPackage(packageName);
+  if (!registryPackage) {
+    throw new Error(`Serverless Registry Package "${packageName}" does not exist.`);
+  }
+  // registryPackage.component will be null if component is not found
+  // this is the design for platform API backward compatibility
+  delete registryPackage.component;
+  if (Object.keys(registryPackage).length === 0) {
+    throw new Error(`Serverless Registry Package "${packageName}" does not exist.`);
   }
 
-  const targetPath = path.resolve(process.cwd(), template.name);
+  let targetName = registryPackage.name;
+  if (config.params && config.params.length > 1) {
+    targetName = config.params[1];
+  }
+  const targetPath = path.resolve(process.cwd(), targetName);
 
-  cli.sessionStatus('Fetching template from registry', templateName);
-  const tmpFilename = path.resolve(process.cwd(), path.basename(template.downloadKey));
-  await pipeline(got.stream(template.downloadUrl), fs.createWriteStream(tmpFilename));
+  if (registryPackage.type !== 'template') {
+    await fse.mkdir(targetPath);
+    const envDestination = path.resolve(targetPath, 'serverless.yml');
+    const envConfig = `component: ${packageName}\nname: ${targetName}\ninputs:\n`;
+    await fse.writeFile(envDestination, envConfig);
+  } else {
+    cli.sessionStatus('Fetching template from registry', packageName);
+    const tmpFilename = path.resolve(process.cwd(), path.basename(registryPackage.downloadKey));
+    await pipeline(got.stream(registryPackage.downloadUrl), fs.createWriteStream(tmpFilename));
 
-  cli.sessionStatus('Unpacking your new app', templateName);
-  const zip = new AdmZip(tmpFilename);
-  zip.extractAllTo(targetPath);
-  await fs.promises.unlink(tmpFilename);
+    cli.sessionStatus('Unpacking your new app', packageName);
+    const zip = new AdmZip(tmpFilename);
+    zip.extractAllTo(targetPath);
+    await fs.promises.unlink(tmpFilename);
 
-  cli.sessionStatus('Setting up your new app');
-  await unpack(cli, targetPath, true);
+    cli.sessionStatus('Setting up your new app');
+    await unpack(cli, targetPath, true);
+  }
 
-  cli.log(`- Successfully created "${templateName}" in the current working directory.`);
-  cli.log(`- Run "cd ${template.name} && serverless deploy" to deploy your new instance.`);
+  cli.log(`- Successfully created "${targetName}" in the current working directory.`);
+  cli.log(`- Run "cd ${targetName} && serverless deploy" to deploy your new application.`);
 
   cli.sessionStop('success', 'Created');
   return null;
