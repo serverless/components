@@ -52,9 +52,13 @@ module.exports = async (config, cli) => {
   cli.logLogo();
   cli.log();
 
-  const templateName = config.t || config.template;
+  let templateName = config.t || config.template;
   if (!templateName) {
-    throw new Error('Need to specify template name by using -t or --template option.');
+    if (config.params && config.params.length > 0) {
+      templateName = config.params[0];
+    } else {
+      throw new Error('Need to specify template name. e.g. "serverless init some-template".');
+    }
   }
 
   const sdk = new ServerlessSDK();
