@@ -11,34 +11,33 @@ const path = require('path');
 const AdmZip = require('adm-zip');
 const got = require('got');
 const { ServerlessSDK } = require('@serverless/platform-client-china');
-const { getServerlessFilePath } = require('../serverlessFile');
 const spawn = require('child-process-ext/spawn');
 
 const pipeline = promisify(require('stream.pipeline-shim'));
 
-async function unpack(cli, dir, isTopLevel = false) {
-  // Check if the directory contains a serverless.yml/yaml/json/js.
-  // If it does, we need to unpack it
-  if (getServerlessFilePath(dir) || isTopLevel) {
-    if (await fse.exists(path.resolve(dir, 'package.json'))) {
-      cli.sessionStatus(`Installing node_modules via npm in ${dir}`);
-      try {
-        await spawn('npm', ['install'], { cwd: dir });
-      } catch (error) {
-        cli.logError(
-          'Failed install dependencies, make sure install dependencies manually before deploy.'
-        );
-        return null;
-      }
+async function unpack(cli, dir) {
+  if (await fse.exists(path.resolve(dir, 'package.json'))) {
+    cli.sessionStatus(`Installing node_modules via npm in ${dir}`);
+    try {
+      await spawn('npm', ['install'], { cwd: dir });
+    } catch (error) {
+      cli.logError(
+        'Failed install dependencies, make sure install dependencies manually before deploy.'
+      );
+      return null;
     }
+  }
 
-    const files = await fse.readdir(dir);
-    for (const file of files) {
-      // Check if the file is a directory, or a file
-      const stats = await fse.stat(`${dir}/${file}`);
-      if (stats.isDirectory()) {
-        await unpack(cli, path.resolve(dir, file), false);
-      }
+  const files = await fse.readdir(dir);
+  for (const file of files) {
+    // skip node_modules folder
+    if (file === 'node_modules') {
+      continue;
+    }
+    // Check if the file is a directory, or a file
+    const stats = await fse.stat(`${dir}/${file}`);
+    if (stats.isDirectory()) {
+      await unpack(cli, path.resolve(dir, file));
     }
   }
   return null;
@@ -75,7 +74,7 @@ module.exports = async (config, cli) => {
     throw new Error(`Serverless Registry Package "${packageName}" does not exist.`);
   }
 
-  const targetName = config.name || registryPackage.name;
+  const targetName = config.name || packageName;
   const targetPath = path.resolve(targetName);
 
   if (registryPackage.type !== 'template') {
@@ -94,7 +93,7 @@ module.exports = async (config, cli) => {
     await fs.promises.unlink(tmpFilename);
 
     cli.sessionStatus('Setting up your new app');
-    await unpack(cli, targetPath, true);
+    await unpack(cli, targetPath);
   }
 
   cli.log(`- Successfully created "${targetName}" in the current working directory.`);
