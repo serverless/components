@@ -595,7 +595,6 @@ inputs:
 
 If you are referencing a parameter in the same stage/app as your component instance, you can omit the stage/app part as a shortform:
 
-
 ```yml
 component: express
 org: acme
@@ -1009,7 +1008,6 @@ You can pass the package name (component or template) to view detailed informati
 Publish a Component to the Serverless Registry.
 
 `--dev` - Publishes to the `@dev` version of your Component, for testing purposes.
-
 
 #### `serverless init <package-name>`
 
