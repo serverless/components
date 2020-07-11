@@ -636,7 +636,7 @@ keywords: aws, serverless, express # Optional. The keywords of the Component to 
 repo: https://github.com/owner/project # Optional. The code repository of the Component
 license: MIT # Optional. The license of the Component code
 
-src: ./src # Required. The directory which contains the Component code
+main: ./src # Required. The directory which contains the Component code
 ```
 
 ### serverless.js
