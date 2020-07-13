@@ -1,9 +1,8 @@
 'use strict';
 
 const path = require('path');
-const yaml = require('js-yaml');
 
-const { writeFile } = require('fs-extra');
+const { writeFile, readFile } = require('fs-extra');
 const { fileExistsSync, readAndParseSync } = require('./utils');
 /**
  *
@@ -42,7 +41,7 @@ const getServerlessFilePath = (directoryPath) => {
 };
 
 /**
- * Reads a serverless config file (serverless.yml) in any format (yml, yaml, json), in a given directory path
+ * Reads and parses a serverless config file (serverless.yml) in any format (yml, yaml, json), in a given directory path
  * @param {*} directoryPath
  */
 const loadServerlessFile = (directoryPath) => {
@@ -79,11 +78,11 @@ const loadServerlessFile = (directoryPath) => {
  * @param {*} servicePath
  * @param {*} ymlObject
  */
-const writeServerlessFile = async (cli, servicePath, ymlObject) => {
+const writeServerlessFile = async (cli, servicePath, slsConfig) => {
   const serverlessFileName = await getServerlessFilePath(servicePath);
   if (isYaml(serverlessFileName)) {
     try {
-      await writeFile(serverlessFileName, yaml.safeDump(ymlObject));
+      await writeFile(serverlessFileName, slsConfig);
     } catch (error) {
       cli.error(`Cannot write serverless.yml file in ${servicePath}`);
       throw error;
@@ -100,15 +99,26 @@ const writeServerlessFile = async (cli, servicePath, ymlObject) => {
  * @param {*} serviceName
  */
 const writeMainAttrs = async (cli, servicePath, orgName, appName, serviceName = null) => {
-  const slsConfig = await getServerlessFilePath(servicePath);
-  if (isYaml(slsConfig)) {
-    const ymlObject = await loadServerlessFile(servicePath);
-    if (ymlObject) {
-      if (orgName) ymlObject.org = orgName;
-      if (appName) ymlObject.app = appName;
-      if (serviceName) ymlObject.service = serviceName;
+  const slsConfigPath = await getServerlessFilePath(servicePath);
+  if (isYaml(slsConfigPath)) {
+    let slsConfig = await readFile(slsConfigPath, 'utf8');
 
-      await writeServerlessFile(cli, servicePath, ymlObject);
+    if (slsConfig) {
+      // we want the org at the top, so maintaining this order is important
+      if (serviceName) {
+        slsConfig = `service: ${serviceName}\n${slsConfig}`;
+      }
+      if (appName) {
+        slsConfig = `app: ${appName}\n${slsConfig}`;
+      }
+      if (orgName) {
+        slsConfig = `org: ${orgName}\n${slsConfig}`;
+      }
+
+      // replace extra new lines if they exist
+      slsConfig = slsConfig.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
+
+      await writeServerlessFile(cli, servicePath, slsConfig);
     }
   }
 };
