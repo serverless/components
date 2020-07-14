@@ -92,6 +92,13 @@ module.exports = async () => {
     args._[1] = 'publish';
   }
 
+  /**
+   * Running "serverless --help" is equivalent to "serverless help"
+   */
+  if (args.help || args.h || args['help-components']) {
+    command = 'help';
+  }
+
   const params = [];
   if (args._[1]) {
     params.push(args._[1]);

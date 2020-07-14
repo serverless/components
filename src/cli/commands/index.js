@@ -7,6 +7,7 @@ const info = require('./info');
 const dev = require('./dev');
 const registry = require('./registry');
 const init = require('./init');
+const help = require('./help');
 
 module.exports = {
   login,
@@ -16,4 +17,5 @@ module.exports = {
   dev,
   registry,
   init,
+  help,
 };

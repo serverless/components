@@ -19,19 +19,6 @@ const componentKeywords = new Set(['registry', 'init', 'publish']);
 const runningComponents = () => {
   const args = minimist(process.argv.slice(2));
 
-  const isRunningHelpOrVersion =
-    process.argv[2] === 'version' ||
-    process.argv[2] === 'help' ||
-    args.v ||
-    args.version ||
-    args.h ||
-    args.help;
-
-  // don't load components CLI if running version or help
-  if (isRunningHelpOrVersion) {
-    return false;
-  }
-
   let componentConfig;
   let instanceConfig;
 
@@ -42,7 +29,8 @@ const runningComponents = () => {
     // to save up on extensive FS operations for all the other possible framework v1 commands
     ((process.argv[2] === 'deploy' || process.argv[2] === 'remove') &&
       runningTemplate(process.cwd())) ||
-    args.target
+    args.target ||
+    args['help-components'] // if user runs "serverless --help-components" in ANY context, show components help
   ) {
     return true;
   }
