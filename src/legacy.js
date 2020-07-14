@@ -29,7 +29,8 @@ const runningComponents = () => {
     // to save up on extensive FS operations for all the other possible framework v1 commands
     ((process.argv[2] === 'deploy' || process.argv[2] === 'remove') &&
       runningTemplate(process.cwd())) ||
-    args.target
+    args.target ||
+    args['help-components']
   ) {
     return true;
   }

@@ -95,7 +95,7 @@ module.exports = async () => {
   /**
    * Running "serverless --help" is equivalent to "serverless help"
    */
-  if (args.help || args.h) {
+  if (args.help || args.h || args['help-components']) {
     command = 'help';
   }
 
