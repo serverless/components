@@ -30,7 +30,7 @@ const runningComponents = () => {
     ((process.argv[2] === 'deploy' || process.argv[2] === 'remove') &&
       runningTemplate(process.cwd())) ||
     args.target ||
-    args['help-components']
+    args['help-components'] // if user runs "serverless --help-components" in ANY context, show components help
   ) {
     return true;
   }
