@@ -94,7 +94,9 @@ const validateAgainstV1Variables = (variable) => {
   for (const v1Variable of v1Variables) {
     const v1VariableRegex = new RegExp(`\\\${${v1Variable}:([\\w.-_]+)}`, 'g');
     if (v1VariableRegex.test(variable)) {
-      throw new Error(`Serverless Components does not support variable "${variable}"`);
+      throw new Error(
+        `Serverless Framework Components do not support this Variable: "${variable}".  Here are the Variables supported by Components: https://git.io/JJshw`
+      );
     }
   }
 };
