@@ -88,6 +88,17 @@ const readAndParseSync = (filePath, options = {}) => {
   return contents.toString().trim();
 };
 
+const validateAgainstV1Variables = (variable) => {
+  const v1Variables = ['self', 'opt', 'sls', 'cf', 's3', 'ssm', 'file'];
+
+  for (const v1Variable of v1Variables) {
+    const v1VariableRegex = new RegExp(`\\\${${v1Variable}:(\\w*[\\w.-_]+)}`, 'g');
+    if (v1VariableRegex.test(variable)) {
+      throw new Error(`Serverless Components does not support variable "${variable}"`);
+    }
+  }
+};
+
 /**
  * Resolves any variables that require resolving before the engine.
  * This currently supports only ${env}.  All others should be resolved within the deployment engine.
@@ -101,6 +112,8 @@ const resolveVariables = (inputs) => {
     if (matches) {
       let newValue = value;
       for (const match of matches) {
+        // make sure users are not using v1 variables
+        validateAgainstV1Variables(match);
         // Search for ${env:}
         if (/\${env:(\w*[\w.-_]+)}/g.test(match)) {
           const referencedPropertyPath = match.substring(2, match.length - 1).split(':');
