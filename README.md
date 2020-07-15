@@ -252,7 +252,7 @@ inputs: # The configuration the Component accepts according to its docs
   src: ./src
 ```
 
-There is nothing to install when using Serverless Components. Instead, when you run deploy, the configuration you specify in `serverless.yml` will be sent to the Serverless Components Deployment Engine, along with any files or folders you specifiy in `inputs` that may be part of the outcome you are seeking to deploy.
+There is nothing to install when using Serverless Components. Instead, when you run deploy, the configuration you specify in `serverless.yml` will be sent to the Serverless Components Deployment Engine, along with any files or folders you specify in `inputs` that may be part of the outcome you are seeking to deploy.
 
 Please note that you can only have 1 Serverless Component in `serverless.yml`. We encourage this because it's important to separate the resources in your Serverless Applications, rather than put all of them in 1 infrastructure stack.
 
@@ -298,10 +298,10 @@ While Serverless Components deploy incredibly fast, please note that first deplo
 
 ### State
 
-Serverless Components automatically save their state remotely. This means you can easily push your Components to Github, Gitlab, Bitbucket, etc., and collaborate on them with others as long as the `serverless.yml` contains an `org` which your collaboraters are added to:
+Serverless Components automatically save their state remotely. This means you can easily push your Components to Github, Gitlab, Bitbucket, etc., and collaborate on them with others as long as the `serverless.yml` contains an `org` which your collaborators are added to:
 
 ```yaml
-org: acme-team # Your collaboraters must be added at dashboard.serverless.com
+org: acme-team # Your collaborators must be added at dashboard.serverless.com
 app: ecommerce
 component: my-component
 name: rest-api
@@ -309,7 +309,7 @@ name: rest-api
 
 Further, your Component Instances can easily be deployed with CI/CD, as long as you make sure to include a `SERVERLESS_ACCESS_KEY` environment variable.
 
-You can add collaboraters and create access tokens in the [Serverless Framework Dashboard](https://dashboard.serverless.com).
+You can add collaborators and create access tokens in the [Serverless Framework Dashboard](https://dashboard.serverless.com).
 
 ### Versioning
 
@@ -450,7 +450,7 @@ inputs:
   name: ${org}-api # Results in "acme-api"
 ```
 
-**Note:** If you didn't specify an `org`, the default `org` would be the first org you craeted when you first signed up. You can always overwrite the default `org` or the one specified in `serverless.yml` by passing the `--org` option on deploy:
+**Note:** If you didn't specify an `org`, the default `org` would be the first org you created when you first signed up. You can always overwrite the default `org` or the one specified in `serverless.yml` by passing the `--org` option on deploy:
 
 ```
 $ serverless deploy --org my-other-org
@@ -548,7 +548,7 @@ inputs:
 ```
 
 - `stage` - The stage that the referenced component instance was deployed to. It is the `stage` property in that component instance `serverless.yml` file.
-- `app` - The app that the referenced component instance was deployed to. It is the `app` property in that component instance `serverelss.yml` file, which falls back to the `name` property if you did not specify it.
+- `app` - The app that the referenced component instance was deployed to. It is the `app` property in that component instance `serverless.yml` file, which falls back to the `name` property if you did not specify it.
 - `instance` - The name of the component instance you are referencing. It is the `name` property in that component instance `serverless.yml` file.
 - `output` - One of the outputs of the component instance you are referencing. They are displayed in the CLI after deploying.
 
@@ -594,7 +594,6 @@ inputs:
 ```
 
 If you are referencing a parameter in the same stage/app as your component instance, you can omit the stage/app part as a shortform:
-
 
 ```yml
 component: express
@@ -824,7 +823,7 @@ Run your Component command to test your changes:
 $ serverless deploy --debug
 ```
 
-When writing a Component, we recomend to always use the `--debug` flag, so that the Component's `console.log()` statements are sent to the CLI. These are handy to use in Serverless Components, since they describe what the Component is doing. We recommend you add `console.log()` statements to your Component wherever you think they are necessary.
+When writing a Component, we recommend to always use the `--debug` flag, so that the Component's `console.log()` statements are sent to the CLI. These are handy to use in Serverless Components, since they describe what the Component is doing. We recommend you add `console.log()` statements to your Component wherever you think they are necessary.
 
 ```javascript
 class MyComponent extends Component {
@@ -854,7 +853,7 @@ Serverless: Successfully publish express@0.0.1
 
 ### Components Type System
 
-**Warning: Easly & Experimental**
+**Warning: Early & Experimental**
 
 There is a type system in progress for Components which specifically covers:
 
@@ -895,7 +894,7 @@ There are a handful of Metrics that Components support. Here they are and how th
 
 ###### `type: 'bar-v1'`
 
-This is for displaying a bar chart.  It can support multiple y data sets which cause the bar chart to stack.
+This is for displaying a bar chart. It can support multiple y data sets which cause the bar chart to stack.
 
 In the dashboard, the `stat` property of the first array is preferred.
 
@@ -942,7 +941,7 @@ In the dashboard, the `stat` property of the first array is preferred.
 
 ###### `type: 'line-v1'`
 
-This is for displaying a line chart.  It can support multiple y data sets which cause multiple lines on the chart.
+This is for displaying a line chart. It can support multiple y data sets which cause multiple lines on the chart.
 
 In the dashboard, the `stat` property of the first array is preferred.
 
@@ -1068,7 +1067,6 @@ You can pass the package name (component or template) to view detailed informati
 Publish a Component to the Serverless Registry.
 
 `--dev` - Publishes to the `@dev` version of your Component, for testing purposes.
-
 
 #### `serverless init <package-name>`
 
