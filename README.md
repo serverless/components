@@ -67,6 +67,7 @@ inputs: # The configuration the Component accepts according to its docs
 - [Building Components](#building-components)
   - [serverless.component.yml](#serverlesscomponentyml)
   - [serverless.js](#serverlessjs)
+  - [Input & Output Types](#input--output-types)
   - [Working With Source Code](#working-with-source-code)
   - [Adding The Serverless Agent](#adding-the-serverless-agent)
   - [Development Workflow](#development-workflow)
