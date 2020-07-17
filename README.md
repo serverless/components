@@ -713,13 +713,12 @@ The Actions of a Serverless Component can optionally declare Types for its Input
 
 These Types are recommended because they offer the following benefits:
 
-* They validate user Inputs before they are sent to a Component's Actions.
 * They validate an Action is supported by a Component before running it.
+* They validate user Inputs before they are sent to a Component's Actions.
 * They prevent Component authors from needing to write their own validation logic.
-* They offer helpful errors when a user enters invalid Inputs.
+* They offer helpful errors to Component users when they enter invalid Inputs.
 * They can automate documentation for your Component.
-* They are necessary to support upcoming Serverless Framework features (e.g. rendering form fields in a GUI).
-* They help the [Serverless Framework Dashboard](https://app.serverless.com) visualize Outputs.
+* They are needed for upcoming [Serverless Framework Dashboard](https://app.serverless.com) features that will enable visualizing Input and Output data special ways (e.g. form fields, charts, etc.).
 
 Types are optionally declared in `serverless.component.yml` files.  
 
