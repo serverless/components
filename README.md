@@ -49,7 +49,7 @@ inputs: # The configuration the Component accepts according to its docs
 - [Using Components](#using-components)
   - [Serverless Framework](#serverless-framework)
   - [serverless.yml](#serverlessyml)
-  - [Inputs](#inputs)
+  - [Actions, Inputs & Outputs](#actions-inputs--outputs)
   - [Deploying](#deploying)
   - [State](#state)
   - [Versioning](#versioning)
@@ -296,6 +296,32 @@ In `serverless.yml` the `inputs` property are merely Inputs that you wish to sen
 
 Every Action has it' own Inputs and Outputs.
 
+When a Component Action is finished running, it returns an `outputs` object.
+
+Outputs contain the most important information you need to know from a deployed Component Instance, like the URL of the API or website, or all of the API endpoints.
+
+Outputs can be referenced easily in the `inputs` of other Components. Just use this syntax:
+
+```yaml
+# Simpler Syntax - References the same "stage" and "app"
+${output:[instance].[output]}
+
+# More Configurable Syntax - Customize the "stage" and "app"
+${output:[stage]:[app]:[instance].[output]}
+```
+
+- `stage` - The stage that the referenced component instance was deployed to. It is the `stage` property in that component instance `serverless.yml` file.
+- `app` - The app that the referenced component instance was deployed to. It is the `app` property in that component instance `serverelss.yml` file, which falls back to the `name` property if you did not specify it.
+- `instance` - The name of the component instance you are referencing. It is the `name` property in that component instance `serverless.yml` file.
+- `output` - One of the outputs of the component instance you are referencing. They are displayed in the CLI after deploying.
+
+```yaml
+# Examples
+${output:prod:ecommerce:products-api.url}
+${output:prod:ecommerce:role.arn}
+${output:prod:ecommerce:products-database.name}
+```
+
 ### Deploying
 
 You can deploy Components easily via the Serverless Framework with the `$ serverless deploy` command.
@@ -332,31 +358,6 @@ component: express@0.0.2
 ```
 
 When you add a version, only that Component version is used. When you don't add a version, the Serverless Framework will use the latest version of that Component, if it exists. We recommend to **always** pin your Component to a version.
-
-### Outputs
-
-When a Component is finished running, it returns an `outputs` object.
-
-Outputs contain the most important information you need to know from a deployed Component Instance, like the URL of the API or website, or all of the API endpoints.
-
-Outputs can be referenced easily in the `inputs` of other Components. Just use this syntax:
-
-```yaml
-# Syntax
-${output:[stage]:[app]:[instance].[output]}
-```
-
-- `stage` - The stage that the referenced component instance was deployed to. It is the `stage` property in that component instance `serverless.yml` file.
-- `app` - The app that the referenced component instance was deployed to. It is the `app` property in that component instance `serverelss.yml` file, which falls back to the `name` property if you did not specify it.
-- `instance` - The name of the component instance you are referencing. It is the `name` property in that component instance `serverless.yml` file.
-- `output` - One of the outputs of the component instance you are referencing. They are displayed in the CLI after deploying.
-
-```yaml
-# Examples
-${output:prod:ecommerce:products-api.url}
-${output:prod:ecommerce:role.arn}
-${output:prod:ecommerce:products-database.name}
-```
 
 ### Credentials
 
