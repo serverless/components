@@ -710,9 +710,9 @@ module.exports = MyComponent;
 
 ### Input & Output Types
 
-Actions in a Serverless Component can optionally declare Types for its Inputs and Outputs.
+The Actions of a Serverless Component can optionally declare Types for its Inputs and Outputs.  
 
-**Serverless Component Types** are recommended because they offer the following features:
+These Types are recommended because they offer the following benefits:
 
 * They validate user Inputs before they are sent to a Component's Actions.
 * They validate an Action is supported by a Component before running it.
@@ -919,6 +919,10 @@ actions:
 ```
 
 #### type `metrics`
+
+If you use the `metrics` Type in your Component Outputs, you must return an array that contains one or many of the following data structures.
+
+Each data structure corresponds to a widget that can be rendered in the Serverless Framework Dashboard.
 
 ##### `type: 'bar-v1'`
 
