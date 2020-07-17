@@ -71,7 +71,6 @@ inputs: # The configuration the Component accepts according to its docs
   - [Working With Source Code](#working-with-source-code)
   - [Adding The Serverless Agent](#adding-the-serverless-agent)
   - [Development Workflow](#development-workflow)
-  - [Type System](#components-type-system)
   - [Development Tips](#development-tips)
     - [Start With The Outcome](#start-with-the-outcome)
     - [Knowing The Outcome Is An Advantage](#knowing-the-outcome-is-an-advantage)
