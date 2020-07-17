@@ -19,7 +19,7 @@ const sdk = new ServerlessSDK({
  * @param {*} cli
  * @param {*} cliParams
  */
-const run = async (cli, cliParam) => {
+const run = async (cli, cliParam, customDir) => {
   cli.sessionStart('Fetching app configuration');
   let templateUrl;
   let directory;
@@ -59,6 +59,11 @@ const run = async (cli, cliParam) => {
     templateUrl = data.downloadUrl;
     type = data.type;
   }
+
+  if (customDir) {
+    directory = customDir;
+  }
+
   cli.sessionStatus('Unpacking your new app');
   // Create template directory
   try {
@@ -101,11 +106,12 @@ const run = async (cli, cliParam) => {
 
 const init = async (config, cli) => {
   const maybeToken = config.params[0];
+  const customDir = config.dir || config.d;
   if (!maybeToken) {
     throw new Error('"init" command requires either a token or package name from the Registry');
   }
   cli.logLogo();
-  const serviceDir = await run(cli, config.params[0]);
+  const serviceDir = await run(cli, config.params[0], customDir);
   if (serviceDir) {
     cli.sessionStop(
       'success',

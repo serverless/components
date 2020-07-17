@@ -18,6 +18,7 @@ module.exports = async (config, cli) => {
 ${command(
   'serverless init {name}'
 )}      Initializes the specified package name or token in the current working directory
+${command('  --dir, -d')}                 Specify destination directory
 
 ${command(
   'serverless {command}'
