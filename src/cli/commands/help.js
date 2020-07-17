@@ -23,9 +23,9 @@ ${command(
   'serverless {command}'
 )}        Runs the specified component command (deploy, remove...etc)
 ${command('  --debug')}                   logs the running low-level debug statements
-${command('  --stage')}                   Overwrites the stage set in serverless.yml
-${command('  --app')}                     Overwrites the app set in serverless.yml
-${command('  --org')}                     Overwrites the org set in serverless.yml
+${command('  --stage {stage}')}           Overwrites the stage set in serverless.yml
+${command('  --app {app}')}               Overwrites the app set in serverless.yml
+${command('  --org {org}')}               Overwrites the org set in serverless.yml
 
 ${command(
   'serverless dev'
