@@ -52,7 +52,6 @@ inputs: # The configuration the Component accepts according to its docs
   - [Actions, Inputs & Outputs](#actions-inputs--outputs)
   - [Deploying](#deploying)
   - [State](#state)
-  - [Versioning](#versioning)
   - [Outputs](#outputs)
   - [Credentials](#credentials)
     - [AWS Credentials](#aws-credentials)
