@@ -674,6 +674,32 @@ const isChinaUser = () => {
   return result;
 };
 
+/**
+ * Makes sure user ran "npm install" if package.json with dependencies was found
+ */
+const validateNodeModules = async (directory) => {
+  const srcPath = path.resolve(process.cwd(), directory);
+  const packageJsonPath = path.resolve(srcPath, 'package.json');
+
+  // only validate node modules if package.json exists
+  if (await fileExists(packageJsonPath)) {
+    const packageJson = readAndParseSync(packageJsonPath);
+
+    const hasDependencies = Object.keys(packageJson.dependencies).length > 0;
+
+    // only validate node modules if there are dependencies in package.json
+    if (hasDependencies) {
+      const nodeModulesExists = await fse.pathExists(path.resolve(srcPath, 'node_modules'));
+
+      if (!nodeModulesExists) {
+        throw new Error(
+          'node_modules was not found in the current working directory, or the "src" directory you specified. Did you run "npm install"?'
+        );
+      }
+    }
+  }
+};
+
 module.exports = {
   sleep,
   fileExists,
@@ -699,4 +725,5 @@ module.exports = {
   createGraph,
   executeGraph,
   isChinaUser,
+  validateNodeModules,
 };

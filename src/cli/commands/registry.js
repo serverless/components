@@ -16,7 +16,7 @@ const {
   getTemplate,
   isLoggedInOrHasAccessKey,
 } = require('./utils');
-const { fileExists, loadComponentConfig } = require('../utils');
+const { fileExists, loadComponentConfig, validateNodeModules } = require('../utils');
 const { loadServerlessFile } = require('../serverlessFile');
 
 /**
@@ -84,7 +84,7 @@ const publish = async (config, cli) => {
     serverlessFile.src = process.cwd();
   }
 
-  // validate serverless.js if component
+  // validate serverless.js & node_modules if component
   if (serverlessFile.type === 'component') {
     const serverlessJsFilePath = path.resolve(process.cwd(), serverlessFile.src, 'serverless.js');
 
@@ -93,6 +93,9 @@ const publish = async (config, cli) => {
         'no "serverless.js" file was found in the current working directory, or the "src" directory you specified.'
       );
     }
+
+    // make sure user ran "npm install" if applicable
+    await validateNodeModules(serverlessFile.src);
   } else {
     // validate the template
     await getTemplate(process.cwd());
