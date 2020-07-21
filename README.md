@@ -1072,6 +1072,8 @@ Publish a Component to the Serverless Registry.
 
 Initializes the specified package (component or template) locally to get you started quickly.
 
+`--dir`, `-d` - Specify destination directory.
+
 #### `serverless deploy`
 
 Deploys an Instance of a Component.
