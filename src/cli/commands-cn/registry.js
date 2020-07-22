@@ -40,10 +40,13 @@ const publish = async (config, cli) => {
   }
   // fall back to service name for framework v1
   serverlessFile.name = serverlessFile.name || serverlessFile.service;
+
   // If "--dev" flag is used, set the version the API expects
-  if (config.dev && serverlessFile.type === 'template') {
-    serverlessFile.version = '0.0.0-dev';
+  // default version is dev
+  if (!serverlessFile.version || config.dev) {
+    serverlessFile.version = 'dev';
   }
+
   serverlessFile.org = serverlessFile.org || (await utils.getDefaultOrgName());
 
   // Presentation
