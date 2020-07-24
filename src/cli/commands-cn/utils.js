@@ -227,6 +227,29 @@ const setInputsForCommand = (instanceYaml, command, config) => {
   }
 };
 
+const handleDebugLogMessage = (cli) => {
+  return (evt) => {
+    if (evt.event !== 'instance.run.logs') {
+      return;
+    }
+    if (Array.isArray(evt.data.logs)) {
+      evt.data.logs.forEach((log) => {
+        // Remove strange formatting that comes from stderr
+        if (log.data.startsWith("'")) {
+          log.data = log.data.slice(1);
+        }
+        if (log.data.endsWith("'")) {
+          log.data = log.data.slice(0, -1);
+        }
+        if (log.data.endsWith('\\n')) {
+          log.data = log.data.slice(0, -2);
+        }
+        cli.log(log.data);
+      });
+    }
+  };
+};
+
 module.exports = {
   loadInstanceConfig: loadTencentInstanceConfig,
   loadInstanceCredentials,
@@ -235,4 +258,5 @@ module.exports = {
   getTemplate,
   getInstanceDashboardUrl,
   setInputsForCommand,
+  handleDebugLogMessage,
 };
