@@ -85,13 +85,13 @@ module.exports = async (config, cli) => {
 
     // Deployment
     if (event.event === 'instance.deployment.succeeded') {
-      const header = `${d.toLocaleTimeString()} - ${event.instanceName} - deployment`;
+      const header = `${d.toLocaleTimeString()} - ${event.instance_name} - deployment`;
       cli.log(header, 'grey');
       cli.logOutputs(event.data.outputs);
       cli.sessionStatus('Watching');
     }
     if (event.event === 'instance.deployment.failed') {
-      const header = `${d.toLocaleTimeString()} - ${event.instanceName} - deployment error`;
+      const header = `${d.toLocaleTimeString()} - ${event.instance_name} - deployment error`;
       cli.log(header, 'grey');
       cli.log(event.data.stack, 'red');
       cli.sessionStatus('Watching');
@@ -133,7 +133,7 @@ module.exports = async (config, cli) => {
           if (log.type === 'stderr') {
             type = 'log - stderr';
           }
-          const header = `${date.toLocaleTimeString()} - ${event.instanceName} - ${type}`;
+          const header = `${date.toLocaleTimeString()} - ${event.instance_name} - ${type}`;
           cli.log(header, 'grey');
           if (log.type === 'log' || log.type === 'stdout') {
             cli.log(log.data);
@@ -153,7 +153,7 @@ module.exports = async (config, cli) => {
 
     // Error
     if (event.event === 'instance.error') {
-      const header = `${d.toLocaleTimeString()} - ${event.instanceName} - error`;
+      const header = `${d.toLocaleTimeString()} - ${event.instance_name} - error`;
       cli.log(header, 'grey');
       cli.log(event.data.stack, 'red');
       cli.log();
@@ -166,14 +166,14 @@ module.exports = async (config, cli) => {
       if (event.data.path && event.data.httpMethod) {
         transactionType = `transaction - ${event.data.httpMethod.toUpperCase()} - ${
           event.data.path
-        }`;
+          }`;
       }
       // Default
       else {
         transactionType = 'transaction';
       }
 
-      const header = `${d.toLocaleTimeString()} - ${event.instanceName} - ${transactionType}`;
+      const header = `${d.toLocaleTimeString()} - ${event.instance_name} - ${transactionType}`;
       cli.log(header, 'grey');
     }
   };

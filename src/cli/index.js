@@ -4,6 +4,7 @@
  * Serverless Components: CLI Handler
  */
 
+const os = require('os');
 const path = require('path');
 const http = require('http');
 const https = require('https');
@@ -144,6 +145,33 @@ module.exports = async () => {
     }
   } catch (e) {
     process.exitCode = 1;
+
+    /**
+     * Add dynamic information based on error type to help users
+     */
+
+    // Modify error message for specific error types
+    if (e.name === 'Invalid Component Types') {
+      e.message = `Invalid Input: ${e.message}`;
+    }
+
+    // Add helpful error info
+    e.message = e.message + os.EOL + os.EOL
+
+    // Path
+    if (e.details && e.details.path) {
+      e.message = e.message + `  Input: "${e.details.path}"` + os.EOL;
+    }
+    // Documentation
+    if (e.details && e.details.repo) {
+      e.message = e.message + `  Documentation: ${e.details.repo}` + os.EOL;
+    } else {
+      e.message = e.message + `  Documentation: https://github.com/serverless/components` + os.EOL;
+    }
+    // Support Link
+    e.message = e.message + '  Support: https://app.serverless.com/support' + os.EOL
+    // Slack Channel
+    e.message = e.message + '  Slack: https://www.serverless.com/slack/'
 
     if (cli.isSessionActive()) {
       cli.sessionStop('error', e);

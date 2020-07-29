@@ -102,7 +102,7 @@ module.exports = async (config, cli) => {
   cli.log(
     `Full details: ${getDashboardUrl(
       `/${instance.orgName}/apps/${instance.appName || instance.instanceName}/${
-        instance.instanceName
+      instance.instanceName
       }/${instance.stageName}`
     )}`
   );

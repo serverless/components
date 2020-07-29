@@ -138,7 +138,7 @@ class CLI {
         content += ` ${figures.pointerSmall} `;
       }
       content += `${this._.entity} `;
-      content += `${figures.pointerSmall} ${message}`;
+      content += `${figures.pointerSmall} ${message.message || message}`; // In case an error object was passed in
       process.stdout.write(color(content));
     }
     // Put cursor to starting position for next view
@@ -311,7 +311,7 @@ class CLI {
   logLogo() {
     let logo = os.EOL;
     logo += 'serverless';
-    logo += red(' ⚡');
+    logo += red(' ⚡ ');
     logo += 'framework';
 
     if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
@@ -327,7 +327,7 @@ class CLI {
   logRegistryLogo(text) {
     let logo = os.EOL;
     logo += white('serverless');
-    logo += red(' ⚡');
+    logo += red(' ⚡ ');
     logo += white('registry');
 
     if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
