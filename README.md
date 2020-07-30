@@ -82,6 +82,7 @@ inputs: # The configuration the Component accepts according to its docs
     - [No Surprise Removals](#no-surprise-removals)
     - [Write Integration Tests](#write-integration-tests)
 - [CLI Commands](#cli-commands)
+- [F.A.Q.](#faq)
 
 <br/>
 
@@ -1095,3 +1096,22 @@ Fetches information of an Instance of a Component.
 #### `serverless dev`
 
 Starts DEV MODE, which watches the Component for changes, auto-deploys on changes, and (if supported by the Component) streams logs, errors and transactions to the terminal.
+
+# F.A.Q.
+
+### How can I deploy multiple Components at the same time?
+
+A `serverless.yml` file can only hold 1 Component at this time.  However, that does not mean you cannot deploy multiple Components at the same time.  
+
+Simply navigate to a parent directory, and run `serverless deploy` to deploy any `serverless.yml` files in immediate subfolders.  When this happens, the Serverless Framework will quickly create a graph based on the references your Component apps are making to eachother.  Depending on those references, it will prioritize what needs to be deployed first, otherwise its default is to deploy things in parallel.
+
+For context, here is why we designed `serverless.yml` to only hold 1 Component at a time:
+
+* We have a lot of advanced automation and other features in the works for Components that push the limits of how we think about infrastructure-as-code.  Delivering those features is harder if `serverless.yml` contains multiple Components.
+
+* Many of our support requests come from users who deploy a lot of critical infrastructure together, and end up accidentally breaking that critical infrastructure, often while intending to push updates to one specific area.  In response to this, we wanted to make sure there was an easy way to deploy things separately first, so that developers can deploy more safely.  Generally, try to keep the things you deploy frequently (e.g. code, functions, APIs, etc.), separate from critical things that you deploy infrequently (e.g. VPCs, databases, S3 buckets).  We get that it's convenient to deploy everything together (which is why we still enabled this via the method above), just be careful out there!
+
+
+
+
+
