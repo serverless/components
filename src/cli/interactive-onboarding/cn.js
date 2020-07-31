@@ -20,11 +20,11 @@ const projectTypeChoice = async (choices) =>
       message: '请选择你希望创建的 Serverless 应用',
       type: 'autocomplete',
       name: 'projectType',
-      source: (_, input) => {
-        if (input !== undefined) {
-          return Promise.resolve(choices.filter((choice) => choice.name.includes(input)));
+      source: async (_, input) => {
+        if (input) {
+          return choices.filter((choice) => choice.name.includes(input));
         }
-        return Promise.resolve(choices);
+        return choices;
       },
     })
   ).projectType;
