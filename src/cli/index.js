@@ -42,6 +42,11 @@ module.exports = async () => {
   config.platformStage = process.env.SERVERLESS_PLATFORM_STAGE || 'prod';
   config.debug = process.env.SLS_DEBUG || !!args.debug;
 
+  // Add stage environment variable
+  if (args.stage && !process.env.SERVERLESS_STAGE) {
+    process.env.SERVERLESS_STAGE = args.stage;
+  }
+
   // Initialize CLI utilities
   const cli = new CLI(config);
 
@@ -122,11 +127,6 @@ module.exports = async () => {
    */
   if (args.help || args.h || args['help-components']) {
     command = 'help';
-  }
-
-  // Add stage environment variable
-  if (args.stage && !process.env.SERVERLESS_STAGE) {
-    process.env.SERVERLESS_STAGE = args.stage;
   }
 
   // Handle version command. Log and exit.
