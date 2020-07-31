@@ -55,7 +55,11 @@ const publish = async (config, cli) => {
     }
 
     serverlessFile = serverlessComponentFile;
-    serverlessFile.src = serverlessComponentFile.main;
+    serverlessFile.src = serverlessComponentFile.src || serverlessComponentFile.main;
+  } else if (serverlessFile.version || serverlessFile.type === 'component') {
+    throw new Error(
+      'Publish failed. Components could only be defined with a "serverless.component.yml" file.'
+    );
   }
 
   if (serverlessFile.type === 'template' || (!serverlessFile.type && !serverlessFile.version)) {
