@@ -106,30 +106,29 @@ class CLI {
    * @param {string} reason This tells the status bar how to display its final message. Can be 'error', 'cancel', 'close', 'success', 'silent'.
    * @param {string || error} message Can be a final message to the user (string) or an error.
    */
-  sessionStop(reason, message = 'Closed') {
+  sessionStop(reason, messageOrError = 'Closed') {
+
+    // Clear any existing content
+    process.stdout.write(ansiEscapes.cursorLeft);
+    process.stdout.write(ansiEscapes.eraseDown);
+
     // Set color
     let color = white;
-    if (reason === 'error' || reason === 'cancel') {
-      color = red;
-    }
     if (reason === 'close') {
       color = white;
     }
     if (reason === 'success') {
       color = green;
     }
-
-    // Clear any existing content
-    process.stdout.write(ansiEscapes.cursorLeft);
-    process.stdout.write(ansiEscapes.eraseDown);
-
-    // Render stack trace (if debug is on)
-    if (reason === 'error') {
-      this.logErrorStackTrace(message);
+    if (reason === 'cancel') {
+      color = red;
     }
 
-    // Silent is used to skip the "Done" message
-    if (reason !== 'silent') {
+    // Render error
+    if (reason === 'error') {
+      this.logError(messageOrError);
+    } else if (reason !== 'silent') {
+      // Silent is used to skip the "Done" message
       // Write content
       this.log();
       let content = '';
@@ -138,9 +137,10 @@ class CLI {
         content += ` ${figures.pointerSmall} `;
       }
       content += `${this._.entity} `;
-      content += `${figures.pointerSmall} ${message.message || message}`; // In case an error object was passed in
+      content += `${figures.pointerSmall} ${messageOrError.message || messageOrError}`; // In case an error object was passed in
       process.stdout.write(color(content));
     }
+
     // Put cursor to starting position for next view
     console.log(os.EOL);
     process.stdout.write(ansiEscapes.cursorLeft);
@@ -181,27 +181,44 @@ class CLI {
    * Log an error and optionally a stacktrace
    * @param {error} error An instance of the Error class
    */
-  logError(error) {
+  logError(error = {}, options = {}) {
     // If no argument, skip
     if (!error || error === '') {
       return null;
     }
 
     if (typeof error === 'string') {
-      error = new Error(error);
+      error = { message: error };
     }
 
     // Clear any existing content
     process.stdout.write(ansiEscapes.eraseDown);
 
+    // Add space
+    console.log('')
+
     // Render stack trace (if debug is on)
     this.logErrorStackTrace(error);
 
-    let content = `${this._.entity} `;
-    content += `${figures.pointerSmall} ${error.message}`;
+    let content = `${this._.entity} ${figures.pointerSmall} ${error.message} ${os.EOL}`;
+
+    // Optional prefix.  Useful for timer/seconds
+    if (options.prefix) {
+      content = `${options.prefix}${content}`
+    }
+
+    // Add additional space
+    content += os.EOL;
+
+    // Add helpful error info
+    if (error.documentation) { content += error.documentation }
+    if (error.support) { content += error.support }
+    if (error.slack) { content += error.slack }
+
+    // Write to terminal
     process.stdout.write(red(content));
+
     // Put cursor to starting position for next view
-    console.log(os.EOL);
     process.stdout.write(ansiEscapes.cursorLeft);
 
     return null;

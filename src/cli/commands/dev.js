@@ -6,6 +6,7 @@
 
 const { ServerlessSDK } = require('@serverless/platform-client');
 const {
+  ServerlessError,
   getAccessKey,
   loadInstanceConfig,
   loadInstanceCredentials,
@@ -31,7 +32,7 @@ module.exports = async (config, cli) => {
     try {
       await sdk.deploy(instanceYaml, instanceCredentials);
     } catch (error) {
-      cli.logError(error.message);
+      cli.logError(new ServerlessError(error));
     }
 
     await cli.watcher.close();
@@ -62,7 +63,7 @@ module.exports = async (config, cli) => {
   // Presentation
   cli.logLogo();
   cli.log(
-    'Dev Mode - Watching your Component for changes and enabling streaming logs, if supported...',
+    'Dev Mode - Watching your App for changes and enabling streaming logs, if supported...',
     'grey'
   );
 
@@ -86,14 +87,9 @@ module.exports = async (config, cli) => {
     // Deployment
     if (event.event === 'instance.deployment.succeeded') {
       const header = `${d.toLocaleTimeString()} - ${event.instance_name} - deployment`;
+      cli.log()
       cli.log(header, 'grey');
       cli.logOutputs(event.data.outputs);
-      cli.sessionStatus('Watching');
-    }
-    if (event.event === 'instance.deployment.failed') {
-      const header = `${d.toLocaleTimeString()} - ${event.instance_name} - deployment error`;
-      cli.log(header, 'grey');
-      cli.log(event.data.stack, 'red');
       cli.sessionStatus('Watching');
     }
 
@@ -229,7 +225,7 @@ module.exports = async (config, cli) => {
     try {
       await sdk.deploy(instanceYaml, instanceCredentials, { dev: true });
     } catch (error) {
-      cli.logError(error.message);
+      cli.logError(new ServerlessError(error));
       cli.sessionStatus('Watching');
     }
   });
@@ -256,7 +252,7 @@ module.exports = async (config, cli) => {
       try {
         await sdk.deploy(instanceYaml, instanceCredentials, { dev: true });
       } catch (error) {
-        cli.logError(error.message);
+        cli.logError(new ServerlessError(error));
         cli.sessionStatus('Watching');
       }
 
@@ -267,7 +263,7 @@ module.exports = async (config, cli) => {
         try {
           await sdk.deploy(instanceYaml, instanceCredentials, { dev: true });
         } catch (error) {
-          cli.logError(error.message);
+          cli.logError(new ServerlessError(error));
           cli.sessionStatus('Watching');
         }
       }
