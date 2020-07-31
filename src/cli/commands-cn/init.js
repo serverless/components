@@ -43,7 +43,21 @@ async function unpack(cli, dir) {
   return null;
 }
 
-module.exports = async (config, cli) => {
+const initTemplateFromCli = async (targetPath, packageName, registryPackage, cli) => {
+  cli.sessionStatus('Fetching template from registry', packageName);
+  const tmpFilename = path.resolve(path.basename(registryPackage.downloadKey));
+  await pipeline(got.stream(registryPackage.downloadUrl), fs.createWriteStream(tmpFilename));
+
+  cli.sessionStatus('Unpacking your new app', packageName);
+  const zip = new AdmZip(tmpFilename);
+  zip.extractAllTo(targetPath);
+  await fs.promises.unlink(tmpFilename);
+
+  cli.sessionStatus('Setting up your new app');
+  await unpack(cli, targetPath);
+};
+
+const init = async (config, cli) => {
   // Start CLI persistance status
   cli.sessionStart('Initializing', { timer: false });
 
@@ -83,17 +97,7 @@ module.exports = async (config, cli) => {
     const envConfig = `component: ${packageName}\nname: ${targetName}\ninputs:\n`;
     await fse.writeFile(envDestination, envConfig);
   } else {
-    cli.sessionStatus('Fetching template from registry', packageName);
-    const tmpFilename = path.resolve(path.basename(registryPackage.downloadKey));
-    await pipeline(got.stream(registryPackage.downloadUrl), fs.createWriteStream(tmpFilename));
-
-    cli.sessionStatus('Unpacking your new app', packageName);
-    const zip = new AdmZip(tmpFilename);
-    zip.extractAllTo(targetPath);
-    await fs.promises.unlink(tmpFilename);
-
-    cli.sessionStatus('Setting up your new app');
-    await unpack(cli, targetPath);
+    await initTemplateFromCli(targetPath, packageName, registryPackage, cli);
   }
 
   cli.log(`- Successfully created "${targetName}" in the current working directory.`);
@@ -101,4 +105,9 @@ module.exports = async (config, cli) => {
 
   cli.sessionStop('success', 'Created');
   return null;
+};
+
+module.exports = {
+  init,
+  initTemplateFromCli,
 };
