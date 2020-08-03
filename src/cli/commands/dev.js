@@ -6,14 +6,37 @@
 
 const { ServerlessSDK } = require('@serverless/platform-client');
 const {
-  ServerlessError,
   getAccessKey,
   loadInstanceConfig,
   loadInstanceCredentials,
   isLoggedInOrHasAccessKey,
 } = require('./utils');
 
+/**
+ * Deploy helper function
+ */
+const deploy = async (sdk, cli, instanceYaml, instanceCredentials) => {
+  let result
+  try {
+    result = await sdk.deploy(instanceYaml, instanceCredentials);
+  } catch (error) {
+    if (error.name === 'Invalid Component Types') {
+      error.message = `Invalid Input: ${error.message}`
+    }
+    if (error.details && error.details.repo) {
+      error.documentation = `  Documentation: ${error.details.repo}`
+    }
+    cli.logError(error);
+  }
+
+  return result
+}
+
 module.exports = async (config, cli) => {
+
+  let instanceYaml,
+    instanceCredentials
+
   // Define a close handler, that removes any "dev" mode agents
   const closeHandler = async () => {
     // Set new close listener
@@ -29,11 +52,7 @@ module.exports = async (config, cli) => {
     cli.sessionStatus('Disabling Dev Mode & closing', null, 'green');
 
     // Remove agent from application
-    try {
-      await sdk.deploy(instanceYaml, instanceCredentials);
-    } catch (error) {
-      cli.logError(new ServerlessError(error));
-    }
+    await deploy(sdk, cli, instanceYaml, instanceCredentials)
 
     await cli.watcher.close();
     cli.sessionStop('success', 'Dev Mode closed');
@@ -52,10 +71,10 @@ module.exports = async (config, cli) => {
   cli.sessionStart('Initializing', { closeHandler });
 
   // Load serverless component instance.  Submit a directory where its config files should be.
-  let instanceYaml = await loadInstanceConfig(process.cwd(), { disableCache: true });
+  instanceYaml = await loadInstanceConfig(process.cwd(), { disableCache: true });
 
   // Load Instance Credentials
-  const instanceCredentials = await loadInstanceCredentials(instanceYaml.stage);
+  instanceCredentials = await loadInstanceCredentials(instanceYaml.stage);
 
   // Get access key
   const accessKey = await getAccessKey(instanceYaml.org);
@@ -221,13 +240,8 @@ module.exports = async (config, cli) => {
 
   cli.watcher.on('ready', async () => {
     cli.sessionStatus('Initializing Dev Mode', null, 'green');
-
-    try {
-      await sdk.deploy(instanceYaml, instanceCredentials, { dev: true });
-    } catch (error) {
-      cli.logError(new ServerlessError(error));
-      cli.sessionStatus('Watching');
-    }
+    await deploy(sdk, cli, instanceYaml, instanceCredentials)
+    cli.sessionStatus('Watching');
   });
 
   cli.watcher.on('change', async () => {
@@ -249,23 +263,15 @@ module.exports = async (config, cli) => {
       // reload serverless component instance
       instanceYaml = await loadInstanceConfig(process.cwd(), { disableCache: true });
 
-      try {
-        await sdk.deploy(instanceYaml, instanceCredentials, { dev: true });
-      } catch (error) {
-        cli.logError(new ServerlessError(error));
-        cli.sessionStatus('Watching');
-      }
+      await deploy(sdk, cli, instanceYaml, instanceCredentials)
+      cli.sessionStatus('Watching');
 
       if (queuedOperation) {
         cli.sessionStatus('Deploying', null, 'green');
         // reload serverless component instance
         instanceYaml = await loadInstanceConfig(process.cwd(), { disableCache: true });
-        try {
-          await sdk.deploy(instanceYaml, instanceCredentials, { dev: true });
-        } catch (error) {
-          cli.logError(new ServerlessError(error));
-          cli.sessionStatus('Watching');
-        }
+        await deploy(sdk, cli, instanceYaml, instanceCredentials)
+        cli.sessionStatus('Watching');
       }
 
       isProcessing = false;

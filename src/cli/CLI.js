@@ -12,6 +12,7 @@ const figures = require('figures');
 const prettyoutput = require('prettyoutput');
 const chokidar = require('chokidar');
 const { version } = require('../../package.json');
+const { isChinaUser } = require('./utils')
 
 // CLI Colors
 const grey = chalk.dim;
@@ -104,7 +105,7 @@ class CLI {
   /**
    * Stops rendering the persistent status bar in the CLI with a final status message.
    * @param {string} reason This tells the status bar how to display its final message. Can be 'error', 'cancel', 'close', 'success', 'silent'.
-   * @param {string || error} message Can be a final message to the user (string) or an error.
+   * @param {string || error} messageOrError Can be a final message to the user (string) or an error object.
    */
   sessionStop(reason, messageOrError = 'Closed') {
 
@@ -120,13 +121,13 @@ class CLI {
     if (reason === 'success') {
       color = green;
     }
-    if (reason === 'cancel') {
+    if (reason === 'error' || reason === 'cancel') {
       color = red;
     }
 
     // Render error
     if (reason === 'error') {
-      this.logError(messageOrError);
+      this.logError(messageOrError, { timer: this._.timerSeconds });
     } else if (reason !== 'silent') {
       // Silent is used to skip the "Done" message
       // Write content
@@ -180,6 +181,9 @@ class CLI {
   /**
    * Log an error and optionally a stacktrace
    * @param {error} error An instance of the Error class
+   * @param {string} error.documentation A link to documentation
+   * @param {boolean} error.support Defaults to true and shows a support link.  If false, hides link.
+   * @param {boolean} error.chat Defaults to true and shows a chat link.  If false, hides link.
    */
   logError(error = {}, options = {}) {
     // If no argument, skip
@@ -191,6 +195,31 @@ class CLI {
       error = { message: error };
     }
 
+    // Add defaults
+    error.name = error.name || 'Unknown Error'
+
+    if (!isChinaUser()) {
+      if (error.documentation !== false) {
+        error.documentation = error.documentation ? `  Documentation: ${error.documentation} ${os.EOL}` : `  Documentation: https://github.com/serverless/components ${os.EOL}`
+      }
+      if (error.support !== false) {
+        error.support = `  Support: https://app.serverless.com/support ${os.EOL}`
+      }
+      if (error.chat !== false) {
+        error.chat = `  Slack: https://www.serverless.com/slack/ ${os.EOL}`
+      }
+    } else {
+      if (error.documentation !== false) {
+        error.documentation = error.documentation ? error.documentation + os.EOL : null // TBD
+      }
+      if (error.support !== false) {
+        error.support = error.support ? error.support + os.EOL : null // TBD
+      }
+      if (error.chat !== false) {
+        error.chat = error.chat ? error.chat + os.EOL : null // TBD
+      }
+    }
+
     // Clear any existing content
     process.stdout.write(ansiEscapes.eraseDown);
 
@@ -198,13 +227,13 @@ class CLI {
     console.log('')
 
     // Render stack trace (if debug is on)
-    this.logErrorStackTrace(error);
+    this.logErrorStackTrace(error.stack);
 
     let content = `${this._.entity} ${figures.pointerSmall} ${error.message} ${os.EOL}`;
 
-    // Optional prefix.  Useful for timer/seconds
-    if (options.prefix) {
-      content = `${options.prefix}${content}`
+    // Add timer seconds, if included
+    if (options.timer) {
+      content = `${options.timer}s ${figures.pointerSmall} ${content}`
     }
 
     // Add additional space
@@ -213,7 +242,7 @@ class CLI {
     // Add helpful error info
     if (error.documentation) { content += error.documentation }
     if (error.support) { content += error.support }
-    if (error.slack) { content += error.slack }
+    if (error.chat) { content += error.chat }
 
     // Write to terminal
     process.stdout.write(red(content));
@@ -228,28 +257,25 @@ class CLI {
    * Log an error's stack trace
    * @param {error} error An instance of the Error class
    */
-  logErrorStackTrace(error) {
-    if (!this._.debug || !error.stack) {
+  logErrorStackTrace(errorStack) {
+    if (!this._.debug || !errorStack) {
       return null;
     }
 
     // If no argument, skip
-    if (!error || error === '') {
+    if (!errorStack) {
       return null;
-    }
-
-    if (!(error instanceof Error)) {
-      error = new Error(error);
     }
 
     // Clear any existing content
     process.stdout.write(ansiEscapes.eraseDown);
 
     // Render stack trace
-    console.log();
-    console.log('', red(error.stack));
+    console.log('', red(errorStack));
     // Put cursor to starting position for next view
     process.stdout.write(ansiEscapes.cursorLeft);
+    // Add additional space
+    console.log();
 
     return null;
   }
@@ -328,7 +354,7 @@ class CLI {
   logLogo() {
     let logo = os.EOL;
     logo += 'serverless';
-    logo += red(' ⚡ ');
+    logo += red(' ⚡');
     logo += 'framework';
 
     if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
@@ -344,7 +370,7 @@ class CLI {
   logRegistryLogo(text) {
     let logo = os.EOL;
     logo += white('serverless');
-    logo += red(' ⚡ ');
+    logo += red(' ⚡');
     logo += white('registry');
 
     if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
@@ -369,14 +395,15 @@ class CLI {
 
   logAdvertisement() {
     this.logLogo();
+    this.log();
     let ad = grey(
-      'This is a Serverless Framework Component.  Sign-in to use it for free with these features:'
+      'This is a Serverless Framework Component, which is a premium development experience for a serverless use-case.  Sign in via "serverless login" to use it for free with these features:'
     );
     ad += os.EOL;
-    ad = ad + os.EOL + grey('  • Registry Access');
-    ad = ad + os.EOL + grey('  • Instant Deployments & Logs');
-    ad = ad + os.EOL + grey('  • State Storage, Output Sharing & Secrets');
-    ad = ad + os.EOL + grey('  • And Much More: https://serverless.com/components');
+    ad = ad + os.EOL + grey('  • Monitoring & Metrics');
+    ad = ad + os.EOL + grey('  • Rapid Deployments & Real-time Logs');
+    ad = ad + os.EOL + grey('  • State Storage, Secrets Management & Share Outputs');
+    ad = ad + os.EOL + grey('  • And Much More: https://github.com/serverless/components');
     this.log(ad);
   }
 

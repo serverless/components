@@ -28,39 +28,6 @@ const {
 } = require('../utils');
 
 /**
- * Serverless Error
- * A custom error object for Serverless Framework Global
- */
-
-class ServerlessError extends Error {
-  constructor(errorObjectOrMessage = {}) {
-
-    super()
-
-    // If an error message was passed in, turn it into an object for convenience
-    if (typeof errorObjectOrMessage === 'string') {
-      errorObjectOrMessage = { message: errorObjectOrMessage }
-    }
-
-    // Modify error message for specific error types
-    if (errorObjectOrMessage.name && errorObjectOrMessage.name === 'Invalid Component Types') {
-      this.message = `Invalid Input: ${errorObjectOrMessage.message}`;
-    }
-    // Make documentation point to the component's repo, if it's available
-    if (errorObjectOrMessage.details && errorObjectOrMessage.details.repo) {
-      this.documentation = `  Documentation: ${errorObjectOrMessage.details.repo}` + os.EOL;
-    } else {
-      this.documentation = '  Documentation: https://github.com/serverless/components' + os.EOL
-    }
-
-    // Defaults
-    this.message = errorObjectOrMessage.message || 'Unknown Error'
-    this.support = '  Support: https://app.serverless.com/support' + os.EOL
-    this.slack = '  Slack: https://www.serverless.com/slack/' + os.EOL
-  }
-}
-
-/**
  * Get the URL of the Serverless Framework Dashboard
  * @param {string} urlPath a url path to add to the hostname
  */
@@ -415,7 +382,6 @@ const getTemplate = async (root) => {
 };
 
 module.exports = {
-  ServerlessError,
   getDashboardUrl,
   loadInstanceConfig: loadVendorInstanceConfig,
   getTemplate,

@@ -143,22 +143,14 @@ module.exports = async () => {
     } else {
       await commands.run(config, cli, command);
     }
-  } catch (e) {
+  } catch (error) {
     process.exitCode = 1;
 
-    let serverlessError
-    if (!isChinaUser()) {
-      const { ServerlessError } = require('./commands/utils')
-      serverlessError = ServerlessError
-    } else {
-      const { ServerlessError } = require('./commands-cn/utils')
-      serverlessError = ServerlessError
-    }
-
     if (cli.isSessionActive()) {
-      cli.sessionStop('error', new serverlessError(e));
+      cli.sessionStop('error', error);
     } else {
-      cli.logError(new serverlessError(e));
+      cli.logError(error);
+      cli.log();
     }
   }
 
