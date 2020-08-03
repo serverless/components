@@ -12,7 +12,7 @@ const figures = require('figures');
 const prettyoutput = require('prettyoutput');
 const chokidar = require('chokidar');
 const { version } = require('../../package.json');
-const { isChinaUser } = require('./utils')
+const { isChinaUser } = require('./utils');
 
 // CLI Colors
 const grey = chalk.dim;
@@ -108,7 +108,6 @@ class CLI {
    * @param {string || error} messageOrError Can be a final message to the user (string) or an error object.
    */
   sessionStop(reason, messageOrError = 'Closed') {
-
     // Clear any existing content
     process.stdout.write(ansiEscapes.cursorLeft);
     process.stdout.write(ansiEscapes.eraseDown);
@@ -196,27 +195,29 @@ class CLI {
     }
 
     // Add defaults
-    error.name = error.name || 'Unknown Error'
+    error.name = error.name || 'Unknown Error';
 
     if (!isChinaUser()) {
       if (error.documentation !== false) {
-        error.documentation = error.documentation ? `  Documentation: ${error.documentation} ${os.EOL}` : `  Documentation: https://github.com/serverless/components ${os.EOL}`
+        error.documentation = error.documentation
+          ? `  Documentation: ${error.documentation} ${os.EOL}`
+          : `  Documentation: https://github.com/serverless/components ${os.EOL}`;
       }
       if (error.support !== false) {
-        error.support = `  Support: https://app.serverless.com/support ${os.EOL}`
+        error.support = `  Support: https://app.serverless.com/support ${os.EOL}`;
       }
       if (error.chat !== false) {
-        error.chat = `  Slack: https://www.serverless.com/slack/ ${os.EOL}`
+        error.chat = `  Slack: https://www.serverless.com/slack/ ${os.EOL}`;
       }
     } else {
       if (error.documentation !== false) {
-        error.documentation = error.documentation ? error.documentation + os.EOL : null // TBD
+        error.documentation = error.documentation ? error.documentation + os.EOL : null; // TBD
       }
       if (error.support !== false) {
-        error.support = error.support ? error.support + os.EOL : null // TBD
+        error.support = error.support ? error.support + os.EOL : null; // TBD
       }
       if (error.chat !== false) {
-        error.chat = error.chat ? error.chat + os.EOL : null // TBD
+        error.chat = error.chat ? error.chat + os.EOL : null; // TBD
       }
     }
 
@@ -224,7 +225,7 @@ class CLI {
     process.stdout.write(ansiEscapes.eraseDown);
 
     // Add space
-    console.log('')
+    console.log('');
 
     // Render stack trace (if debug is on)
     this.logErrorStackTrace(error.stack);
@@ -233,16 +234,22 @@ class CLI {
 
     // Add timer seconds, if included
     if (options.timer) {
-      content = `${options.timer}s ${figures.pointerSmall} ${content}`
+      content = `${options.timer}s ${figures.pointerSmall} ${content}`;
     }
 
     // Add additional space
     content += os.EOL;
 
     // Add helpful error info
-    if (error.documentation) { content += error.documentation }
-    if (error.support) { content += error.support }
-    if (error.chat) { content += error.chat }
+    if (error.documentation) {
+      content += error.documentation;
+    }
+    if (error.support) {
+      content += error.support;
+    }
+    if (error.chat) {
+      content += error.chat;
+    }
 
     // Write to terminal
     process.stdout.write(red(content));

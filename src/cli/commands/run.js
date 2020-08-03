@@ -104,7 +104,7 @@ module.exports = async (config, cli, command) => {
     /**
      * Prepare notification promise
      */
-    let action
+    let action;
     let deferredNotificationsData;
 
     if (command === 'deploy') {
@@ -127,8 +127,7 @@ module.exports = async (config, cli, command) => {
       // Set action
       action = async () => {
         return await sdk.deploy(instanceYaml, instanceCredentials, options);
-      }
-
+      };
     } else if (command === 'remove') {
       cli.sessionStatus('Removing', null, 'white');
 
@@ -138,7 +137,7 @@ module.exports = async (config, cli, command) => {
       // Set action
       action = async () => {
         return await sdk.remove(instanceYaml, instanceCredentials, options);
-      }
+      };
     } else {
       // run a custom method synchronously to receive outputs directly
       options.sync = true;
@@ -151,21 +150,21 @@ module.exports = async (config, cli, command) => {
       // Set action
       action = async () => {
         return await sdk.run(command, instanceYaml, instanceCredentials, options);
-      }
+      };
     }
 
     // Run action
-    let instance
+    let instance;
     try {
       instance = await action();
     } catch (error) {
       if (error.name === 'Invalid Component Types') {
-        error.message = `Invalid Input: ${error.message}`
+        error.message = `Invalid Input: ${error.message}`;
       }
       if (error.details && error.details.repo) {
-        error.documentation = `  Documentation: ${error.details.repo}`
+        error.documentation = `  Documentation: ${error.details.repo}`;
       }
-      return cli.sessionStop('error', error)
+      return cli.sessionStop('error', error);
     }
 
     if (instance && instance.outputs) {
@@ -179,9 +178,9 @@ module.exports = async (config, cli, command) => {
     cli.log();
     cli.log(
       `Full details: ${getDashboardUrl(
-        `/${instanceYaml.org}/apps/${instanceYaml.app || instanceYaml.name}/${
-        instanceYaml.name
-        }/${instanceYaml.stage}`
+        `/${instanceYaml.org}/apps/${instanceYaml.app || instanceYaml.name}/${instanceYaml.name}/${
+          instanceYaml.stage
+        }`
       )}`
     );
 

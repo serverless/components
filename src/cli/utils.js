@@ -605,19 +605,18 @@ const executeGraph = async (allComponents, command, graph, cli, sdk, credentials
         try {
           instance = await sdk.remove(instanceYaml, credentials, options);
         } catch (error) {
-
           // Add helpful information
           if (!isChinaUser()) {
             if (error.name === 'Invalid Component Types') {
-              error.message = `Invalid Input: ${error.message}`
+              error.message = `Invalid Input: ${error.message}`;
             }
             if (error.details && error.details.repo) {
-              error.documentation = `  Documentation: ${error.details.repo}`
+              error.documentation = `  Documentation: ${error.details.repo}`;
             } else {
-              error.documentation = false
+              error.documentation = false;
             }
-            error.support = false
-            error.chat = false
+            error.support = false;
+            error.chat = false;
           }
 
           // Prefix with app name
@@ -634,19 +633,18 @@ const executeGraph = async (allComponents, command, graph, cli, sdk, credentials
         try {
           instance = await sdk.deploy(instanceYaml, credentials, options);
         } catch (error) {
-
           // Add helpful information
           if (!isChinaUser()) {
             if (error.name === 'Invalid Component Types') {
-              error.message = `Invalid Input: ${error.message}`
+              error.message = `Invalid Input: ${error.message}`;
             }
             if (error.details && error.details.repo) {
-              error.documentation = `  Documentation: ${error.details.repo}`
+              error.documentation = `  Documentation: ${error.details.repo}`;
             } else {
-              error.documentation = false
+              error.documentation = false;
             }
-            error.support = false
-            error.chat = false
+            error.support = false;
+            error.chat = false;
           }
 
           // Prefix with app name

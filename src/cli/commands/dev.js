@@ -16,26 +16,25 @@ const {
  * Deploy helper function
  */
 const deploy = async (sdk, cli, instanceYaml, instanceCredentials) => {
-  let result
+  let result;
   try {
     result = await sdk.deploy(instanceYaml, instanceCredentials);
   } catch (error) {
     if (error.name === 'Invalid Component Types') {
-      error.message = `Invalid Input: ${error.message}`
+      error.message = `Invalid Input: ${error.message}`;
     }
     if (error.details && error.details.repo) {
-      error.documentation = `  Documentation: ${error.details.repo}`
+      error.documentation = `  Documentation: ${error.details.repo}`;
     }
     cli.logError(error);
   }
 
-  return result
-}
+  return result;
+};
 
 module.exports = async (config, cli) => {
-
-  let instanceYaml,
-    instanceCredentials
+  let instanceYaml;
+  let instanceCredentials;
 
   // Define a close handler, that removes any "dev" mode agents
   const closeHandler = async () => {
@@ -52,7 +51,7 @@ module.exports = async (config, cli) => {
     cli.sessionStatus('Disabling Dev Mode & closing', null, 'green');
 
     // Remove agent from application
-    await deploy(sdk, cli, instanceYaml, instanceCredentials)
+    await deploy(sdk, cli, instanceYaml, instanceCredentials);
 
     await cli.watcher.close();
     cli.sessionStop('success', 'Dev Mode closed');
@@ -106,7 +105,7 @@ module.exports = async (config, cli) => {
     // Deployment
     if (event.event === 'instance.deployment.succeeded') {
       const header = `${d.toLocaleTimeString()} - ${event.instance_name} - deployment`;
-      cli.log()
+      cli.log();
       cli.log(header, 'grey');
       cli.logOutputs(event.data.outputs);
       cli.sessionStatus('Watching');
@@ -181,7 +180,7 @@ module.exports = async (config, cli) => {
       if (event.data.path && event.data.httpMethod) {
         transactionType = `transaction - ${event.data.httpMethod.toUpperCase()} - ${
           event.data.path
-          }`;
+        }`;
       }
       // Default
       else {
@@ -240,7 +239,7 @@ module.exports = async (config, cli) => {
 
   cli.watcher.on('ready', async () => {
     cli.sessionStatus('Initializing Dev Mode', null, 'green');
-    await deploy(sdk, cli, instanceYaml, instanceCredentials)
+    await deploy(sdk, cli, instanceYaml, instanceCredentials);
     cli.sessionStatus('Watching');
   });
 
@@ -263,14 +262,14 @@ module.exports = async (config, cli) => {
       // reload serverless component instance
       instanceYaml = await loadInstanceConfig(process.cwd(), { disableCache: true });
 
-      await deploy(sdk, cli, instanceYaml, instanceCredentials)
+      await deploy(sdk, cli, instanceYaml, instanceCredentials);
       cli.sessionStatus('Watching');
 
       if (queuedOperation) {
         cli.sessionStatus('Deploying', null, 'green');
         // reload serverless component instance
         instanceYaml = await loadInstanceConfig(process.cwd(), { disableCache: true });
-        await deploy(sdk, cli, instanceYaml, instanceCredentials)
+        await deploy(sdk, cli, instanceYaml, instanceCredentials);
         cli.sessionStatus('Watching');
       }
 

@@ -232,25 +232,32 @@ const listFeatured = async (config, cli) => {
 
   cli.log('• fullstack-app - https://github.com/serverless-components/fullstack-app', 'grey');
   cli.log(
-    '• express-starter - https://github.com/serverless-components/express/tree/master/templates/express-starter', 'grey'
+    '• express-starter - https://github.com/serverless-components/express/tree/master/templates/express-starter',
+    'grey'
   );
   cli.log(
-    '• react-starter - https://github.com/serverless-components/website/tree/master/templates/react-starter', 'grey'
+    '• react-starter - https://github.com/serverless-components/website/tree/master/templates/react-starter',
+    'grey'
   );
   cli.log(
-    '• graphql-starter - https://github.com/serverless-components/graphql/tree/master/templates/graphql-starter', 'grey'
+    '• graphql-starter - https://github.com/serverless-components/graphql/tree/master/templates/graphql-starter',
+    'grey'
   );
   cli.log(
-    '• aws-lambda-starter - https://github.com/serverless-components/aws-lambda/tree/master/templates/aws-lambda-starter', 'grey'
+    '• aws-lambda-starter - https://github.com/serverless-components/aws-lambda/tree/master/templates/aws-lambda-starter',
+    'grey'
   );
   cli.log(
-    '• aws-dynamodb-starter - https://github.com/serverless-components/aws-dynamodb/tree/master/templates/aws-dynamodb-starter', 'grey'
+    '• aws-dynamodb-starter - https://github.com/serverless-components/aws-dynamodb/tree/master/templates/aws-dynamodb-starter',
+    'grey'
   );
   cli.log(
-    '• aws-iam-role-starter - https://github.com/serverless-components/aws-iam-role/tree/master/templates/aws-iam-role-starter', 'grey'
+    '• aws-iam-role-starter - https://github.com/serverless-components/aws-iam-role/tree/master/templates/aws-iam-role-starter',
+    'grey'
   );
   cli.log(
-    '• aws-lambda-layer-starter - https://github.com/serverless-components/aws-lambda-layer/tree/master/templates/aws-lambda-layer-starter', 'grey'
+    '• aws-lambda-layer-starter - https://github.com/serverless-components/aws-lambda-layer/tree/master/templates/aws-lambda-layer-starter',
+    'grey'
   );
   cli.log();
   cli.log('Find more here: https://github.com/serverless-components', 'grey');

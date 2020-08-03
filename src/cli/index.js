@@ -4,7 +4,6 @@
  * Serverless Components: CLI Handler
  */
 
-const os = require('os');
 const path = require('path');
 const http = require('http');
 const https = require('https');
