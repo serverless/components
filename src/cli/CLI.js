@@ -211,13 +211,15 @@ class CLI {
       }
     } else {
       if (error.documentation !== false) {
-        error.documentation = error.documentation ? error.documentation + os.EOL : null; // TBD
+        error.documentation = error.documentation
+          ? `  帮助文档: ${error.documentation} ${os.EOL}`
+          : `  帮助文档: https://cloud.tencent.com/document/product/1154/39270 ${os.EOL}`;
       }
       if (error.support !== false) {
-        error.support = error.support ? error.support + os.EOL : null; // TBD
+        error.support = `  获取支持: https://cloud.tencent.com/act/event/Online_service ${os.EOL}`;
       }
       if (error.chat !== false) {
-        error.chat = error.chat ? error.chat + os.EOL : null; // TBD
+        error.chat = `  问答社区: https://cloud.tencent.com/developer/ask ${os.EOL}`;
       }
     }
 
