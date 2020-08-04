@@ -21,6 +21,7 @@ module.exports = (serviceConfig) => {
     versions: {
       '@serverless/components': version,
     },
+    isStandalone: Boolean(process.pkg),
     isDashboardEnabled: Boolean(serviceConfig.org),
   };
 };
