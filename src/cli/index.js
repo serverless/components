@@ -119,7 +119,7 @@ module.exports = async () => {
    */
   if (command === 'publish') {
     command = 'registry';
-    args._[1] = 'publish';
+    config.params.unshift('publish');
   }
 
   /**
