@@ -208,9 +208,7 @@ const getTemplate = async (root) => {
 };
 
 const getInstanceDashboardUrl = (instanceYaml) => {
-  return `Full details: https://serverless.cloud.tencent.com/instances/${encodeURIComponent(
-    `${instanceYaml.app}:${instanceYaml.stage}:${instanceYaml.name}`
-  )}`;
+  return `Full details: https://serverless.cloud.tencent.com/apps/${instanceYaml.app}/${instanceYaml.name}/${instanceYaml.stage}`;
 };
 
 const setInputsForCommand = (instanceYaml, command, config) => {
