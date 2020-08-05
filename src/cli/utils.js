@@ -611,10 +611,9 @@ const executeGraph = async (allComponents, command, graph, cli, sdk, credentials
               error.message = `Invalid Input: ${error.message}`;
             }
             if (error.details && error.details.repo) {
-              error.documentation = `  Documentation: ${error.details.repo}`;
-            } else {
-              error.documentation = false;
+              error.message = `${error.message} - Documentation: ${error.details.repo}`;
             }
+            error.documentation = false;
             error.support = false;
             error.chat = false;
           }
@@ -622,7 +621,7 @@ const executeGraph = async (allComponents, command, graph, cli, sdk, credentials
           // Prefix with app name
           error.message = `${instanceYaml.name}: ${error.message}`;
 
-          cli.logError(error);
+          cli.logError(error, { hideEntity: true });
 
           allComponents[instanceName].error = error;
           return null;
@@ -639,10 +638,9 @@ const executeGraph = async (allComponents, command, graph, cli, sdk, credentials
               error.message = `Invalid Input: ${error.message}`;
             }
             if (error.details && error.details.repo) {
-              error.documentation = `  Documentation: ${error.details.repo}`;
-            } else {
-              error.documentation = false;
+              error.message = `${error.message} - Documentation: ${error.details.repo}`;
             }
+            error.documentation = false;
             error.support = false;
             error.chat = false;
           }
@@ -650,7 +648,7 @@ const executeGraph = async (allComponents, command, graph, cli, sdk, credentials
           // Prefix with app name
           error.message = `${instanceYaml.name}: ${error.message}`;
 
-          cli.logError(error);
+          cli.logError(error, { hideEntity: true });
           allComponents[instanceName].error = error;
           return null;
         }

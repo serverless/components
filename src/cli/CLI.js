@@ -183,6 +183,8 @@ class CLI {
    * @param {string} error.documentation A link to documentation
    * @param {boolean} error.support Defaults to true and shows a support link.  If false, hides link.
    * @param {boolean} error.chat Defaults to true and shows a chat link.  If false, hides link.
+   * @param {boolean} options.hideEntity Hides "Serverless › " at the beginning of the error message.
+   * @param {string} options.timer Include the timer in the error message "16s › ".  Value must be a string or number integer of seconds.
    */
   logError(error = {}, options = {}) {
     // If no argument, skip
@@ -232,7 +234,13 @@ class CLI {
     // Render stack trace (if debug is on)
     this.logErrorStackTrace(error.stack);
 
-    let content = `${this._.entity} ${figures.pointerSmall} ${error.message} ${os.EOL}`;
+    let content
+
+    if (options.hideEntity) {
+      content = `${error.message} ${os.EOL}`;
+    } else {
+      content = `${this._.entity} ${figures.pointerSmall} ${error.message} ${os.EOL}`;
+    }
 
     // Add timer seconds, if included
     if (options.timer) {

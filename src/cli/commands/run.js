@@ -162,7 +162,7 @@ module.exports = async (config, cli, command) => {
         error.message = `Invalid Input: ${error.message}`;
       }
       if (error.details && error.details.repo) {
-        error.documentation = `  Documentation: ${error.details.repo}`;
+        error.documentation = `${error.details.repo}`;
       }
       return cli.sessionStop('error', error);
     }
@@ -179,7 +179,7 @@ module.exports = async (config, cli, command) => {
     cli.log(
       `Full details: ${getDashboardUrl(
         `/${instanceYaml.org}/apps/${instanceYaml.app || instanceYaml.name}/${instanceYaml.name}/${
-          instanceYaml.stage
+        instanceYaml.stage
         }`
       )}`
     );
