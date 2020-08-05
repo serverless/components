@@ -605,11 +605,24 @@ const executeGraph = async (allComponents, command, graph, cli, sdk, credentials
         try {
           instance = await sdk.remove(instanceYaml, credentials, options);
         } catch (error) {
-          error.message = `${instanceYaml.name}: ${error.message}`;
-          if (!options.debug) {
-            cli.log();
+          // Add helpful information
+          if (!isChinaUser()) {
+            if (error.name === 'Invalid Component Types') {
+              error.message = `Invalid Input: ${error.message}`;
+            }
+            if (error.details && error.details.repo) {
+              error.message = `${error.message} - Documentation: ${error.details.repo}`;
+            }
+            error.documentation = false;
+            error.support = false;
+            error.chat = false;
           }
-          cli.log(error.message, 'red');
+
+          // Prefix with app name
+          error.message = `${instanceYaml.name}: ${error.message}`;
+
+          cli.logError(error, { hideEntity: true });
+
           allComponents[instanceName].error = error;
           return null;
         }
@@ -619,11 +632,23 @@ const executeGraph = async (allComponents, command, graph, cli, sdk, credentials
         try {
           instance = await sdk.deploy(instanceYaml, credentials, options);
         } catch (error) {
-          error.message = `${instanceYaml.name}: ${error.message}`;
-          if (!options.debug) {
-            cli.log();
+          // Add helpful information
+          if (!isChinaUser()) {
+            if (error.name === 'Invalid Component Types') {
+              error.message = `Invalid Input: ${error.message}`;
+            }
+            if (error.details && error.details.repo) {
+              error.message = `${error.message} - Documentation: ${error.details.repo}`;
+            }
+            error.documentation = false;
+            error.support = false;
+            error.chat = false;
           }
-          cli.log(error.message, 'red');
+
+          // Prefix with app name
+          error.message = `${instanceYaml.name}: ${error.message}`;
+
+          cli.logError(error, { hideEntity: true });
           allComponents[instanceName].error = error;
           return null;
         }
