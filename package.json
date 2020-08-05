@@ -69,6 +69,7 @@
     "eslint": "^6.8.0",
     "eslint-plugin-import": "^2.22.0",
     "git-list-updated": "^1.2.1",
+    "github-release-from-cc-changelog": "^2.2.0",
     "prettier": "^2.0.5"
   }
 }
