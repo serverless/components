@@ -1101,37 +1101,28 @@ Starts DEV MODE, which watches the Component for changes, auto-deploys on change
 
 ### How can I deploy multiple Components at the same time?
 
-A `serverless.yml` file can only hold 1 Component at this time.  However, that does not mean you cannot deploy multiple Components at the same time.  
+A `serverless.yml` file can only hold 1 Component at this time. However, that does not mean you cannot deploy multiple Components at the same time.
 
-Simply navigate to a parent directory, and run `serverless deploy` to deploy any `serverless.yml` files in immediate subfolders.  When this happens, the Serverless Framework will quickly create a graph based on the references your Component apps are making to eachother.  Depending on those references, it will prioritize what needs to be deployed first, otherwise its default is to deploy things in parallel.
+Simply navigate to a parent directory, and run `serverless deploy` to deploy any `serverless.yml` files in immediate subfolders. When this happens, the Serverless Framework will quickly create a graph based on the references your Component apps are making to eachother. Depending on those references, it will prioritize what needs to be deployed first, otherwise its default is to deploy things in parallel.
 
 For context, here is why we designed `serverless.yml` to only hold 1 Component at a time:
 
-* We have a lot of advanced automation and other features in the works for Components that push the limits of how we think about infrastructure-as-code.  Delivering those features is harder if `serverless.yml` contains multiple Components.
+- We have a lot of advanced automation and other features in the works for Components that push the limits of how we think about infrastructure-as-code. Delivering those features is harder if `serverless.yml` contains multiple Components.
 
-* Many of our support requests come from users who deploy a lot of critical infrastructure together, and end up accidentally breaking that critical infrastructure, often while intending to push updates to one specific area.  In response to this, we wanted to make sure there was an easy way to deploy things separately first, so that developers can deploy more safely.  Generally, try to keep the things you deploy frequently (e.g. code, functions, APIs, etc.), separate from critical things that you deploy infrequently (e.g. VPCs, databases, S3 buckets).  We get that it's convenient to deploy everything together (which is why we still enabled this via the method above), just be careful out there!
+- Many of our support requests come from users who deploy a lot of critical infrastructure together, and end up accidentally breaking that critical infrastructure, often while intending to push updates to one specific area. In response to this, we wanted to make sure there was an easy way to deploy things separately first, so that developers can deploy more safely. Generally, try to keep the things you deploy frequently (e.g. code, functions, APIs, etc.), separate from critical things that you deploy infrequently (e.g. VPCs, databases, S3 buckets). We get that it's convenient to deploy everything together (which is why we still enabled this via the method above), just be careful out there!
 
 ### Where do Components run?
 
-Components run in the cloud.  Here's what that means and why it's important...
+Components run in the cloud. Here's what that means and why it's important...
 
-We've been working on the Serverless Framework for 5 years now.  During that time, there have been many ways we've wanted to better solve user problems, improve the experience and innovate—but we've been limited by the project's design (e.g. requires local installation, hard to push updates, lack of error diagnostics, dealing with user environment quirks, etc.).
+We've been working on the Serverless Framework for 5 years now. During that time, there have been many ways we've wanted to better solve user problems, improve the experience and innovate—but we've been limited by the project's design (e.g. requires local installation, hard to push updates, lack of error diagnostics, dealing with user environment quirks, etc.).
 
 Over a year ago, we whiteboarded several groundbreaking ways we can push the boundaries of serverless dev tools (and infrastructure as code in general), and realized the only way to make that happen was to move the majority of work to the cloud.
 
-Now, when you deploy, or perform any other Action of a Component, that happens in our "Components Engine", which we've spent 1.5+ years building.  For clarity, this means your source code, environment variables and credentials are passed through the Components Engine.
+Now, when you deploy, or perform any other Action of a Component, that happens in our "Components Engine", which we've spent 1.5+ years building. For clarity, this means your source code, environment variables and credentials are passed through the Components Engine.
 
-This is a complete change in how Serverless Framework traditionally worked.  However, this is no different from how most build engines, CI/CD products, and cloud services work, as well as AWS CloudFormation, which Serverless Framework traditionally used.  The "Components Engine" is a managed service, like AWS CloudFormation, CircleCI, Github, Github Actions, Hosted Gitlab, Terraform Cloud, etc.
+This is a complete change in how Serverless Framework traditionally worked. However, this is no different from how most build engines, CI/CD products, and cloud services work, as well as AWS CloudFormation, which Serverless Framework traditionally used. The "Components Engine" is a managed service, like AWS CloudFormation, CircleCI, Github, Github Actions, Hosted Gitlab, Terraform Cloud, etc.
 
-As of today, the Components Engine helped enable: The fastest infrastructure deployments possible, streaming logs to your CLI, streaming metrics to the [Dashboard](https://app.serverless.com), remote state storage and sharing, secrets injection, configuration validation, and so much more.  Please note, this is only 25% of our vision for this effort.  Otherwise known as the table-stakes features.  The real thought-provoking and groundbreaking developer productivity features are coming next...
+As of today, the Components Engine helped enable: The fastest infrastructure deployments possible, streaming logs to your CLI, streaming metrics to the [Dashboard](https://app.serverless.com), remote state storage and sharing, secrets injection, configuration validation, and so much more. Please note, this is only 25% of our vision for this effort. Otherwise known as the table-stakes features. The real thought-provoking and groundbreaking developer productivity features are coming next...
 
-Part of these features will enable greater security features than we've ever had in Serverless Framework.  Features that involve making it easier to reduce the scope of your credentials, analyze/block everything passing through the Engine, rollback unsafe deployments, etc.
-
-
-
-
-
-
-
-
-
+Part of these features will enable greater security features than we've ever had in Serverless Framework. Features that involve making it easier to reduce the scope of your credentials, analyze/block everything passing through the Engine, rollback unsafe deployments, etc.

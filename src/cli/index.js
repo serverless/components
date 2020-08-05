@@ -142,14 +142,14 @@ module.exports = async () => {
     } else {
       await commands.run(config, cli, command);
     }
-  } catch (e) {
+  } catch (error) {
     process.exitCode = 1;
 
     if (cli.isSessionActive()) {
-      cli.sessionStop('error', e);
+      cli.sessionStop('error', error);
     } else {
+      cli.logError(error);
       cli.log();
-      cli.logError(e);
     }
   }
 

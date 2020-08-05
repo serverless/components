@@ -22,8 +22,7 @@ module.exports = async (config, cli, command) => {
   // Ensure the user is logged in or access key is available, or advertise
   if (!isLoggedInOrHasAccessKey()) {
     cli.logAdvertisement();
-    cli.sessionStop('error', 'Please log in by running "serverless login"');
-    return null;
+    throw new Error('Please log in by running "serverless login"');
   }
 
   // Check to see if the cwd is a template containing multiple templates
@@ -105,11 +104,16 @@ module.exports = async (config, cli, command) => {
     /**
      * Prepare notification promise
      */
+    let action;
     let deferredNotificationsData;
+
     if (command === 'deploy') {
       deferredNotificationsData = requestNotification(
         Object.assign(generateNotificationsPayload(instanceYaml), { command: 'deploy' })
       );
+
+      // Set status
+      cli.sessionStatus('Deploying');
 
       // Warn about dev agent
       if (options.dev) {
@@ -120,27 +124,20 @@ module.exports = async (config, cli, command) => {
         );
       }
 
-      // run deploy
-      cli.sessionStatus('Deploying');
-      const instance = await sdk.deploy(instanceYaml, instanceCredentials, options);
-      cli.log();
-      cli.logOutputs(instance.outputs);
-
-      cli.log();
-      cli.log(
-        `Full details: ${getDashboardUrl(
-          `/${instanceYaml.org}/apps/${instanceYaml.app || instanceYaml.name}/${
-            instanceYaml.name
-          }/${instanceYaml.stage}`
-        )}`
-      );
+      // Set action
+      action = async () => {
+        return await sdk.deploy(instanceYaml, instanceCredentials, options);
+      };
     } else if (command === 'remove') {
       cli.sessionStatus('Removing', null, 'white');
 
       // The "inputs" in serverless.yml are only for deploy.  Remove them for all other commands
       instanceYaml.inputs = {};
 
-      await sdk.remove(instanceYaml, instanceCredentials, options);
+      // Set action
+      action = async () => {
+        return await sdk.remove(instanceYaml, instanceCredentials, options);
+      };
     } else {
       // run a custom method synchronously to receive outputs directly
       options.sync = true;
@@ -150,16 +147,42 @@ module.exports = async (config, cli, command) => {
 
       cli.sessionStatus('Running', null, 'white');
 
-      const instance = await sdk.run(command, instanceYaml, instanceCredentials, options);
-
-      if (instance && instance.outputs) {
-        cli.log();
-        cli.logOutputs(instance.outputs);
-      } else {
-        cli.log();
-        cli.log('No outputs available', 'grey');
-      }
+      // Set action
+      action = async () => {
+        return await sdk.run(command, instanceYaml, instanceCredentials, options);
+      };
     }
+
+    // Run action
+    let instance;
+    try {
+      instance = await action();
+    } catch (error) {
+      if (error.name === 'Invalid Component Types') {
+        error.message = `Invalid Input: ${error.message}`;
+      }
+      if (error.details && error.details.repo) {
+        error.documentation = `${error.details.repo}`;
+      }
+      return cli.sessionStop('error', error);
+    }
+
+    if (instance && instance.outputs) {
+      cli.log();
+      cli.logOutputs(instance.outputs);
+    } else {
+      cli.log();
+      cli.log('No outputs available', 'grey');
+    }
+
+    cli.log();
+    cli.log(
+      `Full details: ${getDashboardUrl(
+        `/${instanceYaml.org}/apps/${instanceYaml.app || instanceYaml.name}/${instanceYaml.name}/${
+          instanceYaml.stage
+        }`
+      )}`
+    );
 
     cli.sessionStop('success', 'Success');
     if (deferredNotificationsData) printNotification(cli, await deferredNotificationsData);
