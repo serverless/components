@@ -196,7 +196,7 @@ class CLI {
       error = { message: error };
     }
 
-    // Add defaults
+    // Add default helpful info
     error.name = error.name || 'Unknown Error';
 
     if (!isChinaUser()) {
@@ -234,7 +234,7 @@ class CLI {
     // Render stack trace (if debug is on)
     this.logErrorStackTrace(error.stack);
 
-    let content
+    let content;
 
     if (options.hideEntity) {
       content = `${error.message} ${os.EOL}`;
