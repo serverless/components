@@ -42,7 +42,8 @@ module.exports = async (config, cli) => {
     instanceYaml.org,
     instanceYaml.stage,
     instanceYaml.app,
-    instanceYaml.name
+    instanceYaml.name,
+    { fetchSourceCodeUrl: true }
   );
 
   instance = instance.instance;

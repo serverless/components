@@ -1,45 +1,31 @@
 'use strict';
 
 const path = require('path');
-const https = require('https');
-const urlUtils = require('url');
-const fs = require('fs');
-const os = require('os');
-const crypto = require('crypto');
-const { mkdir } = require('fs-extra');
 const chalk = require('chalk');
-const AdmZip = require('adm-zip');
 const inquirer = require('@serverless/inquirer');
 const confirm = require('@serverless/inquirer/utils/confirm');
+const { ServerlessSDK } = require('@serverless/platform-client-china');
 const { isProjectPath } = require('../utils');
+const { initTemplateFromCli } = require('../commands-cn/init');
 
 const isValidProjectName = RegExp.prototype.test.bind(/^[a-zA-Z][a-zA-Z0-9-]{0,100}$/);
 
-const cosUrl = 'https://serverless-templates-1300862921.cos.ap-beijing.myqcloud.com/';
+// Add search for user to choice different project templates
+inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
 
-const initializeProjectChoices = [
-  {
-    name: 'Express.js app',
-    value: { id: 'express', name: 'Express.js' },
-  },
-  {
-    name: 'SCF Function',
-    value: { id: 'scf', name: 'SCF Function' },
-  },
-  {
-    name: 'Website app',
-    value: { id: 'website', name: 'Website' },
-  },
-];
-
-const projectTypeChoice = async () =>
+const projectTypeChoice = async (choices) =>
   (
     await inquirer.prompt({
       // EN: What do you want to make?
       message: '请选择你希望创建的 Serverless 应用',
-      type: 'list',
+      type: 'autocomplete',
       name: 'projectType',
-      choices: initializeProjectChoices,
+      source: async (_, input) => {
+        if (input) {
+          return choices.filter((choice) => choice.name.includes(input));
+        }
+        return choices;
+      },
     })
   ).projectType;
 
@@ -73,42 +59,16 @@ const projectNameInput = async (workingDir) =>
     })
   ).projectName.trim();
 
-const createProject = async (projectType, projectDir) => {
-  const tmpFilename = path.resolve(os.tmpdir(), crypto.randomBytes(5).toString('hex'));
-  process.stdout.write(
-    // EN: Downloading ${projectType.name} app...
-    `Serverless: ${chalk.yellow(`正在安装 ${projectType.name} 应用...`)}\n`
-  );
-  await Promise.all([
-    mkdir(projectDir),
-    (async () => {
-      const url = urlUtils.parse(`${cosUrl}${projectType.id}-demo.zip`);
+const getTemplatesFromRegistry = async (sdk) => {
+  const { templates = [] } = await sdk.listPackages(null, { isFeatured: true });
 
-      await new Promise((resolve, reject) => {
-        const req = https.request(
-          {
-            protocol: url.protocol,
-            hostname: url.hostname,
-            port: url.port,
-            path: url.path,
-            method: 'GET',
-          },
-          (res) => {
-            const stream = res.pipe(fs.createWriteStream(tmpFilename));
-            stream.on('error', reject);
-            stream.on('finish', resolve);
-          }
-        );
-        req.end();
-      });
-    })(),
-  ]);
-
-  const zip = new AdmZip(tmpFilename);
-  zip.extractAllTo(projectDir);
+  return templates.map((item) => ({
+    name: item.name,
+    value: { id: item.componentName, name: item.name },
+  }));
 };
 
-module.exports = async () => {
+module.exports = async (config, cli) => {
   // We assume we're not in service|component context
   // As this function is configured to be invoked only in such case
   if (
@@ -119,14 +79,39 @@ module.exports = async () => {
   ) {
     return null;
   }
+  const sdk = new ServerlessSDK();
 
-  const projectType = await projectTypeChoice();
+  // Fetch latest templates from registry
+  const templatesChoices = await getTemplatesFromRegistry(sdk);
+  if (templatesChoices.length === 0) {
+    // EN: Can not find any template in registry!
+    cli.log(chalk.red('当前注册中心无可用模版!\n'));
+    return null;
+  }
+
+  const projectType = await projectTypeChoice(templatesChoices);
   const workingDir = process.cwd();
   const projectName = await projectNameInput(workingDir);
+
   const projectDir = path.join(workingDir, projectName);
-  await createProject(projectType, projectDir);
+  const { id: packageName, name } = projectType;
+
+  cli.log(
+    // EN: Downloading ${projectType.name} app...
+    `Serverless: ${chalk.yellow(`正在安装 ${name} 应用...`)}\n`
+  );
+
+  // Get detailed information about the selected template
+  const registryPackage = await sdk.getPackage(packageName);
+
+  // Start CLI persistance status
+  cli.sessionStart('Installing', { timer: false });
+  // Start initialing the template on cli
+  await initTemplateFromCli(projectDir, packageName, registryPackage, cli);
+  cli.sessionStop('success', 'Created');
+
   // EN: Project successfully created in '${projectName}' folder
-  process.stdout.write(`\n${chalk.green(`${projectName} 项目已成功创建！`)}\n`);
+  cli.log(`\n${chalk.green(`${projectName} 项目已成功创建！`)}\n`);
 
   if (
     // EN: Do you want to deploy your project on the cloud now?

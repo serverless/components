@@ -13,6 +13,7 @@ const chalk = require('chalk');
 const generateNotificationsPayload = require('../notifications/generate-payload');
 const requestNotification = require('../notifications/request');
 const printNotification = require('../notifications/print-notification');
+const { version } = require('../../../package.json');
 
 module.exports = async (config, cli, command) => {
   if (!config.target && runningTemplate(process.cwd())) {
@@ -57,6 +58,7 @@ module.exports = async (config, cli, command) => {
       orgUid,
       orgName: instanceYaml.org,
     },
+    agent: `ComponentsCLI_${version}`,
   });
 
   // Prepare Command Inputs

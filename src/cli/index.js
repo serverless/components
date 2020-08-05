@@ -20,6 +20,36 @@ module.exports = async () => {
   const instanceConfig = loadInstanceConfig(process.cwd());
   const stage = args.stage || (instanceConfig && instanceConfig.stage) || 'dev';
 
+  const params = [];
+  if (args._[1]) {
+    params.push(args._[1]);
+  }
+  if (args._[2]) {
+    params.push(args._[2]);
+  }
+  if (args._[3]) {
+    params.push(args._[3]);
+  }
+  if (args._[4]) {
+    params.push(args._[4]);
+  }
+
+  const config = { ...args, params };
+  if (config._) {
+    delete config._;
+  }
+
+  config.platformStage = process.env.SERVERLESS_PLATFORM_STAGE || 'prod';
+  config.debug = process.env.SLS_DEBUG || !!args.debug;
+
+  // Add stage environment variable
+  if (args.stage && !process.env.SERVERLESS_STAGE) {
+    process.env.SERVERLESS_STAGE = args.stage;
+  }
+
+  // Initialize CLI utilities
+  const cli = new CLI(config);
+
   /**
    * Load environment variables from .env files, 2 directories up
    * Nearest to current working directory is preferred
@@ -70,7 +100,7 @@ module.exports = async () => {
    */
   if (process.argv.length === 2 && isChinaUser() && !(await isProjectPath(process.cwd()))) {
     // Interactive onboarding
-    return require('./interactive-onboarding/cn')();
+    return require('./interactive-onboarding/cn')(config, cli);
   }
 
   let commands;
@@ -89,7 +119,7 @@ module.exports = async () => {
    */
   if (command === 'publish') {
     command = 'registry';
-    args._[1] = 'publish';
+    config.params.unshift('publish');
   }
 
   /**
@@ -98,36 +128,6 @@ module.exports = async () => {
   if (args.help || args.h || args['help-components']) {
     command = 'help';
   }
-
-  const params = [];
-  if (args._[1]) {
-    params.push(args._[1]);
-  }
-  if (args._[2]) {
-    params.push(args._[2]);
-  }
-  if (args._[3]) {
-    params.push(args._[3]);
-  }
-  if (args._[4]) {
-    params.push(args._[4]);
-  }
-
-  const config = { ...args, params };
-  if (config._) {
-    delete config._;
-  }
-
-  config.platformStage = process.env.SERVERLESS_PLATFORM_STAGE || 'prod';
-  config.debug = process.env.SLS_DEBUG || !!args.debug;
-
-  // Add stage environment variable
-  if (args.stage && !process.env.SERVERLESS_STAGE) {
-    process.env.SERVERLESS_STAGE = args.stage;
-  }
-
-  // Initialize CLI utilities
-  const cli = new CLI(config);
 
   // Handle version command. Log and exit.
   // TODO: Move this to a command file like all others. Don't handle this here.
