@@ -79,12 +79,12 @@ inputs: # The configuration the Component accepts according to its docs
     - [Optimize For Accessibility](#optimize-for-accessibility)
     - [No Surprise Removals](#no-surprise-removals)
     - [Write Integration Tests](#write-integration-tests)
-- [CLI Commands](#cli-commands) 
-  - [`serverless registry`](#serverless-registry) 
-  - [`serverless registry publish`](#serverless-registry-publish) 
-  - [`serverless deploy`](#serverless-deploy) 
-  - [`serverless remove`](#serverless-remove) 
-  - [`serverless info`](#serverless-info) 
+- [CLI Commands](#cli-commands)
+  - [`serverless registry`](#serverless-registry)
+  - [`serverless registry publish`](#serverless-registry-publish)
+  - [`serverless deploy`](#serverless-deploy)
+  - [`serverless remove`](#serverless-remove)
+  - [`serverless info`](#serverless-info)
   - [`serverless dev`](#serverless-dev)
 - [F.A.Q.](#faq)
 
@@ -234,11 +234,11 @@ Serverless Components favor cloud infrastructure with serverless qualities. They
 
 # Overview
 
-Serverless Components are libraries of code that make it easy to deploy apps and other functionality onto serverless cloud infrastructure.  They're instant serverless use-cases that contain the best infrastructure patterns for scale, performance, cost optimization, collaboration and more.
+Serverless Components are libraries of code that make it easy to deploy apps and other functionality onto serverless cloud infrastructure. They're instant serverless use-cases that contain the best infrastructure patterns for scale, performance, cost optimization, collaboration and more.
 
-We (Serverless Inc) made Serverless Components because composing, configuring and managing low-level serverless infrastructure can be complicated for developers and teams.  We've discovered many of the best patterns, and now we want to share them!
+We (Serverless Inc) made Serverless Components because composing, configuring and managing low-level serverless infrastructure can be complicated for developers and teams. We've discovered many of the best patterns, and now we want to share them!
 
-While Components can help you deploy and manage low-level infrastructure (e.g. an AWS S3 bucket).  Their big use-case is on higher-order functionality and apps, like:
+While Components can help you deploy and manage low-level infrastructure (e.g. an AWS S3 bucket). Their big use-case is on higher-order functionality and apps, like:
 
 1. A group of infrastructure with a purpose, like a type of data processing pipeline.
 2. A software feature, like user authentication, comments, or a payment system.
@@ -250,7 +250,7 @@ While Components can help you deploy and manage low-level infrastructure (e.g. a
 
 ### Serverless Framework
 
-Serverless Components are a [Serverless Framework](https://github.com/serverless/serverless) feature.  You use them with the Serverless Framework CLI.  Install it via:
+Serverless Components are a [Serverless Framework](https://github.com/serverless/serverless) feature. You use them with the Serverless Framework CLI. Install it via:
 
 ```
 $ npm i serverless -g
@@ -258,7 +258,7 @@ $ npm i serverless -g
 
 ### serverless.yml
 
-To use a Serverless Component, declare the name of one that exists in the Serverless Registry in your `serverless.yml`. 
+To use a Serverless Component, declare the name of one that exists in the Serverless Registry in your `serverless.yml`.
 
 The syntax looks like this:
 
@@ -275,24 +275,24 @@ inputs: # The parameters to send to the "deploy" action of the component.
   domain: api.my-app.com
 ```
 
-There is nothing to install when using Serverless Components.  They live in the cloud.  When you run deploy, the configuration you specify in `serverless.yml` will be sent to the Serverless Components Engine, along with the files or source code you specifiy in `inputs`.
+There is nothing to install when using Serverless Components. They live in the cloud. When you run deploy, the configuration you specify in `serverless.yml` will be sent to the Serverless Components Engine, along with the files or source code you specifiy in `inputs`.
 
-**Other Notes:** 
+**Other Notes:**
 
-* You cannot use Serverless Components within an existing Serverless Framework project file (i.e. a `serverless.yml` file that contains `functions`, `events`, `resources` and `plugins`).
+- You cannot use Serverless Components within an existing Serverless Framework project file (i.e. a `serverless.yml` file that contains `functions`, `events`, `resources` and `plugins`).
 
-* You can only have 1 Serverless Component in `serverless.yml`. We encourage this because it's important to separate the resources in your Serverless Applications, rather than put all of them in 1 infrastructure stack.
+- You can only have 1 Serverless Component in `serverless.yml`. We encourage this because it's important to separate the resources in your Serverless Applications, rather than put all of them in 1 infrastructure stack.
 
 ### Actions, Inputs & Outputs
 
 Every Serverless Component can perform one or many **Actions**, which are functions that contain logic which the Component can do for you, such as:
 
-* _deploy_  - Deploy something onto cloud infrastructure.
-* _remove_  - Remove something from cloud infrastructure.
-* _test_    - Test some functionality provisioned by the Component, like an API endpoint.
-* _metrics_ - Get metrics about the Component's performance.
+- _deploy_ - Deploy something onto cloud infrastructure.
+- _remove_ - Remove something from cloud infrastructure.
+- _test_ - Test some functionality provisioned by the Component, like an API endpoint.
+- _metrics_ - Get metrics about the Component's performance.
 
-Components ship with their own unique Actions, though all have _deploy_ and _remove_.  One way to think about Actions is to consider Components as Javascript classes and Actions are the class methods.
+Components ship with their own unique Actions, though all have _deploy_ and _remove_. One way to think about Actions is to consider Components as Javascript classes and Actions are the class methods.
 
 You can run Component Actions via the Serverless Framework CLI or the Serverless Framework SDK.
 
@@ -338,7 +338,7 @@ $ serverless deploy
 
 While Serverless Components deploy incredibly fast, please note that first deployments can often be 2x slower because creating cloud resources takes a lot longer than updating them.
 
-Also note that some resources take a few minutes to be availbale.  For example, APIs and Website URLs may take 1-2 minutes before they are available.
+Also note that some resources take a few minutes to be availbale. For example, APIs and Website URLs may take 1-2 minutes before they are available.
 
 ### State
 
@@ -716,18 +716,18 @@ module.exports = MyComponent;
 
 ### Input & Output Types
 
-Every Serverless Component has Actions (which are merely functions, e.g. deploy, remove, metrics).  Each Action accepts Inputs and returns Outputs.  Serverless Components can optionally declare Types for the Inputs and Outputs of each Action. in their `serverless.component.yml`, which make them easier to write and use.  
+Every Serverless Component has Actions (which are merely functions, e.g. deploy, remove, metrics). Each Action accepts Inputs and returns Outputs. Serverless Components can optionally declare Types for the Inputs and Outputs of each Action. in their `serverless.component.yml`, which make them easier to write and use.
 
 Inputs & Output Types are recommended because they offer the following benefits:
 
-* They validate an Action is supported by a Component before running it.
-* They validate user Inputs before they are sent to a Component's Actions.
-* They prevent Component authors from needing to write their own validation logic.
-* They offer helpful errors to Component users when they enter invalid Inputs.
-* They can automate documentation for your Component.
-* They are needed for upcoming [Serverless Framework Dashboard](https://app.serverless.com) features that will enable visualizing Input and Output data special ways (e.g. form fields, charts, etc.).
+- They validate an Action is supported by a Component before running it.
+- They validate user Inputs before they are sent to a Component's Actions.
+- They prevent Component authors from needing to write their own validation logic.
+- They offer helpful errors to Component users when they enter invalid Inputs.
+- They can automate documentation for your Component.
+- They are needed for upcoming [Serverless Framework Dashboard](https://app.serverless.com) features that will enable visualizing Input and Output data special ways (e.g. form fields, charts, etc.).
 
-Types are optionally declared in `serverless.component.yml` files.  
+Types are optionally declared in `serverless.component.yml` files.
 
 You must first declare the Actions the Component uses, like this:
 
@@ -748,7 +748,7 @@ actions:
       # An array of Types goes here.
 ```
 
-Below is a full example, which also details all supported Types (Disclaimer:  This combines documentation and a real example.  Hopefully it's more helpful!).
+Below is a full example, which also details all supported Types (Disclaimer: This combines documentation and a real example. Hopefully it's more helpful!).
 
 ```yaml
 name: express
@@ -762,7 +762,6 @@ actions:
     # deploy action definition
     definition: Deploy your Express.js application to AWS Lambda, AWS HTTP API and more.
     inputs:
-
       #
       #
       # Primitive Types
@@ -818,7 +817,6 @@ actions:
         required: true # Defaults to required: false
         description: The VPC configuration for your AWS Lambda function # A description of this input
         keys:
-
           # Add more Types in here
           securityGroupIds: # The name of the key
             type: string
@@ -833,7 +831,6 @@ actions:
         min: 1 # Minimum array items
         max: 10 # Max array items
         items:
-
           # Add more Types in here, that you wish to allow, without "name" properties because they are array items.
           - type: string
             min: 5
@@ -841,14 +838,13 @@ actions:
 
           - type: object
             keys:
-
               # Add more standard Types in here, with "name" properties because they are object properties.
               - name: aws_lambda
                 type: string
 
         default: # Default array items
           - '12345678'
-        
+
       #
       #
       # Special Types
@@ -916,14 +912,13 @@ actions:
         # Optional
         required: true # Defaults to required: false
         description: API metrics from your back-end. # A description of this input
-      
+
     outputs:
       # Another array of Types goes here.
 
   # remove action
   remove:
     # ... accepts config identical to the deploy action
-
 ```
 
 #### type `metrics`
@@ -1025,7 +1020,6 @@ In the dashboard, the `stat` property of the first array is preferred.
   ]
 }
 ```
-
 
 ### Working With Source Code
 
