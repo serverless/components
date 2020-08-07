@@ -16,7 +16,7 @@ const {
   getTemplate,
   isLoggedInOrHasAccessKey,
 } = require('./utils');
-const { fileExists, loadComponentConfig } = require('../utils');
+const { fileExists, loadComponentConfig, validateNodeModules } = require('../utils');
 const { loadServerlessFile } = require('../serverlessFile');
 
 /**
@@ -55,7 +55,11 @@ const publish = async (config, cli) => {
     }
 
     serverlessFile = serverlessComponentFile;
-    serverlessFile.src = serverlessComponentFile.main;
+    serverlessFile.src = serverlessComponentFile.src || serverlessComponentFile.main;
+  } else if (serverlessFile.version || serverlessFile.type === 'component') {
+    throw new Error(
+      'Publish failed. Components could only be defined with a "serverless.component.yml" file.'
+    );
   }
 
   if (serverlessFile.type === 'template' || (!serverlessFile.type && !serverlessFile.version)) {
@@ -84,7 +88,7 @@ const publish = async (config, cli) => {
     serverlessFile.src = process.cwd();
   }
 
-  // validate serverless.js if component
+  // validate serverless.js & node_modules if component
   if (serverlessFile.type === 'component') {
     const serverlessJsFilePath = path.resolve(process.cwd(), serverlessFile.src, 'serverless.js');
 
@@ -93,6 +97,9 @@ const publish = async (config, cli) => {
         'no "serverless.js" file was found in the current working directory, or the "src" directory you specified.'
       );
     }
+
+    // make sure user ran "npm install" if applicable
+    await validateNodeModules(serverlessFile.src);
   } else {
     // validate the template
     await getTemplate(process.cwd());
@@ -224,34 +231,40 @@ const listFeatured = async (config, cli) => {
   cli.logRegistryLogo();
   cli.log();
 
-  cli.log('Featured:');
-  // cli.log();
-  cli.log('• fullstack-app - https://github.com/serverless-components/fullstack-app');
+  cli.log('Run "serverless init <package>" to install a template...');
+  cli.log();
+
+  cli.log('• fullstack-app - https://github.com/serverless-components/fullstack-app', 'grey');
   cli.log(
-    '• express-starter - https://github.com/serverless-components/express/tree/master/templates/express-starter'
+    '• express-starter - https://github.com/serverless-components/express/tree/master/templates/express-starter',
+    'grey'
   );
   cli.log(
-    '• react-starter - https://github.com/serverless-components/website/tree/master/templates/react-starter'
+    '• react-starter - https://github.com/serverless-components/website/tree/master/templates/react-starter',
+    'grey'
   );
   cli.log(
-    '• graphql-starter - https://github.com/serverless-components/graphql/tree/master/templates/graphql-starter'
+    '• graphql-starter - https://github.com/serverless-components/graphql/tree/master/templates/graphql-starter',
+    'grey'
   );
   cli.log(
-    '• aws-lambda-starter - https://github.com/serverless-components/aws-lambda/tree/master/templates/aws-lambda-starter'
+    '• aws-lambda-starter - https://github.com/serverless-components/aws-lambda/tree/master/templates/aws-lambda-starter',
+    'grey'
   );
   cli.log(
-    '• aws-dynamodb-starter - https://github.com/serverless-components/aws-dynamodb/tree/master/templates/aws-dynamodb-starter'
+    '• aws-dynamodb-starter - https://github.com/serverless-components/aws-dynamodb/tree/master/templates/aws-dynamodb-starter',
+    'grey'
   );
   cli.log(
-    '• aws-iam-role-starter - https://github.com/serverless-components/aws-iam-role/tree/master/templates/aws-iam-role-starter'
+    '• aws-iam-role-starter - https://github.com/serverless-components/aws-iam-role/tree/master/templates/aws-iam-role-starter',
+    'grey'
   );
   cli.log(
-    '• aws-lambda-layer-starter - https://github.com/serverless-components/aws-lambda-layer/tree/master/templates/aws-lambda-layer-starter'
+    '• aws-lambda-layer-starter - https://github.com/serverless-components/aws-lambda-layer/tree/master/templates/aws-lambda-layer-starter',
+    'grey'
   );
   cli.log();
-  cli.log('Find more here: https://github.com/serverless-components');
-  cli.log();
-  cli.log('Run "serverless init <package>" to install');
+  cli.log('Find more here: https://github.com/serverless-components', 'grey');
   cli.log();
 };
 

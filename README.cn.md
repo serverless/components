@@ -52,6 +52,7 @@ inputs: # 对应的组件配置
   - [从模板初始化项目](#从模板初始化项目)
 - [开发 Components](#开发-Components)
   - [Serverless.component.yml](#serverlesscomponentyml)
+  - [在 serverless.component.yml 中定义用户可输入的类型](#在-serverlesscomponentyml-中定义用户可输入的类型)
   - [Serverless.js](#serverlessjs)
   - [Component 中涉及源代码的场景](#component-中涉及源代码的场景)
   - [增加 Serverless Agent](#增加-serverless-agent)
@@ -646,6 +647,129 @@ keywords: tencent, serverless, express # 选填，Component 的关键词可以�
 repo: https://github.com/owner/project # 选填，Component 的项目代码
 license: MIT # 选填，Component 代码所遵循的协议
 main: ./src # 选填，Component 的代码路径
+```
+
+### 在 serverless.component.yml 中定义用户可输入的类型
+
+一些 component 在被使用时往往需要在`inputs`中定义各种在项目部署时所需的配置，这些配置项往往需要用户配置正确的输入，否则项目部署将会失败。为了更好的指导用户配置正确的输入项，特别是帮助用户检查配置中的错误，component 的开发者可以在开发 component 时就定义好各种 component 所支持的配置项以及对这些配置项的输入要求。例如，如果 component 支持让用户配置所创建的云函数名称，并且希望云函数名称仅能包含特定的字符，则可以在`serverless.component.yml`中定义如下的输入检查规则：
+
+```yaml
+# serverless.component.yml
+
+actions:
+  # deploy action
+  deploy:
+    definition: Deploy your Express.js application to Tencent SCF
+    inputs:
+      scf:
+        type: object
+        description: The SCF related configuration
+        keys:
+          functionName:
+            type: string
+            # 定义scf函数名称仅能配置为字母
+            regex: ^[a-z]+$
+```
+
+有了这个规则定义，当此 component 的用户在使用此 component 时如若配置了如下的云函数名称：
+
+```yaml
+# serverless.yml
+
+component: express
+name: express-api
+stage: dev
+
+inputs:
+  src: ./src
+  scf:
+    functionName: func01 # 函数名称中包含了数字
+```
+
+在用户进行部署时则会收到如下的错误提示：
+
+```bash
+3s › express-api › inputs validation error: "scf.functionName" with value "func01" fails to match the required pattern: /^[a-z]+$/
+```
+
+用户便可根据此提示修改其配置后成功完成应用部署。
+
+`serverless.component.yml`中支持定义的输入类型有很多种，详细举例说明如下：
+
+```yaml
+# serverless.component.yml
+
+actions:
+  # 这里分别定义该component支持的各种action，例如这里定义了最常见的deploy action
+  deploy:
+    definition: Deploy your Express.js application to Tencent.
+    inputs:
+      # Type: string (字符串类型)
+      param1: # inputs中的字段名称
+        type: string
+        # Optional，以下为可选定义
+        required: true # Defaults to required: false
+        default: my-app # The default value
+        description: Some description about param1. # A description of this parameter
+        min: 5 # Minimum number of characters
+        max: 64 # Maximum number of characters
+        regex: ^[a-z0-9-]*$ # A RegEx pattern to validate against.
+
+      # Type: number (数值类型)
+      memory:
+        type: number
+        # Optional
+        default: 2048 # The default value
+        min: 128 # Minimum number allowed
+        max: 3008 # Maximum number allowed
+        allow: # The values that are allowed for this
+          - 128
+          - 1024
+          - 2048
+          - 3008
+
+      # Type: boolean (布尔类型)
+      delete:
+        type: boolean
+        # Optional
+        default: true # The default value
+
+      # Type: object (对象类型)
+      vpcConfig:
+        type: object
+        # Optional
+        keys: # 定义对象中的各个字段
+          securityGroupIds: # 每个字段的定义都可以使用上面完整的定义类型，也可以是一个嵌套的对象
+            type: string
+
+      # Type: array (数组类型)
+      mappingTemplates:
+        type: array
+        # Optional
+        min: 1 # Minimum array items
+        max: 10 # Max array items
+        items:
+          # 定义数组中每个元素的类型
+          - type: number
+            min: 5
+            max: 13
+          # 数组中的元素可以有多种类型
+          - type: object
+            keys:
+              field1:
+                type: string
+        default: # Default array items
+          - '12345678'
+
+      # Type: datetime (日期类型)
+      # This Type is an ISO8601 string that contains a datetime.
+      rangeStart:
+        type: datetime
+
+      # Type: url (URL地址类型)
+      # This Type is for a URL, often describing your root API URL or website URL.
+      myUrl:
+        type: url
 ```
 
 ### serverless.js

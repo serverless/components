@@ -33,7 +33,7 @@ const writeEnvFile = async (dir) => {
     '# to deploy your app https://github.com/serverless/components#credentials\n\n' +
     '# AWS:\n' +
     '# AWS_ACCESS_KEY_ID=<your access key>\n' +
-    '# AWS_SECRET_ACCESS_KEY<your secret access key>\n';
+    '# AWS_SECRET_ACCESS_KEY=<your secret access key>\n';
   await fs.writeFile(envDestination, envConfig);
 };
 

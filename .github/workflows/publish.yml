@@ -11,6 +11,11 @@ jobs:
   publish:
     name: Publish
     runs-on: ubuntu-latest
+    env:
+      # Ensure release notes are published by our `serverless-ci` bot
+      # (If instead we'd use unconditionally provided secrets.GITHUB_TOKEN then
+      # "github-actions" user will be listed as release publisher)
+      GITHUB_TOKEN: ${{ secrets.USER_GITHUB_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -29,3 +34,9 @@ jobs:
         #       as it appears actions/setup-node sets own value
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }} # 01dd......71cc
+
+      - name: Publish release notes
+        run: |
+          TEMP_ARRAY=($(echo $GITHUB_REF | tr "/" "\n"))
+          TAG=${TEMP_ARRAY[@]: -1}
+          npx github-release-from-cc-changelog $TAG

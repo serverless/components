@@ -6,13 +6,14 @@
 
 const path = require('path');
 const { runningTemplate } = require('../utils');
-const { ServerlessSDK } = require('@serverless/platform-client-china');
+const { ServerlessSDK, utils: tencentUtils } = require('@serverless/platform-client-china');
 const utils = require('./utils');
 const runAll = require('./runAll');
 const chalk = require('chalk');
 const generateNotificationsPayload = require('../notifications/generate-payload');
 const requestNotification = require('../notifications/request');
 const printNotification = require('../notifications/print-notification');
+const { version } = require('../../../package.json');
 
 module.exports = async (config, cli, command) => {
   if (!config.target && runningTemplate(process.cwd())) {
@@ -46,10 +47,18 @@ module.exports = async (config, cli, command) => {
   const instanceCredentials = await utils.loadInstanceCredentials(instanceYaml.stage);
 
   // initialize SDK
+  const orgUid = await tencentUtils.getOrgId();
   const sdk = new ServerlessSDK({
+    accessKey: tencentUtils.buildTempAccessKeyForTencent({
+      SecretId: process.env.TENCENT_SECRET_ID,
+      SecretKey: process.env.TENCENT_SECRET_KEY,
+      Token: process.env.TENCENT_TOKEN,
+    }),
     context: {
+      orgUid,
       orgName: instanceYaml.org,
     },
+    agent: `ComponentsCLI_${version}`,
   });
 
   // Prepare Command Inputs
@@ -59,6 +68,18 @@ module.exports = async (config, cli, command) => {
   const options = {};
   options.debug = config.debug;
   options.dev = config.dev;
+
+  // Connect to Serverless Platform Events, if in debug mode
+  if (options.debug) {
+    await sdk.connect({
+      filter: {
+        stageName: instanceYaml.stage,
+        appName: instanceYaml.app,
+        instanceName: instanceYaml.name,
+      },
+      onEvent: utils.handleDebugLogMessage(cli),
+    });
+  }
 
   let deferredNotificationsData;
   if (command === 'deploy') {
@@ -116,5 +137,7 @@ module.exports = async (config, cli, command) => {
   cli.sessionStop('success', 'Success');
 
   if (deferredNotificationsData) printNotification(cli, await deferredNotificationsData);
+
+  sdk.disconnect();
   return null;
 };

@@ -12,7 +12,30 @@ const {
   isLoggedInOrHasAccessKey,
 } = require('./utils');
 
+/**
+ * Deploy helper function
+ */
+const deploy = async (sdk, cli, instanceYaml, instanceCredentials) => {
+  let result;
+  try {
+    result = await sdk.deploy(instanceYaml, instanceCredentials);
+  } catch (error) {
+    if (error.name === 'Invalid Component Types') {
+      error.message = `Invalid Input: ${error.message}`;
+    }
+    if (error.details && error.details.repo) {
+      error.documentation = `  Documentation: ${error.details.repo}`;
+    }
+    cli.logError(error);
+  }
+
+  return result;
+};
+
 module.exports = async (config, cli) => {
+  let instanceYaml;
+  let instanceCredentials;
+
   // Define a close handler, that removes any "dev" mode agents
   const closeHandler = async () => {
     // Set new close listener
@@ -28,11 +51,7 @@ module.exports = async (config, cli) => {
     cli.sessionStatus('Disabling Dev Mode & closing', null, 'green');
 
     // Remove agent from application
-    try {
-      await sdk.deploy(instanceYaml, instanceCredentials);
-    } catch (error) {
-      cli.logError(error.message);
-    }
+    await deploy(sdk, cli, instanceYaml, instanceCredentials);
 
     await cli.watcher.close();
     cli.sessionStop('success', 'Dev Mode closed');
@@ -51,10 +70,10 @@ module.exports = async (config, cli) => {
   cli.sessionStart('Initializing', { closeHandler });
 
   // Load serverless component instance.  Submit a directory where its config files should be.
-  let instanceYaml = await loadInstanceConfig(process.cwd(), { disableCache: true });
+  instanceYaml = await loadInstanceConfig(process.cwd(), { disableCache: true });
 
   // Load Instance Credentials
-  const instanceCredentials = await loadInstanceCredentials(instanceYaml.stage);
+  instanceCredentials = await loadInstanceCredentials(instanceYaml.stage);
 
   // Get access key
   const accessKey = await getAccessKey(instanceYaml.org);
@@ -62,7 +81,7 @@ module.exports = async (config, cli) => {
   // Presentation
   cli.logLogo();
   cli.log(
-    'Dev Mode - Watching your Component for changes and enabling streaming logs, if supported...',
+    'Dev Mode - Watching your App for changes and enabling streaming logs, if supported...',
     'grey'
   );
 
@@ -85,15 +104,10 @@ module.exports = async (config, cli) => {
 
     // Deployment
     if (event.event === 'instance.deployment.succeeded') {
-      const header = `${d.toLocaleTimeString()} - ${event.instanceName} - deployment`;
+      const header = `${d.toLocaleTimeString()} - ${event.instance_name} - deployment`;
+      cli.log();
       cli.log(header, 'grey');
       cli.logOutputs(event.data.outputs);
-      cli.sessionStatus('Watching');
-    }
-    if (event.event === 'instance.deployment.failed') {
-      const header = `${d.toLocaleTimeString()} - ${event.instanceName} - deployment error`;
-      cli.log(header, 'grey');
-      cli.log(event.data.stack, 'red');
       cli.sessionStatus('Watching');
     }
 
@@ -133,7 +147,7 @@ module.exports = async (config, cli) => {
           if (log.type === 'stderr') {
             type = 'log - stderr';
           }
-          const header = `${date.toLocaleTimeString()} - ${event.instanceName} - ${type}`;
+          const header = `${date.toLocaleTimeString()} - ${event.instance_name} - ${type}`;
           cli.log(header, 'grey');
           if (log.type === 'log' || log.type === 'stdout') {
             cli.log(log.data);
@@ -153,7 +167,7 @@ module.exports = async (config, cli) => {
 
     // Error
     if (event.event === 'instance.error') {
-      const header = `${d.toLocaleTimeString()} - ${event.instanceName} - error`;
+      const header = `${d.toLocaleTimeString()} - ${event.instance_name} - error`;
       cli.log(header, 'grey');
       cli.log(event.data.stack, 'red');
       cli.log();
@@ -173,7 +187,7 @@ module.exports = async (config, cli) => {
         transactionType = 'transaction';
       }
 
-      const header = `${d.toLocaleTimeString()} - ${event.instanceName} - ${transactionType}`;
+      const header = `${d.toLocaleTimeString()} - ${event.instance_name} - ${transactionType}`;
       cli.log(header, 'grey');
     }
   };
@@ -225,13 +239,8 @@ module.exports = async (config, cli) => {
 
   cli.watcher.on('ready', async () => {
     cli.sessionStatus('Initializing Dev Mode', null, 'green');
-
-    try {
-      await sdk.deploy(instanceYaml, instanceCredentials, { dev: true });
-    } catch (error) {
-      cli.logError(error.message);
-      cli.sessionStatus('Watching');
-    }
+    await deploy(sdk, cli, instanceYaml, instanceCredentials);
+    cli.sessionStatus('Watching');
   });
 
   cli.watcher.on('change', async () => {
@@ -253,23 +262,15 @@ module.exports = async (config, cli) => {
       // reload serverless component instance
       instanceYaml = await loadInstanceConfig(process.cwd(), { disableCache: true });
 
-      try {
-        await sdk.deploy(instanceYaml, instanceCredentials, { dev: true });
-      } catch (error) {
-        cli.logError(error.message);
-        cli.sessionStatus('Watching');
-      }
+      await deploy(sdk, cli, instanceYaml, instanceCredentials);
+      cli.sessionStatus('Watching');
 
       if (queuedOperation) {
         cli.sessionStatus('Deploying', null, 'green');
         // reload serverless component instance
         instanceYaml = await loadInstanceConfig(process.cwd(), { disableCache: true });
-        try {
-          await sdk.deploy(instanceYaml, instanceCredentials, { dev: true });
-        } catch (error) {
-          cli.logError(error.message);
-          cli.sessionStatus('Watching');
-        }
+        await deploy(sdk, cli, instanceYaml, instanceCredentials);
+        cli.sessionStatus('Watching');
       }
 
       isProcessing = false;

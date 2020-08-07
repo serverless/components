@@ -88,6 +88,19 @@ const readAndParseSync = (filePath, options = {}) => {
   return contents.toString().trim();
 };
 
+const validateAgainstV1Variables = (variable) => {
+  const v1Variables = ['self', 'opt', 'sls', 'cf', 's3', 'ssm', 'file'];
+
+  for (const v1Variable of v1Variables) {
+    const v1VariableRegex = new RegExp(`\\\${${v1Variable}:([\\w.-_]+)}`, 'g');
+    if (v1VariableRegex.test(variable)) {
+      throw new Error(
+        `Serverless Framework Components do not support this Variable: "${variable}".  Here are the Variables supported by Components: https://git.io/JJshw`
+      );
+    }
+  }
+};
+
 /**
  * Resolves any variables that require resolving before the engine.
  * This currently supports only ${env}.  All others should be resolved within the deployment engine.
@@ -101,6 +114,8 @@ const resolveVariables = (inputs) => {
     if (matches) {
       let newValue = value;
       for (const match of matches) {
+        // make sure users are not using v1 variables
+        validateAgainstV1Variables(match);
         // Search for ${env:}
         if (/\${env:(\w*[\w.-_]+)}/g.test(match)) {
           const referencedPropertyPath = match.substring(2, match.length - 1).split(':');
@@ -590,11 +605,24 @@ const executeGraph = async (allComponents, command, graph, cli, sdk, credentials
         try {
           instance = await sdk.remove(instanceYaml, credentials, options);
         } catch (error) {
-          error.message = `${instanceYaml.name}: ${error.message}`;
-          if (!options.debug) {
-            cli.log();
+          // Add helpful information
+          if (!isChinaUser()) {
+            if (error.name === 'Invalid Component Types') {
+              error.message = `Invalid Input: ${error.message}`;
+            }
+            if (error.details && error.details.repo) {
+              error.message = `${error.message} - Documentation: ${error.details.repo}`;
+            }
+            error.documentation = false;
+            error.support = false;
+            error.chat = false;
           }
-          cli.log(error.message, 'red');
+
+          // Prefix with app name
+          error.message = `${instanceYaml.name}: ${error.message}`;
+
+          cli.logError(error, { hideEntity: true });
+
           allComponents[instanceName].error = error;
           return null;
         }
@@ -604,11 +632,23 @@ const executeGraph = async (allComponents, command, graph, cli, sdk, credentials
         try {
           instance = await sdk.deploy(instanceYaml, credentials, options);
         } catch (error) {
-          error.message = `${instanceYaml.name}: ${error.message}`;
-          if (!options.debug) {
-            cli.log();
+          // Add helpful information
+          if (!isChinaUser()) {
+            if (error.name === 'Invalid Component Types') {
+              error.message = `Invalid Input: ${error.message}`;
+            }
+            if (error.details && error.details.repo) {
+              error.message = `${error.message} - Documentation: ${error.details.repo}`;
+            }
+            error.documentation = false;
+            error.support = false;
+            error.chat = false;
           }
-          cli.log(error.message, 'red');
+
+          // Prefix with app name
+          error.message = `${instanceYaml.name}: ${error.message}`;
+
+          cli.logError(error, { hideEntity: true });
           allComponents[instanceName].error = error;
           return null;
         }
@@ -659,6 +699,32 @@ const isChinaUser = () => {
   return result;
 };
 
+/**
+ * Makes sure user ran "npm install" if package.json with dependencies was found
+ */
+const validateNodeModules = async (directory) => {
+  const srcPath = path.resolve(process.cwd(), directory);
+  const packageJsonPath = path.resolve(srcPath, 'package.json');
+
+  // only validate node modules if package.json exists
+  if (await fileExists(packageJsonPath)) {
+    const packageJson = readAndParseSync(packageJsonPath);
+
+    const hasDependencies = Object.keys(packageJson.dependencies).length > 0;
+
+    // only validate node modules if there are dependencies in package.json
+    if (hasDependencies) {
+      const nodeModulesExists = await fse.pathExists(path.resolve(srcPath, 'node_modules'));
+
+      if (!nodeModulesExists) {
+        throw new Error(
+          'node_modules was not found in the current working directory, or the "src" directory you specified. Did you run "npm install"?'
+        );
+      }
+    }
+  }
+};
+
 module.exports = {
   sleep,
   fileExists,
@@ -684,4 +750,5 @@ module.exports = {
   createGraph,
   executeGraph,
   isChinaUser,
+  validateNodeModules,
 };

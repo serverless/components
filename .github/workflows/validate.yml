@@ -53,6 +53,13 @@ jobs:
         run: npm run prettier-check:updated
       - name: Validate Lint rules
         run: npm run lint:updated
+      - name: Validate changelog (if new version)
+        run: |
+          NEW_VERSION=`git diff -U0 master package.json | grep '"version": "' | tail -n 1 | grep -oE "[0-9]+\.[0-9]+\.[0-9]+"` || :
+          if [ -n "$NEW_VERSION" ];
+          then
+            npx dump-release-notes-from-cc-changelog $NEW_VERSION
+          fi
 
   Nodejs8Support:
     name: 'Node.js v8: Support check'
