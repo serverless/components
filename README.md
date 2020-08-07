@@ -79,7 +79,13 @@ inputs: # The configuration the Component accepts according to its docs
     - [Optimize For Accessibility](#optimize-for-accessibility)
     - [No Surprise Removals](#no-surprise-removals)
     - [Write Integration Tests](#write-integration-tests)
-- [CLI Commands](#cli-commands) - [`serverless registry`](#serverless-registry) - [`serverless registry publish`](#serverless-registry-publish) - [`serverless deploy`](#serverless-deploy) - [`serverless remove`](#serverless-remove) - [`serverless info`](#serverless-info) - [`serverless dev`](#serverless-dev)
+- [CLI Commands](#cli-commands) 
+  - [`serverless registry`](#serverless-registry) 
+  - [`serverless registry publish`](#serverless-registry-publish) 
+  - [`serverless deploy`](#serverless-deploy) 
+  - [`serverless remove`](#serverless-remove) 
+  - [`serverless info`](#serverless-info) 
+  - [`serverless dev`](#serverless-dev)
 - [F.A.Q.](#faq)
 
 <br/>
