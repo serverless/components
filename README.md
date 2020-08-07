@@ -709,9 +709,9 @@ module.exports = MyComponent;
 
 ### Input & Output Types
 
-The Actions of a Serverless Component can optionally declare Types for its Inputs and Outputs.  
+Every Serverless Component has Actions (which are merely functions, e.g. deploy, remove, metrics).  Each Action accepts Inputs and returns Outputs.  Serverless Components can optionally declare Types for the Inputs and Outputs of each Action. in their `serverless.component.yml`, which make them easier to write and use.  
 
-These Types are recommended because they offer the following benefits:
+Inputs & Output Types are recommended because they offer the following benefits:
 
 * They validate an Action is supported by a Component before running it.
 * They validate user Inputs before they are sent to a Component's Actions.
@@ -765,7 +765,7 @@ actions:
 
       # Type: string
 
-      - name: name # The name of the parameter
+      name: # The name of the input/output
         type: string # The type
         # Optional
         required: true # Defaults to required: false
@@ -774,10 +774,13 @@ actions:
         min: 5 # Minimum number of characters
         max: 64 # Maximum number of characters
         regex: ^[a-z0-9-]*$ # A RegEx pattern to validate against.
+        allow: # The values that are allowed for this
+          - my-api
+          - my-backend
 
       # Type: number
 
-      - name: memory # The name of the parameter
+      memory: # The name of the input/output
         type: number # The type.  These can be integers or decimals.
         # Optional
         required: true # Defaults to required: false
@@ -793,7 +796,7 @@ actions:
 
       # Type: boolean
 
-      - name: delete # The name of the parameter
+      delete: # The name of the input/output
         type: boolean # The type.
         # Optional
         required: true # Defaults to required: false
@@ -802,7 +805,7 @@ actions:
 
       # Type: object
 
-      - name: vpcConfig # The name of the parameter
+      vpcConfig: # The name of the input/output
         type: object # The type
         # Optional
         required: true # Defaults to required: false
@@ -810,12 +813,12 @@ actions:
         keys:
 
           # Add more Types in here
-          - name: securityGroupIds
+          securityGroupIds: # The name of the key
             type: string
 
       # Type: array
 
-      - name: mappingTemplates # The name of the parameter
+      mappingTemplates: # The name of the input/output
         type: array # The type
         # Optional
         required: true # Defaults to required: false
@@ -850,7 +853,7 @@ actions:
       # This Type specifies a folder containing code or general files you wish to upload upon deployment, which the Component may need to deploy a specific outcome. Before running the Component in the cloud, the Serverless Framework will first upload any files specified in `src`. Generally, you want to keep the package size of your serverless applications small (<5MB) in order to have the best performance in serverless compute services. Larger package sizes will also make deployments slower since the upload process is dependent on your internet connection bandwidth. Consider a tool to build and minify your code first. You can specify a build hook to run and a `dist` folder to upload, via the `src` property.
       # This Type can either be a string containing a relative path to your source code, or an object.
 
-      - name: src # The name "src" is reserved for this Special Type.  Your params can only have one of these.
+      src: # The name "src" is reserved for this Type.  Your inputs can only have one of these.
         type: src # The type
         # Optional
         required: true # Defaults to required: false
@@ -866,7 +869,7 @@ actions:
       # Type: env
       # This Type is for an object of key-value pairs meant to contain sensitive information.  By using it, the Serverless Framework will treat this data more securely.
 
-      - name: env # The name "env" is reserved for this Special Type.  Your params can only have one of these.
+      env: # The name "env" is reserved for this Special Type.  Your params can only have one of these.
         type: env # The type
         # Optional
         description: Environment variables to include in AWS Lambda # A description of this input
@@ -874,7 +877,7 @@ actions:
       # Type: datetime
       # This Type is an ISO8601 string that contains a datetime.
 
-      - name: rangeStart
+      rangeStart: # The name of the input/output
         type: datetime
         # Optional
         required: true # Defaults to required: false
@@ -883,7 +886,7 @@ actions:
       # Type: url
       # This Type is for a URL, often describing your root API URL or website URL.
 
-      - name: url
+      url: # The name of the input/output
         type: url
         # Optional
         required: true # Defaults to required: false
@@ -892,7 +895,7 @@ actions:
       # Type: api
       # This Type is for an OpenAPI specification.
 
-      - name: api
+      api: # The name of the input/output
         type: api
         # Optional
         required: true # Defaults to required: false
@@ -901,7 +904,7 @@ actions:
       # Type: metrics
       # This Type is for an array of supported Metrics widgets which can be rendered dynamically in GUIs.
 
-      - name: metrics
+      metrics: # The name of the input/output
         type: metrics
         # Optional
         required: true # Defaults to required: false
