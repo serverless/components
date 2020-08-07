@@ -38,7 +38,6 @@ inputs: # The configuration the Component accepts according to its docs
 
 # Documentation
 
-- [Documentation](#documentation)
 - [Quick-Start](#quick-start)
 - [Features](#features)
   - [Simplicity](#simplicity)
@@ -48,11 +47,11 @@ inputs: # The configuration the Component accepts according to its docs
   - [Serverless](#serverless)
 - [Overview](#overview)
 - [Using Components](#using-components)
+  - [Serverless Framework](#serverless-framework)
   - [serverless.yml](#serverlessyml)
-  - [Inputs](#inputs)
+  - [Actions, Inputs & Outputs](#actions-inputs--outputs)
   - [Deploying](#deploying)
   - [State](#state)
-  - [Versioning](#versioning)
   - [Outputs](#outputs)
   - [Credentials](#credentials)
     - [AWS Credentials](#aws-credentials)
@@ -65,14 +64,13 @@ inputs: # The configuration the Component accepts according to its docs
     - [Variables: Name](#variables-name)
     - [Variables: Environment Variables](#variables-environment-variables)
     - [Variables: Outputs](#variables-outputs)
-    - [Variables: Parameters](#variables-parameters)
 - [Building Components](#building-components)
-  - [serverless.yml](#serverlessyml)
+  - [serverless.component.yml](#serverlesscomponentyml)
   - [serverless.js](#serverlessjs)
+  - [Input & Output Types](#input--output-types)
   - [Working With Source Code](#working-with-source-code)
   - [Adding The Serverless Agent](#adding-the-serverless-agent)
   - [Development Workflow](#development-workflow)
-  - [Type System](#components-type-system)
   - [Development Tips](#development-tips)
     - [Start With The Outcome](#start-with-the-outcome)
     - [Knowing The Outcome Is An Advantage](#knowing-the-outcome-is-an-advantage)
@@ -82,6 +80,12 @@ inputs: # The configuration the Component accepts according to its docs
     - [No Surprise Removals](#no-surprise-removals)
     - [Write Integration Tests](#write-integration-tests)
 - [CLI Commands](#cli-commands)
+  - [`serverless registry`](#serverless-registry)
+  - [`serverless registry publish`](#serverless-registry-publish)
+  - [`serverless deploy`](#serverless-deploy)
+  - [`serverless remove`](#serverless-remove)
+  - [`serverless info`](#serverless-info)
+  - [`serverless dev`](#serverless-dev)
 - [F.A.Q.](#faq)
 
 <br/>
@@ -94,11 +98,18 @@ To get started with Serverless Components, install the latest version of the [Se
 $ npm i -g serverless
 ```
 
-After installation, use the `init` command to install a Serverless Components Template, which contains Components as well as boilerplate code, to get you started quickly. User `serverless registry` to see the
-available feature components. An easy starting point is the Express.js Component:
+After installation, use the `create --template-url` command to install a [Serverless Components Template](./templates), which contains Components as well as boilerplate code, to get you started quickly. An easy starting point is the Express.js Component:
 
 ```shell
-serverless init express-starter
+serverless create --template-url https://github.com/serverless/components/tree/master/templates/express
+```
+
+The `express` template above requires running `npm i` in its root directory, to install the Express framework. So `cd` into the generated `express` directory and run `npm i`.
+
+Next, log in to enable deployment and saving state in the cloud:
+
+```bash
+$ serverless login
 ```
 
 Lastly, enter your cloud provider credentials into a `.env` file within the folder that contains your `serverless.yml`, or its immediate parent folder.
@@ -128,7 +139,7 @@ Run the `serverless dev` command to auto-deploy on save, and have logs and error
 $ serverless dev
 ```
 
-Deploy other Components that you may want to use with your Express Component. For example, you may want to give your Express application permissions to other resources on your AWS account via the [aws-iam-role Component](https://github.com/serverless-components/aws-iam-role). You may also want an AWS DynamoDB table to use with your Express Component, via the [aws-dynamodb Component](https://github.com/serverless-components/aws-dynamodb). There are Templates for both of these in the `./templates` folder. You can then use them with your `express` Component, like this:
+Deploy other Components that you may want to use with your Express Component. For example, you may want to give your Express application permissions to other resources on your AWS account via the `aws-iam-role` Component. You may also want an AWS DynamoDB table to use with your Express Component, via the `aws-dynamodb` Component. There are Templates for both of these in the [Serverless Components Template](./templates) folder. You can then use them with your `express` Component, like this:
 
 ```yaml
 org: your-org # Your Org
@@ -169,6 +180,8 @@ inputs: # The configuration the Component accepts
   domain: mystore.com
 ```
 
+Check out these [templates](./templates) for more use-cases.
+
 ### Instant Deployments
 
 Serverless Components that deploy instantly, removing the need to emulate cloud services locally for fast feedback during the development process.
@@ -207,9 +220,9 @@ Anyone can build a Serverless Component and share it in our Registry.
 
 ```bash
 
-$ serverless publish
+$ serverless registry publish
 
-Serverless › Successfully published "serverless@1.0.0"...
+express@0.0.4 › Published
 
 ```
 
@@ -221,71 +234,99 @@ Serverless Components favor cloud infrastructure with serverless qualities. They
 
 # Overview
 
-Serverless Components are libraries of code that know how to provision an outcome/use-case. They are focused primarily on use-cases built on cloud infrastructure with serverless qualities, enabling you to deliver functionality with radically low operational cost, without having to be very knowledgeable about the underlying infrastructure. Serverless Components are to serverless, back-end use-cases, what React Components are to front-end use-cases.
+Serverless Components are libraries of code that make it easy to deploy apps and other functionality onto serverless cloud infrastructure. They're instant serverless use-cases that contain the best infrastructure patterns for scale, performance, cost optimization, collaboration and more.
 
-A Component can be designed to provision low-level infrastructure (e.g. an AWS S3 bucket). However, they can also provision higher-order outcomes (which is when they are at their best). Examples of higher-order outcomes are:
+We (Serverless Inc) made Serverless Components because composing, configuring and managing low-level serverless infrastructure can be complicated for developers and teams. We've discovered many of the best patterns, and now we want to share them!
+
+While Components can help you deploy and manage low-level infrastructure (e.g. an AWS S3 bucket). Their big use-case is on higher-order functionality and apps, like:
 
 1. A group of infrastructure with a purpose, like a type of data processing pipeline.
-2. A software feature, like user registration, comments, or a payment system.
+2. A software feature, like user authentication, comments, or a payment system.
 3. An entire application, like a blog, video streaming service, or landing page.
-
-Serverless Components are used **declaratively** (via the Serverless Framework's `serverless.yml` file). They are free to use, and anyone can make and share them by publishing their Component to the Serverless Registry.
 
 <br/>
 
 # Using Components
 
+### Serverless Framework
+
+Serverless Components are a [Serverless Framework](https://github.com/serverless/serverless) feature. You use them with the Serverless Framework CLI. Install it via:
+
+```
+$ npm i serverless -g
+```
+
 ### serverless.yml
 
-Serverless Components live exclusively in the cloud. They are discoverable and usable via the Serverless Registry. Please note, the Registry API exists today, but currently does not have a front-end with search functionality. Instead, run `serverless registry` for available components.
+To use a Serverless Component, declare the name of one that exists in the Serverless Registry in your `serverless.yml`.
 
-To use a Serverless Component, declare the name of one that exists in the Serverless Registry in your `serverless.yml`. The syntax looks like this:
+The syntax looks like this:
 
 ```yaml
 # serverless.yml
 
-component: express # The name of the Component in the Registry
-org: acme # Your Serverless Framework Org
-app: fullstack # Your Serverless Framework App
-name: rest-api # The name of your instance of this Component
+component: express@1.5.4 # The name and version of the Component in the Registry.  To always use the latest, include no '@' and version (e.g. 'component: express').
+org: acme # The name of your Serverless Framework Org
+app: fullstack # Optional. The name of a high-level app container.  Useful if you want to group apps together.
+name: rest-api # The name of your Serverless Framework App
 
-inputs: # The configuration the Component accepts according to its docs
+inputs: # The parameters to send to the "deploy" action of the component.
   src: ./src
+  domain: api.my-app.com
 ```
 
-There is nothing to install when using Serverless Components. Instead, when you run deploy, the configuration you specify in `serverless.yml` will be sent to the Serverless Components Deployment Engine, along with any files or folders you specify in `inputs` that may be part of the outcome you are seeking to deploy.
+There is nothing to install when using Serverless Components. They live in the cloud. When you run deploy, the configuration you specify in `serverless.yml` will be sent to the Serverless Components Engine, along with the files or source code you specifiy in `inputs`.
 
-Please note that you can only have 1 Serverless Component in `serverless.yml`. We encourage this because it's important to separate the resources in your Serverless Applications, rather than put all of them in 1 infrastructure stack.
+**Other Notes:**
 
-**Note:** You cannot yet use Serverless Components within an existing Serverless Framework project file (i.e. a project file that contains `functions`, `events`, `resources` and `plugins`).
+- You cannot use Serverless Components within an existing Serverless Framework project file (i.e. a `serverless.yml` file that contains `functions`, `events`, `resources` and `plugins`).
 
-### Inputs
+- You can only have 1 Serverless Component in `serverless.yml`. We encourage this because it's important to separate the resources in your Serverless Applications, rather than put all of them in 1 infrastructure stack.
 
-Every Serverless Component accepts arguments via an `inputs` property. You can see which `inputs` a Component accepts in its documentation.
+### Actions, Inputs & Outputs
 
-Some `inputs` have special types, starting with `src`. This input specifies a folder containing code or general files you wish to upload upon deployment, which the Component may need to provision a specific outcome. Before running the Component in the cloud, the Serverless Framework will first upload any files specified in `src`. Generally, you want to keep the package size of your serverless applications small (<5MB) in order to have the best performance in serverless compute services. Larger package sizes will also make deployments slower since the upload process is dependent on your internet connection bandwidth. Consider a tool to build and minify your code first. You can specify a build hook to run and a `dist` folder to upload, via the `src` property, like this:
+Every Serverless Component can perform one or many **Actions**, which are functions that contain logic which the Component can do for you, such as:
+
+- _deploy_ - Deploy something onto cloud infrastructure.
+- _remove_ - Remove something from cloud infrastructure.
+- _test_ - Test some functionality provisioned by the Component, like an API endpoint.
+- _metrics_ - Get metrics about the Component's performance.
+
+Components ship with their own unique Actions, though all have _deploy_ and _remove_. One way to think about Actions is to consider Components as Javascript classes and Actions are the class methods.
+
+You can run Component Actions via the Serverless Framework CLI or the Serverless Framework SDK.
+
+All Actions accept parameters known as **Inputs** and return other parameters known as **Outputs**.
+
+In `serverless.yml` the `inputs` property are merely Inputs that you wish to send to the `deploy` Action of your Component.
+
+Every Action has it' own Inputs and Outputs.
+
+When a Component Action is finished running, it returns an `outputs` object.
+
+Outputs contain the most important information you need to know from a deployed Component Instance, like the URL of the API or website, or all of the API endpoints.
+
+Outputs can be referenced easily in the `inputs` of other Components. Just use this syntax:
 
 ```yaml
-inputs:
-  src:
-    src: ./src # Source files
-    hook: npm run build # Build hook to run on every "serverless deploy"
-    dist: ./dist # Location of the distribution folder to upload
+# Simpler Syntax - References the same "stage" and "app"
+${output:[instance].[output]}
+
+# More Configurable Syntax - Customize the "stage" and "app"
+${output:[stage]:[app]:[instance].[output]}
 ```
 
-You can also exclude certain files being upload by using `exclude` in the `src` inputs. You can use glob syntax to describe which file or folder you want to exclude. For example:
+- `stage` - The stage that the referenced component instance was deployed to. It is the `stage` property in that component instance `serverless.yml` file.
+- `app` - The app that the referenced component instance was deployed to. It is the `app` property in that component instance `serverelss.yml` file, which falls back to the `name` property if you did not specify it.
+- `instance` - The name of the component instance you are referencing. It is the `name` property in that component instance `serverless.yml` file.
+- `output` - One of the outputs of the component instance you are referencing. They are displayed in the CLI after deploying.
 
 ```yaml
-inputs:
-  src:
-    src: ./src # Source files
-    exclude:
-      - .env # exclude .env file in ./src
-      - '.git/**' # exclude .git folder and all subfolders and files inside it
-      - '**/*.log' # exclude all files with .log extension in any folder under the ./src
+# Examples
+${output:prod:ecommerce:products-api.url}
+${output:prod:ecommerce:role.arn}
+${output:prod:ecommerce:products-database.name}
 ```
-
-Improving the Component Input Types system is one of our current big priorities.
 
 ### Deploying
 
@@ -295,14 +336,16 @@ You can deploy Components easily via the Serverless Framework with the `$ server
 $ serverless deploy
 ```
 
-While Serverless Components deploy incredibly fast, please note that first deployments can often be 5x slower because creating cloud resources takes a lot longer than updating them.
+While Serverless Components deploy incredibly fast, please note that first deployments can often be 2x slower because creating cloud resources takes a lot longer than updating them.
+
+Also note that some resources take a few minutes to be availbale. For example, APIs and Website URLs may take 1-2 minutes before they are available.
 
 ### State
 
-Serverless Components automatically save their state remotely. This means you can easily push your Components to Github, Gitlab, Bitbucket, etc., and collaborate on them with others as long as the `serverless.yml` contains an `org` which your collaborators are added to:
+Serverless Components automatically save their state remotely. This means you can easily push your Components to Github, Gitlab, Bitbucket, etc., and collaborate on them with others as long as the `serverless.yml` contains an `org` which your collaboraters are added to:
 
 ```yaml
-org: acme-team # Your collaborators must be added at dashboard.serverless.com
+org: acme-team # Your collaboraters must be added at dashboard.serverless.com
 app: ecommerce
 component: my-component
 name: rest-api
@@ -310,7 +353,7 @@ name: rest-api
 
 Further, your Component Instances can easily be deployed with CI/CD, as long as you make sure to include a `SERVERLESS_ACCESS_KEY` environment variable.
 
-You can add collaborators and create access tokens in the [Serverless Framework Dashboard](https://dashboard.serverless.com).
+You can add collaboraters and create access tokens in the [Serverless Framework Dashboard](https://dashboard.serverless.com).
 
 ### Versioning
 
@@ -321,21 +364,6 @@ component: express@0.0.2
 ```
 
 When you add a version, only that Component version is used. When you don't add a version, the Serverless Framework will use the latest version of that Component, if it exists. We recommend to **always** pin your Component to a version.
-
-### Outputs
-
-When a Component is finished running, it returns an `outputs` object.
-
-Outputs contain the most important information you need to know from a deployed Component Instance, like the URL of the API or website, or all of the API endpoints.
-
-Outputs can be referenced easily in the `inputs` of other Components. Just use this syntax:
-
-```yaml
-# Syntax
-${output:[stage]:[app]:[instance].[output]}
-```
-
-Take a look at the [variables documentation](#variables-outputs) for more information on the Output variable.
 
 ### Credentials
 
@@ -451,7 +479,7 @@ inputs:
   name: ${org}-api # Results in "acme-api"
 ```
 
-**Note:** If you didn't specify an `org`, the default `org` would be the first org you created when you first signed up. You can always overwrite the default `org` or the one specified in `serverless.yml` by passing the `--org` option on deploy:
+**Note:** If you didn't specify an `org`, the default `org` would be the first org you craeted when you first signed up. You can always overwrite the default `org` or the one specified in `serverless.yml` by passing the `--org` option on deploy:
 
 ```
 $ serverless deploy --org my-other-org
@@ -548,67 +576,9 @@ inputs:
   roleArn: ${output:[STAGE]:[APP]:[INSTANCE].arn} # Fetches an output from another component instance that is already deployed
 ```
 
-- `stage` - The stage that the referenced component instance was deployed to. It is the `stage` property in that component instance `serverless.yml` file.
-- `app` - The app that the referenced component instance was deployed to. It is the `app` property in that component instance `serverless.yml` file, which falls back to the `name` property if you did not specify it.
-- `instance` - The name of the component instance you are referencing. It is the `name` property in that component instance `serverless.yml` file.
-- `output` - One of the outputs of the component instance you are referencing. They are displayed in the CLI after deploying.
-
-```yaml
-# Examples
-${output:prod:ecommerce:products-api.url}
-${output:prod:ecommerce:role.arn}
-${output:prod:ecommerce:products-database.name}
-```
-
 You can access Outputs across any App, Instance, in an any Stage, within the same Org.
 
 A useful feature of this is the ability to share resources easily, and even do so across environments. This is useful when developers want to deploy a Component Instance in their own personal Stage, but access shared resources within a common "development" Stage, like a database. This way, the developers on your team do not have to recreate the entire development stage to perform their feature work or bug fix, only the Component Instance that needs changes.
-
-#### Variables: Parameters
-
-Serverless Components supports Serverless Parameters that you setup and share across your organization on the [Serverless Dashboard](https://app.serverless.com). After you add a parameter for a stage, in your desired app, you can reference it in inputs with the following syntax:
-
-```yml
-component: express
-org: acme
-app: ecommerce
-name: rest-api
-stage: prod
-
-inputs:
-  env:
-    INTERNAL_ACCESS_KEY: ${param:STAGE:APP:PARAM}
-```
-
-For example:
-
-```yml
-component: express
-org: acme
-app: ecommerce
-name: rest-api
-stage: prod
-
-inputs:
-  env:
-    INTERNAL_ACCESS_KEY: ${param:prod:acme-internal:internalAccessKey} # referencing a param in the acme-internal app
-```
-
-If you are referencing a parameter in the same stage/app as your component instance, you can omit the stage/app part as a shortform:
-
-```yml
-component: express
-org: acme
-app: ecommerce
-name: rest-api
-stage: prod
-
-inputs:
-  env:
-    INTERNAL_ACCESS_KEY: ${param:internalAccessKey} # this inherits the stage "prod" and app "ecommerce" from the properties above
-```
-
-You can reference any parameter in any stage and any app in your organization. If the specified stage was not found, the `default` stage in the Serverless Dashboard would be used instead
 
 <br/>
 
@@ -616,27 +586,27 @@ You can reference any parameter in any stage and any app in your organization. I
 
 If you want to build your own Serverless Component, there are 2 essential files you need to be aware of:
 
-- `serverless.yml` - This contains the definition of your Serverless Component.
+- `serverless.component.yml` - This contains the definition of your Serverless Component.
 - `serverless.js` - This contains your Serverless Component's code.
 
 One of the most important things to note is that Serverless Components **only** run in the cloud and **do not** run locally. That means, to run and test your Component, you must publish it first (it takes only few seconds to publish). We're continuing to improve this workflow. Here's how to do it...
 
-### serverless.yml
+### serverless.component.yml
 
-To declare a Serverless Component and make it available within the Serverless Registry, you must create a `serverless.yml` file with the following properties:
+To declare a Serverless Component and make it available within the Serverless Registry, you must create a `serverless.component.yml` file with the following properties:
 
 ```yaml
 # serverless.component.yml
 
 name: express # Required. The name of the Component
 version: 0.0.4 # Required. The version of the Component
+author: eahefnawy # Required. The author of the Component
 org: serverlessinc # Required. The Serverless Framework org which owns this Component
+main: ./src # Required. The directory which contains the Component code
 description: Deploys Serverless Express.js Apps # Optional. The description of the Component
 keywords: aws, serverless, express # Optional. The keywords of the Component to make it easier to find at registry.serverless.com
 repo: https://github.com/owner/project # Optional. The code repository of the Component
 license: MIT # Optional. The license of the Component code
-
-src: ./src # Required. The directory which contains the Component code
 ```
 
 ### serverless.js
@@ -744,6 +714,313 @@ class MyComponent extends Component {
 module.exports = MyComponent;
 ```
 
+### Input & Output Types
+
+Every Serverless Component has Actions (which are merely functions, e.g. deploy, remove, metrics). Each Action accepts Inputs and returns Outputs. Serverless Components can optionally declare Types for the Inputs and Outputs of each Action. in their `serverless.component.yml`, which make them easier to write and use.
+
+Inputs & Output Types are recommended because they offer the following benefits:
+
+- They validate an Action is supported by a Component before running it.
+- They validate user Inputs before they are sent to a Component's Actions.
+- They prevent Component authors from needing to write their own validation logic.
+- They offer helpful errors to Component users when they enter invalid Inputs.
+- They can automate documentation for your Component.
+- They are needed for upcoming [Serverless Framework Dashboard](https://app.serverless.com) features that will enable visualizing Input and Output data special ways (e.g. form fields, charts, etc.).
+
+Types are optionally declared in `serverless.component.yml` files.
+
+You must first declare the Actions the Component uses, like this:
+
+```yaml
+name: express
+version: 1.5.7
+org: serverlessinc
+description: Deploy a serverless Express.js application onto AWS Lambda and AWS HTTP API.
+
+actions:
+  # deploy action
+  deploy:
+    # deploy action definition
+    definition: Deploy your Express.js application to AWS Lambda, AWS HTTP API and more.
+    inputs:
+      # An array of Types goes here.
+    outputs:
+      # An array of Types goes here.
+```
+
+Below is a full example, which also details all supported Types (Disclaimer: This combines documentation and a real example. Hopefully it's more helpful!).
+
+```yaml
+name: express
+version: 1.5.7
+org: serverlessinc
+description: Deploy a serverless Express.js application onto AWS Lambda and AWS HTTP API.
+
+actions:
+  # deploy action
+  deploy:
+    # deploy action definition
+    definition: Deploy your Express.js application to AWS Lambda, AWS HTTP API and more.
+    inputs:
+      #
+      #
+      # Primitive Types
+      # These cover standard data types, like "string", "number", "object", etc.
+      #
+      #
+
+      # Type: string
+
+      name: # The name of the input/output
+        type: string # The type
+        # Optional
+        required: true # Defaults to required: false
+        default: my-app # The default value
+        description: The name of the AWS Lambda function. # A description of this parameter
+        min: 5 # Minimum number of characters
+        max: 64 # Maximum number of characters
+        regex: ^[a-z0-9-]*$ # A RegEx pattern to validate against.
+        allow: # The values that are allowed for this
+          - my-api
+          - my-backend
+
+      # Type: number
+
+      memory: # The name of the input/output
+        type: number # The type.  These can be integers or decimals.
+        # Optional
+        required: true # Defaults to required: false
+        default: 2048 # The default value
+        description: The memory size of the AWS Lambda function. # A description of this parameter
+        min: 128 # Minimum number allowed
+        max: 3008 # Maximum number allowed
+        allow: # The values that are allowed for this
+          - 128
+          - 1024
+          - 2048
+          - 3008
+
+      # Type: boolean
+
+      delete: # The name of the input/output
+        type: boolean # The type.
+        # Optional
+        required: true # Defaults to required: false
+        description: Whether to delete this infrastructure resource when removed # A description of this parameter
+        default: true # The default value
+
+      # Type: object
+
+      vpcConfig: # The name of the input/output
+        type: object # The type
+        # Optional
+        required: true # Defaults to required: false
+        description: The VPC configuration for your AWS Lambda function # A description of this input
+        keys:
+          # Add more Types in here
+          securityGroupIds: # The name of the key
+            type: string
+
+      # Type: array
+
+      mappingTemplates: # The name of the input/output
+        type: array # The type
+        # Optional
+        required: true # Defaults to required: false
+        description: The mapping templates for your GraphQL endpoints. # A description of this input
+        min: 1 # Minimum array items
+        max: 10 # Max array items
+        items:
+          # Add more Types in here, that you wish to allow, without "name" properties because they are array items.
+          - type: string
+            min: 5
+            max: 13
+
+          - type: object
+            keys:
+              # Add more standard Types in here, with "name" properties because they are object properties.
+              - name: aws_lambda
+                type: string
+
+        default: # Default array items
+          - '12345678'
+
+      #
+      #
+      # Special Types
+      # These are special types, they cover handling source code, and more
+      #
+      #
+
+      # Type: src
+      # This Type specifies a folder containing code or general files you wish to upload upon deployment, which the Component may need to deploy a specific outcome. Before running the Component in the cloud, the Serverless Framework will first upload any files specified in `src`. Generally, you want to keep the package size of your serverless applications small (<5MB) in order to have the best performance in serverless compute services. Larger package sizes will also make deployments slower since the upload process is dependent on your internet connection bandwidth. Consider a tool to build and minify your code first. You can specify a build hook to run and a `dist` folder to upload, via the `src` property.
+      # This Type can either be a string containing a relative path to your source code, or an object.
+
+      src: # The name "src" is reserved for this Type.  Your inputs can only have one of these.
+        type: src # The type
+        # Optional
+        required: true # Defaults to required: false
+        description: The source code of your application that will be uploaded to AWS Lambda. # A description of this parameter
+        src: # A relative file path to the directory which contains your source code and any scripts you wish to run via the "hook" property.
+        hook: # A script you wish to run before uploading your source code.
+        dist: # The directory containing your built source code which you wish to upload.
+        exclude: # An array of glob patterns of files/paths to exclude
+          - .env # exclude .env file in ./src
+          - '.git/**' # exclude .git folder and all subfolders and files inside it
+          - '**/*.log' # exclude all files with .log extension in any folder under the ./src
+
+      # Type: env
+      # This Type is for an object of key-value pairs meant to contain sensitive information.  By using it, the Serverless Framework will treat this data more securely.
+
+      env: # The name "env" is reserved for this Special Type.  Your params can only have one of these.
+        type: env # The type
+        # Optional
+        description: Environment variables to include in AWS Lambda # A description of this input
+
+      # Type: datetime
+      # This Type is an ISO8601 string that contains a datetime.
+
+      rangeStart: # The name of the input/output
+        type: datetime
+        # Optional
+        required: true # Defaults to required: false
+        description: The start date of your metrics timeframe. # A description of this input
+
+      # Type: url
+      # This Type is for a URL, often describing your root API URL or website URL.
+
+      url: # The name of the input/output
+        type: url
+        # Optional
+        required: true # Defaults to required: false
+        description: The url of your website. # A description of this input
+
+      # Type: api
+      # This Type is for an OpenAPI specification.
+
+      api: # The name of the input/output
+        type: api
+        # Optional
+        required: true # Defaults to required: false
+        description: The API from your Express.js app. # A description of this input
+
+      # Type: metrics
+      # This Type is for an array of supported Metrics widgets which can be rendered dynamically in GUIs.
+
+      metrics: # The name of the input/output
+        type: metrics
+        # Optional
+        required: true # Defaults to required: false
+        description: API metrics from your back-end. # A description of this input
+
+    outputs:
+      # Another array of Types goes here.
+
+  # remove action
+  remove:
+    # ... accepts config identical to the deploy action
+```
+
+#### type `metrics`
+
+If you use the `metrics` Type in your Component Outputs, you must return an array that contains one or many of the following data structures.
+
+Each data structure corresponds to a widget that can be rendered in the Serverless Framework Dashboard.
+
+##### `type: 'bar-v1'`
+
+This is for displaying a bar chart. It can support multiple y data sets which cause the bar chart to stack.
+
+In the dashboard, the `stat` property of the first array is preferred.
+
+```javascript
+{
+  // Type: Name and version of this chart type.
+  "type": "bar-v1",
+  // Title: Name of the chart
+  "title": "API Requests & Errors",
+  // xData: The values along the bottom of the chart.  Must have the same quantity as yValues.
+  "xData": [
+    "2021-07-01T19:00:00.999Z",
+    "2021-07-01T20:00:00.999Z",
+    "2021-07-01T21:00:00.999Z",
+    "2021-07-01T22:00:00.999Z"
+  ],
+  // yDataSets: An array of 1 or more items to include in order to stack the bar charts.
+  "yDataSets": [
+    {
+      "title": "API Requests",
+      // yData: An array of the values that correspond to the xData values
+      "yData": [3, 43, 31, 65],
+      // Color of bar chart.  Must be a hex value.
+      "color": "#000000",
+      // Stat: A large number to show at the top.  E.g., total api requests
+      "stat": 142,
+      // Stat Text: Shows next to the large number.  E.g., ms, seconds, requests, etc.  Default is null.
+      "statText": "requests",
+    },
+    {
+      "title": "API Errors",
+      // yData: An array of the values that correspond to the xData values
+      "yData": [2, 3, 1, 6],
+      // Color of bar chart.  Must be a hex value.
+      "color": "#FF5733",
+      // Stat: A large number to show at the top.  E.g., total api errors
+      "stat": 12,
+      // Stat Text: Shows next to the large number.  E.g., ms, seconds, requests, etc.  Default is null.
+      "statText": "errors",
+    }
+  ]
+}
+```
+
+##### `type: 'line-v1'`
+
+This is for displaying a line chart. It can support multiple y data sets which cause multiple lines on the chart.
+
+In the dashboard, the `stat` property of the first array is preferred.
+
+```javascript
+{
+  // Type: Name and version of this chart type.
+  "type": "line-v1",
+  // Title: Name of the chart
+  "title": "API Latency",
+  // xData: The values along the bottom of the chart.  Must have the same quantity as yValues.
+  "xData": [
+    "2021-07-01T19:00:00.999Z",
+    "2021-07-01T20:00:00.999Z",
+    "2021-07-01T21:00:00.999Z",
+    "2021-07-01T22:00:00.999Z"
+  ],
+  // yDataSets: An array of 1 or more items to include for each line.
+  "yDataSets": [
+    {
+      "title": "API P95 Latency",
+      // yData: An array of the values that correspond to the xData values
+      "yData": [3, 43, 31, 65],
+      // Color of bar chart.  Must be a hex value.
+      "color": "#000000",
+      // Stat: A large number to show at the top.  E.g., total api requests
+      "stat": 142,
+      // Stat Text: Shows next to the large number.  E.g., ms, seconds, requests, etc.  Default is null.
+      "statText": "requests",
+    },
+    {
+      "title": "API P99 Latency",
+      // yData: An array of the values that correspond to the xData values
+      "yData": [2, 3, 1, 6],
+      // Color of bar chart.  Must be a hex value.
+      "color": "#FF5733",
+      // Stat: A large number to show at the top.  E.g., total api errors
+      "stat": 12,
+      // Stat Text: Shows next to the large number.  E.g., ms, seconds, requests, etc.  Default is null.
+      "statText": "errors",
+    }
+  ]
+}
+```
+
 ### Working With Source Code
 
 When working with a Component that requires source code (e.g. you are creating a Component that will run on AWS Lambda), if you make the `src` one of your inputs, anything specified there will be automatically uploaded and made available within the Component environment.
@@ -824,7 +1101,7 @@ Run your Component command to test your changes:
 $ serverless deploy --debug
 ```
 
-When writing a Component, we recommend to always use the `--debug` flag, so that the Component's `console.log()` statements are sent to the CLI. These are handy to use in Serverless Components, since they describe what the Component is doing. We recommend you add `console.log()` statements to your Component wherever you think they are necessary.
+When writing a Component, we recomend to always use the `--debug` flag, so that the Component's `console.log()` statements are sent to the CLI. These are handy to use in Serverless Components, since they describe what the Component is doing. We recommend you add `console.log()` statements to your Component wherever you think they are necessary.
 
 ```javascript
 class MyComponent extends Component {
@@ -838,10 +1115,10 @@ class MyComponent extends Component {
 }
 ```
 
-When you're ready to publish a new version for others to use, update the version in `serverless.yml`, then run publish without the `--dev` flag.
+When you're ready to publish a new version for others to use, update the version in `serverless.component.yml`, then run publish without the `--dev` flag.
 
 ```yaml
-# serverless.yml
+# serverless.component.yml
 
 name: express@0.0.1
 ```
@@ -850,141 +1127,6 @@ name: express@0.0.1
 $ serverless publish
 
 Serverless: Successfully publish express@0.0.1
-```
-
-### Components Type System
-
-**Warning: Early & Experimental**
-
-There is a type system in progress for Components which specifically covers:
-
-- Inputs
-- Outputs
-- Providers
-
-#### Input Types
-
-#### Output Types
-
-##### `metrics`
-
-These are metrics from the Component used to display infrastructure, product and business metrics from the Component. If you use this output type, the Serverless Framework Dashboard and more can render charts and other useful widgets.
-
-These are the inputs supported currently:
-
-```json
-{
-  "rangeStart": "2021-07-01T23:59:59.999Z",
-  "rangeEnd": "2021-07-02T23:59:59.999Z"
-}
-```
-
-This are the standard response returned as the `metrics` output:
-
-```json
-{
-  "metrics": {
-    "rangeStart": "2021-07-01T23:59:59.999Z",
-    "rangeEnd": "2021-07-02T23:59:59.999Z",
-    "metrics": [{...}]
-  }
-}
-```
-
-There are a handful of Metrics that Components support. Here they are and how they work...
-
-###### `type: 'bar-v1'`
-
-This is for displaying a bar chart. It can support multiple y data sets which cause the bar chart to stack.
-
-In the dashboard, the `stat` property of the first array is preferred.
-
-```javascript
-{
-  // Type: Name and version of this chart type.
-  "type": "bar-v1",
-  // Title: Name of the chart
-  "title": "API Requests & Errors",
-  // xData: The values along the bottom of the chart.  Must have the same quantity as yValues.
-  "xData": [
-    "2021-07-01T19:00:00.999Z",
-    "2021-07-01T20:00:00.999Z",
-    "2021-07-01T21:00:00.999Z",
-    "2021-07-01T22:00:00.999Z"
-  ],
-  // yDataSets: An array of 1 or more items to include in order to stack the bar charts.
-  "yDataSets": [
-    {
-      "title": "API Requests",
-      // yData: An array of the values that correspond to the xData values
-      "yData": [3, 43, 31, 65],
-      // Color of bar chart.  Must be a hex value.
-      "color": "#000000",
-      // Stat: A large number to show at the top.  E.g., total api requests
-      "stat": 142,
-      // Stat Text: Shows next to the large number.  E.g., ms, seconds, requests, etc.  Default is null.
-      "statText": "requests",
-    },
-    {
-      "title": "API Errors",
-      // yData: An array of the values that correspond to the xData values
-      "yData": [2, 3, 1, 6],
-      // Color of bar chart.  Must be a hex value.
-      "color": "#FF5733",
-      // Stat: A large number to show at the top.  E.g., total api errors
-      "stat": 12,
-      // Stat Text: Shows next to the large number.  E.g., ms, seconds, requests, etc.  Default is null.
-      "statText": "errors",
-    }
-  ]
-}
-```
-
-###### `type: 'line-v1'`
-
-This is for displaying a line chart. It can support multiple y data sets which cause multiple lines on the chart.
-
-In the dashboard, the `stat` property of the first array is preferred.
-
-```javascript
-{
-  // Type: Name and version of this chart type.
-  "type": "line-v1",
-  // Title: Name of the chart
-  "title": "API Latency",
-  // xData: The values along the bottom of the chart.  Must have the same quantity as yValues.
-  "xData": [
-    "2021-07-01T19:00:00.999Z",
-    "2021-07-01T20:00:00.999Z",
-    "2021-07-01T21:00:00.999Z",
-    "2021-07-01T22:00:00.999Z"
-  ],
-  // yDataSets: An array of 1 or more items to include for each line.
-  "yDataSets": [
-    {
-      "title": "API P95 Latency",
-      // yData: An array of the values that correspond to the xData values
-      "yData": [3, 43, 31, 65],
-      // Color of bar chart.  Must be a hex value.
-      "color": "#000000",
-      // Stat: A large number to show at the top.  E.g., total api requests
-      "stat": 142,
-      // Stat Text: Shows next to the large number.  E.g., ms, seconds, requests, etc.  Default is null.
-      "statText": "requests",
-    },
-    {
-      "title": "API P99 Latency",
-      // yData: An array of the values that correspond to the xData values
-      "yData": [2, 3, 1, 6],
-      // Color of bar chart.  Must be a hex value.
-      "color": "#FF5733",
-      // Stat: A large number to show at the top.  E.g., total api errors
-      "stat": 12,
-      // Stat Text: Shows next to the large number.  E.g., ms, seconds, requests, etc.  Default is null.
-      "statText": "errors",
-    }
-  ]
-}
 ```
 
 ### Development Tips
@@ -1057,13 +1199,9 @@ Running these integration tests will most likely require AWS keys, which are sto
 
 #### `serverless registry`
 
-See available templates
+See available Components
 
-#### `serverless registry <package-name>`
-
-You can pass the package name (component or template) to view detailed information for that package.
-
-#### `serverless publish`
+#### `serverless registry publish`
 
 Publish a Component to the Serverless Registry.
 
