@@ -1237,11 +1237,11 @@ Starts DEV MODE, which watches the Component for changes, auto-deploys on change
 
 # F.A.Q.
 
-### How can I deploy multiple Components at the same time?
+### How can I deploy and remove multiple Components at the same time?
 
-A `serverless.yml` file can only hold 1 Component at this time. However, that does not mean you cannot deploy multiple Components at the same time.
+A `serverless.yml` file can only hold 1 Component at this time. However, that does not mean you cannot deploy/remove multiple Components at the same time.
 
-Simply navigate to a parent directory, and run `serverless deploy` to deploy any `serverless.yml` files in immediate subfolders. When this happens, the Serverless Framework will quickly create a graph based on the references your Component apps are making to eachother. Depending on those references, it will prioritize what needs to be deployed first, otherwise its default is to deploy things in parallel.
+Simply navigate to a parent directory, and run `serverless deploy` to deploy any `serverless.yml` files in immediate subfolders. When this happens, the Serverless Framework will quickly create a graph based on the references your Component apps are making to eachother. Depending on those references, it will prioritize what needs to be deployed first, otherwise its default is to deploy things in parallel.  This also works for `serverless remove`.
 
 For context, here is why we designed `serverless.yml` to only hold 1 Component at a time:
 
