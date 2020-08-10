@@ -48,7 +48,7 @@ const getDashboardUrl = (urlPath) => {
 const getDefaultOrgName = async () => {
   const res = readConfigFile();
 
-  if (!res.userId) {
+  if (!res.userId || !res.users || !res.users[res.userId] || !res.users[res.userId].dashboard) {
     return null;
   }
 
