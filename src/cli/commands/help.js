@@ -43,7 +43,7 @@ ${command(
 )}          Publishes the package in the current working directory to the Serverless Registry
 ${command('  --dev')}                     Overwrites the version property and set it to dev
 
-${command('serverless registry')}         Lists featured pacakges in the Serverless Registry
+${command('serverless registry')}         Lists featured packages in the Serverless Registry
 
 ${command(
   'serverless registry {name}'
