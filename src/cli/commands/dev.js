@@ -18,7 +18,7 @@ const {
 const deploy = async (sdk, cli, instanceYaml, instanceCredentials) => {
   let result;
   try {
-    result = await sdk.deploy(instanceYaml, instanceCredentials);
+    result = await sdk.deploy(instanceYaml, instanceCredentials, { dev: true });
   } catch (error) {
     if (error.name === 'Invalid Component Types') {
       error.message = `Invalid Input: ${error.message}`;
