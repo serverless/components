@@ -13,6 +13,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        with:
+          # Workaround unexplained "no merge base" error
+          fetch-depth: 2
 
       - name: Retrieve last master commit (for `git diff` purposes)
         run: |
