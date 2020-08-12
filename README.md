@@ -26,16 +26,10 @@ Serverless Components are simple abstractions that enable developers to deploy s
 
 <br/>
 
-Here's how to use a Serverless Component:
+Start with one command:
 
-```yaml
-# serverless.yml
-
-component: express # The name of the Component in the Registry
-name: rest-api # The name of your instance of this Component
-
-inputs: # The configuration the Component accepts according to its docs
-  src: ./src #     In that case the express component accepts source code
+```shell
+$ npx serverless init express-starter
 ```
 
 # Documentation
