@@ -42,8 +42,6 @@ module.exports = async (config, cli) => {
 
   const loginConfig = {
     ...urls,
-    componentName,
-    componentVersion,
   };
 
   // for some reason this env var is required by the SDK in order to open the browser
