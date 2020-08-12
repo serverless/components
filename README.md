@@ -26,7 +26,7 @@ Serverless Components are simple abstractions that enable developers to deploy s
 
 <br/>
 
-Get started with any one these one commands:
+Deploy a serverless app rapidly, with and of these commands:
 
 ```shell
 $ npx serverless init fullstack-app
