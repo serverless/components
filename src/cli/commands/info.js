@@ -77,6 +77,7 @@ module.exports = async (config, cli) => {
   cli.log(`${'Last Action:'}  ${instance.lastAction} (${lastActionAgo})`);
   cli.log(`${'Deployments:'}  ${instance.instanceMetrics.deployments}`);
   cli.log(`${'Status:'}       ${statusLog}`);
+  cli.log(`${'Component:'}    ${instance.componentName}@${instance.componentVersion}`);
 
   // show error stack if available
   if (instance.deploymentErrorStack) {
