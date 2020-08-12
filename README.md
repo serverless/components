@@ -26,10 +26,14 @@ Serverless Components are simple abstractions that enable developers to deploy s
 
 <br/>
 
-Start with one command:
+Get started with any one these one commands:
 
 ```shell
+$ npx serverless init fullstack-app
 $ npx serverless init express-starter
+$ npx serverless init react-starter
+$ npx serverless init vue-starter
+$ npx serverless init graphql-starter
 ```
 
 # Documentation
