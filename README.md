@@ -151,7 +151,7 @@ inputs:
   src: ./src
   roleName: ${output:my-role.name}
   env:
-    dbTableName: ${outputs:${stage}:${app}:my-table.name}
+    dbTableName: ${output:${stage}:${app}:my-table.name}
 ```
 
 <br/>
