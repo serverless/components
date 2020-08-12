@@ -17,8 +17,10 @@ Serverless Components are simple abstractions that enable developers to deploy s
 
 <br/>
 
-- [x] **Ease** - Deploy serverless infrastructure or entire serverless applications via Components.
-- [x] **Instant Deployments** - Components deploy in 2-4 seconds.
+- [x] **Ease** - Deploy entire serverless applications/use-cases via Components, without being a cloud expert.
+- [x] **Instant Deployments** - Components deploy in 2-4 seconds, making rapid development on the cloud possible.
+- [x] **Streaming Logs** - Many Components stream logs from your app to your console in real-time, for fast debugging.
+- [x] **Automatic Metrics** - Many Components auto-set-up metrics upon deployment.
 - [x] **Build Your Own** - Components are easy to build.
 - [x] **Registry** - Share your Components with you, your team, and the world, via the Serverless Registry.
 
@@ -98,19 +100,15 @@ To get started with Serverless Components, install the latest version of the [Se
 $ npm i -g serverless
 ```
 
-After installation, use the `create --template-url` command to install a [Serverless Components Template](./templates), which contains Components as well as boilerplate code, to get you started quickly. An easy starting point is the Express.js Component:
+After installation, run `serverless registry` to see many Component-based templates you can deploy, or see more in the [Serverless Framework Dashboard](https://app.serverless.com).  These contain Components as well as boilerplate code, to get you started quickly.
+
+Install anything from the registry via `$ serverless init <template>`, like this:
 
 ```shell
-serverless create --template-url https://github.com/serverless/components/tree/master/templates/express
+$ serverless init express-starter
 ```
 
-The `express` template above requires running `npm i` in its root directory, to install the Express framework. So `cd` into the generated `express` directory and run `npm i`.
-
-Next, log in to enable deployment and saving state in the cloud:
-
-```bash
-$ serverless login
-```
+`cd` into the generated directory.
 
 Lastly, enter your cloud provider credentials into a `.env` file within the folder that contains your `serverless.yml`, or its immediate parent folder.
 
@@ -119,7 +117,7 @@ AWS_ACCESS_KEY_ID=12345
 AWS_SECRET_ACCESS_KEY=5321
 ```
 
-Deploy...
+And deploy!
 
 ```bash
 $ serverless deploy
