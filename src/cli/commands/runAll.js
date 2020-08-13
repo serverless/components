@@ -105,8 +105,8 @@ module.exports = async (config, cli, command) => {
     const deferredNotificationsData =
       command === 'deploy'
         ? requestNotification(
-          Object.assign(generateNotificationsPayload(templateYaml), { command: 'deploy' })
-        )
+            Object.assign(generateNotificationsPayload(templateYaml), { command: 'deploy' })
+          )
         : null;
 
     if (command === 'deploy') {
@@ -116,7 +116,7 @@ module.exports = async (config, cli, command) => {
     } else {
       cli.sessionStop(
         'error',
-        `Error: You can only run "deploy" or "remove" when working with multiple services`
+        'Error: You can only run "deploy" or "remove" when working with multiple services'
       );
       return null;
     }
@@ -126,8 +126,8 @@ module.exports = async (config, cli, command) => {
     // Remove all inputs for the "remove" command
     if (command === 'remove' && allComponents) {
       Object.keys(allComponents).forEach((c) => {
-        allComponents[c].inputs = {}
-      })
+        allComponents[c].inputs = {};
+      });
     }
 
     const allComponentsWithDependencies = setDependencies(allComponents);

@@ -137,9 +137,10 @@ module.exports = async () => {
   }
 
   try {
-
     if (!command) {
-      throw new Error('Please enter a valid command. Run "serverless help" to see all available commands.')
+      throw new Error(
+        'Please enter a valid command. Run "serverless help" to see all available commands.'
+      );
     }
 
     if (commands[command]) {
