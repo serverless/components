@@ -59,7 +59,7 @@ const run = async (cli, cliParam, customDir) => {
     templateUrl = data.downloadUrl;
     type = data.type;
   }
-  console.log(directory, serviceName)
+
   if (customDir) {
     directory = customDir;
   }
