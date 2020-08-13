@@ -3,7 +3,11 @@ const fs = require('fs-extra');
 const spawn = require('child-process-ext/spawn');
 const { writeMainAttrs, getServerlessFilePath } = require('../../serverlessFile');
 const path = require('path');
-const { legacyLoadComponentConfig, legacyLoadInstanceConfig } = require('../../utils');
+const {
+  legacyLoadComponentConfig,
+  legacyLoadInstanceConfig,
+  runningTemplate,
+} = require('../../utils');
 
 class Unpacker {
   /**
@@ -26,16 +30,16 @@ class Unpacker {
    * CWD is a component project or not, to determine which
    * attrs to write into sls.yml
    */
-  isComponents() {
+  isComponents(dir) {
     let componentConfig;
     let instanceConfig;
     try {
-      componentConfig = legacyLoadComponentConfig(process.cwd());
+      componentConfig = legacyLoadComponentConfig(dir);
     } catch (e) {
       // ignore
     }
     try {
-      instanceConfig = legacyLoadInstanceConfig(process.cwd());
+      instanceConfig = legacyLoadInstanceConfig(dir);
     } catch (e) {
       // ignore
     }
@@ -62,10 +66,12 @@ class Unpacker {
 
       // Writes the tenantName and serviceName to the serverless.y(a)ml file
       // If projectType === v1
-      if (this.isComponents()) {
-        await writeMainAttrs(this.cli, dir, this.tenantName, this.serviceName);
-      } else {
-        await writeMainAttrs(this.cli, dir, this.tenantName, this.serviceName, this.serviceName);
+      if (!runningTemplate(dir)) {
+        if (this.isComponents(dir)) {
+          await writeMainAttrs(this.cli, dir, this.tenantName, this.serviceName);
+        } else {
+          await writeMainAttrs(this.cli, dir, this.tenantName, this.serviceName, this.serviceName);
+        }
       }
       const files = await fs.readdir(dir);
       await Promise.all(
