@@ -29,6 +29,15 @@ const projectTypeChoice = async (choices) =>
     })
   ).projectType;
 
+const getScfRuntimeTypeChoice = async (choices) =>
+  await inquirer.prompt({
+    // EN: please choice runtime(only for scf)
+    message: '请选择应用的运行时',
+    type: 'list',
+    name: 'scfRuntimeType',
+    choices,
+  });
+
 const projectNameInput = async (workingDir) =>
   (
     await inquirer.prompt({
@@ -62,10 +71,20 @@ const projectNameInput = async (workingDir) =>
 const getTemplatesFromRegistry = async (sdk) => {
   const { templates = [] } = await sdk.listPackages(null, { isFeatured: true });
 
-  return templates.map((item) => ({
-    name: item.name,
-    value: { id: item.componentName, name: item.name },
-  }));
+  const templatesChoices = templates
+    .filter((item) => !item.name.includes('helloworld')) // only show the scf helloworld examples when user select the scf-demo in first step
+    .map((item) => ({
+      name: item.displayName || item.name,
+      value: { id: item.componentName, name: item.name },
+    }));
+
+  const scfTemplatesChoices = templates
+    .filter((item) => item.name.includes('helloworld'))
+    .map((item) => ({
+      name: item.displayName || item.name,
+      value: { id: item.componentName, name: item.name },
+    }));
+  return { templatesChoices, scfTemplatesChoices };
 };
 
 module.exports = async (config, cli) => {
@@ -82,7 +101,7 @@ module.exports = async (config, cli) => {
   const sdk = new ServerlessSDK();
 
   // Fetch latest templates from registry
-  const templatesChoices = await getTemplatesFromRegistry(sdk);
+  const { templatesChoices, scfTemplatesChoices } = await getTemplatesFromRegistry(sdk);
   if (templatesChoices.length === 0) {
     // EN: Can not find any template in registry!
     cli.log(chalk.red('当前注册中心无可用模版!\n'));
@@ -91,10 +110,19 @@ module.exports = async (config, cli) => {
 
   const projectType = await projectTypeChoice(templatesChoices);
   const workingDir = process.cwd();
-  const projectName = await projectNameInput(workingDir);
+  let { name, id: packageName } = projectType;
 
+  // Choice runtime for scf helloworld examples:https://github.com/tencentyun/serverless-demo
+  if (name.includes('scf-demo')) {
+    const {
+      scfRuntimeType: { id, name: scfName },
+    } = await getScfRuntimeTypeChoice(scfTemplatesChoices);
+    packageName = id;
+    name = scfName;
+  }
+
+  const projectName = await projectNameInput(workingDir);
   const projectDir = path.join(workingDir, projectName);
-  const { id: packageName, name } = projectType;
 
   cli.log(
     // EN: Downloading ${projectType.name} app...
