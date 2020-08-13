@@ -3,8 +3,6 @@
 const { ServerlessSDK } = require('@serverless/platform-client');
 const { urls, readConfigFile, writeConfigFile } = require('@serverless/platform-sdk');
 const open = require('open');
-const { loadInstanceConfig } = require('./utils');
-const { loadComponentConfig } = require('../utils');
 
 module.exports = async (config, cli) => {
   // Offer nice presentation
@@ -13,37 +11,8 @@ module.exports = async (config, cli) => {
 
   const sdk = new ServerlessSDK();
 
-  let instanceYaml;
-  let componentYaml;
-  let componentName;
-  let componentVersion;
-  try {
-    // load serverless.yml if available
-    instanceYaml = await loadInstanceConfig(process.cwd());
-  } catch (e) {
-    // ignore
-  }
-
-  try {
-    // load serverless.component.yml if available
-    componentYaml = await loadComponentConfig(process.cwd());
-  } catch (e) {
-    // ignore
-  }
-
-  // parse component name and version if available
-  if (instanceYaml) {
-    componentName = instanceYaml.component.split('@')[0];
-    componentVersion = instanceYaml.component.split('@')[1];
-  } else if (componentYaml) {
-    componentName = componentYaml.name;
-    componentVersion = componentYaml.version;
-  }
-
   const loginConfig = {
     ...urls,
-    componentName,
-    componentVersion,
   };
 
   // for some reason this env var is required by the SDK in order to open the browser
