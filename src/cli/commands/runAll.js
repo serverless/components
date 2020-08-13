@@ -105,17 +105,30 @@ module.exports = async (config, cli, command) => {
     const deferredNotificationsData =
       command === 'deploy'
         ? requestNotification(
-            Object.assign(generateNotificationsPayload(templateYaml), { command: 'deploy' })
-          )
+          Object.assign(generateNotificationsPayload(templateYaml), { command: 'deploy' })
+        )
         : null;
 
-    if (command === 'remove') {
+    if (command === 'deploy') {
+      cli.sessionStatus('Deploying');
+    } else if (command === 'remove') {
       cli.sessionStatus('Removing');
     } else {
-      cli.sessionStatus('Deploying');
+      cli.sessionStop(
+        'error',
+        `Error: You can only run "deploy" or "remove" when working with multiple services`
+      );
+      return null;
     }
 
     const allComponents = await getAllComponents(templateYaml);
+
+    // Remove all inputs for the "remove" command
+    if (command === 'remove' && allComponents) {
+      Object.keys(allComponents).forEach((c) => {
+        allComponents[c].inputs = {}
+      })
+    }
 
     const allComponentsWithDependencies = setDependencies(allComponents);
 
@@ -149,7 +162,7 @@ module.exports = async (config, cli, command) => {
     if (failed.length) {
       cli.sessionStop(
         'error',
-        `Errors: "${command}" ran for ${succeeded.length} apps successfully. ${failed.length} failed.`
+        `Error: "${command}" ran for ${succeeded.length} apps successfully. But, ${failed.length} failed.`
       );
       return null;
     }
