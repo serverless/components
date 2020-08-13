@@ -102,7 +102,7 @@ const writeMainAttrs = async (cli, servicePath, orgName, appName, serviceName = 
   const slsConfigPath = await getServerlessFilePath(servicePath);
   if (isYaml(slsConfigPath)) {
     let slsConfig = await readFile(slsConfigPath, 'utf8');
-
+    console.log(slsConfig)
     if (slsConfig) {
       // we want the org at the top, so maintaining this order is important
       if (serviceName) {
@@ -117,7 +117,7 @@ const writeMainAttrs = async (cli, servicePath, orgName, appName, serviceName = 
 
       // replace extra new lines if they exist
       slsConfig = slsConfig.replace(/(\r\n|\r|\n){2,}/g, '$1\n');
-
+      console.log(slsConfig)
       await writeServerlessFile(cli, servicePath, slsConfig);
     }
   }
