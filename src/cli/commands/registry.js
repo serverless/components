@@ -174,20 +174,19 @@ const unpublish = async (config, cli) => {
   let serverlessFile = await loadServerlessFile(process.cwd());
 
   if (!serverlessFile) {
-    // keeping serverless.component.yml for backward compatability
     const serverlessComponentFile = await loadComponentConfig(process.cwd());
 
-    // If no serverless.yml and no serverless.component.yml, there is nothing to publish in this cwd
+    // If no serverless.yml and no serverless.component.yml, there is nothing to unpublish in this cwd
     if (!serverlessFile && !serverlessComponentFile) {
       throw new Error(
-        'UnPublish failed. The current working directory does not contain a "serverless.yml" or "serverless.component.yml"'
+        'Unpublish failed. The current working directory does not contain a "serverless.yml" or "serverless.component.yml"'
       );
     }
 
     serverlessFile = serverlessComponentFile;
   } else if (serverlessFile.version || serverlessFile.type === 'component') {
     throw new Error(
-      'UnPublish failed. Components could only be defined with a "serverless.component.yml" file.'
+      'Unpublish failed. Components could only be defined with a "serverless.component.yml" file.'
     );
   }
 
