@@ -113,13 +113,18 @@ module.exports = async () => {
   let command = args._[0] || 'deploy';
 
   /**
-   * Intercept "publish" command.  Any "registry" command is also intercepted.
-   * publish is just an alias for registry publish
-   * we also wanna keep the other registry functionality
+   * Intercept "publish" and "unpublish" commands.
    */
-  if (command === 'publish') {
+  if (command === 'publish' || command === 'unpublish') {
     command = 'registry';
-    config.params.unshift('publish');
+
+    if (command === 'publish') {
+      config.params.unshift('publish');
+    }
+
+    if (command === 'unpublish') {
+      config.params.unshift('unpublish');
+    }
   }
 
   /**

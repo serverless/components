@@ -20,7 +20,7 @@ const { fileExists, loadComponentConfig, validateNodeModules } = require('../uti
 const { loadServerlessFile } = require('../serverlessFile');
 
 /**
- * Publish a Component to the Serverless Registry
+ * Publish a package to the Serverless Registry
  * @param {*} config
  * @param {*} cli
  */
@@ -134,6 +134,101 @@ const publish = async (config, cli) => {
     // log message in case of template
     if (serverlessFile.type === 'template') {
       successLogMsg = `Successfully published "${serverlessFile.name}" to the Serverless Framework Registry`;
+    }
+
+    cli.sessionStop('success', successLogMsg);
+  } catch (error) {
+    if (error.message.includes('409')) {
+      error.message = error.message.replace('409 - ', '');
+      throw new Error(error.message);
+    } else {
+      throw error;
+    }
+  }
+
+  return null;
+};
+
+/**
+ * Unpublishes a package from the Serverless Registry
+ * @param {*} config
+ * @param {*} cli
+ */
+const unpublish = async (config, cli) => {
+  // Ensure the user is logged in or access key is available, or advertise
+  if (!isLoggedInOrHasAccessKey()) {
+    cli.logAdvertisement();
+    cli.sessionStop('error', 'Please log in by running "serverless login"');
+    return null;
+  }
+
+  // Disable timer
+  config.timer = false;
+
+  // Start CLI persistance status
+  cli.sessionStart('Initializing');
+
+  // Get access key
+  const accessKey = await getAccessKey();
+
+  let serverlessFile = await loadServerlessFile(process.cwd());
+
+  if (!serverlessFile) {
+    // keeping serverless.component.yml for backward compatability
+    const serverlessComponentFile = await loadComponentConfig(process.cwd());
+
+    // If no serverless.yml and no serverless.component.yml, there is nothing to publish in this cwd
+    if (!serverlessFile && !serverlessComponentFile) {
+      throw new Error(
+        'UnPublish failed. The current working directory does not contain a "serverless.yml" or "serverless.component.yml"'
+      );
+    }
+
+    serverlessFile = serverlessComponentFile;
+  } else if (serverlessFile.version || serverlessFile.type === 'component') {
+    throw new Error(
+      'UnPublish failed. Components could only be defined with a "serverless.component.yml" file.'
+    );
+  }
+
+  // fall back to service name for framework v1
+  serverlessFile.name = serverlessFile.name || serverlessFile.service;
+
+  // default version is dev
+  if (!serverlessFile.version || config.dev) {
+    serverlessFile.version = 'dev';
+  }
+
+  serverlessFile.org = serverlessFile.org || (await getDefaultOrgName());
+
+  if (!serverlessFile.org) {
+    throw new Error('"org" property is required in your config file');
+  }
+
+  // log message in case of component
+  let initialStatus = `Unpublishing "${serverlessFile.name}@${serverlessFile.version}" from the Serverless Framework Registry`;
+
+  // log message in case of template
+  if (serverlessFile.type === 'template') {
+    initialStatus = `Unpublishing "${serverlessFile.name}" from the Serverless Framework Registry`;
+  }
+
+  // Presentation
+  cli.logRegistryLogo();
+
+  const sdk = new ServerlessSDK({ accessKey });
+
+  // Unpublish
+  cli.sessionStatus(initialStatus);
+
+  try {
+    await sdk.unpublishFromRegistry(serverlessFile);
+    // log message in case of component
+    let successLogMsg = `Successfully unpublished "${serverlessFile.name}@${serverlessFile.version}" from the Serverless Framework Registry.`;
+
+    // log message in case of template
+    if (serverlessFile.type === 'template') {
+      successLogMsg = `Successfully unpublished "${serverlessFile.name}" from the Serverless Framework Registry`;
     }
 
     cli.sessionStop('success', successLogMsg);
@@ -277,6 +372,9 @@ module.exports = async (config, cli) => {
   }
   if (config.params[0] === 'publish') {
     return await publish(config, cli);
+  }
+  if (config.params[0] === 'unpublish') {
+    return await unpublish(config, cli);
   }
   return await get(config, cli);
 };
