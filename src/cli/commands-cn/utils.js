@@ -184,16 +184,18 @@ const getTemplate = async (root) => {
       componentDirectoryFound = true;
       const instanceYaml = await loadTencentInstanceConfig(directoryPath);
 
+      const errorMessage = 'Template instances must use the same org, app & stage properties';
+
       if (template.org !== null && template.org !== instanceYaml.org) {
-        throw new Error('Attempting to deploy multiple instances to multiple orgs');
+        throw new Error(errorMessage);
       }
 
       if (template.app !== null && template.app !== instanceYaml.app) {
-        throw new Error('Attempting to deploy multiple instances to multiple apps');
+        throw new Error(errorMessage);
       }
 
       if (template.stage !== null && template.stage !== instanceYaml.stage) {
-        throw new Error('Attempting to deploy multiple instances to multiple stages');
+        throw new Error(errorMessage);
       }
 
       template.org = instanceYaml.org;
