@@ -112,21 +112,17 @@ module.exports = async () => {
 
   let command = args._[0] || 'deploy';
 
-  /**
-   * Intercept "publish" and "unpublish" commands.
-   */
-  if (command === 'publish' || command === 'unpublish') {
+  // handle "publish" command.
+  if (command === 'publish') {
     command = 'registry';
-
-    if (command === 'publish') {
-      config.params.unshift('publish');
-    }
-
-    if (command === 'unpublish') {
-      config.params.unshift('unpublish');
-    }
+    config.params.unshift('publish');
   }
 
+  // // handle "unpublish" command.
+  if (command === 'unpublish') {
+    command = 'registry';
+    config.params.unshift('unpublish');
+  }
   /**
    * Running "serverless --help" is equivalent to "serverless help"
    */
