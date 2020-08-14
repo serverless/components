@@ -264,6 +264,10 @@ const isYamlFile = (filename) => {
   return (filename && filename.endsWith('yaml')) || (filename && filename.endsWith('yml'));
 };
 
+/**
+ * Returns the path of the serverless file found in the given directory
+ * @param {*} filePath
+ */
 const getServerlessFilePath = (directoryPath) => {
   directoryPath = path.resolve(directoryPath);
   const ymlFilePath = path.join(directoryPath, 'serverless.yml');
@@ -292,7 +296,7 @@ const getServerlessFilePath = (directoryPath) => {
 };
 
 /**
- * Reads and parses a serverless config file (serverless.yml) in any format (yml, yaml, json), in a given directory path
+ * Reads and parses a the serverless config file found in the parent directory
  * @param {*} directoryPath
  */
 const loadParentConfigFile = (directoryPath) => {
