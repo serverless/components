@@ -69,8 +69,9 @@ module.exports = async (config, cli, command) => {
     instanceYaml.name
   );
 
-  const providerCredentials = await sdk.getProviderByOrgInstance(
+  const providerCredentials = await sdk.getProviderByOrgServiceInstance(
     instance.instance.orgUid,
+    instance.instance.instanceName,
     instance.instance.instanceId
   );
   if (providerCredentials.result) {
@@ -82,9 +83,12 @@ module.exports = async (config, cli, command) => {
       accessKeyId,
       secretAccessKey,
     };
-  } else {
-    // Load Instance Credentials, override if they exist
-    instanceCredentials = await loadInstanceCredentials(instanceYaml.stage);
+  }
+  // Load Instance Credentials
+  const overrideInstanceCredentials = await loadInstanceCredentials(instanceYaml.stage);
+  // override if they exist
+  if (overrideInstanceCredentials) {
+    instanceCredentials = overrideInstanceCredentials;
   }
   try {
     // Prepare Options
