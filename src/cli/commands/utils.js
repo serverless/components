@@ -135,6 +135,7 @@ const loadInstanceCredentials = () => {
   providers.aws = {};
   providers.aws.AWS_ACCESS_KEY_ID = 'accessKeyId';
   providers.aws.AWS_SECRET_ACCESS_KEY = 'secretAccessKey';
+  providers.aws.AWS_SESSION_TOKEN = 'sessionToken';
   providers.aws.AWS_REGION = 'region';
 
   // Google
