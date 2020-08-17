@@ -168,10 +168,11 @@ const unpublish = async (config, cli) => {
   // Start CLI persistance status
   cli.sessionStart('Initializing');
 
-  // Get access key
-  const accessKey = await getAccessKey();
+  const res = await Promise.all([getAccessKey(), loadServerlessFile(process.cwd())]);
 
-  let serverlessFile = await loadServerlessFile(process.cwd());
+  const accessKey = res[0];
+
+  let serverlessFile = res[1];
 
   if (!serverlessFile) {
     const serverlessComponentFile = await loadComponentConfig(process.cwd());
