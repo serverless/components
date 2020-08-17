@@ -52,10 +52,6 @@ module.exports = async (config, cli, command) => {
   if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
     cli.log('Running in Platform Dev stage');
   }
-
-  // Load Instance Credentials
-  const instanceCredentials = await loadInstanceCredentials(instanceYaml.stage);
-
   // initialize SDK
   const sdk = new ServerlessSDK({
     accessKey,
@@ -64,6 +60,32 @@ module.exports = async (config, cli, command) => {
     },
   });
 
+  let instanceCredentials = {};
+
+  let instance = await sdk.getInstance(
+    instanceYaml.org,
+    instanceYaml.stage,
+    instanceYaml.app,
+    instanceYaml.name
+  );
+
+  const providerCredentials = await sdk.getProviderByOrgInstance(
+    instance.instance.orgUid,
+    instance.instance.instanceId
+  );
+  if (providerCredentials.result) {
+    const {
+      AWS_ACCESS_KEY_ID: accessKeyId,
+      AWS_SECRET_ACCESS_KEY: secretAccessKey,
+    } = providerCredentials.result[0].providerDetails;
+    instanceCredentials.aws = {
+      accessKeyId,
+      secretAccessKey,
+    };
+  } else {
+    // Load Instance Credentials, override if they exist
+    instanceCredentials = await loadInstanceCredentials(instanceYaml.stage);
+  }
   try {
     // Prepare Options
     const options = {};
@@ -154,7 +176,6 @@ module.exports = async (config, cli, command) => {
     }
 
     // Run action
-    let instance;
     try {
       instance = await action();
     } catch (error) {
