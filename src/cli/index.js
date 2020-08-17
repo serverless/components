@@ -112,16 +112,17 @@ module.exports = async () => {
 
   let command = args._[0] || 'deploy';
 
-  /**
-   * Intercept "publish" command.  Any "registry" command is also intercepted.
-   * publish is just an alias for registry publish
-   * we also wanna keep the other registry functionality
-   */
+  // handle "publish" command.
   if (command === 'publish') {
     command = 'registry';
     config.params.unshift('publish');
   }
 
+  // // handle "unpublish" command.
+  if (command === 'unpublish') {
+    command = 'registry';
+    config.params.unshift('unpublish');
+  }
   /**
    * Running "serverless --help" is equivalent to "serverless help"
    */
