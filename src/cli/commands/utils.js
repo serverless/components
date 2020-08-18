@@ -27,6 +27,11 @@ const {
   resolveVariables,
 } = require('../utils');
 
+/*
+ * AWS Provider clients
+ */
+const STS = require('aws-sdk/clients/sts')
+
 /**
  * Get the URL of the Serverless Framework Dashboard
  * @param {string} urlPath a url path to add to the hostname
@@ -80,7 +85,7 @@ const getDefaultOrgName = async () => {
 /**
  * Load AWS credentials from the aws credentials file
  */
-const loadAwsCredentials = () => {
+const loadAwsCredentials = async () => {
   const awsCredsInEnv = process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY;
 
   if (awsCredsInEnv) {
@@ -114,6 +119,37 @@ const loadAwsCredentials = () => {
 
   if (!credentials) return;
 
+  // check if profile use assume role
+  if (credentials.source_profile && credentials.role_arn) {
+    const sourceCredentials = parsedCredentialsFile[credentials.source_profile]
+
+    if (!sourceCredentials) return;
+
+    // init AWS STS client with source profile credentials
+    const sts = new STS({
+      credentials: {
+        accessKeyId: sourceCredentials.aws_access_key_id,
+        secretAccessKey: sourceCredentials.aws_secret_access_key
+      }
+    })
+
+    // assume profile role and retrieve credentials
+    const timestamp = (new Date()).getTime();
+    const stsResponse = await sts.assumeRole({
+      RoleArn: credentials.role_arn,
+      RoleSessionName: `serverless-components-${timestamp}`
+    }).promise()
+
+    if (!stsResponse.Credentials) return;
+
+    // set assumed role credentials in the env to pass it to the sdk
+    process.env.AWS_ACCESS_KEY_ID = stsResponse.Credentials.AccessKeyId;
+    process.env.AWS_SECRET_ACCESS_KEY = stsResponse.Credentials.SecretAccessKey;
+    process.env.AWS_SESSION_TOKEN = stsResponse.Credentials.SessionToken;
+
+    return
+  }
+
   // set the credentials in the env to pass it to the sdk
   process.env.AWS_ACCESS_KEY_ID = credentials.aws_access_key_id;
   process.env.AWS_SECRET_ACCESS_KEY = credentials.aws_secret_access_key;
@@ -124,9 +160,9 @@ const loadAwsCredentials = () => {
  * @param {*} stage
  */
 
-const loadInstanceCredentials = () => {
+const loadInstanceCredentials = async () => {
   // load aws credentials if found
-  loadAwsCredentials();
+  await loadAwsCredentials();
 
   // Known Provider Environment Variables and their SDK configuration properties
   const providers = {};

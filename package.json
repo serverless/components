@@ -39,6 +39,7 @@
     "@serverless/utils": "^1.2.0",
     "adm-zip": "^0.4.16",
     "ansi-escapes": "^4.3.1",
+    "aws-sdk": "^2.735.0",
     "chalk": "^2.4.2",
     "child-process-ext": "^2.1.1",
     "chokidar": "^3.4.1",
