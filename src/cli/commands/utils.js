@@ -30,7 +30,7 @@ const {
 /*
  * AWS Provider clients
  */
-const STS = require('aws-sdk/clients/sts')
+const STS = require('aws-sdk/clients/sts');
 
 /**
  * Get the URL of the Serverless Framework Dashboard
@@ -121,7 +121,7 @@ const loadAwsCredentials = async () => {
 
   // check if profile use assume role
   if (credentials.source_profile && credentials.role_arn) {
-    const sourceCredentials = parsedCredentialsFile[credentials.source_profile]
+    const sourceCredentials = parsedCredentialsFile[credentials.source_profile];
 
     if (!sourceCredentials) return;
 
@@ -129,16 +129,18 @@ const loadAwsCredentials = async () => {
     const sts = new STS({
       credentials: {
         accessKeyId: sourceCredentials.aws_access_key_id,
-        secretAccessKey: sourceCredentials.aws_secret_access_key
-      }
-    })
+        secretAccessKey: sourceCredentials.aws_secret_access_key,
+      },
+    });
 
     // assume profile role and retrieve credentials
-    const timestamp = (new Date()).getTime();
-    const stsResponse = await sts.assumeRole({
-      RoleArn: credentials.role_arn,
-      RoleSessionName: `serverless-components-${timestamp}`
-    }).promise()
+    const timestamp = new Date().getTime();
+    const stsResponse = await sts
+      .assumeRole({
+        RoleArn: credentials.role_arn,
+        RoleSessionName: `serverless-components-${timestamp}`,
+      })
+      .promise();
 
     if (!stsResponse.Credentials) return;
 
@@ -147,7 +149,7 @@ const loadAwsCredentials = async () => {
     process.env.AWS_SECRET_ACCESS_KEY = stsResponse.Credentials.SecretAccessKey;
     process.env.AWS_SESSION_TOKEN = stsResponse.Credentials.SessionToken;
 
-    return
+    return;
   }
 
   // set the credentials in the env to pass it to the sdk
