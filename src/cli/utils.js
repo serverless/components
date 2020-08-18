@@ -49,7 +49,7 @@ const fileExistsSync = (filePath) => {
 const fileExists = async (filePath) => {
   try {
     const stats = await fse.lstat(filePath);
-    return stats.isFile();
+    return stats.isFile() || stats.isSymbolicLink();
   } catch (error) {
     return false;
   }
