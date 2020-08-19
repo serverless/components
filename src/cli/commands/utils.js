@@ -7,6 +7,7 @@
 const args = require('minimist')(process.argv.slice(2));
 const path = require('path');
 const os = require('os');
+const https = require('https');
 const {
   readConfigFile,
   writeConfigFile,
@@ -28,9 +29,48 @@ const {
 } = require('../utils');
 
 /*
- * AWS Provider clients
+ * AWS request signer
  */
-const STS = require('aws-sdk/clients/sts');
+const aws4 = require('aws4');
+
+/**
+ * Execute AWS API request
+ * @param {string} service AWS service identifier, example (sts, sqs, ec2..)
+ * @param {string} requestPath AWS API path with parameters
+ * @param {string} credentials.accessKeyId AWS access key id
+ * @param {string} credentials.secretAccessKey AWS secret access key
+ */
+const awsRequest = async (service, requestPath, { accessKeyId, secretAccessKey }) => {
+  // aws4 will sign an options object as you'd pass to https.request, with an AWS service
+  const opts = { service, path: requestPath };
+
+  // aws4.sign() will sign and modify these options, ready to pass to https.request
+  aws4.sign(opts, { accessKeyId, secretAccessKey });
+
+  // set JSON as response type
+  opts.headers.Accept = 'application/json';
+
+  // execute HTTP request
+  return new Promise((resolve, reject) => {
+    const req = https.request(opts, (resp) => {
+      let data = '';
+
+      resp.on('data', (chunk) => {
+        data += chunk;
+      });
+
+      resp.on('end', () => {
+        resolve(JSON.parse(data));
+      });
+    });
+
+    req.on('error', (err) => {
+      reject(err);
+    });
+
+    req.end();
+  });
+};
 
 /**
  * Get the URL of the Serverless Framework Dashboard
@@ -125,29 +165,36 @@ const loadAwsCredentials = async () => {
 
     if (!sourceCredentials) return;
 
-    // init AWS STS client with source profile credentials
-    const sts = new STS({
-      credentials: {
-        accessKeyId: sourceCredentials.aws_access_key_id,
-        secretAccessKey: sourceCredentials.aws_secret_access_key,
-      },
-    });
-
     // assume profile role and retrieve credentials
     const timestamp = new Date().getTime();
-    const stsResponse = await sts
-      .assumeRole({
-        RoleArn: credentials.role_arn,
-        RoleSessionName: `serverless-components-${timestamp}`,
-      })
-      .promise();
+    const stsResponse = await awsRequest(
+      'sts',
+      [
+        '/?Action=AssumeRole',
+        'Version=2011-06-15',
+        `RoleSessionName=serverless-components-${timestamp}`,
+        `RoleArn=${credentials.role_arn}`,
+      ].join('&'),
+      {
+        accessKeyId: sourceCredentials.aws_access_key_id,
+        secretAccessKey: sourceCredentials.aws_secret_access_key,
+      }
+    );
 
-    if (!stsResponse.Credentials) return;
+    // check anc parse response
+    if (
+      !stsResponse.AssumeRoleResponse ||
+      !stsResponse.AssumeRoleResponse.AssumeRoleResult ||
+      !stsResponse.AssumeRoleResponse.AssumeRoleResult.Credentials
+    ) {
+      return;
+    }
+    const temporaryCredentials = stsResponse.AssumeRoleResponse.AssumeRoleResult.Credentials;
 
     // set assumed role credentials in the env to pass it to the sdk
-    process.env.AWS_ACCESS_KEY_ID = stsResponse.Credentials.AccessKeyId;
-    process.env.AWS_SECRET_ACCESS_KEY = stsResponse.Credentials.SecretAccessKey;
-    process.env.AWS_SESSION_TOKEN = stsResponse.Credentials.SessionToken;
+    process.env.AWS_ACCESS_KEY_ID = temporaryCredentials.AccessKeyId;
+    process.env.AWS_SECRET_ACCESS_KEY = temporaryCredentials.SecretAccessKey;
+    process.env.AWS_SESSION_TOKEN = temporaryCredentials.SessionToken;
 
     return;
   }
