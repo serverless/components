@@ -98,7 +98,7 @@ To get started with Serverless Components, install the latest version of the [Se
 $ npm i -g serverless
 ```
 
-After installation, run `serverless registry` to see many Component-based templates you can deploy, or see more in the [Serverless Framework Dashboard](https://app.serverless.com).  These contain Components as well as boilerplate code, to get you started quickly.
+After installation, run `serverless registry` to see many Component-based templates you can deploy, or see more in the [Serverless Framework Dashboard](https://app.serverless.com). These contain Components as well as boilerplate code, to get you started quickly.
 
 Install anything from the registry via `$ serverless init <template>`, like this:
 
@@ -624,6 +624,8 @@ class MyComponent extends Component {
 
 module.exports = MyComponent;
 ```
+
+**Note:** You do NOT need to install the `@serverless/core` package via npm. This package is automatically available to you on the Cloud runtime.
 
 `deploy()` is always required. It is where the logic resides in order for your Component to _make_ something. Whenever you run the `$ serverless deploy` command, it's always calling the `deploy()` method.
 
@@ -1237,7 +1239,7 @@ Starts DEV MODE, which watches the Component for changes, auto-deploys on change
 
 A `serverless.yml` file can only hold 1 Component at this time. However, that does not mean you cannot deploy/remove multiple Components at the same time.
 
-Simply navigate to a parent directory, and run `serverless deploy` to deploy any `serverless.yml` files in immediate subfolders. When this happens, the Serverless Framework will quickly create a graph based on the references your Component apps are making to eachother. Depending on those references, it will prioritize what needs to be deployed first, otherwise its default is to deploy things in parallel.  This also works for `serverless remove`.
+Simply navigate to a parent directory, and run `serverless deploy` to deploy any `serverless.yml` files in immediate subfolders. When this happens, the Serverless Framework will quickly create a graph based on the references your Component apps are making to eachother. Depending on those references, it will prioritize what needs to be deployed first, otherwise its default is to deploy things in parallel. This also works for `serverless remove`.
 
 For context, here is why we designed `serverless.yml` to only hold 1 Component at a time:
 
