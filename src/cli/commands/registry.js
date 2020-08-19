@@ -18,6 +18,7 @@ const {
 } = require('./utils');
 const { fileExists, loadComponentConfig, validateNodeModules } = require('../utils');
 const { loadServerlessFile } = require('../serverlessFile');
+const { remove } = require('fs-extra');
 
 /**
  * Publish a package to the Serverless Registry
@@ -122,6 +123,11 @@ const publish = async (config, cli) => {
   if (await fileExists(readmeFilePath)) {
     serverlessFile.readme = await readFile(readmeFilePath, 'utf-8');
   }
+
+  // silently remove @serverless/core to avoid conflict with components v1
+  // if it already does not exist, it just moves on
+  const coreDependencyPath = path.join(serverlessFile.src, 'node_modules', '@serverless', 'core');
+  await remove(coreDependencyPath);
 
   // Publish
   cli.sessionStatus(initialStatus);
