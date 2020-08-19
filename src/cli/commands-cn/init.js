@@ -51,7 +51,13 @@ const initTemplateFromCli = async (targetPath, packageName, registryPackage, cli
   cli.sessionStatus('Unpacking your new app', packageName);
   const zip = new AdmZip(tmpFilename);
   zip.extractAllTo(targetPath);
-  await fs.promises.unlink(tmpFilename);
+  // Need to polyfill this promise feature for support of nodejs>=8
+  if (fs.promises) {
+    await fs.promises.unlink(tmpFilename);
+  } else {
+    const unlink = promisify(fs.unlink);
+    await unlink(tmpFilename);
+  }
 
   cli.sessionStatus('Setting up your new app');
   await unpack(cli, targetPath);
