@@ -578,6 +578,48 @@ A useful feature of this is the ability to share resources easily, and even do s
 
 <br/>
 
+# CLI Commands
+
+#### `serverless registry`
+
+See available Components
+
+#### `serverless publish`
+
+Publish a Component to the Serverless Registry.
+
+`--dev` - Publishes to the `@dev` version of your Component, for testing purposes.
+
+#### `serverless init <package-name>`
+
+Initializes the specified package (component or template) locally to get you started quickly.
+
+`--dir`, `-d` - Specify destination directory.
+
+#### `serverless deploy`
+
+Deploys an Instance of a Component.
+
+`--debug` - Lists `console.log()` statements left in your Component upon `deploy` or any action.
+
+#### `serverless remove`
+
+Removes an Instance of a Component.
+
+`--debug` - Lists `console.log()` statements left in your Component upon `remove` or any action.
+
+#### `serverless info`
+
+Fetches information of an Instance of a Component.
+
+`--debug` - Lists `state`.
+
+#### `serverless dev`
+
+Starts DEV MODE, which watches the Component for changes, auto-deploys on changes, and (if supported by the Component) streams logs, errors and transactions to the terminal.
+
+<br/>
+
 # Building Components
 
 If you want to build your own Serverless Component, there are 2 essential files you need to be aware of:
@@ -1190,46 +1232,6 @@ We write integration tests in the `tests/integration.tests.js` file in each comp
 - [Test Run](https://github.com/serverless-components/website/runs/622852865?check_suite_focus=true)
 
 Running these integration tests will most likely require AWS keys, which are stored as Github Secrets. So you'll most likely need write access to the repo to accomplish this.
-
-# CLI Commands
-
-#### `serverless registry`
-
-See available Components
-
-#### `serverless publish`
-
-Publish a Component to the Serverless Registry.
-
-`--dev` - Publishes to the `@dev` version of your Component, for testing purposes.
-
-#### `serverless init <package-name>`
-
-Initializes the specified package (component or template) locally to get you started quickly.
-
-`--dir`, `-d` - Specify destination directory.
-
-#### `serverless deploy`
-
-Deploys an Instance of a Component.
-
-`--debug` - Lists `console.log()` statements left in your Component upon `deploy` or any action.
-
-#### `serverless remove`
-
-Removes an Instance of a Component.
-
-`--debug` - Lists `console.log()` statements left in your Component upon `remove` or any action.
-
-#### `serverless info`
-
-Fetches information of an Instance of a Component.
-
-`--debug` - Lists `state`.
-
-#### `serverless dev`
-
-Starts DEV MODE, which watches the Component for changes, auto-deploys on changes, and (if supported by the Component) streams logs, errors and transactions to the terminal.
 
 # F.A.Q.
 
