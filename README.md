@@ -66,7 +66,7 @@ $ npx serverless init graphql-starter
     - [Variables: Outputs](#variables-outputs)
 - [CLI Commands](#cli-commands)
   - [`serverless registry`](#serverless-registry)
-  - [`serverless registry publish`](#serverless-registry-publish)
+  - [`serverless publish`](#serverless-publish)
   - [`serverless deploy`](#serverless-deploy)
   - [`serverless remove`](#serverless-remove)
   - [`serverless info`](#serverless-info)
@@ -216,7 +216,7 @@ Anyone can build a Serverless Component and share it in our Registry.
 
 ```bash
 
-$ serverless registry publish
+$ serverless publish
 
 express@0.0.4 › Published
 
@@ -1074,7 +1074,7 @@ When you have added or updated the code of your Serverless Component and you wan
 Simply run the following command to publish your Serverless Component to the "dev" version:
 
 ```console
-$ serverless registry publish --dev
+$ serverless publish --dev
 ```
 
 You can test the "dev" version of your Component in `serverless.yml`, by including a `@dev` in your Component name, like this:
@@ -1197,7 +1197,7 @@ Running these integration tests will most likely require AWS keys, which are sto
 
 See available Components
 
-#### `serverless registry publish`
+#### `serverless publish`
 
 Publish a Component to the Serverless Registry.
 
