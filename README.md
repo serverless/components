@@ -40,11 +40,6 @@ $ npx serverless init graphql-starter
 
 - [Quick-Start](#quick-start)
 - [Features](#features)
-  - [Simplicity](#simplicity)
-  - [Instant Deployments](#instant-deployments)
-  - [Build Your Own](#build-your-own)
-  - [Registry](#registry)
-  - [Serverless](#serverless)
 - [Overview](#overview)
 - [Using Components](#using-components)
   - [Serverless Framework](#serverless-framework)
