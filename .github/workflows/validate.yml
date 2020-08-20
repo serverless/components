@@ -14,13 +14,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-          # Workaround unexplained "no merge base" error
+          # Ensure connection with 'master' branch
           fetch-depth: 2
 
       - name: Retrieve last master commit (for `git diff` purposes)
         run: |
           git checkout -b pr
-          git fetch --prune --depth=1 origin +refs/heads/master:refs/remotes/origin/master
+          git fetch --prune --depth=20 origin +refs/heads/master:refs/remotes/origin/master
           git checkout master
           git checkout pr
 
