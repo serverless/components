@@ -39,7 +39,6 @@ $ npx serverless init graphql-starter
 # Documentation
 
 - [Quick-Start](#quick-start)
-- [Features](#features)
 - [Overview](#overview)
 - [Using Components](#using-components)
   - [Serverless Framework](#serverless-framework)
@@ -147,7 +146,19 @@ inputs:
 
 <br/>
 
-# Features
+# Overview
+
+Serverless Components are libraries of code that make it easy to deploy apps and other functionality onto serverless cloud infrastructure. They're instant serverless use-cases that contain the best infrastructure patterns for scale, performance, cost optimization, collaboration and more.
+
+We (Serverless Inc) made Serverless Components because composing, configuring and managing low-level serverless infrastructure can be complicated for developers and teams. We've discovered many of the best patterns, and now we want to share them!
+
+While Components can help you deploy and manage low-level infrastructure (e.g. an AWS S3 bucket). Their big use-case is on higher-order functionality and apps, like:
+
+1. A group of infrastructure with a purpose, like a type of data processing pipeline.
+2. A software feature, like user authentication, comments, or a payment system.
+3. An entire application, like a blog, video streaming service, or landing page.
+
+## Features
 
 ### Simplicity
 
@@ -220,20 +231,6 @@ express@0.0.4 › Published
 ### Serverless
 
 Serverless Components favor cloud infrastructure with serverless qualities. They are also entirely vendor agnostic, enabling you to easily use services from different vendors, together. Like, AWS Lambda, AWS S3, Azure Functions, Google Big Query, Twilio, Stripe, Algolia, Cloudflare Workers and more.
-
-<br/>
-
-# Overview
-
-Serverless Components are libraries of code that make it easy to deploy apps and other functionality onto serverless cloud infrastructure. They're instant serverless use-cases that contain the best infrastructure patterns for scale, performance, cost optimization, collaboration and more.
-
-We (Serverless Inc) made Serverless Components because composing, configuring and managing low-level serverless infrastructure can be complicated for developers and teams. We've discovered many of the best patterns, and now we want to share them!
-
-While Components can help you deploy and manage low-level infrastructure (e.g. an AWS S3 bucket). Their big use-case is on higher-order functionality and apps, like:
-
-1. A group of infrastructure with a purpose, like a type of data processing pipeline.
-2. A software feature, like user authentication, comments, or a payment system.
-3. An entire application, like a blog, video streaming service, or landing page.
 
 <br/>
 
