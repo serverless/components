@@ -179,7 +179,7 @@ module.exports = async (config, cli, command) => {
     cli.log(
       `Full details: ${getDashboardUrl(
         `/${instanceYaml.org}/apps/${instanceYaml.app || instanceYaml.name}/${instanceYaml.name}/${
-          instanceYaml.stage
+        instanceYaml.stage
         }`
       )}`
     );

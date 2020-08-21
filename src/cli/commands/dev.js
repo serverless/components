@@ -15,10 +15,10 @@ const {
 /**
  * Deploy helper function
  */
-const deploy = async (sdk, cli, instanceYaml, instanceCredentials) => {
+const deploy = async (sdk, cli, instanceYaml, instanceCredentials, options = {}) => {
   let result;
   try {
-    result = await sdk.deploy(instanceYaml, instanceCredentials, { dev: true });
+    result = await sdk.deploy(instanceYaml, instanceCredentials, options);
   } catch (error) {
     if (error.name === 'Invalid Component Types') {
       error.message = `Invalid Input: ${error.message}`;
@@ -51,7 +51,7 @@ module.exports = async (config, cli) => {
     cli.sessionStatus('Disabling Dev Mode & closing', null, 'green');
 
     // Remove agent from application
-    await deploy(sdk, cli, instanceYaml, instanceCredentials);
+    await deploy(sdk, cli, instanceYaml, instanceCredentials); // Don't include dev flag
 
     await cli.watcher.close();
     cli.sessionStop('success', 'Dev Mode closed');
@@ -180,7 +180,7 @@ module.exports = async (config, cli) => {
       if (event.data.path && event.data.httpMethod) {
         transactionType = `transaction - ${event.data.httpMethod.toUpperCase()} - ${
           event.data.path
-        }`;
+          }`;
       }
       // Default
       else {
@@ -239,7 +239,7 @@ module.exports = async (config, cli) => {
 
   cli.watcher.on('ready', async () => {
     cli.sessionStatus('Initializing Dev Mode', null, 'green');
-    await deploy(sdk, cli, instanceYaml, instanceCredentials);
+    await deploy(sdk, cli, instanceYaml, instanceCredentials, { dev: true });
     cli.sessionStatus('Watching');
   });
 
@@ -262,14 +262,14 @@ module.exports = async (config, cli) => {
       // reload serverless component instance
       instanceYaml = await loadInstanceConfig(process.cwd(), { disableCache: true });
 
-      await deploy(sdk, cli, instanceYaml, instanceCredentials);
+      await deploy(sdk, cli, instanceYaml, instanceCredentials, { dev: true });
       cli.sessionStatus('Watching');
 
       if (queuedOperation) {
         cli.sessionStatus('Deploying', null, 'green');
         // reload serverless component instance
         instanceYaml = await loadInstanceConfig(process.cwd(), { disableCache: true });
-        await deploy(sdk, cli, instanceYaml, instanceCredentials);
+        await deploy(sdk, cli, instanceYaml, instanceCredentials, { dev: true });
         cli.sessionStatus('Watching');
       }
 
