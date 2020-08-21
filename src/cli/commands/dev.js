@@ -180,7 +180,7 @@ module.exports = async (config, cli) => {
       if (event.data.path && event.data.httpMethod) {
         transactionType = `transaction - ${event.data.httpMethod.toUpperCase()} - ${
           event.data.path
-          }`;
+        }`;
       }
       // Default
       else {
