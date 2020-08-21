@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [2.34.6](https://github.com/serverless/components/compare/v2.34.6...v2.34.7) (2020-08-21)
 
-- Dev Mode Fix: Fixes a bug that did not remove the agent from user applications when they disable Dev Mode.  Since the agent was still running in prod apps, it was causing slow performance due to log/error streaming.
+- Dev Mode Fix: Fixes a bug that did not remove the agent from user applications when they disable Dev Mode. Since the agent was still running in prod apps, it was causing slow performance due to log/error streaming.
 
 ### [2.34.6](https://github.com/serverless/components/compare/v2.34.5...v2.34.6) (2020-08-19)
 
