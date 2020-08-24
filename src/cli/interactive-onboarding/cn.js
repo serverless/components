@@ -45,6 +45,7 @@ const projectNameInput = async (workingDir) =>
       message: '请输入项目名称',
       type: 'input',
       name: 'projectName',
+      default: 'demo',
       validate: async (input) => {
         input = input.trim();
         if (!isValidProjectName(input)) {
@@ -135,7 +136,7 @@ module.exports = async (config, cli) => {
   // Start CLI persistance status
   cli.sessionStart('Installing', { timer: false });
   // Start initialing the template on cli
-  await initTemplateFromCli(projectDir, packageName, registryPackage, cli);
+  await initTemplateFromCli(projectDir, packageName, registryPackage, cli, projectName);
   cli.sessionStop('success', 'Created');
 
   // EN: Project successfully created in '${projectName}' folder

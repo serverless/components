@@ -10,6 +10,8 @@ const args = require('minimist')(process.argv.slice(2));
 const { utils: platformUtils } = require('@serverless/platform-client-china');
 const { loadInstanceConfig, resolveVariables } = require('../utils');
 const { mergeDeepRight } = require('ramda');
+const YAML = require('js-yaml');
+const fse = require('fs-extra');
 
 const updateEnvFile = (envs) => {
   // write env file
@@ -250,6 +252,23 @@ const handleDebugLogMessage = (cli) => {
   };
 };
 
+const parseYaml = async (yamlPath) => {
+  let yamlObj = YAML.safeLoad(await fse.readFile(yamlPath));
+  if (!yamlObj) {
+    yamlObj = {};
+  }
+  return yamlObj;
+};
+
+const saveYaml = async (yamlPath, yamlObj) => {
+  if (!yamlObj || Object.keys(yamlObj) === 0) {
+    await fse.remove(yamlPath);
+    return;
+  }
+  const yamlContent = YAML.safeDump(yamlObj);
+  await fse.writeFile(yamlPath, yamlContent);
+};
+
 module.exports = {
   loadInstanceConfig: loadTencentInstanceConfig,
   loadInstanceCredentials,
@@ -259,4 +278,6 @@ module.exports = {
   getInstanceDashboardUrl,
   setInputsForCommand,
   handleDebugLogMessage,
+  parseYaml,
+  saveYaml,
 };
