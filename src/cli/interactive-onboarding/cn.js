@@ -24,7 +24,7 @@ const projectTypeChoice = async (choices) =>
         if (input) {
           return choices.filter((choice) => choice.name.includes(input));
         }
-        return choices;
+        return choices.slice(0, 6); // default to show the first 6 items
       },
     })
   ).projectType;
