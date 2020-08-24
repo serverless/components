@@ -129,7 +129,7 @@ Run the `serverless dev` command to auto-deploy on save, and have logs and error
 $ serverless dev
 ```
 
-Deploy other Components that you may want to use with your Express Component. For example, you may want to give your Express application permissions to other resources on your AWS account via the `aws-iam-role` Component. You may also want an AWS DynamoDB table to use with your Express Component, via the `aws-dynamodb` Component. There are Templates for both of these in the [Serverless Components Template](./templates) folder. You can then use them with your `express` Component, like this:
+Deploy other Components that you may want to use with your Express Component. For example, you may want to give your Express application permissions to other resources on your AWS account via the `aws-iam-role` Component. You may also want an AWS DynamoDB table to use with your Express Component, via the `aws-dynamodb` Component. You can initialize and deploy them just like the express component. You can then use them with your `express` Component, like this:
 
 ```yaml
 org: your-org # Your Org
