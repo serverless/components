@@ -12,6 +12,7 @@ const AdmZip = require('adm-zip');
 const got = require('got');
 const { ServerlessSDK } = require('@serverless/platform-client-china');
 const spawn = require('child-process-ext/spawn');
+const { parseYaml, saveYaml } = require('./utils');
 
 const pipeline = promisify(require('stream.pipeline-shim'));
 
@@ -43,7 +44,7 @@ async function unpack(cli, dir) {
   return null;
 }
 
-const initTemplateFromCli = async (targetPath, packageName, registryPackage, cli) => {
+const initTemplateFromCli = async (targetPath, packageName, registryPackage, cli, appName) => {
   cli.sessionStatus('Fetching template from registry', packageName);
   const tmpFilename = path.resolve(path.basename(registryPackage.downloadKey));
   await pipeline(got.stream(registryPackage.downloadUrl), fs.createWriteStream(tmpFilename));
@@ -58,6 +59,21 @@ const initTemplateFromCli = async (targetPath, packageName, registryPackage, cli
     const unlink = promisify(fs.unlink);
     await unlink(tmpFilename);
   }
+
+  cli.sessionStatus('app.YAML processd');
+  const serverlessFilePath = path.resolve(targetPath, 'serverless.yml');
+  if (!(await fse.existsSync(serverlessFilePath))) {
+    await fse.createFile(serverlessFilePath);
+  }
+  const serverlessFile = await parseYaml(serverlessFilePath);
+  cli.log(serverlessFile);
+  if (appName) {
+    serverlessFile.app = appName;
+  }
+
+  await saveYaml(serverlessFilePath, serverlessFile);
+
+  cli.sessionStatus('app.YAML processd end');
 
   cli.sessionStatus('Setting up your new app');
   await unpack(cli, targetPath);
@@ -103,7 +119,7 @@ const init = async (config, cli) => {
     const envConfig = `component: ${packageName}\nname: ${targetName}\ninputs:\n`;
     await fse.writeFile(envDestination, envConfig);
   } else {
-    await initTemplateFromCli(targetPath, packageName, registryPackage, cli);
+    await initTemplateFromCli(targetPath, packageName, registryPackage, cli, targetName);
   }
 
   cli.log(`- Successfully created "${targetName}" in the current working directory.`);
