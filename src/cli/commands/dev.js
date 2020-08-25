@@ -135,6 +135,9 @@ module.exports = async (config, cli) => {
           if (log.type === 'debug' || log.type === 'stderr') {
             type = 'log - debug';
           }
+          if (log.type === 'info') {
+            type = 'log - info';
+          }
           if (log.type === 'warn') {
             type = 'log - warn';
           }
@@ -152,7 +155,7 @@ module.exports = async (config, cli) => {
           if (log.type === 'log' || log.type === 'stdout') {
             cli.log(log.data);
           }
-          if (log.type === 'debug' || log.type === 'stderr') {
+          if (log.type === 'debug' || log.type === 'info' || log.type === 'stderr') {
             cli.log(log.data);
           }
           if (log.type === 'warn') {
