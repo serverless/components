@@ -26,6 +26,22 @@ jobs:
           node-version: 14.x
           registry-url: https://registry.npmjs.org
 
+      - name: Retrieve dependencies from cache
+        id: cacheNpm
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: npm-v14-${{ runner.os }}-refs/heads/master-${{ hashFiles('package.json') }}
+          restore-keys: npm-v14-${{ runner.os }}-refs/heads/master-
+
+      - name: Install dependencies
+        if: steps.cacheNpm.outputs.cache-hit != 'true'
+        run: |
+          npm update --no-save
+          npm update --save-dev --no-save
+
       - name: Publish new version
         run: |
           npm publish
