@@ -9,6 +9,7 @@
   "publishConfig": {
     "access": "public"
   },
+  "repository": "serverless/components",
   "scripts": {
     "lint": "eslint .",
     "lint:updated": "pipe-git-updated --ext=js -- eslint",
