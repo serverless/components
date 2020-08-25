@@ -6,6 +6,7 @@ const { init } = require('./init');
 const dev = require('./dev');
 const registry = require('./registry');
 const help = require('./help');
+const param = require('./param');
 
 module.exports = {
   run,
@@ -14,4 +15,5 @@ module.exports = {
   dev,
   registry,
   help,
+  param,
 };
