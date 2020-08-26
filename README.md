@@ -182,8 +182,6 @@ inputs: # The configuration the Component accepts
   domain: mystore.com
 ```
 
-Check out these [templates](./templates) for more use-cases.
-
 ### Instant Deployments
 
 Serverless Components that deploy instantly, removing the need to emulate cloud services locally for fast feedback during the development process.
