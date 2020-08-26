@@ -467,7 +467,7 @@ inputs:
   name: ${org}-api # Results in "acme-api"
 ```
 
-**Note:** If you didn't specify an `org`, the default `org` would be the first org you craeted when you first signed up. You can always overwrite the default `org` or the one specified in `serverless.yml` by passing the `--org` option on deploy:
+**Note:** If you didn't specify an `org`, the default `org` would be the first org you created when you first signed up. You can always overwrite the default `org` or the one specified in `serverless.yml` by passing the `--org` option on deploy:
 
 ```
 $ serverless deploy --org my-other-org
