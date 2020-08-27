@@ -98,7 +98,7 @@ To get started with Serverless Components, install the latest version of the [Se
 $ npm i -g serverless
 ```
 
-After installation, run `serverless registry` to see many Component-based templates you can deploy, or see more in the [Serverless Framework Dashboard](https://app.serverless.com).  These contain Components as well as boilerplate code, to get you started quickly.
+After installation, run `serverless registry` to see many Component-based templates you can deploy, or see more in the [Serverless Framework Dashboard](https://app.serverless.com). These contain Components as well as boilerplate code, to get you started quickly.
 
 Install anything from the registry via `$ serverless init <template>`, like this:
 
@@ -382,6 +382,37 @@ Components could access these AWS credentials using `this.credentials.aws`. This
 ```
 
 **Note:** For AWS, if no `.env` file was found in the current working directory or immediate parent directory, the CLI will attempt to get the credentials from AWS's shared credentials file (typically at `~/.aws/credentials`) as a fallback according to your `AWS_DEFAULT_PROFILE` or `AWS_PROFILE` environment variables, just like how it works on the AWS SDK.
+
+#### AWS Profile with AssumeRole
+
+```bash
+AWS_PROFILE=myprofile
+```
+
+The CLI will check AWS's shared credentials file (typically at `~/.aws/credentials`) for 'role_arn' and 'source_profile' configuration for provided profile
+and assume that role using [AWS STS API](https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html). AWS's shared credentials should look like this:
+
+```
+[mycompanyprofile]
+aws_access_key_id = xxxxxxxxxxxxxxxxxxxx
+aws_secret_access_key = xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+[myprofile]
+role_arn = arn:aws:iam::000000000000:role/MyOrganizationAccountAccessRole
+source_profile = mycompanyprofile
+```
+
+Components could access AWS credentials using `this.credentials.aws` with the addition of 'sessionToken' property. This object would look like this:
+
+```js
+{
+  accessKeyId: '123456789',
+  secretAccessKey: '123456789',
+  sessionToken: '123456789AAAAAAAAAAAAAAAAAAAAAAAA',
+}
+```
+
+**Note:** These credentials are temporary by default 3600 seconds. This value can be configured via `AWS_ROLE_SESSION_DURATION` environment variable. The minimum value is 900 and the maximum is 43200.
 
 #### Google Credentials
 
@@ -1237,7 +1268,7 @@ Starts DEV MODE, which watches the Component for changes, auto-deploys on change
 
 A `serverless.yml` file can only hold 1 Component at this time. However, that does not mean you cannot deploy/remove multiple Components at the same time.
 
-Simply navigate to a parent directory, and run `serverless deploy` to deploy any `serverless.yml` files in immediate subfolders. When this happens, the Serverless Framework will quickly create a graph based on the references your Component apps are making to eachother. Depending on those references, it will prioritize what needs to be deployed first, otherwise its default is to deploy things in parallel.  This also works for `serverless remove`.
+Simply navigate to a parent directory, and run `serverless deploy` to deploy any `serverless.yml` files in immediate subfolders. When this happens, the Serverless Framework will quickly create a graph based on the references your Component apps are making to eachother. Depending on those references, it will prioritize what needs to be deployed first, otherwise its default is to deploy things in parallel. This also works for `serverless remove`.
 
 For context, here is why we designed `serverless.yml` to only hold 1 Component at a time:
 
