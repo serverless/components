@@ -46,7 +46,6 @@ $ npx serverless init graphql-starter
   - [Actions, Inputs & Outputs](#actions-inputs--outputs)
   - [Deploying](#deploying)
   - [State](#state)
-  - [Outputs](#outputs)
   - [Credentials](#credentials)
     - [AWS Credentials](#aws-credentials)
     - [Google Credentials](#google-credentials)
