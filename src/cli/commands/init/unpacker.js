@@ -1,7 +1,12 @@
 'use strict';
 const fs = require('fs-extra');
 const spawn = require('child-process-ext/spawn');
-const { writeMainAttrs, getServerlessFilePath } = require('../../serverlessFile');
+const {
+  writeMainAttrs,
+  getServerlessFilePath,
+  rootServerlessFileExists,
+  createRootServerlessFile,
+} = require('../../serverlessFile');
 const path = require('path');
 const {
   legacyLoadComponentConfig,
@@ -64,15 +69,22 @@ class Unpacker {
         await spawn('npm', ['install'], { cwd: dir });
       }
 
-      // Writes the tenantName and serviceName to the serverless.y(a)ml file
-      // If projectType === v1
       if (!runningTemplate(dir)) {
         if (this.isComponents(dir)) {
-          await writeMainAttrs(this.cli, dir, this.tenantName, this.serviceName);
+          // components service
+          if (!rootServerlessFileExists(dir)) {
+            // single component template that does not have a parent
+            await writeMainAttrs(this.cli, dir, this.tenantName, this.serviceName);
+          }
         } else {
+          // v1 service
           await writeMainAttrs(this.cli, dir, this.tenantName, this.serviceName, this.serviceName);
         }
+      } else {
+        // create root level serverless file if running templates
+        await createRootServerlessFile(dir, this.serviceName, this.serviceName, this.tenantName);
       }
+
       const files = await fs.readdir(dir);
       await Promise.all(
         files.map(async (file) => {
