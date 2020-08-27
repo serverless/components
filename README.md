@@ -322,9 +322,9 @@ You can deploy Components easily via the Serverless Framework with the `$ server
 $ serverless deploy
 ```
 
-While Serverless Components deploy incredibly fast, please note that first deployments can often be 2x slower because creating cloud resources takes a lot longer than updating them.
+This command can be run in any directory containing a valid components `serverless.yml` as shown above. You can also run `serverless deploy` in any directory that contains multiple component directories, in which case it would deploy all these components in parallel whenever possible according to their output variable dependencies. If you'd like to make sure all these related components deploy to the same org, app & stage, you can create a `serverless.yml` file at the parent level that includes these properties. The [`fullstack-app`](https://github.com/serverless-components/fullstack-app) template is a good example for all of this.
 
-Also note that some resources take a few minutes to be availbale. For example, APIs and Website URLs may take 1-2 minutes before they are available.
+While Serverless Components deploy incredibly fast, please note that first deployments can often be 2x slower because creating cloud resources takes a lot longer than updating them. Also note that some resources take a few minutes to be availbale. For example, APIs and Website URLs may take 1-2 minutes before they are available.
 
 ### State
 
