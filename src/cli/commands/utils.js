@@ -165,6 +165,9 @@ const loadAwsCredentials = async () => {
 
     if (!sourceCredentials) return;
 
+    // retrieve session duration configuration
+    const durationSeconds = process.env.AWS_ROLE_SESSION_DURATION || 3600;
+
     // assume profile role and retrieve credentials
     const timestamp = new Date().getTime();
     const stsResponse = await awsRequest(
@@ -174,6 +177,7 @@ const loadAwsCredentials = async () => {
         'Version=2011-06-15',
         `RoleSessionName=serverless-components-${timestamp}`,
         `RoleArn=${credentials.role_arn}`,
+        `DurationSeconds=${durationSeconds}`,
       ].join('&'),
       {
         accessKeyId: sourceCredentials.aws_access_key_id,
