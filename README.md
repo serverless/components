@@ -412,7 +412,7 @@ Components could access AWS credentials using `this.credentials.aws` with the ad
 }
 ```
 
-**Note:** These credentials are temporary by default 3600 seconds. This value can be configured via `AWS_ROLE_SESSION_DURATION` environment variable. The minimum value is 900 and the maximum is 43200.
+**Note:** These credentials are temporary, by default they last 3600 seconds. This value can be configured via `AWS_ROLE_SESSION_DURATION` environment variable. The minimum value is 900 and the maximum is 43200.
 
 #### Google Credentials
 
