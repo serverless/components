@@ -657,7 +657,7 @@ class MyComponent extends Component {
 module.exports = MyComponent;
 ```
 
-**Note:** You do NOT need to install the `@serverless/core` package via npm. This package is automatically available to you on the Cloud runtime.
+**Note:** You do NOT need to install the `@serverless/core` package via npm. This package is automatically available to you in the cloud environment.
 
 `deploy()` is always required. It is where the logic resides in order for your Component to _make_ something. Whenever you run the `$ serverless deploy` command, it's always calling the `deploy()` method.
 
