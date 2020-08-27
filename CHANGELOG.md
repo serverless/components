@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.34.8](https://github.com/serverless/components/compare/v2.34.7...v2.34.8) (2020-08-27)
+
+- Feature: When users in China init or use cli onboarding to create a new serverless project, the cli will repopulate the name variable into the app field of the yaml file.
+
 ### [2.34.7](https://github.com/serverless/components/compare/v2.34.6...v2.34.7) (2020-08-21)
 
 - Dev Mode Fix: Fixes a bug that did not remove the agent from user applications when they disable Dev Mode. Since the agent was still running in prod apps, it was causing slow performance due to log/error streaming.

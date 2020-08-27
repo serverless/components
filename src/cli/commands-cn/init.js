@@ -66,7 +66,6 @@ const initTemplateFromCli = async (targetPath, packageName, registryPackage, cli
     await fse.createFile(serverlessFilePath);
   }
   const serverlessFile = await parseYaml(serverlessFilePath);
-  cli.log(serverlessFile);
   if (appName) {
     serverlessFile.app = appName;
   }
