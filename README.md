@@ -372,6 +372,37 @@ Components could access these AWS credentials using `this.credentials.aws`. This
 
 **Note:** For AWS, if no `.env` file was found in the current working directory or immediate parent directory, the CLI will attempt to get the credentials from AWS's shared credentials file (typically at `~/.aws/credentials`) as a fallback according to your `AWS_DEFAULT_PROFILE` or `AWS_PROFILE` environment variables, just like how it works on the AWS SDK.
 
+#### AWS Profile with AssumeRole
+
+```bash
+AWS_PROFILE=myprofile
+```
+
+The CLI will check AWS's shared credentials file (typically at `~/.aws/credentials`) for 'role_arn' and 'source_profile' configuration for provided profile
+and assume that role using [AWS STS API](https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html). AWS's shared credentials should look like this:
+
+```
+[mycompanyprofile]
+aws_access_key_id = xxxxxxxxxxxxxxxxxxxx
+aws_secret_access_key = xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+[myprofile]
+role_arn = arn:aws:iam::000000000000:role/MyOrganizationAccountAccessRole
+source_profile = mycompanyprofile
+```
+
+Components could access AWS credentials using `this.credentials.aws` with the addition of 'sessionToken' property. This object would look like this:
+
+```js
+{
+  accessKeyId: '123456789',
+  secretAccessKey: '123456789',
+  sessionToken: '123456789AAAAAAAAAAAAAAAAAAAAAAAA',
+}
+```
+
+**Note:** These credentials are temporary, by default they last 3600 seconds (60 minutes). This value can be configured via `AWS_ROLE_SESSION_DURATION` environment variable. The minimum value is 900 (15 minutes) and the maximum is 43200 (12 hours).
+
 #### Google Credentials
 
 ```bash

@@ -36,7 +36,7 @@ const sleep = async (wait) => new Promise((resolve) => setTimeout(() => resolve(
 const fileExistsSync = (filePath) => {
   try {
     const stats = fse.lstatSync(filePath);
-    return stats.isFile();
+    return stats.isFile() || stats.isSymbolicLink();
   } catch (e) {
     return false;
   }
@@ -49,7 +49,7 @@ const fileExistsSync = (filePath) => {
 const fileExists = async (filePath) => {
   try {
     const stats = await fse.lstat(filePath);
-    return stats.isFile();
+    return stats.isFile() || stats.isSymbolicLink();
   } catch (error) {
     return false;
   }

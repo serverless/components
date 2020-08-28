@@ -7,6 +7,7 @@
 const args = require('minimist')(process.argv.slice(2));
 const path = require('path');
 const os = require('os');
+const https = require('https');
 const {
   readConfigFile,
   writeConfigFile,
@@ -26,6 +27,50 @@ const {
   loadInstanceConfigUncached,
   resolveVariables,
 } = require('../utils');
+
+/*
+ * AWS request signer
+ */
+const aws4 = require('aws4');
+
+/**
+ * Execute AWS API request
+ * @param {string} service AWS service identifier, example (sts, sqs, ec2..)
+ * @param {string} requestPath AWS API path with parameters
+ * @param {string} credentials.accessKeyId AWS access key id
+ * @param {string} credentials.secretAccessKey AWS secret access key
+ */
+const awsRequest = async (service, requestPath, { accessKeyId, secretAccessKey }) => {
+  // aws4 will sign an options object as you'd pass to https.request, with an AWS service
+  const opts = { service, path: requestPath };
+
+  // aws4.sign() will sign and modify these options, ready to pass to https.request
+  aws4.sign(opts, { accessKeyId, secretAccessKey });
+
+  // set JSON as response type
+  opts.headers.Accept = 'application/json';
+
+  // execute HTTP request
+  return new Promise((resolve, reject) => {
+    const req = https.request(opts, (resp) => {
+      let data = '';
+
+      resp.on('data', (chunk) => {
+        data += chunk;
+      });
+
+      resp.on('end', () => {
+        resolve(JSON.parse(data));
+      });
+    });
+
+    req.on('error', (err) => {
+      reject(err);
+    });
+
+    req.end();
+  });
+};
 
 /**
  * Get the URL of the Serverless Framework Dashboard
@@ -80,7 +125,7 @@ const getDefaultOrgName = async () => {
 /**
  * Load AWS credentials from the aws credentials file
  */
-const loadAwsCredentials = () => {
+const loadAwsCredentials = async () => {
   const awsCredsInEnv = process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY;
 
   if (awsCredsInEnv) {
@@ -114,6 +159,50 @@ const loadAwsCredentials = () => {
 
   if (!credentials) return;
 
+  // check if profile use assume role
+  if (credentials.source_profile && credentials.role_arn) {
+    const sourceCredentials = parsedCredentialsFile[credentials.source_profile];
+
+    if (!sourceCredentials) return;
+
+    // retrieve session duration configuration
+    const durationSeconds = process.env.AWS_ROLE_SESSION_DURATION || 3600;
+
+    // assume profile role and retrieve credentials
+    const timestamp = new Date().getTime();
+    const stsResponse = await awsRequest(
+      'sts',
+      [
+        '/?Action=AssumeRole',
+        'Version=2011-06-15',
+        `RoleSessionName=serverless-components-${timestamp}`,
+        `RoleArn=${credentials.role_arn}`,
+        `DurationSeconds=${durationSeconds}`,
+      ].join('&'),
+      {
+        accessKeyId: sourceCredentials.aws_access_key_id,
+        secretAccessKey: sourceCredentials.aws_secret_access_key,
+      }
+    );
+
+    // check anc parse response
+    if (
+      !stsResponse.AssumeRoleResponse ||
+      !stsResponse.AssumeRoleResponse.AssumeRoleResult ||
+      !stsResponse.AssumeRoleResponse.AssumeRoleResult.Credentials
+    ) {
+      return;
+    }
+    const temporaryCredentials = stsResponse.AssumeRoleResponse.AssumeRoleResult.Credentials;
+
+    // set assumed role credentials in the env to pass it to the sdk
+    process.env.AWS_ACCESS_KEY_ID = temporaryCredentials.AccessKeyId;
+    process.env.AWS_SECRET_ACCESS_KEY = temporaryCredentials.SecretAccessKey;
+    process.env.AWS_SESSION_TOKEN = temporaryCredentials.SessionToken;
+
+    return;
+  }
+
   // set the credentials in the env to pass it to the sdk
   process.env.AWS_ACCESS_KEY_ID = credentials.aws_access_key_id;
   process.env.AWS_SECRET_ACCESS_KEY = credentials.aws_secret_access_key;
@@ -124,9 +213,9 @@ const loadAwsCredentials = () => {
  * @param {*} stage
  */
 
-const loadInstanceCredentials = () => {
+const loadInstanceCredentials = async () => {
   // load aws credentials if found
-  loadAwsCredentials();
+  await loadAwsCredentials();
 
   // Known Provider Environment Variables and their SDK configuration properties
   const providers = {};
