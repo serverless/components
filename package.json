@@ -60,7 +60,6 @@
     "prettyoutput": "^1.2.0",
     "ramda": "^0.26.1",
     "semver": "^7.3.2",
-    "stream.pipeline-shim": "^1.1.0",
     "strip-ansi": "^5.2.0",
     "traverse": "^0.6.6",
     "uuid": "^3.4.0",
@@ -73,5 +72,8 @@
     "git-list-updated": "^1.2.1",
     "github-release-from-cc-changelog": "^2.2.0",
     "prettier": "^2.0.5"
+  },
+  "engines": {
+    "node": ">=10.0"
   }
 }

@@ -8,13 +8,14 @@ const fs = require('fs');
 const fse = require('fs-extra');
 const { promisify } = require('util');
 const path = require('path');
+const stream = require('stream');
 const AdmZip = require('adm-zip');
 const got = require('got');
 const { ServerlessSDK } = require('@serverless/platform-client-china');
 const spawn = require('child-process-ext/spawn');
 const { parseYaml, saveYaml } = require('./utils');
 
-const pipeline = promisify(require('stream.pipeline-shim'));
+const pipeline = promisify(stream.pipeline);
 
 async function unpack(cli, dir) {
   if (await fse.exists(path.resolve(dir, 'package.json'))) {
@@ -52,13 +53,7 @@ const initTemplateFromCli = async (targetPath, packageName, registryPackage, cli
   cli.sessionStatus('Unpacking your new app', packageName);
   const zip = new AdmZip(tmpFilename);
   zip.extractAllTo(targetPath);
-  // Need to polyfill this promise feature for support of nodejs>=8
-  if (fs.promises) {
-    await fs.promises.unlink(tmpFilename);
-  } else {
-    const unlink = promisify(fs.unlink);
-    await unlink(tmpFilename);
-  }
+  await fs.promises.unlink(tmpFilename);
 
   cli.sessionStatus('app.YAML processd');
   const serverlessFilePath = path.resolve(targetPath, 'serverless.yml');
