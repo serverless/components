@@ -29,6 +29,18 @@ const deploy = async (sdk, cli, instanceYaml, instanceCredentials, options = {})
     cli.logError(error);
   }
 
+  const d = new Date();
+  const header = `${d.toLocaleTimeString()} - ${instanceYaml.name} - deployment`;
+
+  cli.log();
+  cli.log(header, 'grey');
+
+  if (result.outputs) {
+    cli.logOutputs(result.outputs);
+  }
+
+  cli.sessionStatus('Watching');
+
   return result;
 };
 
@@ -101,15 +113,6 @@ module.exports = async (config, cli) => {
 
   const onEvent = (event) => {
     const d = new Date();
-
-    // Deployment
-    if (event.event === 'instance.deployment.succeeded') {
-      const header = `${d.toLocaleTimeString()} - ${event.instance_name} - deployment`;
-      cli.log();
-      cli.log(header, 'grey');
-      cli.logOutputs(event.data.outputs);
-      cli.sessionStatus('Watching');
-    }
 
     // Logs
     if (event.event === 'instance.logs') {
