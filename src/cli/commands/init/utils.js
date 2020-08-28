@@ -3,9 +3,9 @@ const fs = require('fs-extra');
 const got = require('got');
 const { promisify } = require('util');
 const path = require('path');
-const pipelineShim = require('stream.pipeline-shim');
+const stream = require('stream');
 
-const pipeline = promisify(pipelineShim);
+const pipeline = promisify(stream.pipeline);
 
 /**
  * Downloads a zip file into `template.zip`

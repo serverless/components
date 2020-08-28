@@ -58,8 +58,8 @@ jobs:
             npx dump-release-notes-from-cc-changelog $NEW_VERSION
           fi
 
-  Nodejs8Support:
-    name: 'Node.js v8: Support check'
+  Nodejs10Support:
+    name: 'Node.js v10: Support check'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -72,15 +72,15 @@ jobs:
           path: |
             ~/.npm
             node_modules
-          key: npm-v8-${{ runner.os }}-${{ github.ref }}-${{ hashFiles('package.json') }}
+          key: npm-v10-${{ runner.os }}-${{ github.ref }}-${{ hashFiles('package.json') }}
           restore-keys: |
-            npm-v8-${{ runner.os }}-${{ github.ref }}-
-            npm-v8-${{ runner.os }}-refs/heads/master-
+            npm-v10-${{ runner.os }}-${{ github.ref }}-
+            npm-v10-${{ runner.os }}-refs/heads/master-
 
       - name: Install Node.js and npm
         uses: actions/setup-node@v1
         with:
-          node-version: 8.x
+          node-version: 10.x
 
       - name: Install prod dependencies
         if: steps.cacheNpm.outputs.cache-hit != 'true'
