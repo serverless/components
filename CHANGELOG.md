@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.0](https://github.com/serverless/components/compare/v2.34.9...v3.0.0) (2020-08-28)
+
+### ⚠ BREAKING CHANGES
+
+- Node.js version below v10 are no longer supported
+
+### Features
+
+- Drop support for Node.js versions below v10 ([3afcc20](https://github.com/serverless/components/commit/3afcc209e043ae817511e0b5c462c79856f75490))
+
 ### [2.34.9](https://github.com/serverless/components/compare/v2.34.8...v2.34.9) (2020-08-28)
 
 - Bug fix: Fix dev mode deployment outputs
