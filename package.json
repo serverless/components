@@ -66,7 +66,7 @@
     "ws": "^7.3.1"
   },
   "devDependencies": {
-    "@serverless/eslint-config": "^2.2.0",
+    "@serverless/eslint-config": "^3.0.0",
     "eslint": "^6.8.0",
     "eslint-plugin-import": "^2.22.0",
     "git-list-updated": "^1.2.1",
