@@ -22,7 +22,9 @@ const projectTypeChoice = async (choices) =>
       name: 'projectType',
       source: async (_, input) => {
         if (input) {
-          return choices.filter((choice) => choice.name.includes(input));
+          return choices.filter((choice) =>
+            choice.name.toLowerCase().includes(input.toLowerCase())
+          );
         }
         return choices.slice(0, 6); // default to show the first 6 items
       },
