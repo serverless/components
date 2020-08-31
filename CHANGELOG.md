@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.1.0](https://github.com/serverless/components/compare/v3.0.0...v3.1.0) (2020-08-31)
+
+- Feature: Users in China can search case-insensitive name of components onboarding
+
 ## [3.0.0](https://github.com/serverless/components/compare/v2.34.9...v3.0.0) (2020-08-28)
 
 ### ⚠ BREAKING CHANGES
