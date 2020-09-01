@@ -381,10 +381,12 @@ const loadInstanceConfigUncached = (directoryPath) => {
     instanceFile.stage = 'dev';
   }
 
-  // inherit app property from parent if exists
+  // inherit properties from parent if they exist
   const parentConfigFile = loadParentConfigFile(directoryPath);
-  if (parentConfigFile && parentConfigFile.app) {
-    instanceFile.app = parentConfigFile.app;
+  if (parentConfigFile) {
+    instanceFile.app = parentConfigFile.app || instanceFile.app;
+    instanceFile.stage = parentConfigFile.stage || instanceFile.stage;
+    instanceFile.org = parentConfigFile.org || instanceFile.org;
   }
 
   // If no app, set it from the "name" property
