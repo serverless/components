@@ -157,8 +157,9 @@ const loadAwsCredentials = async () => {
   // get the credentials for that profile
   const credentials = parsedCredentialsFile[awsCredentialsProfile];
 
-  if (!credentials) return;
-
+  if (!credentials) {
+    throw new Error('Missing credentials. Please to create a .env file');
+  }
   // check if profile use assume role
   if (credentials.source_profile && credentials.role_arn) {
     const sourceCredentials = parsedCredentialsFile[credentials.source_profile];
