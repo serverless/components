@@ -163,7 +163,7 @@ module.exports = async (config, cli) => {
   let instanceYaml = await utils.loadInstanceConfig(instanceDir);
 
   // Load Instance Credentials
-  const instanceCredentials = await utils.loadInstanceCredentials(instanceYaml.stage);
+  const instanceCredentials = utils.loadInstanceCredentials();
 
   const sdk = new ServerlessSDK({
     context: {

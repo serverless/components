@@ -44,7 +44,7 @@ module.exports = async (config, cli, command) => {
   cli.sessionStatus('Initializing', instanceYaml.name);
 
   // Load Instance Credentials
-  const instanceCredentials = await utils.loadInstanceCredentials(instanceYaml.stage);
+  const instanceCredentials = utils.loadInstanceCredentials();
 
   // initialize SDK
   const orgUid = await tencentUtils.getOrgId();
