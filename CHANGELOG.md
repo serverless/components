@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## [3.1.1](https://github.com/serverless/components/compare/v3.1.0...v3.1.1) (2020-08-31)
 
-- Bug Fix: As long as any config file existed(`yml` or `yaml` extension name), cli will write the name back to the origin file or create a new `yml` file
+- Bug Fix: As long as any config file existed(`yml` or `yaml` extension name), cli will write the name back to the origin file or create a new `yml` file for users in China
 
 ## [3.1.0](https://github.com/serverless/components/compare/v3.0.0...v3.1.0) (2020-08-31)
 
