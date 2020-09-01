@@ -329,6 +329,13 @@ const loadVendorInstanceConfig = async (directoryPath, options = { disableCache:
     }
   }
 
+  // give early feedback to people who are trying to use plugins with components
+  if (instanceFile.plugins) {
+    throw new Error(
+      'Serverless Framework plugins are not support by Serverless Components. Please remove the "plugins" property and try again'
+    );
+  }
+
   return instanceFile;
 };
 
