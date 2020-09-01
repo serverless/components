@@ -56,9 +56,16 @@ const initTemplateFromCli = async (targetPath, packageName, registryPackage, cli
   await fs.promises.unlink(tmpFilename);
 
   cli.sessionStatus('app.YAML processd');
-  const serverlessFilePath = path.resolve(targetPath, 'serverless.yml');
+  let serverlessFilePath = path.resolve(targetPath, 'serverless.yaml');
+
+  // Both yaml and yml is valid config file, if neither of them exist, create a new yml file
   if (!(await fse.existsSync(serverlessFilePath))) {
-    await fse.createFile(serverlessFilePath);
+    const serverlessYmlFilePath = path.resolve(targetPath, 'serverless.yml');
+    if (await fse.existsSync(serverlessYmlFilePath)) {
+      serverlessFilePath = serverlessYmlFilePath;
+    } else {
+      await fse.createFile(serverlessFilePath);
+    }
   }
   const serverlessFile = await parseYaml(serverlessFilePath);
   if (appName) {
