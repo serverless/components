@@ -164,10 +164,13 @@ const resolveContentWithType = (content) => {
  * This currently supports only ${env}.  All others should be resolved within the deployment engine.
  * @param {*} inputs
  */
-const resolveVariables = (inputs) => {
+const resolveVariables = (inputs, needStrongType = false) => {
   const regex = /\${(\w*:?[\w\d.-]+)}/g;
   let variableResolved = false;
-  const parsedTypeEnv = resolveContentWithType(JSON.parse(JSON.stringify(process.env)));
+  const parsedTypeEnv = needStrongType
+    ? resolveContentWithType(JSON.parse(JSON.stringify(process.env)))
+    : process.env;
+
   const resolvedInputs = traverse(inputs).forEach(function (value) {
     const matches = typeof value === 'string' ? value.match(regex) : null;
     if (matches) {

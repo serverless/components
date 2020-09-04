@@ -91,7 +91,7 @@ const loadTencentInstanceConfig = async (directoryPath) => {
   if (instanceFile.inputs) {
     // load credentials to process .env files before resolving env variables
     await loadInstanceCredentials(instanceFile.stage);
-    instanceFile = resolveVariables(instanceFile);
+    instanceFile = resolveVariables(instanceFile, true);
     if (instanceFile.inputs.src) {
       if (typeof instanceFile.inputs.src === 'string') {
         instanceFile.inputs.src = path.resolve(directoryPath, instanceFile.inputs.src);
