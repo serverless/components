@@ -101,6 +101,64 @@ const validateAgainstV1Variables = (variable) => {
   }
 };
 
+// Resolve an object content with strong type
+const resolveContentWithType = (content) => {
+  const parseKey = (value, option = { resolveArray: false }) => {
+    // if the value is wrapped in bacticks e.g. (`value`) then just return its value
+    if (
+      value.toString().indexOf('`') === 0 &&
+      value.toString().lastIndexOf('`') === value.toString().length - 1
+    ) {
+      return value.toString().substring(1, value.toString().length - 1);
+    }
+
+    // if the value ends in an asterisk then just return its value
+    if (
+      value.toString().lastIndexOf('*') === value.toString().length - 1 &&
+      value.toString().indexOf(',') === -1
+    ) {
+      return value.toString().substring(0, value.toString().length - 1);
+    }
+
+    // Boolean
+    if (value.toString().toLowerCase() === 'true' || value.toString().toLowerCase() === 'false') {
+      return value.toString().toLowerCase() === 'true';
+    }
+
+    // Number
+    if (!isNaN(value)) {
+      return Number(value);
+    }
+
+    // null
+    if (value === 'null') {
+      return null;
+    }
+
+    // undefined
+    if (value === 'undefined') {
+      return undefined;
+    }
+
+    // Array
+    if (option.resolveArray && value.indexOf(',') !== -1) {
+      return value
+        .split(',')
+        .filter((str) => str !== '')
+        .map(parseKey);
+    }
+
+    return value;
+  };
+
+  Object.keys(content).forEach((key) => {
+    if (content[key]) {
+      content[key] = parseKey(content[key]);
+    }
+  });
+
+  return content;
+};
 /**
  * Resolves any variables that require resolving before the engine.
  * This currently supports only ${env}.  All others should be resolved within the deployment engine.
@@ -109,6 +167,7 @@ const validateAgainstV1Variables = (variable) => {
 const resolveVariables = (inputs) => {
   const regex = /\${(\w*:?[\w\d.-]+)}/g;
   let variableResolved = false;
+  const parsedTypeEnv = resolveContentWithType(JSON.parse(JSON.stringify(process.env)));
   const resolvedInputs = traverse(inputs).forEach(function (value) {
     const matches = typeof value === 'string' ? value.match(regex) : null;
     if (matches) {
@@ -119,12 +178,12 @@ const resolveVariables = (inputs) => {
         // Search for ${env:}
         if (/\${env:(\w*[\w.-_]+)}/g.test(match)) {
           const referencedPropertyPath = match.substring(2, match.length - 1).split(':');
-          newValue = process.env[referencedPropertyPath[1]];
+          newValue = parsedTypeEnv[referencedPropertyPath[1]];
           variableResolved = true;
           if (match === value) {
-            newValue = process.env[referencedPropertyPath[1]];
+            newValue = parsedTypeEnv[referencedPropertyPath[1]];
           } else {
-            newValue = value.replace(match, process.env[referencedPropertyPath[1]]);
+            newValue = value.replace(match, parsedTypeEnv[referencedPropertyPath[1]]);
           }
         }
       }
@@ -832,4 +891,5 @@ module.exports = {
   executeGraph,
   isChinaUser,
   validateNodeModules,
+  resolveContentWithType,
 };
