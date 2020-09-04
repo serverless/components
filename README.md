@@ -57,6 +57,7 @@ $ npx serverless init graphql-starter
     - [Variables: Name](#variables-name)
     - [Variables: Environment Variables](#variables-environment-variables)
     - [Variables: Outputs](#variables-outputs)
+  - [Proxy](#proxy)
 - [CLI Commands](#cli-commands)
   - [`serverless registry`](#serverless-registry)
   - [`serverless publish`](#serverless-publish)
@@ -597,6 +598,17 @@ You can access Outputs across any App, Instance, in an any Stage, within the sam
 A useful feature of this is the ability to share resources easily, and even do so across environments. This is useful when developers want to deploy a Component Instance in their own personal Stage, but access shared resources within a common "development" Stage, like a database. This way, the developers on your team do not have to recreate the entire development stage to perform their feature work or bug fix, only the Component Instance that needs changes.
 
 <br/>
+
+### Proxy
+
+Problem: your environment does not have permission to access the public network and can access the public network only through a proxy, and a network failure is reported when `sls deploy` is executed.
+<br>
+Solution: add the following configuration to the `.env` file, it needs the version of Node.js `>= 11.7.0`:
+
+```
+HTTP_PROXY=http://127.0.0.1:12345 # Your proxy
+HTTPS_PROXY=http://127.0.0.1:12345 # Your proxy
+```
 
 # CLI Commands
 
