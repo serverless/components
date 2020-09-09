@@ -8,7 +8,7 @@ const path = require('path');
 const fs = require('fs');
 const args = require('minimist')(process.argv.slice(2));
 const { utils: platformUtils } = require('@serverless/platform-client-china');
-const { loadInstanceConfig, resolveVariables } = require('../utils');
+const { loadInstanceConfig, resolveVariables, parseCliInputs } = require('../utils');
 const { mergeDeepRight } = require('ramda');
 const YAML = require('js-yaml');
 const fse = require('fs-extra');
@@ -87,6 +87,10 @@ const loadTencentInstanceConfig = async (directoryPath) => {
   if (!instanceFile.app) {
     instanceFile.app = instanceFile.name;
   }
+
+  const cliInputs = parseCliInputs();
+
+  instanceFile.inputs = mergeDeepRight(instanceFile.inputs || {}, cliInputs);
 
   if (instanceFile.inputs) {
     // load credentials to process .env files before resolving env variables

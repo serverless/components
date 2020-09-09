@@ -26,7 +26,10 @@ const {
   loadInstanceConfig,
   loadInstanceConfigUncached,
   resolveVariables,
+  parseCliInputs,
 } = require('../utils');
+
+const { mergeDeepRight } = require('ramda');
 
 /*
  * AWS request signer
@@ -310,6 +313,10 @@ const loadVendorInstanceConfig = async (directoryPath, options = { disableCache:
     instanceFile.app = args.app;
   }
 
+  const cliInputs = parseCliInputs();
+
+  instanceFile.inputs = mergeDeepRight(instanceFile.inputs || {}, cliInputs);
+
   if (instanceFile.inputs) {
     // load credentials to process .env files before resolving env variables
     await loadInstanceCredentials(instanceFile.stage);
@@ -335,6 +342,8 @@ const loadVendorInstanceConfig = async (directoryPath, options = { disableCache:
       'Serverless Framework plugins are not supported by Serverless Components. Please remove the "plugins" property and try again'
     );
   }
+
+  console.log(instanceFile.inputs);
 
   return instanceFile;
 };
