@@ -343,8 +343,6 @@ const loadVendorInstanceConfig = async (directoryPath, options = { disableCache:
     );
   }
 
-  console.log(instanceFile.inputs);
-
   return instanceFile;
 };
 
