@@ -127,6 +127,7 @@ class CLI {
     // Render error
     if (reason === 'error') {
       this.logError(messageOrError, { timer: this._.timerSeconds });
+      process.exitCode = 1;
     } else if (reason !== 'silent') {
       // Silent is used to skip the "Done" message
       // Write content
