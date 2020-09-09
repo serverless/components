@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file. See [standa
 ## [3.1.2](https://github.com/serverless/components/compare/v3.1.1...v3.1.2) (2020-09-09)
 
 - Bug Fix: Session stop with an error reason should result in an error process exit status code
+- Bug Fix: Throw error when using plugins with components
 
 ## [3.1.1](https://github.com/serverless/components/compare/v3.1.0...v3.1.1) (2020-08-31)
 
