@@ -1296,3 +1296,8 @@ This is a complete change in how Serverless Framework traditionally worked. Howe
 As of today, the Components Engine helped enable: The fastest infrastructure deployments possible, streaming logs to your CLI, streaming metrics to the [Dashboard](https://app.serverless.com), remote state storage and sharing, secrets injection, configuration validation, and so much more. Please note, this is only 25% of our vision for this effort. Otherwise known as the table-stakes features. The real thought-provoking and groundbreaking developer productivity features are coming next...
 
 Part of these features will enable greater security features than we've ever had in Serverless Framework. Features that involve making it easier to reduce the scope of your credentials, analyze/block everything passing through the Engine, rollback unsafe deployments, etc.
+
+
+### Where to find Components?
+
+Serverless components can be found in the [github.com/serverless-components](https://github.com/serverless-components).
