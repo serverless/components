@@ -131,7 +131,7 @@ module.exports = async (config, cli, command) => {
     } else if (command === 'remove') {
       cli.sessionStatus('Removing', null, 'white');
 
-      // The "inputs" in serverless.yml are only for deploy.  Remove them for all other commands
+      // The remove command does not take any inputs
       instanceYaml.inputs = {};
 
       // Set action
@@ -141,9 +141,6 @@ module.exports = async (config, cli, command) => {
     } else {
       // run a custom method synchronously to receive outputs directly
       options.sync = true;
-
-      // The "inputs" in serverless.yml are only for deploy.  Remove them for all other commands
-      instanceYaml.inputs = {};
 
       cli.sessionStatus('Running', null, 'white');
 

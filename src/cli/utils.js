@@ -806,13 +806,26 @@ const validateNodeModules = async (directory) => {
   }
 };
 
+const isJson = (str) => {
+  try {
+    JSON.parse(str);
+  } catch (e) {
+    return false;
+  }
+  return true;
+};
+
 /**
  * Parses CLI inputs in the following syntax:
  *   serverless invoke --inputs key=value foo=bar
  *
- * It automatically converts to string, boolean, number and array types.
+ * It automatically converts to string, boolean, number, array and object types.
+ *
  * In case of array, the syntax looks like this:
  *   serverless invoke --inputs names=abc,xyz
+ *
+ * In case of object, we use JSON syntax that looks like this:
+ *   serverless invoke --inputs env='{"LANG": "en"}'
  *
  * @returns Object
  */
@@ -829,6 +842,11 @@ const parseCliInputs = () => {
   // set the type of the cli input (ie. convert the string "true" to true)
   // supports strings, numbers, booleans & arrays
   const setCliInputValueType = (value) => {
+    // check if string is actually a json object and just parse it
+    if (isJson(value)) {
+      return JSON.parse(value);
+    }
+
     // check if the string is actually an array
     if (value.includes(',')) {
       value = value.split(',');
