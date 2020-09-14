@@ -26,7 +26,10 @@ const {
   loadInstanceConfig,
   loadInstanceConfigUncached,
   resolveVariables,
+  parseCliInputs,
 } = require('../utils');
+
+const { mergeDeepRight } = require('ramda');
 
 /*
  * AWS request signer
@@ -309,6 +312,10 @@ const loadVendorInstanceConfig = async (directoryPath, options = { disableCache:
   if (args.app) {
     instanceFile.app = args.app;
   }
+
+  const cliInputs = parseCliInputs();
+
+  instanceFile.inputs = mergeDeepRight(instanceFile.inputs || {}, cliInputs);
 
   if (instanceFile.inputs) {
     // load credentials to process .env files before resolving env variables

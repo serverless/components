@@ -650,6 +650,23 @@ Fetches information of an Instance of a Component.
 
 Starts DEV MODE, which watches the Component for changes, auto-deploys on changes, and (if supported by the Component) streams logs, errors and transactions to the terminal.
 
+#### `serverless <command> --inputs key=value foo=bar`
+
+Runs any component custom command, and passes inputs to it. The inputs you pass in the above syntax overwrite any inputs found in the `serverless.yml` file.
+
+Few examples:
+
+```
+# simple example
+serverless test --inputs domain=serverless.com
+
+# passing objects with JSON syntax
+serverless invoke --inputs env='{"LANG": "en"}'
+
+# passing arrays with comma seperation
+serverless backup --inputs userIds=foo,bar
+```
+
 <br/>
 
 # Building Components
