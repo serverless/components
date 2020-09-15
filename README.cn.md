@@ -1107,3 +1107,18 @@ src: # 描述项目中的哪些文件需要作为模板发布
 #### `serverless login`
 
 支持通过 login 命令，通过微信扫描二维码的方式，登录腾讯云账号并授权对关联资源进行操作。
+
+#### `serverless <command> --inputs key=value foo=bar`
+
+在运行命令时覆盖 `serverless.yml` 中的 inputs
+
+例子:
+
+```
+# 简单的例子
+serverless test --inputs domain=serverless.com
+# 传递对象: 使用 JSON 格式
+serverless invoke --inputs env='{"LANG": "en"}'
+# 传递 Array: 用逗号分隔
+serverless backup --inputs userIds=foo,bar
+```

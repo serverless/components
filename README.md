@@ -663,7 +663,7 @@ serverless test --inputs domain=serverless.com
 # passing objects with JSON syntax
 serverless invoke --inputs env='{"LANG": "en"}'
 
-# passing arrays with comma seperation
+# passing arrays with comma separation
 serverless backup --inputs userIds=foo,bar
 ```
 
