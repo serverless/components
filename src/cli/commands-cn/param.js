@@ -41,10 +41,12 @@ const runParamSet = async (config, instanceYaml, cli, sdk) => {
   const stage = config.stage || instanceYaml.stage;
   const app = config.app || instanceYaml.app;
 
-  const payload = { ...instanceYaml, stage, app, params };
+  const payload = { ...instanceYaml, stage, app, params, appName: app, stageName: stage };
   const result = await sdk.paramSet(payload);
 
-  cli.sessionStop('Param set successfully', result);
+  cli.log(`Parameters app and stage config: app:${chalk.green(app)}, stage: ${chalk.green(stage)}`);
+  cli.log(chalk.yellow(result.message));
+  cli.sessionStop('Param set stop');
 };
 
 const runParamList = async (config, instanceYaml, cli, sdk) => {
@@ -60,10 +62,13 @@ const runParamList = async (config, instanceYaml, cli, sdk) => {
   cli.sessionStart('Start to list parameter');
   const stage = config.stage || instanceYaml.stage;
   const app = config.app || instanceYaml.app;
-  const payload = { ...instanceYaml, stage, app, params };
-  const result = sdk.paramList(payload);
+  const payload = { ...instanceYaml, stage, app, params, appName: app, stageName: stage };
+  const result = await sdk.paramList(payload);
 
-  cli.sessionStop('Param set successfully', result);
+  cli.log(`Parameters app and stage config: app:${chalk.green(app)}, stage: ${chalk.green(stage)}`);
+  cli.log(result.data);
+  cli.log(`message: ${chalk.yellow(result.message)}`);
+  cli.sessionStop('Param list stop');
 };
 
 /**
