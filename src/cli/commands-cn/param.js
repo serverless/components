@@ -6,8 +6,8 @@ const utils = require('./utils');
 const { version } = require('../../../package.json');
 
 const resolveParams = (value) => {
-  if (!value) {
-    throw new Error('A name is required for param setting');
+  if (!value.length) {
+    throw new Error('At least one parameter is required for param setting');
   }
   const result = {};
   const resolveParamSet = (item) => {
@@ -22,15 +22,10 @@ const resolveParams = (value) => {
     return [paramName, paramValue];
   };
 
-  if (Array.isArray(value)) {
-    value.forEach((item) => {
-      const [paramName, paramValue] = resolveParamSet(item);
-      result[paramName] = paramValue;
-    });
-  } else {
-    const [paramName, paramValue] = resolveParamSet(value);
+  value.forEach((item) => {
+    const [paramName, paramValue] = resolveParamSet(item);
     result[paramName] = paramValue;
-  }
+  });
   return result;
 };
 
@@ -50,14 +45,7 @@ const runParamSet = async (config, instanceYaml, cli, sdk) => {
 };
 
 const runParamList = async (config, instanceYaml, cli, sdk) => {
-  let params = [];
-  if (config.name) {
-    if (Array.isArray(config.name)) {
-      params = [...config.name];
-    } else {
-      params.push(config.name);
-    }
-  }
+  const params = config.name;
 
   cli.sessionStart('Start to list parameter');
   const stage = config.stage || instanceYaml.stage;
@@ -88,6 +76,8 @@ module.exports = async (config, cli) => {
 
   await utils.login();
 
+  const name = config.params.slice(1);
+  config.name = name;
   const instanceYaml = await utils.loadInstanceConfig(instanceDir);
   // initialize SDK
   const orgUid = await tencentUtils.getOrgId();
