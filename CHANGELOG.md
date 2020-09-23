@@ -1,10 +1,10 @@
 # Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
 ## [3.2.0](https://github.com/serverless/components/compare/v3.1.5...v3.2.0) (2020-09-26)
 
 - Feature: Add parameters setting feature for Chinese users
-
 
 ### [3.1.5](https://github.com/serverless/components/compare/v3.1.4...v3.1.5) (2020-09-25)
 
@@ -16,12 +16,14 @@ All notable changes to this project will be documented in this file. See [standa
 - Upgrade `got` to v11
 - Upgrade `strip-ansi` to v6
 - Remove not used dependencies (`uuid` and `ws`)
+
 ### [3.1.4](https://github.com/serverless/components/compare/v3.1.3...v3.1.4) (2020-09-23)
 
 ### Maintanance improvements
 
 - Upgrade `@serverless/platform-client` to v2
 - Upgrade `@serverless/utils` to v2 (and drop `@serverless/inquirer` dependency)
+
 ## [3.1.3](https://github.com/serverless/components/compare/v3.1.2...v3.1.3) (2020-09-09)
 
 - Feature: Supports passing inputs via the CLI

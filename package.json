@@ -1,10 +1,6 @@
 {
   "name": "@serverless/components",
-<<<<<<< HEAD
-  "version": "3.1.5",
-=======
   "version": "3.2.0",
->>>>>>> d31075b0... update version for CLI release
   "description": "The Serverless Framework's new infrastructure provisioning technology — Build, compose, & deploy serverless apps in seconds...",
   "main": "./src/index.js",
   "bin": {
