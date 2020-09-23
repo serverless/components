@@ -2,8 +2,8 @@
 
 const path = require('path');
 const chalk = require('chalk');
-const inquirer = require('@serverless/inquirer');
-const confirm = require('@serverless/inquirer/utils/confirm');
+const inquirer = require('@serverless/utils/inquirer');
+const confirm = require('@serverless/utils/inquirer/confirm');
 const { ServerlessSDK } = require('@serverless/platform-client-china');
 const { isProjectPath } = require('../utils');
 const { initTemplateFromCli } = require('../commands-cn/init');
