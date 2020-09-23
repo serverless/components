@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.1.4](https://github.com/serverless/components/compare/v3.1.3...v3.1.4) (2020-09-23)
+
+### Maintanance improvements
+
+- Upgrade `@serverless/platform-client` to v2
+- Upgrade `@serverless/utils` to v2 (and drop `@serverless/inquirer` dependency)
+
 ## [3.1.3](https://github.com/serverless/components/compare/v3.1.2...v3.1.3) (2020-09-09)
 
 - Feature: Supports passing inputs via the CLI
