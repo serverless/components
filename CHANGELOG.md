@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.1.5](https://github.com/serverless/components/compare/v3.1.4...v3.1.5) (2020-09-25)
+
+### Maintanance improvements
+
+- Upgrade `@serverless/platform-client-china` to v2
+- Upgrade `chalk` to v4
+- Upgrade `globby` to v11
+- Upgrade `got` to v11
+- Upgrade `strip-ansi` to v6
+- Remove not used dependencies (`uuid` and `ws`)
+
 ### [3.1.4](https://github.com/serverless/components/compare/v3.1.3...v3.1.4) (2020-09-23)
 
 ### Maintanance improvements
