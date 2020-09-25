@@ -9,7 +9,7 @@ const {
   isNil,
   last,
   split,
-  merge,
+  mergeRight,
   endsWith,
   isEmpty,
   memoizeWith,
@@ -81,7 +81,7 @@ const readAndParseSync = (filePath, options = {}) => {
   if (isJsonPath(filePath)) {
     return JSON.parse(contents);
   } else if (isYamlPath(filePath)) {
-    return YAML.load(contents.toString(), merge(options, { filename: filePath }));
+    return YAML.load(contents.toString(), mergeRight(options, { filename: filePath }));
   } else if (filePath.endsWith('.slsignore')) {
     return contents.toString().split('\n');
   }
