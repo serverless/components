@@ -46,7 +46,7 @@
     "dotenv": "^8.2.0",
     "figures": "^3.2.0",
     "fs-extra": "^9.0.1",
-    "globby": "^10.0.2",
+    "globby": "^11.0.1",
     "got": "^9.6.0",
     "graphlib": "^2.1.8",
     "https-proxy-agent": "^5.0.0",
