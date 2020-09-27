@@ -65,6 +65,7 @@ $ npx serverless init graphql-starter
   - [`serverless remove`](#serverless-remove)
   - [`serverless info`](#serverless-info)
   - [`serverless dev`](#serverless-dev)
+  - [`serverless param`](#serverless-param)
 - [Building Components](#building-components)
   - [serverless.component.yml](#serverlesscomponentyml)
   - [serverless.js](#serverlessjs)
@@ -649,6 +650,26 @@ Fetches information of an Instance of a Component.
 #### `serverless dev`
 
 Starts DEV MODE, which watches the Component for changes, auto-deploys on changes, and (if supported by the Component) streams logs, errors and transactions to the terminal.
+
+#### `serverless param`-**Chinsese users only available now**
+
+User can set and list secrets value as parameters by CLI with app and stage
+
+##### Set parameters
+
+`serverless param set id=param age=12 [--app test] [--stage dev]`
+
+- User can set multiple parameters once, use `paramName=paramValue`
+- If user does not set app or stage, CLI will read from config file or use default values
+
+###### List parameters
+
+`serverless param list [--app test] [--stage dev]`
+
+- If user does not set app or stage, CLI will read from config file or use default values
+- CLI will show the all parameters for current stage and app
+
+##### [Use parameters in serverless.yml](https://www.serverless.com/framework/docs/dashboard/parameters#using-a-parameter-in-serverlessyml)
 
 #### `serverless <command> --inputs key=value foo=bar`
 

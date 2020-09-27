@@ -48,6 +48,7 @@ inputs: # 对应的组件配置
   - [环境](#环境)
   - [变量](#变量)
   - [代理](#代理)
+  - [参数](#参数)
 - [使用模板（Template）](#使用模板template)
   - [查看可使用的模板](#查看可使用的模板)
   - [从模板初始化项目](#从模板初始化项目)
@@ -595,6 +596,28 @@ inputs:
 HTTP_PROXY=http://127.0.0.1:12345 # 您的代理
 HTTPS_PROXY=http://127.0.0.1:12345 # 您的代理
 ```
+
+### 参数-**当前只中国用户可用**
+
+用户可以通过命令行为当前 app 和 stage 的敏感信息设置参数, 可以后续直接在配置文件中使用
+
+#### 参数设置
+
+`serverless param set id=param age=12 [--app test] [--stage dev]`
+
+- 用户可以一次性设置多个参数, `paramName=paramValue`
+- 用户可以显式的设置`app`和`stage`, 否则命令行则会读取配置文件中的设置或者使用默认值
+
+#### 参数展示
+
+`serverless param list [--app test] [--stage dev]`
+
+- 会返回展示当前`app`和`stage`的全部参数
+- 用户可以显式的设置`app`和`stage`, 否则命令行则会读取配置文件中的设置或者使用默认值
+
+#### 参数使用
+
+可以参考[Serverless parameters 使用文档](https://www.serverless.com/framework/docs/dashboard/parameters#using-a-parameter-in-serverlessyml)
 
 # 使用模板（Template）
 
