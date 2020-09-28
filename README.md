@@ -81,6 +81,7 @@ $ npx serverless init graphql-starter
     - [Optimize For Accessibility](#optimize-for-accessibility)
     - [No Surprise Removals](#no-surprise-removals)
     - [Write Integration Tests](#write-integration-tests)
+- [Components List](https://github.com/serverless-components/)
 - [F.A.Q.](#faq)
 
 <br/>
