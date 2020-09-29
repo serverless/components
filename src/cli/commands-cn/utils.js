@@ -224,7 +224,8 @@ const setInputsForCommand = (instanceYaml, command, config) => {
     const defaultInputs = command === 'deploy' ? instanceYaml.inputs : {};
     instanceYaml.inputs = instanceYaml.commandInputs[command] || defaultInputs;
   } else if (command !== 'deploy') {
-    // no op
+    // make src undefined, so no need to upload code for other commands
+    instanceYaml.inputs.src = undefined
   }
   // merging inputs from command args, e.g. slcc deploy --inputs.src="./new-src"
   // will be merged into inputs.src
