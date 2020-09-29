@@ -21,12 +21,13 @@ const deploy = async (sdk, cli, instanceYaml, instanceCredentials, options = {})
     result = await sdk.deploy(instanceYaml, instanceCredentials, options);
   } catch (error) {
     if (error.name === 'Invalid Component Types') {
-      error.message = `Invalid Input: ${error.message}`;
+      error.message = `Deployment failed due to invalid input: ${error.message}`;
     }
     if (error.details && error.details.repo) {
-      error.documentation = `  Documentation: ${error.details.repo}`;
+      error.documentation = error.details.repo;
     }
     cli.logError(error);
+    return null;
   }
 
   const d = new Date();
@@ -63,10 +64,18 @@ module.exports = async (config, cli) => {
     cli.sessionStatus('Disabling Dev Mode & closing', null, 'green');
 
     // Remove agent from application
-    await deploy(sdk, cli, instanceYaml, instanceCredentials); // Don't include dev flag
+    const result = await deploy(sdk, cli, instanceYaml, instanceCredentials); // Don't include dev flag
 
     await cli.watcher.close();
-    cli.sessionStop('success', 'Dev Mode closed');
+
+    if (!result) {
+      cli.sessionStop(
+        'success',
+        "Dev Mode closed, however the last deployment failed due to the above error.  Fix it and run 'serverless deploy' to ensure your service does not have issues."
+      );
+    } else {
+      cli.sessionStop('success', 'Dev Mode closed');
+    }
 
     return null;
   };
