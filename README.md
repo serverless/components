@@ -181,6 +181,9 @@ inputs: # The configuration the Component accepts
     src: ./src
     hook: npm run build
     dist: ./dist
+    env:
+      # environment variables to pass to the website build environment
+      REACT_APP_API_URL: https://api.example.com
   domain: mystore.com
 ```
 
