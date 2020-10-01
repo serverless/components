@@ -105,7 +105,7 @@ module.exports = async (config, cli, command) => {
         if (error.message.includes('401')) {
           cli.sessionStop(
             'error',
-            `Your credentials do not have access to the Organization with the name of: ${instanceYaml.org}.  Try logging into a different account.`
+            `Your credentials do not have access to the Organization with the name of: ${templateYaml.org}.  Try logging into a different account.`
           );
           return null;
         }
