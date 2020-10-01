@@ -38,7 +38,6 @@ module.exports = async (config, cli, command) => {
 
   // Get access key
   const accessKey = await getAccessKey(instanceYaml.org);
-
   const meta = `Action: "${command}" - Stage: "${instanceYaml.stage}" - Org: "${instanceYaml.org}" - App: "${instanceYaml.app}" - Name: "${instanceYaml.name}"`;
 
   // Presentation
@@ -72,33 +71,43 @@ module.exports = async (config, cli, command) => {
 
     // Connect to Serverless Platform Events, if in debug mode
     if (options.debug) {
-      await sdk.connect({
-        filter: {
-          stageName: instanceYaml.stage,
-          appName: instanceYaml.app,
-          instanceName: instanceYaml.name,
-        },
-        onEvent: (evt) => {
-          if (evt.event !== 'instance.run.logs') {
-            return;
-          }
-          if (evt.data.logs && Array.isArray(evt.data.logs)) {
-            evt.data.logs.forEach((log) => {
-              // Remove strange formatting that comes from stderr
-              if (typeof log.data === 'string' && log.data.startsWith("'")) {
-                log.data = log.data.substr(1);
-              }
-              if (typeof log.data === 'string' && log.data.endsWith("'")) {
-                log.data = log.data.substring(0, log.data.length - 1);
-              }
-              if (typeof log.data === 'string' && log.data.endsWith('\\n')) {
-                log.data = log.data.substring(0, log.data.length - 2);
-              }
-              cli.log(log.data);
-            });
-          }
-        },
-      });
+      try {
+        await sdk.connect({
+          filter: {
+            stageName: instanceYaml.stage,
+            appName: instanceYaml.app,
+            instanceName: instanceYaml.name,
+          },
+          onEvent: (evt) => {
+            if (evt.event !== 'instance.run.logs') {
+              return;
+            }
+            if (evt.data.logs && Array.isArray(evt.data.logs)) {
+              evt.data.logs.forEach((log) => {
+                // Remove strange formatting that comes from stderr
+                if (typeof log.data === 'string' && log.data.startsWith("'")) {
+                  log.data = log.data.substr(1);
+                }
+                if (typeof log.data === 'string' && log.data.endsWith("'")) {
+                  log.data = log.data.substring(0, log.data.length - 1);
+                }
+                if (typeof log.data === 'string' && log.data.endsWith('\\n')) {
+                  log.data = log.data.substring(0, log.data.length - 2);
+                }
+                cli.log(log.data);
+              });
+            }
+          },
+        });
+      } catch (error) {
+        if (error.message.includes('401')) {
+          cli.sessionStop(
+            'error',
+            `Your credentials do not have access to the Organization with the name of: ${instanceYaml.org}.  Try logging into a different account.`
+          );
+          return null;
+        }
+      }
     }
 
     /**

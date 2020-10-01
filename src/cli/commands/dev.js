@@ -230,6 +230,13 @@ module.exports = async (config, cli) => {
       onEvent,
     });
   } catch (error) {
+    if (error.message.includes('401')) {
+      cli.sessionStop(
+        'error',
+        `Your credentials do not have access to the Organization with the name of: ${instanceYaml.org}.  Try logging into a different account.`
+      );
+      return null;
+    }
     throw new Error(error);
   }
 
