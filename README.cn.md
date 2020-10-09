@@ -962,7 +962,7 @@ console.log(`Files zipped into ${zipPath}...`);
 
 ### 开发流程
 
-Serverless Components 仅能在云端运行，而不支持在本地运行。这对 Component 的用户而已有巨大的优势。同时我们也通过下面的开发流程让开发一个 Component 变得更加容易。
+Serverless Components 仅能在云端运行，而不支持在本地运行。这对 Component 的用户而言有巨大的优势。同时我们也通过下面的开发流程让开发一个 Component 变得更加容易。
 
 当你新增或者更新 Serverless Components 的代码时，如果希望测试变化的部分，那么需要先发布该 Component 到云端。由于我们不希望发布的测试版本会影响到正式版本的 Component（可能有用户正在使用这些正式版本），因此当前支持直接发布 "dev" 版本的 Component，用于隔离正式环境和开发环境。
 
