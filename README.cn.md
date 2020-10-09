@@ -875,9 +875,6 @@ class MyComponent extends Component {
 module.exports = MyComponent;
 ```
 
-在
-When inside a Component method, `this` comes with utilities which you can use. Here is a guide to what's available to you within the context of a Component.
-
 在 Component 方法里，通过 this 方法指定当前的运行环境，包含了一些可用的工具。下面有一些指南可以展示出在 Component 方法中哪些语法是可用的。
 
 ```javascript
