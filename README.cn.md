@@ -875,9 +875,6 @@ class MyComponent extends Component {
 module.exports = MyComponent;
 ```
 
-在
-When inside a Component method, `this` comes with utilities which you can use. Here is a guide to what's available to you within the context of a Component.
-
 在 Component 方法里，通过 this 方法指定当前的运行环境，包含了一些可用的工具。下面有一些指南可以展示出在 Component 方法中哪些语法是可用的。
 
 ```javascript
@@ -961,11 +958,11 @@ const zipPath = await instance.zip(sourceDirectory);
 console.log(`Files zipped into ${zipPath}...`);
 ```
 
-增加 SDK 之后，可能需要再次将代码答辩上传到云服务中（例如云函数 SCF）
+增加 SDK 之后，可能需要再次将代码打包上传到云服务中（例如云函数 SCF）
 
 ### 开发流程
 
-Serverless Components 仅能在云端运行，而不支持在本地运行。这对 Component 的用户而已有巨大的优势。同时我们也通过下面的开发流程让开发一个 Component 变得更加容易。
+Serverless Components 仅能在云端运行，而不支持在本地运行。这对 Component 的用户而言有巨大的优势。同时我们也通过下面的开发流程让开发一个 Component 变得更加容易。
 
 当你新增或者更新 Serverless Components 的代码时，如果希望测试变化的部分，那么需要先发布该 Component 到云端。由于我们不希望发布的测试版本会影响到正式版本的 Component（可能有用户正在使用这些正式版本），因此当前支持直接发布 "dev" 版本的 Component，用于隔离正式环境和开发环境。
 
