@@ -958,7 +958,7 @@ const zipPath = await instance.zip(sourceDirectory);
 console.log(`Files zipped into ${zipPath}...`);
 ```
 
-增加 SDK 之后，可能需要再次将代码答辩上传到云服务中（例如云函数 SCF）
+增加 SDK 之后，可能需要再次将代码打包上传到云服务中（例如云函数 SCF）
 
 ### 开发流程
 
