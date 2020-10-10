@@ -1,3 +1,5 @@
+/* eslint no-restricted-syntax: 0 */
+
 'use strict';
 
 const { ServerlessSDK, utils: tencentUtils } = require('@serverless/platform-client-china');
