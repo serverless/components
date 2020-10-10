@@ -95,6 +95,29 @@ module.exports = async (config, cli, command) => {
     options
   );
 
+  // Check for errors
+  const succeeded = [];
+  const failed = [];
+  for (const component in allComponentsWithOutputs) {
+    if (Object.prototype.hasOwnProperty.call(allComponentsWithOutputs, component)) {
+      const c = allComponentsWithOutputs[component];
+      if (c.error) {
+        failed.push(c.name);
+      }
+      if (c.outputs) {
+        succeeded.push(c.name);
+      }
+    }
+  }
+
+  if (failed.length) {
+    cli.sessionStop(
+      'error',
+      `Errors: "${command}" ran for ${succeeded.length} apps successfully. ${failed.length} failed.`
+    );
+    return null;
+  }
+
   // don't show outputs if removing
   if (command !== 'remove') {
     const outputs = getOutputs(allComponentsWithOutputs);
@@ -108,7 +131,7 @@ module.exports = async (config, cli, command) => {
     }
   }
 
-  cli.sessionStop('success', 'Success');
+  cli.sessionStop('success', `"${command}" ran for ${succeeded.length} apps successfully.`);
 
   if (deferredNotificationsData) printNotification(cli, await deferredNotificationsData);
 
