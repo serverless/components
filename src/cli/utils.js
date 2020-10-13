@@ -163,7 +163,7 @@ const loadComponentConfig = (directoryPath) => {
     filePath = jsonFilePath;
   }
   if (!filePath) {
-    throw new Error('No serverless config file was found in the current working directory.');
+    return null;
   }
 
   // Read file
@@ -183,6 +183,54 @@ const loadComponentConfig = (directoryPath) => {
   }
 
   return componentFile;
+};
+
+/**
+ * Reads a serverless template config file in a given directory path
+ * @param {*} directoryPath
+ */
+const loadTemplateConfig = (directoryPath) => {
+  directoryPath = path.resolve(directoryPath);
+  const ymlFilePath = path.join(directoryPath, 'serverless.template.yml');
+  const yamlFilePath = path.join(directoryPath, 'serverless.template.yaml');
+  const jsonFilePath = path.join(directoryPath, 'serverless.template.json');
+  let filePath;
+  let isYaml = false;
+  let templateFile;
+
+  // Check to see if exists and is yaml or json file
+  if (fileExistsSync(ymlFilePath)) {
+    filePath = ymlFilePath;
+    isYaml = true;
+  }
+  if (fileExistsSync(yamlFilePath)) {
+    filePath = yamlFilePath;
+    isYaml = true;
+  }
+  if (fileExistsSync(jsonFilePath)) {
+    filePath = jsonFilePath;
+  }
+  if (!filePath) {
+    return null;
+  }
+
+  // Read file
+  if (isYaml) {
+    try {
+      templateFile = readAndParseSync(filePath);
+    } catch (e) {
+      // todo currently our YAML parser does not support
+      // CF schema (!Ref for example). So we silent that error
+      // because the framework can deal with that
+      if (e.name !== 'YAMLException') {
+        throw e;
+      }
+    }
+  } else {
+    templateFile = readAndParseSync(filePath);
+  }
+
+  return templateFile;
 };
 
 const getDirSize = async (p) => {
@@ -500,6 +548,7 @@ const legacyLoadComponentConfig = (directoryPath) => {
 
   return componentFile;
 };
+
 
 const possibleConfigurationFiles = [
   'serverless.yml',
@@ -891,6 +940,7 @@ module.exports = {
   pack,
   getInstanceDashboardUrl,
   loadComponentConfig,
+  loadTemplateConfig,
   loadInstanceConfig,
   loadInstanceConfigUncached,
   legacyLoadComponentConfig,

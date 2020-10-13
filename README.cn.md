@@ -1061,7 +1061,7 @@ Components 依赖云服务作为状态的来源，并用其存储状态信息。
 
 ### 如何分享（发布）项目模板
 
-要将你的基于 Serverless Component 部署的项目作为模板发布非常简单，你不需要对项目进行任何改造，只需要添加一个`serverless.yml`文件（或者修改已有的`serverless.yml`文件），在其中添加一些需要告诉注册中心的模板元信息即可。详细说明如下：
+要将你的基于 Serverless Component 部署的项目作为模板发布非常简单，你不需要对项目进行任何改造，只需要添加一个`serverless.template.yml`文件（或者修改已有的`serverless.template.yml`文件），在其中添加一些需要告诉注册中心的模板元信息即可。详细说明如下：
 
 ```yaml
 name: fullstack # 项目模板的名字
@@ -1084,7 +1084,7 @@ src: # 描述项目中的哪些文件需要作为模板发布
     - '**/package-lock.json'
 ```
 
-一旦你准备好了描述项目模板元信息的`serverless.yml`文件，便可以使用发布命令`sls publish`将此项目作为模板发布到注册中心。
+一旦你准备好了描述项目模板元信息的`serverless.template.yml`文件，便可以使用发布命令`sls publish`将此项目作为模板发布到注册中心。
 
 # CLI 命令列表
 
