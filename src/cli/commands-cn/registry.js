@@ -38,14 +38,13 @@ const publish = async (config, cli) => {
 
   let finalServerlessFile;
 
-  // Publishing a component
   if (serverlessComponentFile) {
+    // Publishing a component
     finalServerlessFile = serverlessComponentFile;
     finalServerlessFile.src = serverlessComponentFile.main;
     finalServerlessFile.type = 'component';
-
-  // Publishing a template
   } else {
+    // Publishing a template
     finalServerlessFile = serverlessTemplateFile || serverlessFile;
     finalServerlessFile.type = 'template';
     finalServerlessFile.version = '0.0.0';
@@ -65,7 +64,9 @@ const publish = async (config, cli) => {
   // Presentation
   cli.logRegistryLogo();
   cli.log(
-    `Publishing "${finalServerlessFile.name}@${config.dev ? 'dev' : finalServerlessFile.version}"...`,
+    `Publishing "${finalServerlessFile.name}@${
+      config.dev ? 'dev' : finalServerlessFile.version
+    }"...`,
     'grey'
   );
 
@@ -92,7 +93,8 @@ const publish = async (config, cli) => {
 
   cli.sessionStop(
     'success',
-    `Successfully published ${registryPackage.name}${registryPackage.type === 'template' ? '' : `@${registryPackage.version}`
+    `Successfully published ${registryPackage.name}${
+      registryPackage.type === 'template' ? '' : `@${registryPackage.version}`
     }`
   );
   return null;

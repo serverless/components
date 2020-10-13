@@ -549,7 +549,6 @@ const legacyLoadComponentConfig = (directoryPath) => {
   return componentFile;
 };
 
-
 const possibleConfigurationFiles = [
   'serverless.yml',
   'serverless.yaml',

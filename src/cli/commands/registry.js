@@ -16,7 +16,12 @@ const {
   getTemplate,
   isLoggedInOrHasAccessKey,
 } = require('./utils');
-const { fileExists, loadComponentConfig, loadTemplateConfig, validateNodeModules } = require('../utils');
+const {
+  fileExists,
+  loadComponentConfig,
+  loadTemplateConfig,
+  validateNodeModules,
+} = require('../utils');
 const { loadServerlessFile } = require('../serverlessFile');
 const { remove } = require('fs-extra');
 
@@ -54,14 +59,13 @@ const publish = async (config, cli) => {
 
   let finalServerlessFile;
 
-  // Publishing a component
   if (serverlessComponentFile) {
+    // Publishing a component
     finalServerlessFile = serverlessComponentFile;
     finalServerlessFile.src = serverlessComponentFile.src || serverlessComponentFile.main;
     finalServerlessFile.type = 'component';
-
-  // Publishing a template
   } else {
+    // Publishing a template
     finalServerlessFile = serverlessTemplateFile || serverlessFile;
     finalServerlessFile.type = 'template';
   }
@@ -87,7 +91,11 @@ const publish = async (config, cli) => {
 
   // validate serverless.js & node_modules if component
   if (finalServerlessFile.type === 'component') {
-    const serverlessJsFilePath = path.resolve(process.cwd(), finalServerlessFile.src, 'serverless.js');
+    const serverlessJsFilePath = path.resolve(
+      process.cwd(),
+      finalServerlessFile.src,
+      'serverless.js'
+    );
 
     if (!(await fileExists(serverlessJsFilePath))) {
       throw new Error(
@@ -122,7 +130,12 @@ const publish = async (config, cli) => {
 
   // silently remove @serverless/core to avoid conflict with components v1
   // if it already does not exist, it just moves on
-  const coreDependencyPath = path.join(finalServerlessFile.src, 'node_modules', '@serverless', 'core');
+  const coreDependencyPath = path.join(
+    finalServerlessFile.src,
+    'node_modules',
+    '@serverless',
+    'core'
+  );
   await remove(coreDependencyPath);
 
   // Publish
