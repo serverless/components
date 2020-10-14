@@ -53,7 +53,7 @@ const publish = async (config, cli) => {
 
   if (!serverlessTemplateFile && !serverlessComponentFile && !serverlessFile) {
     throw new Error(
-      'Publish failed. The current working directory does not contain a "serverless.yml" or "serverless.component.yml"'
+      'Publish failed. The current working directory does not contain a "serverless.template.yml" or "serverless.component.yml"'
     );
   }
 
