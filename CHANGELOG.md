@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.2.2](https://github.com/serverless/components/compare/v3.2.2...v3.2.1) (2020-10-15)
+
+- Feature: Add support for serverless.template.yml
+- Feature: Add detailed success/failure message for `runAll` of commands-cn
+- Upgrade `@serverless/platform-client` to v3
+
 ## [3.2.1](https://github.com/serverless/components/compare/v3.2.0...v3.2.1) (2020-09-29)
 
 - Bug fix: Fix deployment error handling for dev mode
