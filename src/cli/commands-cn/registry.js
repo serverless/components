@@ -6,7 +6,7 @@
 
 const { ServerlessSDK } = require('@serverless/platform-client-china');
 const utils = require('./utils');
-const { loadComponentConfig } = require('../utils');
+const { loadComponentConfig, loadTemplateConfig } = require('../utils');
 const { loadServerlessFile } = require('../serverlessFile');
 
 /**
@@ -23,36 +23,50 @@ const publish = async (config, cli) => {
 
   await utils.login();
 
-  // Load YAML and normalize
-  let serverlessFile = await loadServerlessFile(process.cwd());
-  if (!serverlessFile) {
-    // keeping serverless.component.yml for backward compatability
-    const serverlessComponentFile = await loadComponentConfig(process.cwd());
-    serverlessFile = serverlessComponentFile;
-    serverlessFile.src = serverlessComponentFile.main;
+  // We want to check the existence of serverless.template.yml and serverless.component.yml first
+  // If both of them did not show up, we will check serverless.yml for backward compatibility
+  // Why not check the existence of serverless.yml first? serverless.template.yml and serverless.yml may be in the same folder
+  const serverlessTemplateFile = await loadTemplateConfig(process.cwd());
+  const serverlessComponentFile = await loadComponentConfig(process.cwd());
+  const serverlessFile = await loadServerlessFile(process.cwd());
+
+  if (!serverlessTemplateFile && !serverlessComponentFile && !serverlessFile) {
+    throw new Error(
+      'Publish failed. The current working directory does not contain a "serverless.template.yml" or "serverless.component.yml"'
+    );
   }
-  if (serverlessFile.type === 'template' || (!serverlessFile.type && !serverlessFile.version)) {
-    // if the user did not specify a type nor a version, it's a template
-    serverlessFile.type = 'template';
-    serverlessFile.version = '0.0.0';
+
+  let finalServerlessFile;
+
+  if (serverlessComponentFile) {
+    // Publishing a component
+    finalServerlessFile = serverlessComponentFile;
+    finalServerlessFile.src = serverlessComponentFile.main;
+    finalServerlessFile.type = 'component';
   } else {
-    serverlessFile.type = 'component';
+    // Publishing a template
+    finalServerlessFile = serverlessTemplateFile || serverlessFile;
+    finalServerlessFile.type = 'template';
+    finalServerlessFile.version = '0.0.0';
   }
+
   // fall back to service name for framework v1
-  serverlessFile.name = serverlessFile.name || serverlessFile.service;
+  finalServerlessFile.name = finalServerlessFile.name || finalServerlessFile.service;
 
   // If "--dev" flag is used, set the version the API expects
   // default version is dev
-  if (!serverlessFile.version || config.dev) {
-    serverlessFile.version = 'dev';
+  if (!finalServerlessFile.version || config.dev) {
+    finalServerlessFile.version = 'dev';
   }
 
-  serverlessFile.org = serverlessFile.org || (await utils.getDefaultOrgName());
+  finalServerlessFile.org = finalServerlessFile.org || (await utils.getDefaultOrgName());
 
   // Presentation
   cli.logRegistryLogo();
   cli.log(
-    `Publishing "${serverlessFile.name}@${config.dev ? 'dev' : serverlessFile.version}"...`,
+    `Publishing "${finalServerlessFile.name}@${
+      config.dev ? 'dev' : finalServerlessFile.version
+    }"...`,
     'grey'
   );
 
@@ -63,7 +77,7 @@ const publish = async (config, cli) => {
 
   let registryPackage;
   try {
-    registryPackage = await sdk.publishPackage(serverlessFile);
+    registryPackage = await sdk.publishPackage(finalServerlessFile);
   } catch (error) {
     if (error.message.includes('409')) {
       error.message = error.message.replace('409 - ', '');

@@ -33,8 +33,8 @@
     "/templates"
   ],
   "dependencies": {
-    "@serverless/platform-client": "^2.1.0",
-    "@serverless/platform-client-china": "^2.0.0",
+    "@serverless/platform-client": "^3.1.1",
+    "@serverless/platform-client-china": "^2.0.3",
     "@serverless/platform-sdk": "^2.3.2",
     "@serverless/utils": "^2.0.0",
     "adm-zip": "^0.4.16",

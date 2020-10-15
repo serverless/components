@@ -16,7 +16,12 @@ const {
   getTemplate,
   isLoggedInOrHasAccessKey,
 } = require('./utils');
-const { fileExists, loadComponentConfig, validateNodeModules } = require('../utils');
+const {
+  fileExists,
+  loadComponentConfig,
+  loadTemplateConfig,
+  validateNodeModules,
+} = require('../utils');
 const { loadServerlessFile } = require('../serverlessFile');
 const { remove } = require('fs-extra');
 
@@ -42,56 +47,55 @@ const publish = async (config, cli) => {
   // Get access key
   const accessKey = await getAccessKey();
 
-  let serverlessFile = await loadServerlessFile(process.cwd());
+  const serverlessTemplateFile = await loadTemplateConfig(process.cwd());
+  const serverlessComponentFile = await loadComponentConfig(process.cwd());
+  const serverlessFile = await loadServerlessFile(process.cwd());
 
-  if (!serverlessFile) {
-    // keeping serverless.component.yml for backward compatability
-    const serverlessComponentFile = await loadComponentConfig(process.cwd());
-
-    // If no serverless.yml and no serverless.component.yml, there is nothing to publish in this cwd
-    if (!serverlessFile && !serverlessComponentFile) {
-      throw new Error(
-        'Publish failed. The current working directory does not contain a "serverless.yml" or "serverless.component.yml"'
-      );
-    }
-
-    serverlessFile = serverlessComponentFile;
-    serverlessFile.src = serverlessComponentFile.src || serverlessComponentFile.main;
-  } else if (serverlessFile.version || serverlessFile.type === 'component') {
+  if (!serverlessTemplateFile && !serverlessComponentFile && !serverlessFile) {
     throw new Error(
-      'Publish failed. Components could only be defined with a "serverless.component.yml" file.'
+      'Publish failed. The current working directory does not contain a "serverless.template.yml" or "serverless.component.yml"'
     );
   }
 
-  if (serverlessFile.type === 'template' || (!serverlessFile.type && !serverlessFile.version)) {
-    // if the user did not specify a type nor a version, it's a template
-    serverlessFile.type = 'template';
+  let finalServerlessFile;
+
+  if (serverlessComponentFile) {
+    // Publishing a component
+    finalServerlessFile = serverlessComponentFile;
+    finalServerlessFile.src = serverlessComponentFile.src || serverlessComponentFile.main;
+    finalServerlessFile.type = 'component';
   } else {
-    serverlessFile.type = 'component';
+    // Publishing a template
+    finalServerlessFile = serverlessTemplateFile || serverlessFile;
+    finalServerlessFile.type = 'template';
   }
 
   // fall back to service name for framework v1
-  serverlessFile.name = serverlessFile.name || serverlessFile.service;
+  finalServerlessFile.name = finalServerlessFile.name || finalServerlessFile.service;
 
   // default version is dev
-  if (!serverlessFile.version || config.dev) {
-    serverlessFile.version = 'dev';
+  if (!finalServerlessFile.version || config.dev) {
+    finalServerlessFile.version = 'dev';
   }
 
-  serverlessFile.org = serverlessFile.org || (await getDefaultOrgName());
+  finalServerlessFile.org = finalServerlessFile.org || (await getDefaultOrgName());
 
-  if (!serverlessFile.org) {
+  if (!finalServerlessFile.org) {
     throw new Error('"org" property is required in serverless.yml');
   }
 
   // cwd is the default src
-  if (!serverlessFile.src) {
-    serverlessFile.src = process.cwd();
+  if (!finalServerlessFile.src) {
+    finalServerlessFile.src = process.cwd();
   }
 
   // validate serverless.js & node_modules if component
-  if (serverlessFile.type === 'component') {
-    const serverlessJsFilePath = path.resolve(process.cwd(), serverlessFile.src, 'serverless.js');
+  if (finalServerlessFile.type === 'component') {
+    const serverlessJsFilePath = path.resolve(
+      process.cwd(),
+      finalServerlessFile.src,
+      'serverless.js'
+    );
 
     if (!(await fileExists(serverlessJsFilePath))) {
       throw new Error(
@@ -100,18 +104,18 @@ const publish = async (config, cli) => {
     }
 
     // make sure user ran "npm install" if applicable
-    await validateNodeModules(serverlessFile.src);
+    await validateNodeModules(finalServerlessFile.src);
   } else {
     // validate the template
     await getTemplate(process.cwd());
   }
 
   // log message in case of component
-  let initialStatus = `Publishing "${serverlessFile.name}@${serverlessFile.version}" to the Serverless Framework Registry`;
+  let initialStatus = `Publishing "${finalServerlessFile.name}@${finalServerlessFile.version}" to the Serverless Framework Registry`;
 
   // log message in case of template
-  if (serverlessFile.type === 'template') {
-    initialStatus = `Publishing "${serverlessFile.name}" to the Serverless Framework Registry`;
+  if (finalServerlessFile.type === 'template') {
+    initialStatus = `Publishing "${finalServerlessFile.name}" to the Serverless Framework Registry`;
   }
 
   // Presentation
@@ -121,25 +125,30 @@ const publish = async (config, cli) => {
 
   const readmeFilePath = path.join(process.cwd(), 'README.md');
   if (await fileExists(readmeFilePath)) {
-    serverlessFile.readme = await readFile(readmeFilePath, 'utf-8');
+    finalServerlessFile.readme = await readFile(readmeFilePath, 'utf-8');
   }
 
   // silently remove @serverless/core to avoid conflict with components v1
   // if it already does not exist, it just moves on
-  const coreDependencyPath = path.join(serverlessFile.src, 'node_modules', '@serverless', 'core');
+  const coreDependencyPath = path.join(
+    finalServerlessFile.src,
+    'node_modules',
+    '@serverless',
+    'core'
+  );
   await remove(coreDependencyPath);
 
   // Publish
   cli.sessionStatus(initialStatus);
 
   try {
-    await sdk.publishToRegistry(serverlessFile);
+    await sdk.publishToRegistry(finalServerlessFile);
     // log message in case of component
-    let successLogMsg = `Successfully published "${serverlessFile.name}@${serverlessFile.version}" to the Serverless Framework Registry.`;
+    let successLogMsg = `Successfully published "${finalServerlessFile.name}@${finalServerlessFile.version}" to the Serverless Framework Registry.`;
 
     // log message in case of template
-    if (serverlessFile.type === 'template') {
-      successLogMsg = `Successfully published "${serverlessFile.name}" to the Serverless Framework Registry`;
+    if (finalServerlessFile.type === 'template') {
+      successLogMsg = `Successfully published "${finalServerlessFile.name}" to the Serverless Framework Registry`;
     }
 
     cli.sessionStop('success', successLogMsg);
