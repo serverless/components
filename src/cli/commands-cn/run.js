@@ -61,6 +61,7 @@ module.exports = async (config, cli, command) => {
     agent: `ComponentsCLI_${version}`,
   });
 
+  await utils.setInputsForCommandInputs(instanceYaml, command);
   // Prepare Options
   const options = {};
   options.debug = config.debug;

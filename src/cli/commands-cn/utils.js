@@ -258,6 +258,12 @@ const saveYaml = async (yamlPath, yamlObj) => {
   const yamlContent = YAML.safeDump(yamlObj);
   await fse.writeFile(yamlPath, yamlContent);
 };
+const setInputsForCommandInputs = (instanceYaml, command) => {
+  // If user sets customized command inputs in yaml, need to insert them in final yaml config
+  if (instanceYaml.commandInputs && instanceYaml.commandInputs[command]) {
+    instanceYaml.inputs = { ...instanceYaml.inputs, ...instanceYaml.commandInputs[command] };
+  }
+};
 
 module.exports = {
   loadInstanceConfig: loadTencentInstanceConfig,
@@ -269,4 +275,5 @@ module.exports = {
   handleDebugLogMessage,
   parseYaml,
   saveYaml,
+  setInputsForCommandInputs,
 };
