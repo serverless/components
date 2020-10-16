@@ -46,7 +46,7 @@ const getDefaultOrgName = async () => {
  * Reads a serverless instance config file in a given directory path
  * @param {*} directoryPath
  */
-const loadTencentInstanceConfig = async (directoryPath) => {
+const loadTencentInstanceConfig = async (directoryPath, command) => {
   let instanceFile = loadInstanceConfig(directoryPath);
 
   if (!instanceFile) {
@@ -88,6 +88,13 @@ const loadTencentInstanceConfig = async (directoryPath) => {
     instanceFile.app = instanceFile.name;
   }
 
+  // If user sets customized command inputs in yaml, need to insert them in yaml config
+  if (instanceFile.commandInputs && instanceFile.commandInputs[command]) {
+    instanceFile.inputs = mergeDeepRight(
+      instanceFile.inputs || {},
+      instanceFile.commandInputs[command]
+    );
+  }
   const cliInputs = parseCliInputs();
 
   instanceFile.inputs = mergeDeepRight(instanceFile.inputs || {}, cliInputs);
@@ -258,12 +265,6 @@ const saveYaml = async (yamlPath, yamlObj) => {
   const yamlContent = YAML.safeDump(yamlObj);
   await fse.writeFile(yamlPath, yamlContent);
 };
-const setInputsForCommandInputs = (instanceYaml, command) => {
-  // If user sets customized command inputs in yaml, need to insert them in final yaml config
-  if (instanceYaml.commandInputs && instanceYaml.commandInputs[command]) {
-    instanceYaml.inputs = { ...instanceYaml.inputs, ...instanceYaml.commandInputs[command] };
-  }
-};
 
 module.exports = {
   loadInstanceConfig: loadTencentInstanceConfig,
@@ -275,5 +276,4 @@ module.exports = {
   handleDebugLogMessage,
   parseYaml,
   saveYaml,
-  setInputsForCommandInputs,
 };

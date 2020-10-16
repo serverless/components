@@ -10,7 +10,7 @@ const utils = require('./utils');
 const chalk = require('chalk');
 const moment = require('moment');
 
-module.exports = async (config, cli) => {
+module.exports = async (config, cli, command) => {
   // Start CLI persistance status
   cli.sessionStart('Initializing', { timer: false });
 
@@ -21,7 +21,7 @@ module.exports = async (config, cli) => {
   if (config.target) {
     instanceDir = path.join(instanceDir, config.target);
   }
-  const instanceYaml = await utils.loadInstanceConfig(instanceDir);
+  const instanceYaml = await utils.loadInstanceConfig(instanceDir, command);
 
   // Presentation
   cli.logLogo();

@@ -64,7 +64,7 @@ const runParamList = async (config, instanceYaml, cli, sdk) => {
 /**
  * Route param command
  */
-module.exports = async (config, cli) => {
+module.exports = async (config, cli, command) => {
   // Load YAML
   let instanceDir = process.cwd();
   if (config.target) {
@@ -78,7 +78,7 @@ module.exports = async (config, cli) => {
 
   await utils.login();
 
-  const instanceYaml = await utils.loadInstanceConfig(instanceDir);
+  const instanceYaml = await utils.loadInstanceConfig(instanceDir, command);
   // initialize SDK
   const orgUid = await tencentUtils.getOrgId();
   const sdk = new ServerlessSDK({
