@@ -118,7 +118,7 @@ async function updateDeploymentStatus(cli, instanceInfo, startDebug) {
   return false;
 }
 
-module.exports = async (config, cli) => {
+module.exports = async (config, cli, command) => {
   let watcher;
 
   // Define a close handler, that removes any "dev" mode agents
@@ -160,7 +160,7 @@ module.exports = async (config, cli) => {
   if (config.target) {
     instanceDir = path.join(instanceDir, config.target);
   }
-  let instanceYaml = await utils.loadInstanceConfig(instanceDir);
+  let instanceYaml = await utils.loadInstanceConfig(instanceDir, command);
 
   // Load Instance Credentials
   const instanceCredentials = await utils.loadInstanceCredentials(instanceYaml.stage);
@@ -222,12 +222,12 @@ module.exports = async (config, cli) => {
       isProcessing = true;
       cli.sessionStatus('Deploying', null, 'green');
       // reload serverless component instance
-      instanceYaml = await utils.loadInstanceConfig(instanceDir);
+      instanceYaml = await utils.loadInstanceConfig(instanceDir, command);
       deployedInstance = await deploy(sdk, instanceYaml, instanceCredentials);
       if (queuedOperation) {
         cli.sessionStatus('Deploying', null, 'green');
         // reload serverless component instance
-        instanceYaml = await utils.loadInstanceConfig(instanceDir);
+        instanceYaml = await utils.loadInstanceConfig(instanceDir, command);
         deployedInstance = await deploy(sdk, instanceYaml, instanceCredentials);
       }
 

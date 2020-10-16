@@ -30,7 +30,7 @@ module.exports = async (config, cli, command) => {
   if (config.target) {
     instanceDir = path.join(instanceDir, config.target);
   }
-  const instanceYaml = await utils.loadInstanceConfig(instanceDir);
+  const instanceYaml = await utils.loadInstanceConfig(instanceDir, command);
 
   // Presentation
   const meta = `Action: "${command}" - Stage: "${instanceYaml.stage}" - App: "${instanceYaml.app}" - Instance: "${instanceYaml.name}"`;
@@ -60,9 +60,6 @@ module.exports = async (config, cli, command) => {
     },
     agent: `ComponentsCLI_${version}`,
   });
-
-  // Prepare Command Inputs
-  utils.setInputsForCommand(instanceYaml, command, config);
 
   // Prepare Options
   const options = {};

@@ -2,7 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [3.2.2](https://github.com/serverless/components/compare/v3.2.2...v3.2.1) (2020-10-15)
+## [3.2.3](https://github.com/serverless/components/compare/v3.2.2...v3.2.3) (2020-10-16)
+
+- Bug fix: Parsing CLI inputs with key-value object
+
+## [3.2.2](https://github.com/serverless/components/compare/v3.2.1...v3.2.2) (2020-10-15)
 
 - Feature: Add support for serverless.template.yml
 - Feature: Add detailed success/failure message for `runAll` of commands-cn
