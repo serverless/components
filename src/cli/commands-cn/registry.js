@@ -162,27 +162,18 @@ const listFeatured = async (config, cli) => {
 
   const sdk = new ServerlessSDK();
   const {
-    components: featuredComponents,
     templates: featuredTemplates,
   } = await sdk.listPackages(null, { isFeatured: true });
 
   cli.log();
 
-  if (featuredComponents.length > 0) {
-    cli.log('Featured Components:');
-    cli.log();
-    for (const featuredComponent of featuredComponents) {
-      cli.log(`  ${featuredComponent.componentName} - ${featuredComponent.repo}`);
-    }
-  }
-
   if (featuredTemplates.length > 0) {
     cli.log();
     cli.log();
-    cli.log('Featured Templates:');
+    cli.log('Run "serverless init <package>" to install a template...');
     cli.log();
     for (const featuredTemplate of featuredTemplates) {
-      cli.log(`  ${featuredTemplate.name} - ${featuredTemplate.description}`);
+      cli.log(`• ${featuredTemplate.name} - ${featuredTemplate.repo}`, 'grey');
     }
   }
 

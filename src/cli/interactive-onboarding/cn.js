@@ -26,7 +26,7 @@ const projectTypeChoice = async (choices) =>
             choice.name.toLowerCase().includes(input.toLowerCase())
           );
         }
-        return choices.slice(0, 6); // default to show the first 6 items
+        return choices; // default to show the first 6 items
       },
     })
   ).projectType;
@@ -110,13 +110,14 @@ module.exports = async (config, cli) => {
     cli.log(chalk.red('当前注册中心无可用模版!\n'));
     return null;
   }
+  // console.log(templatesChoices)
 
   const projectType = await projectTypeChoice(templatesChoices);
   const workingDir = process.cwd();
   let { name, id: packageName } = projectType;
 
-  // Choice runtime for scf helloworld examples:https://github.com/tencentyun/serverless-demo
-  if (name.includes('scf-demo')) {
+  // Choice runtime for scf helloworld examples: https://github.com/tencentyun/serverless-demo
+  if (name.includes('scf-')) {
     const {
       scfRuntimeType: { id, name: scfName },
     } = await getScfRuntimeTypeChoice(scfTemplatesChoices);
