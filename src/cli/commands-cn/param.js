@@ -1,6 +1,7 @@
 'use strict';
 const path = require('path');
 const { ServerlessSDK, utils: tencentUtils } = require('@serverless/platform-client-china');
+const { v4: uuidv4 } = require('uuid');
 const chalk = require('chalk');
 const utils = require('./utils');
 const { version } = require('../../../package.json');
@@ -64,7 +65,7 @@ const runParamList = async (config, instanceYaml, cli, sdk) => {
 /**
  * Route param command
  */
-module.exports = async (config, cli) => {
+module.exports = async (config, cli, command) => {
   // Load YAML
   let instanceDir = process.cwd();
   if (config.target) {
@@ -78,7 +79,7 @@ module.exports = async (config, cli) => {
 
   await utils.login();
 
-  const instanceYaml = await utils.loadInstanceConfig(instanceDir);
+  const instanceYaml = await utils.loadInstanceConfig(instanceDir, command);
   // initialize SDK
   const orgUid = await tencentUtils.getOrgId();
   const sdk = new ServerlessSDK({
@@ -90,6 +91,7 @@ module.exports = async (config, cli) => {
     context: {
       orgUid,
       orgName: instanceYaml.org,
+      traceId: uuidv4(),
     },
     agent: `ComponentsCLI_${version}`,
   });

@@ -10,6 +10,7 @@ const { promisify } = require('util');
 const path = require('path');
 const stream = require('stream');
 const AdmZip = require('adm-zip');
+const { v4: uuidv4 } = require('uuid');
 const got = require('got');
 const { ServerlessSDK } = require('@serverless/platform-client-china');
 const spawn = require('child-process-ext/spawn');
@@ -99,7 +100,7 @@ const init = async (config, cli) => {
     }
   }
 
-  const sdk = new ServerlessSDK();
+  const sdk = new ServerlessSDK({ context: { traceId: uuidv4() } });
   const registryPackage = await sdk.getPackage(packageName);
   if (!registryPackage) {
     throw new Error(`Serverless Registry Package "${packageName}" does not exist.`);

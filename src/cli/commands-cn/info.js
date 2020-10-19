@@ -6,11 +6,12 @@
 
 const path = require('path');
 const { ServerlessSDK } = require('@serverless/platform-client-china');
+const { v4: uuidv4 } = require('uuid');
 const utils = require('./utils');
 const chalk = require('chalk');
 const moment = require('moment');
 
-module.exports = async (config, cli) => {
+module.exports = async (config, cli, command) => {
   // Start CLI persistance status
   cli.sessionStart('Initializing', { timer: false });
 
@@ -21,7 +22,7 @@ module.exports = async (config, cli) => {
   if (config.target) {
     instanceDir = path.join(instanceDir, config.target);
   }
-  const instanceYaml = await utils.loadInstanceConfig(instanceDir);
+  const instanceYaml = await utils.loadInstanceConfig(instanceDir, command);
 
   // Presentation
   cli.logLogo();
@@ -30,7 +31,7 @@ module.exports = async (config, cli) => {
   cli.sessionStatus('Initializing', instanceYaml.name);
 
   // initialize SDK
-  const sdk = new ServerlessSDK();
+  const sdk = new ServerlessSDK({ context: { traceId: uuidv4() } });
 
   // don't show the status in debug mode due to formatting issues
   if (!config.debug) {

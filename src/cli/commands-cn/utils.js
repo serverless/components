@@ -46,7 +46,7 @@ const getDefaultOrgName = async () => {
  * Reads a serverless instance config file in a given directory path
  * @param {*} directoryPath
  */
-const loadTencentInstanceConfig = async (directoryPath) => {
+const loadTencentInstanceConfig = async (directoryPath, command) => {
   let instanceFile = loadInstanceConfig(directoryPath);
 
   if (!instanceFile) {
@@ -88,6 +88,13 @@ const loadTencentInstanceConfig = async (directoryPath) => {
     instanceFile.app = instanceFile.name;
   }
 
+  // If user sets customized command inputs in yaml, need to insert them in yaml config
+  if (instanceFile.commandInputs && instanceFile.commandInputs[command]) {
+    instanceFile.inputs = mergeDeepRight(
+      instanceFile.inputs || {},
+      instanceFile.commandInputs[command]
+    );
+  }
   const cliInputs = parseCliInputs();
 
   instanceFile.inputs = mergeDeepRight(instanceFile.inputs || {}, cliInputs);
@@ -219,20 +226,6 @@ const getInstanceDashboardUrl = (instanceYaml) => {
   return `Full details: https://serverless.cloud.tencent.com/apps/${instanceYaml.app}/${instanceYaml.name}/${instanceYaml.stage}`;
 };
 
-const setInputsForCommand = (instanceYaml, command, config) => {
-  if (instanceYaml.commandInputs) {
-    const defaultInputs = command === 'deploy' ? instanceYaml.inputs : {};
-    instanceYaml.inputs = instanceYaml.commandInputs[command] || defaultInputs;
-  } else if (command !== 'deploy') {
-    instanceYaml.inputs = {};
-  }
-  // merging inputs from command args, e.g. slcc deploy --inputs.src="./new-src"
-  // will be merged into inputs.src
-  if (config.inputs) {
-    instanceYaml.inputs = mergeDeepRight(instanceYaml.inputs, config.inputs);
-  }
-};
-
 const handleDebugLogMessage = (cli) => {
   return (evt) => {
     if (evt.event !== 'instance.run.logs') {
@@ -280,7 +273,6 @@ module.exports = {
   getDefaultOrgName,
   getTemplate,
   getInstanceDashboardUrl,
-  setInputsForCommand,
   handleDebugLogMessage,
   parseYaml,
   saveYaml,

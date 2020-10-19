@@ -337,7 +337,7 @@ commandInputs:
 
 一旦配置了自定义动作的 inputs 参数，Component 开发者可以在相关的自定义方法中通过传入的第一个参数接收到这些输入。例如上面的配置中，当 Component 用户使用`sls myComponentMethod`执行自定义动作时，Component 中的`myComponentMethod`方法便可以接收到一个`{ message: "hello" }`这样的输入参数。
 
-此外，所有的 inputs 参数都可以使用命令行的方式进行覆盖，例如上例中如果用户执行`sls myComponentMethod --inputs.anotherMsg=world`，Component 中的`myComponentMethod`方法便会接收到一个`{ message: "hello", anotherMsg: "world" }`这样的输入参数。
+此外，所有的 inputs 参数都可以使用命令行的方式进行覆盖，例如上例中如果用户执行`sls myComponentMethod --inputs anotherMsg=world`，Component 中的`myComponentMethod`方法便会接收到一个`{ message: "hello", anotherMsg: "world" }`这样的输入参数。
 
 ### 部署
 

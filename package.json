@@ -1,6 +1,6 @@
 {
   "name": "@serverless/components",
-  "version": "3.2.2",
+  "version": "3.2.4",
   "description": "The Serverless Framework's new infrastructure provisioning technology — Build, compose, & deploy serverless apps in seconds...",
   "main": "./src/index.js",
   "bin": {
@@ -34,7 +34,7 @@
   ],
   "dependencies": {
     "@serverless/platform-client": "^3.1.1",
-    "@serverless/platform-client-china": "^2.0.3",
+    "@serverless/platform-client-china": "^2.0.4",
     "@serverless/platform-sdk": "^2.3.2",
     "@serverless/utils": "^2.0.0",
     "adm-zip": "^0.4.16",
@@ -60,7 +60,8 @@
     "ramda": "^0.27.1",
     "semver": "^7.3.2",
     "strip-ansi": "^6.0.0",
-    "traverse": "^0.6.6"
+    "traverse": "^0.6.6",
+    "uuid": "^8.3.1"
   },
   "devDependencies": {
     "@serverless/eslint-config": "^3.0.0",

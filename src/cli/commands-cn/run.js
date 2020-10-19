@@ -7,6 +7,7 @@
 const path = require('path');
 const { runningTemplate } = require('../utils');
 const { ServerlessSDK, utils: tencentUtils } = require('@serverless/platform-client-china');
+const { v4: uuidv4 } = require('uuid');
 const utils = require('./utils');
 const runAll = require('./runAll');
 const chalk = require('chalk');
@@ -30,7 +31,7 @@ module.exports = async (config, cli, command) => {
   if (config.target) {
     instanceDir = path.join(instanceDir, config.target);
   }
-  const instanceYaml = await utils.loadInstanceConfig(instanceDir);
+  const instanceYaml = await utils.loadInstanceConfig(instanceDir, command);
 
   // Presentation
   const meta = `Action: "${command}" - Stage: "${instanceYaml.stage}" - App: "${instanceYaml.app}" - Instance: "${instanceYaml.name}"`;
@@ -57,12 +58,10 @@ module.exports = async (config, cli, command) => {
     context: {
       orgUid,
       orgName: instanceYaml.org,
+      traceId: uuidv4(),
     },
     agent: `ComponentsCLI_${version}`,
   });
-
-  // Prepare Command Inputs
-  utils.setInputsForCommand(instanceYaml, command, config);
 
   // Prepare Options
   const options = {};
