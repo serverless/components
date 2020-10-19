@@ -76,7 +76,7 @@ const getTemplatesFromRegistry = async (sdk) => {
 
   // only show the scf examples when user select the scf-starter in first step
   const templatesChoices = templates
-    .filter((item) => !item.name.includes('scf-') || item.name === 'scf-starter') 
+    .filter((item) => !item.name.includes('scf-') || item.name === 'scf-starter')
     .map((item) => ({
       name: `${item.name} - ${item['description-i18n']['zh-cn']}`,
       value: { id: item.componentName, name: item.name },

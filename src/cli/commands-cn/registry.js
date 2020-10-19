@@ -160,17 +160,17 @@ const listFeatured = async (config, cli) => {
   cli.logRegistryLogo();
 
   const sdk = new ServerlessSDK();
-  const {
-    templates: featuredTemplates,
-  } = await sdk.listPackages(null, { isFeatured: true });
-
+  const { templates: featuredTemplates } = await sdk.listPackages(null, { isFeatured: true });
 
   if (featuredTemplates.length > 0) {
     cli.log();
     cli.log('Run "serverless init <package>" to install a template...');
     cli.log();
     for (const featuredTemplate of featuredTemplates) {
-      cli.log(`• ${featuredTemplate.name} - ${featuredTemplate['description-i18n']['zh-cn']}`, 'grey');
+      cli.log(
+        `• ${featuredTemplate.name} - ${featuredTemplate['description-i18n']['zh-cn']}`,
+        'grey'
+      );
     }
   }
 
