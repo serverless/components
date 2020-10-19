@@ -6,6 +6,7 @@
 
 const path = require('path');
 const { ServerlessSDK } = require('@serverless/platform-client-china');
+const { v4: uuidv4 } = require('uuid');
 const utils = require('./utils');
 const chalk = require('chalk');
 const moment = require('moment');
@@ -30,7 +31,7 @@ module.exports = async (config, cli, command) => {
   cli.sessionStatus('Initializing', instanceYaml.name);
 
   // initialize SDK
-  const sdk = new ServerlessSDK();
+  const sdk = new ServerlessSDK({ context: { traceId: uuidv4() } });
 
   // don't show the status in debug mode due to formatting issues
   if (!config.debug) {
