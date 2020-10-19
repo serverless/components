@@ -5,6 +5,7 @@
  */
 
 const { ServerlessSDK } = require('@serverless/platform-client-china');
+const { v4: uuidv4 } = require('uuid');
 const utils = require('./utils');
 const { loadComponentConfig, loadTemplateConfig } = require('../utils');
 const { loadServerlessFile } = require('../serverlessFile');
@@ -160,7 +161,7 @@ const listFeatured = async (config, cli) => {
   cli.sessionStart('Loading');
   cli.logRegistryLogo();
 
-  const sdk = new ServerlessSDK();
+  const sdk = new ServerlessSDK({ context: { traceId: uuidv4() } });
   const {
     components: featuredComponents,
     templates: featuredTemplates,

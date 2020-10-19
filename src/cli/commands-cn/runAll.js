@@ -12,6 +12,7 @@ const {
 } = require('../utils');
 const { login, loadInstanceCredentials, getTemplate, handleDebugLogMessage } = require('./utils');
 const generateNotificationsPayload = require('../notifications/generate-payload');
+const { v4: uuidv4 } = require('uuid');
 const requestNotification = require('../notifications/request');
 const printNotification = require('../notifications/print-notification');
 
@@ -48,6 +49,7 @@ module.exports = async (config, cli, command) => {
     context: {
       orgUid,
       orgName: templateYaml.org,
+      traceId: uuidv4(),
     },
   });
 

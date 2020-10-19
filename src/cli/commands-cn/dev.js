@@ -9,6 +9,7 @@ const { Writable } = require('stream');
 const ansiEscapes = require('ansi-escapes');
 const chokidar = require('chokidar');
 const { ServerlessSDK, utils: chinaUtils } = require('@serverless/platform-client-china');
+const { v4: uuidv4 } = require('uuid');
 const utils = require('./utils');
 
 class LogForwardingOutput extends Writable {
@@ -168,6 +169,7 @@ module.exports = async (config, cli, command) => {
   const sdk = new ServerlessSDK({
     context: {
       orgName: instanceYaml.org,
+      traceId: uuidv4(),
     },
   });
 

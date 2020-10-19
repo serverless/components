@@ -1,6 +1,7 @@
 'use strict';
 const path = require('path');
 const { ServerlessSDK, utils: tencentUtils } = require('@serverless/platform-client-china');
+const { v4: uuidv4 } = require('uuid');
 const chalk = require('chalk');
 const utils = require('./utils');
 const { version } = require('../../../package.json');
@@ -90,6 +91,7 @@ module.exports = async (config, cli, command) => {
     context: {
       orgUid,
       orgName: instanceYaml.org,
+      traceId: uuidv4(),
     },
     agent: `ComponentsCLI_${version}`,
   });

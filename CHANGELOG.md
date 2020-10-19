@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.2.4](https://github.com/serverless/components/compare/v3.2.2...v3.2.4) (2020-10-17)
+
+- Feat: Add a traceId into proxy for tracing a full-chain request
+
 ## [3.2.3](https://github.com/serverless/components/compare/v3.2.2...v3.2.3) (2020-10-16)
 
 - Bug fix: Parsing CLI inputs with key-value object
