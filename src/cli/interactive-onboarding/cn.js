@@ -27,7 +27,7 @@ const projectTypeChoice = async (choices) =>
             choice.name.toLowerCase().includes(input.toLowerCase())
           );
         }
-        return choices.slice(0, 6); // default to show the first 6 items
+        return choices;
       },
     })
   ).projectType;
@@ -75,17 +75,18 @@ const projectNameInput = async (workingDir) =>
 const getTemplatesFromRegistry = async (sdk) => {
   const { templates = [] } = await sdk.listPackages(null, { isFeatured: true });
 
+  // only show the scf examples when user select the scf-starter in first step
   const templatesChoices = templates
-    .filter((item) => !item.name.includes('helloworld')) // only show the scf helloworld examples when user select the scf-demo in first step
+    .filter((item) => !item.name.includes('scf-') || item.name === 'scf-starter')
     .map((item) => ({
-      name: item.displayName || item.name,
+      name: `${item.name} - ${item['description-i18n']['zh-cn']}`,
       value: { id: item.componentName, name: item.name },
     }));
 
   const scfTemplatesChoices = templates
-    .filter((item) => item.name.includes('helloworld'))
+    .filter((item) => item.name.includes('scf-') && item.name !== 'scf-starter')
     .map((item) => ({
-      name: item.displayName || item.name,
+      name: `${item.name} - ${item['description-i18n']['zh-cn']}`,
       value: { id: item.componentName, name: item.name },
     }));
   return { templatesChoices, scfTemplatesChoices };
@@ -111,13 +112,14 @@ module.exports = async (config, cli) => {
     cli.log(chalk.red('当前注册中心无可用模版!\n'));
     return null;
   }
+  // console.log(templatesChoices)
 
   const projectType = await projectTypeChoice(templatesChoices);
   const workingDir = process.cwd();
   let { name, id: packageName } = projectType;
 
-  // Choice runtime for scf helloworld examples:https://github.com/tencentyun/serverless-demo
-  if (name.includes('scf-demo')) {
+  // Choice runtime for scf examples
+  if (name.includes('scf-starter')) {
     const {
       scfRuntimeType: { id, name: scfName },
     } = await getScfRuntimeTypeChoice(scfTemplatesChoices);
