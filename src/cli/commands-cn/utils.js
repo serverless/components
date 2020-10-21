@@ -105,12 +105,15 @@ const loadTencentInstanceConfig = async (directoryPath, command) => {
     instanceFile = resolveVariables(instanceFile);
     if (instanceFile.inputs.src) {
       if (typeof instanceFile.inputs.src === 'string') {
+        instanceFile.inputs.originSrc = instanceFile.inputs.src;
         instanceFile.inputs.src = path.resolve(directoryPath, instanceFile.inputs.src);
       } else if (typeof instanceFile.inputs.src === 'object') {
         if (instanceFile.inputs.src.src) {
+          instanceFile.inputs.originSrc = instanceFile.inputs.src.src;
           instanceFile.inputs.src.src = path.resolve(directoryPath, instanceFile.inputs.src.src);
         }
         if (instanceFile.inputs.src.dist) {
+          instanceFile.inputs.originDist = instanceFile.inputs.src.dist;
           instanceFile.inputs.src.dist = path.resolve(directoryPath, instanceFile.inputs.src.dist);
         }
       }
