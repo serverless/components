@@ -1156,7 +1156,7 @@ Now, you are free to manipulate the source files. When finished, you may want to
 async deploy(inputs = {}) {
 
   // Zip up the source files...
-  const zipPath = await instance.zip(sourceDirectory)
+  const zipPath = await this.zip(sourceDirectory)
 
 }
 ```
