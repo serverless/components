@@ -79,14 +79,14 @@ const getTemplatesFromRegistry = async (sdk) => {
   const templatesChoices = templates
     .filter((item) => !item.name.includes('scf-') || item.name === 'scf-starter')
     .map((item) => ({
-      name: `${item.name} - ${item['description-i18n']['zh-cn']}`,
+      name: `${item.name} - ${item['description-i18n'] ? item['description-i18n']['zh-cn'] : item['description']}`,
       value: { id: item.componentName, name: item.name },
     }));
 
   const scfTemplatesChoices = templates
     .filter((item) => item.name.includes('scf-') && item.name !== 'scf-starter')
     .map((item) => ({
-      name: `${item.name} - ${item['description-i18n']['zh-cn']}`,
+      name: `${item.name} - ${item['description-i18n'] ? item['description-i18n']['zh-cn'] : item['description']}`,
       value: { id: item.componentName, name: item.name },
     }));
   return { templatesChoices, scfTemplatesChoices };
