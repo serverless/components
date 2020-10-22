@@ -71,7 +71,7 @@ const publish = async (config, cli) => {
     'grey'
   );
 
-  const sdk = new ServerlessSDK();
+  const sdk = new ServerlessSDK({ context: { traceId: uuidv4() } });
 
   // Publish
   cli.sessionStatus('Publishing');
@@ -112,7 +112,7 @@ const getPackage = async (config, cli) => {
   // Start CLI persistance status
   cli.sessionStart(`Fetching versions for: ${packageName}`);
 
-  const sdk = new ServerlessSDK();
+  const sdk = new ServerlessSDK({ context: { traceId: uuidv4() } });
   const data = await sdk.getPackage(packageName);
   delete data.component;
 
