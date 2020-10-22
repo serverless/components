@@ -78,17 +78,37 @@ const getTemplatesFromRegistry = async (sdk) => {
   // only show the scf examples when user select the scf-starter in first step
   const templatesChoices = templates
     .filter((item) => !item.name.includes('scf-') || item.name === 'scf-starter')
-    .map((item) => ({
-      name: `${item.name} - ${item['description-i18n']['zh-cn']}`,
-      value: { id: item.componentName, name: item.name },
-    }));
+    .map((item) => {
+      let name = item.name;
+
+      if (item['description-i18n'] && item['description-i18n']['zh-cn']) {
+        name = `${name} - ${item['description-i18n']}`;
+      } else if (item.description) {
+        name = `${name} - ${item.description}`;
+      }
+
+      return {
+        name,
+        value: { id: item.componentName, name: item.name },
+      };
+    });
 
   const scfTemplatesChoices = templates
     .filter((item) => item.name.includes('scf-') && item.name !== 'scf-starter')
-    .map((item) => ({
-      name: `${item.name} - ${item['description-i18n']['zh-cn']}`,
-      value: { id: item.componentName, name: item.name },
-    }));
+    .map((item) => {
+      let name = item.name;
+
+      if (item['description-i18n'] && item['description-i18n']['zh-cn']) {
+        name = `${name} - ${item['description-i18n']}`;
+      } else if (item.description) {
+        name = `${name} - ${item.description}`;
+      }
+
+      return {
+        name,
+        value: { id: item.componentName, name: item.name },
+      };
+    });
   return { templatesChoices, scfTemplatesChoices };
 };
 
