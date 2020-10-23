@@ -128,6 +128,8 @@ module.exports = async (config, cli, command) => {
 
     // run a custom method
     cli.sessionStatus('Running', null, 'white');
+    // We need to convert xx-yy-zz into xx_yy_zz, due to we can not use a 'xx-yy` as the name of function in nodejs
+    command = command.replace(/-/g, '_');
     const instance = await sdk.run(command, instanceYaml, instanceCredentials, options);
 
     cli.log();

@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.2.6](https://github.com/serverless/components/compare/v3.2.5...v3.2.6) (2020-10-22)
+
+- Convert the dash symbol in command to underscore symbol
+
 ## [3.2.5](https://github.com/serverless/components/compare/v3.2.4...v3.2.5) (2020-10-21)
 
 - Feat: Add original src in inputs
