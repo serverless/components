@@ -168,8 +168,16 @@ const listFeatured = async (config, cli) => {
     cli.log('Run "serverless init <package>" to install a template...');
     cli.log();
     for (const featuredTemplate of featuredTemplates) {
+      let name = featuredTemplate.name;
+
+      if (featuredTemplate['description-i18n'] && featuredTemplate['description-i18n']['zh-cn']) {
+        name = `${name} - ${featuredTemplate['description-i18n']['zh-cn']}`;
+      } else if (featuredTemplate.description) {
+        name = `${name} - ${featuredTemplate.description}`;
+      }
+
       cli.log(
-        `• ${featuredTemplate.name} - ${featuredTemplate['description-i18n']['zh-cn']}`,
+        `• ${name}`,
         'grey'
       );
     }
