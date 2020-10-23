@@ -176,10 +176,7 @@ const listFeatured = async (config, cli) => {
         name = `${name} - ${featuredTemplate.description}`;
       }
 
-      cli.log(
-        `• ${name}`,
-        'grey'
-      );
+      cli.log(`• ${name}`, 'grey');
     }
   }
 
