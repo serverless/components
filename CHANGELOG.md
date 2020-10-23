@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.2.7](https://github.com/serverless/components/compare/v3.2.6...v3.2.7) (2020-10-23)
+
+- For `sls registry` in China, use English description as fallback if no zh-cn description is found
+
 ## [3.2.6](https://github.com/serverless/components/compare/v3.2.5...v3.2.6) (2020-10-22)
 
 - Convert the dash symbol in command to underscore symbol

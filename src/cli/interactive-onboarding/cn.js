@@ -82,7 +82,7 @@ const getTemplatesFromRegistry = async (sdk) => {
       let name = item.name;
 
       if (item['description-i18n'] && item['description-i18n']['zh-cn']) {
-        name = `${name} - ${item['description-i18n']}`;
+        name = `${name} - ${item['description-i18n']['zh-cn']}`;
       } else if (item.description) {
         name = `${name} - ${item.description}`;
       }
@@ -99,7 +99,7 @@ const getTemplatesFromRegistry = async (sdk) => {
       let name = item.name;
 
       if (item['description-i18n'] && item['description-i18n']['zh-cn']) {
-        name = `${name} - ${item['description-i18n']}`;
+        name = `${name} - ${item['description-i18n']['zh-cn']}`;
       } else if (item.description) {
         name = `${name} - ${item.description}`;
       }
