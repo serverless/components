@@ -159,7 +159,7 @@ module.exports = async (config, cli, command) => {
     if (failed.length) {
       cli.sessionStop(
         'error',
-        `Errors: "${command}" ran for ${succeeded.length} apps successfully. ${failed.length} failed.`
+        `Errors: "${command}" ran for ${succeeded.length} apps successfully. But, ${failed.length} failed.`
       );
       return null;
     }

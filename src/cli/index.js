@@ -110,7 +110,7 @@ module.exports = async () => {
     commands = require('./commands');
   }
 
-  let command = args._[0] || 'deploy';
+  let command = args._[0];
 
   // handle "publish" command.
   if (command === 'publish') {
@@ -138,6 +138,11 @@ module.exports = async () => {
   }
 
   try {
+    if (!command) {
+      throw new Error(
+        'Please enter a valid command. Run "serverless help" to see all available commands.'
+      );
+    }
     if (commands[command]) {
       await commands[command](config, cli, command);
     } else {

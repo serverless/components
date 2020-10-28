@@ -460,13 +460,9 @@ const getTemplate = async (root) => {
       componentDirectoryFound = true;
       const instanceYaml = await loadVendorInstanceConfig(directoryPath);
 
-      const errorMessage = 'Template instances must use the same org, app & stage properties';
+      const errorMessage = 'Template instances must use the same org & stage properties';
 
       if (template.org !== null && template.org !== instanceYaml.org) {
-        throw new Error(errorMessage);
-      }
-
-      if (template.app !== null && template.app !== instanceYaml.app) {
         throw new Error(errorMessage);
       }
 
