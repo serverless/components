@@ -135,7 +135,7 @@ $ cd example
 执行如下命令，安装 express 应用的对应依赖
 
 ```bash
-$ cd src && npm install
+$ npm install
 ```
 
 在 serverless.yml 文件下的目录中运行 serverless deploy 进行 express 项目的部署：
