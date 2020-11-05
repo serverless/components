@@ -353,6 +353,11 @@ inputs:
   const supportedComponents = ['express', 'koa', 'egg', 'next', 'nuxt'];
   const packageJsonFile = fs.readFileSync(path.join(process.cwd(), 'package.json'), 'utf-8');
   const packageObj = JSON.parse(packageJsonFile);
+
+  if (!packageObj.dependencies) {
+    throw new Error('当前目录未检测到 Serverless 配置文件'); 
+  }
+
   const dependencies = Object.keys(packageObj.dependencies);
   const knownPackages = supportedComponents.filter((value) => dependencies.includes(value));
 
@@ -419,6 +424,8 @@ inputs:
   if (ymlType === 'nuxt') {
     return getNuxtYML();
   }
+
+  throw new Error('当前目录未检测到 Serverless 配置文件');
 };
 
 module.exports = {
