@@ -355,7 +355,7 @@ inputs:
   const packageObj = JSON.parse(packageJsonFile);
 
   if (!packageObj.dependencies) {
-    throw new Error('当前目录未检测到 Serverless 配置文件'); 
+    throw new Error('当前目录未检测到 Serverless 配置文件');
   }
 
   const dependencies = Object.keys(packageObj.dependencies);
