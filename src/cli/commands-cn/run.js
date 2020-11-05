@@ -23,9 +23,9 @@ module.exports = async (config, cli, command) => {
   }
 
   if (
-    command === 'deploy'
-    && !fs.existsSync(path.join(process.cwd(), 'serverless.yml'))
-    && fs.existsSync(path.join(process.cwd(), 'package.json'))
+    command === 'deploy' &&
+    !fs.existsSync(path.join(process.cwd(), 'serverless.yml')) &&
+    fs.existsSync(path.join(process.cwd(), 'package.json'))
   ) {
     const generatedYML = await utils.generateYMLForNodejsProject();
     cli.log('自动生成 serverless.yml 成功，即将部署');

@@ -271,8 +271,7 @@ const saveYaml = async (yamlPath, yamlObj) => {
 };
 
 const generateYMLForNodejsProject = async () => {
-
-  const getExpressYML = entryFile => `component: express
+  const getExpressYML = (entryFile) => `component: express
 name: expressDemo
 app: appDemo
 
@@ -287,7 +286,7 @@ inputs:${entryFile ? `\n  entryFile: ${entryFile}` : ''}
     environment: release
 `;
 
-  const getKoaYML = entryFile => `component: koa
+  const getKoaYML = (entryFile) => `component: koa
 name: koaDemo
 app: appDemo
 
@@ -355,7 +354,7 @@ inputs:
   const packageJsonFile = fs.readFileSync(path.join(process.cwd(), 'package.json'), 'utf-8');
   const packageObj = JSON.parse(packageJsonFile);
   const dependencies = Object.keys(packageObj.dependencies);
-  const knownPackages = supportedComponents.filter(value => dependencies.includes(value));
+  const knownPackages = supportedComponents.filter((value) => dependencies.includes(value));
 
   if (knownPackages.length === 0) {
     throw new Error('当前目录未检测到 Serverless 配置文件');
@@ -374,7 +373,7 @@ inputs:
     });
     ymlType = result.ymlType;
   }
-  
+
   if (ymlType === 'express') {
     if (fs.existsSync(path.join(process.cwd(), 'sls.js'))) {
       return getExpressYML();
@@ -391,7 +390,7 @@ inputs:
 
     return getExpressYML(entryFile);
   }
-  
+
   if (ymlType === 'koa') {
     if (fs.existsSync(path.join(process.cwd(), 'sls.js'))) {
       return getKoaYML();
@@ -408,15 +407,15 @@ inputs:
 
     return getKoaYML(entryFile);
   }
-  
+
   if (ymlType === 'egg') {
     return getEggYML();
   }
-  
+
   if (ymlType === 'next') {
     return getNextYML();
   }
-  
+
   if (ymlType === 'nuxt') {
     return getNuxtYML();
   }
