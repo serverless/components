@@ -13,11 +13,11 @@ const semver = require('semver');
 const chalk = require('chalk');
 const HttpsProxyAgent = require('https-proxy-agent');
 const CLI = require('./CLI');
-const { loadInstanceConfig, fileExistsSync, isProjectPath, isChinaUser } = require('./utils');
+const { loadInstanceConfigUncached, fileExistsSync, isProjectPath, isChinaUser } = require('./utils');
 
 module.exports = async () => {
   const args = minimist(process.argv.slice(2));
-  const instanceConfig = loadInstanceConfig(process.cwd());
+  const instanceConfig = loadInstanceConfigUncached(process.cwd());
   const stage = args.stage || (instanceConfig && instanceConfig.stage) || 'dev';
 
   const params = [];

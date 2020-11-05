@@ -52,6 +52,10 @@ const runningComponents = () => {
     return process.argv.length === 2 && isChinaUser();
   }
 
+  if (!componentConfig && process.argv[2] === 'deploy' && isChinaUser()) {
+    return true;
+  }
+
   if (instanceConfig && !instanceConfig.component) {
     return false;
   }
