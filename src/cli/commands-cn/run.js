@@ -119,6 +119,8 @@ module.exports = async (config, cli, command) => {
     // run remove
     cli.sessionStatus('Removing', null, 'white');
     await sdk.remove(instanceYaml, instanceCredentials, options);
+  } else if (command === 'initCAM') {
+    await sdk.bindRole(instanceCredentials);
   } else if (command === 'login') {
     // we have do login upside, so if command is login, do nothing here
     // no op
