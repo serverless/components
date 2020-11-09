@@ -121,6 +121,7 @@ module.exports = async (config, cli, command) => {
     await sdk.remove(instanceYaml, instanceCredentials, options);
   } else if (command === 'initCAM') {
     await sdk.bindRole(instanceCredentials);
+    cli.log('已成功开通 Serverless 相关权限');
   } else if (command === 'login') {
     // we have do login upside, so if command is login, do nothing here
     // no op
