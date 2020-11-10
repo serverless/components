@@ -46,7 +46,7 @@ ${command('serverless registry {name}')}  显示 应用中心 里的指定组件
 
 ${command('serverless publish')}          发布一个组件或模版到 应用中心
 
-${command('serverless bind role')}          重新为当前用户分配使用 Serverless 所需权限
+${command('serverless bind role')}        重新为当前用户分配使用 Serverless 所需权限
 
 
 ${title('当前命令行版本:')}  v${version}
