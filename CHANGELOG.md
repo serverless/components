@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## [3.3.1](https://github.com/serverless/components/compare/v3.3.0...v3.3.1) (2020-11-09)
 
-- Add a new command for Chinese users to init CAM roles: `serverless initCAM`
+- Add a new command for Chinese users to bind CAM roles: `serverless bind role`
 
 ## [3.3.0](https://github.com/serverless/components/compare/v3.2.7...v3.3.0) (2020-10-28)
 

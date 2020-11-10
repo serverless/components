@@ -119,7 +119,7 @@ module.exports = async (config, cli, command) => {
     // run remove
     cli.sessionStatus('Removing', null, 'white');
     await sdk.remove(instanceYaml, instanceCredentials, options);
-  } else if (command === 'initCAM') {
+  } else if (command === 'bind' && config.params[0] === 'role') {
     await sdk.bindRole(instanceCredentials);
     cli.log('已成功开通 Serverless 相关权限');
   } else if (command === 'login') {
