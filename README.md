@@ -615,6 +615,13 @@ HTTP_PROXY=http://127.0.0.1:12345 # Your proxy
 HTTPS_PROXY=http://127.0.0.1:12345 # Your proxy
 ```
 
+or:
+
+```
+http_proxy=http://127.0.0.1:12345 # Your proxy
+https_proxy=http://127.0.0.1:12345 # Your proxy
+```
+
 # CLI Commands
 
 #### `serverless registry`
