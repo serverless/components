@@ -78,18 +78,20 @@ module.exports = async () => {
   /**
    * Set global proxy agent if it's configured in environment variable
    */
-  if (process.env.HTTP_PROXY || process.env.HTTPS_PROXY) {
+  const httpProxy = process.env.HTTP_PROXY || process.env.http_proxy;
+  const httpsProxy = process.env.HTTPS_PROXY || process.env.https_proxy;
+  if (httpProxy || httpsProxy) {
     if (semver.gte(process.version, 'v11.7.0')) {
       // save default global agent in case we want to restore them
       // and hand proxy handling to other libs
       http.defaultGlobalAgent = http.globalAgent;
       https.defaultGlobalAgent = https.globalAgent;
-      http.globalAgent = new HttpsProxyAgent(process.env.HTTP_PROXY || process.env.HTTPS_PROXY);
-      https.globalAgent = new HttpsProxyAgent(process.env.HTTPS_PROXY || process.env.HTTP_PROXY);
+      http.globalAgent = new HttpsProxyAgent(httpProxy || httpsProxy);
+      https.globalAgent = new HttpsProxyAgent(httpsProxy || httpProxy);
     } else {
       process.stdout.write(
         `Serverless: ${chalk.yellow(
-          'you need to upgrade the NodeJS in order to use http/https proxy.'
+          'you need to upgrade the NodeJS in order to use http/https proxy.(Nodejs >= 11.7)'
         )}\n`
       );
     }
