@@ -16,6 +16,7 @@ const generateNotificationsPayload = require('../notifications/generate-payload'
 const requestNotification = require('../notifications/request');
 const printNotification = require('../notifications/print-notification');
 const { version } = require('../../../package.json');
+const { getServerlessFilePath } = require('../serverlessFile');
 
 module.exports = async (config, cli, command) => {
   if (!config.target && runningTemplate(process.cwd())) {
@@ -24,12 +25,12 @@ module.exports = async (config, cli, command) => {
 
   if (
     command === 'deploy' &&
-    !fs.existsSync(path.join(process.cwd(), 'serverless.yml')) &&
+    !getServerlessFilePath(process.cwd()) &&
     fs.existsSync(path.join(process.cwd(), 'package.json'))
   ) {
     const generatedYML = await utils.generateYMLForNodejsProject();
-    cli.log('自动生成 serverless.yml 成功，即将部署');
     fs.writeFileSync(path.join(process.cwd(), 'serverless.yml'), generatedYML, 'utf8');
+    cli.log('自动生成 serverless.yml 成功，即将部署');
   }
 
   // Start CLI persistance status
