@@ -29,7 +29,7 @@ ${command('  --name')}                       自定义项目目录名称
 ${command('serverless deploy')}           部署 Serverless 实例到云端
 ${command('  --debug')}                      获取部署过程的详细信息
 ${command('  --target')}                     部署该目录下指定 Serverless 实例
-${command('  --inputs.xxx')}                 增加实例部署参数
+${command('  --inputs')}                     增加实例部署参数
 
 ${command('serverless info')}             获取并展示一个 Serverless 实例的相关信息
 
@@ -45,6 +45,8 @@ ${command('serverless registry')}         显示 应用中心 里的组件与模
 ${command('serverless registry {name}')}  显示 应用中心 里的指定组件或模版的详细信息
 
 ${command('serverless publish')}          发布一个组件或模版到 应用中心
+
+${command('serverless bind role')}        重新为当前用户分配使用 Serverless 所需权限
 
 
 ${title('当前命令行版本:')}  v${version}
