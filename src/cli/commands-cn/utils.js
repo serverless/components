@@ -270,7 +270,7 @@ const saveYaml = async (yamlPath, yamlObj) => {
   await fse.writeFile(yamlPath, yamlContent);
 };
 
-const generateYMLForNodejsProject = async () => {
+const generateYMLForNodejsProject = async (cli) => {
   const getExpressYML = (entryFile) => `component: express
 name: expressDemo
 app: appDemo
@@ -401,6 +401,13 @@ inputs:
     }
 
     const entryFileRelativePath = path.relative(process.cwd(), entryFilePath);
+    cli.log('');
+    cli.log(
+      `提示: 为保证应用可以成功部署，需要您在入口文件中使用 module.exports 导出 ${ymlType} app，示例: module.exports = app;`,
+      'green'
+    );
+    cli.log('');
+
     if (ymlType === 'express') return getExpressYML(entryFileRelativePath);
     return getKoaYML(entryFileRelativePath);
   }
