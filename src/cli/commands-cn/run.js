@@ -6,11 +6,10 @@
 
 const path = require('path');
 const fs = require('fs');
-const { runningTemplate, fileExists } = require('../utils');
+const { runningTemplate, loadInstanceConfig, fileExists } = require('../utils');
 const { ServerlessSDK, utils: tencentUtils } = require('@serverless/platform-client-china');
 const { v4: uuidv4 } = require('uuid');
 const utils = require('./utils');
-const { loadInstanceConfig } = require('../utils');
 const runAll = require('./runAll');
 const chalk = require('chalk');
 const generateNotificationsPayload = require('../notifications/generate-payload');
