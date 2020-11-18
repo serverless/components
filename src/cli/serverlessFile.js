@@ -136,22 +136,12 @@ const rootServerlessFileExists = (dir) => {
 const createRootServerlessFile = async (rootDir, serviceName, appName, orgName) => {
   const rootServerlessYmlPath = path.join(rootDir, 'serverless.yml');
 
-  // set the name
-  let rootServerlessYml = `name: ${serviceName}`;
-
-  // if app name was specified, set it
-  if (appName) {
-    rootServerlessYml = `${rootServerlessYml}\napp: ${appName}`;
-  }
+  let rootServerlessYml = `app: ${appName}`;
 
   // if org name is specified, set it
   if (orgName) {
     rootServerlessYml = `${rootServerlessYml}\norg: ${orgName}`;
   }
-
-  // there's currently no way to specify a stage in init command
-  // so we just set a default one to let users know they can change it
-  rootServerlessYml = `${rootServerlessYml}\nstage: dev`;
 
   await writeFile(rootServerlessYmlPath, rootServerlessYml);
 };

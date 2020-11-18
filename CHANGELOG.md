@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.3.1](https://github.com/serverless/components/compare/v3.3.0...v3.3.1) (2020-11-09)
+
+- Add a new command for Chinese users to bind CAM roles: `serverless bind role`
+
+## [3.3.0](https://github.com/serverless/components/compare/v3.2.7...v3.3.0) (2020-10-28)
+
+- Remove `app` property requirement from `sls publish` (because it's app is determined on `init`)
+- Remove `name` and `stage` properties from root level `serverless.yml`
+- Remove inputs from the yaml file when running `serverless remove`
+- Remove support for single command deploys.
+
 ## [3.2.7](https://github.com/serverless/components/compare/v3.2.6...v3.2.7) (2020-10-23)
 
 - For `sls registry` in China, use English description as fallback if no zh-cn description is found

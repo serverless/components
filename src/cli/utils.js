@@ -722,6 +722,10 @@ const executeGraph = async (allComponents, command, graph, cli, sdk, credentials
 
       if (command === 'remove') {
         let instance;
+
+        // do not pass inputs to remove command
+        instanceYaml.inputs = {};
+
         try {
           instance = await sdk.remove(instanceYaml, credentials, options);
         } catch (error) {
