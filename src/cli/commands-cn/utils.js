@@ -382,42 +382,37 @@ inputs:
     ymlType = result.ymlType;
   }
 
-  if (ymlType === 'express') {
-    const hasSlsJs = await fileExists(path.join(process.cwd(), 'sls.js'));
-    if (hasSlsJs) {
-      return getExpressYML();
+  if (ymlType === 'express' || ymlType === 'koa') {
+    let entryFilePath = path.join(process.cwd(), 'sls.js');
+    const hasSlsJs = await fileExists(entryFilePath);
+    if (!hasSlsJs) {
+      const res = await inquirer.prompt({
+        message: '未发现 sls.js，请输入入口文件名称',
+        type: 'input',
+        name: 'entryFile',
+      });
+      entryFilePath = path.join(process.cwd(), res.entryFile);
     }
-    const { entryFile } = await inquirer.prompt({
-      message: '未发现 sls.js，请输入入口文件名称',
-      type: 'input',
-      name: 'entryFile',
-    });
 
-    const hasEntryFile = await fileExists(path.join(process.cwd(), entryFile));
+    const hasEntryFile = await fileExists(entryFilePath);
+
     if (!hasEntryFile) {
       throw new Error('未找到入口文件，请重试');
     }
 
-    return getExpressYML(entryFile);
-  }
-
-  if (ymlType === 'koa') {
-    const hasSlsJs = await fileExists(path.join(process.cwd(), 'sls.js'));
-    if (hasSlsJs) {
-      return getKoaYML();
-    }
-    const { entryFile } = await inquirer.prompt({
-      message: '未发现 sls.js，请输入入口文件名称',
-      type: 'input',
-      name: 'entryFile',
+    const { hasExported } = await inquirer.prompt({
+      message: '部署之前，请确保入口文件中 export 了 app',
+      type: 'confirm',
+      name: 'hasExported',
     });
 
-    const hasEntryFile = await fileExists(path.join(process.cwd(), entryFile));
-    if (!hasEntryFile) {
-      throw new Error('未找到入口文件，请重试');
+    if (!hasExported) {
+      throw new Error('为保证部署成功，请先在入口文件中 export app');
     }
 
-    return getKoaYML(entryFile);
+    const entryFileRelativePath = path.relative(process.cwd(), entryFilePath);
+    if (ymlType === 'express') return getExpressYML(entryFileRelativePath);
+    return getKoaYML(entryFileRelativePath);
   }
 
   if (ymlType === 'egg') {

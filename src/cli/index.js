@@ -13,12 +13,7 @@ const semver = require('semver');
 const chalk = require('chalk');
 const HttpsProxyAgent = require('https-proxy-agent');
 const CLI = require('./CLI');
-const {
-  loadInstanceConfig,
-  fileExistsSync,
-  isProjectPath,
-  isChinaUser,
-} = require('./utils');
+const { loadInstanceConfig, fileExistsSync, isProjectPath, isChinaUser } = require('./utils');
 
 module.exports = async () => {
   const args = minimist(process.argv.slice(2));

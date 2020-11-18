@@ -4,16 +4,8 @@
  * Serverless Components: Utilities
  */
 
-const {
-  contains,
-  isNil,
-  last,
-  split,
-  mergeRight,
-  endsWith,
-  isEmpty,
-} = require('ramda');
-const memoize = require("memoizee");
+const { contains, isNil, last, split, mergeRight, endsWith, isEmpty } = require('ramda');
+const memoize = require('memoizee');
 const path = require('path');
 const globby = require('globby');
 const AdmZip = require('adm-zip');
