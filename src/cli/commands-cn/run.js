@@ -29,7 +29,11 @@ module.exports = async (config, cli, command) => {
     const generatedYML = await utils.generateYMLForNodejsProject();
     await fs.promises.writeFile(path.join(process.cwd(), 'serverless.yml'), generatedYML, 'utf8');
     loadInstanceConfig.clear();
+    cli.log('');
     cli.log('自动生成 serverless.yml 成功，即将部署');
+    cli.log('');
+    cli.log('为保证应用可以成功部署，需要您在入口文件中使用 module.exports 导出接口模块，示例: module.exports = app;', 'green');
+    cli.log('');
   }
 
   // Start CLI persistance status

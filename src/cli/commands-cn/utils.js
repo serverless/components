@@ -400,16 +400,6 @@ inputs:
       throw new Error('未找到入口文件，请重试');
     }
 
-    const { hasExported } = await inquirer.prompt({
-      message: '部署之前，请确保入口文件中 export 了 app',
-      type: 'confirm',
-      name: 'hasExported',
-    });
-
-    if (!hasExported) {
-      throw new Error('为保证部署成功，请先在入口文件中 export app');
-    }
-
     const entryFileRelativePath = path.relative(process.cwd(), entryFilePath);
     if (ymlType === 'express') return getExpressYML(entryFileRelativePath);
     return getKoaYML(entryFileRelativePath);
