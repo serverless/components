@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.3.2](https://github.com/serverless/components/compare/v3.3.1...v3.3.2) (2020-11-18)
+
+- Help Chinese users to deploy normal express/koa/nuxtjs/nextjs/egg APP easier: auto generate `serverless.yml` when `serverless deploy`
+
 ## [3.3.1](https://github.com/serverless/components/compare/v3.3.0...v3.3.1) (2020-11-09)
 
 - Add a new command for Chinese users to bind CAM roles: `serverless bind role`
