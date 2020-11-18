@@ -8,7 +8,7 @@ const path = require('path');
 const fs = require('fs');
 const args = require('minimist')(process.argv.slice(2));
 const { utils: platformUtils } = require('@serverless/platform-client-china');
-const { loadInstanceConfig, resolveVariables, parseCliInputs } = require('../utils');
+const { loadInstanceConfig, resolveVariables, parseCliInputs, fileExists } = require('../utils');
 const { mergeDeepRight } = require('ramda');
 const YAML = require('js-yaml');
 const fse = require('fs-extra');
@@ -351,7 +351,7 @@ inputs:
 `;
 
   const supportedComponents = ['express', 'koa', 'egg', 'next', 'nuxt'];
-  const packageJsonFile = fs.readFileSync(path.join(process.cwd(), 'package.json'), 'utf-8');
+  const packageJsonFile = await fs.promises.readFile(path.join(process.cwd(), 'package.json'), 'utf-8');
   const packageObj = JSON.parse(packageJsonFile);
 
   if (!packageObj.dependencies) {
@@ -380,7 +380,8 @@ inputs:
   }
 
   if (ymlType === 'express') {
-    if (fs.existsSync(path.join(process.cwd(), 'sls.js'))) {
+    const hasSlsJs = await fileExists(path.join(process.cwd(), 'sls.js'));
+    if (hasSlsJs) {
       return getExpressYML();
     }
     const { entryFile } = await inquirer.prompt({
@@ -389,7 +390,8 @@ inputs:
       name: 'entryFile',
     });
 
-    if (!fs.existsSync(path.join(process.cwd(), entryFile))) {
+    const hasEntryFile = await fileExists(path.join(process.cwd(), entryFile));
+    if (!hasEntryFile) {
       throw new Error('未找到入口文件，请重试');
     }
 
@@ -397,7 +399,8 @@ inputs:
   }
 
   if (ymlType === 'koa') {
-    if (fs.existsSync(path.join(process.cwd(), 'sls.js'))) {
+    const hasSlsJs = await fileExists(path.join(process.cwd(), 'sls.js'));
+    if (hasSlsJs) {
       return getKoaYML();
     }
     const { entryFile } = await inquirer.prompt({
@@ -406,7 +409,8 @@ inputs:
       name: 'entryFile',
     });
 
-    if (!fs.existsSync(path.join(process.cwd(), entryFile))) {
+    const hasEntryFile = await fileExists(path.join(process.cwd(), entryFile));
+    if (!hasEntryFile) {
       throw new Error('未找到入口文件，请重试');
     }
 
