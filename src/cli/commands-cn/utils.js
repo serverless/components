@@ -351,7 +351,10 @@ inputs:
 `;
 
   const supportedComponents = ['express', 'koa', 'egg', 'next', 'nuxt'];
-  const packageJsonFile = await fs.promises.readFile(path.join(process.cwd(), 'package.json'), 'utf-8');
+  const packageJsonFile = await fs.promises.readFile(
+    path.join(process.cwd(), 'package.json'),
+    'utf-8'
+  );
   const packageObj = JSON.parse(packageJsonFile);
 
   if (!packageObj.dependencies) {

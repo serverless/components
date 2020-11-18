@@ -12,9 +12,8 @@ const {
   mergeRight,
   endsWith,
   isEmpty,
-  memoizeWith,
-  identity,
 } = require('ramda');
+const memoize = require("memoizee");
 const path = require('path');
 const globby = require('globby');
 const AdmZip = require('adm-zip');
@@ -450,7 +449,7 @@ const loadInstanceConfigUncached = (directoryPath) => {
  * and caches for subsequent calls
  * @param {*} directoryPath
  */
-const loadInstanceConfig = memoizeWith(identity, loadInstanceConfigUncached);
+const loadInstanceConfig = memoize(loadInstanceConfigUncached);
 
 /**
  * THIS IS USED BY SFV1.  DO NOT MODIFY OR DELETE

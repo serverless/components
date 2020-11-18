@@ -14,7 +14,7 @@ const chalk = require('chalk');
 const HttpsProxyAgent = require('https-proxy-agent');
 const CLI = require('./CLI');
 const {
-  loadInstanceConfigUncached,
+  loadInstanceConfig,
   fileExistsSync,
   isProjectPath,
   isChinaUser,
@@ -22,7 +22,7 @@ const {
 
 module.exports = async () => {
   const args = minimist(process.argv.slice(2));
-  const instanceConfig = loadInstanceConfigUncached(process.cwd());
+  const instanceConfig = loadInstanceConfig(process.cwd());
   const stage = args.stage || (instanceConfig && instanceConfig.stage) || 'dev';
 
   const params = [];
