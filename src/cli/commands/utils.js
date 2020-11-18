@@ -128,11 +128,14 @@ const getDefaultOrgName = async () => {
 /**
  * Load AWS credentials from the aws credentials file
  */
-const loadAwsCredentials = async () => {
+const loadAwsCredentials = async (instanceYaml) => {
   const awsCredsInEnv = process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY;
 
-  if (awsCredsInEnv) {
+  const componentName = instanceYaml.component.split('@')[0];
+
+  if (awsCredsInEnv || componentName === 'express') {
     // exit if the user already has aws credentials in env or .env file
+    // or if user is trying to run the express component
     return;
   }
 
@@ -216,9 +219,9 @@ const loadAwsCredentials = async () => {
  * @param {*} stage
  */
 
-const loadInstanceCredentials = async () => {
+const loadInstanceCredentials = async (instanceYaml) => {
   // load aws credentials if found
-  await loadAwsCredentials();
+  await loadAwsCredentials(instanceYaml);
 
   // Known Provider Environment Variables and their SDK configuration properties
   const providers = {};
@@ -319,7 +322,7 @@ const loadVendorInstanceConfig = async (directoryPath, options = { disableCache:
 
   if (instanceFile.inputs) {
     // load credentials to process .env files before resolving env variables
-    await loadInstanceCredentials(instanceFile.stage);
+    await loadInstanceCredentials(instanceFile);
     instanceFile = resolveVariables(instanceFile);
 
     if (instanceFile.inputs.src) {

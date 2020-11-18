@@ -94,7 +94,7 @@ module.exports = async (config, cli) => {
   instanceYaml = await loadInstanceConfig(process.cwd(), { disableCache: true });
 
   // Load Instance Credentials
-  instanceCredentials = await loadInstanceCredentials(instanceYaml.stage);
+  instanceCredentials = await loadInstanceCredentials(instanceYaml);
 
   // Get access key
   const accessKey = await getAccessKey(instanceYaml.org);

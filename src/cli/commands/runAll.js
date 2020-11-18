@@ -54,7 +54,7 @@ module.exports = async (config, cli, command) => {
   }
 
   // Load Instance Credentials
-  const credentials = await loadInstanceCredentials(templateYaml.stage);
+  const credentials = await loadInstanceCredentials(templateYaml);
 
   cli.sessionStatus('Initializing');
 
