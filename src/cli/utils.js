@@ -937,7 +937,7 @@ const hasServerlessConfigFile = (inputPath) => {
     }
   }
   return false;
-}
+};
 
 module.exports = {
   sleep,

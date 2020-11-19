@@ -66,5 +66,3 @@ const runningComponents = () => {
 };
 
 module.exports = { runningComponents };
-
-runningComponents()
