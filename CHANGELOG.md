@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [3.3.2](https://github.com/serverless/components/compare/v3.3.1...v3.3.2) (2020-11-18)
+## [3.4.0](https://github.com/serverless/components/compare/v3.3.1...v3.4.0) (2020-11-19)
 
 - Help Chinese users to deploy normal express/koa/nuxtjs/nextjs APP easier
   - Auto generate `serverless.yml` when `serverless deploy`
