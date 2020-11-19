@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## [3.3.2](https://github.com/serverless/components/compare/v3.3.1...v3.3.2) (2020-11-18)
 
-- Help Chinese users to deploy normal express/koa/nuxtjs/nextjs/egg APP easier
+- Help Chinese users to deploy normal express/koa/nuxtjs/nextjs APP easier
   - Auto generate `serverless.yml` when `serverless deploy`
   - Remind them where and how to change their code when necessary
 

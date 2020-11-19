@@ -301,21 +301,6 @@ inputs:${entryFile ? `\n  entryFile: ${entryFile}` : ''}
     environment: release
 `;
 
-  const getEggYML = () => `component: egg
-name: eggDemo
-app: appDemo
-
-inputs:
-  src: ./
-  region: ap-guangzhou
-  runtime: Nodejs10.15
-  apigatewayConf:
-    protocols:
-      - http
-      - https
-    environment: release
-`;
-
   const getNextYML = () => `component: nextjs
 name: nextjsDemo
 app: appDemo
@@ -350,7 +335,7 @@ inputs:
     environment: release
 `;
 
-  const supportedComponents = ['express', 'koa', 'egg', 'next', 'nuxt'];
+  const supportedComponents = ['express', 'koa', 'next', 'nuxt'];
   const packageJsonFile = await fs.promises.readFile(
     path.join(process.cwd(), 'package.json'),
     'utf-8'
@@ -410,10 +395,6 @@ inputs:
 
     if (ymlType === 'express') return getExpressYML(entryFileRelativePath);
     return getKoaYML(entryFileRelativePath);
-  }
-
-  if (ymlType === 'egg') {
-    return getEggYML();
   }
 
   if (ymlType === 'next') {
