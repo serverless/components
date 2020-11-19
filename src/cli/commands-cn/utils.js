@@ -8,10 +8,11 @@ const path = require('path');
 const fs = require('fs');
 const args = require('minimist')(process.argv.slice(2));
 const { utils: platformUtils } = require('@serverless/platform-client-china');
-const { loadInstanceConfig, resolveVariables, parseCliInputs } = require('../utils');
+const { loadInstanceConfig, resolveVariables, parseCliInputs, fileExists } = require('../utils');
 const { mergeDeepRight } = require('ramda');
 const YAML = require('js-yaml');
 const fse = require('fs-extra');
+const inquirer = require('@serverless/utils/inquirer');
 
 const updateEnvFile = (envs) => {
   // write env file
@@ -269,6 +270,144 @@ const saveYaml = async (yamlPath, yamlObj) => {
   await fse.writeFile(yamlPath, yamlContent);
 };
 
+const generateYMLForNodejsProject = async (cli) => {
+  const getExpressYML = (entryFile) => `component: express
+name: expressDemo
+app: appDemo
+
+inputs:${entryFile ? `\n  entryFile: ${entryFile}` : ''}
+  src: ./
+  region: ap-guangzhou
+  runtime: Nodejs10.15
+  apigatewayConf:
+    protocols:
+      - http
+      - https
+    environment: release
+`;
+
+  const getKoaYML = (entryFile) => `component: koa
+name: koaDemo
+app: appDemo
+
+inputs:${entryFile ? `\n  entryFile: ${entryFile}` : ''}
+  src: ./
+  region: ap-guangzhou
+  runtime: Nodejs10.15
+  apigatewayConf:
+    protocols:
+      - http
+      - https
+    environment: release
+`;
+
+  const getNextYML = () => `component: nextjs
+name: nextjsDemo
+app: appDemo
+
+inputs:
+  src:
+    dist: ./
+    hook: npm run build
+  region: ap-guangzhou
+  runtime: Nodejs10.15
+  apigatewayConf:
+    protocols:
+      - http
+      - https
+    environment: release
+`;
+
+  const getNuxtYML = () => `component: nuxtjs
+name: nuxtjsDemo
+app: appDemo
+
+inputs:
+  src:
+    hook: npm run build
+    dist: ./
+  region: ap-guangzhou
+  runtime: Nodejs10.15
+  apigatewayConf:
+    protocols:
+      - http
+      - https
+    environment: release
+`;
+
+  const supportedComponents = ['express', 'koa', 'next', 'nuxt'];
+  const packageJsonFile = await fs.promises.readFile(
+    path.join(process.cwd(), 'package.json'),
+    'utf-8'
+  );
+  const packageObj = JSON.parse(packageJsonFile);
+
+  if (!packageObj.dependencies) {
+    throw new Error('当前目录未检测到 Serverless 配置文件');
+  }
+
+  const dependencies = Object.keys(packageObj.dependencies);
+  const knownPackages = supportedComponents.filter((value) => dependencies.includes(value));
+
+  if (knownPackages.length === 0) {
+    throw new Error('当前目录未检测到 Serverless 配置文件');
+  }
+
+  // get yml type
+  let ymlType;
+  if (knownPackages.length === 1) {
+    ymlType = knownPackages[0];
+  } else if (knownPackages.length > 1) {
+    const result = await inquirer.prompt({
+      message: '在 package.json 里发现以下依赖，选择您希望创建的 serverless 的应用类型',
+      type: 'list',
+      name: 'ymlType',
+      choices: knownPackages,
+    });
+    ymlType = result.ymlType;
+  }
+
+  if (ymlType === 'express' || ymlType === 'koa') {
+    let entryFilePath = path.join(process.cwd(), 'sls.js');
+    const hasSlsJs = await fileExists(entryFilePath);
+    if (!hasSlsJs) {
+      const res = await inquirer.prompt({
+        message: '未发现 sls.js，请输入入口文件名称',
+        type: 'input',
+        name: 'entryFile',
+      });
+      entryFilePath = path.join(process.cwd(), res.entryFile);
+    }
+
+    const hasEntryFile = await fileExists(entryFilePath);
+
+    if (!hasEntryFile) {
+      throw new Error('未找到入口文件，请重试');
+    }
+
+    const entryFileRelativePath = path.relative(process.cwd(), entryFilePath);
+    cli.log('');
+    cli.log(
+      `提示: 为保证应用可以成功部署，需要您在入口文件中使用 module.exports 导出 ${ymlType} app，示例: module.exports = app;`,
+      'green'
+    );
+    cli.log('');
+
+    if (ymlType === 'express') return getExpressYML(entryFileRelativePath);
+    return getKoaYML(entryFileRelativePath);
+  }
+
+  if (ymlType === 'next') {
+    return getNextYML();
+  }
+
+  if (ymlType === 'nuxt') {
+    return getNuxtYML();
+  }
+
+  throw new Error('当前目录未检测到 Serverless 配置文件');
+};
+
 module.exports = {
   loadInstanceConfig: loadTencentInstanceConfig,
   loadInstanceCredentials,
@@ -279,4 +418,5 @@ module.exports = {
   handleDebugLogMessage,
   parseYaml,
   saveYaml,
+  generateYMLForNodejsProject,
 };

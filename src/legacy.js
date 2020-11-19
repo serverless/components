@@ -11,6 +11,7 @@ const {
   legacyLoadComponentConfig,
   legacyLoadInstanceConfig,
   isChinaUser,
+  hasServerlessConfigFile,
 } = require('./cli/utils');
 
 // These keywords are intercepted by the Serverless Components CLI
@@ -32,6 +33,11 @@ const runningComponents = () => {
     args.target ||
     args['help-components'] // if user runs "serverless --help-components" in ANY context, show components help
   ) {
+    return true;
+  }
+
+  // Chinese users running "serverless deploy" in a project without a serverless config file
+  if (isChinaUser() && process.argv[2] === 'deploy' && !hasServerlessConfigFile(process.cwd())) {
     return true;
   }
 

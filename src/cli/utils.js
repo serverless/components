@@ -4,17 +4,8 @@
  * Serverless Components: Utilities
  */
 
-const {
-  contains,
-  isNil,
-  last,
-  split,
-  mergeRight,
-  endsWith,
-  isEmpty,
-  memoizeWith,
-  identity,
-} = require('ramda');
+const { contains, isNil, last, split, mergeRight, endsWith, isEmpty } = require('ramda');
+const memoize = require('memoizee');
 const path = require('path');
 const globby = require('globby');
 const AdmZip = require('adm-zip');
@@ -450,7 +441,7 @@ const loadInstanceConfigUncached = (directoryPath) => {
  * and caches for subsequent calls
  * @param {*} directoryPath
  */
-const loadInstanceConfig = memoizeWith(identity, loadInstanceConfigUncached);
+const loadInstanceConfig = memoize(loadInstanceConfigUncached);
 
 /**
  * THIS IS USED BY SFV1.  DO NOT MODIFY OR DELETE
@@ -931,6 +922,23 @@ const parseCliInputs = () => {
   return cliInputs;
 };
 
+const hasServerlessConfigFile = (inputPath) => {
+  const possibleConfigFiles = [
+    'serverless.yml',
+    'serverless.yaml',
+    'serverless.json',
+    'serverless.js',
+    'serverless.ts',
+  ];
+
+  for (const possibleConfigFile of possibleConfigFiles) {
+    if (fileExistsSync(path.join(inputPath, possibleConfigFile))) {
+      return true;
+    }
+  }
+  return false;
+};
+
 module.exports = {
   sleep,
   fileExists,
@@ -959,4 +967,5 @@ module.exports = {
   isChinaUser,
   validateNodeModules,
   parseCliInputs,
+  hasServerlessConfigFile,
 };

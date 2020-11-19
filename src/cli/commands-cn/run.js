@@ -5,7 +5,8 @@
  */
 
 const path = require('path');
-const { runningTemplate } = require('../utils');
+const fs = require('fs');
+const { runningTemplate, loadInstanceConfig, fileExists } = require('../utils');
 const { ServerlessSDK, utils: tencentUtils } = require('@serverless/platform-client-china');
 const { v4: uuidv4 } = require('uuid');
 const utils = require('./utils');
@@ -15,10 +16,20 @@ const generateNotificationsPayload = require('../notifications/generate-payload'
 const requestNotification = require('../notifications/request');
 const printNotification = require('../notifications/print-notification');
 const { version } = require('../../../package.json');
+const { getServerlessFilePath } = require('../serverlessFile');
 
 module.exports = async (config, cli, command) => {
   if (!config.target && runningTemplate(process.cwd())) {
     return runAll(config, cli, command);
+  }
+
+  const hasPackageJson = await fileExists(path.join(process.cwd(), 'package.json'));
+
+  if (command === 'deploy' && !getServerlessFilePath(process.cwd()) && hasPackageJson) {
+    const generatedYML = await utils.generateYMLForNodejsProject(cli);
+    await fs.promises.writeFile(path.join(process.cwd(), 'serverless.yml'), generatedYML, 'utf8');
+    loadInstanceConfig.clear();
+    cli.log('自动生成 serverless.yml 成功，即将部署');
   }
 
   // Start CLI persistance status
