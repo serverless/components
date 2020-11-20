@@ -8,6 +8,8 @@ const path = require('path');
 const { ServerlessSDK } = require('@serverless/platform-client-china');
 const { v4: uuidv4 } = require('uuid');
 const utils = require('./utils');
+const { runningTemplate } = require('../utils');
+const infoAll = require('./infoAll');
 const chalk = require('chalk');
 const moment = require('moment');
 
@@ -17,6 +19,10 @@ module.exports = async (config, cli, command) => {
 
   await utils.login();
 
+  if (runningTemplate(process.cwd())) {
+    return infoAll();
+  }
+  
   // Load YAML
   let instanceDir = process.cwd();
   if (config.target) {

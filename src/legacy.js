@@ -16,6 +16,8 @@ const {
 
 // These keywords are intercepted by the Serverless Components CLI
 const componentKeywords = new Set(['registry', 'init', 'publish']);
+// These keywords are allowed for nested templates
+const nestedTemplateKeywords = new Set(['deploy', 'remove', 'info']);
 
 const runningComponents = () => {
   const args = minimist(process.argv.slice(2));
@@ -26,10 +28,7 @@ const runningComponents = () => {
   // load components if user runs a keyword command, or "sls --all" or "sls --target" (that last one for china)
   if (
     componentKeywords.has(process.argv[2]) ||
-    // only allow deploy & remove commands for nested templates
-    // to save up on extensive FS operations for all the other possible framework v1 commands
-    ((process.argv[2] === 'deploy' || process.argv[2] === 'remove') &&
-      runningTemplate(process.cwd())) ||
+    (nestedTemplateKeywords.has(process.argv[2]) && runningTemplate(process.cwd())) ||
     args.target ||
     args['help-components'] // if user runs "serverless --help-components" in ANY context, show components help
   ) {
