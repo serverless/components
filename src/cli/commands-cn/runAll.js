@@ -10,7 +10,7 @@ const {
   createGraph,
   executeGraph,
 } = require('../utils');
-const { login, loadInstanceCredentials, getTemplate, handleDebugLogMessage } = require('./utils');
+const { login, getTemplate, handleDebugLogMessage } = require('./utils');
 const generateNotificationsPayload = require('../notifications/generate-payload');
 const { v4: uuidv4 } = require('uuid');
 const requestNotification = require('../notifications/request');
@@ -34,7 +34,7 @@ module.exports = async (config, cli, command) => {
   }
 
   // Load Instance Credentials
-  const credentials = await loadInstanceCredentials(templateYaml.stage);
+  const credentials = {};
 
   cli.sessionStatus('Initializing', templateYaml.name);
 
