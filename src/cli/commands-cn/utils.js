@@ -101,8 +101,6 @@ const loadTencentInstanceConfig = async (directoryPath, command) => {
   instanceFile.inputs = mergeDeepRight(instanceFile.inputs || {}, cliInputs);
 
   if (instanceFile.inputs) {
-    // load credentials to process .env files before resolving env variables
-    await loadInstanceCredentials(instanceFile.stage);
     instanceFile = resolveVariables(instanceFile);
     if (instanceFile.inputs.src) {
       if (typeof instanceFile.inputs.src === 'string') {
@@ -138,45 +136,6 @@ const login = async () => {
       TENCENT_TOKEN: token,
     });
   }
-};
-
-/**
- * Load credentials from a ".env" or ".env.[stage]" file
- * @param {*} stage
- */
-const loadInstanceCredentials = () => {
-  // Load env vars TODO
-  const envVars = {};
-
-  // Known Provider Environment Variables and their SDK configuration properties
-  const providers = {};
-
-  // Tencent
-  providers.tencent = {};
-  providers.tencent.TENCENT_APP_ID = 'AppId';
-  providers.tencent.TENCENT_SECRET_ID = 'SecretId';
-  providers.tencent.TENCENT_SECRET_KEY = 'SecretKey';
-  providers.tencent.TENCENT_TOKEN = 'Token';
-
-  const credentials = {};
-
-  for (const [providerName, provider] of Object.entries(providers)) {
-    const providerEnvVars = provider;
-    for (const [envVarName, envVarValue] of Object.entries(providerEnvVars)) {
-      if (!credentials[providerName]) {
-        credentials[providerName] = {};
-      }
-      // Proper environment variables override what's in the .env file
-      if (process.env[envVarName] != null) {
-        credentials[providerName][envVarValue] = process.env[envVarName];
-      } else if (envVars[envVarName] != null) {
-        credentials[providerName][envVarValue] = envVars[envVarName];
-      }
-      continue;
-    }
-  }
-
-  return credentials;
 };
 
 const getTemplate = async (root) => {
@@ -410,7 +369,6 @@ inputs:
 
 module.exports = {
   loadInstanceConfig: loadTencentInstanceConfig,
-  loadInstanceCredentials,
   login,
   getDefaultOrgName,
   getTemplate,
