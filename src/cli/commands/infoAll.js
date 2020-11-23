@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 const { getAccessKey, getTemplate, getDashboardUrl } = require('./utils');
 const { ServerlessSDK } = require('@serverless/platform-client');

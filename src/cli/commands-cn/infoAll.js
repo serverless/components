@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 const { v4: uuidv4 } = require('uuid');
 const { ServerlessSDK } = require('@serverless/platform-client-china');
