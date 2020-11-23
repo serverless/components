@@ -104,11 +104,7 @@ module.exports = async () => {
   }
 
   let commands;
-  let InvalidCommandMsg =
-    'Please enter a valid command. Run "serverless help" to see all available commands.';
   if (isChinaUser()) {
-    InvalidCommandMsg =
-      "检测到当前目录下已有 serverless 项目，请通过 'sls deploy' 进行部署，或在新路径下完成 serverless 项目初始化";
     commands = require('./commands-cn');
   } else {
     commands = require('./commands');
@@ -143,7 +139,9 @@ module.exports = async () => {
 
   try {
     if (!command) {
-      throw new Error(InvalidCommandMsg);
+      throw new Error(
+        'Please enter a valid command. Run "serverless help" to see all available commands.'
+      );
     }
     if (commands[command]) {
       await commands[command](config, cli, command);

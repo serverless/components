@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.4.2](https://github.com/serverless/components/compare/v3.4.1...v3.4.2) (2020-11-23)
+
+- Revert v3.4.1
+
 ## [3.4.1](https://github.com/serverless/components/compare/v3.4.0...v3.4.1) (2020-11-20)
 
 - Add Chinese translation for invalid commend error message
