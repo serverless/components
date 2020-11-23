@@ -17,6 +17,7 @@ const { isChinaUser } = require('./utils');
 // CLI Colors
 const grey = chalk.dim;
 const white = (str) => str; // we wanna use the default terimanl color, so we just return the string as is with no color codes
+const whiteBold = chalk.bold;
 const { green } = chalk;
 const red = chalk.rgb(255, 99, 99);
 const blue = chalk.rgb(199, 232, 255);
@@ -344,6 +345,9 @@ class CLI {
       if (!color || color === 'white') {
         process.stdout.write(white(msg));
       }
+      if (color === 'whiteBold') {
+        process.stdout.write(whiteBold(msg));
+      }
       if (color === 'grey') {
         process.stdout.write(grey(msg));
       }
@@ -447,7 +451,7 @@ class CLI {
    * Outputs
    * - Render outputs cleanly.
    */
-  logOutputs(outputs) {
+  logOutputs(outputs, indent = 0) {
     if (!outputs || typeof outputs !== 'object' || Object.keys(outputs).length === 0) {
       this.sessionStop('done', 'Success');
     }
@@ -467,7 +471,7 @@ class CLI {
               false: null,
             },
           },
-          0
+          indent
         )
       )
     );

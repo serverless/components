@@ -25,7 +25,7 @@ module.exports = async (config, cli) => {
   }
 
   if (runningTemplate(process.cwd())) {
-    return infoAll();
+    return infoAll(config, cli);
   }
 
   // Start CLI persistance status

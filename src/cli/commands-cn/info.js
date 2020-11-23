@@ -20,9 +20,9 @@ module.exports = async (config, cli, command) => {
   await utils.login();
 
   if (runningTemplate(process.cwd())) {
-    return infoAll();
+    return infoAll(config, cli);
   }
-  
+
   // Load YAML
   let instanceDir = process.cwd();
   if (config.target) {
