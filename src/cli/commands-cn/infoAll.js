@@ -60,6 +60,14 @@ module.exports = async (config, cli) => {
     cli.log(`  ${chalk.grey('Status:')}       ${statusLog}`);
     cli.log(`  ${chalk.grey('Deployments:')}  ${instance.instanceMetrics.deployments}`);
 
+    // show state only in debug mode
+    if (config.debug) {
+      cli.log();
+      cli.log(`${'State:'}`, 'whiteBold');
+      cli.log();
+      cli.logOutputs(instance.state);
+    }
+
     const outputs = instance.outputs;
 
     delete outputs.vendorMessage;

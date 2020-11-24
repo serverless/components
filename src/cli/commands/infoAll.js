@@ -62,6 +62,14 @@ module.exports = async (config, cli) => {
       `  ${chalk.grey('Component:')}    ${instance.componentName}@${instance.componentVersion}`
     );
 
+    // show state only in debug mode
+    if (config.debug) {
+      cli.log();
+      cli.log(`${'State:'}`, 'whiteBold');
+      cli.log();
+      cli.logOutputs(instance.state);
+    }
+
     const outputs = instance.outputs;
 
     delete outputs.vendorMessage;
