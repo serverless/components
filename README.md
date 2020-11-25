@@ -146,6 +146,8 @@ inputs:
     dbTableName: ${output:${stage}:${app}:my-table.name}
 ```
 
+**Note:** Serverless Components only supports Node.js applications at the moment.
+
 <br/>
 
 # Overview
