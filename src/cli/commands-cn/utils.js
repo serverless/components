@@ -230,6 +230,10 @@ const getInstanceDashboardUrl = (instanceYaml) => {
   return `Full details: https://serverless.cloud.tencent.com/apps/${instanceYaml.app}/${instanceYaml.name}/${instanceYaml.stage}`;
 };
 
+const getTemplateDashboardUrl = (templateYaml) => {
+  return `Full details: https://serverless.cloud.tencent.com/?q=${templateYaml.app}`;
+};
+
 const handleDebugLogMessage = (cli) => {
   return (evt) => {
     if (evt.event !== 'instance.run.logs') {
@@ -415,6 +419,7 @@ module.exports = {
   getDefaultOrgName,
   getTemplate,
   getInstanceDashboardUrl,
+  getTemplateDashboardUrl,
   handleDebugLogMessage,
   parseYaml,
   saveYaml,

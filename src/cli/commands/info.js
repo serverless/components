@@ -11,6 +11,8 @@ const {
   isLoggedInOrHasAccessKey,
   getDashboardUrl,
 } = require('./utils');
+const { runningTemplate } = require('../utils');
+const infoAll = require('./infoAll');
 const chalk = require('chalk');
 const moment = require('moment');
 
@@ -20,6 +22,10 @@ module.exports = async (config, cli) => {
     cli.logAdvertisement();
     cli.sessionStop('error', 'Please log in by running "serverless login"');
     return null;
+  }
+
+  if (runningTemplate(process.cwd())) {
+    return infoAll(config, cli);
   }
 
   // Start CLI persistance status
