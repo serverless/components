@@ -25,7 +25,12 @@ module.exports = async (config, cli, command) => {
 
   const hasPackageJson = await fileExists(path.join(process.cwd(), 'package.json'));
 
-  if (command === 'deploy' && !getServerlessFilePath(process.cwd()) && hasPackageJson) {
+  if (
+    command === 'deploy' &&
+    !getServerlessFilePath(process.cwd()) &&
+    hasPackageJson &&
+    !config.target
+  ) {
     const generatedYML = await utils.generateYMLForNodejsProject(cli);
     await fs.promises.writeFile(path.join(process.cwd(), 'serverless.yml'), generatedYML, 'utf8');
     loadInstanceConfig.clear();
