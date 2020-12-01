@@ -226,12 +226,17 @@ const getTemplate = async (root) => {
   return componentDirectoryFound ? template : null;
 };
 
+const SSRComponents = ['nextjs', 'nuxtjs', 'express', 'flask', 'laravel', 'koa', 'egg'];
 const getInstanceDashboardUrl = (instanceYaml) => {
-  return `Full details: https://serverless.cloud.tencent.com/apps/${instanceYaml.app}/${instanceYaml.name}/${instanceYaml.stage}`;
+  let dashboardUrl = `https://serverless.cloud.tencent.com/apps/${instanceYaml.app}/${instanceYaml.name}/${instanceYaml.stage}`;
+  if (SSRComponents.includes(instanceYaml.component)) {
+    dashboardUrl = `https://console.cloud.tencent.com/ssr/detail?stageName=${instanceYaml.stage}&appName=${instanceYaml.app}&instanceName=${instanceYaml.name}&stageList=${instanceYaml.stage}`;
+  }
+  return `前往控制台查看应用详细信息: ${dashboardUrl}`;
 };
 
 const getTemplateDashboardUrl = (templateYaml) => {
-  return `Full details: https://serverless.cloud.tencent.com/?q=${templateYaml.app}`;
+  return `前往控制台查看应用详细信息: https://serverless.cloud.tencent.com/?q=${templateYaml.app}`;
 };
 
 const handleDebugLogMessage = (cli) => {
