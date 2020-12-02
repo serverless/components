@@ -4,9 +4,9 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## [3.4.3](https://github.com/serverless/components/compare/v3.4.2...v3.4.1) (2020-11-23)
 
-- Update dashboard URL
-- Add `serverless info` support for nested template
-- Fix `serverless deploy --target` bug
+- Update dashboard URL #846
+- Add `serverless info` support for nested template #845
+- Fix `serverless deploy --target` bug #842
 
 ## [3.4.2](https://github.com/serverless/components/compare/v3.4.1...v3.4.2) (2020-11-23)
 
