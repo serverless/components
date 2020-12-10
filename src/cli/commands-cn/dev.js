@@ -7,7 +7,6 @@
 const path = require('path');
 const { Writable } = require('stream');
 const ansiEscapes = require('ansi-escapes');
-const confirm = require('@serverless/utils/inquirer/confirm');
 const chokidar = require('chokidar');
 const { ServerlessSDK, utils: chinaUtils } = require('@serverless/platform-client-china');
 const { v4: uuidv4 } = require('uuid');
@@ -28,9 +27,7 @@ class LogForwardingOutput extends Writable {
 }
 
 const logForwardingOutput = new LogForwardingOutput();
-let functionInfoStore = null;
-let regionStore = null;
-let cliEventCallback = null;
+
 /*
  * Deploy changes and hookup event callback which will be called when
  * deploying status has been changed.
@@ -40,10 +37,6 @@ let cliEventCallback = null;
  * @param enventCallback - event callback, when set to false, it will remove all event listener
  */
 async function deploy(sdk, instance, credentials) {
-  // The new debug api does not support deploying instance while it's in debugging mode, so stop it before deployment
-  if (functionInfoStore && regionStore && cliEventCallback) {
-    await chinaUtils.stopTencentRemoteLogAndDebug(functionInfoStore, regionStore, cliEventCallback);
-  }
   const getInstanceInfo = async () => {
     const { instance: instanceInfo } = await sdk.getInstance(
       instance.org,
@@ -63,7 +56,7 @@ async function deploy(sdk, instance, credentials) {
     while (instanceInfo.instanceStatus === 'deploying') {
       instanceInfo = await getInstanceInfo();
       if (Date.now() - instanceStatusPollingStartTime > 24000) {
-        throw new Error('部署超时，请稍后重试');
+        throw new Error('Deployment timeout, please retry in a few seconds');
       }
     }
   } catch (e) {
@@ -79,7 +72,7 @@ async function updateDeploymentStatus(cli, instanceInfo, startDebug) {
   const d = new Date();
   const header = `${d.toLocaleTimeString()} - ${instanceName} - deployment`;
 
-  cliEventCallback = (msg, option) => {
+  const cliEventCallback = (msg, option) => {
     cli.log(msg, option && option.type === 'error' ? 'red' : 'grey');
   };
   cliEventCallback.stdout = logForwardingOutput;
@@ -90,8 +83,6 @@ async function updateDeploymentStatus(cli, instanceInfo, startDebug) {
         state: { lambdaArn, region },
         outputs: { scf, runtime, namespace },
       } = instanceInfo;
-      regionStore = region;
-
       let runtimeInfo = runtime;
       let namespaceInfo = namespace;
       if (!runtimeInfo && scf) {
@@ -106,7 +97,6 @@ async function updateDeploymentStatus(cli, instanceInfo, startDebug) {
           namespace: namespaceInfo,
           runtime: runtimeInfo,
         };
-        functionInfoStore = functionInfo;
         await chinaUtils.stopTencentRemoteLogAndDebug(functionInfo, region, cliEventCallback);
         if (startDebug) {
           await chinaUtils.startTencentRemoteLogAndDebug(functionInfo, region, cliEventCallback);
@@ -124,46 +114,32 @@ async function updateDeploymentStatus(cli, instanceInfo, startDebug) {
       cli.sessionStatus('Watching');
       break;
     default:
-      cli.log(`部署失败，当前实例状态不支持更改: ${instanceStatus}`, 'red');
+      cli.log(`Deployment failed due to unknown deployment status: ${instanceStatus}`, 'red');
   }
   return false;
 }
 
-// eslint-disable-next-line consistent-return
 module.exports = async (config, cli, command) => {
-  cli.log('为方便您的调试，当前开启调试模式后，应用实例配置将会变更:');
-  cli.log(
-    '1. 当前函数实例将进入单例模式；同一时间该函数所有版本只能响应一个事件，并发超出的事件将调用失败；已预制的多个实例也会缩至单个实例'
-  );
-  cli.log('2. $LATEST版本执行超时时间将调整为900s');
-  cli.log('3. 关闭调试模式后，上述配置将恢复');
-  if (
-    !(await confirm(
-      '以上变更只针对Node.js且版本>=10.15, 其它语言或版本不受影响, 是否确定开启调试模式?(Y/N)'
-    ))
-  ) {
-    return null;
-  }
   let watcher;
 
   // Define a close handler, that removes any "dev" mode agents
   const closeHandler = async () => {
     // Set new close listener
     process.on('SIGINT', () => {
-      cli.sessionStop('error', 'dev 模式已取消');
+      cli.sessionStop('error', 'Dev Mode Canceled.');
       process.exit();
     });
 
     if (watcher) {
       await watcher.close();
     }
-    cli.sessionStatus('dev 模式关闭中', null, 'green');
+    cli.sessionStatus('Disabling Dev Mode & Closing', null, 'green');
     const deployedInstance = await deploy(sdk, instanceYaml, instanceCredentials);
     if (await updateDeploymentStatus(cli, deployedInstance, false)) {
-      cli.sessionStop('success', 'dev 模式已关闭');
+      cli.sessionStop('success', 'Dev Mode Closed');
       return null;
     }
-    cli.sessionStop('error', '部署失败，请运行 “sls deploy” 进行重试');
+    cli.sessionStop('error', 'Deployment failed. Run "serverless deploy" to deploy again.');
     return null;
   };
 
@@ -174,7 +150,10 @@ module.exports = async (config, cli, command) => {
 
   // Presentation
   cli.logLogo();
-  cli.log('Dev Mode - 项目监控中，任何变更都会通过日志输出', 'grey');
+  cli.log(
+    'Dev Mode - Watching your Component for changes and enabling streaming logs, if supported...',
+    'grey'
+  );
   cli.log();
 
   // Load serverless component instance.  Submit a directory where its config files should be.
@@ -222,7 +201,7 @@ module.exports = async (config, cli, command) => {
   watcher = chokidar.watch(process.cwd(), { ignored: /\.serverless/ });
 
   watcher.on('ready', async () => {
-    cli.sessionStatus('dev 模式开启中', null, 'green');
+    cli.sessionStatus('Enabling Dev Mode', null, 'green');
     const deployedInstance = await deploy(sdk, instanceYaml, instanceCredentials);
     await updateDeploymentStatus(cli, deployedInstance, true);
   });
