@@ -597,6 +597,13 @@ HTTP_PROXY=http://127.0.0.1:12345 # 您的代理
 HTTPS_PROXY=http://127.0.0.1:12345 # 您的代理
 ```
 
+或者:
+
+```
+http_proxy=http://127.0.0.1:12345 # Your proxy
+https_proxy=http://127.0.0.1:12345 # Your proxy
+```
+
 ### 参数-**当前只中国用户可用**
 
 用户可以通过命令行为当前 app 和 stage 的敏感信息设置参数, 可以后续直接在配置文件中使用
