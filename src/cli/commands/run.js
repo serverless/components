@@ -164,6 +164,12 @@ module.exports = async (config, cli, command) => {
     try {
       instance = await action();
     } catch (error) {
+      if (error.message.includes('AWS Credentials not found')) {
+        error.message = `${error.message}
+
+  Note: Starting in 2021, we no longer automatically pick up credentials not defined in a .env file. More Info: git.io/aasdfas`;
+      }
+
       if (error.name === 'Invalid Component Types') {
         error.message = `Invalid Input: ${error.message}`;
       }
