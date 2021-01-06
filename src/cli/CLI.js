@@ -427,7 +427,12 @@ class CLI {
     ad = ad + os.EOL + grey('  • State Storage, Secrets Management');
     ad = ad + os.EOL + grey('  • And More: https://github.com/serverless/components');
     ad += os.EOL;
-    ad = ad + os.EOL + grey('Note - This is an optional SaaS feature, where our hosted cloud engine can access your credentials and code alike a CI/CD product. Learn more here: https://github.com/serverless/components#security-considerations');
+    ad =
+      ad +
+      os.EOL +
+      grey(
+        'Note - This is an optional SaaS feature, where our hosted cloud engine can access your credentials and code alike a CI/CD product. Learn more here: https://github.com/serverless/components#security-considerations'
+      );
     this.log(ad);
   }
 
