@@ -419,13 +419,15 @@ class CLI {
     this.logLogo();
     this.log();
     let ad = grey(
-      'This is a Serverless Framework Component, which is a premium development experience for a serverless use-case.  Sign in via "serverless login" to use it for free with these features:'
+      'This is a Serverless Framework Component, a premium development experience.  Run "serverless login" to use it for free with these features:'
     );
     ad += os.EOL;
-    ad = ad + os.EOL + grey('  • Monitoring & Metrics');
-    ad = ad + os.EOL + grey('  • Rapid Deployments & Real-time Logs');
-    ad = ad + os.EOL + grey('  • State Storage, Secrets Management & Share Outputs');
-    ad = ad + os.EOL + grey('  • And Much More: https://github.com/serverless/components');
+    ad = ad + os.EOL + grey('  • Instant Deployments');
+    ad = ad + os.EOL + grey('  • Real-Time Logs In Your CLI');
+    ad = ad + os.EOL + grey('  • State Storage, Secrets Management');
+    ad = ad + os.EOL + grey('  • And More: https://github.com/serverless/components');
+    ad += os.EOL;
+    ad = ad + os.EOL + grey('Note - This is a SaaS feature. Your credentials and code will pass through our cloud engine (alike a CI/CD product).  Learn more here: https://github.com/serverless/components#security-considerations');
     this.log(ad);
   }
 
