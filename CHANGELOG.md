@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.4.4](https://github.com/serverless/components/compare/v3.4.3...v3.4.4) (2021-01-06)
+
+- Update login logs #862
+- Support http_proxy & https_proxy environment variables #838
+
 ## [3.4.3](https://github.com/serverless/components/compare/v3.4.2...v3.4.1) (2020-11-23)
 
 - Update dashboard URL #846
