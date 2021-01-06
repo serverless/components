@@ -12,7 +12,7 @@ Serverless Components are abstractions that enable developers to deploy serverle
 Serverless Components work differently from Serverless Framework's traditional local deployment model.  To deliver a significantly faster development experience, your source code and credentials will pass through an innovative, hosted deployment engine (it's alike a CI/CD product).  Learn more about our deployment engine's handling of credentials and source code [here](#security-considerations).
 
 <p>
-  Serverless Components is now Generally Available.  <a href="https://github.com/serverless/components/tree/v1">Click here for documentation of the Beta Version</a>
+  Serverless Components is now Generally Available.  <a href="https://github.com/serverless/components/tree/v1">Click here for the Beta version.</a>
 </p>
 
 <br/>
