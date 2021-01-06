@@ -13,13 +13,15 @@
   <a href="./README.cn.md">简体中文</a>
 </p>
 
-Serverless Components are simple abstractions that enable developers to deploy serverless applications and use-cases easily, via the [Serverless Framework](https://github.com/serverless/serverless).
+Serverless Components are abstractions that enable developers to deploy serverless applications and use-cases more easily, all via the [Serverless Framework](https://github.com/serverless/serverless).  
+
+Serverless Components work differently from Serverless Framework's traditional local deployment model.  To deliver a significantly faster development experience, your source code and credentials will pass through an innovative, hosted deployment engine (it's alike a CI/CD product).  Learn more about our deployment engine's handling of credentials and source code [here](#security-considerations).
 
 <br/>
 
 - [x] **Ease** - Deploy entire serverless applications/use-cases via Components, without being a cloud expert.
-- [x] **Instant Deployments** - Components deploy in 2-4 seconds, making rapid development on the cloud possible.
-- [x] **Streaming Logs** - Many Components stream logs from your app to your console in real-time, for fast debugging.
+- [x] **Instant Deployments** - Components deploy in ~8s seconds, making rapid development on the cloud possible.
+- [x] **Streaming Logs** - Components stream logs from your app to your console in real-time, for fast debugging.
 - [x] **Automatic Metrics** - Many Components auto-set-up metrics upon deployment.
 - [x] **Build Your Own** - Components are easy to build.
 - [x] **Registry** - Share your Components with you, your team, and the world, via the Serverless Registry.
@@ -152,29 +154,29 @@ inputs:
 
 # Overview
 
-Serverless Components are libraries of code that make it easy to deploy apps and other functionality onto serverless cloud infrastructure. They're instant serverless use-cases that contain the best infrastructure patterns for scale, performance, cost optimization, collaboration and more.
+We (Serverless Inc) made Serverless Framework Components because composing, configuring and managing low-level serverless infrastructure can be complicated for developers and teams.
 
-We (Serverless Inc) made Serverless Components because composing, configuring and managing low-level serverless infrastructure can be complicated for developers and teams. We've discovered many of the best patterns, and now we want to share them!
+Serverless Components are merely libraries of code that deploy use-cases onto serverless cloud infrastructure for you.  Each Component contains the best infrastructure pattern for that use-case, for scale, performance, cost optimization, collaboration and more.
 
-While Components can help you deploy and manage low-level infrastructure (e.g. an AWS S3 bucket). Their big use-case is on higher-order functionality and apps, like:
+## Use-Cases
 
-1. A group of infrastructure with a purpose, like a type of data processing pipeline.
+You can use Serverless Components to abstract over anything, but these are the most common patterns:
+
+1. An entire application, like a blog, video streaming service, or landing page.
 2. A software feature, like user authentication, comments, or a payment system.
-3. An entire application, like a blog, video streaming service, or landing page.
+3. A low-leve use-case, like a data processing pipeline or microservice.
 
 ## Features
 
-### Simplicity
+### Ease
 
-Serverless Components are built around higher-order use-cases (e.g. a website, blog, payment system). Irrelevant low-level infrastructure details (that aren't necessary for the use-case) are abstracted away, and simpler configuration is offered instead.
+Serverless Components are use-case first.  Infrastructure details that aren't necessary for the use-case are hidden, and use-case focused configuration is offered instead.
 
-For example, here's what it looks like to provision a **serverless website** hosted on AWS S3, delivered globally and quickly w/ AWS Cloudfront, via a custom domain on AWS Route 53, secured by a free AWS ACM SSL Certificate:
+Here's what it looks like to provision a **serverless website** hosted on AWS S3, delivered globally and quickly w/ AWS Cloudfront, via a custom domain on AWS Route 53, secured by a free AWS ACM SSL Certificate:
 
 ```yaml
 # serverless.yml
 
-org: acme # Your Org
-app: ecommerce # Your App
 component: website # A Component in the Registry
 name: my-website # The name of your Component Instance
 
@@ -183,27 +185,24 @@ inputs: # The configuration the Component accepts
     src: ./src
     hook: npm run build
     dist: ./dist
-    env:
-      # environment variables to pass to the website build environment
-      REACT_APP_API_URL: https://api.example.com
   domain: mystore.com
 ```
 
 ### Instant Deployments
 
-Serverless Components that deploy instantly, removing the need to emulate cloud services locally for fast feedback during the development process.
+Serverless Components deploy fast (~8 seconds), removing the need to emulate cloud services locally for fast feedback during the development process.
 
 ```bash
 
 $ serverless deploy
 
-4s > my-express-app › Successfully deployed
+8s > my-express-app › Successfully deployed
 
 ```
 
 ### Build Your Own
 
-Serverless Components are easily written in Javascript (`serverless.js`), with simple syntax inspired by component-based frameworks, like React.
+Serverless Components are easily written in Javascript (`serverless.js`), with syntax inspired by component-based frameworks, like React.
 
 ```javascript
 // serverless.js
@@ -623,6 +622,24 @@ or:
 http_proxy=http://127.0.0.1:12345 # Your proxy
 https_proxy=http://127.0.0.1:12345 # Your proxy
 ```
+
+# Security Considerations
+
+Serverless Framework Components are used via the Serverless Framework CLI, but they are different from Serverless Framework's Traditional experience in that deployment happens via an innovative hosted deplyoment engine (it's alike a CI/CD product).  You will be prompted when using Components, to login and ensure you're aware of this difference.
+
+Here are the security implications of this.
+
+### Credentials
+
+Your cloud account credentials will pass through our company's hosted deployment engine.  These credentials are not stored.  The reason for this is this design enables 95% faster deployments, automatic metrics, real-time logging, and more, all accessible from multiple clients.  Because of this, we recommend you do not use long-lived credentials and instead use temporary credentials via a solution like AWS Security Token Service.
+
+Further, Serverless Framework now offers a [Providers feature](https://www.serverless.com/framework/docs/guides/providers/), which will help you create an AWS IAM Role which our hosted engine can call to generate temporary credentials automatically, before every action it performs.  Read more about Providers [here](https://www.serverless.com/framework/docs/guides/providers/), or go to the [Serverless Framework Dashboard](https://app.serverless.com) and navigate to "Org" and "Providers" to create one.
+
+We also recommend you strictly limit the scope of your credentials or access role to what each Serverless Framework Component needs.  Each Component deploys a specific use-case and specific infrastructure, so permissions required are signficantly reduced compared to what Serverless Framework Traditional requires.  Further, clear permission policies for each Component will soon be available to help you understand what permissions each Component needs.
+
+### Source Code
+
+Your application source code will pass through our company's hosted deployment engine, where it is stored for a limited time.  The reason is this design enables 95% faster deployments, automatic metrics, real-time logging, and rollback features, all accessible from multiple clients.  In the near future, we will enable storing code on your own account, but we have not yet reached this section of our roadmap.
 
 # CLI Commands
 
