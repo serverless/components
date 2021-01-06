@@ -939,6 +939,45 @@ const hasServerlessConfigFile = (inputPath) => {
   return false;
 };
 
+/**
+ * Returns the path of the env file to load, 2 directories up
+ * Nearest to current working directory is preferred
+ * Falls back to the default .env file if no .env.STAGE found
+ */
+const getEnvFilePath = (stageName) => {
+  const defaultEnvFilePath = path.join(process.cwd(), '.env');
+  const stageEnvFilePath = path.join(process.cwd(), `.env.${stageName}`);
+
+  const firstParentDefaultEnvFilePath = path.join(process.cwd(), '..', '.env');
+  const firstParentStageEnvFilePath = path.join(process.cwd(), '..', `.env.${stageName}`);
+
+  const secondParentDefaultEnvFilePath = path.join(process.cwd(), '../..', '.env');
+  const secondParentStageEnvFilePath = path.join(process.cwd(), '../..', `.env.${stageName}`);
+
+  /*
+   * This order is important. For each directory level,
+   * we first check if .env.STAGE exists,
+   * then fall back to .env if .env.STAGE not found.
+   * .env must be checked AFTER .env.STAGE for a given directory
+   */
+  let envFilePath;
+  if (fileExistsSync(stageEnvFilePath)) {
+    envFilePath = stageEnvFilePath;
+  } else if (fileExistsSync(defaultEnvFilePath)) {
+    envFilePath = defaultEnvFilePath;
+  } else if (fileExistsSync(firstParentStageEnvFilePath)) {
+    envFilePath = firstParentStageEnvFilePath;
+  } else if (fileExistsSync(firstParentDefaultEnvFilePath)) {
+    envFilePath = firstParentDefaultEnvFilePath;
+  } else if (fileExistsSync(secondParentStageEnvFilePath)) {
+    envFilePath = secondParentStageEnvFilePath;
+  } else if (fileExistsSync(secondParentDefaultEnvFilePath)) {
+    envFilePath = secondParentDefaultEnvFilePath;
+  }
+
+  return envFilePath;
+};
+
 module.exports = {
   sleep,
   fileExists,
@@ -968,4 +1007,5 @@ module.exports = {
   validateNodeModules,
   parseCliInputs,
   hasServerlessConfigFile,
+  getEnvFilePath,
 };

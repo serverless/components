@@ -6,6 +6,7 @@
 
 const args = require('minimist')(process.argv.slice(2));
 const path = require('path');
+const dotenv = require('dotenv');
 const os = require('os');
 const https = require('https');
 const {
@@ -27,6 +28,7 @@ const {
   loadInstanceConfigUncached,
   resolveVariables,
   parseCliInputs,
+  getEnvFilePath,
 } = require('../utils');
 
 const { mergeDeepRight } = require('ramda');
@@ -126,25 +128,18 @@ const getDefaultOrgName = async () => {
 };
 
 /**
- * Load AWS credentials from the aws credentials file
+ * Load AWS credentials from the aws credentials file (opt-in)
  */
-const loadAwsCredentials = async () => {
-  const awsCredsInEnv = process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY;
-
-  if (awsCredsInEnv) {
-    // exit if the user already has aws credentials in env or .env file
-    return;
-  }
-
+const getAwsProfileCredentials = async (profileName) => {
   // fetch the credentials file path
   const awsCredentialsPath =
     process.env.AWS_CREDENTIALS_PATH || path.resolve(os.homedir(), './.aws/credentials');
 
   const awsCredsFileExists = fileExistsSync(awsCredentialsPath);
 
+  // return if the user has no aws credentials file
   if (!awsCredsFileExists) {
-    // exit if the user has no aws credentials file
-    return;
+    return {};
   }
 
   // read the credentials file
@@ -153,20 +148,22 @@ const loadAwsCredentials = async () => {
   // parse the credentials file
   const parsedCredentialsFile = ini.parse(credentialsFile);
 
-  // get the configured profile
-  const awsCredentialsProfile =
-    process.env.AWS_PROFILE || process.env.AWS_DEFAULT_PROFILE || 'default';
-
   // get the credentials for that profile
-  const credentials = parsedCredentialsFile[awsCredentialsProfile];
+  const credentials = parsedCredentialsFile[profileName];
 
-  if (!credentials) return;
+  // return if that profile does not exist in credentials file
+  if (!credentials) {
+    return {};
+  }
 
   // check if profile use assume role
   if (credentials.source_profile && credentials.role_arn) {
     const sourceCredentials = parsedCredentialsFile[credentials.source_profile];
 
-    if (!sourceCredentials) return;
+    // return if source profile does not contain credentials
+    if (!sourceCredentials) {
+      return {};
+    }
 
     // retrieve session duration configuration
     const durationSeconds = process.env.AWS_ROLE_SESSION_DURATION || 3600;
@@ -188,37 +185,54 @@ const loadAwsCredentials = async () => {
       }
     );
 
-    // check anc parse response
+    // check sts response
     if (
       !stsResponse.AssumeRoleResponse ||
       !stsResponse.AssumeRoleResponse.AssumeRoleResult ||
       !stsResponse.AssumeRoleResponse.AssumeRoleResult.Credentials
     ) {
-      return;
+      return {};
     }
     const temporaryCredentials = stsResponse.AssumeRoleResponse.AssumeRoleResult.Credentials;
 
-    // set assumed role credentials in the env to pass it to the sdk
-    process.env.AWS_ACCESS_KEY_ID = temporaryCredentials.AccessKeyId;
-    process.env.AWS_SECRET_ACCESS_KEY = temporaryCredentials.SecretAccessKey;
-    process.env.AWS_SESSION_TOKEN = temporaryCredentials.SessionToken;
-
-    return;
+    // return assumed role credentials
+    return {
+      AWS_ACCESS_KEY_ID: temporaryCredentials.AccessKeyId,
+      AWS_SECRET_ACCESS_KEY: temporaryCredentials.SecretAccessKey,
+      AWS_SESSION_TOKEN: temporaryCredentials.SessionToken,
+    };
   }
 
-  // set the credentials in the env to pass it to the sdk
-  process.env.AWS_ACCESS_KEY_ID = credentials.aws_access_key_id;
-  process.env.AWS_SECRET_ACCESS_KEY = credentials.aws_secret_access_key;
+  return {
+    AWS_ACCESS_KEY_ID: credentials.aws_access_key_id,
+    AWS_SECRET_ACCESS_KEY: credentials.aws_secret_access_key,
+  };
+};
+
+/**
+ * Reads and parses the env file
+ * and returns it as an object
+ */
+const parseEnvFile = (stageName) => {
+  const envFilePath = getEnvFilePath(stageName);
+  const envFile = readFileSync(envFilePath, 'utf8');
+  const parsedEnvFile = dotenv.parse(envFile);
+  return parsedEnvFile;
 };
 
 /**
  * Load credentials from a ".env" or ".env.[stage]" file
  * @param {*} stage
  */
+const loadInstanceCredentials = async (stageName) => {
+  let envFile = parseEnvFile(stageName);
 
-const loadInstanceCredentials = async () => {
-  // load aws credentials if found
-  await loadAwsCredentials();
+  // if user specified AWS_PROFILE instead of access keys,
+  // fetch the access keys from the aws credentials file
+  if (envFile && envFile.AWS_PROFILE && !envFile.AWS_ACCESS_KEY_ID) {
+    const profileCredentials = await getAwsProfileCredentials(envFile.AWS_PROFILE);
+    envFile = { ...envFile, ...profileCredentials };
+  }
 
   // Known Provider Environment Variables and their SDK configuration properties
   const providers = {};
@@ -259,8 +273,8 @@ const loadInstanceCredentials = async () => {
         credentials[providerName] = {};
       }
       // Proper environment variables override what's in the .env file
-      if (process.env[envVarName] != null) {
-        credentials[providerName][envVarValue] = process.env[envVarName];
+      if (envFile[envVarName] != null) {
+        credentials[providerName][envVarValue] = envFile[envVarName];
       }
       continue;
     }

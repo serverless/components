@@ -4,7 +4,6 @@
  * Serverless Components: CLI Handler
  */
 
-const path = require('path');
 const http = require('http');
 const https = require('https');
 const minimist = require('minimist');
@@ -13,7 +12,7 @@ const semver = require('semver');
 const chalk = require('chalk');
 const HttpsProxyAgent = require('https-proxy-agent');
 const CLI = require('./CLI');
-const { loadInstanceConfig, fileExistsSync, isProjectPath, isChinaUser } = require('./utils');
+const { loadInstanceConfig, isProjectPath, isChinaUser, getEnvFilePath } = require('./utils');
 
 module.exports = async () => {
   const args = minimist(process.argv.slice(2));
@@ -50,30 +49,7 @@ module.exports = async () => {
   // Initialize CLI utilities
   const cli = new CLI(config);
 
-  /**
-   * Load environment variables from .env files, 2 directories up
-   * Nearest to current working directory is preferred
-   */
-  const defaultEnvFilePath = path.join(process.cwd(), '.env');
-  const stageEnvFilePath = path.join(process.cwd(), `.env.${stage}`);
-  const firstParentDefaultEnvFilePath = path.join(process.cwd(), '..', '.env');
-  const firstParentStageEnvFilePath = path.join(process.cwd(), '..', `.env.${stage}`);
-  const secondParentDefaultEnvFilePath = path.join(process.cwd(), '../..', '.env');
-  const secondParentStageEnvFilePath = path.join(process.cwd(), '../..', `.env.${stage}`);
-
-  if (stage && fileExistsSync(stageEnvFilePath)) {
-    dotenv.config({ path: path.resolve(stageEnvFilePath) });
-  } else if (fileExistsSync(defaultEnvFilePath)) {
-    dotenv.config({ path: path.resolve(defaultEnvFilePath) });
-  } else if (fileExistsSync(firstParentStageEnvFilePath)) {
-    dotenv.config({ path: path.resolve(firstParentStageEnvFilePath) });
-  } else if (fileExistsSync(firstParentDefaultEnvFilePath)) {
-    dotenv.config({ path: path.resolve(firstParentDefaultEnvFilePath) });
-  } else if (fileExistsSync(secondParentDefaultEnvFilePath)) {
-    dotenv.config({ path: path.resolve(secondParentDefaultEnvFilePath) });
-  } else if (fileExistsSync(secondParentStageEnvFilePath)) {
-    dotenv.config({ path: path.resolve(secondParentStageEnvFilePath) });
-  }
+  dotenv.config({ path: getEnvFilePath(stage) });
 
   /**
    * Set global proxy agent if it's configured in environment variable
