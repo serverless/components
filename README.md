@@ -7,9 +7,9 @@
   <a href="./README.cn.md">简体中文</a>
 </p>
 
-Serverless Components are abstractions that enable developers to deploy serverless applications and use-cases more easily, all via the [Serverless Framework](https://github.com/serverless/serverless).  
+Serverless Components are abstractions that enable developers to deploy serverless applications and use-cases more easily, all via the [Serverless Framework](https://github.com/serverless/serverless).
 
-Please note, Serverless Components work differently from Serverless Framework's traditional local deployment model.  To deliver a significantly faster development experience, your source code and credentials will pass through an innovative, hosted deployment engine (it's alike a CI/CD product).  Learn more about our deployment engine's handling of credentials and source code [here](#security-considerations).
+Please note, Serverless Components work differently from Serverless Framework's traditional local deployment model. To deliver a significantly faster development experience, your source code and credentials will pass through an innovative, hosted deployment engine (it's alike a CI/CD product). Learn more about our deployment engine's handling of credentials and source code [here](#security-considerations).
 
 <p>
   Serverless Components is now Generally Available.  <a href="https://github.com/serverless/components/tree/v1">Click here for the Beta version.</a>
@@ -154,7 +154,7 @@ inputs:
 
 We (Serverless Inc) made Serverless Framework Components because composing, configuring and managing low-level serverless infrastructure can be complicated for developers and teams.
 
-Serverless Components are merely libraries of code that deploy use-cases onto serverless cloud infrastructure for you.  Each Component contains the best infrastructure pattern for that use-case, for scale, performance, cost optimization, collaboration and more.
+Serverless Components are merely libraries of code that deploy use-cases onto serverless cloud infrastructure for you. Each Component contains the best infrastructure pattern for that use-case, for scale, performance, cost optimization, collaboration and more.
 
 ## Use-Cases
 
@@ -168,7 +168,7 @@ You can use Serverless Components to abstract over anything, but these are the m
 
 ### Ease
 
-Serverless Components are use-case first.  Infrastructure details that aren't necessary for the use-case are hidden, and use-case focused configuration is offered instead.
+Serverless Components are use-case first. Infrastructure details that aren't necessary for the use-case are hidden, and use-case focused configuration is offered instead.
 
 Here's what it looks like to provision a **serverless website** hosted on AWS S3, delivered globally and quickly w/ AWS Cloudfront, via a custom domain on AWS Route 53, secured by a free AWS ACM SSL Certificate:
 
@@ -357,7 +357,9 @@ When you add a version, only that Component version is used. When you don't add 
 
 ### Credentials
 
-Upon deployment, the Serverless Framework looks for a `.env` file in the current working directory, as well as the immediate parent directory. Components can find these credentials within the `this.credentials` object. However, you must use the following Environment Variable keys:
+Upon deployment, the Serverless Framework looks for a `.env` file in the current working directory, as well as 2 directories up. Components can find these credentials within the `this.credentials` object. However, you must use the following Environment Variable keys:
+
+**Note:** The Serverless Framework never reads your local credentials without your explicit permission in a `.env` file.
 
 #### AWS Credentials
 
@@ -375,16 +377,16 @@ Components could access these AWS credentials using `this.credentials.aws`. This
 }
 ```
 
-**Note:** For AWS, if no `.env` file was found in the current working directory or immediate parent directory, the CLI will attempt to get the credentials from AWS's shared credentials file (typically at `~/.aws/credentials`) as a fallback according to your `AWS_DEFAULT_PROFILE` or `AWS_PROFILE` environment variables, just like how it works on the AWS SDK.
+##### AWS Profiles
 
-#### AWS Profile with AssumeRole
+If you'd like to use AWS credentials stored in an AWS profile in your local machine, you could simply specify that profile name in the following environment variable in the `.env` file:
 
-```bash
-AWS_PROFILE=myprofile
+```
+# .env
+AWS_PROFILE=default
 ```
 
-The CLI will check AWS's shared credentials file (typically at `~/.aws/credentials`) for 'role_arn' and 'source_profile' configuration for provided profile
-and assume that role using [AWS STS API](https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html). AWS's shared credentials should look like this:
+If the specified profile is configured with a `role_arn` and `source_profile`, the Serverless Framework will generate temporary credentials using [AWS STS API](https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html) based on these paremeters. This setup should look like this:
 
 ```
 [mycompanyprofile]
@@ -623,21 +625,23 @@ https_proxy=http://127.0.0.1:12345 # Your proxy
 
 # Security Considerations
 
-Serverless Framework Components are used via the Serverless Framework CLI, but they are different from Serverless Framework's Traditional experience in that deployment happens via an innovative hosted deplyoment engine (it's alike a CI/CD product).  You will be prompted when using Components, to login and ensure you're aware of this difference.
+Serverless Framework Components are used via the Serverless Framework CLI, but they are different from Serverless Framework's Traditional experience in that deployment happens via an innovative hosted deplyoment engine (it's alike a CI/CD product). You will be prompted when using Components, to login and ensure you're aware of this difference.
 
 Here are the security implications of this.
 
 ### Credentials
 
-Your cloud account credentials will pass through our company's hosted deployment engine.  These credentials are not stored.  The reason for this is this design enables 95% faster deployments, automatic metrics, real-time logging, and more, all accessible from multiple clients.  Because of this, we recommend you do not use long-lived credentials and instead use temporary credentials via a solution like AWS Security Token Service.
+Your cloud account credentials will pass through our company's hosted deployment engine. These credentials are not stored. The reason for this is this design enables 95% faster deployments, automatic metrics, real-time logging, and more, all accessible from multiple clients. Because of this, we recommend you do not use long-lived credentials and instead use temporary credentials via a solution like AWS Security Token Service.
 
-Further, Serverless Framework now offers a [Providers feature](https://www.serverless.com/framework/docs/guides/providers/), which will help you create an AWS IAM Role which our hosted engine can call to generate temporary credentials automatically, before every action it performs.  Read more about Providers [here](https://www.serverless.com/framework/docs/guides/providers/), or go to the [Serverless Framework Dashboard](https://app.serverless.com) and navigate to "Org" and "Providers" to create one.
+Serverless Framework Components does not automatically read the credentials on your machine. Only the credentials that are specified in `.env` or `.env.<stage>` files (up to two directory levels up) are loaded and passed through our system. Serverless Framework Components will only read your local AWS credentials file if you explicitly specified a profile with the `AWS_PROFILE` environment variable in one the `.env` files described above.
 
-We also recommend you strictly limit the scope of your credentials or access role to what each Serverless Framework Component needs.  Each Component deploys a specific use-case and specific infrastructure, so permissions required are signficantly reduced compared to what Serverless Framework Traditional requires.  Further, clear permission policies for each Component will soon be available to help you understand what permissions each Component needs.
+Further, Serverless Framework now offers a [Providers feature](https://www.serverless.com/framework/docs/guides/providers/), which will help you create an AWS IAM Role which our hosted engine can call to generate temporary credentials automatically, before every action it performs. Read more about Providers [here](https://www.serverless.com/framework/docs/guides/providers/), or go to the [Serverless Framework Dashboard](https://app.serverless.com) and navigate to "Org" and "Providers" to create one.
+
+We also recommend you strictly limit the scope of your credentials or access role to what each Serverless Framework Component needs. Each Component deploys a specific use-case and specific infrastructure, so permissions required are signficantly reduced compared to what Serverless Framework Traditional requires. Further, clear permission policies for each Component will soon be available to help you understand what permissions each Component needs.
 
 ### Source Code
 
-Your application source code will pass through our company's hosted deployment engine, where it is stored for a limited time.  The reason is this design enables 95% faster deployments, automatic metrics, real-time logging, and rollback features, all accessible from multiple clients.  In the near future, we will enable storing code on your own account, but we have not yet reached this section of our roadmap.
+Your application source code will pass through our company's hosted deployment engine, where it is stored for a limited time. The reason is this design enables 95% faster deployments, automatic metrics, real-time logging, and rollback features, all accessible from multiple clients. In the near future, we will enable storing code on your own account, but we have not yet reached this section of our roadmap.
 
 # CLI Commands
 
