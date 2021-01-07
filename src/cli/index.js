@@ -69,10 +69,10 @@ module.exports = async () => {
     dotenv.config({ path: path.resolve(firstParentStageEnvFilePath) });
   } else if (fileExistsSync(firstParentDefaultEnvFilePath)) {
     dotenv.config({ path: path.resolve(firstParentDefaultEnvFilePath) });
-  } else if (fileExistsSync(secondParentDefaultEnvFilePath)) {
-    dotenv.config({ path: path.resolve(secondParentDefaultEnvFilePath) });
   } else if (fileExistsSync(secondParentStageEnvFilePath)) {
     dotenv.config({ path: path.resolve(secondParentStageEnvFilePath) });
+  } else if (fileExistsSync(secondParentDefaultEnvFilePath)) {
+    dotenv.config({ path: path.resolve(secondParentDefaultEnvFilePath) });
   }
 
   /**
