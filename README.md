@@ -7,9 +7,9 @@
   <a href="./README.cn.md">简体中文</a>
 </p>
 
-Serverless Components are abstractions that enable developers to deploy serverless applications and use-cases more easily, all via the [Serverless Framework](https://github.com/serverless/serverless).  
+Serverless Components are abstractions that enable developers to deploy serverless applications and use-cases more easily, all via the [Serverless Framework](https://github.com/serverless/serverless).
 
-**Important Note:** Serverless Components work differently from Serverless Framework's traditional local deployment model.  To deliver a significantly faster development experience, your source code and credentials will pass through an innovative, hosted deployment engine (similar to a CI/CD product).  Learn more about our deployment engine's handling of credentials and source code [here](#security-considerations).
+**Important Note:** Serverless Components work differently from Serverless Framework's traditional local deployment model. To deliver a significantly faster development experience, your source code and credentials will pass through an innovative, hosted deployment engine (similar to a CI/CD product). Learn more about our deployment engine's handling of credentials and source code [here](#security-considerations).
 
 <p>
   Serverless Components is now Generally Available.  <a href="https://github.com/serverless/components/tree/v1">Click here for the Beta version.</a>
@@ -104,7 +104,7 @@ $ serverless init express-starter
 
 `cd` into the generated directory.
 
-Eenter your cloud provider credentials into a `.env` file within the folder that contains your `serverless.yml`, or its immediate parent folder.  Please note that these credentials will be sent to the Serverless deployment engine and should be scoped appropriately. [Click here to learn more](#security-considerations) about how we handle credentials and source code.
+Eenter your cloud provider credentials into a `.env` file within the folder that contains your `serverless.yml`, or its immediate parent folder. Please note that these credentials will be sent to the Serverless deployment engine and should be scoped appropriately. [Click here to learn more](#security-considerations) about how we handle credentials and source code.
 
 ```text
 AWS_ACCESS_KEY_ID=12345
@@ -154,7 +154,7 @@ inputs:
 
 We (Serverless Inc) made Serverless Framework Components because composing, configuring and managing low-level serverless infrastructure can be complicated for developers and teams.
 
-Serverless Components are merely libraries of code that deploy use-cases onto serverless cloud infrastructure for you.  Each Component contains the best infrastructure pattern for that use-case, for scale, performance, cost optimization, collaboration and more.
+Serverless Components are merely libraries of code that deploy use-cases onto serverless cloud infrastructure for you. Each Component contains the best infrastructure pattern for that use-case, for scale, performance, cost optimization, collaboration and more.
 
 ## Use-Cases
 
@@ -168,7 +168,7 @@ You can use Serverless Components to abstract over anything, but these are the m
 
 ### Ease
 
-Serverless Components are use-case first.  Infrastructure details that aren't necessary for the use-case are hidden, and use-case focused configuration is offered instead.
+Serverless Components are use-case first. Infrastructure details that aren't necessary for the use-case are hidden, and use-case focused configuration is offered instead.
 
 Here's what it looks like to provision a **serverless website** hosted on AWS S3, delivered globally and quickly w/ AWS Cloudfront, via a custom domain on AWS Route 53, secured by a free AWS ACM SSL Certificate:
 
@@ -623,21 +623,21 @@ https_proxy=http://127.0.0.1:12345 # Your proxy
 
 # Security Considerations
 
-Serverless Framework Components are used via the Serverless Framework CLI, but they are different from Serverless Framework's Traditional experience in that deployment happens via an innovative hosted deployment engine (similar to a CI/CD product).  You will be prompted when using Components, to login and ensure you're aware of this difference.
+Serverless Framework Components are used via the Serverless Framework CLI, but they are different from Serverless Framework's Traditional experience in that deployment happens via an innovative hosted deployment engine (similar to a CI/CD product). You will be prompted when using Components, to login and ensure you're aware of this difference.
 
 Here are the security implications of this.
 
 ### Credentials
 
-Your cloud account credentials will pass through our company's hosted deployment engine.  **These credentials are not stored**.  This design enables 95% faster deployments, automatic metrics, real-time logging, and more, all accessible from multiple clients.  Because of this, we recommend you **do not use long-lived credentials** and instead use temporary credentials via a solution like AWS Security Token Service.
+Your cloud account credentials will pass through our company's hosted deployment engine. **These credentials are not stored**. This design enables 95% faster deployments, automatic metrics, real-time logging, and more, all accessible from multiple clients. Because of this, we recommend you **do not use long-lived credentials** and instead use temporary credentials via a solution like AWS Security Token Service.
 
-Further, Serverless Framework now offers a [Providers feature](https://www.serverless.com/framework/docs/guides/providers/), which will help you create an AWS IAM Role which our hosted engine can call to automatically generate temporary credentials before every action it performs.  Read more about Providers [here](https://www.serverless.com/framework/docs/guides/providers/), or go to the [Serverless Framework Dashboard](https://app.serverless.com) and navigate to "Org" and "Providers" to create one.
+Further, Serverless Framework now offers a [Providers feature](https://www.serverless.com/framework/docs/guides/providers/), which will help you create an AWS IAM Role which our hosted engine can call to automatically generate temporary credentials before every action it performs. Read more about Providers [here](https://www.serverless.com/framework/docs/guides/providers/), or go to the [Serverless Framework Dashboard](https://app.serverless.com) and navigate to "Org" and "Providers" to create one.
 
-We also recommend you **strictly limit the scope** of your credentials or access role to allow only what each Serverless Framework Component needs.  Each Component deploys a specific use-case and specific infrastructure, so permissions required are significantly reduced compared to what Serverless Framework Traditional requires.  Further, clear permission policies for each Component will soon be available to help you understand what permissions are required.
+We also recommend you **strictly limit the scope** of your credentials or access role to allow only what each Serverless Framework Component needs. Each Component deploys a specific use-case and specific infrastructure, so permissions required are significantly reduced compared to what Serverless Framework Traditional requires. Further, clear permission policies for each Component will soon be available to help you understand what permissions are required.
 
 ### Source Code
 
-Your application source code will be uploaded and temporarily stored within our hosted deployment engine.  This design enables 95% faster deployments, automatic metrics, real-time logging, and rollback features, all accessible from multiple clients.  In the near future, we will enable storing code on your own account, but we have not yet reached this section of our roadmap.
+Your application source code will be uploaded and temporarily stored within our hosted deployment engine. This design enables 95% faster deployments, automatic metrics, real-time logging, and rollback features, all accessible from multiple clients. In the near future, we will enable storing code on your own account, but we have not yet reached this section of our roadmap.
 
 # CLI Commands
 
