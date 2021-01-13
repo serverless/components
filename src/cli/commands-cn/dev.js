@@ -228,22 +228,38 @@ module.exports = async (config, cli, command) => {
   watcher.on('ready', async () => {
     cli.sessionStatus('dev 模式开启中', null, 'green');
     // Try to stop debug mode before first time deploy
-    const info = await getInstanceInfo(sdk, instanceYaml);
-    if (info.instanceStatus === 'active') {
-      functionInfoStore = {
-        functionName: info.state.lambdaArn,
-        namespace: info.outputs.namespace,
-        runtime: info.outputs.runtime,
-      };
-      regionStore = info.state.region;
-      await chinaUtils.stopTencentRemoteLogAndDebug(
-        functionInfoStore,
-        regionStore,
-        cliEventCallback
-      );
+    const instanceInfo = await getInstanceInfo(sdk, instanceYaml);
+    if (instanceInfo.instanceStatus === 'active') {
+      const {
+        state: { lambdaArn, region },
+        outputs: { scf, runtime, namespace },
+      } = instanceInfo;
+      regionStore = region;
+
+      let runtimeInfo = runtime;
+      let namespaceInfo = namespace;
+      if (!runtimeInfo && scf) {
+        runtimeInfo = scf.runtime;
+      }
+      if (!namespaceInfo && scf) {
+        namespaceInfo = scf.namespace;
+      }
+      if (lambdaArn && runtimeInfo && region) {
+        const functionInfo = {
+          functionName: lambdaArn,
+          namespace: namespaceInfo,
+          runtime: runtimeInfo,
+        };
+        functionInfoStore = functionInfo;
+        await chinaUtils.stopTencentRemoteLogAndDebug(
+          functionInfoStore,
+          regionStore,
+          cliEventCallback
+        );
+      }
     }
     // const deployedInstance = await deploy(sdk, instanceYaml, instanceCredentials);
-    await updateDeploymentStatus(cli, info, true);
+    await updateDeploymentStatus(cli, instanceInfo, true);
   });
 
   // "raw" makes sure to catch all FS events, not just file changes
