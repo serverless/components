@@ -344,7 +344,22 @@ inputs:
     environment: release
 `;
 
-  const supportedComponents = ['express', 'koa', 'next', 'nuxt'];
+  const getEggYML = () => `component: egg
+name: eggjsDemo
+app: appDemo
+
+inputs:
+  src: ./
+  region: ap-guangzhou
+  runtime: Nodejs10.15
+  apigatewayConf:
+    protocols:
+      - http
+      - https
+    environment: release
+`;
+
+  const supportedComponents = ['express', 'koa', 'next', 'nuxt', 'egg'];
   const packageJsonFile = await fs.promises.readFile(
     path.join(process.cwd(), 'package.json'),
     'utf-8'
@@ -412,6 +427,10 @@ inputs:
 
   if (ymlType === 'nuxt') {
     return getNuxtYML();
+  }
+
+  if (ymlType === 'egg') {
+    return getEggYML();
   }
 
   throw new Error('当前目录未检测到 Serverless 配置文件');
