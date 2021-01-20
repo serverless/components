@@ -178,19 +178,15 @@ Serverless Components 可以实现高阶应用场景，例如网站、博客或�
 
 org: acme # Your Org
 app: ecommerce # Your App
-component: tencent-website # A Component in the Registry
+component: website # A Component in the Registry
 name: my-website # The name of your Component Instance
 
 inputs: # The configuration the Component accepts
   src:
     src: ./src
-    hook: npm run build
-    dist: ./dist
-    hosts:
-      - host: www.mystore.com
+  hosts:
+    - host: www.mystore.com
 ```
-
-- 在模板目录中查看更多[应用场景](https://github.com/serverless/components/tree/master/templates)
 
 ### 快速部署
 
