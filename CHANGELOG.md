@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.5.1](https://github.com/serverless/components/compare/v3.5.0...v3.5.1) (2021-01-21)
+
+- Fix: Pass orgUid for deployment when using dev mode
+
 ## [3.5.0](https://github.com/serverless/components/compare/v3.4.7...v3.5.0) (2021-01-20)
 
 - Auto generate `serverless.yml` when `serverless deploy` for eggjs APP
