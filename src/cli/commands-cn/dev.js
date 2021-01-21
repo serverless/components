@@ -187,10 +187,12 @@ module.exports = async (config, cli, command) => {
   // Load Instance Credentials
   const instanceCredentials = await utils.loadInstanceCredentials(instanceYaml.stage);
 
+  const orgUid = await chinaUtils.getOrgId();
   const sdk = new ServerlessSDK({
     context: {
       orgName: instanceYaml.org,
       traceId: uuidv4(),
+      orgUid,
     },
   });
 
