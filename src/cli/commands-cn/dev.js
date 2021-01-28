@@ -229,7 +229,7 @@ module.exports = async (config, cli, command) => {
     await updateDeploymentStatus(cli, deployedInstance, true);
   });
 
-  watcher.on('change', async () => {
+  watcher.on('raw', async () => {
     // Skip if processing already and there is a queued operation
     if (isProcessing && queuedOperation) {
       return;
