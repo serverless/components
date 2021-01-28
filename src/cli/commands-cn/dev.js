@@ -229,6 +229,7 @@ module.exports = async (config, cli, command) => {
     await updateDeploymentStatus(cli, deployedInstance, true);
   });
 
+  // "raw" makes sure to catch all FS events, not just file changes
   watcher.on('raw', async () => {
     // Skip if processing already and there is a queued operation
     if (isProcessing && queuedOperation) {
