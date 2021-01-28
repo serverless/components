@@ -265,7 +265,7 @@ module.exports = async (config, cli) => {
     cli.sessionStatus('Watching');
   });
 
-  cli.watcher.on('change', async () => {
+  cli.watcher.on('raw', async () => {
     // Skip if processing already and there is a queued operation
     if (isProcessing && queuedOperation) {
       return;
