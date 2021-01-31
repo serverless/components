@@ -707,7 +707,7 @@ const createGraph = (allComponents, command) => {
   return graph;
 };
 
-const executeGraph = async (allComponents, command, graph, cli, sdk, credentials, options) => {
+const executeGraph = async (allComponents, command, graph, cli, sdk, options) => {
   const leaves = graph.sinks();
 
   if (isEmpty(leaves)) {
@@ -727,7 +727,7 @@ const executeGraph = async (allComponents, command, graph, cli, sdk, credentials
         instanceYaml.inputs = {};
 
         try {
-          instance = await sdk.remove(instanceYaml, credentials, options);
+          instance = await sdk.remove(instanceYaml, options);
         } catch (error) {
           // Add helpful information
           if (!isChinaUser()) {
@@ -754,7 +754,7 @@ const executeGraph = async (allComponents, command, graph, cli, sdk, credentials
       } else {
         let instance;
         try {
-          instance = await sdk.deploy(instanceYaml, credentials, options);
+          instance = await sdk.deploy(instanceYaml, options);
         } catch (error) {
           // Add helpful information
           if (!isChinaUser()) {
@@ -799,7 +799,7 @@ const executeGraph = async (allComponents, command, graph, cli, sdk, credentials
     graph.removeNode(instanceName);
   }
 
-  return executeGraph(allComponents, command, graph, cli, sdk, credentials, options);
+  return executeGraph(allComponents, command, graph, cli, sdk, options);
 };
 
 /**

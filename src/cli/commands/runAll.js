@@ -10,12 +10,7 @@ const {
   createGraph,
   executeGraph,
 } = require('../utils');
-const {
-  getAccessKey,
-  loadInstanceCredentials,
-  getTemplate,
-  isLoggedInOrHasAccessKey,
-} = require('./utils');
+const { getAccessKey, getTemplate, isLoggedInOrHasAccessKey } = require('./utils');
 const generateNotificationsPayload = require('../notifications/generate-payload');
 const requestNotification = require('../notifications/request');
 const printNotification = require('../notifications/print-notification');
@@ -52,9 +47,6 @@ module.exports = async (config, cli, command) => {
   if (!templateYaml) {
     throw new Error('No apps found in sub directories.');
   }
-
-  // Load Instance Credentials
-  const credentials = await loadInstanceCredentials(templateYaml.stage);
 
   cli.sessionStatus('Initializing');
 
@@ -137,7 +129,6 @@ module.exports = async (config, cli, command) => {
       graph,
       cli,
       sdk,
-      credentials,
       options
     );
 
