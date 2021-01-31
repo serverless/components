@@ -11,6 +11,8 @@ const {
   loadInstanceCredentials,
   isLoggedInOrHasAccessKey,
 } = require('./utils');
+const path = require('path');
+const { getInstanceConfigPath } = require('../utils');
 
 /**
  * Deploy helper function
@@ -249,15 +251,33 @@ module.exports = async (config, cli) => {
 
   const ignored = [];
 
-  if (instanceYaml.inputs && instanceYaml.inputs.src && instanceYaml.inputs.src.dist) {
-    // dont trigger a redeploy on dist changes
-    // the src changes is enough to trigger the
-    // build which updates dist
-    ignored.push(instanceYaml.inputs.src.dist);
+  // get the src path to watch.
+  // could be in child dir, parent dir, cwd, any dir.
+  // by default it's the cwd.
+  let srcPath = process.cwd();
+  if (instanceYaml.inputs && instanceYaml.inputs.src) {
+    if (typeof instanceYaml.inputs.src === 'string') {
+      srcPath = path.resolve(instanceYaml.inputs.src);
+    } else if (typeof instanceYaml.inputs.src === 'object') {
+      if (instanceYaml.inputs.src.src) {
+        srcPath = path.resolve(instanceYaml.inputs.src.src);
+      }
+
+      if (instanceYaml.inputs.src.dist) {
+        // dont trigger a redeploy on dist changes
+        // the src changes is enough to trigger the
+        // build which updates dist
+        ignored.push(instanceYaml.inputs.src.dist);
+      }
+    }
   }
 
   // Set watcher
-  cli.watch(process.cwd(), { ignored });
+  cli.watch(srcPath, { ignored });
+
+  // also watch the yaml file for changes
+  // in case it is not in the src directory
+  cli.watcher.add(getInstanceConfigPath(process.cwd()));
 
   cli.watcher.on('ready', async () => {
     cli.sessionStatus('Initializing Dev Mode', null, 'green');
@@ -265,6 +285,7 @@ module.exports = async (config, cli) => {
     cli.sessionStatus('Watching');
   });
 
+  // watch "raw" events to capture all FS events (creating files, deleting files..etc)
   cli.watcher.on('raw', async () => {
     // Skip if processing already and there is a queued operation
     if (isProcessing && queuedOperation) {
@@ -277,7 +298,7 @@ module.exports = async (config, cli) => {
       return;
     }
 
-    // If it's not processin and there is no queued operation
+    // If it's not processing and there is no queued operation
     if (!isProcessing) {
       isProcessing = true;
       cli.sessionStatus('Deploying', null, 'green');
