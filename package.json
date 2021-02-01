@@ -36,7 +36,7 @@
     "@serverless/platform-client": "^3.1.5",
     "@serverless/platform-client-china": "^2.1.0",
     "@serverless/platform-sdk": "^2.3.2",
-    "@serverless/utils": "^2.2.0",
+    "@serverless/utils": "^3.1.0",
     "adm-zip": "^0.4.16",
     "ansi-escapes": "^4.3.1",
     "aws4": "^1.11.0",
