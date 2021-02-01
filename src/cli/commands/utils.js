@@ -6,7 +6,7 @@
 
 const args = require('minimist')(process.argv.slice(2));
 const path = require('path');
-const { readConfigFile, refreshToken, listTenants } = require('@serverless/platform-sdk');
+const { refreshToken, listTenants } = require('@serverless/platform-sdk');
 const configUtils = require('@serverless/utils/config');
 
 const { readdirSync, statSync } = require('fs');
@@ -215,15 +215,7 @@ const isLoggedInOrHasAccessKey = () => {
  * Check whether the user is logged in
  */
 const isLoggedIn = () => {
-  const userConfigFile = readConfigFile();
-  // If userId is null, they are not logged in.  They also might be a new user.
-  if (!userConfigFile.userId) {
-    return false;
-  }
-  if (!userConfigFile.users[userConfigFile.userId]) {
-    return false;
-  }
-  return true;
+  return Boolean(configUtils.getLoggedInUser());
 };
 
 /**
@@ -244,20 +236,16 @@ const getAccessKey = async (org = null) => {
   // if it did expire, it'll refresh it and update the config file
   await refreshToken();
 
-  // read config file from user machine
-  const userConfigFile = readConfigFile();
+  const loggedInUser = configUtils.getLoggedInUser();
 
-  // Verify config file and that the user is logged in
-  if (!userConfigFile || !userConfigFile.users || !userConfigFile.users[userConfigFile.userId]) {
+  if (!loggedInUser) {
     return null;
   }
 
-  const user = userConfigFile.users[userConfigFile.userId];
-
-  if (user.dashboard.accessKeys && user.dashboard.accessKeys[org]) {
-    return user.dashboard.accessKeys[org];
+  if (loggedInUser.accessKeys && loggedInUser.accessKeys[org]) {
+    return loggedInUser.accessKeys[org];
   }
-  return user.dashboard.idToken;
+  return loggedInUser.idToken;
 };
 
 const getTemplate = async (root) => {
