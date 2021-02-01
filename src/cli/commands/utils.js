@@ -6,8 +6,10 @@
 
 const args = require('minimist')(process.argv.slice(2));
 const path = require('path');
-const { refreshToken, listTenants } = require('@serverless/platform-sdk');
+const { listTenants } = require('@serverless/platform-sdk');
+const { ServerlessSDK } = require('@serverless/platform-client');
 const configUtils = require('@serverless/utils/config');
+const accountUtils = require('@serverless/utils/account');
 
 const { readdirSync, statSync } = require('fs');
 const { join, basename } = require('path');
@@ -50,7 +52,7 @@ const getDefaultOrgName = async () => {
 
   // if defaultOrgName is not in RC file, fetch it from the platform
   if (!defaultOrgName) {
-    await refreshToken();
+    await accountUtils.refreshToken(new ServerlessSDK());
 
     const { username, idToken, userId } = configUtils.getLoggedInUser();
     const orgsList = await listTenants({ username, idToken });
@@ -232,9 +234,9 @@ const getAccessKey = async (org = null) => {
   }
 
   // refresh token if it's expired.
-  // this platform-sdk method returns immediately if the idToken did not expire
+  // this accountUtils method returns immediately if the idToken did not expire
   // if it did expire, it'll refresh it and update the config file
-  await refreshToken();
+  await accountUtils.refreshToken(new ServerlessSDK());
 
   const loggedInUser = configUtils.getLoggedInUser();
 
