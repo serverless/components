@@ -6,13 +6,7 @@
 
 const args = require('minimist')(process.argv.slice(2));
 const path = require('path');
-const {
-  readConfigFile,
-  writeConfigFile,
-  createAccessKeyForTenant,
-  refreshToken,
-  listTenants,
-} = require('@serverless/platform-sdk');
+const { readConfigFile, refreshToken, listTenants } = require('@serverless/platform-sdk');
 const configUtils = require('@serverless/utils/config');
 
 const { readdirSync, statSync } = require('fs');
@@ -266,38 +260,6 @@ const getAccessKey = async (org = null) => {
   return user.dashboard.idToken;
 };
 
-/**
- * Gets or creates an access key based on org
- * @param {*} org
- */
-const getOrCreateAccessKey = async (org) => {
-  if (process.env.SERVERLESS_ACCESS_KEY) {
-    return process.env.SERVERLESS_ACCESS_KEY;
-  }
-
-  // read config file from the user machine
-  const userConfigFile = readConfigFile();
-
-  // Verify config file
-  if (!userConfigFile || !userConfigFile.users || !userConfigFile.users[userConfigFile.userId]) {
-    return null;
-  }
-
-  const user = userConfigFile.users[userConfigFile.userId];
-
-  if (!user.dashboard.accessKeys[org]) {
-    // create access key and save it
-    const accessKey = await createAccessKeyForTenant(org);
-    userConfigFile.users[userConfigFile.userId].dashboard.accessKeys[org] = accessKey;
-    writeConfigFile(userConfigFile);
-    return accessKey;
-  }
-
-  // return the access key for the specified org
-  // return user.dashboard.accessKeys[org]
-  return user.dashboard.idToken;
-};
-
 const getTemplate = async (root) => {
   const directories = readdirSync(root).filter((f) => statSync(join(root, f)).isDirectory());
 
@@ -344,7 +306,6 @@ module.exports = {
   loadInstanceConfig: loadVendorInstanceConfig,
   getTemplate,
   loadInstanceCredentials,
-  getOrCreateAccessKey,
   getAccessKey,
   isLoggedIn,
   isLoggedInOrHasAccessKey,
