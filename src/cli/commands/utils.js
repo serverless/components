@@ -13,6 +13,7 @@ const {
   refreshToken,
   listTenants,
 } = require('@serverless/platform-sdk');
+const configUtils = require('@serverless/utils/config');
 
 const { readdirSync, statSync } = require('fs');
 const { join, basename } = require('path');
@@ -45,7 +46,7 @@ const getDashboardUrl = (urlPath) => {
  * Get default org name by fetching all Orgs and picking the first one which the user is the owner of
  */
 const getDefaultOrgName = async () => {
-  const res = readConfigFile();
+  const res = configUtils.getConfig();
 
   if (!res.userId || !res.users || !res.users[res.userId] || !res.users[res.userId].dashboard) {
     return null;
@@ -57,10 +58,7 @@ const getDefaultOrgName = async () => {
   if (!defaultOrgName) {
     await refreshToken();
 
-    const userConfigFile = readConfigFile();
-
-    const { username, dashboard } = userConfigFile.users[userConfigFile.userId];
-    const { idToken } = dashboard;
+    const { username, idToken, userId } = configUtils.getLoggedInUser();
     const orgsList = await listTenants({ username, idToken });
 
     // filter by owner
@@ -68,9 +66,7 @@ const getDefaultOrgName = async () => {
 
     defaultOrgName = filteredOrgsList[0].orgName;
 
-    res.users[res.userId].dashboard.defaultOrgName = defaultOrgName;
-
-    writeConfigFile(res);
+    configUtils.set(`users.${userId}.dashboard.defaultOrgName`, defaultOrgName);
   }
 
   return defaultOrgName;
