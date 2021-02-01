@@ -6,7 +6,6 @@
 
 const args = require('minimist')(process.argv.slice(2));
 const path = require('path');
-const { listTenants } = require('@serverless/platform-sdk');
 const { ServerlessSDK } = require('@serverless/platform-client');
 const configUtils = require('@serverless/utils/config');
 const accountUtils = require('@serverless/utils/account');
@@ -52,10 +51,12 @@ const getDefaultOrgName = async () => {
 
   // if defaultOrgName is not in RC file, fetch it from the platform
   if (!defaultOrgName) {
-    await accountUtils.refreshToken(new ServerlessSDK());
+    const sdk = new ServerlessSDK();
+    await accountUtils.refreshToken(sdk);
 
     const { username, idToken, userId } = configUtils.getLoggedInUser();
-    const orgsList = await listTenants({ username, idToken });
+    sdk.config({ accessKey: idToken });
+    const orgsList = await sdk.listOrgs(username);
 
     // filter by owner
     const filteredOrgsList = orgsList.filter((org) => org.role === 'owner');
