@@ -922,6 +922,24 @@ const parseCliInputs = () => {
   return cliInputs;
 };
 
+const getInstanceConfigPath = (inputPath) => {
+  const possibleConfigFiles = [
+    'serverless.yml',
+    'serverless.yaml',
+    'serverless.json',
+    'serverless.js',
+    'serverless.ts',
+  ];
+
+  for (const possibleConfigFile of possibleConfigFiles) {
+    const possibleConfigFilePath = path.join(inputPath, possibleConfigFile);
+    if (fileExistsSync(possibleConfigFilePath)) {
+      return possibleConfigFilePath;
+    }
+  }
+  return null;
+};
+
 module.exports = {
   sleep,
   fileExists,
@@ -950,4 +968,5 @@ module.exports = {
   isChinaUser,
   validateNodeModules,
   parseCliInputs,
+  getInstanceConfigPath,
 };

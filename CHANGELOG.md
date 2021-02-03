@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.6.1](https://github.com/serverless/components/compare/v3.6.0...v3.6.1) (2021-01-28)
+
+- Fix a bug when using dev mode and the src input is pointing to a parent directory
+
+## [3.6.0](https://github.com/serverless/components/compare/v3.5.1...v3.6.0) (2021-01-28)
+
+- [Remove support for loading AWS credentials from the ~/.aws/credentials file.](https://github.com/serverless/components/pull/878)
+
 ## [3.5.1](https://github.com/serverless/components/compare/v3.5.0...v3.5.1) (2021-01-21)
 
 - Fix: Pass orgUid for deployment when using dev mode
