@@ -285,6 +285,7 @@ module.exports = async (config, cli) => {
     cli.sessionStatus('Watching');
   });
 
+  // watch "raw" events to capture all FS events (creating files, deleting files..etc)
   cli.watcher.on('raw', async () => {
     // Skip if processing already and there is a queued operation
     if (isProcessing && queuedOperation) {

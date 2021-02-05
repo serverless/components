@@ -159,9 +159,8 @@ module.exports = async (config, cli, command) => {
       await watcher.close();
     }
     cli.sessionStatus('dev 模式关闭中', null, 'green');
-    const info = await getInstanceInfo(sdk, instanceYaml);
-    // const deployedInstance = await deploy(sdk, instanceYaml, instanceCredentials);
-    if (await updateDeploymentStatus(cli, info, false)) {
+    const deployedInstance = await deploy(sdk, instanceYaml, instanceCredentials);
+    if (await updateDeploymentStatus(cli, deployedInstance, false)) {
       cli.sessionStop('success', 'dev 模式已关闭');
       return null;
     }
@@ -245,21 +244,21 @@ module.exports = async (config, cli, command) => {
         namespaceInfo = scf.namespace;
       }
       if (lambdaArn && runtimeInfo && region) {
-        const functionInfo = {
+        functionInfoStore = {
           functionName: lambdaArn,
           namespace: namespaceInfo,
           runtime: runtimeInfo,
         };
-        functionInfoStore = functionInfo;
-        await chinaUtils.stopTencentRemoteLogAndDebug(
+        // FIXME: we need to call start debug method here, due to we bind stopAll function in the startTencentRemoteLogAndDebug method and the stopAll is used in stopDebug method, if we want to stop debug mode that we must has stopAll firstly
+        await chinaUtils.startTencentRemoteLogAndDebug(
           functionInfoStore,
           regionStore,
           cliEventCallback
         );
       }
     }
-    // const deployedInstance = await deploy(sdk, instanceYaml, instanceCredentials);
-    await updateDeploymentStatus(cli, instanceInfo, true);
+    const deployedInstance = await deploy(sdk, instanceYaml, instanceCredentials);
+    await updateDeploymentStatus(cli, deployedInstance, true);
   });
 
   // "raw" makes sure to catch all FS events, not just file changes
