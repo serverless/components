@@ -4,11 +4,9 @@
  * Serverless Components: Utilities
  */
 
-const { contains, isNil, last, split, mergeRight, endsWith, isEmpty } = require('ramda');
+const { mergeRight, endsWith, isEmpty } = require('ramda');
 const memoize = require('memoizee');
 const path = require('path');
-const globby = require('globby');
-const AdmZip = require('adm-zip');
 const fse = require('fs-extra');
 const YAML = require('js-yaml');
 const traverse = require('traverse');
