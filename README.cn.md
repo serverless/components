@@ -38,7 +38,7 @@ inputs: # 对应的组件配置
 - [特点](#特点)
 - [概述](#概述)
 - [使用 Components](#使用-Components)
-  - [Serverless.yml 介绍](#Serverless.yml-介绍)
+  - [Serverless.yml 介绍](#serverlessyml-介绍)
   - [输入](#输入)
   - [部署](#部署)
   - [状态](#状态)
