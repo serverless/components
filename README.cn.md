@@ -157,7 +157,6 @@ $ serverless dev
 当前支持在 Express 组件中引用其他的组件联合进行部署。例如，如果希望引用 `website` 组件中的静态地址，可以直接使用 [Serverless Component 模板](https://github.com/serverless/components/tree/master/templates) 部署其它组件并用如下方式引用。
 
 ```yaml
-org: your-org # Your Org
 app: your-app # Your App
 component: express
 name: express-api
@@ -181,7 +180,6 @@ Serverless Components 可以实现高阶应用场景，例如网站、博客或�
 ```yaml
 # serverless.yml
 
-org: acme # Your Org
 app: ecommerce # Your App
 component: website # A Component in the Registry
 name: my-website # The name of your Component Instance
@@ -279,7 +277,6 @@ Serverless Components 完全借助云资源进行部署，可以通过注册中�
 # serverless.yml
 
 component: express # The name of the Component in the Registry
-org: tencent # Your Serverless Framework Org
 app: fullstack # Your Serverless Framework App
 name: rest-api # The name of your instance of this Component
 
@@ -347,10 +344,9 @@ Serverless Components 支持秒级别的部署，但在第一次部署时往往�
 
 ### 状态
 
-Serverless Components 自动将状态存储的云端，因此你可以很方便的将你的组件发布到 Github，Gitlab，Coding 等代码托管平台。并且可以和团队中其他人一起协作，只要确保这些协作组都在 `serverless.yml` 中的 org 组织中即可。由于 org 当前默认为腾讯云的 appid，因此相同主账号下的子账户即可进行协作开发。
+Serverless Components 自动将状态存储的云端，因此你可以很方便的将你的组件发布到 Github，Gitlab，Coding 等代码托管平台。并且可以和团队中其他人一起协作，相同主账号下的子账户即可进行协作开发。(通过在 `serverless.yml` 中的 org 组织信息判断是否在同一个团队。当前 org 默认为腾讯云的 appid，)
 
 ```yaml
-org: tencent-team # 相同主账号下的子账户即可进行协作
 app: ecommerce
 component: my-component
 name: rest-api
@@ -419,7 +415,6 @@ Serverless Components 提供了 Stage 的概念，支持通过 Stage 的方式�
 默认的环境配置为 `dev` 开发环境，如果希望修改该配置，可以直接在 `serverless.yml` 中更新，如下所示：
 
 ```yaml
-org: my-org
 app: my-app
 component: express@0.0.2
 name: my-component-instance
@@ -451,14 +446,13 @@ $ serverless deploy --stage prod
 你可以直接通过变量的方式在 `serverless.yml` 中引用环境变量，`serverless.yml` 中的值，或者其他 Component 中已经部署的实例中的输出信息，配置如下所示：
 
 ```yaml
-org: acme
 app: ecommerce
 component: express
 name: rest-api
 stage: prod
 
 inputs:
-  name: ${org}-${stage}-${app}-${name} # 命名最终为 "acme-prod-ecommerce-rest-api"
+  name: ${stage}-${app}-${name} # 命名最终为 "acme-prod-ecommerce-rest-api"
   region: ${env:REGION} # 环境变量中指定的 REGION= 信息
   vpcName: ${output:prod:my-app:vpc.name} # 获取其他组件中的输出信息
   vpcName: ${output:${stage}:${app}:vpc.name} # 上述方式也可以组合使用
@@ -466,31 +460,13 @@ inputs:
 
 #### 变量：Org
 
-当前支持通过 `${org}` 的方式，在 `serverless.yml` 的 `inputs` 字段中引用 `org` 的信息，如下所示：
-
-```yml
-org: acme
-app: ecommerce
-component: express
-name: rest-api
-stage: prod
-
-inputs:
-  name: ${org}-api # 该例子中的 name 值为 "acme-api"
-```
-
-**注：** 如果未指定 `org` 参数，则默认的值为登录后腾讯云的 appid 信息。当前支持通过如下命令修改 `org` 参数：
-
-```
-$ serverless deploy --org my-other-org
-```
+> 变量 Org 目前在中国并没有实际使用，系统会默认使用腾讯云的 appid 信息作为 Org 信息，并且不需要中国项目的在引用中使用 `${org}` 内容
 
 #### 变量：Stage
 
 当前支持通过 `${stage}` 的方式，在 `serverless.yml` 的 `inputs` 字段中引用 `stage` 的信息，如下所示：
 
 ```yml
-org: acme
 app: ecommerce
 component: express
 name: rest-api
@@ -511,7 +487,6 @@ $ serverless deploy --stage prod
 当前支持通过 `${app}` 的方式，在 `serverless.yml` 的 `inputs` 字段中引用 `app` 的信息，如下所示：
 
 ```yml
-org: acme
 app: ecommerce
 component: express
 name: rest-api
@@ -532,7 +507,6 @@ $ serverless deploy --app my-other-app
 当前支持通过 `${name}` 的方式，在 `serverless.yml` 的 `inputs` 字段中引用 `name` 的信息，如下所示：
 
 ```yml
-org: acme
 app: ecommerce
 component: express
 name: rest-api
@@ -550,7 +524,6 @@ inputs:
 
 ```yml
 component: express
-org: acme
 app: ecommerce
 name: rest-api
 stage: prod
@@ -567,7 +540,6 @@ inputs:
 
 ```yml
 component: express
-org: acme
 app: ecommerce
 name: rest-api
 stage: prod
@@ -576,7 +548,7 @@ inputs:
   roleArn: ${output:[STAGE]:[APP]:[INSTANCE].arn} # 获取已经部署的其他 Component 中的 output 信息
 ```
 
-当前支持获取相同组织(Org)下，不同 App，实例以及不同环境(Stage）中的输出信息。
+当前支持获取不同 App，实例以及不同环境(Stage）中的输出信息。
 
 该能力的一个应用场景是可以支持横跨不同环境(Stage）共享资源信息，当一个开发者在个人的环境中开发一个 Component 实例时，如果他希望获取公共的 “dev” 环境中的配置信息时，即可采用该方式引用。例如获取 DB 的参数配置等。用这种方式团队中的开发者无需重新为个人环境部署一套全新资源即可完成特性开发、bug 修复等工作，只需要部署一个新的 Component 实例并且复用公共配置即可。
 
@@ -980,7 +952,6 @@ $ serverless registry publish --dev
 ```yaml
 # serverless.yml
 
-org: acme
 app: fullstack
 component: express@dev # Add "dev" as the version
 name: rest-api
