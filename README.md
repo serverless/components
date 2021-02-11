@@ -9,7 +9,7 @@
 
 Serverless Components are abstractions that enable developers to deploy serverless applications and use-cases more easily, all via the [Serverless Framework](https://github.com/serverless/serverless).
 
-**Important Note:** Serverless Components work differently from Serverless Framework's traditional local deployment model. To deliver a significantly faster development experience, your source code and credentials will pass through an innovative, hosted deployment engine (similar to a CI/CD product). Learn more about our deployment engine's handling of credentials and source code [here](#security-considerations).
+**Important Note:** Serverless Components work differently from Serverless Framework's traditional local deployment model. To deliver a significantly faster development experience, your source code and temporary credentials will pass through an innovative, hosted deployment engine (similar to a CI/CD product). Learn more about our deployment engine's handling of credentials and source code [here](#security-considerations).
 
 <p>
   Serverless Components is now Generally Available.  <a href="https://github.com/serverless/components/tree/v1">Click here for the Beta version.</a>
@@ -46,9 +46,7 @@ $ npx serverless init graphql-starter
   - [Actions, Inputs & Outputs](#actions-inputs--outputs)
   - [Deploying](#deploying)
   - [State](#state)
-  - [Credentials](#credentials)
-    - [AWS Credentials](#aws-credentials)
-    - [Google Credentials](#google-credentials)
+  - [Providers](#providers)
   - [Stages](#stages)
   - [Variables](#variables)
     - [Variables: Org](#variables-org)
@@ -94,7 +92,15 @@ To get started with Serverless Components, install the latest version of the [Se
 $ npm i -g serverless
 ```
 
-After installation, run `serverless registry` to see many Component-based templates you can deploy, or see more in the [Serverless Framework Dashboard](https://app.serverless.com). These contain Components as well as boilerplate code, to get you started quickly.
+Login into the Serverless dashboard via the CLI:
+
+```
+$ serverlesss login
+```
+
+**Before you proceed, make sure you connect your AWS account by creating a provider in the settings page on the [Serverless Dashboard](https://app.serverless.com).**
+
+Then, run `serverless registry` to see many Component-based templates you can deploy, or see more in the [Serverless Framework Dashboard](https://app.serverless.com). These contain Components as well as boilerplate code, to get you started quickly.
 
 Install anything from the registry via `$ serverless init <template>`, like this:
 
@@ -102,16 +108,7 @@ Install anything from the registry via `$ serverless init <template>`, like this
 $ serverless init express-starter
 ```
 
-`cd` into the generated directory.
-
-Eenter your cloud provider credentials into a `.env` file within the folder that contains your `serverless.yml`, or its immediate parent folder. Please note that these credentials will be sent to the Serverless deployment engine and should be scoped appropriately. [Click here to learn more](#security-considerations) about how we handle credentials and source code.
-
-```text
-AWS_ACCESS_KEY_ID=12345
-AWS_SECRET_ACCESS_KEY=5321
-```
-
-And deploy!
+`cd` into the generated directory. And deploy!
 
 ```bash
 $ serverless deploy
@@ -355,48 +352,9 @@ component: express@0.0.2
 
 When you add a version, only that Component version is used. When you don't add a version, the Serverless Framework will use the latest version of that Component, if it exists. We recommend to **always** pin your Component to a version.
 
-### Credentials
+### Providers
 
-Upon deployment, the Serverless Framework looks for a `.env` file in the current working directory, as well as the immediate parent directory. Components can find these credentials within the `this.credentials` object. However, you must use the following Environment Variable keys:
-
-#### AWS Credentials
-
-```bash
-AWS_ACCESS_KEY_ID=123456789
-AWS_SECRET_ACCESS_KEY=123456789
-```
-
-Components could access these AWS credentials using `this.credentials.aws`. This object would look like this:
-
-```js
-{
-  accessKeyId: '123456789',
-  secretAccessKey: '123456789',
-}
-```
-
-#### Google Credentials
-
-```bash
-# You can specify the path to the JSON credentials file that you downloaded from Google
-GOOGLE_APPLICATION_CREDENTIALS=path/to/credentials/json/file
-
-# Or you could just provide your project id, client email & private key
-GOOGLE_PROJECT_ID=project-id-xxx
-GOOGLE_CLIENT_EMAIL=project-id-xxx@appspot.gserviceaccount.com
-GOOGLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgk..."
-```
-
-Components could access these google credentials using `this.credentials.google`. This object would look like this:
-
-```js
-{
-  applicationCredentials: 'path/to/credentials/json/file',
-  projectId: 'project-id-xxx',
-  clientEmail: 'project-id-xxx@appspot.gserviceaccount.com',
-  privateKey: '-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgk...'
-}
-```
+Upon deployment, the Serverless Framework Components looks for a provider connected to your service. If none was found, the default provider will be used. You can manage providers in the settings page on the [Serverless Dashboard](https://app.serverless.com). To learn more about the Providers feature, [check out its docs here](https://www.serverless.com/framework/docs/guides/providers/).
 
 ### Stages
 
@@ -427,8 +385,6 @@ $ serverless deploy --stage prod
 Again, the CLI flag overrides both a `stage` in `serverless.yml` and an Environment Variable. Whereas an Environment Variable can only override the `stage` in `serverless.yml`.
 
 Lastly, you can set stage-specific environment variables using separate `.env` files. Each file must be named in the following format: `.env.STAGE`. For example, if you run in the prod stage, the environment variables in `.env.prod` would be loaded, otherwise the default `.env` file (without stage extension) would be loaded. You can also put the `.env.STAGE` file in the immediate parent directory, in the case that you have a parent folder containing many Component Instances.
-
-A practical usage of this is if you want to have a separate AWS account for each stage. In that case you would keep separate AWS credentials for each stage you are targeting. Then based on the stage you're deploying to, the correct credentials would be picked up.
 
 <br/>
 
@@ -596,9 +552,9 @@ Here are the security implications of this.
 
 ### Credentials
 
-Your cloud account credentials will pass through our company's hosted deployment engine. **These credentials are not stored**. This design enables 95% faster deployments, automatic metrics, real-time logging, and more, all accessible from multiple clients. Because of this, we recommend you **do not use long-lived credentials** and instead use temporary credentials via a solution like AWS Security Token Service.
+Serverless Framework Components relies completely on our secure [Providers feature](https://www.serverless.com/framework/docs/guides/providers/), which will help you create an AWS IAM Role which our hosted engine can call to automatically generate temporary credentials before every action it performs. Read more about Providers [here](https://www.serverless.com/framework/docs/guides/providers/), or go to the [Serverless Framework Dashboard](https://app.serverless.com) and navigate to "Org" and "Providers" to create one.
 
-Further, Serverless Framework now offers a [Providers feature](https://www.serverless.com/framework/docs/guides/providers/), which will help you create an AWS IAM Role which our hosted engine can call to automatically generate temporary credentials before every action it performs. Read more about Providers [here](https://www.serverless.com/framework/docs/guides/providers/), or go to the [Serverless Framework Dashboard](https://app.serverless.com) and navigate to "Org" and "Providers" to create one.
+The temporary credentials generated by your provider will pass through our company's hosted deployment engine. **These credentials are not stored**. This design enables 95% faster deployments, automatic metrics, real-time logging, and more, all accessible from multiple clients.
 
 We also recommend you **strictly limit the scope** of your credentials or access role to allow only what each Serverless Framework Component needs. Each Component deploys a specific use-case and specific infrastructure, so permissions required are significantly reduced compared to what Serverless Framework Traditional requires. Further, clear permission policies for each Component will soon be available to help you understand what permissions are required.
 
@@ -1322,7 +1278,7 @@ We've been working on the Serverless Framework for 5 years now. During that time
 
 Over a year ago, we whiteboarded several groundbreaking ways we can push the boundaries of serverless dev tools (and infrastructure as code in general), and realized the only way to make that happen was to move the majority of work to the cloud.
 
-Now, when you deploy, or perform any other Action of a Component, that happens in our "Components Engine", which we've spent 1.5+ years building. For clarity, this means your source code, environment variables and credentials are passed through the Components Engine.
+Now, when you deploy, or perform any other Action of a Component, that happens in our "Components Engine", which we've spent 1.5+ years building. For clarity, this means your source code, environment variables and temporary credentials are passed through the Components Engine.
 
 This is a complete change in how Serverless Framework traditionally worked. However, this is no different from how most build engines, CI/CD products, and cloud services work, as well as AWS CloudFormation, which Serverless Framework traditionally used. The "Components Engine" is a managed service, like AWS CloudFormation, CircleCI, Github, Github Actions, Hosted Gitlab, Terraform Cloud, etc.
 
