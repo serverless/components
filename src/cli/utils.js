@@ -4,21 +4,13 @@
  * Serverless Components: Utilities
  */
 
-const { contains, isNil, last, split, mergeRight, endsWith, isEmpty } = require('ramda');
+const { mergeRight, endsWith, isEmpty } = require('ramda');
 const memoize = require('memoizee');
 const path = require('path');
-const globby = require('globby');
-const AdmZip = require('adm-zip');
 const fse = require('fs-extra');
 const YAML = require('js-yaml');
 const traverse = require('traverse');
 const { Graph, alg } = require('graphlib');
-
-/**
- * Wait for a number of miliseconds
- * @param {*} wait
- */
-const sleep = async (wait) => new Promise((resolve) => setTimeout(() => resolve(), wait));
 
 /**
  * Checks if a file exists
@@ -222,76 +214,6 @@ const loadTemplateConfig = (directoryPath) => {
   }
 
   return templateFile;
-};
-
-const getDirSize = async (p) => {
-  return fse.stat(p).then((stat) => {
-    if (stat.isFile()) {
-      return stat.size;
-    } else if (stat.isDirectory()) {
-      return fse
-        .readdir(p)
-        .then((entries) => Promise.all(entries.map((e) => getDirSize(path.join(p, e)))))
-        .then((e) => e.reduce((a, c) => a + c, 0));
-    }
-    return 0; // can't take size of a stream/symlink/socket/etc
-  });
-};
-
-/**
- * Package files into a zip
- * @param {*} inputDirPath
- * @param {*} outputFilePath
- * @param {*} include
- * @param {*} exclude
- */
-const pack = async (inputDirPath, outputFilePath, include = [], exclude = []) => {
-  const format = last(split('.', outputFilePath));
-
-  if (!contains(format, ['zip', 'tar'])) {
-    throw new Error('Please provide a valid format. Either a "zip" or a "tar"');
-  }
-
-  const patterns = ['**/*'];
-
-  if (!isNil(exclude)) {
-    exclude.forEach((excludedItem) => patterns.push(`!${excludedItem}`));
-  }
-
-  const zip = new AdmZip();
-
-  const files = (await globby(patterns, { cwd: inputDirPath })).sort();
-
-  if (files.length === 0) {
-    throw new Error('The provided directory is empty and cannot be packaged');
-  }
-
-  files.forEach((file) => {
-    if (file === path.basename(file)) {
-      zip.addLocalFile(path.join(inputDirPath, file));
-    } else {
-      zip.addLocalFile(path.join(inputDirPath, file), path.dirname(file));
-    }
-  });
-
-  if (include && include.length) {
-    include.forEach((filePath) => zip.addLocalFile(path.resolve(filePath)));
-  }
-
-  zip.writeZip(outputFilePath);
-
-  return outputFilePath;
-};
-
-const getInstanceDashboardUrl = (instanceYaml) => {
-  let dashboardRoot = 'https://dashboard.serverless.com';
-  if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
-    dashboardRoot = 'https://dashboard.serverless-dev.com';
-  }
-
-  const dashboardUrl = `${dashboardRoot}/tenants/${instanceYaml.org}/applications/${instanceYaml.app}/component/${instanceYaml.name}/stage/${instanceYaml.stage}/overview`;
-
-  return dashboardUrl;
 };
 
 /**
@@ -939,17 +861,31 @@ const hasServerlessConfigFile = (inputPath) => {
   return false;
 };
 
+const getInstanceConfigPath = (inputPath) => {
+  const possibleConfigFiles = [
+    'serverless.yml',
+    'serverless.yaml',
+    'serverless.json',
+    'serverless.js',
+    'serverless.ts',
+  ];
+
+  for (const possibleConfigFile of possibleConfigFiles) {
+    const possibleConfigFilePath = path.join(inputPath, possibleConfigFile);
+    if (fileExistsSync(possibleConfigFilePath)) {
+      return possibleConfigFilePath;
+    }
+  }
+  return null;
+};
+
 module.exports = {
-  sleep,
   fileExists,
   fileExistsSync,
   readAndParseSync,
   isYamlPath,
   isJsonPath,
   resolveVariables,
-  getDirSize,
-  pack,
-  getInstanceDashboardUrl,
   loadComponentConfig,
   loadTemplateConfig,
   loadInstanceConfig,
@@ -968,4 +904,5 @@ module.exports = {
   validateNodeModules,
   parseCliInputs,
   hasServerlessConfigFile,
+  getInstanceConfigPath,
 };

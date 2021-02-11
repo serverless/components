@@ -6,13 +6,9 @@
 
 const args = require('minimist')(process.argv.slice(2));
 const path = require('path');
-const {
-  readConfigFile,
-  writeConfigFile,
-  createAccessKeyForTenant,
-  refreshToken,
-  listTenants,
-} = require('@serverless/platform-sdk');
+const { ServerlessSDK } = require('@serverless/platform-client');
+const configUtils = require('@serverless/utils/config');
+const accountUtils = require('@serverless/utils/account');
 
 const { readdirSync, statSync } = require('fs');
 const { join, basename } = require('path');
@@ -45,7 +41,7 @@ const getDashboardUrl = (urlPath) => {
  * Get default org name by fetching all Orgs and picking the first one which the user is the owner of
  */
 const getDefaultOrgName = async () => {
-  const res = readConfigFile();
+  const res = configUtils.getConfig();
 
   if (!res.userId || !res.users || !res.users[res.userId] || !res.users[res.userId].dashboard) {
     return null;
@@ -55,22 +51,19 @@ const getDefaultOrgName = async () => {
 
   // if defaultOrgName is not in RC file, fetch it from the platform
   if (!defaultOrgName) {
-    await refreshToken();
+    const sdk = new ServerlessSDK();
+    await accountUtils.refreshToken(sdk);
 
-    const userConfigFile = readConfigFile();
-
-    const { username, dashboard } = userConfigFile.users[userConfigFile.userId];
-    const { idToken } = dashboard;
-    const orgsList = await listTenants({ username, idToken });
+    const { username, idToken, userId } = configUtils.getLoggedInUser();
+    sdk.config({ accessKey: idToken });
+    const orgsList = await sdk.listOrgs(username);
 
     // filter by owner
     const filteredOrgsList = orgsList.filter((org) => org.role === 'owner');
 
     defaultOrgName = filteredOrgsList[0].orgName;
 
-    res.users[res.userId].dashboard.defaultOrgName = defaultOrgName;
-
-    writeConfigFile(res);
+    configUtils.set(`users.${userId}.dashboard.defaultOrgName`, defaultOrgName);
   }
 
   return defaultOrgName;
@@ -168,15 +161,7 @@ const isLoggedInOrHasAccessKey = () => {
  * Check whether the user is logged in
  */
 const isLoggedIn = () => {
-  const userConfigFile = readConfigFile();
-  // If userId is null, they are not logged in.  They also might be a new user.
-  if (!userConfigFile.userId) {
-    return false;
-  }
-  if (!userConfigFile.users[userConfigFile.userId]) {
-    return false;
-  }
-  return true;
+  return Boolean(configUtils.getLoggedInUser());
 };
 
 /**
@@ -193,56 +178,20 @@ const getAccessKey = async (org = null) => {
   }
 
   // refresh token if it's expired.
-  // this platform-sdk method returns immediately if the idToken did not expire
+  // this accountUtils method returns immediately if the idToken did not expire
   // if it did expire, it'll refresh it and update the config file
-  await refreshToken();
+  await accountUtils.refreshToken(new ServerlessSDK());
 
-  // read config file from user machine
-  const userConfigFile = readConfigFile();
+  const loggedInUser = configUtils.getLoggedInUser();
 
-  // Verify config file and that the user is logged in
-  if (!userConfigFile || !userConfigFile.users || !userConfigFile.users[userConfigFile.userId]) {
+  if (!loggedInUser) {
     return null;
   }
 
-  const user = userConfigFile.users[userConfigFile.userId];
-
-  if (user.dashboard.accessKeys && user.dashboard.accessKeys[org]) {
-    return user.dashboard.accessKeys[org];
+  if (loggedInUser.accessKeys && loggedInUser.accessKeys[org]) {
+    return loggedInUser.accessKeys[org];
   }
-  return user.dashboard.idToken;
-};
-
-/**
- * Gets or creates an access key based on org
- * @param {*} org
- */
-const getOrCreateAccessKey = async (org) => {
-  if (process.env.SERVERLESS_ACCESS_KEY) {
-    return process.env.SERVERLESS_ACCESS_KEY;
-  }
-
-  // read config file from the user machine
-  const userConfigFile = readConfigFile();
-
-  // Verify config file
-  if (!userConfigFile || !userConfigFile.users || !userConfigFile.users[userConfigFile.userId]) {
-    return null;
-  }
-
-  const user = userConfigFile.users[userConfigFile.userId];
-
-  if (!user.dashboard.accessKeys[org]) {
-    // create access key and save it
-    const accessKey = await createAccessKeyForTenant(org);
-    userConfigFile.users[userConfigFile.userId].dashboard.accessKeys[org] = accessKey;
-    writeConfigFile(userConfigFile);
-    return accessKey;
-  }
-
-  // return the access key for the specified org
-  // return user.dashboard.accessKeys[org]
-  return user.dashboard.idToken;
+  return loggedInUser.idToken;
 };
 
 const getTemplate = async (root) => {
@@ -290,7 +239,6 @@ module.exports = {
   getDashboardUrl,
   loadInstanceConfig: loadVendorInstanceConfig,
   getTemplate,
-  getOrCreateAccessKey,
   getAccessKey,
   isLoggedIn,
   isLoggedInOrHasAccessKey,
