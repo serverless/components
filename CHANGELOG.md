@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.0.0](https://github.com/serverless/components/compare/v3.6.1...v4.0.0) (2021-02-11)
+
+- BREAKING - remove support for loading credentials from the local machine, and rely on providers instead.
+
 ## [3.6.2](https://github.com/serverless/components/compare/v3.6.1...v3.6.2) (2021-02-04)
 
 - Use `@serverless/utils` to replace corresponding methods from `@serverless/platform-sdk`
