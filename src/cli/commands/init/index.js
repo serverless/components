@@ -1,7 +1,7 @@
 'use strict';
 
 const { ServerlessSDK } = require('@serverless/platform-client');
-const { downloadTemplate, writeEnvFile, createSlsFile } = require('./utils');
+const { downloadTemplate, createSlsFile } = require('./utils');
 const initTokenHandler = require('./initTokenHandler');
 const Unpacker = require('./unpacker');
 
@@ -77,7 +77,6 @@ const run = async (cli, cliParam, customDir) => {
     throw error;
   }
   const servicePath = path.resolve(process.cwd(), directory);
-  await writeEnvFile(directory);
   /**
    * If the package is a component, don't pull the source code
    * Instead, create an empty sls.yml (with component filled out)

@@ -1,6 +1,7 @@
 'use strict';
 
 const { getAccessKey, getTemplate, getDashboardUrl } = require('./utils');
+const { checkLocalCredentials } = require('../utils');
 const { ServerlessSDK } = require('@serverless/platform-client');
 const moment = require('moment');
 const chalk = require('chalk');
@@ -19,6 +20,8 @@ module.exports = async (config, cli) => {
   const sdk = new ServerlessSDK({
     accessKey,
   });
+
+  await checkLocalCredentials(sdk, config, templateYaml.org);
 
   const instanceYamls = Object.values(templateYaml).filter(
     (instance) => typeof instance === 'object'

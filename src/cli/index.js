@@ -61,19 +61,27 @@ module.exports = async () => {
   const secondParentDefaultEnvFilePath = path.join(process.cwd(), '../..', '.env');
   const secondParentStageEnvFilePath = path.join(process.cwd(), '../..', `.env.${stage}`);
 
+  let dotEnvContent;
   if (stage && fileExistsSync(stageEnvFilePath)) {
-    dotenv.config({ path: path.resolve(stageEnvFilePath) });
+    dotEnvContent = dotenv.config({ path: path.resolve(stageEnvFilePath) });
   } else if (fileExistsSync(defaultEnvFilePath)) {
-    dotenv.config({ path: path.resolve(defaultEnvFilePath) });
+    dotEnvContent = dotenv.config({ path: path.resolve(defaultEnvFilePath) });
   } else if (fileExistsSync(firstParentStageEnvFilePath)) {
-    dotenv.config({ path: path.resolve(firstParentStageEnvFilePath) });
+    dotEnvContent = dotenv.config({ path: path.resolve(firstParentStageEnvFilePath) });
   } else if (fileExistsSync(firstParentDefaultEnvFilePath)) {
-    dotenv.config({ path: path.resolve(firstParentDefaultEnvFilePath) });
+    dotEnvContent = dotenv.config({ path: path.resolve(firstParentDefaultEnvFilePath) });
   } else if (fileExistsSync(secondParentStageEnvFilePath)) {
-    dotenv.config({ path: path.resolve(secondParentStageEnvFilePath) });
+    dotEnvContent = dotenv.config({ path: path.resolve(secondParentStageEnvFilePath) });
   } else if (fileExistsSync(secondParentDefaultEnvFilePath)) {
-    dotenv.config({ path: path.resolve(secondParentDefaultEnvFilePath) });
+    dotEnvContent = dotenv.config({ path: path.resolve(secondParentDefaultEnvFilePath) });
   }
+
+  // temporary check to help users transition to providers
+  config.usingLocalCredentials =
+    dotEnvContent &&
+    dotEnvContent.parsed &&
+    dotEnvContent.parsed.AWS_ACCESS_KEY_ID &&
+    dotEnvContent.parsed.AWS_SECRET_ACCESS_KEY;
 
   /**
    * Set global proxy agent if it's configured in environment variable

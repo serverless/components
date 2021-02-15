@@ -70,61 +70,6 @@ const getDefaultOrgName = async () => {
 };
 
 /**
- * Load credentials from a ".env" or ".env.[stage]" file
- * @param {*} stage
- */
-
-const loadInstanceCredentials = async () => {
-  // Known Provider Environment Variables and their SDK configuration properties
-  const providers = {};
-
-  // AWS
-  providers.aws = {};
-  providers.aws.AWS_ACCESS_KEY_ID = 'accessKeyId';
-  providers.aws.AWS_SECRET_ACCESS_KEY = 'secretAccessKey';
-  providers.aws.AWS_SESSION_TOKEN = 'sessionToken';
-  providers.aws.AWS_REGION = 'region';
-
-  // Google
-  providers.google = {};
-  providers.google.GOOGLE_APPLICATION_CREDENTIALS = 'applicationCredentials';
-  providers.google.GOOGLE_PROJECT_ID = 'projectId';
-  providers.google.GOOGLE_CLIENT_EMAIL = 'clientEmail';
-  providers.google.GOOGLE_PRIVATE_KEY = 'privateKey';
-
-  // Kubernetes
-  providers.kubernetes = {};
-  providers.kubernetes.KUBERNETES_ENDPOINT = 'endpoint';
-  providers.kubernetes.KUBERNETES_PORT = 'port';
-  providers.kubernetes.KUBERNETES_SERVICE_ACCOUNT_TOKEN = 'serviceAccountToken';
-  providers.kubernetes.KUBERNETES_SKIP_TLS_VERIFY = 'skipTlsVerify';
-
-  // Docker
-  providers.docker = {};
-  providers.docker.DOCKER_USERNAME = 'username';
-  providers.docker.DOCKER_PASSWORD = 'password';
-  providers.docker.DOCKER_AUTH = 'auth';
-
-  const credentials = {};
-
-  for (const [providerName, provider] of Object.entries(providers)) {
-    const providerEnvVars = provider;
-    for (const [envVarName, envVarValue] of Object.entries(providerEnvVars)) {
-      if (!credentials[providerName]) {
-        credentials[providerName] = {};
-      }
-      // Proper environment variables override what's in the .env file
-      if (process.env[envVarName] != null) {
-        credentials[providerName][envVarValue] = process.env[envVarName];
-      }
-      continue;
-    }
-  }
-
-  return credentials;
-};
-
-/**
  * Reads a serverless instance config file in a given directory path
  * @param {*} directoryPath
  */
@@ -173,8 +118,6 @@ const loadVendorInstanceConfig = async (directoryPath, options = { disableCache:
   instanceFile.inputs = mergeDeepRight(instanceFile.inputs || {}, cliInputs);
 
   if (instanceFile.inputs) {
-    // load credentials to process .env files before resolving env variables
-    await loadInstanceCredentials(instanceFile.stage);
     instanceFile = resolveVariables(instanceFile);
 
     if (instanceFile.inputs.src) {
@@ -296,7 +239,6 @@ module.exports = {
   getDashboardUrl,
   loadInstanceConfig: loadVendorInstanceConfig,
   getTemplate,
-  loadInstanceCredentials,
   getAccessKey,
   isLoggedIn,
   isLoggedInOrHasAccessKey,

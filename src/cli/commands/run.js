@@ -5,13 +5,12 @@
  */
 
 const { ServerlessSDK } = require('@serverless/platform-client');
-const { runningTemplate } = require('../utils');
+const { runningTemplate, checkLocalCredentials } = require('../utils');
 const {
   getDashboardUrl,
   getAccessKey,
   isLoggedInOrHasAccessKey,
   loadInstanceConfig,
-  loadInstanceCredentials,
 } = require('./utils');
 const runAll = require('./runAll');
 const generateNotificationsPayload = require('../notifications/generate-payload');
@@ -52,9 +51,6 @@ module.exports = async (config, cli, command) => {
     cli.log('Running in Platform Dev stage');
   }
 
-  // Load Instance Credentials
-  const instanceCredentials = await loadInstanceCredentials(instanceYaml.stage);
-
   // initialize SDK
   const sdk = new ServerlessSDK({
     accessKey,
@@ -62,6 +58,8 @@ module.exports = async (config, cli, command) => {
       orgName: instanceYaml.org,
     },
   });
+
+  await checkLocalCredentials(sdk, config, instanceYaml.org);
 
   try {
     // Prepare Options
@@ -135,7 +133,7 @@ module.exports = async (config, cli, command) => {
 
       // Set action
       action = async () => {
-        return await sdk.deploy(instanceYaml, instanceCredentials, options);
+        return await sdk.deploy(instanceYaml, options);
       };
     } else if (command === 'remove') {
       cli.sessionStatus('Removing', null, 'white');
@@ -145,7 +143,7 @@ module.exports = async (config, cli, command) => {
 
       // Set action
       action = async () => {
-        return await sdk.remove(instanceYaml, instanceCredentials, options);
+        return await sdk.remove(instanceYaml, options);
       };
     } else {
       // run a custom method synchronously to receive outputs directly
@@ -155,7 +153,7 @@ module.exports = async (config, cli, command) => {
 
       // Set action
       action = async () => {
-        return await sdk.run(command, instanceYaml, instanceCredentials, options);
+        return await sdk.run(command, instanceYaml, options);
       };
     }
 

@@ -11,7 +11,7 @@ const {
   isLoggedInOrHasAccessKey,
   getDashboardUrl,
 } = require('./utils');
-const { runningTemplate } = require('../utils');
+const { runningTemplate, checkLocalCredentials } = require('../utils');
 const infoAll = require('./infoAll');
 const chalk = require('chalk');
 const moment = require('moment');
@@ -46,6 +46,8 @@ module.exports = async (config, cli) => {
   const sdk = new ServerlessSDK({
     accessKey,
   });
+
+  await checkLocalCredentials(sdk, config, instanceYaml.org);
 
   // Fetch info
   let instance = await sdk.getInstance(

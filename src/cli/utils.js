@@ -629,7 +629,7 @@ const createGraph = (allComponents, command) => {
   return graph;
 };
 
-const executeGraph = async (allComponents, command, graph, cli, sdk, credentials, options) => {
+const executeGraph = async (allComponents, command, graph, cli, sdk, options) => {
   const leaves = graph.sinks();
 
   if (isEmpty(leaves)) {
@@ -649,7 +649,7 @@ const executeGraph = async (allComponents, command, graph, cli, sdk, credentials
         instanceYaml.inputs = {};
 
         try {
-          instance = await sdk.remove(instanceYaml, credentials, options);
+          instance = await sdk.remove(instanceYaml, options);
         } catch (error) {
           // Add helpful information
           if (!isChinaUser()) {
@@ -676,7 +676,7 @@ const executeGraph = async (allComponents, command, graph, cli, sdk, credentials
       } else {
         let instance;
         try {
-          instance = await sdk.deploy(instanceYaml, credentials, options);
+          instance = await sdk.deploy(instanceYaml, options);
         } catch (error) {
           // Add helpful information
           if (!isChinaUser()) {
@@ -721,7 +721,7 @@ const executeGraph = async (allComponents, command, graph, cli, sdk, credentials
     graph.removeNode(instanceName);
   }
 
-  return executeGraph(allComponents, command, graph, cli, sdk, credentials, options);
+  return executeGraph(allComponents, command, graph, cli, sdk, options);
 };
 
 /**
@@ -879,6 +879,26 @@ const getInstanceConfigPath = (inputPath) => {
   return null;
 };
 
+// temporary UX function to help users transition to providers
+const checkLocalCredentials = async (sdk, config, orgName) => {
+  const org = await sdk.getOrgByName(orgName);
+
+  const { result: providers } = await sdk.getProviders(org.orgUid);
+
+  const defaultProvider = providers.find((p) => p.isDefault);
+
+  if (!defaultProvider && config.usingLocalCredentials) {
+    let dashboardStage = 'serverless';
+
+    if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
+      dashboardStage = 'serverless-dev';
+    }
+    throw new Error(
+      `Using local credentials is no longer supported. Please link a provider to a service or set a default provider on the dashboard by visiting this URL: \n\n  https://app.${dashboardStage}.com/${orgName}/settings/providers?providerId=new&provider=aws`
+    );
+  }
+};
+
 module.exports = {
   fileExists,
   fileExistsSync,
@@ -905,4 +925,5 @@ module.exports = {
   parseCliInputs,
   hasServerlessConfigFile,
   getInstanceConfigPath,
+  checkLocalCredentials,
 };
