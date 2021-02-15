@@ -9,6 +9,7 @@ const {
   setDependencies,
   createGraph,
   executeGraph,
+  checkLocalCredentials,
 } = require('../utils');
 const { getAccessKey, getTemplate, isLoggedInOrHasAccessKey } = require('./utils');
 const generateNotificationsPayload = require('../notifications/generate-payload');
@@ -49,6 +50,8 @@ module.exports = async (config, cli, command) => {
   }
 
   cli.sessionStatus('Initializing');
+
+  checkLocalCredentials(config, templateYaml.org);
 
   // initialize SDK
   const sdk = new ServerlessSDK({

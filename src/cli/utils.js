@@ -879,6 +879,20 @@ const getInstanceConfigPath = (inputPath) => {
   return null;
 };
 
+// temporary UX function to help users transition to providers
+const checkLocalCredentials = (config, orgName) => {
+  if (config.usingLocalCredentials) {
+    let dashboardStage = 'serverless';
+
+    if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
+      dashboardStage = 'serverless-dev';
+    }
+    throw new Error(
+      `Using local credentials is no longer supported. Please link a provider to a service or set a default provider on the dashboard by visiting this URL: \n\n  https://app.${dashboardStage}.com/${orgName}/settings/providers?providerId=new&provider=aws`
+    );
+  }
+};
+
 module.exports = {
   fileExists,
   fileExistsSync,
@@ -905,4 +919,5 @@ module.exports = {
   parseCliInputs,
   hasServerlessConfigFile,
   getInstanceConfigPath,
+  checkLocalCredentials,
 };

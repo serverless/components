@@ -11,7 +11,7 @@ const {
   isLoggedInOrHasAccessKey,
   getDashboardUrl,
 } = require('./utils');
-const { runningTemplate } = require('../utils');
+const { runningTemplate, checkLocalCredentials } = require('../utils');
 const infoAll = require('./infoAll');
 const chalk = require('chalk');
 const moment = require('moment');
@@ -38,6 +38,8 @@ module.exports = async (config, cli) => {
 
   // Presentation
   cli.logLogo();
+
+  checkLocalCredentials(config, instanceYaml.org);
 
   const meta = `Action: "info" - Stage: "${instanceYaml.stage}" - Org: "${instanceYaml.org}" - App: "${instanceYaml.app}" - Name: "${instanceYaml.name}"`;
   cli.log(meta, 'grey');

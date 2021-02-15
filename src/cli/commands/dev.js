@@ -7,7 +7,7 @@
 const { ServerlessSDK } = require('@serverless/platform-client');
 const { getAccessKey, loadInstanceConfig, isLoggedInOrHasAccessKey } = require('./utils');
 const path = require('path');
-const { getInstanceConfigPath } = require('../utils');
+const { getInstanceConfigPath, checkLocalCredentials } = require('../utils');
 
 /**
  * Deploy helper function
@@ -94,6 +94,9 @@ module.exports = async (config, cli) => {
 
   // Presentation
   cli.logLogo();
+
+  checkLocalCredentials(config, instanceYaml.org);
+
   cli.log(
     'Dev Mode - Watching your App for changes and enabling streaming logs, if supported...',
     'grey'

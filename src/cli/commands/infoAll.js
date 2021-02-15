@@ -1,6 +1,7 @@
 'use strict';
 
 const { getAccessKey, getTemplate, getDashboardUrl } = require('./utils');
+const { checkLocalCredentials } = require('../utils');
 const { ServerlessSDK } = require('@serverless/platform-client');
 const moment = require('moment');
 const chalk = require('chalk');
@@ -10,6 +11,8 @@ module.exports = async (config, cli) => {
   const templateYaml = await getTemplate(process.cwd());
 
   cli.logLogo();
+
+  checkLocalCredentials(config, templateYaml.org);
 
   const meta = `Action: "info" - Stage: "${templateYaml.stage}" - Org: "${templateYaml.org}" - App: "${templateYaml.app}" - Name: "${templateYaml.name}"`;
   cli.log(meta, 'grey');

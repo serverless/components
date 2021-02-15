@@ -5,7 +5,7 @@
  */
 
 const { ServerlessSDK } = require('@serverless/platform-client');
-const { runningTemplate } = require('../utils');
+const { runningTemplate, checkLocalCredentials } = require('../utils');
 const {
   getDashboardUrl,
   getAccessKey,
@@ -50,6 +50,8 @@ module.exports = async (config, cli, command) => {
   if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
     cli.log('Running in Platform Dev stage');
   }
+
+  checkLocalCredentials(config, instanceYaml.org);
 
   // initialize SDK
   const sdk = new ServerlessSDK({
