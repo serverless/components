@@ -39,8 +39,6 @@ module.exports = async (config, cli) => {
   // Presentation
   cli.logLogo();
 
-  checkLocalCredentials(config, instanceYaml.org);
-
   const meta = `Action: "info" - Stage: "${instanceYaml.stage}" - Org: "${instanceYaml.org}" - App: "${instanceYaml.app}" - Name: "${instanceYaml.name}"`;
   cli.log(meta, 'grey');
 
@@ -48,6 +46,8 @@ module.exports = async (config, cli) => {
   const sdk = new ServerlessSDK({
     accessKey,
   });
+
+  await checkLocalCredentials(sdk, config, instanceYaml.org);
 
   // Fetch info
   let instance = await sdk.getInstance(

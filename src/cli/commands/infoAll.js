@@ -12,8 +12,6 @@ module.exports = async (config, cli) => {
 
   cli.logLogo();
 
-  checkLocalCredentials(config, templateYaml.org);
-
   const meta = `Action: "info" - Stage: "${templateYaml.stage}" - Org: "${templateYaml.org}" - App: "${templateYaml.app}" - Name: "${templateYaml.name}"`;
   cli.log(meta, 'grey');
   cli.log();
@@ -22,6 +20,8 @@ module.exports = async (config, cli) => {
   const sdk = new ServerlessSDK({
     accessKey,
   });
+
+  await checkLocalCredentials(sdk, config, templateYaml.org);
 
   const instanceYamls = Object.values(templateYaml).filter(
     (instance) => typeof instance === 'object'

@@ -880,8 +880,14 @@ const getInstanceConfigPath = (inputPath) => {
 };
 
 // temporary UX function to help users transition to providers
-const checkLocalCredentials = (config, orgName) => {
-  if (config.usingLocalCredentials) {
+const checkLocalCredentials = async (sdk, config, orgName) => {
+  const org = await sdk.getOrgByName(orgName);
+
+  const { result: providers } = await sdk.getProviders(org.orgUid);
+
+  const defaultProvider = providers.find((p) => p.isDefault);
+
+  if (!defaultProvider && config.usingLocalCredentials) {
     let dashboardStage = 'serverless';
 
     if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {

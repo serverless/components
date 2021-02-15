@@ -51,8 +51,6 @@ module.exports = async (config, cli, command) => {
 
   cli.sessionStatus('Initializing');
 
-  checkLocalCredentials(config, templateYaml.org);
-
   // initialize SDK
   const sdk = new ServerlessSDK({
     accessKey,
@@ -60,6 +58,8 @@ module.exports = async (config, cli, command) => {
       orgName: templateYaml.org,
     },
   });
+
+  await checkLocalCredentials(sdk, config, templateYaml.org);
 
   try {
     // Prepare Options

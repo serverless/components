@@ -95,8 +95,6 @@ module.exports = async (config, cli) => {
   // Presentation
   cli.logLogo();
 
-  checkLocalCredentials(config, instanceYaml.org);
-
   cli.log(
     'Dev Mode - Watching your App for changes and enabling streaming logs, if supported...',
     'grey'
@@ -109,6 +107,8 @@ module.exports = async (config, cli) => {
       orgName: instanceYaml.org,
     },
   });
+
+  await checkLocalCredentials(sdk, config, instanceYaml.org);
 
   cli.sessionStatus('Initializing');
 

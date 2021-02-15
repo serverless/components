@@ -51,8 +51,6 @@ module.exports = async (config, cli, command) => {
     cli.log('Running in Platform Dev stage');
   }
 
-  checkLocalCredentials(config, instanceYaml.org);
-
   // initialize SDK
   const sdk = new ServerlessSDK({
     accessKey,
@@ -60,6 +58,8 @@ module.exports = async (config, cli, command) => {
       orgName: instanceYaml.org,
     },
   });
+
+  await checkLocalCredentials(sdk, config, instanceYaml.org);
 
   try {
     // Prepare Options
