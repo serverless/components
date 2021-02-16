@@ -95,7 +95,7 @@ $ npm i -g serverless
 Login into the Serverless dashboard via the CLI:
 
 ```
-$ serverlesss login
+$ serverless login
 ```
 
 **Before you proceed, make sure you connect your AWS account by creating a provider in the settings page on the [Serverless Dashboard](https://app.serverless.com).**
