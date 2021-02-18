@@ -6,7 +6,13 @@
  */
 
 const minimist = require('minimist');
-const { runningTemplate, legacyLoadInstanceConfig, isChinaUser } = require('./cli/utils');
+const {
+  runningTemplate,
+  legacyLoadComponentConfig,
+  legacyLoadInstanceConfig,
+  isChinaUser,
+  hasServerlessConfigFile,
+} = require('./cli/utils');
 
 // These keywords are intercepted by the Serverless Components CLI
 const componentKeywords = new Set(['registry', 'init', 'publish']);
@@ -15,6 +21,9 @@ const nestedTemplateKeywords = new Set(['deploy', 'remove', 'info']);
 
 const runningComponents = () => {
   const args = minimist(process.argv.slice(2));
+
+  let componentConfig;
+  let instanceConfig;
 
   // load components if user runs a keyword command, or "sls --all" or "sls --target" (that last one for china)
   if (
@@ -26,16 +35,26 @@ const runningComponents = () => {
     return true;
   }
 
-  // Load componets if user in China
-  if (isChinaUser()) {
+  // Chinese users running "serverless deploy" in a project without a serverless config file
+  if (isChinaUser() && process.argv[2] === 'deploy' && !hasServerlessConfigFile(process.cwd())) {
     return true;
   }
 
-  let instanceConfig;
+  try {
+    componentConfig = legacyLoadComponentConfig(process.cwd());
+  } catch (e) {
+    // ignore
+  }
   try {
     instanceConfig = legacyLoadInstanceConfig(process.cwd());
   } catch (e) {
     // ignore
+  }
+
+  if (!componentConfig && !instanceConfig) {
+    // When no in service context and plain `serverless` command, return true when user in China
+    // It's to enable interactive CLI components onboarding for Chinese users
+    return process.argv.length === 2 && isChinaUser();
   }
 
   if (instanceConfig && !instanceConfig.component) {
