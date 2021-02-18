@@ -452,7 +452,7 @@ name: rest-api
 stage: prod
 
 inputs:
-  name: ${stage}-${app}-${name} # 命名最终为 "acme-prod-ecommerce-rest-api"
+  name: ${stage}-${app}-${name} # 命名最终为 "prod-ecommerce-rest-api"
   region: ${env:REGION} # 环境变量中指定的 REGION= 信息
   vpcName: ${output:prod:my-app:vpc.name} # 获取其他组件中的输出信息
   vpcName: ${output:${stage}:${app}:vpc.name} # 上述方式也可以组合使用
