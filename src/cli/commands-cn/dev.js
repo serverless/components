@@ -31,6 +31,17 @@ const logForwardingOutput = new LogForwardingOutput();
 let functionInfoStore = null;
 let regionStore = null;
 let cliEventCallback = null;
+
+const getInstanceInfo = async (sdk, instance) => {
+  const { instance: instanceInfo } = await sdk.getInstance(
+    instance.org,
+    instance.stage,
+    instance.app,
+    instance.name
+  );
+  return instanceInfo;
+};
+
 /*
  * Deploy changes and hookup event callback which will be called when
  * deploying status has been changed.
@@ -44,24 +55,14 @@ async function deploy(sdk, instance, credentials) {
   if (functionInfoStore && regionStore && cliEventCallback) {
     await chinaUtils.stopTencentRemoteLogAndDebug(functionInfoStore, regionStore, cliEventCallback);
   }
-  const getInstanceInfo = async () => {
-    const { instance: instanceInfo } = await sdk.getInstance(
-      instance.org,
-      instance.stage,
-      instance.app,
-      instance.name
-    );
-    return instanceInfo;
-  };
-
   let instanceInfo = {};
 
   try {
     await sdk.deploy(instance, credentials);
     const instanceStatusPollingStartTime = new Date().getTime();
-    instanceInfo = await getInstanceInfo();
+    instanceInfo = await getInstanceInfo(sdk, instance);
     while (instanceInfo.instanceStatus === 'deploying') {
-      instanceInfo = await getInstanceInfo();
+      instanceInfo = await getInstanceInfo(sdk, instance);
       if (Date.now() - instanceStatusPollingStartTime > 24000) {
         throw new Error('部署超时，请稍后重试');
       }
@@ -79,9 +80,6 @@ async function updateDeploymentStatus(cli, instanceInfo, startDebug) {
   const d = new Date();
   const header = `${d.toLocaleTimeString()} - ${instanceName} - deployment`;
 
-  cliEventCallback = (msg, option) => {
-    cli.log(msg, option && option.type === 'error' ? 'red' : 'grey');
-  };
   cliEventCallback.stdout = logForwardingOutput;
 
   switch (instanceStatus) {
@@ -146,6 +144,9 @@ module.exports = async (config, cli, command) => {
   }
   let watcher;
 
+  cliEventCallback = (msg, option) => {
+    cli.log(msg, option && option.type === 'error' ? 'red' : 'grey');
+  };
   // Define a close handler, that removes any "dev" mode agents
   const closeHandler = async () => {
     // Set new close listener
@@ -225,6 +226,37 @@ module.exports = async (config, cli, command) => {
 
   watcher.on('ready', async () => {
     cli.sessionStatus('dev 模式开启中', null, 'green');
+    // Try to stop debug mode before first time deploy
+    const instanceInfo = await getInstanceInfo(sdk, instanceYaml);
+    if (instanceInfo.instanceStatus === 'active') {
+      const {
+        state: { lambdaArn, region },
+        outputs: { scf, runtime, namespace },
+      } = instanceInfo;
+      regionStore = region;
+
+      let runtimeInfo = runtime;
+      let namespaceInfo = namespace;
+      if (!runtimeInfo && scf) {
+        runtimeInfo = scf.runtime;
+      }
+      if (!namespaceInfo && scf) {
+        namespaceInfo = scf.namespace;
+      }
+      if (lambdaArn && runtimeInfo && region) {
+        functionInfoStore = {
+          functionName: lambdaArn,
+          namespace: namespaceInfo,
+          runtime: runtimeInfo,
+        };
+        // FIXME: we need to call start debug method here, due to we bind stopAll function in the startTencentRemoteLogAndDebug method and the stopAll is used in stopDebug method, if we want to stop debug mode that we must has stopAll firstly
+        await chinaUtils.startTencentRemoteLogAndDebug(
+          functionInfoStore,
+          regionStore,
+          cliEventCallback
+        );
+      }
+    }
     const deployedInstance = await deploy(sdk, instanceYaml, instanceCredentials);
     await updateDeploymentStatus(cli, deployedInstance, true);
   });
