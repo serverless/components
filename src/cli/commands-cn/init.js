@@ -73,7 +73,10 @@ const initTemplateFromCli = async (targetPath, packageName, registryPackage, cli
   const ymlParsed = await parseYaml(serverlessFilePath);
 
   if (appName && ymlParsed.app) {
-    const newYmlContent = ymlOriginal.replace(/^app:\s\S*/m, `app: ${appName}`);
+    const newYmlContent = ymlOriginal.replace(
+      /^app:\s\S*/m,
+      `app: ${appName}-${uuidv4().split('-')[0]}`
+    );
     await fse.writeFile(serverlessFilePath, newYmlContent, 'utf8');
   }
 
@@ -125,7 +128,9 @@ const init = async (config, cli) => {
   if (registryPackage.type !== 'template') {
     await fse.mkdir(targetPath);
     const envDestination = path.resolve(targetPath, 'serverless.yml');
-    const envConfig = `component: ${packageName}\nname: ${targetName}\ninputs:\n`;
+    const envConfig = `component: ${packageName}\nname: ${targetName}\napp: ${targetName}-${
+      uuidv4().split('-')[0]
+    }\ninputs:\n`;
     await fse.writeFile(envDestination, envConfig);
   } else {
     await initTemplateFromCli(targetPath, packageName, registryPackage, cli, targetName);
