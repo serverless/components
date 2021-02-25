@@ -1,7 +1,6 @@
 'use strict';
 
 const { ServerlessSDK } = require('@serverless/platform-client');
-const { urls } = require('@serverless/platform-sdk');
 const open = require('open');
 const configUtils = require('@serverless/utils/config');
 
@@ -12,13 +11,9 @@ module.exports = async (config, cli) => {
 
   const sdk = new ServerlessSDK();
 
-  const loginConfig = {
-    ...urls,
-  };
-
   // for some reason this env var is required by the SDK in order to open the browser
   process.env.DISPLAY = true;
-  let { loginUrl, loginData } = await sdk.login(loginConfig); // eslint-disable-line
+  let { loginUrl, loginData } = await sdk.login(); // eslint-disable-line
 
   cli.log();
   cli.log(
