@@ -105,6 +105,25 @@ module.exports = async () => {
     }
   }
 
+  // Check env file whether or not containing an inline comment, which is invalid for the dotenv package's parsing: https://github.com/motdotla/dotenv/issues/484
+  if (dotEnvContent && dotEnvContent.parsed) {
+    const envKeys = Object.keys(dotEnvContent.parsed);
+    envKeys.forEach((key) => {
+      const envValue = dotEnvContent.parsed[key];
+      if (envValue.includes('#')) {
+        if (isChinaUser()) {
+          cli.log(`${key}的值为:${envValue}, 含有不正确内容，请修改后重试(不支持行内注释)`, 'red');
+        } else {
+          cli.log(
+            `The value of ${key} is: ${envValue}, which contains invalid content, please retry it after changing(No support for inline comment)`,
+            'red'
+          );
+        }
+        process.exit();
+      }
+    });
+  }
+
   /**
    * Handle interactive onboarding when using the "serverless" command for China-based users
    */
