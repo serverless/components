@@ -40,14 +40,14 @@ module.exports = async (config, cli, command) => {
   // Start CLI persistance status
   cli.sessionStart('Initializing', { timer: true });
 
+  await utils.login();
+
   // Load YAML
   let instanceDir = process.cwd();
   if (config.target) {
     instanceDir = path.join(instanceDir, config.target);
   }
   const instanceYaml = await utils.loadInstanceConfig(instanceDir, command);
-
-  await utils.login();
 
   // Presentation
   const meta = `Action: "${command}" - Stage: "${instanceYaml.stage}" - App: "${instanceYaml.app}" - Instance: "${instanceYaml.name}"`;
