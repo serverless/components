@@ -105,6 +105,30 @@ module.exports = async () => {
     }
   }
 
+  // Check env file whether or not containing an inline comment, which is invalid for the dotenv package's parsing: https://github.com/motdotla/dotenv/issues/484
+  if (dotEnvContent && dotEnvContent.parsed) {
+    const envKeys = Object.keys(dotEnvContent.parsed);
+    envKeys.forEach((key) => {
+      const regexForComment = / #+.*$/g;
+      const envValue = dotEnvContent.parsed[key];
+      if (regexForComment.test(envValue)) {
+        if (isChinaUser()) {
+          cli.log(
+            chalk.yellow(
+              `在dotenv配置中字段${key}发现 #,请确保注释都写在单独由#开头的新一行, 不支持行内注释。详情查看：https://github.com/motdotla/dotenv#rules\n`
+            )
+          );
+        } else {
+          cli.log(
+            chalk.yellow(
+              `Found field ${key} in dotenv file has # symbol, please ensure all comments begin with a # symbol on a new line，no support for inline comment. Detail: https://github.com/motdotla/dotenv#rules\n`
+            )
+          );
+        }
+      }
+    });
+  }
+
   /**
    * Handle interactive onboarding when using the "serverless" command for China-based users
    */
