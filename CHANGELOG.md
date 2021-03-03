@@ -2,7 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## 3.7.1 (2021-02-24)
+## [3.7.2](https://github.com/serverless/components/compare/v3.7.1...v3.7.2) (2021-03-03)
+
+- Show warning message for inline comments in the `dotenv` file: https://github.com/serverless/components/pull/898
+- Fix the bug which can't request new login permission without a `dotenv` file: https://github.com/serverless/components/pull/899
+
+## [3.7.1](https://github.com/serverless/components/compare/v3.7.0...v3.7.1) (2021-02-24)
 
 - unsupported command error message
 - Force cancel dev mode can't enter dev mode
