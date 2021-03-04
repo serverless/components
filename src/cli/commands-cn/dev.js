@@ -52,7 +52,12 @@ const getInstanceInfo = async (sdk, instance) => {
  */
 async function deploy(sdk, instance, credentials) {
   // The new debug api does not support deploying instance while it's in debugging mode, so stop it before deployment
-  if (functionInfoStore && regionStore && cliEventCallback) {
+  if (
+    functionInfoStore &&
+    regionStore &&
+    cliEventCallback &&
+    chinaUtils.doesRuntimeSupportDebug(functionInfoStore.runtime)
+  ) {
     await chinaUtils.stopTencentRemoteLogAndDebug(functionInfoStore, regionStore, cliEventCallback);
   }
   let instanceInfo = {};
@@ -243,7 +248,7 @@ module.exports = async (config, cli, command) => {
       if (!namespaceInfo && scf) {
         namespaceInfo = scf.namespace;
       }
-      if (lambdaArn && runtimeInfo && region) {
+      if (lambdaArn && runtimeInfo && region && chinaUtils.doesRuntimeSupportDebug(runtime)) {
         functionInfoStore = {
           functionName: lambdaArn,
           namespace: namespaceInfo,
