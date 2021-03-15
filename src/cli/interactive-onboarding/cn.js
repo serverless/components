@@ -82,7 +82,9 @@ const getTemplatesFromRegistry = async (sdk) => {
       let name = item.name;
 
       if (item['description-i18n'] && item['description-i18n']['zh-cn']) {
-        name = `${name} - ${item['description-i18n']['zh-cn']}`;
+        name = `${name} - ${item['description-i18n']['zh-cn']}${
+          item.keywords && `-${item.keywords}`
+        }`;
       } else if (item.description) {
         name = `${name} - ${item.description}`;
       }
@@ -99,7 +101,9 @@ const getTemplatesFromRegistry = async (sdk) => {
       let name = item.name;
 
       if (item['description-i18n'] && item['description-i18n']['zh-cn']) {
-        name = `${name} - ${item['description-i18n']['zh-cn']}`;
+        name = `${name} - ${item['description-i18n']['zh-cn']}${
+          item.keywords && `-${item.keywords}`
+        }\``;
       } else if (item.description) {
         name = `${name} - ${item.description}`;
       }
