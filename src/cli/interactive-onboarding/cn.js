@@ -21,10 +21,14 @@ const projectTypeChoice = async (choices) =>
       message: '请选择你希望创建的 Serverless 应用',
       type: 'autocomplete',
       name: 'projectType',
+      emptyText: '无结果',
+      searchText: '查询中',
       source: async (_, input) => {
         if (input) {
-          return choices.filter((choice) =>
-            choice.name.toLowerCase().includes(input.toLowerCase())
+          return choices.filter(
+            (choice) =>
+              choice.name.toLowerCase().includes(input.toLowerCase()) ||
+              choice.keywords.toLowerCase().includes(input.toLowerCase())
           );
         }
         return choices;
@@ -89,6 +93,7 @@ const getTemplatesFromRegistry = async (sdk) => {
 
       return {
         name,
+        keywords: item.keywords || '',
         value: { id: item.componentName, name: item.name },
       };
     });
@@ -133,7 +138,6 @@ module.exports = async (config, cli) => {
     return null;
   }
   // console.log(templatesChoices)
-
   const projectType = await projectTypeChoice(templatesChoices);
   const workingDir = process.cwd();
   let { name, id: packageName } = projectType;
