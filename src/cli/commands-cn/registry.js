@@ -140,8 +140,6 @@ const getPackage = async (config, cli) => {
   if (data.type !== 'template') {
     cli.log('可用版本:');
     cli.log(`${data.versions.join(', ')}`);
-  } else {
-    cli.log(`下载连接: ${data.downloadUrl}`);
   }
 
   cli.sessionStop('success', `"${packageName}" 的包信息`);
