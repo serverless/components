@@ -20,7 +20,7 @@ const publish = async (config, cli) => {
   config.timer = false;
 
   // Start CLI persistance status
-  cli.sessionStart('Initializing');
+  cli.sessionStart('初始化中...');
 
   await utils.login();
 
@@ -33,7 +33,7 @@ const publish = async (config, cli) => {
 
   if (!serverlessTemplateFile && !serverlessComponentFile && !serverlessFile) {
     throw new Error(
-      'Publish failed. The current working directory does not contain a "serverless.template.yml" or "serverless.component.yml"'
+      '发布失败。当前工作目录没有包含 "serverless.template.yml" 或者 "serverless.component.yml"'
     );
   }
 
@@ -65,16 +65,14 @@ const publish = async (config, cli) => {
   // Presentation
   cli.logRegistryLogo();
   cli.log(
-    `Publishing "${finalServerlessFile.name}@${
-      config.dev ? 'dev' : finalServerlessFile.version
-    }"...`,
+    `发布中 "${finalServerlessFile.name}@${config.dev ? 'dev' : finalServerlessFile.version}"...`,
     'grey'
   );
 
   const sdk = new ServerlessSDK({ context: { traceId: uuidv4() } });
 
   // Publish
-  cli.sessionStatus('Publishing');
+  cli.sessionStatus('发布中');
 
   let registryPackage;
   try {
@@ -94,7 +92,7 @@ const publish = async (config, cli) => {
 
   cli.sessionStop(
     'success',
-    `Successfully published ${registryPackage.name}${
+    `发布成功 ${registryPackage.name}${
       registryPackage.type === 'template' ? '' : `@${registryPackage.version}`
     }`
   );
@@ -110,16 +108,14 @@ const getPackage = async (config, cli) => {
   const packageName = config.params[0];
 
   // Start CLI persistance status
-  cli.sessionStart(`Fetching versions for: ${packageName}`);
+  cli.sessionStart(`正在获取版本: ${packageName}`);
 
   const sdk = new ServerlessSDK({ context: { traceId: uuidv4() } });
   const data = await sdk.getPackage(packageName);
   delete data.component;
 
   if (Object.keys(data).length === 0) {
-    throw new Error(
-      `Registry package "${packageName}" not found in the Serverless Framework Registry.`
-    );
+    throw new Error(`包 "${packageName}" 在Serverless库中没有找到.`);
   }
 
   const devVersion = data.versions.indexOf('0.0.0-dev');
@@ -130,25 +126,23 @@ const getPackage = async (config, cli) => {
   cli.logRegistryLogo();
   cli.log();
   cli.log(`${data.type === 'template' ? 'Template' : 'Component'}: ${packageName}`);
-  cli.log(`Description: ${data.description}`);
+  cli.log(`描述: ${data.description}`);
   if (data.type !== 'template') {
-    cli.log(`Latest Version: ${data.version}`);
+    cli.log(`最新版本: ${data.version}`);
   }
   if (data.author) {
-    cli.log(`Author: ${data.author}`);
+    cli.log(`作者: ${data.author}`);
   }
   if (data.repo) {
-    cli.log(`Repo: ${data.repo}`);
+    cli.log(`代码地址: ${data.repo}`);
   }
   cli.log();
   if (data.type !== 'template') {
-    cli.log('Available Versions:');
+    cli.log('可用版本:');
     cli.log(`${data.versions.join(', ')}`);
-  } else {
-    cli.log(`Download Link: ${data.downloadUrl}`);
   }
 
-  cli.sessionStop('success', `Registry Package information listed for "${packageName}"`);
+  cli.sessionStop('success', `"${packageName}" 的包信息`);
   return null;
 };
 
@@ -165,7 +159,7 @@ const listFeatured = async (config, cli) => {
 
   if (featuredTemplates.length > 0) {
     cli.log();
-    cli.log('Run "serverless init <package>" to install a template...');
+    cli.log('运行 "serverless init <package>" 安装组件或者模版...');
     cli.log();
     for (const featuredTemplate of featuredTemplates) {
       let name = featuredTemplate.name;
@@ -180,7 +174,7 @@ const listFeatured = async (config, cli) => {
     }
   }
 
-  cli.sessionStop('close', 'Find more here: https://registry.serverless.com');
+  cli.sessionStop('close', '查看更多: https://github.com/serverless-components?q=tencent');
   return null;
 };
 
