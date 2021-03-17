@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.7.5](https://github.com/serverless/components/compare/v3.7.4...v3.7.5) (2021-03-17)
+
+- Fix `dev mode` runtime bug
+
 ## [3.7.4](https://github.com/serverless/components/compare/v3.7.3...v3.7.4) (2021-03-16)
 
 - sls registry info improve with translation
