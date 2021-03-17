@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.7.4](https://github.com/serverless/components/compare/v3.7.3...v3.7.4) (2021-03-16)
+
+- sls registry info improve with translation
+- sls component search support keyword search
+
 ## [3.7.3](https://github.com/serverless/components/compare/v3.7.2...v3.7.3) (2021-03-10)
 
 - Improve non-nodejs debug experience (avoid close before start dev)
