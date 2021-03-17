@@ -248,7 +248,7 @@ module.exports = async (config, cli, command) => {
       if (!namespaceInfo && scf) {
         namespaceInfo = scf.namespace;
       }
-      if (lambdaArn && runtimeInfo && region && chinaUtils.doesRuntimeSupportDebug(runtime)) {
+      if (lambdaArn && runtimeInfo && region && chinaUtils.doesRuntimeSupportDebug(runtimeInfo)) {
         functionInfoStore = {
           functionName: lambdaArn,
           namespace: namespaceInfo,
