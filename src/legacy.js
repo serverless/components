@@ -15,7 +15,7 @@ const {
 } = require('./cli/utils');
 
 // These keywords are intercepted by the Serverless Components CLI
-const componentKeywords = new Set(['registry', 'init', 'publish']);
+const componentKeywords = new Set(['registry', 'init', 'publish', '--help', 'help']);
 // These keywords are allowed for nested templates
 const nestedTemplateKeywords = new Set(['deploy', 'remove', 'info']);
 
