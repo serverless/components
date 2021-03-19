@@ -45,12 +45,11 @@ const runningComponents = () => {
   } catch (e) {
     // ignore
   }
-
   if (isChinaUser()) {
     // When no in service context and plain `serverless` command, return true when user in China
     // It's to enable interactive CLI components onboarding for Chinese users
     if (!componentConfig && !instanceConfig && process.argv.length === 2) return true;
-  
+
     // Chinese users running "serverless deploy" in a project without a serverless config file
     if (process.argv[2] === 'deploy' && !hasServerlessConfigFile(process.cwd())) return true;
 
