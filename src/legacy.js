@@ -15,7 +15,7 @@ const {
 } = require('./cli/utils');
 
 // These keywords are intercepted by the Serverless Components CLI
-const componentKeywords = new Set(['registry', 'init', 'publish', '--help', 'help']);
+const componentKeywords = new Set(['registry', 'init', 'publish']);
 // These keywords are allowed for nested templates
 const nestedTemplateKeywords = new Set(['deploy', 'remove', 'info']);
 
@@ -35,11 +35,6 @@ const runningComponents = () => {
     return true;
   }
 
-  // Chinese users running "serverless deploy" in a project without a serverless config file
-  if (isChinaUser() && process.argv[2] === 'deploy' && !hasServerlessConfigFile(process.cwd())) {
-    return true;
-  }
-
   try {
     componentConfig = legacyLoadComponentConfig(process.cwd());
   } catch (e) {
@@ -51,10 +46,16 @@ const runningComponents = () => {
     // ignore
   }
 
-  if (!componentConfig && !instanceConfig) {
+  if (isChinaUser()) {
     // When no in service context and plain `serverless` command, return true when user in China
     // It's to enable interactive CLI components onboarding for Chinese users
-    return process.argv.length === 2 && isChinaUser();
+    if (!componentConfig && !instanceConfig && process.argv.length === 2) return true;
+  
+    // Chinese users running "serverless deploy" in a project without a serverless config file
+    if (process.argv[2] === 'deploy' && !hasServerlessConfigFile(process.cwd())) return true;
+
+    // Chinese users running "serverless help/--help"
+    if (process.argv[2] === 'help' || process.argv[2] === '--help') return true;
   }
 
   if (instanceConfig && !instanceConfig.component) {
