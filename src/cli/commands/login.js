@@ -28,11 +28,14 @@ module.exports = async (config, cli) => {
 
   loginData = await loginData;
 
+  // In `.serverlessrc`, we want to use `user_uid` as `userId` if it's available
+  const userId = loginData.user_uid || loginData.id;
+
   const loginDataToSaveInConfig = {
-    userId: loginData.id,
+    userId,
     users: {
-      [loginData.id]: {
-        userId: loginData.id,
+      [userId]: {
+        userId,
         name: loginData.name,
         email: loginData.email,
         username: loginData.username,
