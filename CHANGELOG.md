@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.7.6](https://github.com/serverless/components/compare/v3.7.5...v3.7.6) (2021-03-22)
+
+- Recognize `user_uid` during `login` command and persist it in local config file ([#911](https://github.com/serverless/components/pull/911)) ([63b31712](https://github.com/serverless/components/commit/63b31712384b6be04a0893e18c79c9da9f30d7bc)) ([Piotr Grzesik](https://github.com/pgrzesik))
+
 ## [3.7.5](https://github.com/serverless/components/compare/v3.7.4...v3.7.5) (2021-03-17)
 
 - Fix `dev mode` runtime bug
