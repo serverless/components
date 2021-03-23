@@ -68,12 +68,19 @@ const initTemplateFromCli = async (targetPath, packageName, registryPackage, cli
       await fse.createFile(serverlessFilePath);
     }
   }
-  const serverlessFile = await parseYaml(serverlessFilePath);
-  if (appName) {
-    serverlessFile.app = appName;
+
+  const ymlOriginal = await fse.readFile(serverlessFilePath, 'utf8');
+  const ymlParsed = await parseYaml(serverlessFilePath);
+
+  if (appName && ymlParsed.app) {
+    const newYmlContent = ymlOriginal.replace(/^app:\s\S*/m, `app: ${appName}`);
+    await fse.writeFile(serverlessFilePath, newYmlContent, 'utf8');
   }
 
-  await saveYaml(serverlessFilePath, serverlessFile);
+  if (appName && !ymlParsed.app) {
+    ymlParsed.app = appName;
+    await saveYaml(serverlessFilePath, ymlParsed);
+  }
 
   cli.sessionStatus('app.YAML processd end');
 
