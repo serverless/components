@@ -73,7 +73,7 @@ const initTemplateFromCli = async (targetPath, packageName, registryPackage, cli
   const ymlParsed = await parseYaml(serverlessFilePath);
 
   if (appName && ymlParsed.app) {
-    const newYmlContent = ymlOriginal.replace(/^app:\s(.*)/i, `app: ${appName}`);
+    const newYmlContent = ymlOriginal.replace(/^app:\s\S*/m, `app: ${appName}`, 'm');
     await fse.writeFile(serverlessFilePath, newYmlContent, 'utf8');
   }
 
