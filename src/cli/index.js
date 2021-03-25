@@ -204,11 +204,7 @@ module.exports = async () => {
           )
         );
       } else {
-        cli.log(
-          chalk.yellow(
-            '发现新的 CLI 版本，建议通过 npm install -g serverless 进行升级'
-          )
-        ); 
+        cli.log(chalk.yellow('发现新的 CLI 版本，建议通过 npm install -g serverless 进行升级'));
       }
     }
   } catch (error) {
