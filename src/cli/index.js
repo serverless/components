@@ -186,7 +186,7 @@ module.exports = async () => {
       await commands.run(config, cli, command);
     }
 
-    // Check if there is new version of components
+    // Check if there is newer version of Components
     const latestVersion = await getLatestVersion('@serverless/components');
     const currentVersion = require('../../package.json').version;
     const latestVersionData = semver.parse(latestVersion);
@@ -200,13 +200,13 @@ module.exports = async () => {
       if (!isChinaUser()) {
         cli.log(
           chalk.yellow(
-            `New version of serverless components CLI available! Run npm install -g serverless to update!`
+            'New version of serverless components CLI available! Run npm install -g serverless to update!'
           )
         );
       } else {
         cli.log(
           chalk.yellow(
-            `发现新的 CLI 版本，建议通过 npm install -g serverless 进行升级`
+            '发现新的 CLI 版本，建议通过 npm install -g serverless 进行升级'
           )
         ); 
       }
