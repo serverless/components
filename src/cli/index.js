@@ -12,6 +12,7 @@ const dotenv = require('dotenv');
 const semver = require('semver');
 const chalk = require('chalk');
 const HttpsProxyAgent = require('https-proxy-agent');
+const getLatestVersion = require('latest-version');
 const CLI = require('./CLI');
 const { loadInstanceConfig, fileExistsSync, isProjectPath, isChinaUser } = require('./utils');
 
@@ -183,6 +184,32 @@ module.exports = async () => {
       await commands[command](config, cli, command);
     } else {
       await commands.run(config, cli, command);
+    }
+
+    // Check if there is new version of components
+    const latestVersion = await getLatestVersion('@serverless/components');
+    const currentVersion = require('../../package.json').version;
+    const latestVersionData = semver.parse(latestVersion);
+    const currentVersionData = semver.parse(currentVersion);
+
+    if (
+      latestVersionData.major > currentVersionData.major ||
+      latestVersionData.minor > currentVersionData.minor
+    ) {
+      // TODO: Better message for users
+      if (!isChinaUser()) {
+        cli.log(
+          chalk.yellow(
+            `New version of serverless components CLI available! Run npm install -g serverless to update!`
+          )
+        );
+      } else {
+        cli.log(
+          chalk.yellow(
+            `发现新的 CLI 版本，建议通过 npm install -g serverless 进行升级`
+          )
+        ); 
+      }
     }
   } catch (error) {
     process.exitCode = 1;
