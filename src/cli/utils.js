@@ -497,7 +497,7 @@ const isDeployableProjectExists = (inputPath) => {
   return false;
 };
 
-const runningTemplate = (root, checkAppAndStage) => {
+const checkTemplateAppAndStage = (root) => {
   try {
     if (isDeployableProjectExists(root)) {
       // if cwd contains a serverless.yml file that can be deployed we return immediately
@@ -510,8 +510,6 @@ const runningTemplate = (root, checkAppAndStage) => {
     let hasNullApp = false;
     const stages = new Set();
     let hasNullStage = false;
-
-    let hasComponentProject = false;
 
     for (const itemName of itemNames) {
       const itemPath = path.join(root, itemName);
@@ -528,7 +526,39 @@ const runningTemplate = (root, checkAppAndStage) => {
           } else {
             hasNullApp = true;
           }
+        }
+      }
+    }
 
+    // If we need to check the app and stage value for all sub folders, if we have more than 1 app value or at least one folder's yml has app but others do not have, we think it's not a valid template project
+    // same to stage value. Valid template standard: 1. All sub folders do not have app and stage; 2. All sub folders have one same app and stage.
+    return !(
+      apps.size > 1 ||
+      (apps.size === 1 && hasNullApp) ||
+      stages.size > 1 ||
+      (stages.size === 1 && hasNullStage)
+    );
+  } catch (error) {
+    return false;
+  }
+};
+
+const runningTemplate = (root) => {
+  try {
+    if (isDeployableProjectExists(root)) {
+      // if cwd contains a serverless.yml file that can be deployed we return immediately
+      // to let users deploy their projects in cwd (v1 or component instance)
+      return false;
+    }
+    const itemNames = fse.readdirSync(root);
+
+    let hasComponentProject = false;
+
+    for (const itemName of itemNames) {
+      const itemPath = path.join(root, itemName);
+      if (!itemName.startsWith('.') && fse.statSync(itemPath).isDirectory()) {
+        const instanceYml = loadInstanceConfig(itemPath);
+        if (instanceYml) {
           if (instanceYml.component) {
             hasComponentProject = true;
           } else {
@@ -536,19 +566,6 @@ const runningTemplate = (root, checkAppAndStage) => {
             return false;
           }
         }
-      }
-    }
-
-    // If we need to check the app and stage value for all sub folders, if we have more than 1 app value or at least one folder's yml has app but others do not have, we think it's not a valid template project
-    // same to stage value. Valid template standard: 1. All sub folders do not have app and stage; 2. All sub folders have one same app and stage.
-    if (checkAppAndStage) {
-      if (
-        apps.size > 1 ||
-        (apps.size === 1 && hasNullApp) ||
-        stages.size > 1 ||
-        (stages.size === 1 && hasNullStage)
-      ) {
-        return false;
       }
     }
 
@@ -957,4 +974,5 @@ module.exports = {
   hasServerlessConfigFile,
   getInstanceConfigPath,
   checkLocalCredentials,
+  checkTemplateAppAndStage,
 };

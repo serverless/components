@@ -51,15 +51,15 @@ const checkBasicConfigValidation = async (dicPath) => {
   const instanceFile = loadInstanceConfig(dicPath);
 
   if (!instanceFile) {
-    throw new Error('serverless config file was not found');
+    throw new Error('没有找到serverless配置文件，请检查。');
   }
 
   if (!instanceFile.name) {
-    throw new Error('Missing "name" property in serverless.yml');
+    throw new Error('在serverless配置文件中没有发现实例名称("name"字段)，请检查。');
   }
 
   if (!instanceFile.component) {
-    throw new Error('Missing "component" property in serverless.yml');
+    throw new Error('在serverless配置文件中没有发现组件类型("component"字段)，请检查。');
   }
 };
 
@@ -71,15 +71,15 @@ const loadTencentInstanceConfig = async (directoryPath, command) => {
   let instanceFile = loadInstanceConfig(directoryPath);
 
   if (!instanceFile) {
-    throw new Error('serverless config file was not found');
+    throw new Error('没有找到serverless配置文件，请检查。');
   }
 
   if (!instanceFile.name) {
-    throw new Error('Missing "name" property in serverless.yml');
+    throw new Error('在serverless配置文件中没有发现实例名称("name"字段)，请检查。');
   }
 
   if (!instanceFile.component) {
-    throw new Error('Missing "component" property in serverless.yml');
+    throw new Error('在serverless配置文件中没有发现组件类型("component"字段)，请检查。');
   }
 
   // if stage flag provided, overwrite
