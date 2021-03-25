@@ -68,19 +68,8 @@ const checkBasicConfigValidation = async (dicPath) => {
  * @param {*} directoryPath
  */
 const loadTencentInstanceConfig = async (directoryPath, command) => {
+  await checkBasicConfigValidation(directoryPath);
   let instanceFile = loadInstanceConfig(directoryPath);
-
-  if (!instanceFile) {
-    throw new Error('没有找到serverless配置文件，请检查。');
-  }
-
-  if (!instanceFile.name) {
-    throw new Error('在serverless配置文件中没有发现实例名称("name"字段)，请检查。');
-  }
-
-  if (!instanceFile.component) {
-    throw new Error('在serverless配置文件中没有发现组件类型("component"字段)，请检查。');
-  }
 
   // if stage flag provided, overwrite
   if (args.stage) {
