@@ -17,17 +17,18 @@ module.exports = async (config, cli, command) => {
   // Start CLI persistance status
   cli.sessionStart('Initializing', { timer: false });
 
-  await utils.login();
-
-  if (runningTemplate(process.cwd())) {
+  if (runningTemplate(process.cwd(), true)) {
     return infoAll(config, cli);
   }
 
-  // Load YAML
   let instanceDir = process.cwd();
   if (config.target) {
     instanceDir = path.join(instanceDir, config.target);
   }
+  await utils.checkBasicConfigValidation(instanceDir);
+  await utils.login();
+  // Load YAML
+
   const instanceYaml = await utils.loadInstanceConfig(instanceDir, command);
 
   // Presentation

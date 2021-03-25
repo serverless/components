@@ -44,6 +44,26 @@ const getDefaultOrgName = async () => {
 };
 
 /**
+ * check basic config validation
+ */
+
+const checkBasicConfigValidation = async (dicPath) => {
+  const instanceFile = loadInstanceConfig(dicPath);
+
+  if (!instanceFile) {
+    throw new Error('serverless config file was not found');
+  }
+
+  if (!instanceFile.name) {
+    throw new Error('Missing "name" property in serverless.yml');
+  }
+
+  if (!instanceFile.component) {
+    throw new Error('Missing "component" property in serverless.yml');
+  }
+};
+
+/**
  * Reads a serverless instance config file in a given directory path
  * @param {*} directoryPath
  */
@@ -448,4 +468,5 @@ module.exports = {
   parseYaml,
   saveYaml,
   generateYMLForNodejsProject,
+  checkBasicConfigValidation,
 };
