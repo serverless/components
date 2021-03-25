@@ -8,7 +8,7 @@ const path = require('path');
 const { ServerlessSDK } = require('@serverless/platform-client-china');
 const { v4: uuidv4 } = require('uuid');
 const utils = require('./utils');
-const { runningTemplate } = require('../utils');
+const { runningTemplate, checkTemplateAppAndStage } = require('../utils');
 const infoAll = require('./infoAll');
 const chalk = require('chalk');
 const moment = require('moment');
@@ -17,17 +17,18 @@ module.exports = async (config, cli, command) => {
   // Start CLI persistance status
   cli.sessionStart('Initializing', { timer: false });
 
-  await utils.login();
-
-  if (runningTemplate(process.cwd())) {
+  let instanceDir = process.cwd();
+  if (runningTemplate(instanceDir) && checkTemplateAppAndStage(instanceDir)) {
     return infoAll(config, cli);
   }
 
-  // Load YAML
-  let instanceDir = process.cwd();
   if (config.target) {
     instanceDir = path.join(instanceDir, config.target);
   }
+  await utils.checkBasicConfigValidation(instanceDir);
+  await utils.login();
+  // Load YAML
+
   const instanceYaml = await utils.loadInstanceConfig(instanceDir, command);
 
   // Presentation

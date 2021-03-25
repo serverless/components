@@ -44,23 +44,32 @@ const getDefaultOrgName = async () => {
 };
 
 /**
+ * check basic config validation
+ */
+
+const checkBasicConfigValidation = async (dicPath) => {
+  const instanceFile = loadInstanceConfig(dicPath);
+
+  if (!instanceFile) {
+    throw new Error('没有找到serverless配置文件，请检查。');
+  }
+
+  if (!instanceFile.name) {
+    throw new Error('在serverless配置文件中没有发现实例名称("name"字段)，请检查。');
+  }
+
+  if (!instanceFile.component) {
+    throw new Error('在serverless配置文件中没有发现组件类型("component"字段)，请检查。');
+  }
+};
+
+/**
  * Reads a serverless instance config file in a given directory path
  * @param {*} directoryPath
  */
 const loadTencentInstanceConfig = async (directoryPath, command) => {
+  await checkBasicConfigValidation(directoryPath);
   let instanceFile = loadInstanceConfig(directoryPath);
-
-  if (!instanceFile) {
-    throw new Error('serverless config file was not found');
-  }
-
-  if (!instanceFile.name) {
-    throw new Error('Missing "name" property in serverless.yml');
-  }
-
-  if (!instanceFile.component) {
-    throw new Error('Missing "component" property in serverless.yml');
-  }
 
   // if stage flag provided, overwrite
   if (args.stage) {
@@ -448,4 +457,5 @@ module.exports = {
   parseYaml,
   saveYaml,
   generateYMLForNodejsProject,
+  checkBasicConfigValidation,
 };

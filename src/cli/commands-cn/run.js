@@ -6,7 +6,12 @@
 
 const path = require('path');
 const fs = require('fs');
-const { runningTemplate, loadInstanceConfig, fileExists } = require('../utils');
+const {
+  runningTemplate,
+  loadInstanceConfig,
+  fileExists,
+  checkTemplateAppAndStage,
+} = require('../utils');
 const { ServerlessSDK, utils: tencentUtils } = require('@serverless/platform-client-china');
 const { v4: uuidv4 } = require('uuid');
 const utils = require('./utils');
@@ -19,7 +24,8 @@ const { version } = require('../../../package.json');
 const { getServerlessFilePath } = require('../serverlessFile');
 
 module.exports = async (config, cli, command) => {
-  if (!config.target && runningTemplate(process.cwd())) {
+  let instanceDir = process.cwd();
+  if (!config.target && runningTemplate(instanceDir) && checkTemplateAppAndStage(instanceDir)) {
     return runAll(config, cli, command);
   }
 
@@ -40,13 +46,15 @@ module.exports = async (config, cli, command) => {
   // Start CLI persistance status
   cli.sessionStart('Initializing', { timer: true });
 
-  await utils.login();
-
-  // Load YAML
-  let instanceDir = process.cwd();
   if (config.target) {
     instanceDir = path.join(instanceDir, config.target);
   }
+
+  await utils.checkBasicConfigValidation(instanceDir);
+
+  await utils.login();
+
+  // Load YAML
   const instanceYaml = await utils.loadInstanceConfig(instanceDir, command);
 
   // Presentation
