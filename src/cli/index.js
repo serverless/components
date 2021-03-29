@@ -14,7 +14,6 @@ const chalk = require('chalk');
 const HttpsProxyAgent = require('https-proxy-agent');
 const CLI = require('./CLI');
 const { loadInstanceConfig, fileExistsSync, isProjectPath, isChinaUser } = require('./utils');
-const updateNotifier = require('update-notifier');
 
 module.exports = async () => {
   const args = minimist(process.argv.slice(2));
@@ -147,6 +146,7 @@ module.exports = async () => {
       "检测到当前目录下已有 serverless 项目，请通过 'sls deploy' 进行部署，或在新路径下完成 serverless 项目初始化";
 
     // For non China versions we have upgrade notifications configured through backend notifications service
+    const updateNotifier = require('update-notifier');
     const notifier = updateNotifier({
       pkg: require('../../package.json'),
       // Show update notification one time a day at most, this is done to not be annoying to the user
