@@ -12,9 +12,9 @@ const dotenv = require('dotenv');
 const semver = require('semver');
 const chalk = require('chalk');
 const HttpsProxyAgent = require('https-proxy-agent');
-const getLatestVersion = require('latest-version');
 const CLI = require('./CLI');
 const { loadInstanceConfig, fileExistsSync, isProjectPath, isChinaUser } = require('./utils');
+const updateNotifier = require('update-notifier');
 
 module.exports = async () => {
   const args = minimist(process.argv.slice(2));
@@ -145,6 +145,17 @@ module.exports = async () => {
     commands = require('./commands-cn');
     InvalidCommandMsg =
       "检测到当前目录下已有 serverless 项目，请通过 'sls deploy' 进行部署，或在新路径下完成 serverless 项目初始化";
+
+    // For non China versions we have upgrade notifications configured through backend notifications service
+    const notifier = updateNotifier({
+      pkg: require('../../package.json'),
+      // Show update notification one time a day at most, this is done to not be annoying to the user
+      updateCheckInterval: 1000 * 60 * 60 * 24,
+    });
+
+    notifier.notify({
+      message: '发现 serverless 新版本，建议通过 `npm update -g serverless` 进行升级',
+    });
   } else {
     commands = require('./commands');
   }
@@ -184,28 +195,6 @@ module.exports = async () => {
       await commands[command](config, cli, command);
     } else {
       await commands.run(config, cli, command);
-    }
-
-    // Check if there is newer version of Components
-    const latestVersion = await getLatestVersion('@serverless/components');
-    const currentVersion = require('../../package.json').version;
-    const latestVersionData = semver.parse(latestVersion);
-    const currentVersionData = semver.parse(currentVersion);
-
-    if (
-      latestVersionData.major > currentVersionData.major ||
-      latestVersionData.minor > currentVersionData.minor
-    ) {
-      // TODO: Better message for users
-      if (!isChinaUser()) {
-        cli.log(
-          chalk.yellow(
-            'New version of serverless components CLI available! Run npm install -g serverless to update!'
-          )
-        );
-      } else {
-        cli.log(chalk.yellow('发现新的 CLI 版本，建议通过 npm install -g serverless 进行升级'));
-      }
     }
   } catch (error) {
     process.exitCode = 1;
