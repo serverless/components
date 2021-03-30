@@ -115,7 +115,7 @@ const getPackage = async (config, cli) => {
   delete data.component;
 
   if (Object.keys(data).length === 0) {
-    throw new Error(`包 "${packageName}" 在Serverless库中没有找到.`);
+    throw new Error(`所查询的包 "${packageName}" 不存在.`);
   }
 
   const devVersion = data.versions.indexOf('0.0.0-dev');

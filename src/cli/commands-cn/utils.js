@@ -61,6 +61,7 @@ const checkBasicConfigValidation = async (dicPath) => {
   if (!instanceFile.component) {
     throw new Error('在serverless配置文件中没有发现组件类型("component"字段)，请检查。');
   }
+  return instanceFile;
 };
 
 /**
@@ -241,7 +242,7 @@ const getInstanceDashboardUrl = (instanceYaml) => {
   if (SSRComponents.includes(instanceYaml.component)) {
     dashboardUrl = `https://console.cloud.tencent.com/ssr/detail?stageName=${instanceYaml.stage}&appName=${instanceYaml.app}&instanceName=${instanceYaml.name}&stageList=${instanceYaml.stage}`;
   }
-  return `前往控制台查看应用详细信息: ${dashboardUrl}`;
+  return dashboardUrl;
 };
 
 const getTemplateDashboardUrl = (templateYaml) => {
