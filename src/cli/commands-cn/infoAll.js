@@ -56,9 +56,9 @@ module.exports = async (config, cli) => {
     } else {
       statusLog = instance.instanceStatus;
     }
-    cli.log(`  ${chalk.grey('Last Action:')}  ${instance.lastAction} (${lastActionAgo})`);
-    cli.log(`  ${chalk.grey('Status:')}       ${statusLog}`);
-    cli.log(`  ${chalk.grey('Deployments:')}  ${instance.instanceMetrics.deployments}`);
+    cli.log(`  ${chalk.grey('最后操作:')}  ${instance.lastAction} (${lastActionAgo})`);
+    cli.log(`  ${chalk.grey('部署次数:')}  ${statusLog}`);
+    cli.log(`  ${chalk.grey('应用状态:')}  ${instance.instanceMetrics.deployments}`);
 
     // show state only in debug mode
     if (config.debug) {
@@ -72,7 +72,7 @@ module.exports = async (config, cli) => {
 
     delete outputs.vendorMessage;
 
-    cli.log(`  ${chalk.grey('Outputs:')}`);
+    cli.log(`  ${chalk.grey('输出:')}`);
     cli.logOutputs(outputs, 4);
 
     cli.log();
@@ -80,5 +80,5 @@ module.exports = async (config, cli) => {
 
   cli.log(getTemplateDashboardUrl(templateYaml));
 
-  cli.sessionStop('success', 'Info successfully loaded');
+  cli.sessionStop('success', '信息成功加载');
 };

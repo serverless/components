@@ -79,16 +79,15 @@ module.exports = async (config, cli, command) => {
   }
 
   cli.log();
-  cli.log(`${chalk.grey('Last Action:')}  ${instance.lastAction} (${lastActionAgo})`);
-  cli.log(`${chalk.grey('Deployments:')}  ${instance.instanceMetrics.deployments}`);
-  cli.log(`${chalk.grey('Status:')}       ${statusLog}`);
+  cli.log(`${chalk.grey('最后操作:')}  ${instance.lastAction} (${lastActionAgo})`);
+  cli.log(`${chalk.grey('部署次数:')}  ${instance.instanceMetrics.deployments}`);
+  cli.log(`${chalk.grey('应用状态:')}  ${statusLog}`);
 
   // show error stack if available
   if (instance.deploymentErrorStack) {
     cli.log();
     cli.log(chalk.red(instance.deploymentErrorStack));
   }
-  cli.log(`${chalk.grey('More Info:')}    ${utils.getInstanceDashboardUrl(instanceYaml)}`);
 
   // show state only in debug mode
   if (config.debug) {
@@ -97,15 +96,19 @@ module.exports = async (config, cli, command) => {
     cli.log();
     cli.logOutputs(instance.state);
     cli.log();
-    cli.log(`${chalk.grey('Outputs:')}`);
+    cli.log(`${chalk.grey('输出:')}`);
   }
 
   if (instance.outputs) {
     delete instance.outputs.vendorMessage;
+    delete instance.outputs.sourceCodeDownloadUrl;
     cli.log();
     cli.logOutputs(instance.outputs);
   }
 
-  cli.sessionStop('success', 'Info successfully loaded');
+  cli.log();
+  cli.log(`${chalk.grey('应用控制台:')} ${utils.getInstanceDashboardUrl(instanceYaml)}`);
+
+  cli.sessionStop('success', '信息成功加载');
   return null;
 };

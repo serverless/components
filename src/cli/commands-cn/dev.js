@@ -7,7 +7,6 @@
 const path = require('path');
 const { Writable } = require('stream');
 const ansiEscapes = require('ansi-escapes');
-const confirm = require('@serverless/utils/inquirer/confirm');
 const chokidar = require('chokidar');
 const { ServerlessSDK, utils: chinaUtils } = require('@serverless/platform-client-china');
 const { v4: uuidv4 } = require('uuid');
@@ -134,19 +133,28 @@ async function updateDeploymentStatus(cli, instanceInfo, startDebug) {
 
 // eslint-disable-next-line consistent-return
 module.exports = async (config, cli, command) => {
-  cli.log('为方便您的调试，当前开启调试模式后，应用实例配置将会变更:');
-  cli.log(
-    '1. 当前函数实例将进入单例模式；同一时间该函数所有版本只能响应一个事件，并发超出的事件将调用失败；已预制的多个实例也会缩至单个实例'
-  );
-  cli.log('2. $LATEST版本执行超时时间将调整为900s');
-  cli.log('3. 关闭调试模式后，上述配置将恢复');
-  if (
-    !(await confirm(
-      '以上变更只针对Node.js且版本>=10.15, 其它语言或版本不受影响, 是否确定开启调试模式?(Y/N)'
-    ))
-  ) {
-    return null;
+  // Load serverless component instance.  Submit a directory where its config files should be.
+  let instanceDir = process.cwd();
+  if (config.target) {
+    instanceDir = path.join(instanceDir, config.target);
   }
+
+  const projectFile = await utils.checkBasicConfigValidation(instanceDir);
+  if (
+    projectFile &&
+    projectFile.inputs &&
+    projectFile.inputs.runtime &&
+    projectFile.inputs.runtime.toLowerCase().startsWith('nodejs')
+  ) {
+    cli.log('为方便您的调试，当前开启调试模式后，应用实例配置将会变更:');
+    cli.log(
+      '1. 当前函数实例将进入单例模式；同一时间该函数所有版本只能响应一个事件，并发超出的事件将调用失败；已预制的多个实例也会缩至单个实例'
+    );
+    cli.log('2. $LATEST版本执行超时时间将调整为900s');
+    cli.log('3. 关闭调试模式后，上述配置将恢复');
+    cli.log('以上变更只针对Node.js且版本>=10.15, 其它语言或版本不受影响');
+  }
+
   let watcher;
 
   cliEventCallback = (msg, option) => {
@@ -183,11 +191,6 @@ module.exports = async (config, cli, command) => {
   cli.log('Dev Mode - 项目监控中，任何变更都会通过日志输出', 'grey');
   cli.log();
 
-  // Load serverless component instance.  Submit a directory where its config files should be.
-  let instanceDir = process.cwd();
-  if (config.target) {
-    instanceDir = path.join(instanceDir, config.target);
-  }
   let instanceYaml = await utils.loadInstanceConfig(instanceDir, command);
 
   // Load Instance Credentials
