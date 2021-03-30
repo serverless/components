@@ -159,7 +159,7 @@ You can use Serverless Components to abstract over anything, but these are the m
 
 1. An entire application, like a blog, video streaming service, or landing page.
 2. A software feature, like user authentication, comments, or a payment system.
-3. A low-leve use-case, like a data processing pipeline or microservice.
+3. A low-level use-case, like a data processing pipeline or microservice.
 
 ## Features
 
