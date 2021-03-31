@@ -166,10 +166,11 @@ module.exports = async (config, cli) => {
   cli.sessionStart('Installing', { timer: false });
   // Start initialing the template on cli
   await initTemplateFromCli(projectDir, packageName, registryPackage, cli, projectName);
-  cli.sessionStop('success', 'Created');
 
-  // EN: Project successfully created in '${projectName}' folder
-  cli.log(`\n${chalk.green(`${projectName} 项目已成功创建！`)}\n`);
+  cli.log(`- 项目 "${projectName}" 已在当前目录成功创建`);
+  cli.log(`- 执行 "cd ${projectName} && serverless deploy" 部署应用`);
+
+  cli.sessionStop('success', '创建成功');
 
   if (
     // EN: Do you want to deploy your project on the cloud now?

@@ -105,7 +105,7 @@ const init = async (config, cli) => {
       packageName = config.params[0];
     } else {
       throw new Error(
-        'Need to specify component or template name. e.g. "serverless init some-template".'
+        '需要指定 Component 或者 Template 的名称 e.g. "serverless init scf-starter".'
       );
     }
   }
@@ -113,13 +113,13 @@ const init = async (config, cli) => {
   const sdk = new ServerlessSDK({ context: { traceId: uuidv4() } });
   const registryPackage = await sdk.getPackage(packageName);
   if (!registryPackage) {
-    throw new Error(`Serverless Registry Package "${packageName}" does not exist.`);
+    throw new Error(`查询的包 "${packageName}" 不存在.`);
   }
   // registryPackage.component will be null if component is not found
   // this is the design for platform API backward compatibility
   delete registryPackage.component;
   if (Object.keys(registryPackage).length === 0) {
-    throw new Error(`Serverless Registry Package "${packageName}" does not exist.`);
+    throw new Error(`查询的包 "${packageName}" 不存在.`);
   }
 
   const targetName = config.name || packageName;
@@ -136,10 +136,10 @@ const init = async (config, cli) => {
     await initTemplateFromCli(targetPath, packageName, registryPackage, cli, targetName);
   }
 
-  cli.log(`- Successfully created "${targetName}" in the current working directory.`);
-  cli.log(`- Run "cd ${targetName} && serverless deploy" to deploy your new application.`);
+  cli.log(`- 项目 "${packageName}" 已在当前目录成功创建`);
+  cli.log(`- 执行 "cd ${targetName} && serverless deploy" 部署应用`);
 
-  cli.sessionStop('success', 'Created');
+  cli.sessionStop('success', '创建成功');
   return null;
 };
 

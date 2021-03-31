@@ -134,6 +134,9 @@ module.exports = async (config, cli, command) => {
     cli.log();
     cli.logOutputs(instance.outputs);
     cli.log();
+    if (instance.outputs.apigw && instance.outputs.apigw.url) {
+      cli.log(`${chalk.grey('项目访问地址:')} ${instance.outputs.apigw.url}`);
+    }
     cli.log(`${chalk.grey('应用控制台:')} ${utils.getInstanceDashboardUrl(instanceYaml)}`);
     if (vendorMessage) {
       cli.log();
