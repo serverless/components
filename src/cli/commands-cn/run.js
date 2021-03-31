@@ -134,7 +134,7 @@ module.exports = async (config, cli, command) => {
     cli.log();
     cli.logOutputs(instance.outputs);
     cli.log();
-    cli.log(`${chalk.grey(utils.getInstanceDashboardUrl(instanceYaml))}`);
+    cli.log(`${chalk.grey('应用控制台:')} ${utils.getInstanceDashboardUrl(instanceYaml)}`);
     if (vendorMessage) {
       cli.log();
       cli.log(`${chalk.green(vendorMessage)}`);

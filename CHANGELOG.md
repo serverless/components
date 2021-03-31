@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.8.1](https://github.com/serverless/components/compare/v3.8.0...v3.8.1) (2021-03-31)
+
+- Fix typo
+
 ## [3.8.0](https://github.com/serverless/components/compare/v3.7.7...v3.8.0) (2021-03-31)
 
 - Process polish for commands: info, remove, registry, dev
