@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.8.0](https://github.com/serverless/components/compare/v3.7.7...v3.8.0) (2021-03-31)
+
+- Process polish for commands: info, remove, registry, dev
+- Random default app name after generation
+- Login require for only needed cases.
+
 ## [3.7.7](https://github.com/serverless/components/compare/v3.7.6...v3.7.7) (2021-03-24)
 
 - Reserve comments for templates([#913](https://github.com/serverless/components/pull/913))
