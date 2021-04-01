@@ -446,10 +446,6 @@ inputs:
   throw new Error('当前目录未检测到 Serverless 配置文件');
 };
 
-const notificationActions = {
-  components_questionnaire: 'COMPONENTS_QUESTIONNAIRE',
-};
-
 module.exports = {
   loadInstanceConfig: loadTencentInstanceConfig,
   loadInstanceCredentials,
@@ -463,5 +459,4 @@ module.exports = {
   saveYaml,
   generateYMLForNodejsProject,
   checkBasicConfigValidation,
-  notificationActions,
 };

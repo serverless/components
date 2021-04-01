@@ -107,10 +107,7 @@ module.exports = async (config, cli, command) => {
   let deferredNotificationsData;
   if (command === 'deploy') {
     deferredNotificationsData = requestNotification(
-      Object.assign(generateNotificationsPayload(instanceYaml), {
-        command: 'deploy',
-        actions: [utils.notificationActions.components_questionnaire],
-      })
+      Object.assign(generateNotificationsPayload(instanceYaml), { command: 'deploy' })
     );
 
     // Warn about dev agent
