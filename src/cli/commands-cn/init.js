@@ -105,7 +105,7 @@ const init = async (config, cli) => {
       packageName = config.params[0];
     } else {
       throw new Error(
-        '需要指定 Component 或者 Template 的名称 e.g. "serverless init scf-starter".'
+        '请指定 component 或 template 名称，如: "serverless init scf-starter"'
       );
     }
   }
