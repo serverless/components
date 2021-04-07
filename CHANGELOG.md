@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.8.2](https://github.com/serverless/components/compare/v3.8.1...v3.8.2) (2021-03-31)
+
+- Update cli logs [#923](https://github.com/serverless/components/pull/923)
+- Update utils version [#924](https://github.com/serverless/components/pull/924)
+
 ## [3.8.1](https://github.com/serverless/components/compare/v3.8.0...v3.8.1) (2021-03-31)
 
 - Fix typo
