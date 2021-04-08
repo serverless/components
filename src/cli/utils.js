@@ -4,12 +4,14 @@
  * Serverless Components: Utilities
  */
 
+const os = require('os');
 const { mergeRight, endsWith, isEmpty } = require('ramda');
 const memoize = require('memoizee');
 const path = require('path');
 const fse = require('fs-extra');
 const YAML = require('js-yaml');
 const traverse = require('traverse');
+const dotenv = require('dotenv');
 const { Graph, alg } = require('graphlib');
 
 /**
@@ -947,6 +949,13 @@ const checkLocalCredentials = async (sdk, config, orgName) => {
   }
 };
 
+const loadTencentGlobalConfig = () => {
+  const globalTencentEnvFilePath = path.join(os.homedir(), '.tencent_serverless.env');
+  if (fileExistsSync(globalTencentEnvFilePath)) {
+    dotenv.config({ path: globalTencentEnvFilePath });
+  }
+};
+
 module.exports = {
   fileExists,
   fileExistsSync,
@@ -975,4 +984,5 @@ module.exports = {
   getInstanceConfigPath,
   checkLocalCredentials,
   checkTemplateAppAndStage,
+  loadTencentGlobalConfig,
 };
