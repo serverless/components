@@ -160,6 +160,8 @@ module.exports = async (config, cli, command) => {
   cliEventCallback = (msg, option) => {
     cli.log(msg, option && option.type === 'error' ? 'red' : 'grey');
   };
+  cliEventCallback.stdout = logForwardingOutput;
+
   // Define a close handler, that removes any "dev" mode agents
   const closeHandler = async () => {
     // Set new close listener
@@ -236,7 +238,7 @@ module.exports = async (config, cli, command) => {
     cli.sessionStatus('dev 模式开启中', null, 'green');
     // Try to stop debug mode before first time deploy
     const instanceInfo = await getInstanceInfo(sdk, instanceYaml);
-    if (instanceInfo && instanceInfo.instanceStatus === 'active') {
+    if (instanceInfo && instanceInfo.instanceStatus && instanceInfo.instanceStatus !== 'inactive') {
       const {
         state: { lambdaArn, region },
         outputs: { scf, runtime, namespace },
