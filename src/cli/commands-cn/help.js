@@ -6,6 +6,7 @@
 
 const chalk = require('chalk');
 const { version } = require('../../../package.json');
+const utils = require('../utils');
 
 const title = chalk.underline.bold;
 const command = chalk.dim.bold;
@@ -13,6 +14,19 @@ const command = chalk.dim.bold;
 module.exports = async (config, cli) => {
   cli.logLogo();
 
+  const instanceYaml = await utils.loadInstanceConfig(process.cwd());
+
+  let scfCommand = '';
+  if (instanceYaml && instanceYaml.component === 'scf') {
+    scfCommand = `
+SCF component 指令
+
+${command('serverless invoke')}           调用 SCF 函数
+`;
+console.log(scfCommand)
+  }
+
+  // console.log(instanceYaml)
   cli.log(
     `
 Serverless 指令
@@ -48,7 +62,7 @@ ${command('serverless publish')}          发布一个组件或模版到 应用�
 
 ${command('serverless bind role')}        重新为当前用户分配使用 Serverless 所需权限
 
-
+${scfCommand}
 ${title('当前命令行版本:')}  v${version}
 
 ${title('产品文档:')}        https://cloud.tencent.com/document/product/1154
