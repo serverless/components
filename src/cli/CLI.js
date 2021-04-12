@@ -477,6 +477,7 @@ class CLI {
               true: null,
               false: null,
             },
+            maxDepth: 10,
           },
           indent
         )
