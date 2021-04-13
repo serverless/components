@@ -220,10 +220,10 @@ class CLI {
           : `  帮助文档: https://cloud.tencent.com/document/product/1154/39270 ${os.EOL}`;
       }
       if (error.support !== false) {
-        error.support = `  获取支持: https://cloud.tencent.com/act/event/Online_service ${os.EOL}`;
+        error.support = `  BUG提交: https://github.com/serverless/serverless-tencent/issues ${os.EOL}`;
       }
       if (error.chat !== false) {
-        error.chat = `  问答社区: https://cloud.tencent.com/developer/ask ${os.EOL}`;
+        error.chat = `  问答社区: https://github.com/serverless/serverless-tencent/discussions ${os.EOL}`;
       }
     }
 
