@@ -948,14 +948,27 @@ const checkLocalCredentials = async (sdk, config, orgName) => {
   }
 };
 
-const loadTencentGlobalConfig = () => {
+const loadTencentGlobalConfig = (cli, config = {}) => {
+  // Users do not want to use global credentials
+  if (config.login) {
+    return;
+  }
+
+  process.env.TENCENT_CREDENTIALS_PROFILE = config.profile || 'default';
   const globalTencentCredentials = path.join(os.homedir(), '.serverless/tencent/credentials');
-  if (fileExistsSync(globalTencentCredentials) && process.env.TENCENT_CREDENTIALS_PROFILE) {
+  if (fileExistsSync(globalTencentCredentials)) {
     const credContent = loadCredentialsToJson(globalTencentCredentials);
     const envToInsert = credContent[process.env.TENCENT_CREDENTIALS_PROFILE];
     if (!envToInsert) {
       return;
     }
+
+    if (cli && cli.log) {
+      if (!process.env.TENCENT_SECRET_KEY && !process.env.TENCENT_SECRET_ID) {
+        cli.log(`正在使用全局身份信息[${process.env.TENCENT_CREDENTIALS_PROFILE}]进行授权\n`);
+      }
+    }
+
     for (const [key, value] of Object.entries(envToInsert)) {
       // it will not override exsting env variables
       if (!process.env[key]) {

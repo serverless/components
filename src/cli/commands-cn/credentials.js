@@ -1,3 +1,10 @@
+/*
+ * Long-term credentials functionality:
+ * Ticket: https://app.asana.com/0/1200011502754281/1200046588610090/f
+ * Design proposal: https://hackmd.io/JAPDyl8ORe6jZWh9JvLY2w
+ * Author: Meng Zong(meng.zong@serverless.com)
+ * Date: 2021/04/12
+ */
 'use strict';
 
 const path = require('path');
@@ -11,16 +18,29 @@ module.exports = async (config, cli) => {
   const subCommand = config.params[0];
 
   if (subCommand === 'set') {
-    const { secretId, secretKey, section } = config;
-    if (!secretId) {
-      throw new Error('缺少secretId, 请使用 --secretId 指定');
-    }
-    if (!secretKey) {
-      throw new Error('缺少secretKey, 请使用 --secretKey 指定');
+    const { i, k, n, overwrite, o } = config;
+    let { secretId, secretKey, profile } = config;
+
+    const canOverwrite = overwrite || o;
+
+    if (!secretId && !i) {
+      throw new Error('缺少secretId, 请使用 --secretId 或者 -i 指定');
+    } else if (i) {
+      secretId = i;
     }
 
-    if (!section) {
-      throw new Error('缺少section, 请使用 --section 指定全局认证文件中要设置的section');
+    if (!secretKey && !k) {
+      throw new Error('缺少secretKey, 请使用 --secretKey 或者 -k 指定');
+    } else if (k) {
+      secretKey = k;
+    }
+
+    if (!profile) {
+      if (n) {
+        profile = n;
+      } else {
+        profile = 'default';
+      }
     }
 
     try {
@@ -28,17 +48,33 @@ module.exports = async (config, cli) => {
         fse.createFileSync(globalTencentCredentials);
       }
       const credContent = loadCredentialsToJson(globalTencentCredentials);
-      if (credContent[section]) {
-        credContent[section] = {
-          ...credContent[section],
+
+      cli.log(
+        `
+使用授权信息请在 serverless 命令后添加 --profile {name}
+或储存 TENCENT_CREDENTIALS_PROFILE={name} 在项目 .env 文件中。
+授权信息会储存在系统本地目录，并长期有效。请确认当前电脑不是公用电脑或与他人共享。
+如果密钥信息泄漏请前往 腾讯云-用户控制台 删除相关用户。
+更多帮助请查看 sls --help
+        `
+      );
+
+      if (credContent[profile]) {
+        if (!canOverwrite) {
+          throw new Error(`相关用户信息名称:${profile}已存在，请使用 --overwrite 进行覆写`);
+        }
+        credContent[profile] = {
+          ...credContent[profile],
           TENCENT_SECRET_KEY: secretKey,
           TENCENT_SECRET_ID: secretId,
         };
+        cli.log(`Serverless: 授权信息 [${profile}] 更新成功`);
       } else {
-        credContent[section] = { TENCENT_SECRET_KEY: secretKey, TENCENT_SECRET_ID: secretId };
+        credContent[profile] = { TENCENT_SECRET_KEY: secretKey, TENCENT_SECRET_ID: secretId };
+        cli.log(`Serverless: 授权信息 [${profile}] 储存成功`);
       }
+
       writeJsonToCredentials(globalTencentCredentials, credContent);
-      cli.log('更新Serverless全局认证信息成功');
     } catch (e) {
       cli.log(
         `更新Serverless全局认证信息失败, 配置文件地址: ${globalTencentCredentials}, 错误信息: ${e.message}`,
@@ -47,27 +83,49 @@ module.exports = async (config, cli) => {
     }
   }
 
-  if (subCommand === 'revoke') {
-    const { section } = config;
-    if (!section) {
-      throw new Error('缺少section, 请使用 --section 指定全局认证文件中要设置的section');
+  if (subCommand === 'remove') {
+    let { profile } = config;
+    const { n } = config;
+
+    if (!profile) {
+      if (n) {
+        profile = n;
+      } else {
+        profile = 'default';
+      }
     }
 
     if (fileExistsSync(globalTencentCredentials)) {
       try {
         const credContent = loadCredentialsToJson(globalTencentCredentials);
-        if (!credContent[section]) {
-          cli.log(`配置文件 ${globalTencentCredentials} 中没有要删除的部分: ${section}`);
-          return;
+        if (!credContent[profile]) {
+          throw new Error(
+            `Serverless: 授权信息 ${profile} 不存在，请通过 serverless credentials list 查看当前授权信息。`
+          );
         }
-        delete credContent[section];
+
+        delete credContent[profile];
         writeJsonToCredentials(globalTencentCredentials, credContent);
-        cli.log('废除认证信息成功');
+        cli.log(
+          '如果需要删除相关授权用户请前往 腾讯云-用户控制台 删除相关用户。\n更多帮助请查看 sls --help'
+        );
+        cli.log(`Serverless: 授权信息 ${profile} 移除成功`);
       } catch (e) {
-        cli.log(`废除认证配置失败, 错误:${e.message}`, 'red');
+        cli.log(`删除认证配置失败, 错误:${e.message}`, 'red');
       }
     } else {
-      cli.log(`无法找到全局认证配置文件:${globalTencentCredentials}, 取消失败`);
+      cli.log(`无法找到全局认证配置文件:${globalTencentCredentials}, 删除失败`);
+    }
+  }
+
+  if (subCommand === 'list') {
+    if (fileExistsSync(globalTencentCredentials)) {
+      const credContent = loadCredentialsToJson(globalTencentCredentials);
+
+      cli.log('Serverless: 当前已有用户授权信息名称：');
+      Object.keys(credContent).forEach((item) => {
+        cli.log(`  - ${item}`);
+      });
     }
   }
 };

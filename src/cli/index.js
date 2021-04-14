@@ -90,7 +90,7 @@ module.exports = async () => {
     dotEnvContent.parsed.AWS_SECRET_ACCESS_KEY;
 
   if (isChinaUser()) {
-    loadTencentGlobalConfig();
+    loadTencentGlobalConfig(cli, config);
   }
 
   /**
