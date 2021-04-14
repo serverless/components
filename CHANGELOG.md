@@ -2,7 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [3.8.2](https://github.com/serverless/components/compare/v3.8.1...v3.8.2) (2021-03-31)
+## [3.8.3](https://github.com/serverless/components/compare/v3.8.2...v3.8.3) (2021-04-14)
+
+- Update help doc [#931](https://github.com/serverless/components/pull/931)
+- Display complete outputs [#930](https://github.com/serverless/components/pull/930)
+- Fix dev log print issue [#927](https://github.com/serverless/components/pull/927)
+
+## [3.8.2](https://github.com/serverless/components/compare/v3.8.1...v3.8.2) (2021-04-07)
 
 - Update cli logs [#923](https://github.com/serverless/components/pull/923)
 - Update utils version [#924](https://github.com/serverless/components/pull/924)
