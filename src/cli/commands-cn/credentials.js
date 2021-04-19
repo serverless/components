@@ -4,6 +4,14 @@
  * Design proposal: https://hackmd.io/JAPDyl8ORe6jZWh9JvLY2w
  * Author: Meng Zong(meng.zong@serverless.com)
  * Date: 2021/04/12
+
+ * Credentials format:
+ * [xxxx]
+ * key=value
+ * key2=value2
+ * [yyyy]
+ * key=value
+ * key2=value2
  */
 'use strict';
 
@@ -61,7 +69,7 @@ module.exports = async (config, cli) => {
 
       if (credContent[profile]) {
         if (!canOverwrite) {
-          throw new Error(`相关用户信息名称:${profile}已存在，请使用 --overwrite 进行覆写`);
+          throw new Error(`相关用户信息名称: ${profile}已存在，请使用 --overwrite 进行覆写`);
         }
         credContent[profile] = {
           ...credContent[profile],
@@ -111,10 +119,10 @@ module.exports = async (config, cli) => {
         );
         cli.log(`Serverless: 授权信息 ${profile} 移除成功`);
       } catch (e) {
-        cli.log(`删除认证配置失败, 错误:${e.message}`, 'red');
+        cli.log(`删除认证配置失败, 错误: ${e.message}`, 'red');
       }
     } else {
-      cli.log(`无法找到全局认证配置文件:${globalTencentCredentials}, 删除失败`);
+      cli.log(`无法找到全局认证配置文件: ${globalTencentCredentials}, 删除失败`);
     }
   }
 

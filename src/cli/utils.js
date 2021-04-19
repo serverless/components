@@ -954,18 +954,19 @@ const loadTencentGlobalConfig = (cli, config = {}) => {
     return;
   }
 
-  process.env.TENCENT_CREDENTIALS_PROFILE = config.profile || 'default';
+  const profile = process.env.TENCENT_CREDENTIALS_PROFILE || config.profile || 'default';
+
   const globalTencentCredentials = path.join(os.homedir(), '.serverless/tencent/credentials');
   if (fileExistsSync(globalTencentCredentials)) {
     const credContent = loadCredentialsToJson(globalTencentCredentials);
-    const envToInsert = credContent[process.env.TENCENT_CREDENTIALS_PROFILE];
+    const envToInsert = credContent[profile];
     if (!envToInsert) {
       return;
     }
 
     if (cli && cli.log) {
       if (!process.env.TENCENT_SECRET_KEY && !process.env.TENCENT_SECRET_ID) {
-        cli.log(`正在使用全局身份信息[${process.env.TENCENT_CREDENTIALS_PROFILE}]进行授权\n`);
+        cli.log(`正在使用全局身份信息[${profile}]进行授权\n`);
       }
     }
 
