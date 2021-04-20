@@ -13,7 +13,13 @@ const semver = require('semver');
 const chalk = require('chalk');
 const HttpsProxyAgent = require('https-proxy-agent');
 const CLI = require('./CLI');
-const { loadInstanceConfig, fileExistsSync, isProjectPath, isChinaUser } = require('./utils');
+const {
+  loadTencentGlobalConfig,
+  loadInstanceConfig,
+  fileExistsSync,
+  isProjectPath,
+  isChinaUser,
+} = require('./utils');
 
 module.exports = async () => {
   const args = minimist(process.argv.slice(2));
@@ -82,6 +88,10 @@ module.exports = async () => {
     dotEnvContent.parsed &&
     dotEnvContent.parsed.AWS_ACCESS_KEY_ID &&
     dotEnvContent.parsed.AWS_SECRET_ACCESS_KEY;
+
+  if (isChinaUser()) {
+    loadTencentGlobalConfig(cli, config);
+  }
 
   /**
    * Set global proxy agent if it's configured in environment variable

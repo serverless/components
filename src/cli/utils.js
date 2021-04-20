@@ -4,6 +4,7 @@
  * Serverless Components: Utilities
  */
 
+const os = require('os');
 const { mergeRight, endsWith, isEmpty } = require('ramda');
 const memoize = require('memoizee');
 const path = require('path');
@@ -947,6 +948,77 @@ const checkLocalCredentials = async (sdk, config, orgName) => {
   }
 };
 
+const loadTencentGlobalConfig = (cli, config = {}) => {
+  // Users do not want to use global credentials
+  if (config.login) {
+    return;
+  }
+
+  const profile = process.env.TENCENT_CREDENTIALS_PROFILE || config.profile || 'default';
+
+  const globalTencentCredentials = path.join(os.homedir(), '.serverless/tencent/credentials');
+  if (fileExistsSync(globalTencentCredentials)) {
+    const credContent = loadCredentialsToJson(globalTencentCredentials);
+    const envToInsert = credContent[profile];
+    if (!envToInsert) {
+      return;
+    }
+
+    if (cli && cli.log) {
+      if (!process.env.TENCENT_SECRET_KEY && !process.env.TENCENT_SECRET_ID) {
+        cli.log(`正在使用全局身份信息[${profile}]进行授权\n`);
+      }
+    }
+
+    for (const [key, value] of Object.entries(envToInsert)) {
+      // it will not override exsting env variables
+      if (!process.env[key]) {
+        process.env[key] = value;
+      }
+    }
+  }
+};
+
+const loadCredentialsToJson = (credPath) => {
+  if (!fileExistsSync(credPath)) {
+    throw new Error(`Can not find credentials in ${credPath}`);
+  }
+  let credContent = fse.readFileSync(credPath, { encoding: 'utf-8' });
+  credContent = credContent
+    .trim()
+    .split('\n')
+    .filter((v) => !!v);
+  const res = {};
+  let key = '';
+  credContent.forEach((item) => {
+    if (item.includes('[')) {
+      key = item.slice(1, -1);
+      if (!res[key]) {
+        res[key] = {};
+      }
+    } else {
+      const [kkey, vvalue] = item.split('=');
+      res[key][kkey] = vvalue;
+    }
+  });
+  return res;
+};
+
+const writeJsonToCredentials = (credPath, content = {}) => {
+  if (!credPath) {
+    throw new Error('Missing required credentials path field');
+  }
+  let writeContent = '';
+  for (const [key, value] of Object.entries(content)) {
+    writeContent += `[${key}]\n`;
+
+    for (const [kkey, vvalue] of Object.entries(value)) {
+      writeContent += `${kkey}=${vvalue}\n`;
+    }
+    writeContent += '\n';
+  }
+  fse.writeFileSync(credPath, writeContent);
+};
 module.exports = {
   fileExists,
   fileExistsSync,
@@ -975,4 +1047,7 @@ module.exports = {
   getInstanceConfigPath,
   checkLocalCredentials,
   checkTemplateAppAndStage,
+  loadTencentGlobalConfig,
+  loadCredentialsToJson,
+  writeJsonToCredentials,
 };

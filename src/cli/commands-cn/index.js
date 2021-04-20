@@ -7,6 +7,7 @@ const dev = require('./dev');
 const registry = require('./registry');
 const help = require('./help');
 const param = require('./param');
+const credentials = require('./credentials');
 
 module.exports = {
   run,
@@ -16,4 +17,5 @@ module.exports = {
   registry,
   help,
   param,
+  credentials,
 };
