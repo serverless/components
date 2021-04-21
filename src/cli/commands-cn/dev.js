@@ -117,13 +117,13 @@ async function updateDeploymentStatus(cli, instanceInfo, startDebug) {
       cli.log(header, 'grey');
       delete instanceInfo.outputs.vendorMessage;
       cli.logOutputs(instanceInfo.outputs);
-      cli.sessionStatus('Watching');
+      cli.sessionStatus('监听中');
       return true;
     }
     case 'error':
       cli.log(`${header} error`, 'grey');
       cli.log(deploymentErrorStack || deploymentError, 'red');
-      cli.sessionStatus('Watching');
+      cli.sessionStatus('监听中');
       break;
     default:
       cli.log(`部署失败，当前实例状态不支持更改: ${instanceStatus}`, 'red');

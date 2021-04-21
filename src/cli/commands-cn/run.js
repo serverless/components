@@ -44,7 +44,7 @@ module.exports = async (config, cli, command) => {
   }
 
   // Start CLI persistance status
-  cli.sessionStart('Initializing', { timer: true });
+  cli.sessionStart('正在初始化', { timer: true });
 
   if (config.target) {
     instanceDir = path.join(instanceDir, config.target);
@@ -66,7 +66,7 @@ module.exports = async (config, cli, command) => {
     cli.log(meta);
   }
 
-  cli.sessionStatus('Initializing', instanceYaml.name);
+  cli.sessionStatus('正在初始化', instanceYaml.name);
 
   // Load Instance Credentials
   const instanceCredentials = await utils.loadInstanceCredentials(instanceYaml.stage);
@@ -120,12 +120,12 @@ module.exports = async (config, cli, command) => {
     }
 
     // run deploy
-    cli.sessionStatus('Initializing', null, 'white');
+    cli.sessionStatus('', null, 'white');
     options.statusReceiver = (statusMsg) => {
       if (statusMsg) {
         cli.sessionStatus(statusMsg, null, 'white');
       } else {
-        cli.sessionStatus('Deploying', null, 'white');
+        cli.sessionStatus('部署中', null, 'white');
       }
     };
     const instance = await sdk.deploy(instanceYaml, instanceCredentials, options);
@@ -141,7 +141,7 @@ module.exports = async (config, cli, command) => {
     }
   } else if (command === 'remove') {
     // run remove
-    cli.sessionStatus('Removing', null, 'white');
+    cli.sessionStatus('删除中', null, 'white');
     await sdk.remove(instanceYaml, instanceCredentials, options);
   } else if (command === 'bind' && config.params[0] === 'role') {
     await sdk.bindRole(instanceCredentials);
@@ -154,7 +154,7 @@ module.exports = async (config, cli, command) => {
     options.sync = true;
 
     // run a custom method
-    cli.sessionStatus('Running', null, 'white');
+    cli.sessionStatus('正在运行', null, 'white');
     // We need to convert xx-yy-zz into xx_yy_zz, due to we can not use a 'xx-yy` as the name of function in nodejs
     command = command.replace(/-/g, '_');
     const instance = await sdk.run(command, instanceYaml, instanceCredentials, options);
@@ -162,7 +162,7 @@ module.exports = async (config, cli, command) => {
     cli.log();
     cli.logOutputs(instance.outputs);
   }
-  cli.sessionStop('success', 'Success');
+  cli.sessionStop('success', '执行成功');
 
   if (deferredNotificationsData) printNotification(cli, await deferredNotificationsData);
 
