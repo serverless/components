@@ -376,8 +376,8 @@ class CLI {
   logLogo() {
     let logo = os.EOL;
     logo += 'serverless';
-    logo += red(' ⚡');
-    logo += 'framework';
+    logo += red(' ⚡ ');
+    logo += 'components';
 
     if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
       logo += grey(' (dev)');
@@ -392,7 +392,7 @@ class CLI {
   logRegistryLogo(text) {
     let logo = os.EOL;
     logo += white('serverless');
-    logo += red(' ⚡');
+    logo += red(' ⚡ ');
     logo += white('registry');
 
     if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
