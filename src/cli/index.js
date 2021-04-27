@@ -189,6 +189,7 @@ module.exports = async () => {
     if (!command) {
       throw new Error(InvalidCommandMsg);
     }
+
     if (commands[command]) {
       await commands[command](config, cli, command);
     } else {

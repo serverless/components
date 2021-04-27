@@ -965,8 +965,9 @@ const loadTencentGlobalConfig = (cli, config = {}) => {
     }
 
     if (cli && cli.log) {
+      // only show tip messgae for commands need login credentials info
       if (!process.env.TENCENT_SECRET_KEY && !process.env.TENCENT_SECRET_ID) {
-        cli.log(`正在使用全局身份信息[${profile}]进行授权\n`);
+        config.useTencentCredential = profile;
       }
     }
 

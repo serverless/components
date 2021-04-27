@@ -18,6 +18,7 @@
 const path = require('path');
 const os = require('os');
 const fse = require('fs-extra');
+const chalk = require('chalk');
 const { fileExistsSync, loadCredentialsToJson, writeJsonToCredentials } = require('../utils');
 
 const globalTencentCredentials = path.join(os.homedir(), '.serverless/tencent/credentials');
@@ -57,37 +58,38 @@ module.exports = async (config, cli) => {
       }
       const credContent = loadCredentialsToJson(globalTencentCredentials);
 
-      cli.log(
-        `
-使用授权信息请在 serverless 命令后添加 --profile {name}
-或储存 TENCENT_CREDENTIALS_PROFILE={name} 在项目 .env 文件中。
-授权信息会储存在系统本地目录，并长期有效。请确认当前电脑不是公用电脑或与他人共享。
-如果密钥信息泄漏请前往 腾讯云-用户控制台 删除相关用户。
-更多帮助请查看 sls --help
-        `
-      );
-
       if (credContent[profile]) {
         if (!canOverwrite) {
-          throw new Error(`相关用户信息名称: ${profile}已存在，请使用 --overwrite 进行覆写`);
+          cli.log(
+            `Serverless: ${chalk.yellow(
+              `相关用户信息名称: ${profile}已存在，请使用 --overwrite 进行覆写`
+            )}`
+          );
+          process.exit();
         }
         credContent[profile] = {
           ...credContent[profile],
           TENCENT_SECRET_KEY: secretKey,
           TENCENT_SECRET_ID: secretId,
         };
-        cli.log(`Serverless: 授权信息 [${profile}] 更新成功`);
+        cli.log(`Serverless: ${chalk.green(`授权信息 [${profile}] 更新成功`)}`);
       } else {
         credContent[profile] = { TENCENT_SECRET_KEY: secretKey, TENCENT_SECRET_ID: secretId };
-        cli.log(`Serverless: 授权信息 [${profile}] 储存成功`);
+        cli.log(
+          `
+使用授权信息请在 serverless 命令后添加 --profile {name}
+或储存 TENCENT_CREDENTIALS_PROFILE={name} 在项目 .env 文件中。
+授权信息会储存在系统本地目录，并长期有效。请确认当前电脑不是公用电脑或与他人共享。
+如果密钥信息泄漏请前往 腾讯云-用户控制台 删除相关用户。
+更多帮助请查看 sls --help
+`
+        );
+        cli.log(`Serverless: ${chalk.green(`授权信息 [${profile}] 储存成功`)}`);
       }
 
       writeJsonToCredentials(globalTencentCredentials, credContent);
     } catch (e) {
-      cli.log(
-        `更新Serverless全局认证信息失败, 配置文件地址: ${globalTencentCredentials}, 错误信息: ${e.message}`,
-        'red'
-      );
+      throw new Error(e.message);
     }
   }
 
@@ -107,19 +109,22 @@ module.exports = async (config, cli) => {
       try {
         const credContent = loadCredentialsToJson(globalTencentCredentials);
         if (!credContent[profile]) {
-          throw new Error(
-            `Serverless: 授权信息 ${profile} 不存在，请通过 serverless credentials list 查看当前授权信息。`
+          cli.log(
+            `Serverless: ${chalk.yellow(
+              `授权信息 ${profile} 不存在，请通过 serverless credentials list 查看当前授权信息`
+            )}`
           );
+          process.exit();
         }
 
         delete credContent[profile];
         writeJsonToCredentials(globalTencentCredentials, credContent);
         cli.log(
-          '如果需要删除相关授权用户请前往 腾讯云-用户控制台 删除相关用户。\n更多帮助请查看 sls --help'
+          '如果需要删除相关授权用户请前往 腾讯云-用户控制台 删除相关用户。\n更多帮助请查看 sls --help\n'
         );
-        cli.log(`Serverless: 授权信息 ${profile} 移除成功`);
+        cli.log(`Serverless: ${chalk.green(`授权信息 ${profile} 移除成功`)}`);
       } catch (e) {
-        cli.log(`删除认证配置失败, 错误: ${e.message}`, 'red');
+        throw new Error(e.message);
       }
     } else {
       cli.log(`无法找到全局认证配置文件: ${globalTencentCredentials}, 删除失败`);
@@ -130,7 +135,7 @@ module.exports = async (config, cli) => {
     if (fileExistsSync(globalTencentCredentials)) {
       const credContent = loadCredentialsToJson(globalTencentCredentials);
 
-      cli.log('Serverless: 当前已有用户授权信息名称：');
+      cli.log('Serverless: 当前已有用户授权信息名称：\n');
       Object.keys(credContent).forEach((item) => {
         cli.log(`  - ${item}`);
       });

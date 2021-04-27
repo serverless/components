@@ -19,7 +19,7 @@ const printNotification = require('../notifications/print-notification');
 module.exports = async (config, cli, command) => {
   cli.sessionStart('Initializing', { timer: true });
 
-  await login();
+  await login(config);
 
   if (!config.debug) {
     cli.logLogo();
