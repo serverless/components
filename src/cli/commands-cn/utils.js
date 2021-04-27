@@ -137,8 +137,14 @@ const loadTencentInstanceConfig = async (directoryPath, command) => {
 /**
  * Gets the logged in user's token id, or access key if its in env
  */
-const login = async () => {
-  const [reLoggedIn, credentials] = await platformUtils.loginWithTencent();
+const login = async (config = {}) => {
+  const [reLoggedIn, credentials] = await platformUtils.loginWithTencent(config);
+  if (config.useTencentCredential) {
+    process.stdout.write(
+      `使用授权信息 ${config.useTencentCredential} 授权中，如果需要使用临时密钥，请使用 --login 重新登陆\n`
+    );
+  }
+
   if (reLoggedIn) {
     const { secret_id: secretId, secret_key: secretKey, appid, token } = credentials;
     updateEnvFile({

@@ -22,7 +22,7 @@ const publish = async (config, cli) => {
   // Start CLI persistance status
   cli.sessionStart('初始化中...');
 
-  await utils.login();
+  await utils.login(config);
 
   // We want to check the existence of serverless.template.yml and serverless.component.yml first
   // If both of them did not show up, we will check serverless.yml for backward compatibility

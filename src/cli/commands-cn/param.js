@@ -77,7 +77,7 @@ module.exports = async (config, cli, command) => {
     throw new Error('You must input one of these two sub commands: set or list');
   }
 
-  await utils.login();
+  await utils.login(config);
 
   const instanceYaml = await utils.loadInstanceConfig(instanceDir, command);
   // initialize SDK

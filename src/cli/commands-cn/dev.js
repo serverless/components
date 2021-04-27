@@ -186,7 +186,7 @@ module.exports = async (config, cli, command) => {
   // Start CLI persistance status
   cli.sessionStart('Initializing', { closeHandler });
 
-  await utils.login();
+  await utils.login(config);
 
   // Presentation
   cli.logLogo();

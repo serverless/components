@@ -26,7 +26,7 @@ module.exports = async (config, cli, command) => {
     instanceDir = path.join(instanceDir, config.target);
   }
   await utils.checkBasicConfigValidation(instanceDir);
-  await utils.login();
+  await utils.login(config);
   // Load YAML
 
   const instanceYaml = await utils.loadInstanceConfig(instanceDir, command);
