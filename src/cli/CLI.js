@@ -377,7 +377,7 @@ class CLI {
     let logo = os.EOL;
     logo += 'serverless';
     logo += red(' ⚡');
-    logo += 'framework';
+    logo += 'components';
 
     if (process.env.SERVERLESS_PLATFORM_STAGE === 'dev') {
       logo += grey(' (dev)');
