@@ -10,6 +10,7 @@ const memoize = require('memoizee');
 const path = require('path');
 const fse = require('fs-extra');
 const YAML = require('js-yaml');
+const chalk = require('chalk');
 const traverse = require('traverse');
 const { Graph, alg } = require('graphlib');
 
@@ -961,6 +962,16 @@ const loadTencentGlobalConfig = (cli, config = {}) => {
     const credContent = loadCredentialsToJson(globalTencentCredentials);
     const envToInsert = credContent[profile];
     if (!envToInsert) {
+      // If the user indicates the profile to be used, but the profile doesn't exist, throw a warning and stop the process, or only skip the global credentials and continue normal process
+      if (config.profile || process.env.TENCENT_CREDENTIALS_PROFILE) {
+        cli.log(
+          `Serverless: ${chalk.yellow(
+            `授权信息 ${profile} 不存在，请通过 serverless credentials list 查看当前授权信息`
+          )}`
+        );
+        process.exit();
+      }
+
       return;
     }
 
