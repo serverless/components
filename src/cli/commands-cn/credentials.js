@@ -61,9 +61,7 @@ module.exports = async (config, cli) => {
       if (credContent[profile]) {
         if (!canOverwrite) {
           cli.log(
-            `Serverless: ${chalk.yellow(
-              `相关用户信息名称: ${profile}已存在，请使用 --overwrite 进行覆写`
-            )}`
+            `Serverless: ${chalk.yellow(`授权信息 ${profile} 已存在，请使用 --overwrite 进行覆写`)}`
           );
           process.exit();
         }
@@ -72,7 +70,7 @@ module.exports = async (config, cli) => {
           TENCENT_SECRET_KEY: secretKey,
           TENCENT_SECRET_ID: secretId,
         };
-        cli.log(`Serverless: ${chalk.green(`授权信息 [${profile}] 更新成功`)}`);
+        cli.log(`Serverless: ${chalk.green(`授权信息 ${profile} 更新成功`)}`);
       } else {
         credContent[profile] = { TENCENT_SECRET_KEY: secretKey, TENCENT_SECRET_ID: secretId };
         cli.log(
@@ -84,7 +82,7 @@ module.exports = async (config, cli) => {
 更多帮助请查看 sls --help
 `
         );
-        cli.log(`Serverless: ${chalk.green(`授权信息 [${profile}] 储存成功`)}`);
+        cli.log(`Serverless: ${chalk.green(`授权信息 ${profile} 储存成功`)}`);
       }
 
       writeJsonToCredentials(globalTencentCredentials, credContent);
