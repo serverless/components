@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.9.1](https://github.com/serverless/components/compare/v3.9;0...v3.9.1) (2021-04-28)
+
+- Improve long-term login messages
+- Improve CLI logo
+
 ## [3.9.0](https://github.com/serverless/components/compare/v3.8.3...v3.9.0) (2021-04-21)
 
 - Local long-term login feature for Chinese users
