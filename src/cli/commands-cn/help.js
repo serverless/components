@@ -53,7 +53,7 @@ ${command('     --secretKey / -k')}             (必填)腾讯云CAM账号secret
 ${command('     --profile / -n {name}')}        身份名称. 默认为 "default"
 ${command('     --overwrite / -o')}             覆写已有身份名称授权信息
 ${command('   remove')}                      删除用户授权信息
-${command('     --profile / -n {name}')}        身份名称. 默认为 "default"
+${command('     --profile / -n {name}')}        (必填)身份名称.
 ${command('   list')}                        查看用户授权信息
 
 ${command('serverless registry')}         显示 应用中心 里的组件与模版信息

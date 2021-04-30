@@ -99,7 +99,10 @@ module.exports = async (config, cli) => {
       if (n) {
         profile = n;
       } else {
-        profile = 'default';
+        cli.log(
+          `Serverless: ${chalk.yellow('未指定授权名称，请通过 --profile 指定要删除的授权名称')}`
+        );
+        process.exit();
       }
     }
 
