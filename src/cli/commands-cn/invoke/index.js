@@ -1,7 +1,10 @@
+'use strict';
+
 const { FaaS } = require('@tencent-sdk/faas');
 const fs = require('fs');
-const utils = require('./utils');
-const { isJson } = require('../utils');
+const utils = require('../utils');
+const { isJson } = require('../../utils');
+const invokeLocal = require('./invoke-local');
 
 /**
  * --stage / -s Set stage
@@ -10,6 +13,13 @@ const { isJson } = require('../utils');
  * --path / -p Data path sent to SCF
  */
 module.exports = async (config, cli, command) => {
+  const subCommand = config.params[0];
+
+  if (subCommand === 'local') {
+    invokeLocal(config, cli, command);
+    return;
+  }
+
   const { stage, s, region, r, data, d, path, p } = config;
   const stageValue = stage || s;
   const regionValue = region || r;

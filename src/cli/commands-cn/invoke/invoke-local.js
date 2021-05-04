@@ -1,8 +1,8 @@
 'use strict';
 const path = require('path');
 const semver = require('semver');
-const utils = require('./utils');
-const { readAndParseSync, fileExistsSync } = require('../utils');
+const utils = require('../utils');
+const { readAndParseSync, fileExistsSync } = require('../../utils');
 
 const checkRuntime = (requiredRuntime) => {
   if (!requiredRuntime) {
