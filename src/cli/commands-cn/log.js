@@ -9,6 +9,10 @@ const utils = require('./utils');
  * --tail Stream new logs
  */
 module.exports = async (config, cli, command) => {
+
+  cli.logLogo();
+  cli.log();
+
   const { stage, s, region, r, startTime, endTime, tail } = config;
   const stageValue = stage || s;
   const regionValue = region || r;
@@ -56,8 +60,6 @@ module.exports = async (config, cli, command) => {
       cli.logOutputs(currentLogList);
       latestLogReqId = currentLogList.pop().requestId;
     }
-
-    console.log(latestLogReqId, 'latestLogReqId');
 
     setInterval(async () => {
       const newLogList =
