@@ -1,16 +1,15 @@
 const { FaaS } = require('@tencent-sdk/faas');
-const fs = require('fs');
 const utils = require('./utils');
-const { isJson } = require('../utils');
 
 /**
  * --stage / -s Set stage
  * --region / -r Set region
  * --startTime Set log start time
+ * --endTime Set log start time
  * --tail Stream new logs
  */
 module.exports = async (config, cli, command) => {
-  const { stage, s, region, r, startTime, tail } = config;
+  const { stage, s, region, r, startTime, endTime, tail } = config;
   const stageValue = stage || s;
   const regionValue = region || r;
 
@@ -32,11 +31,58 @@ module.exports = async (config, cli, command) => {
     debug: false,
   });
 
-  const res = await client.getLogList({
-    name: functionName,
-    namespace: 'default',
-    qualifier: '$LATEST',
-  });
+  if (!tail) {
+    const res =
+      (await client.getLogList({
+        name: functionName,
+        namespace: 'default',
+        qualifier: '$LATEST',
+        startTime: startTime,
+        endTime: endTime,
+      })) || [];
 
-  cli.logOutputs(res);
+    cli.logOutputs(res.reverse());
+  } else {
+    const currentLogList =
+      (await client.getLogList({
+        name: functionName,
+        namespace: 'default',
+        qualifier: '$LATEST',
+      })) || [];
+    currentLogList.reverse();
+
+    let latestLogReqId;
+    if (currentLogList && currentLogList.length > 0) {
+      cli.logOutputs(currentLogList);
+      latestLogReqId = currentLogList.pop().requestId;
+    }
+
+    console.log(latestLogReqId, 'latestLogReqId');
+
+    setInterval(async () => {
+      const newLogList =
+        (await client.getLogList({
+          name: functionName,
+          namespace: 'default',
+          qualifier: '$LATEST',
+        })) || [];
+
+      newLogList.reverse();
+
+      if (newLogList && newLogList.length > 0 && !latestLogReqId) {
+        cli.logOutputs(newLogList);
+        latestLogReqId = newLogList.pop().requestId;
+      }
+
+      if (newLogList && newLogList.length > 0 && latestLogReqId) {
+        const newLogPosition = newLogList.findIndex((item) => item.requestId === latestLogReqId);
+        if (newLogPosition === -1) {
+          cli.logOutputs(newLogList);
+        } else if (newLogPosition < newLogList.length - 1) {
+          cli.logOutputs(newLogList.slice(newLogPosition + 1));
+        }
+        latestLogReqId = newLogList.pop().requestId;
+      }
+    }, 3000);
+  }
 };
