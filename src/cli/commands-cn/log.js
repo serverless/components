@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 const { FaaS } = require('@tencent-sdk/faas');
 const utils = require('./utils');
@@ -11,7 +11,6 @@ const utils = require('./utils');
  * --tail Stream new logs
  */
 module.exports = async (config, cli, command) => {
-
   cli.logLogo();
   cli.log();
 
