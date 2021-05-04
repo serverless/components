@@ -1,3 +1,5 @@
+'use strict'
+
 const { FaaS } = require('@tencent-sdk/faas');
 const utils = require('./utils');
 
@@ -41,8 +43,8 @@ module.exports = async (config, cli, command) => {
         name: functionName,
         namespace: 'default',
         qualifier: '$LATEST',
-        startTime: startTime,
-        endTime: endTime,
+        startTime,
+        endTime,
       })) || [];
 
     cli.logOutputs(res.reverse());
