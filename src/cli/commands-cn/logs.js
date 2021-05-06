@@ -14,21 +14,29 @@ const moment = require('moment');
  */
 module.exports = async (config, cli, command) => {
   // Parse commands
-  const { function: functionName, f, stage, s, region, r, startTime, tail, t, interval, i } = config;
+  const {
+    function: functionName,
+    f,
+    stage,
+    s,
+    region,
+    r,
+    startTime,
+    tail,
+    t,
+    interval,
+    i,
+  } = config;
   const stageValue = stage || s;
   const regionValue = region || r;
   const intervalValue = interval || i;
   const functionNameValue = functionName || f;
   let startTimeValue;
   if (startTime) {
-    const since =
-      ['m', 'h', 'd'].indexOf(startTime[startTime.length - 1]) !== -1;
+    const since = ['m', 'h', 'd'].indexOf(startTime[startTime.length - 1]) !== -1;
     if (since) {
       startTimeValue = moment()
-        .subtract(
-          startTime.replace(/\D/g, ''),
-          startTime.replace(/\d/g, '')
-        )
+        .subtract(startTime.replace(/\D/g, ''), startTime.replace(/\d/g, ''))
         .format('YYYY-MM-DD HH:MM:SS');
     } else {
       startTimeValue = moment.utc(startTime).format('YYYY-MM-DD HH:MM:SS');
@@ -66,7 +74,9 @@ module.exports = async (config, cli, command) => {
       throw new Error('目前 inputs.name 只支持 stage, name, app 三种变量');
     }
   } else {
-    finalFunctionName = `${instanceYaml.name}-${stageValue || instanceYaml.stage}-${instanceYaml.app}`;
+    finalFunctionName = `${instanceYaml.name}-${stageValue || instanceYaml.stage}-${
+      instanceYaml.app
+    }`;
   }
 
   const client = new FaaS({
@@ -78,15 +88,15 @@ module.exports = async (config, cli, command) => {
   });
 
   if (!tail && !t) {
-      const res =
-        (await client.getLogList({
-          name: finalFunctionName,
-          namespace: 'default',
-          qualifier: '$LATEST',
-          startTime: startTimeValue,
-        })) || [];
-  
-      cli.logOutputs(res.reverse());
+    const res =
+      (await client.getLogList({
+        name: finalFunctionName,
+        namespace: 'default',
+        qualifier: '$LATEST',
+        startTime: startTimeValue,
+      })) || [];
+
+    cli.logOutputs(res.reverse());
   } else {
     const currentLogList =
       (await client.getLogList({
