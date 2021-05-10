@@ -5,12 +5,12 @@ const utils = require('./utils');
 const moment = require('moment');
 
 /**
- * --function /-f Set function name
+ * --function / -f Set function name
  * --stage / -s Set stage
  * --region / -r Set region
  * --startTime Set log start time
- * --tail Stream new logs
- * --interval poll interval
+ * --tail / -t Stream new logs
+ * --interval / -i poll interval
  */
 module.exports = async (config, cli, command) => {
   // Parse commands
