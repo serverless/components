@@ -88,6 +88,7 @@ module.exports = async (config, cli, command) => {
   });
 
   if (!tail && !t) {
+    cli.sessionStart('正在获取日志');
     const res =
       (await client.getLogList({
         name: finalFunctionName,
@@ -96,7 +97,8 @@ module.exports = async (config, cli, command) => {
         startTime: startTimeValue,
       })) || [];
 
-    cli.logOutputs(res.reverse());
+    if (res.length > 0) cli.logOutputs(res.reverse());
+    cli.sessionStop('success', '获取日志成功');
   } else {
     const currentLogList =
       (await client.getLogList({
@@ -112,6 +114,7 @@ module.exports = async (config, cli, command) => {
       latestLogReqId = currentLogList.pop().requestId;
     }
 
+    cli.sessionStart('监听中');
     setInterval(async () => {
       const newLogList =
         (await client.getLogList({
@@ -136,6 +139,6 @@ module.exports = async (config, cli, command) => {
         }
         latestLogReqId = newLogList.pop().requestId;
       }
-    }, Number(intervalValue) || 1000);
+    }, Number(intervalValue) || 3000);
   }
 };
