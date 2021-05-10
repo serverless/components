@@ -32,19 +32,20 @@ module.exports = async (config, cli, command) => {
   const intervalValue = interval || i;
   const functionNameValue = functionName || f;
   let startTimeValue;
+
   if (startTime) {
     const since = ['m', 'h', 'd'].indexOf(startTime[startTime.length - 1]) !== -1;
     if (since) {
       startTimeValue = moment()
         .subtract(startTime.replace(/\D/g, ''), startTime.replace(/\d/g, ''))
-        .format('YYYY-MM-DD HH:MM:SS');
+        .format('YYYY-MM-DD HH:mm:ss');
     } else {
-      startTimeValue = moment.utc(startTime).format('YYYY-MM-DD HH:MM:SS');
+      startTimeValue = moment.utc(startTime).format('YYYY-MM-DD HH:mm:ss');
     }
   } else {
-    startTimeValue = moment().subtract(10, 'm').format('YYYY-MM-DD HH:MM:SS');
+    startTimeValue = moment().subtract(10, 'm').format('YYYY-MM-DD HH:mm:ss');
     if (tail) {
-      startTimeValue = moment().subtract(10, 's').format('YYYY-MM-DD HH:MM:SS');
+      startTimeValue = moment().subtract(1, 'm').format('YYYY-MM-DD HH:mm:ss');
     }
   }
 
@@ -100,18 +101,17 @@ module.exports = async (config, cli, command) => {
     if (res.length > 0) cli.logOutputs(res.reverse());
     cli.sessionStop('success', '获取日志成功');
   } else {
-    const currentLogList =
+    let lastLogList =
       (await client.getLogList({
         name: finalFunctionName,
         namespace: 'default',
         qualifier: '$LATEST',
+        startTime: startTimeValue,
       })) || [];
-    currentLogList.reverse();
+    lastLogList.reverse();
 
-    let latestLogReqId;
-    if (currentLogList && currentLogList.length > 0) {
-      cli.logOutputs(currentLogList);
-      latestLogReqId = currentLogList.pop().requestId;
+    if (lastLogList.length > 0) {
+      cli.logOutputs(lastLogList);
     }
 
     cli.sessionStart('监听中');
@@ -125,19 +125,28 @@ module.exports = async (config, cli, command) => {
 
       newLogList.reverse();
 
-      if (newLogList && newLogList.length > 0 && !latestLogReqId) {
+      if (newLogList.length > 0 && lastLogList.length <= 0) {
         cli.logOutputs(newLogList);
-        latestLogReqId = newLogList.pop().requestId;
+        lastLogList = newLogList;
       }
 
-      if (newLogList && newLogList.length > 0 && latestLogReqId) {
-        const newLogPosition = newLogList.findIndex((item) => item.requestId === latestLogReqId);
-        if (newLogPosition === -1) {
-          cli.logOutputs(newLogList);
-        } else if (newLogPosition < newLogList.length - 1) {
-          cli.logOutputs(newLogList.slice(newLogPosition + 1));
+      if (newLogList.length > 0 && lastLogList.length > 0) {
+        const lastLogReqId = lastLogList[lastLogList.length - 1].requestId;
+        const newLogReqId = newLogList[newLogList.length - 1].requestId;
+
+        const newestLogIndexInOldLogs = lastLogList.findIndex(item => item.requestId === newLogReqId);
+        const lastLogIndexInNewLogs = newLogList.findIndex((item) => item.requestId === lastLogReqId);
+
+        // When newestLogIndexInOldLogs !== -1, it means newest log already exists in the old log list
+        // Note: tencent log API has a cache mechanism, sometimes newly fetched log may not conataining newst log
+        if (newestLogIndexInOldLogs === -1) {
+          if (lastLogIndexInNewLogs === -1) {
+            cli.logOutputs(newLogList);
+          } else if (lastLogIndexInNewLogs < newLogList.length - 1) {
+            cli.logOutputs(newLogList.slice(lastLogIndexInNewLogs + 1));
+          }
+          lastLogList = newLogList;
         }
-        latestLogReqId = newLogList.pop().requestId;
       }
     }, Number(intervalValue) || 3000);
   }
