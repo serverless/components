@@ -134,8 +134,12 @@ module.exports = async (config, cli, command) => {
         const lastLogReqId = lastLogList[lastLogList.length - 1].requestId;
         const newLogReqId = newLogList[newLogList.length - 1].requestId;
 
-        const newestLogIndexInOldLogs = lastLogList.findIndex(item => item.requestId === newLogReqId);
-        const lastLogIndexInNewLogs = newLogList.findIndex((item) => item.requestId === lastLogReqId);
+        const newestLogIndexInOldLogs = lastLogList.findIndex(
+          (item) => item.requestId === newLogReqId
+        );
+        const lastLogIndexInNewLogs = newLogList.findIndex(
+          (item) => item.requestId === lastLogReqId
+        );
 
         // When newestLogIndexInOldLogs !== -1, it means newest log already exists in the old log list
         // Note: tencent log API has a cache mechanism, sometimes newly fetched log may not conataining newst log
