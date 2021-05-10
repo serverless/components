@@ -16,8 +16,7 @@ module.exports = async (config, cli, command) => {
   const subCommand = config.params[0];
 
   if (subCommand === 'local') {
-    invokeLocal(config, cli, command);
-    return;
+    return invokeLocal(config, cli, command);
   }
 
   const { stage, s, region, r, data, d, path, p } = config;
