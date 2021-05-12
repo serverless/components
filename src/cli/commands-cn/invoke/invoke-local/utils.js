@@ -102,7 +102,7 @@ const summaryOptions = (config, instanceYml, cli) => {
   }
 
   // Deal with scf component(single instance situation)
-  if (component === 'scf') {
+  if (component.includes('scf')) {
     const inputsHandler = inputs.handler || '';
     if (!inputsHandler) {
       colorLog('调用函数未指定，请检查 serverless.yml 中的 hanlder 配置后重试。', 'yellow', cli);
@@ -168,7 +168,7 @@ const runNodeFrameworkProject = async (event, context, component) => {
 };
 
 const colorLog = (msg, color = 'green', cli = console) => {
-  const logMsg = `Serverless: ${chalk[color](`${msg}`)} `;
+  const logMsg = `Serverless: ${chalk[color](`${msg}`)}\n`;
 
   if (cli && cli.log) {
     cli.log(logMsg);
@@ -193,7 +193,7 @@ const handleError = (err) => {
       errorMessage: err,
     };
   }
-  colorLog(JSON.stringify(errorResult, null, 4), 'red');
+  console.log(chalk.red(JSON.stringify(errorResult, null, 4)));
 };
 
 module.exports = {
