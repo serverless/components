@@ -42,39 +42,31 @@ module.exports = async (config, cli, command) => {
     cli
   );
 
-  switch (runtime) {
-    case 'Nodejs6.10':
-    case 'Nodejs8.9':
-    case 'Nodejs10.15':
-    case 'Nodejs12.15': {
-      if (component === 'scf') {
-        const invokeFromFile = path.join(process.cwd(), handlerFile);
-        const exportedVars = require(invokeFromFile);
-        const finalInvokedFunc = exportedVars[handlerFunc];
-        if (!finalInvokedFunc) {
-          colorLog(`调用的函数 ${handlerFunc} 不存在， 请检查后重试。`, 'yellow', cli);
-        }
-        try {
-          const result = await finalInvokedFunc(eventData, contextData);
-          cli.log('---------------------------------------------');
-          colorLog('调用成功\n', 'green', cli);
-          jsome(result);
-        } catch (e) {
-          cli.log('---------------------------------------------');
-          colorLog('调用错误\n', 'red', cli);
-          handleError(e);
-        }
-      } else {
-        const result = await runNodeFrameworkProject(eventData, contextData, component);
-        cli.log('\n------------------');
-        cli.log(`本地调用Nodejs框架 ${component} 结果:\n`);
-        jsome(result);
+  if (runtime.includes('Nodejs')) {
+    if (component.includes('scf')) {
+      const invokeFromFile = path.join(process.cwd(), handlerFile);
+      const exportedVars = require(invokeFromFile);
+      const finalInvokedFunc = exportedVars[handlerFunc];
+      if (!finalInvokedFunc) {
+        colorLog(`调用的函数 ${handlerFunc} 不存在， 请检查后重试。`, 'yellow', cli);
       }
-
-      break;
+      try {
+        const result = await finalInvokedFunc(eventData, contextData);
+        cli.log('---------------------------------------------');
+        colorLog('调用成功', 'green', cli);
+        jsome(result);
+        cli.log();
+      } catch (e) {
+        cli.log('---------------------------------------------');
+        colorLog('调用错误\n', 'red', cli);
+        handleError(e);
+        cli.log();
+      }
+    } else {
+      const result = await runNodeFrameworkProject(eventData, contextData, component);
+      cli.log('\n------------------');
+      cli.log(`本地调用Nodejs框架 ${component} 结果:\n`);
+      jsome(result);
     }
-    default:
-      colorLog(`所配置的运行时为 ${runtime}, 无法进行本地调试`, 'yellow');
-      break;
   }
 };
