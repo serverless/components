@@ -51,6 +51,8 @@ module.exports = async (config, cli, command) => {
 
   // Parse YML
   const instanceDir = process.cwd();
+  await utils.checkBasicConfigValidation(instanceDir);
+  await utils.login(config);
   const instanceYaml = await utils.loadInstanceConfig(instanceDir, command);
   const regionInYml = instanceYaml && instanceYaml.inputs && instanceYaml.inputs.region;
 
