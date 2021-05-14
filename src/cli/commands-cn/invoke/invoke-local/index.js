@@ -5,13 +5,7 @@ const jsome = require('jsome');
 
 const utils = require('../../utils');
 const { readAndParseSync, fileExistsSync } = require('../../../utils');
-const {
-  colorLog,
-  handleError,
-  summaryOptions,
-  runNodeFrameworkProject,
-  checkRuntime,
-} = require('./utils');
+const { colorLog, handleError, summaryOptions, checkRuntime } = require('./utils');
 
 module.exports = async (config, cli, command) => {
   const { config: ymlFilePath, c } = config;
@@ -43,30 +37,23 @@ module.exports = async (config, cli, command) => {
   );
 
   if (runtime.includes('Nodejs')) {
-    if (component.includes('scf')) {
-      const invokeFromFile = path.join(process.cwd(), handlerFile);
-      const exportedVars = require(invokeFromFile);
-      const finalInvokedFunc = exportedVars[handlerFunc];
-      if (!finalInvokedFunc) {
-        colorLog(`调用的函数 ${handlerFunc} 不存在， 请检查后重试。`, 'yellow', cli);
-      }
-      try {
-        const result = await finalInvokedFunc(eventData, contextData);
-        cli.log('---------------------------------------------');
-        colorLog('调用成功', 'green', cli);
-        jsome(result);
-        cli.log();
-      } catch (e) {
-        cli.log('---------------------------------------------');
-        colorLog('调用错误\n', 'red', cli);
-        handleError(e);
-        cli.log();
-      }
-    } else {
-      const result = await runNodeFrameworkProject(eventData, contextData, component);
-      cli.log('\n------------------');
-      cli.log(`本地调用Nodejs框架 ${component} 结果:\n`);
+    const invokeFromFile = path.join(process.cwd(), handlerFile);
+    const exportedVars = require(invokeFromFile);
+    const finalInvokedFunc = exportedVars[handlerFunc];
+    if (!finalInvokedFunc) {
+      colorLog(`调用的函数 ${handlerFunc} 不存在， 请检查后重试。`, 'yellow', cli);
+    }
+    try {
+      const result = await finalInvokedFunc(eventData, contextData);
+      cli.log('---------------------------------------------');
+      colorLog('调用成功', 'green', cli);
       jsome(result);
+      cli.log();
+    } catch (e) {
+      cli.log('---------------------------------------------');
+      colorLog('调用错误\n', 'red', cli);
+      handleError(e);
+      cli.log();
     }
   }
 };
