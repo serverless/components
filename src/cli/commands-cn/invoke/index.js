@@ -66,9 +66,7 @@ module.exports = async (config, cli, command) => {
       throw new Error('目前 inputs.name 只支持 stage, name, app 三种变量');
     }
   } else {
-    functionName = `${instanceYaml.name}-${stageValue || instanceYaml.stage}-${
-      instanceYaml.app
-    }`;
+    functionName = `${instanceYaml.name}-${stageValue || instanceYaml.stage}-${instanceYaml.app}`;
   }
   const client = new FaaS({
     secretId: process.env.TENCENT_SECRET_ID,
@@ -86,4 +84,6 @@ module.exports = async (config, cli, command) => {
   });
 
   cli.logOutputs(res);
+
+  return 0;
 };
