@@ -5,7 +5,6 @@ const utils = require('./utils');
 const moment = require('moment');
 
 /**
- * --function / -f Set function name
  * --stage / -s Set stage
  * --region / -r Set region
  * --startTime Set log start time
@@ -15,8 +14,6 @@ const moment = require('moment');
 module.exports = async (config, cli, command) => {
   // Parse commands
   const {
-    function: functionName,
-    f,
     stage,
     s,
     region,
@@ -30,7 +27,6 @@ module.exports = async (config, cli, command) => {
   const stageValue = stage || s;
   const regionValue = region || r;
   const intervalValue = interval || i;
-  const functionNameValue = functionName || f;
   let startTimeValue;
 
   if (startTime) {
@@ -63,9 +59,7 @@ module.exports = async (config, cli, command) => {
 
   // Get function name
   let finalFunctionName;
-  if (functionNameValue) {
-    finalFunctionName = functionNameValue;
-  } else if (instanceYaml && instanceYaml.inputs && instanceYaml.inputs.name) {
+  if (instanceYaml && instanceYaml.inputs && instanceYaml.inputs.name) {
     finalFunctionName = instanceYaml.inputs.name.trim();
     finalFunctionName = finalFunctionName.replace('${name}', instanceYaml.name);
     finalFunctionName = finalFunctionName.replace('${app}', instanceYaml.app);
