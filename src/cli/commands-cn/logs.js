@@ -13,17 +13,7 @@ const moment = require('moment');
  */
 module.exports = async (config, cli, command) => {
   // Parse commands
-  const {
-    stage,
-    s,
-    region,
-    r,
-    startTime,
-    tail,
-    t,
-    interval,
-    i,
-  } = config;
+  const { stage, s, region, r, startTime, tail, t, interval, i } = config;
   const stageValue = stage || s;
   const regionValue = region || r;
   const intervalValue = interval || i;
