@@ -13,6 +13,9 @@ const invokeLocal = require('./invoke-local');
  * --path / -p Data path sent to SCF
  */
 module.exports = async (config, cli, command) => {
+  const instanceDir = process.cwd();
+  await utils.checkBasicConfigValidation(instanceDir);
+
   const subCommand = config.params[0];
 
   if (subCommand === 'local') {
@@ -41,8 +44,6 @@ module.exports = async (config, cli, command) => {
     throw new Error('传入的 data 不是序列化 JSON, 请检查后重试');
   }
 
-  const instanceDir = process.cwd();
-  await utils.checkBasicConfigValidation(instanceDir);
   await utils.login(config);
   const instanceYaml = await utils.loadInstanceConfig(instanceDir, command);
   const regionInYml = instanceYaml && instanceYaml.inputs && instanceYaml.inputs.region;
