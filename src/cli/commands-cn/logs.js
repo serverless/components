@@ -54,11 +54,13 @@ module.exports = async (config, cli, command) => {
     finalFunctionName = finalFunctionName.replace('${name}', instanceYaml.name);
     finalFunctionName = finalFunctionName.replace('${app}', instanceYaml.app);
     if (!finalFunctionName.match('${stage}') && stageValue) {
-      throw new Error('当前应用自定义SCF实例名称无法指定 stage 信息，请检查后重试');
+      cli.log(`Serverless: ${chalk.yellow('当前应用自定义SCF实例名称无法指定 stage 信息，请检查后重试')}`);
+      process.exit();
     }
     finalFunctionName = finalFunctionName.replace('${stage}', stageValue || instanceYaml.stage);
     if (finalFunctionName.match(/\${(\w*:?[\w\d.-]+)}/g)) {
-      throw new Error('目前 inputs.name 只支持 stage, name, app 三种变量');
+      cli.log(`Serverless: ${chalk.yellow('目前 inputs.name 只支持 stage, name, app 三种变量')}`);
+      process.exit();
     }
   } else {
     finalFunctionName = `${instanceYaml.name}-${stageValue || instanceYaml.stage}-${
