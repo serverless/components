@@ -29,19 +29,28 @@ module.exports = async (config, cli, command) => {
   const pathValue = path || p;
 
   if (dataValue && pathValue) {
-    throw new Error('不能同时指定 data 与 path, 请检查后重试');
+    cli.log(
+      `Serverless: ${chalk.yellow('不能同时指定 data 与 path, 请检查后重试')}`
+    );
+    process.exit(); 
   }
 
   if (path || p) {
     try {
       dataValue = fs.readFileSync(pathValue, 'utf8');
     } catch (e) {
-      throw new Error('找不到指定的路径文件, 请检查后重试');
+      cli.log(
+        `Serverless: ${chalk.yellow('找不到指定的路径文件, 请检查后重试')}`
+      );
+      process.exit(); 
     }
   }
 
   if (dataValue && !isJson(dataValue)) {
-    throw new Error('传入的 data 不是序列化 JSON, 请检查后重试');
+    cli.log(
+      `Serverless: ${chalk.yellow('传入的 data 不是序列化 JSON, 请检查后重试')}`
+    );
+    process.exit(); 
   }
 
   await utils.login(config);
@@ -50,7 +59,10 @@ module.exports = async (config, cli, command) => {
   const componentType = instanceYaml && instanceYaml.component;
 
   if (componentType !== 'scf') {
-    throw new Error('Inovke 仅能在函数组件目录中调用, 请检查目录后重试');
+    cli.log(
+      `Serverless: ${chalk.yellow('Inovke 仅能在函数组件目录中调用, 请检查目录后重试')}`
+    );
+    process.exit(); 
   }
 
   let functionName;
@@ -59,11 +71,17 @@ module.exports = async (config, cli, command) => {
     functionName = functionName.replace('${name}', instanceYaml.name);
     functionName = functionName.replace('${app}', instanceYaml.app);
     if (!functionName.match('${stage}') && stageValue) {
-      throw new Error('当前应用自定义SCF实例名称无法指定 stage 信息, 请检查后重试');
+      cli.log(
+        `Serverless: ${chalk.yellow('当前应用自定义SCF实例名称无法指定 stage 信息, 请检查后重试')}`
+      );
+      process.exit(); 
     }
     functionName = functionName.replace('${stage}', stageValue || instanceYaml.stage);
     if (functionName.match(/\${(\w*:?[\w\d.-]+)}/g)) {
-      throw new Error('目前 inputs.name 只支持 stage, name, app 三种变量');
+      cli.log(
+        `Serverless: ${chalk.yellow('目前 inputs.name 只支持 stage, name, app 三种变量')}`
+      );
+      process.exit(); 
     }
   } else {
     functionName = `${instanceYaml.name}-${stageValue || instanceYaml.stage}-${instanceYaml.app}`;
