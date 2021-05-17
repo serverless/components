@@ -3,6 +3,7 @@
 const { FaaS } = require('@tencent-sdk/faas');
 const utils = require('./utils');
 const moment = require('moment');
+const chalk = require('chalk');
 
 /**
  * --stage / -s Set stage
@@ -54,7 +55,9 @@ module.exports = async (config, cli, command) => {
     finalFunctionName = finalFunctionName.replace('${name}', instanceYaml.name);
     finalFunctionName = finalFunctionName.replace('${app}', instanceYaml.app);
     if (!finalFunctionName.match('${stage}') && stageValue) {
-      cli.log(`Serverless: ${chalk.yellow('当前应用自定义SCF实例名称无法指定 stage 信息，请检查后重试')}`);
+      cli.log(
+        `Serverless: ${chalk.yellow('当前应用自定义SCF实例名称无法指定 stage 信息，请检查后重试')}`
+      );
       process.exit();
     }
     finalFunctionName = finalFunctionName.replace('${stage}', stageValue || instanceYaml.stage);
