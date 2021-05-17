@@ -8,6 +8,7 @@ const registry = require('./registry');
 const help = require('./help');
 const param = require('./param');
 const credentials = require('./credentials');
+const invoke = require('./invoke');
 const logs = require('./logs');
 
 module.exports = {
@@ -19,5 +20,6 @@ module.exports = {
   help,
   param,
   credentials,
+  invoke,
   logs,
 };

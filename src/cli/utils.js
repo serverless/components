@@ -1036,6 +1036,7 @@ module.exports = {
   fileExistsSync,
   readAndParseSync,
   isYamlPath,
+  isJson,
   isJsonPath,
   resolveVariables,
   loadComponentConfig,
