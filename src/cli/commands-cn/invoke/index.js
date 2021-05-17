@@ -5,6 +5,7 @@ const fs = require('fs');
 const utils = require('../utils');
 const { isJson } = require('../../utils');
 const invokeLocal = require('./invoke-local');
+const chalk = require('chalk');
 
 /**
  * --stage / -s Set stage
@@ -29,28 +30,22 @@ module.exports = async (config, cli, command) => {
   const pathValue = path || p;
 
   if (dataValue && pathValue) {
-    cli.log(
-      `Serverless: ${chalk.yellow('不能同时指定 data 与 path, 请检查后重试')}`
-    );
-    process.exit(); 
+    cli.log(`Serverless: ${chalk.yellow('不能同时指定 data 与 path, 请检查后重试')}`);
+    process.exit();
   }
 
   if (path || p) {
     try {
       dataValue = fs.readFileSync(pathValue, 'utf8');
     } catch (e) {
-      cli.log(
-        `Serverless: ${chalk.yellow('找不到指定的路径文件, 请检查后重试')}`
-      );
-      process.exit(); 
+      cli.log(`Serverless: ${chalk.yellow('找不到指定的路径文件, 请检查后重试')}`);
+      process.exit();
     }
   }
 
   if (dataValue && !isJson(dataValue)) {
-    cli.log(
-      `Serverless: ${chalk.yellow('传入的 data 不是序列化 JSON, 请检查后重试')}`
-    );
-    process.exit(); 
+    cli.log(`Serverless: ${chalk.yellow('传入的 data 不是序列化 JSON, 请检查后重试')}`);
+    process.exit();
   }
 
   await utils.login(config);
@@ -59,10 +54,8 @@ module.exports = async (config, cli, command) => {
   const componentType = instanceYaml && instanceYaml.component;
 
   if (componentType !== 'scf') {
-    cli.log(
-      `Serverless: ${chalk.yellow('Inovke 仅能在函数组件目录中调用, 请检查目录后重试')}`
-    );
-    process.exit(); 
+    cli.log(`Serverless: ${chalk.yellow('Inovke 仅能在函数组件目录中调用, 请检查目录后重试')}`);
+    process.exit();
   }
 
   let functionName;
@@ -74,14 +67,12 @@ module.exports = async (config, cli, command) => {
       cli.log(
         `Serverless: ${chalk.yellow('当前应用自定义SCF实例名称无法指定 stage 信息, 请检查后重试')}`
       );
-      process.exit(); 
+      process.exit();
     }
     functionName = functionName.replace('${stage}', stageValue || instanceYaml.stage);
     if (functionName.match(/\${(\w*:?[\w\d.-]+)}/g)) {
-      cli.log(
-        `Serverless: ${chalk.yellow('目前 inputs.name 只支持 stage, name, app 三种变量')}`
-      );
-      process.exit(); 
+      cli.log(`Serverless: ${chalk.yellow('目前 inputs.name 只支持 stage, name, app 三种变量')}`);
+      process.exit();
     }
   } else {
     functionName = `${instanceYaml.name}-${stageValue || instanceYaml.stage}-${instanceYaml.app}`;
