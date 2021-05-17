@@ -96,7 +96,7 @@ Wait login...
 Login successful for TencentCloud.
 
 serverless ⚡ framework
-Action: "deploy" - Stage: "dev" - App: "scfApp" - Instance: "scfdemo"
+Action: "deploy" - Stage: "dev" - App: "scfApp" - Name: "scfdemo"
 
 FunctionName: scfFunctionName
 Description:

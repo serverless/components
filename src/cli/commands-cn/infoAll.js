@@ -12,7 +12,7 @@ module.exports = async (config, cli) => {
 
   cli.logLogo();
 
-  const meta = `Action: "info" - Stage: "${templateYaml.stage}" - Org: "${templateYaml.org}" - App: "${templateYaml.app}" - Name: "${templateYaml.name}"`;
+  const meta = `Action: "info" - Stage: "${templateYaml.stage}" - App: "${templateYaml.app}" - Name: "${templateYaml.name}"`;
   cli.log(meta, 'grey');
   cli.log();
 
