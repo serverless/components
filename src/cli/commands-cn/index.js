@@ -9,6 +9,7 @@ const help = require('./help');
 const param = require('./param');
 const credentials = require('./credentials');
 const invoke = require('./invoke');
+const logs = require('./logs');
 
 module.exports = {
   run,
@@ -20,4 +21,5 @@ module.exports = {
   param,
   credentials,
   invoke,
+  logs,
 };

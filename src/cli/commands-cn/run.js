@@ -58,7 +58,7 @@ module.exports = async (config, cli, command) => {
   const instanceYaml = await utils.loadInstanceConfig(instanceDir, command);
 
   // Presentation
-  const meta = `Action: "${command}" - Stage: "${instanceYaml.stage}" - App: "${instanceYaml.app}" - Instance: "${instanceYaml.name}"`;
+  const meta = `Action: "${command}" - Stage: "${instanceYaml.stage}" - App: "${instanceYaml.app}" - Name: "${instanceYaml.name}"`;
   if (!config.debug) {
     cli.logLogo();
     cli.log(meta, 'grey');
