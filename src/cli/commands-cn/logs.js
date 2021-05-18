@@ -2,7 +2,7 @@
 
 const { FaaS } = require('@tencent-sdk/faas');
 const utils = require('./utils');
-const moment = require('moment');
+const dayjs = require('dayjs');
 const chalk = require('chalk');
 
 function printLogMessages(logList, cli) {
@@ -27,16 +27,23 @@ module.exports = async (config, cli, command) => {
   if (startTime) {
     const since = ['m', 'h', 'd'].indexOf(startTime[startTime.length - 1]) !== -1;
     if (since) {
-      startTimeValue = moment()
+      startTimeValue = dayjs()
         .subtract(startTime.replace(/\D/g, ''), startTime.replace(/\d/g, ''))
         .format('YYYY-MM-DD HH:mm:ss');
+    } else if (!dayjs(startTime).isValid()) {
+      cli.log(
+        `Serverless: ${chalk.yellow(
+          '指定时间格式不正确，请检查后重试'
+        )}`
+      );
+      process.exit();
     } else {
-      startTimeValue = moment.utc(startTime).format('YYYY-MM-DD HH:mm:ss');
+      startTimeValue = dayjs.utc(startTime).format('YYYY-MM-DD HH:mm:ss');
     }
   } else {
-    startTimeValue = moment().subtract(10, 'm').format('YYYY-MM-DD HH:mm:ss');
+    startTimeValue = dayjs().subtract(10, 'm').format('YYYY-MM-DD HH:mm:ss');
     if (tail) {
-      startTimeValue = moment().subtract(1, 'm').format('YYYY-MM-DD HH:mm:ss');
+      startTimeValue = dayjs().subtract(1, 'm').format('YYYY-MM-DD HH:mm:ss');
     }
   }
 
