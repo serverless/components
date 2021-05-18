@@ -32,16 +32,22 @@ module.exports = async (config, cli) => {
     scfCommands = `
 函数组件命令
 ${command('serverless invoke')}           调用函数
-${command('   --data / -d')}                 指定传入函数的事件 (event) 参数数据，需要使用序列化的 JSON 格式
+${command(
+  '   --data / -d'
+)}                 指定传入函数的事件 (event) 参数数据，需要使用序列化的 JSON 格式
 ${command('   --path / -p')}                 指定传入函数的事件 (event) 参数的 JSON 文件路径
 ${command('   --stage / -s')}                指定环境名称，默认使用配置环境
 ${command('   --region / -r')}               指定地区名称，默认使用配置地区
 
 ${command('serverless invoke local')}     本地调用函数
 ${command('   --function / -f')}             调用的函数名称，默认使用配置的函数
-${command('   --data / -d')}                 指定传入函数的事件 (event) 参数数据，需要使用序列化的 JSON 格式
+${command(
+  '   --data / -d'
+)}                 指定传入函数的事件 (event) 参数数据，需要使用序列化的 JSON 格式
 ${command('   --path / -p')}                 指定传入函数的事件 (event) 参数的 JSON 文件路径
-${command('   --context')}                   指定传入函数的上下文(context)参数数据，需要使用序列化的 JSON 格式
+${command(
+  '   --context'
+)}                   指定传入函数的上下文(context)参数数据，需要使用序列化的 JSON 格式
 ${command('   --contextPath / -x')}          指定传入函数的上下文(context)参数的 JSON 文件路径
 ${command('   --env / -e')}                  指定环境变量信息 如: --env VAR=val
 ${command('   --config / -c')}               指定使用的配置文件
