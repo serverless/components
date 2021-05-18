@@ -2,8 +2,10 @@
 
 const { FaaS } = require('@tencent-sdk/faas');
 const utils = require('./utils');
-const dayjs = require('dayjs');
 const chalk = require('chalk');
+const dayjs = require('dayjs');
+const relativeTime = require('dayjs/plugin/relativeTime');
+dayjs.extend(relativeTime);
 
 function printLogMessages(logList, cli) {
   cli.log(logList.map((item) => item.message).join('\n'));
