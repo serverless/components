@@ -6,6 +6,7 @@ const utils = require('../utils');
 const { isJson } = require('../../utils');
 const invokeLocal = require('./invoke-local');
 const chalk = require('chalk');
+const jsome = require('jsome');
 
 /**
  * --stage / -s Set stage
@@ -26,7 +27,7 @@ module.exports = async (config, cli, command) => {
   const { stage, s, region, r, data, d, path, p } = config;
   const stageValue = stage || s;
   const regionValue = region || r;
-  let dataValue = data || d || '{}';
+  let dataValue = data || d;
   const pathValue = path || p;
 
   if (dataValue && pathValue) {
@@ -54,7 +55,7 @@ module.exports = async (config, cli, command) => {
   const componentType = instanceYaml && instanceYaml.component;
 
   if (componentType !== 'scf') {
-    cli.log(`Serverless: ${chalk.yellow('Inovke 仅能在函数组件目录中调用, 请检查目录后重试')}`);
+    cli.log(`Serverless: ${chalk.yellow('Inovke 命令仅能在 SCF 组件目录中调用')}`);
     process.exit();
   }
 
@@ -63,9 +64,11 @@ module.exports = async (config, cli, command) => {
     functionName = instanceYaml.inputs.name.trim();
     functionName = functionName.replace('${name}', instanceYaml.name);
     functionName = functionName.replace('${app}', instanceYaml.app);
-    if (!functionName.match('${stage}') && stageValue) {
+    if (!functionName.includes('${stage}') && stageValue) {
       cli.log(
-        `Serverless: ${chalk.yellow('当前应用自定义SCF实例名称无法指定 stage 信息, 请检查后重试')}`
+        `Serverless: ${chalk.yellow(
+          '当前应用自定义 SCF 实例名称无法指定 stage 信息, 请检查后重试'
+        )}`
       );
       process.exit();
     }
@@ -85,14 +88,43 @@ module.exports = async (config, cli, command) => {
     debug: false,
   });
 
-  const res = await client.invoke({
-    name: functionName,
-    namespace: 'default',
-    qualifier: '$LATEST',
-    event: JSON.parse(dataValue),
-  });
+  try {
+    const res = await client.invoke({
+      name: functionName,
+      namespace: 'default',
+      qualifier: '$LATEST',
+      event: JSON.parse(dataValue || '{}'),
+    });
 
-  cli.logOutputs(res);
+    if (res.retMsg) {
+      const retMsg = res.retMsg;
+      delete res.retMsg;
+      cli.logOutputs(res);
+      cli.log();
+      cli.log('---------------------------------------------');
+      cli.log(`Serverless: ${chalk.green('调用成功')}`);
+      cli.log();
+      try {
+        const retJson = JSON.parse(retMsg);
+        jsome(retJson);
+      } catch (error) {
+        cli.log(retMsg);
+      }
+    } else {
+      cli.logOutputs(res);
+    }
+  } catch (error) {
+    if (error.code === '1001') {
+      cli.log(
+        `Serverless: ${chalk.yellow(
+          '无法找到指定 SCF 实例，请检查 SCF 实例名称和 Stage / Region 信息或重新部署后调用'
+        )}`
+      );
+      process.exit();
+    } else {
+      throw error;
+    }
+  }
 
   return 0;
 };

@@ -5,6 +5,10 @@ const utils = require('./utils');
 const moment = require('moment');
 const chalk = require('chalk');
 
+function printLogMessages(logList, cli) {
+  cli.log(logList.map((item) => item.message).join('\n'));
+}
+
 /**
  * --stage / -s Set stage
  * --region / -r Set region
@@ -54,9 +58,11 @@ module.exports = async (config, cli, command) => {
     finalFunctionName = instanceYaml.inputs.name.trim();
     finalFunctionName = finalFunctionName.replace('${name}', instanceYaml.name);
     finalFunctionName = finalFunctionName.replace('${app}', instanceYaml.app);
-    if (!finalFunctionName.match('${stage}') && stageValue) {
+    if (!finalFunctionName.includes('${stage}') && stageValue) {
       cli.log(
-        `Serverless: ${chalk.yellow('当前应用自定义SCF实例名称无法指定 stage 信息，请检查后重试')}`
+        `Serverless: ${chalk.yellow(
+          '当前应用自定义 SCF 实例名称无法指定 stage 信息，请检查后重试'
+        )}`
       );
       process.exit();
     }
@@ -79,45 +85,53 @@ module.exports = async (config, cli, command) => {
     debug: false,
   });
 
+  async function getLogList(name, theStartTime) {
+    try {
+      const res =
+        (await client.getLogList({
+          name,
+          startTime: theStartTime,
+          namespace: 'default',
+          qualifier: '$LATEST',
+        })) || [];
+      return res.reverse();
+    } catch (error) {
+      if (error.code === '1001') {
+        cli.log(
+          `Serverless: ${chalk.yellow(
+            '无法找到指定 SCF 实例，请检查 SCF 实例名称和 Stage / Region 信息或重新部署后调用'
+          )}`
+        );
+        process.exit();
+      } else {
+        throw error;
+      }
+    }
+    return 0;
+  }
+
   if (!tail && !t) {
     cli.sessionStart('正在获取日志');
-    const res =
-      (await client.getLogList({
-        name: finalFunctionName,
-        namespace: 'default',
-        qualifier: '$LATEST',
-        startTime: startTimeValue,
-      })) || [];
-
-    if (res.length > 0) cli.logOutputs(res.reverse());
+    const res = await getLogList(finalFunctionName, startTimeValue);
+    if (res.length > 0) {
+      printLogMessages(res, cli);
+    } else {
+      cli.log(chalk.gray('当前时间范围内没有可用的日志信息'));
+    }
     cli.sessionStop('success', '获取日志成功');
   } else {
-    let lastLogList =
-      (await client.getLogList({
-        name: finalFunctionName,
-        namespace: 'default',
-        qualifier: '$LATEST',
-        startTime: startTimeValue,
-      })) || [];
-    lastLogList.reverse();
+    let lastLogList = await getLogList(finalFunctionName, startTimeValue);
 
     if (lastLogList.length > 0) {
-      cli.logOutputs(lastLogList);
+      printLogMessages(lastLogList, cli);
     }
 
     cli.sessionStart('监听中');
     setInterval(async () => {
-      const newLogList =
-        (await client.getLogList({
-          name: finalFunctionName,
-          namespace: 'default',
-          qualifier: '$LATEST',
-        })) || [];
-
-      newLogList.reverse();
+      const newLogList = await getLogList(finalFunctionName, null);
 
       if (newLogList.length > 0 && lastLogList.length <= 0) {
-        cli.logOutputs(newLogList);
+        printLogMessages(newLogList, cli);
         lastLogList = newLogList;
       }
 
@@ -136,13 +150,13 @@ module.exports = async (config, cli, command) => {
         // Note: tencent log API has a cache mechanism, sometimes newly fetched log may not conataining newst log
         if (newestLogIndexInOldLogs === -1) {
           if (lastLogIndexInNewLogs === -1) {
-            cli.logOutputs(newLogList);
+            printLogMessages(newLogList, cli);
           } else if (lastLogIndexInNewLogs < newLogList.length - 1) {
-            cli.logOutputs(newLogList.slice(lastLogIndexInNewLogs + 1));
+            printLogMessages(newLogList.slice(lastLogIndexInNewLogs + 1), cli);
           }
           lastLogList = newLogList;
         }
       }
-    }, Number(intervalValue) || 3000);
+    }, Number(intervalValue) || 2000);
   }
 };
