@@ -3,7 +3,7 @@
 const { getAccessKey, getTemplate, getDashboardUrl } = require('./utils');
 const { checkLocalCredentials } = require('../utils');
 const { ServerlessSDK } = require('@serverless/platform-client');
-const moment = require('moment');
+const dayjs = require('dayjs');
 const chalk = require('chalk');
 
 module.exports = async (config, cli) => {
@@ -44,7 +44,7 @@ module.exports = async (config, cli) => {
     }
 
     // format last action for better UX
-    const lastActionAgo = moment(instance.lastActionAt).fromNow();
+    const lastActionAgo = dayjs(instance.lastActionAt).fromNow();
 
     // color status based on...status
     let statusLog;
