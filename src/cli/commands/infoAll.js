@@ -3,8 +3,10 @@
 const { getAccessKey, getTemplate, getDashboardUrl } = require('./utils');
 const { checkLocalCredentials } = require('../utils');
 const { ServerlessSDK } = require('@serverless/platform-client');
-const dayjs = require('dayjs');
 const chalk = require('chalk');
+const dayjs = require('dayjs');
+const relativeTime = require('dayjs/plugin/relativeTime');
+dayjs.extend(relativeTime);
 
 module.exports = async (config, cli) => {
   cli.sessionStart('Fetching App Info', { timer: false });
