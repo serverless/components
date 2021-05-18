@@ -13,6 +13,7 @@ const infoAll = require('./infoAll');
 const chalk = require('chalk');
 const dayjs = require('dayjs');
 const relativeTime = require('dayjs/plugin/relativeTime');
+
 dayjs.extend(relativeTime);
 
 module.exports = async (config, cli, command) => {

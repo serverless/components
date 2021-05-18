@@ -5,6 +5,7 @@ const utils = require('./utils');
 const chalk = require('chalk');
 const dayjs = require('dayjs');
 const relativeTime = require('dayjs/plugin/relativeTime');
+
 dayjs.extend(relativeTime);
 
 function printLogMessages(logList, cli) {
@@ -33,11 +34,7 @@ module.exports = async (config, cli, command) => {
         .subtract(startTime.replace(/\D/g, ''), startTime.replace(/\d/g, ''))
         .format('YYYY-MM-DD HH:mm:ss');
     } else if (!dayjs(startTime).isValid()) {
-      cli.log(
-        `Serverless: ${chalk.yellow(
-          '指定时间格式不正确，请检查后重试'
-        )}`
-      );
+      cli.log(`Serverless: ${chalk.yellow('指定时间格式不正确，请检查后重试')}`);
       process.exit();
     } else {
       startTimeValue = dayjs.utc(startTime).format('YYYY-MM-DD HH:mm:ss');
