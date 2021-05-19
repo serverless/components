@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.10.0](https://github.com/serverless/components/compare/v3.9.2....v3.10.0) (2021-05-19)
+
+- Add `sls logs` command for all components
+- Add `sls invoke` command for scf component
+- Add `sls invoke local` command for scf component
+
 ## [3.9.2](https://github.com/serverless/components/compare/v3.9.1...v3.9.2) (2021-05-05)
 
 - Improve Chinese long-term login messages
