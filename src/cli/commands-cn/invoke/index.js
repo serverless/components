@@ -64,7 +64,7 @@ module.exports = async (config, cli, command) => {
     functionName = instanceYaml.inputs.name.trim();
     functionName = functionName.replace('${name}', instanceYaml.name);
     functionName = functionName.replace('${app}', instanceYaml.app);
-    if (functionName && functionName.includes && !functionName.includes('${stage}') && stageValue) {
+    if (typeof functionName === 'string' && !functionName.includes('${stage}') && stageValue) {
       cli.log(
         `Serverless: ${chalk.yellow(
           '当前应用自定义 SCF 实例名称无法指定 stage 信息, 请检查后重试'
