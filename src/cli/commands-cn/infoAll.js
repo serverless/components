@@ -4,7 +4,10 @@ const { v4: uuidv4 } = require('uuid');
 const { ServerlessSDK } = require('@serverless/platform-client-china');
 const { getTemplate, getTemplateDashboardUrl } = require('./utils');
 const chalk = require('chalk');
-const moment = require('moment');
+const dayjs = require('dayjs');
+const relativeTime = require('dayjs/plugin/relativeTime');
+
+dayjs.extend(relativeTime);
 
 module.exports = async (config, cli) => {
   const templateYaml = await getTemplate(process.cwd());
@@ -44,7 +47,7 @@ module.exports = async (config, cli) => {
       continue;
     }
 
-    const lastActionAgo = moment(instance.lastActionAt).fromNow();
+    const lastActionAgo = dayjs(instance.lastActionAt).fromNow();
 
     let statusLog;
     if (instance.instanceStatus === 'error') {

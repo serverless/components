@@ -14,7 +14,10 @@ const {
 const { runningTemplate, checkLocalCredentials } = require('../utils');
 const infoAll = require('./infoAll');
 const chalk = require('chalk');
-const moment = require('moment');
+const dayjs = require('dayjs');
+const relativeTime = require('dayjs/plugin/relativeTime');
+
+dayjs.extend(relativeTime);
 
 module.exports = async (config, cli) => {
   // Ensure the user is logged in or access key is available, or advertise
@@ -67,7 +70,7 @@ module.exports = async (config, cli) => {
   }
 
   // format last action for better UX
-  const lastActionAgo = moment(instance.lastActionAt).fromNow();
+  const lastActionAgo = dayjs(instance.lastActionAt).fromNow();
 
   // color status based on...status
   let statusLog;

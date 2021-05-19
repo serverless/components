@@ -11,7 +11,10 @@ const utils = require('./utils');
 const { runningTemplate, checkTemplateAppAndStage } = require('../utils');
 const infoAll = require('./infoAll');
 const chalk = require('chalk');
-const moment = require('moment');
+const dayjs = require('dayjs');
+const relativeTime = require('dayjs/plugin/relativeTime');
+
+dayjs.extend(relativeTime);
 
 module.exports = async (config, cli, command) => {
   // Start CLI persistance status
@@ -64,7 +67,7 @@ module.exports = async (config, cli, command) => {
   }
 
   // format last action for better UX
-  const lastActionAgo = moment(instance.lastActionAt).fromNow();
+  const lastActionAgo = dayjs(instance.lastActionAt).fromNow();
 
   // color status based on...status
   let statusLog;

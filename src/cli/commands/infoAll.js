@@ -3,8 +3,11 @@
 const { getAccessKey, getTemplate, getDashboardUrl } = require('./utils');
 const { checkLocalCredentials } = require('../utils');
 const { ServerlessSDK } = require('@serverless/platform-client');
-const moment = require('moment');
 const chalk = require('chalk');
+const dayjs = require('dayjs');
+const relativeTime = require('dayjs/plugin/relativeTime');
+
+dayjs.extend(relativeTime);
 
 module.exports = async (config, cli) => {
   cli.sessionStart('Fetching App Info', { timer: false });
@@ -44,7 +47,7 @@ module.exports = async (config, cli) => {
     }
 
     // format last action for better UX
-    const lastActionAgo = moment(instance.lastActionAt).fromNow();
+    const lastActionAgo = dayjs(instance.lastActionAt).fromNow();
 
     // color status based on...status
     let statusLog;
