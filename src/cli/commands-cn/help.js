@@ -48,7 +48,7 @@ ${command('   --path / -p')}                 指定传入函数的事件 (event)
 ${command(
   '   --context'
 )}                   指定传入函数的上下文(context)参数数据，需要使用序列化的 JSON 格式
-${command('   --contextPath / -x')}          指定传入函数的上下文(context)参数的 JSON 文件路径
+${command('   --contextPath / -x')}          指定传入函数的上下文 (context) 参数的 JSON 文件路径
 ${command('   --env / -e')}                  指定环境变量信息 如: --env VAR=val
 ${command('   --config / -c')}               指定使用的配置文件
 `;
