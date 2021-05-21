@@ -6,7 +6,7 @@ const utils = require('../utils');
 const { isJson } = require('../../utils');
 const invokeLocal = require('./invoke-local');
 const chalk = require('chalk');
-const jsome = require('jsome');
+const { inspect } = require('util');
 
 /**
  * --stage / -s Set stage
@@ -105,7 +105,7 @@ module.exports = async (config, cli, command) => {
       cli.log();
       try {
         const retJson = JSON.parse(retMsg);
-        jsome(retJson);
+        cli.log(inspect(retJson, { depth: Infinity, colors: true, compact: 0 }));
       } catch (error) {
         cli.log(retMsg);
       }
