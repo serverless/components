@@ -6,7 +6,7 @@ const utils = require('../utils');
 const { isJson } = require('../../utils');
 const invokeLocal = require('./invoke-local');
 const chalk = require('chalk');
-const jsome = require('jsome');
+const { inspect } = require('util');
 
 /**
  * --stage / -s Set stage
@@ -64,7 +64,7 @@ module.exports = async (config, cli, command) => {
     functionName = instanceYaml.inputs.name.trim();
     functionName = functionName.replace('${name}', instanceYaml.name);
     functionName = functionName.replace('${app}', instanceYaml.app);
-    if (!functionName.includes('${stage}') && stageValue) {
+    if (typeof functionName === 'string' && !functionName.includes('${stage}') && stageValue) {
       cli.log(
         `Serverless: ${chalk.yellow(
           '当前应用自定义 SCF 实例名称无法指定 stage 信息, 请检查后重试'
@@ -100,13 +100,12 @@ module.exports = async (config, cli, command) => {
       const retMsg = res.retMsg;
       delete res.retMsg;
       cli.logOutputs(res);
-      cli.log();
       cli.log('---------------------------------------------');
       cli.log(`Serverless: ${chalk.green('调用成功')}`);
       cli.log();
       try {
         const retJson = JSON.parse(retMsg);
-        jsome(retJson);
+        cli.log(inspect(retJson, { depth: Infinity, colors: true, compact: 0 }));
       } catch (error) {
         cli.log(retMsg);
       }

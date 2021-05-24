@@ -1,7 +1,7 @@
 'use strict';
 
 const path = require('path');
-const jsome = require('jsome');
+const { inspect } = require('util');
 
 const utils = require('../../utils');
 const { readAndParseSync, fileExistsSync } = require('../../../utils');
@@ -47,7 +47,7 @@ module.exports = async (config, cli, command) => {
       const result = await finalInvokedFunc(eventData, contextData);
       cli.log('---------------------------------------------');
       colorLog('调用成功', 'green', cli);
-      jsome(result);
+      cli.log(inspect(result, { depth: Infinity, colors: true, compact: 0 }));
       cli.log();
     } catch (e) {
       cli.log('---------------------------------------------');

@@ -5,7 +5,11 @@ const utils = require('./utils');
 const chalk = require('chalk');
 const dayjs = require('dayjs');
 const relativeTime = require('dayjs/plugin/relativeTime');
+const utc = require('dayjs/plugin/utc');
+const timezone = require('dayjs/plugin/timezone');
 
+dayjs.extend(utc);
+dayjs.extend(timezone); // dependent on utc plugin
 dayjs.extend(relativeTime);
 
 function printLogMessages(logList, cli) {
@@ -32,17 +36,18 @@ module.exports = async (config, cli, command) => {
     if (since) {
       startTimeValue = dayjs()
         .subtract(startTime.replace(/\D/g, ''), startTime.replace(/\d/g, ''))
+        .tz('Asia/Shanghai')
         .format('YYYY-MM-DD HH:mm:ss');
     } else if (!dayjs(startTime).isValid()) {
       cli.log(`Serverless: ${chalk.yellow('指定时间格式不正确，请检查后重试')}`);
       process.exit();
     } else {
-      startTimeValue = dayjs.utc(startTime).format('YYYY-MM-DD HH:mm:ss');
+      startTimeValue = dayjs(startTime).tz('Asia/Shanghai').format('YYYY-MM-DD HH:mm:ss');
     }
   } else {
-    startTimeValue = dayjs().subtract(10, 'm').format('YYYY-MM-DD HH:mm:ss');
+    startTimeValue = dayjs().subtract(10, 'm').tz('Asia/Shanghai').format('YYYY-MM-DD HH:mm:ss');
     if (tail) {
-      startTimeValue = dayjs().subtract(1, 'm').format('YYYY-MM-DD HH:mm:ss');
+      startTimeValue = dayjs().subtract(1, 'm').tz('Asia/Shanghai').format('YYYY-MM-DD HH:mm:ss');
     }
   }
 
@@ -64,7 +69,11 @@ module.exports = async (config, cli, command) => {
     finalFunctionName = instanceYaml.inputs.name.trim();
     finalFunctionName = finalFunctionName.replace('${name}', instanceYaml.name);
     finalFunctionName = finalFunctionName.replace('${app}', instanceYaml.app);
-    if (!finalFunctionName.includes('${stage}') && stageValue) {
+    if (
+      typeof finalFunctionName === 'string' &&
+      !finalFunctionName.includes('${stage}') &&
+      stageValue
+    ) {
       cli.log(
         `Serverless: ${chalk.yellow(
           '当前应用自定义 SCF 实例名称无法指定 stage 信息，请检查后重试'
