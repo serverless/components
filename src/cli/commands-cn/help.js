@@ -183,14 +183,14 @@ module.exports = async (config, cli) => {
   // sls [command] --help
   if (config.help === true) {
     commandName = config.originalCommand;
-    const params = config.params.join(' ');
-    if (params) commandName = `${commandName} ${params}`;
+    const paramStr = config.params.join(' ');
+    if (paramStr) commandName = `${commandName} ${paramStr}`;
   }
 
   // sls --help [command]
   if (config.help && config.help !== true) {
     commandName = config.help;
-    if (config.originalCommand) commandName += ' ' + config.originalCommand;
+    if (config.originalCommand) commandName = `${commandName} ${config.originalCommand}`;
   }
 
   // sls help [command]
