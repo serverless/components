@@ -115,7 +115,7 @@ ${description(`    --secretId / -i          [必填]腾讯云CAM账号secretId
     --profile / -n {name}    身份名称. 默认为 "default"
     --overwrite / -o         覆写已有身份名称授权信息`)}
 ${command2('credentials remove')}        删除用户授权信息
-${description(`    --profile / -n {name}    身份名称. 默认为 "default"`)}
+${description('    --profile / -n {name}    身份名称. 默认为 "default"')}
 ${command2('credentials list')}          查看已有用户授权信息
 `,
     'registry': `
