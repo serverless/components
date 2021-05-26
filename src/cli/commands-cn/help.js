@@ -51,7 +51,7 @@ ${gray('控制面板: https://serverless.cloud.tencent.com/')}
 ${gray('问答社区: https://github.com/serverless/serverless-tencent/discussions ')}
 
 ${title('命令')}
-${gray('* 您可以通过 “serverless” 或简称 “sls” 来执行命令')}
+${gray('* 您可以通过 "serverless" 或简称 "sls" 来执行命令')}
 ${gray('* 使用 "serverless [command] --help" 获取详细帮助信息')}
 
 ${command('init')}             通过模板初始化新项目
