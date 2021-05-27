@@ -73,7 +73,7 @@ function generateCommandHelp(commandName, cli) {
   const allowedCommands = {
     'init': `
 ${command2('init')}                       通过模板初始化新应用
-${description(`    {template}               [必填] 模板名称 
+${description(`    {template}               [必填] 模板名称
     --name                   指定应用目录名称
 `)}`,
     'deploy': `
@@ -145,6 +145,7 @@ ${description(`    --function / -f          调用的函数名称，默认使用
     --contextPath / -x       指定传入函数的上下文(context)参数的 JSON 文件路径
     --env / -e               指定环境变量信息 如: --env VAR=val
     --config / -c            指定使用的配置文件
+    --py                     指定要使用的本机中的Python版本，默认使用python. 如: --py python3 (此配置只对runtime是Python的配置有效)
 `)}`,
   };
 
