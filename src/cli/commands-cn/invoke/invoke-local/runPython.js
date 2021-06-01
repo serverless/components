@@ -32,9 +32,11 @@ f.close()`;
       const errData = data.toString().split('\n');
       errData.splice(1, 2);
 
+      cli.log('---------------------------------------------');
       fse.unlinkSync(tempPyFile);
       fse.unlinkSync(tempResFile);
-      colorLog(`Python 函数运行错误：${errData.join('\n').toString()}`, 'yellow', cli);
+      colorLog(`调用错误\n\n ${errData.join('\n').toString()}`, 'red', cli);
+      process.exit();
     });
 
     res.on('close', () => {

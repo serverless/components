@@ -48,7 +48,7 @@ const checkRuntime = (requiredRuntime, cli) => {
       );
     }
   } else {
-    colorLog('当前命令只支持 Node.js 和 Python运行时，其他运行时暂不支持。', 'yellow', cli);
+    colorLog('当前命令只支持 Node.js 和 Python 运行时，其他运行时暂不支持。', 'yellow', cli);
   }
 };
 
