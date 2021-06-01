@@ -1,9 +1,11 @@
 'use strict';
 
 const path = require('path');
+const { inspect } = require('util');
 const semver = require('semver');
 const { fileExistsSync } = require('../../../utils');
 const chalk = require('chalk');
+const { execSync } = require('child_process');
 
 const checkRuntime = (requiredRuntime, cli) => {
   if (!requiredRuntime) {
@@ -25,8 +27,28 @@ const checkRuntime = (requiredRuntime, cli) => {
         `当前系统Node版本为 ${node}, 项目指定的版本为 ${requiredRuntime}, 建议使用相同版本进行测试。\n`
       );
     }
+  } else if (requiredRuntime.includes('Python')) {
+    let pythonInfo;
+    try {
+      pythonInfo = execSync('python -c "import platform; print(platform.python_version())"');
+      pythonInfo = Buffer.from(pythonInfo).toString();
+    } catch (e) {
+      throw new Error(`检查当前环境的Python 运行时出错，错误信息: ${e.message}`);
+    }
+    const requiredMajorVer = requiredRuntime.split('Python')[1].split('.')[0];
+    const requiredMinorVer = requiredRuntime.split('Python')[1].split('.')[1];
+    const currentMajorVer = pythonInfo.split(' ')[0].split('.')[0];
+    const currentMinorVer = pythonInfo.split(' ')[0].split('.')[1];
+
+    if (currentMajorVer !== requiredMajorVer || currentMinorVer !== requiredMinorVer) {
+      cli.log(
+        `当前系统Python版本为 ${pythonInfo
+          .split(' ')[0]
+          .replace('\n', '')}, 项目指定的版本为 ${requiredRuntime}, 建议使用相同版本进行测试。\n`
+      );
+    }
   } else {
-    colorLog('当前命令只支持 Node.js 运行时，其他运行时暂不支持。', 'yellow', cli);
+    colorLog('当前命令只支持 Node.js 和 Python 运行时，其他运行时暂不支持。', 'yellow', cli);
   }
 };
 
@@ -196,10 +218,23 @@ const handleError = (err) => {
   console.log(chalk.red(JSON.stringify(errorResult, null, 4)));
 };
 
+const printOutput = (cli, res = {}, err = null) => {
+  cli.log('---------------------------------------------');
+  if (err) {
+    colorLog('调用错误', 'red', cli);
+    handleError(err);
+  } else {
+    colorLog('调用成功', 'green', cli);
+    cli.log(inspect(res, { depth: Infinity, colors: true, compact: 0 }));
+  }
+  cli.log();
+};
+
 module.exports = {
   checkRuntime,
   summaryOptions,
   runNodeFrameworkProject,
   colorLog,
   handleError,
+  printOutput,
 };

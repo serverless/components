@@ -1,11 +1,11 @@
 'use strict';
 
 const path = require('path');
-const { inspect } = require('util');
 
 const utils = require('../../utils');
 const { readAndParseSync, fileExistsSync } = require('../../../utils');
-const { colorLog, handleError, summaryOptions, checkRuntime } = require('./utils');
+const { colorLog, printOutput, summaryOptions, checkRuntime } = require('./utils');
+const runPython = require('./runPython');
 
 module.exports = async (config, cli, command) => {
   const { config: ymlFilePath, c } = config;
@@ -45,15 +45,13 @@ module.exports = async (config, cli, command) => {
     }
     try {
       const result = await finalInvokedFunc(eventData, contextData);
-      cli.log('---------------------------------------------');
-      colorLog('调用成功', 'green', cli);
-      cli.log(inspect(result, { depth: Infinity, colors: true, compact: 0 }));
-      cli.log();
+      printOutput(cli, result);
     } catch (e) {
-      cli.log('---------------------------------------------');
-      colorLog('调用错误\n', 'red', cli);
-      handleError(e);
-      cli.log();
+      printOutput(cli, null, e);
     }
+  }
+
+  if (runtime.includes('Python')) {
+    await runPython(eventData, contextData, handlerFile, handlerFunc, cli);
   }
 };
