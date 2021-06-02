@@ -12,6 +12,7 @@ module.exports = async (event, context, handlerFile, handlerFunc, cli) => {
   fse.createFileSync(tempResFile);
 
   const tempPyFileContent = `
+# -*- coding: utf-8 -*-
 import json
 from ${handlerFile} import ${handlerFunc}
 
@@ -22,7 +23,9 @@ f.close()`;
 
   fse.writeFileSync(tempPyFile, tempPyFileContent);
   try {
-    const res = spawn('python', [path.join(process.cwd(), tempPyFile)]);
+    const res = spawn(`${process.env.INVOKE_LOCAL_PYTHON || 'python'}`, [
+      path.join(process.cwd(), tempPyFile),
+    ]);
     res.stdout.on('data', (d) => {
       console.log(d.toString());
     });

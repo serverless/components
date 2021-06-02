@@ -27,14 +27,14 @@ module.exports = async (config, cli, command) => {
     colorLog('当前命令只支持 SCF 组件，请在 SCF 组件目录内使用', 'yellow', cli);
   }
 
-  const runtime = inputs.runtime;
-  checkRuntime(runtime, cli);
-
   const [eventData, contextData, handlerFile, handlerFunc] = summaryOptions(
     config,
     instanceYml,
     cli
   );
+
+  const runtime = inputs.runtime;
+  checkRuntime(runtime, cli);
 
   if (runtime.includes('Nodejs')) {
     const invokeFromFile = path.join(process.cwd(), handlerFile);
