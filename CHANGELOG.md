@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.11.0](https://github.com/serverless/components/compare/v3.10.1....v3.11.0) (2021-06-02)
+
+- `sls invoke local` supports **Python** runtime
+- Fix `sls --help` show help informational inside template project.
+
 ## [3.10.1](https://github.com/serverless/components/compare/v3.10.0....v3.10.1) (2021-05-26)
 
 - Refactoring `sls --help` command
