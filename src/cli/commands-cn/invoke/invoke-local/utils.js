@@ -30,7 +30,11 @@ const checkRuntime = (requiredRuntime, cli) => {
   } else if (requiredRuntime.includes('Python')) {
     let pythonInfo;
     try {
-      pythonInfo = execSync('python -c "import platform; print(platform.python_version())"');
+      pythonInfo = execSync(
+        `${
+          process.env.INVOKE_LOCAL_PYTHON || 'python'
+        } -c "import platform; print(platform.python_version())"`
+      );
       pythonInfo = Buffer.from(pythonInfo).toString();
     } catch (e) {
       throw new Error(`检查当前环境的Python 运行时出错，错误信息: ${e.message}`);
@@ -63,6 +67,7 @@ const summaryOptions = (config, instanceYml, cli) => {
     context,
     contextPath,
     x,
+    py,
   } = config;
   const { inputs = {}, component } = instanceYml;
 
@@ -121,6 +126,11 @@ const summaryOptions = (config, instanceYml, cli) => {
     for (const [k, v] of Object.entries(inputs.environment.variables)) {
       process.env[k] = v;
     }
+  }
+
+  // For python runtime, users can set python execution by --py: sls invoke local --python python3
+  if (py) {
+    process.env.INVOKE_LOCAL_PYTHON = py;
   }
 
   // Deal with scf component(single instance situation)
