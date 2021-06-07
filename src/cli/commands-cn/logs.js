@@ -26,7 +26,19 @@ function printLogMessages(logList, cli) {
  */
 module.exports = async (config, cli, command) => {
   // Parse commands
-  const { stage, s, region, r, startTime, tail, t, interval, i, function: originalFunctionAlias, f } = config;
+  const {
+    stage,
+    s,
+    region,
+    r,
+    startTime,
+    tail,
+    t,
+    interval,
+    i,
+    function: originalFunctionAlias,
+    f,
+  } = config;
   const stageValue = stage || s;
   const regionValue = region || r;
   const intervalValue = interval || i;

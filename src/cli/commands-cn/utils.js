@@ -493,7 +493,9 @@ function getFunctionNameOfMultiScf(instanceYaml, stageValue, functionAlias) {
       throw new Error('目前 inputs.name 只支持 stage, name, app 三种变量');
     }
   } else {
-    functionName = `${instanceYaml.name}-${stageValue || instanceYaml.stage}-${instanceYaml.app}-${functionAlias}`;
+    functionName = `${instanceYaml.name}-${stageValue || instanceYaml.stage}-${
+      instanceYaml.app
+    }-${functionAlias}`;
   }
 
   return functionName;
