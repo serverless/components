@@ -134,7 +134,7 @@ const summaryOptions = (config, instanceYml, cli) => {
   }
 
   // Deal with scf component(single instance situation)
-  if (component === 'scf') {
+  if (component.startsWith('scf')) {
     const inputsHandler = inputs.handler || '';
     if (!inputsHandler) {
       colorLog('调用函数未指定，请检查 serverless.yml 中的 hanlder 配置后重试。', 'yellow', cli);
@@ -143,10 +143,8 @@ const summaryOptions = (config, instanceYml, cli) => {
     const [handlerFile, handlerFunc] = inputsHandler.split('.');
 
     return [eventData, contextData, handlerFile, handlerFunc];
-  }
-
-  // multi scf instances component
-  if (component === 'multi-scf') {
+  } else if (component.startsWith('multi-scf')) {
+    // multi scf instances component
     const functions = inputs.functions || null;
     if (!functions) {
       colorLog(
@@ -157,11 +155,13 @@ const summaryOptions = (config, instanceYml, cli) => {
     }
     const specificFunc = f || invokedFunc;
 
-    const choosedFunc = specificFunc
-      ? functions[specificFunc]
-      : functions[Object.keys(functions)[0]]; // If users don't specify which function want to invoke, use the first one by default
+    if (!specificFunc) {
+      colorLog('请使用 --function / -f 指定要调用的函数', 'yellow', cli);
+    }
 
-    if (specificFunc && !choosedFunc) {
+    const choosedFunc = functions[specificFunc];
+
+    if (!choosedFunc) {
       colorLog(
         `未找到待调用的函数: ${specificFunc}，请检查 serverless.yml 中的 functions 配置后重试.`,
         'yellow',
