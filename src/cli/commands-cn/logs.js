@@ -22,13 +22,15 @@ function printLogMessages(logList, cli) {
  * --startTime Set log start time
  * --tail / -t Stream new logs
  * --interval / -i poll interval
+ * --function / -f function alias
  */
 module.exports = async (config, cli, command) => {
   // Parse commands
-  const { stage, s, region, r, startTime, tail, t, interval, i } = config;
+  const { stage, s, region, r, startTime, tail, t, interval, i, function: originalFunctionAlias, f } = config;
   const stageValue = stage || s;
   const regionValue = region || r;
   const intervalValue = interval || i;
+  const functionAlias = originalFunctionAlias || f;
   let startTimeValue;
 
   if (startTime) {
@@ -57,6 +59,7 @@ module.exports = async (config, cli, command) => {
   await utils.login(config);
   const instanceYaml = await utils.loadInstanceConfig(instanceDir, command);
   const regionInYml = instanceYaml && instanceYaml.inputs && instanceYaml.inputs.region;
+  const componentType = instanceYaml && instanceYaml.component;
 
   cli.logLogo();
   const meta = `Action: "logs" - Stage: "${instanceYaml.stage}" - App: "${instanceYaml.app}" - Name: "${instanceYaml.name}"`;
@@ -65,31 +68,15 @@ module.exports = async (config, cli, command) => {
 
   // Get function name
   let finalFunctionName;
-  if (instanceYaml && instanceYaml.inputs && instanceYaml.inputs.name) {
-    finalFunctionName = instanceYaml.inputs.name.trim();
-    finalFunctionName = finalFunctionName.replace('${name}', instanceYaml.name);
-    finalFunctionName = finalFunctionName.replace('${app}', instanceYaml.app);
-    if (
-      typeof finalFunctionName === 'string' &&
-      !finalFunctionName.includes('${stage}') &&
-      stageValue
-    ) {
-      cli.log(
-        `Serverless: ${chalk.yellow(
-          '当前应用自定义 SCF 实例名称无法指定 stage 信息，请检查后重试'
-        )}`
-      );
-      process.exit();
+  try {
+    if (componentType === 'multi-scf') {
+      finalFunctionName = utils.getFunctionNameOfMultiScf(instanceYaml, stageValue, functionAlias);
+    } else {
+      finalFunctionName = utils.getFunctionName(instanceYaml, stageValue);
     }
-    finalFunctionName = finalFunctionName.replace('${stage}', stageValue || instanceYaml.stage);
-    if (finalFunctionName.match(/\${(\w*:?[\w\d.-]+)}/g)) {
-      cli.log(`Serverless: ${chalk.yellow('目前 inputs.name 只支持 stage, name, app 三种变量')}`);
-      process.exit();
-    }
-  } else {
-    finalFunctionName = `${instanceYaml.name}-${stageValue || instanceYaml.stage}-${
-      instanceYaml.app
-    }`;
+  } catch (error) {
+    cli.log(`Serverless: ${chalk.yellow(error.message)}`);
+    process.exit();
   }
 
   const client = new FaaS({
