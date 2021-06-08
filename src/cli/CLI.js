@@ -217,7 +217,7 @@ class CLI {
       if (error.documentation !== false) {
         error.documentation = error.documentation
           ? `  帮助文档: ${error.documentation} ${os.EOL}`
-          : `  帮助文档: https://cloud.tencent.com/document/product/1154/39270 ${os.EOL}`;
+          : `  帮助文档: https://www.serverless.com/cn/framework/docs/ ${os.EOL}`;
       }
       if (error.support !== false) {
         error.support = `  BUG提交: https://github.com/serverless/serverless-tencent/issues ${os.EOL}`;
