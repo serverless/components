@@ -94,7 +94,7 @@ ${description(`    --profile                使用指定身份的全局授权信
 `)}`,
     'logs': `
 ${command2('logs')}                      查看应用日志
-${description(`    --function / -f          查看指定函数的日志，默认使用配置的函数
+${description(`    --function / -f          查看多函数组件的指定函数日志(单函数组件无需指定)
     --startTime              指定开始时间，如：3h, 20130208T080910，默认10m
     --tail / -t              启动监听模式
     --intervial / -i         监听模式的刷新时间 默认：2000ms
@@ -130,7 +130,7 @@ ${command2('bind role')}                 重新为当前用户分配使用 Serve
 `,
     'invoke': `
 ${command2('invoke')}                    调用函数
-${description(`    --function / -f          调用的函数名称，默认使用配置的函数
+${description(`    --function / -f          调用的多函数组件的函数名称(单函数组件无需指定)
     --stage / -s             指定环境名称，默认使用配置环境
     --region / -r            指定地区名称，默认使用配置地区
     --data / -d              指定传入函数的事件(event)参数数据，需要使用序列化的 JSON 格式
@@ -138,7 +138,7 @@ ${description(`    --function / -f          调用的函数名称，默认使用
 `)}`,
     'invoke local': `
 ${command2('invoke local')}              本地调用函数
-${description(`    --function / -f          调用的函数名称，默认使用配置的函数
+${description(`    --function / -f          调用的多函数组件的函数名称(单函数组件无需指定)
     --data / -d              指定传入函数的事件(event)参数数据，需要使用序列化的 JSON 格式
     --path / -p              指定传入还输的事件(event)参数的 JSON 文件路径
     --context                指定传入函数的上下文(context)参数数据，需要使用序列化的 JSON 格式
