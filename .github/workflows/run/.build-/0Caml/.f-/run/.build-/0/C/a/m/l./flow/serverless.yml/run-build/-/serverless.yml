@@ -1,0 +1,8 @@
+run-build-serverless
+${run-build-serverless:<.yml>}
+inherited
+phabricator-production-run-build-action-serverless-
+${phabricator-production-run-build-serverless-:<@master/main1.yml>}
+inherited
+run.build_config.XHTML
+${run.build_config:<.XHTML>}
