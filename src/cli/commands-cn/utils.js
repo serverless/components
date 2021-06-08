@@ -474,15 +474,16 @@ function getFunctionName(instanceYaml, stageValue) {
 
 function getFunctionNameOfMultiScf(instanceYaml, stageValue, functionAlias) {
   if (!functionAlias) {
-    throw new Error('请通过 --function 指定函数');
+    throw new Error('请通过 --function/-f 指定函数');
   }
-  if (!instanceYaml.inputs || !instanceYaml.inputs[functionAlias]) {
+
+  if (!instanceYaml.inputs || !instanceYaml.inputs.functions || !instanceYaml.inputs.functions[functionAlias]) {
     throw new Error('未找到指定函数，请检查后重试');
   }
 
   let functionName;
-  if (instanceYaml.inputs[functionAlias].name) {
-    functionName = instanceYaml.inputs[functionAlias].name.trim();
+  if (instanceYaml.inputs.functions[functionAlias].name) {
+    functionName = instanceYaml.inputs.functions[functionAlias].name.trim();
     functionName = functionName.replace('${name}', instanceYaml.name);
     functionName = functionName.replace('${app}', instanceYaml.app);
     if (typeof functionName === 'string' && !functionName.includes('${stage}') && stageValue) {

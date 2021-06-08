@@ -81,7 +81,7 @@ module.exports = async (config, cli, command) => {
   // Get function name
   let finalFunctionName;
   try {
-    if (componentType === 'multi-scf') {
+    if (componentType.startsWith('multi-scf')) {
       finalFunctionName = utils.getFunctionNameOfMultiScf(instanceYaml, stageValue, functionAlias);
     } else {
       finalFunctionName = utils.getFunctionName(instanceYaml, stageValue);

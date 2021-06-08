@@ -56,14 +56,14 @@ module.exports = async (config, cli, command) => {
   const regionInYml = instanceYaml && instanceYaml.inputs && instanceYaml.inputs.region;
   const componentType = instanceYaml && instanceYaml.component;
 
-  if (componentType !== 'scf' || componentType !== 'multi-scf') {
+  if (!componentType.startsWith('scf') || !componentType.startsWith('multi-scf')) {
     cli.log(`Serverless: ${chalk.yellow('Inovke 命令仅能在 scf 或者 multi-scf 组件目录中调用')}`);
     process.exit();
   }
 
   let functionName;
   try {
-    if (componentType === 'multi-scf') {
+    if (componentType.startsWith('multi-scf')) {
       functionName = utils.getFunctionNameOfMultiScf(instanceYaml, stageValue, functionAlias);
     } else {
       functionName = utils.getFunctionName(instanceYaml, stageValue);
