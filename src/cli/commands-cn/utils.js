@@ -474,7 +474,7 @@ function getFunctionName(instanceYaml, stageValue) {
 
 function getFunctionNameOfMultiScf(instanceYaml, stageValue, functionAlias) {
   if (!functionAlias) {
-    throw new Error('请通过 --function/-f 指定函数');
+    throw new Error('请使用 --function / -f 指定要调用的函数');
   }
 
   if (
