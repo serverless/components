@@ -128,28 +128,54 @@ const summaryOptions = (config, instanceYml, cli) => {
     }
   }
 
-  // For python runtime, users can set python execution by --py: sls invoke local --python python3
+  // For python runtime, users can set python execution by --py: sls invoke local --py python3
   if (py) {
     process.env.INVOKE_LOCAL_PYTHON = py;
   }
 
   // Deal with scf component(single instance situation)
-  if (component.includes('scf')) {
+  if (component.startsWith('scf')) {
     const inputsHandler = inputs.handler || '';
     if (!inputsHandler) {
       colorLog('调用函数未指定，请检查 serverless.yml 中的 hanlder 配置后重试。', 'yellow', cli);
     }
 
-    const [handlerFile] = inputsHandler.split('.');
-    let [, handlerFunc] = inputsHandler.split('.');
+    const [handlerFile, handlerFunc] = inputsHandler.split('.');
 
-    if (f || invokedFunc) {
-      handlerFunc = f || invokedFunc;
+    return [eventData, contextData, handlerFile, handlerFunc];
+  } else if (component.startsWith('multi-scf')) {
+    // multi scf instances component
+    const functions = inputs.functions || null;
+    if (!functions) {
+      colorLog(
+        'functions 字段配置错误，请检查serverless.yml 中的 functions 配置后重试.',
+        'yellow',
+        cli
+      );
     }
+    const specificFunc = f || invokedFunc;
+
+    if (!specificFunc) {
+      colorLog('请使用 --function / -f 指定要调用的函数', 'yellow', cli);
+    }
+
+    const choosedFunc = functions[specificFunc];
+
+    if (!choosedFunc) {
+      colorLog(
+        `未找到待调用的函数: ${specificFunc}，请检查 serverless.yml 中的 functions 配置后重试.`,
+        'yellow',
+        cli
+      );
+    }
+
+    const { handler } = choosedFunc;
+
+    const [handlerFile, handlerFunc] = handler.split('.');
 
     return [eventData, contextData, handlerFile, handlerFunc];
   }
-  // TODO: deal with multi-instance component
+
   return [eventData, contextData];
 };
 
