@@ -1,4 +1,4 @@
-[![Serverless Components](https://s3.amazonaws.com/public.assets.serverless.com/images/readme_serverless_components.gif)](http://serverless.com)
+[[Serverless Components](https://s3.amazonaws.com/public.assets.serverless.com/images/readme_serverless_components.gif)](http://serverless.com)
 
 <br/>
 
@@ -28,13 +28,14 @@ Serverless Components are abstractions that enable developers to deploy serverle
 
 Deploy a serverless app rapidly, with any of these commands:
 
-```shell
+
+shell
 $ npx serverless init fullstack-app
 $ npx serverless init express-starter
 $ npx serverless init react-starter
 $ npx serverless init vue-starter
 $ npx serverless init graphql-starter
-```
+
 
 # Documentation
 
@@ -57,14 +58,14 @@ $ npx serverless init graphql-starter
     - [Variables: Outputs](#variables-outputs)
   - [Proxy](#proxy)
 - [CLI Commands](#cli-commands)
-  - [`serverless registry`](#serverless-registry)
-  - [`serverless publish`](#serverless-publish)
-  - [`serverless deploy`](#serverless-deploy)
-  - [`serverless remove`](#serverless-remove)
-  - [`serverless info`](#serverless-info)
-  - [`serverless dev`](#serverless-dev)
-  - [`serverless param`](#serverless-param)
-- [Building Components](#building-components)
+  - [serverless registry](serverless-registry)
+  - [serverless publish](serverless-publish)
+  - [serverless deploy](serverless-deploy)
+  - [serverless remove](serverless-remove)
+  - [serverless info](serverless-info)
+  - [serverless dev](serverless-dev)
+  - [serverless param](serverless-param)
+- [Building Components](building-components)
   - [serverless.component.yml](#serverlesscomponentyml)
   - [serverless.js](#serverlessjs)
   - [Input & Output Types](#input--output-types)
@@ -88,21 +89,21 @@ $ npx serverless init graphql-starter
 
 To get started with Serverless Components, install the latest version of the [Serverless Framework](https://www.github.com/serverless/serverless):
 
-```console
+console
 $ npm i -g serverless
-```
+
 
 Login into the Serverless dashboard via the CLI:
 
-```
+
 $ serverless login
-```
+
 
 **Before you proceed, make sure you connect your AWS account by creating a provider in the settings page on the [Serverless Dashboard](https://app.serverless.com).**
 
-Then, run `serverless registry` to see many Component-based templates you can deploy, or see more in the [Serverless Framework Dashboard](https://app.serverless.com). These contain Components as well as boilerplate code, to get you started quickly.
+Then, run serverless registry to see many Component-based templates you can deploy, or see more in the [Serverless Framework Dashboard](https://app.serverless.com). These contain Components as well as boilerplate code, to get you started quickly.
 
-Install anything from the registry via `$ serverless init <template>`, like this:
+Install anything from the registry via $ serverless init <template>`, like this:
 
 ```shell
 $ serverless init express-starter
