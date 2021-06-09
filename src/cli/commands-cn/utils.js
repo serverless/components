@@ -452,6 +452,60 @@ inputs:
   throw new Error('当前目录未检测到 Serverless 配置文件');
 };
 
+function getFunctionName(instanceYaml, stageValue) {
+  let functionName;
+  if (instanceYaml && instanceYaml.inputs && instanceYaml.inputs.name) {
+    functionName = instanceYaml.inputs.name.trim();
+    functionName = functionName.replace('${name}', instanceYaml.name);
+    functionName = functionName.replace('${app}', instanceYaml.app);
+    if (typeof functionName === 'string' && !functionName.includes('${stage}') && stageValue) {
+      throw new Error('当前应用自定义 SCF 实例名称无法指定 stage 信息，请检查后重试');
+    }
+    functionName = functionName.replace('${stage}', stageValue || instanceYaml.stage);
+    if (functionName.match(/\${(\w*:?[\w\d.-]+)}/g)) {
+      throw new Error('目前 inputs.name 只支持 stage, name, app 三种变量');
+    }
+  } else {
+    functionName = `${instanceYaml.name}-${stageValue || instanceYaml.stage}-${instanceYaml.app}`;
+  }
+
+  return functionName;
+}
+
+function getFunctionNameOfMultiScf(instanceYaml, stageValue, functionAlias) {
+  if (!functionAlias) {
+    throw new Error('请使用 --function / -f 指定要调用的函数');
+  }
+
+  if (
+    !instanceYaml.inputs ||
+    !instanceYaml.inputs.functions ||
+    !instanceYaml.inputs.functions[functionAlias]
+  ) {
+    throw new Error('未找到指定函数，请检查后重试');
+  }
+
+  let functionName;
+  if (instanceYaml.inputs.functions[functionAlias].name) {
+    functionName = instanceYaml.inputs.functions[functionAlias].name.trim();
+    functionName = functionName.replace('${name}', instanceYaml.name);
+    functionName = functionName.replace('${app}', instanceYaml.app);
+    if (typeof functionName === 'string' && !functionName.includes('${stage}') && stageValue) {
+      throw new Error('当前应用自定义 SCF 实例名称无法指定 stage 信息，请检查后重试');
+    }
+    functionName = functionName.replace('${stage}', stageValue || instanceYaml.stage);
+    if (functionName.match(/\${(\w*:?[\w\d.-]+)}/g)) {
+      throw new Error('目前 inputs.name 只支持 stage, name, app 三种变量');
+    }
+  } else {
+    functionName = `${instanceYaml.name}-${stageValue || instanceYaml.stage}-${
+      instanceYaml.app
+    }-${functionAlias}`;
+  }
+
+  return functionName;
+}
+
 module.exports = {
   loadInstanceConfig: loadTencentInstanceConfig,
   loadInstanceCredentials,
@@ -460,6 +514,8 @@ module.exports = {
   getTemplate,
   getInstanceDashboardUrl,
   getTemplateDashboardUrl,
+  getFunctionName,
+  getFunctionNameOfMultiScf,
   handleDebugLogMessage,
   parseYaml,
   saveYaml,

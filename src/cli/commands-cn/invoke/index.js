@@ -13,6 +13,7 @@ const { inspect } = require('util');
  * --region / -r Set region
  * --data / -d Data sent to SCF
  * --path / -p Data path sent to SCF
+ * --function / -f function alias
  */
 module.exports = async (config, cli, command) => {
   const instanceDir = process.cwd();
@@ -24,11 +25,12 @@ module.exports = async (config, cli, command) => {
     return invokeLocal(config, cli, command);
   }
 
-  const { stage, s, region, r, data, d, path, p } = config;
+  const { stage, s, region, r, data, d, path, p, function: originalFunctionAlias, f } = config;
   const stageValue = stage || s;
   const regionValue = region || r;
   let dataValue = data || d;
   const pathValue = path || p;
+  const functionAlias = originalFunctionAlias || f;
 
   if (dataValue && pathValue) {
     cli.log(`Serverless: ${chalk.yellow('不能同时指定 data 与 path, 请检查后重试')}`);
@@ -54,32 +56,23 @@ module.exports = async (config, cli, command) => {
   const regionInYml = instanceYaml && instanceYaml.inputs && instanceYaml.inputs.region;
   const componentType = instanceYaml && instanceYaml.component;
 
-  if (componentType !== 'scf') {
-    cli.log(`Serverless: ${chalk.yellow('Inovke 命令仅能在 SCF 组件目录中调用')}`);
+  if (!componentType.startsWith('scf') && !componentType.startsWith('multi-scf')) {
+    cli.log(`Serverless: ${chalk.yellow('Inovke 命令仅能在 scf 或者 multi-scf 组件目录中调用')}`);
     process.exit();
   }
 
   let functionName;
-  if (instanceYaml && instanceYaml.inputs && instanceYaml.inputs.name) {
-    functionName = instanceYaml.inputs.name.trim();
-    functionName = functionName.replace('${name}', instanceYaml.name);
-    functionName = functionName.replace('${app}', instanceYaml.app);
-    if (typeof functionName === 'string' && !functionName.includes('${stage}') && stageValue) {
-      cli.log(
-        `Serverless: ${chalk.yellow(
-          '当前应用自定义 SCF 实例名称无法指定 stage 信息, 请检查后重试'
-        )}`
-      );
-      process.exit();
+  try {
+    if (componentType.startsWith('multi-scf')) {
+      functionName = utils.getFunctionNameOfMultiScf(instanceYaml, stageValue, functionAlias);
+    } else {
+      functionName = utils.getFunctionName(instanceYaml, stageValue);
     }
-    functionName = functionName.replace('${stage}', stageValue || instanceYaml.stage);
-    if (functionName.match(/\${(\w*:?[\w\d.-]+)}/g)) {
-      cli.log(`Serverless: ${chalk.yellow('目前 inputs.name 只支持 stage, name, app 三种变量')}`);
-      process.exit();
-    }
-  } else {
-    functionName = `${instanceYaml.name}-${stageValue || instanceYaml.stage}-${instanceYaml.app}`;
+  } catch (error) {
+    cli.log(`Serverless: ${chalk.yellow(error.message)}`);
+    process.exit();
   }
+
   const client = new FaaS({
     secretId: process.env.TENCENT_SECRET_ID,
     secretKey: process.env.TENCENT_SECRET_KEY,
