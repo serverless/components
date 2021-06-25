@@ -2,7 +2,9 @@
 
 const { FaaS } = require('@tencent-sdk/faas');
 const utils = require('./utils');
+const { utils: chinaUtils } = require('@serverless/platform-client-china');
 const chalk = require('chalk');
+const { generatePayload, storeLocally } = require('./telemtry');
 const dayjs = require('dayjs');
 const relativeTime = require('dayjs/plugin/relativeTime');
 const utc = require('dayjs/plugin/utc');
@@ -73,6 +75,8 @@ module.exports = async (config, cli, command) => {
   const regionInYml = instanceYaml && instanceYaml.inputs && instanceYaml.inputs.region;
   const componentType = instanceYaml && instanceYaml.component;
 
+  const orgUid = await chinaUtils.getOrgId();
+  const telemtryData = await generatePayload({ command, rootConfig: instanceYaml, userId: orgUid });
   cli.logLogo();
   const meta = `Action: "logs" - Stage: "${instanceYaml.stage}" - App: "${instanceYaml.app}" - Name: "${instanceYaml.name}"`;
   cli.log(meta, 'grey');
@@ -110,17 +114,26 @@ module.exports = async (config, cli, command) => {
         })) || [];
       return res.reverse();
     } catch (error) {
+      telemtryData.outcome = 'failure';
+
       if (error.code === '1001') {
+        telemtryData.failure_reason =
+          '无法找到指定 SCF 实例，请检查 SCF 实例名称和 Stage / Region 信息或重新部署后调用';
+
         cli.log(
           `Serverless: ${chalk.yellow(
             '无法找到指定 SCF 实例，请检查 SCF 实例名称和 Stage / Region 信息或重新部署后调用'
           )}`
         );
+        await storeLocally(telemtryData);
         process.exit();
       } else {
+        telemtryData.failure_reason = error.message;
+        await storeLocally(telemtryData);
         throw error;
       }
     }
+
     return 0;
   }
 
