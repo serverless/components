@@ -6,9 +6,18 @@
 
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
+const { v1: uuidv1 } = require('uuid');
 const args = require('minimist')(process.argv.slice(2));
 const { utils: platformUtils } = require('@serverless/platform-client-china');
-const { loadInstanceConfig, resolveVariables, parseCliInputs, fileExists } = require('../utils');
+const {
+  writeJsonToCredentials,
+  loadCredentialsToJson,
+  loadInstanceConfig,
+  resolveVariables,
+  parseCliInputs,
+  fileExists,
+} = require('../utils');
 const { mergeDeepRight } = require('ramda');
 const YAML = require('js-yaml');
 const fse = require('fs-extra');
@@ -506,6 +515,28 @@ function getFunctionNameOfMultiScf(instanceYaml, stageValue, functionAlias) {
   return functionName;
 }
 
+// If current machine does not have an uuid, create and save it, or load  and finally return the value.
+const writeClientUid = async (
+  p = path.join(os.homedir(), '.serverless/tencent/client_uid-credentials')
+) => {
+  let res = null;
+  if (!fse.existsSync(p)) {
+    res = {
+      value: uuidv1(), // the value of client_uid
+      downloadAt: Date.now(), // the created time of client_uid
+    };
+    writeJsonToCredentials(p, {
+      client_uid: res,
+    });
+    const { sendToMetrics } = require('./telemtry/index');
+
+    await sendToMetrics(res, {}, { initClientUid: true });
+  } else {
+    res = loadCredentialsToJson(p).client_uid;
+  }
+  return res;
+};
+
 module.exports = {
   loadInstanceConfig: loadTencentInstanceConfig,
   loadInstanceCredentials,
@@ -521,4 +552,5 @@ module.exports = {
   saveYaml,
   generateYMLForNodejsProject,
   checkBasicConfigValidation,
+  writeClientUid,
 };

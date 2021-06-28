@@ -11,6 +11,7 @@ const path = require('path');
 const stream = require('stream');
 const AdmZip = require('adm-zip');
 const { v4: uuidv4 } = require('uuid');
+const { generatePayload, storeLocally } = require('./telemtry');
 const got = require('got');
 const { ServerlessSDK } = require('@serverless/platform-client-china');
 const spawn = require('child-process-ext/spawn');
@@ -89,6 +90,8 @@ const initTemplateFromCli = async (targetPath, packageName, registryPackage, cli
 
   cli.sessionStatus('Setting up your new app');
   await unpack(cli, targetPath);
+
+  return ymlParsed;
 };
 
 const init = async (config, cli) => {
@@ -108,15 +111,26 @@ const init = async (config, cli) => {
     }
   }
 
+  let telemtryData = await generatePayload({ command: 'init' });
+
   const sdk = new ServerlessSDK({ context: { traceId: uuidv4() } });
   const registryPackage = await sdk.getPackage(packageName);
   if (!registryPackage) {
+    telemtryData.outcome = 'failure';
+    telemtryData.failure_reason = `查询的包 "${packageName}" 不存在.`;
+    await storeLocally(telemtryData);
+
     throw new Error(`查询的包 "${packageName}" 不存在.`);
   }
+
   // registryPackage.component will be null if component is not found
   // this is the design for platform API backward compatibility
   delete registryPackage.component;
   if (Object.keys(registryPackage).length === 0) {
+    telemtryData.outcome = 'failure';
+    telemtryData.failure_reason = `查询的包 "${packageName}" 不存在.`;
+    await storeLocally(telemtryData);
+
     throw new Error(`查询的包 "${packageName}" 不存在.`);
   }
 
@@ -130,14 +144,25 @@ const init = async (config, cli) => {
       uuidv4().split('-')[0]
     }\ninputs:\n`;
     await fse.writeFile(envDestination, envConfig);
+
+    telemtryData.components.push(packageName);
   } else {
-    await initTemplateFromCli(targetPath, packageName, registryPackage, cli, targetName);
+    const ymlParsed = await initTemplateFromCli(
+      targetPath,
+      packageName,
+      registryPackage,
+      cli,
+      targetName
+    );
+    telemtryData = await generatePayload({ command: 'init', rootConfig: ymlParsed });
   }
 
   cli.log(`- 项目 "${packageName}" 已在当前目录成功创建`);
   cli.log(`- 执行 "cd ${targetName} && serverless deploy" 部署应用`);
 
+  await storeLocally(telemtryData);
   cli.sessionStop('success', '创建成功');
+
   return null;
 };
 

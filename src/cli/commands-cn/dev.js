@@ -9,6 +9,7 @@ const { Writable } = require('stream');
 const ansiEscapes = require('ansi-escapes');
 const chokidar = require('chokidar');
 const { ServerlessSDK, utils: chinaUtils } = require('@serverless/platform-client-china');
+const { generatePayload, storeLocally } = require('./telemtry');
 const { v4: uuidv4 } = require('uuid');
 const utils = require('./utils');
 
@@ -207,6 +208,7 @@ module.exports = async (config, cli, command) => {
     },
   });
 
+  const telemtryData = await generatePayload({ command, rootConfig: instanceYaml, userId: orgUid });
   cli.sessionStatus('Initializing', instanceYaml.name);
 
   // Filter configuration
@@ -269,6 +271,11 @@ module.exports = async (config, cli, command) => {
     }
     const deployedInstance = await deploy(sdk, instanceYaml, instanceCredentials);
     await updateDeploymentStatus(cli, deployedInstance, true);
+    if (deployedInstance.instanceStatus === 'error') {
+      telemtryData.outcome = 'failure';
+      telemtryData.failure_reason = deployedInstance.deploymentError;
+    }
+    await storeLocally(telemtryData);
   });
 
   // "raw" makes sure to catch all FS events, not just file changes
