@@ -81,7 +81,7 @@ const getTemplatesFromRegistry = async (sdk) => {
 
   // only show the scf examples when user select the scf-starter in first step
   const templatesChoices = templates
-    .filter((item) => !item.name.includes('scf-') || item.name === 'scf-starter')
+    .filter((item) => !item.name.startsWith('scf-') || item.name === 'scf-starter')
     .map((item) => {
       let name = item.name;
 
@@ -99,7 +99,7 @@ const getTemplatesFromRegistry = async (sdk) => {
     });
 
   const scfTemplatesChoices = templates
-    .filter((item) => item.name.includes('scf-') && item.name !== 'scf-starter')
+    .filter((item) => item.name.startsWith('scf-') && item.name !== 'scf-starter')
     .map((item) => {
       let name = item.name;
 
