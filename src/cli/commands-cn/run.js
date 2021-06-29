@@ -99,9 +99,6 @@ module.exports = async (config, cli, command) => {
   const cliendUidResult = await utils.writeClientUid();
   if (!cliendUidResult[orgUid]) {
     options.client_uid = cliendUidResult.value;
-    writeJsonToCredentials(path.join(os.homedir(), '.serverless/tencent/client_uid-credentials'), {
-      client_uid: { ...cliendUidResult, [orgUid]: true },
-    });
   }
 
   // Connect to Serverless Platform Events, if in debug mode
@@ -152,6 +149,15 @@ module.exports = async (config, cli, command) => {
       cli.log(`${chalk.green(vendorMessage)}`);
     }
 
+    // Insert appId into client_uid-credentials to avoid repeatly searching database, no matter the status of instance is succ or fail
+    if (!cliendUidResult[orgUid]) {
+      writeJsonToCredentials(
+        path.join(os.homedir(), '.serverless/tencent/client_uid-credentials'),
+        {
+          client_uid: { ...cliendUidResult, [orgUid]: true },
+        }
+      );
+    }
     if (instance.instanceStatus === 'error') {
       telemtryData.outcome = 'failure';
       telemtryData.failure_reason = instance.deploymentError;
