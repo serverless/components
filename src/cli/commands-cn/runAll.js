@@ -73,9 +73,6 @@ module.exports = async (config, cli, command) => {
   const cliendUidResult = await writeClientUid();
   if (!cliendUidResult[orgUid]) {
     options.client_uid = cliendUidResult.value;
-    writeJsonToCredentials(path.join(os.homedir(), '.serverless/tencent/client_uid-credentials'), {
-      client_uid: { ...cliendUidResult, [orgUid]: true },
-    });
   }
 
   if (options.debug) {
@@ -138,6 +135,12 @@ module.exports = async (config, cli, command) => {
     }
   }
 
+  // Insert appId into client_uid-credentials to avoid repeatly searching database, no matter the status of instance is succ or fail
+  if (!cliendUidResult[orgUid] && command === 'deploy') {
+    writeJsonToCredentials(path.join(os.homedir(), '.serverless/tencent/client_uid-credentials'), {
+      client_uid: { ...cliendUidResult, [orgUid]: true },
+    });
+  }
   if (failed.length) {
     cli.sessionStop(
       'error',
