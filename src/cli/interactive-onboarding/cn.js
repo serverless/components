@@ -45,6 +45,15 @@ const getScfRuntimeTypeChoice = async (choices) =>
     choices,
   });
 
+const getMultiScfRuntimeTypeChoice = async (choices) =>
+  await inquirer.prompt({
+    // EN: please choice runtime(only for scf)
+    message: '请选择应用的运行时',
+    type: 'list',
+    name: 'multiScfRuntimeType',
+    choices,
+  });
+
 const projectNameInput = async (workingDir) =>
   (
     await inquirer.prompt({
@@ -79,9 +88,15 @@ const projectNameInput = async (workingDir) =>
 const getTemplatesFromRegistry = async (sdk) => {
   const { templates = [] } = await sdk.listPackages(null, { isFeatured: true });
 
-  // only show the scf examples when user select the scf-starter in first step
+  // Not displaying the scf related templates in the first step
   const templatesChoices = templates
-    .filter((item) => !item.name.startsWith('scf-') || item.name === 'scf-starter')
+    .filter(
+      (item) =>
+        !item.name.startsWith('scf-') ||
+        !item.name.startsWith('multi-scf-') ||
+        item.name === 'scf-starter' ||
+        item.name === 'multi-scf-starter'
+    )
     .map((item) => {
       let name = item.name;
 
@@ -114,7 +129,25 @@ const getTemplatesFromRegistry = async (sdk) => {
         value: { id: item.componentName, name: item.name },
       };
     });
-  return { templatesChoices, scfTemplatesChoices };
+
+  const multiScfTemplatesChioices = templates
+    .filter((item) => item.name.startsWith('multi-scf-') && item.name !== 'multi-scf-starter')
+    .map((item) => {
+      let name = item.name;
+
+      if (item['description-i18n'] && item['description-i18n']['zh-cn']) {
+        name = `${name} - ${item['description-i18n']['zh-cn']}`;
+      } else if (item.description) {
+        name = `${name} - ${item.description}`;
+      }
+
+      return {
+        name,
+        value: { id: item.componentName, name: item.name },
+      };
+    });
+
+  return { templatesChoices, scfTemplatesChoices, multiScfTemplatesChioices };
 };
 
 module.exports = async (config, cli) => {
@@ -131,7 +164,11 @@ module.exports = async (config, cli) => {
   const sdk = new ServerlessSDK({ context: { traceId: uuidv4() } });
 
   // Fetch latest templates from registry
-  const { templatesChoices, scfTemplatesChoices } = await getTemplatesFromRegistry(sdk);
+  const {
+    templatesChoices,
+    scfTemplatesChoices,
+    multiScfTemplatesChioices,
+  } = await getTemplatesFromRegistry(sdk);
   if (templatesChoices.length === 0) {
     // EN: Can not find any template in registry!
     cli.log(chalk.red('当前注册中心无可用模版!\n'));
@@ -143,12 +180,20 @@ module.exports = async (config, cli) => {
   let { name, id: packageName } = projectType;
 
   // Choice runtime for scf examples
-  if (name.includes('scf-starter')) {
+  if (name === 'scf-starter') {
     const {
       scfRuntimeType: { id, name: scfName },
     } = await getScfRuntimeTypeChoice(scfTemplatesChoices);
     packageName = id;
     name = scfName;
+  }
+
+  if (name === 'multi-scf-starter') {
+    const {
+      multiScfRuntimeType: { id, name: multiScfName },
+    } = await getMultiScfRuntimeTypeChoice(multiScfTemplatesChioices);
+    packageName = id;
+    name = multiScfName;
   }
 
   const projectName = await projectNameInput(workingDir);
