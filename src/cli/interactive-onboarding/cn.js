@@ -38,7 +38,7 @@ const projectTypeChoice = async (choices) =>
 
 const getScfRuntimeTypeChoice = async (choices) =>
   await inquirer.prompt({
-    // EN: please choice runtime(only for scf)
+    // EN: please choice runtime
     message: '请选择应用的运行时',
     type: 'list',
     name: 'scfRuntimeType',
@@ -47,7 +47,7 @@ const getScfRuntimeTypeChoice = async (choices) =>
 
 const getMultiScfRuntimeTypeChoice = async (choices) =>
   await inquirer.prompt({
-    // EN: please choice runtime(only for scf)
+    // EN: please choice runtime
     message: '请选择应用的运行时',
     type: 'list',
     name: 'multiScfRuntimeType',
