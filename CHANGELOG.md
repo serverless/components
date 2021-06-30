@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.13.0](https://github.com/serverless/components/compare/v3.12.0....v3.13.0) (2021-06-30)
+
+- Add Components metriecs collection
+
 ## [3.12.0](https://github.com/serverless/components/compare/v3.11.1....v3.12.0) (2021-06-09)
 
 - Add `sls invoke`, `sls invoke local` and `sls logs` commands for multi-scf component
