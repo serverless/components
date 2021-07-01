@@ -159,8 +159,12 @@ module.exports = async (config, cli) => {
   const sdk = new ServerlessSDK({ context: { traceId: uuidv4() } });
 
   // Fetch latest templates from registry
-  const { templatesChoices, scfTemplatesChoices, multiScfTemplatesChioices } =
-    await getTemplatesFromRegistry(sdk);
+  // prettier-ignore
+  const {
+    templatesChoices,
+    scfTemplatesChoices,
+    multiScfTemplatesChioices,
+  } = await getTemplatesFromRegistry(sdk);
   if (templatesChoices.length === 0) {
     // EN: Can not find any template in registry!
     cli.log(chalk.red('当前注册中心无可用模版!\n'));
