@@ -519,20 +519,24 @@ function getFunctionNameOfMultiScf(instanceYaml, stageValue, functionAlias) {
 const writeClientUid = async (
   p = path.join(os.homedir(), '.serverless/tencent/client_uid-credentials')
 ) => {
-  let res = null;
-  if (!fse.existsSync(p)) {
-    res = {
-      value: uuidv1(), // the value of client_uid
-      downloadAt: Date.now(), // the created time of client_uid
-    };
-    writeJsonToCredentials(p, {
-      client_uid: res,
-    });
-    const { sendToMetrics } = require('./telemtry/index');
+  let res = {};
+  try {
+    if (!fse.existsSync(p)) {
+      res = {
+        value: uuidv1(), // the value of client_uid
+        downloadAt: Date.now(), // the created time of client_uid
+      };
+      writeJsonToCredentials(p, {
+        client_uid: res,
+      });
+      const { sendToMetrics } = require('./telemtry/index');
 
-    await sendToMetrics(res, {}, { initClientUid: true });
-  } else {
-    res = loadCredentialsToJson(p).client_uid;
+      await sendToMetrics(res, {}, { initClientUid: true });
+    } else {
+      res = loadCredentialsToJson(p).client_uid;
+    }
+  } catch (e) {
+    console.log('write client_uid error', e.message);
   }
   return res;
 };
