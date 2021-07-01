@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.13.1](https://github.com/serverless/components/compare/v3.13.0....v3.13.1) (2021-07-01)
+
+- Revoke wrong code
+
 ## [3.13.0](https://github.com/serverless/components/compare/v3.12.0....v3.13.0) (2021-06-30)
 
 - Add Components metriecs collection
