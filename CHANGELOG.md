@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.13.2](https://github.com/serverless/components/compare/v3.13.1....v3.13.2) (2021-07-01)
+
+- Fix bug that can not create new file in new dictionary
+
 ## [3.13.1](https://github.com/serverless/components/compare/v3.13.0....v3.13.1) (2021-07-01)
 
 - Revoke wrong code
