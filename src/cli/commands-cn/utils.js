@@ -522,6 +522,7 @@ const writeClientUid = async (
   let res = {};
   try {
     if (!fse.existsSync(p)) {
+      fse.ensureFileSync(p);
       res = {
         value: uuidv1(), // the value of client_uid
         downloadAt: Date.now(), // the created time of client_uid
@@ -535,9 +536,8 @@ const writeClientUid = async (
     } else {
       res = loadCredentialsToJson(p).client_uid;
     }
-  } catch (e) {
-    console.log('write client_uid error', e.message);
-  }
+    // eslint-disable-next-line no-empty
+  } catch (e) {}
   return res;
 };
 
