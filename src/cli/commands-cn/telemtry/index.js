@@ -43,8 +43,8 @@ const sendToMetrics = async (payload, { ids }, options = {}) => {
 };
 
 // Store telemtry data locally and send them later while deploying
-const storeLocally = async (payload) => {
-  if (isTelemetryDisabled || !cacheDirPath) return null;
+const storeLocally = async (payload = {}) => {
+  if (isTelemetryDisabled || !cacheDirPath || !payload.event) return null;
   const id = uuid();
 
   return (async function self() {

@@ -6,14 +6,17 @@
 
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 const {
   runningTemplate,
   loadInstanceConfig,
   fileExists,
   checkTemplateAppAndStage,
+  writeJsonToCredentials,
 } = require('../utils');
 const { ServerlessSDK, utils: tencentUtils } = require('@serverless/platform-client-china');
 const { v4: uuidv4 } = require('uuid');
+const { generatePayload, storeLocally, send: sendTelemtry } = require('./telemtry');
 const utils = require('./utils');
 const runAll = require('./runAll');
 const chalk = require('chalk');
@@ -87,10 +90,16 @@ module.exports = async (config, cli, command) => {
     agent: `ComponentsCLI_${version}`,
   });
 
+  const telemtryData = await generatePayload({ command, rootConfig: instanceYaml, userId: orgUid });
   // Prepare Options
   const options = {};
   options.debug = config.debug;
   options.dev = config.dev;
+
+  const cliendUidResult = await utils.writeClientUid();
+  if (!cliendUidResult[orgUid]) {
+    options.client_uid = cliendUidResult.value;
+  }
 
   // Connect to Serverless Platform Events, if in debug mode
   if (options.debug) {
@@ -139,6 +148,20 @@ module.exports = async (config, cli, command) => {
       cli.log();
       cli.log(`${chalk.green(vendorMessage)}`);
     }
+
+    // Insert appId into client_uid-credentials to avoid repeatly searching database, no matter the status of instance is succ or fail
+    if (!cliendUidResult[orgUid]) {
+      writeJsonToCredentials(
+        path.join(os.homedir(), '.serverless/tencent/client_uid-credentials'),
+        {
+          client_uid: { ...cliendUidResult, [orgUid]: true },
+        }
+      );
+    }
+    if (instance.instanceStatus === 'error') {
+      telemtryData.outcome = 'failure';
+      telemtryData.failure_reason = instance.deploymentError;
+    }
   } else if (command === 'remove') {
     // run remove
     cli.sessionStatus('删除中', null, 'white');
@@ -161,10 +184,19 @@ module.exports = async (config, cli, command) => {
 
     cli.log();
     cli.logOutputs(instance.outputs);
+    if (instance.actionStatus === 'error') {
+      telemtryData.outcome = 'failure';
+      telemtryData.failure_reason = instance.actionError;
+    }
   }
   cli.sessionStop('success', '执行成功');
 
+  await storeLocally(telemtryData);
   if (deferredNotificationsData) printNotification(cli, await deferredNotificationsData);
+  // we will send all telemtry data into metrics server while deploying
+  if (command === 'deploy') {
+    sendTelemtry();
+  }
 
   sdk.disconnect();
   return null;

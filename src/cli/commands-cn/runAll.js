@@ -2,8 +2,8 @@
 
 'use strict';
 
-// const path = require('path');
-// const os = require('os');
+const path = require('path');
+const os = require('os');
 const { ServerlessSDK, utils: tencentUtils } = require('@serverless/platform-client-china');
 const {
   getOutputs,
@@ -11,16 +11,16 @@ const {
   setDependencies,
   createGraph,
   executeGraph,
-  // writeJsonToCredentials,
+  writeJsonToCredentials,
 } = require('../utils');
 const {
-  // writeClientUid,
+  writeClientUid,
   login,
   loadInstanceCredentials,
   getTemplate,
   handleDebugLogMessage,
 } = require('./utils');
-// const { generatePayload, storeLocally, send: sendTelemtry } = require('./telemtry');
+const { generatePayload, storeLocally, send: sendTelemtry } = require('./telemtry');
 const generateNotificationsPayload = require('../notifications/generate-payload');
 const { v4: uuidv4 } = require('uuid');
 const requestNotification = require('../notifications/request');
@@ -70,10 +70,10 @@ module.exports = async (config, cli, command) => {
   // Connect to Serverless Platform Events, if in debug mode
   options.debug = config.debug;
 
-  // const cliendUidResult = await writeClientUid();
-  // if (!cliendUidResult[orgUid]) {
-  //   options.client_uid = cliendUidResult.value;
-  // }
+  const cliendUidResult = await writeClientUid();
+  if (!cliendUidResult[orgUid]) {
+    options.client_uid = cliendUidResult.value;
+  }
 
   if (options.debug) {
     await sdk.connect({
@@ -100,12 +100,12 @@ module.exports = async (config, cli, command) => {
 
   const allComponents = await getAllComponents(templateYaml);
 
-  // const telemtryData = await generatePayload({
-  //   command,
-  //   userId: orgUid,
-  //   rootConfig: templateYaml,
-  //   configs: Object.values(allComponents),
-  // });
+  const telemtryData = await generatePayload({
+    command,
+    userId: orgUid,
+    rootConfig: templateYaml,
+    configs: Object.values(allComponents),
+  });
 
   const allComponentsWithDependencies = setDependencies(allComponents);
   const graph = createGraph(allComponentsWithDependencies, command);
@@ -136,22 +136,22 @@ module.exports = async (config, cli, command) => {
   }
 
   // Insert appId into client_uid-credentials to avoid repeatly searching database, no matter the status of instance is succ or fail
-  // if (!cliendUidResult[orgUid] && command === 'deploy') {
-  //   writeJsonToCredentials(path.join(os.homedir(), '.serverless/tencent/client_uid-credentials'), {
-  //     client_uid: { ...cliendUidResult, [orgUid]: true },
-  //   });
-  // }
+  if (!cliendUidResult[orgUid] && command === 'deploy') {
+    writeJsonToCredentials(path.join(os.homedir(), '.serverless/tencent/client_uid-credentials'), {
+      client_uid: { ...cliendUidResult, [orgUid]: true },
+    });
+  }
   if (failed.length) {
     cli.sessionStop(
       'error',
       `Errors: "${command}" ran for ${succeeded.length} apps successfully. ${failed.length} failed.`
     );
-    // telemtryData.outcome = 'failure';
-    // telemtryData.failure_reason = failed.map((f) => f.error.message).join(',');
-    // await storeLocally(telemtryData);
-    // if (command === 'deploy') {
-    //   sendTelemtry();
-    // }
+    telemtryData.outcome = 'failure';
+    telemtryData.failure_reason = failed.map((f) => f.error.message).join(',');
+    await storeLocally(telemtryData);
+    if (command === 'deploy') {
+      sendTelemtry();
+    }
     return null;
   }
 
@@ -171,11 +171,11 @@ module.exports = async (config, cli, command) => {
   cli.sessionStop('success', `"${command}" ran for ${succeeded.length} apps successfully.`);
 
   if (deferredNotificationsData) printNotification(cli, await deferredNotificationsData);
-  // await storeLocally(telemtryData);
+  await storeLocally(telemtryData);
 
-  // if (command === 'deploy') {
-  //   sendTelemtry();
-  // }
+  if (command === 'deploy') {
+    sendTelemtry();
+  }
   sdk.disconnect();
   return null;
 };

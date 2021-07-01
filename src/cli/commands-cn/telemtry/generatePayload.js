@@ -73,151 +73,155 @@ module.exports = async ({
   configs = null,
   serviceDir = process.cwd(),
 }) => {
-  const { value: clientUid } = await writeClientUid(); // get client uid, if it doesn't exist, create one firstly.
-
-  if (!command) {
-    throw new Error('command is required for sending metrics analytics');
-  }
-
-  const ciName = (() => {
-    if (process.env.SERVERLESS_CI_CD) {
-      return 'Serverless CI/CD';
-    }
-
-    if (process.env.SEED_APP_NAME) {
-      return 'Seed';
-    }
-
-    if (ci.isCI) {
-      if (ci.name) {
-        return ci.name;
-      }
-      return 'unknown';
-    }
-    return null;
-  })();
-
-  let payload = {
-    event: `components.command.${command}`,
-    client_uid: clientUid,
-    timestamp: Date.now(),
-    provider_name: 'tencent', // This should be fixed as 'tencent'
-    ciName,
-    outcome: 'success', // default outcome is success
-  };
-
-  // If this is an action(deploy, logs...) which needs auth, it can have a userID(appId), we save and send it, or skip it(init, invoke local...)
-  if (userId) {
-    payload.user_uid = userId;
-  }
-
   try {
-    payload.timezone = new Intl.DateTimeFormat().resolvedOptions().timeZone;
-    payload.components_cli_version = require('../../../../package.json').version;
-    // eslint-disable-next-line no-empty
-  } catch (e) {}
+    const { value: clientUid } = await writeClientUid(); // get client uid, if it doesn't exist, create one firstly.
 
-  const components = []; // Which components used in this project
-  const providerRuntimes = []; // which runtime used in this project
-
-  if (rootConfig) {
-    if (rootConfig.depMode) {
-      payload.npmDependencies = npmDependencies(serviceDir);
-    }
-    if (rootConfig.stage) {
-      payload.provider_stage = rootConfig.stage;
+    if (!command) {
+      throw new Error('command is required for sending metrics analytics');
     }
 
-    if (rootConfig.component) {
-      components.push(rootConfig.component);
-
-      if (rootConfig.inputs) {
-        // Tencent supports two types for component: web and event
-        if (rootConfig.inputs.type) {
-          payload.type = rootConfig.inputs.type;
-        }
-        if (rootConfig.inputs.runtime) {
-          providerRuntimes.push(rootConfig.inputs.runtime);
-        }
-        if (rootConfig.inputs.region) {
-          payload.provider_region = rootConfig.inputs.region;
-        }
-      }
-      // count single instance project's functions number, only works for scf and multi-scf components
-      if (rootConfig.component === 'scf') {
-        payload.functions_count = 1;
-      } else if (
-        rootConfig.component === 'multi-scf' &&
-        rootConfig.inputs &&
-        rootConfig.inputs.functions
-      ) {
-        payload.functions_count = Object.keys(rootConfig.inputs.functions).length;
+    const ciName = (() => {
+      if (process.env.SERVERLESS_CI_CD) {
+        return 'Serverless CI/CD';
       }
 
-      const resolveEventsResult = resolveEvents(rootConfig.component, rootConfig.inputs);
-      if (resolveEventsResult) {
-        payload.events_count = resolveEventsResult[0];
-        payload.events_type = resolveEventsResult[1];
+      if (process.env.SEED_APP_NAME) {
+        return 'Seed';
       }
+
+      if (ci.isCI) {
+        if (ci.name) {
+          return ci.name;
+        }
+        return 'unknown';
+      }
+      return null;
+    })();
+
+    let payload = {
+      event: `components.command.${command}`,
+      client_uid: clientUid,
+      timestamp: Date.now(),
+      provider_name: 'tencent', // This should be fixed as 'tencent'
+      ciName,
+      outcome: 'success', // default outcome is success
+    };
+
+    // If this is an action(deploy, logs...) which needs auth, it can have a userID(appId), we save and send it, or skip it(init, invoke local...)
+    if (userId) {
+      payload.user_uid = userId;
     }
-  }
 
-  // collection sub-instance's info
-  if (configs) {
-    for (const config of configs) {
-      if (config.component) {
-        components.push(config.component);
+    try {
+      payload.timezone = new Intl.DateTimeFormat().resolvedOptions().timeZone;
+      payload.components_cli_version = require('../../../../package.json').version;
+      // eslint-disable-next-line no-empty
+    } catch (e) {}
+
+    const components = []; // Which components used in this project
+    const providerRuntimes = []; // which runtime used in this project
+
+    if (rootConfig) {
+      if (rootConfig.depMode) {
+        payload.npmDependencies = npmDependencies(serviceDir);
+      }
+      if (rootConfig.stage) {
+        payload.provider_stage = rootConfig.stage;
       }
 
-      // If we already set stage from rootConfig, we do not need to set it again, because all sub-instance will inherit that value
-      if (!payload.provider_stage && config.stage) {
-        payload.provider_stage = config.stage;
-      }
+      if (rootConfig.component) {
+        components.push(rootConfig.component);
 
-      if (config.inputs) {
-        if (config.inputs.runtime) {
-          providerRuntimes.push(config.inputs.runtime);
+        if (rootConfig.inputs) {
+          // Tencent supports two types for component: web and event
+          if (rootConfig.inputs.type) {
+            payload.type = rootConfig.inputs.type;
+          }
+          if (rootConfig.inputs.runtime) {
+            providerRuntimes.push(rootConfig.inputs.runtime);
+          }
+          if (rootConfig.inputs.region) {
+            payload.provider_region = rootConfig.inputs.region;
+          }
         }
-        if (config.inputs.region) {
-          payload.provider_region = config.inputs.region;
-        }
-      }
-
-      // collect functions count for sub-instances
-      if (config.component === 'scf') {
-        if (payload.functions_count) {
-          payload.functions_count += 1;
-        } else {
+        // count single instance project's functions number, only works for scf and multi-scf components
+        if (rootConfig.component === 'scf') {
           payload.functions_count = 1;
+        } else if (
+          rootConfig.component === 'multi-scf' &&
+          rootConfig.inputs &&
+          rootConfig.inputs.functions
+        ) {
+          payload.functions_count = Object.keys(rootConfig.inputs.functions).length;
         }
-      } else if (config.component === 'multi-scf' && config.inputs && config.inputs.functions) {
-        const count = Object.keys(config.inputs.functions);
-        if (payload.functions_count) {
-          payload.functions_count += count;
-        } else {
-          payload.functions_count = count;
-        }
-      }
 
-      // collect events for each sub-instance
-      const resolveEventsResult = resolveEvents(rootConfig.component, rootConfig.inputs);
-      if (resolveEventsResult) {
-        if (payload.events_count) {
-          payload.events_count += resolveEventsResult[0];
-          payload.events_type += resolveEventsResult[1];
-        } else {
+        const resolveEventsResult = resolveEvents(rootConfig.component, rootConfig.inputs);
+        if (resolveEventsResult) {
           payload.events_count = resolveEventsResult[0];
           payload.events_type = resolveEventsResult[1];
         }
       }
     }
+
+    // collection sub-instance's info
+    if (configs) {
+      for (const config of configs) {
+        if (config.component) {
+          components.push(config.component);
+        }
+
+        // If we already set stage from rootConfig, we do not need to set it again, because all sub-instance will inherit that value
+        if (!payload.provider_stage && config.stage) {
+          payload.provider_stage = config.stage;
+        }
+
+        if (config.inputs) {
+          if (config.inputs.runtime) {
+            providerRuntimes.push(config.inputs.runtime);
+          }
+          if (config.inputs.region) {
+            payload.provider_region = config.inputs.region;
+          }
+        }
+
+        // collect functions count for sub-instances
+        if (config.component === 'scf') {
+          if (payload.functions_count) {
+            payload.functions_count += 1;
+          } else {
+            payload.functions_count = 1;
+          }
+        } else if (config.component === 'multi-scf' && config.inputs && config.inputs.functions) {
+          const count = Object.keys(config.inputs.functions);
+          if (payload.functions_count) {
+            payload.functions_count += count;
+          } else {
+            payload.functions_count = count;
+          }
+        }
+
+        // collect events for each sub-instance
+        const resolveEventsResult = resolveEvents(rootConfig.component, rootConfig.inputs);
+        if (resolveEventsResult) {
+          if (payload.events_count) {
+            payload.events_count += resolveEventsResult[0];
+            payload.events_type += resolveEventsResult[1];
+          } else {
+            payload.events_count = resolveEventsResult[0];
+            payload.events_type = resolveEventsResult[1];
+          }
+        }
+      }
+    }
+
+    payload = {
+      ...payload,
+      components,
+      provider_runtimes: providerRuntimes,
+    };
+
+    return payload;
+  } catch (e) {
+    return {};
   }
-
-  payload = {
-    ...payload,
-    components,
-    provider_runtimes: providerRuntimes,
-  };
-
-  return payload;
 };
