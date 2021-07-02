@@ -140,11 +140,6 @@ module.exports = async (config, cli, command) => {
         const retJson = JSON.parse(retMsg);
         cli.log(inspect(retJson, { depth: Infinity, colors: true, compact: 0 }));
       } catch (error) {
-        await storeLocally({
-          ...telemtryData,
-          outcome: 'failure',
-          failure_reason: error.message,
-        });
         cli.log(retMsg);
       }
     } else {
