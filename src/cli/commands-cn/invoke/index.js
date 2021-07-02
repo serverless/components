@@ -27,18 +27,7 @@ module.exports = async (config, cli, command) => {
     return invokeLocal(config, cli, command);
   }
 
-  const {
-    stage,
-    s,
-    region,
-    r,
-    data,
-    d,
-    path,
-    p,
-    function: originalFunctionAlias,
-    f,
-  } = config;
+  const { stage, s, region, r, data, d, path, p, function: originalFunctionAlias, f } = config;
   const stageValue = stage || s;
   const regionValue = region || r;
   let dataValue = data || d;
