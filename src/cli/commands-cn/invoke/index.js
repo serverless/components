@@ -1,6 +1,5 @@
 'use strict';
 
-const { FaaS } = require('@tencent-sdk/faas');
 const fs = require('fs');
 const utils = require('../utils');
 const { isJson } = require('../../utils');
@@ -28,7 +27,20 @@ module.exports = async (config, cli, command) => {
     return invokeLocal(config, cli, command);
   }
 
-  const { stage, s, region, r, data, d, path, p, function: originalFunctionAlias, f } = config;
+  const {
+    stage,
+    s,
+    region,
+    r,
+    data,
+    d,
+    path,
+    p,
+    function: originalFunctionAlias,
+    f,
+    namespace,
+    qualifer,
+  } = config;
   const stageValue = stage || s;
   const regionValue = region || r;
   let dataValue = data || d;
@@ -76,7 +88,6 @@ module.exports = async (config, cli, command) => {
   }
 
   await utils.login(config);
-  const regionInYml = instanceYaml && instanceYaml.inputs && instanceYaml.inputs.region;
   const componentType = instanceYaml && instanceYaml.component;
 
   const orgUid = await chinaUtils.getOrgId();
@@ -93,22 +104,6 @@ module.exports = async (config, cli, command) => {
     process.exit();
   }
 
-  let functionName;
-  try {
-    if (componentType.startsWith('multi-scf')) {
-      functionName = utils.getFunctionNameOfMultiScf(instanceYaml, stageValue, functionAlias);
-    } else {
-      functionName = utils.getFunctionName(instanceYaml, stageValue);
-    }
-  } catch (error) {
-    cli.log(`Serverless: ${chalk.yellow(error.message)}`);
-    await storeLocally({
-      ...telemtryData,
-      outcome: 'failure',
-      failure_reason: error.message,
-    });
-    process.exit();
-  }
   const sdk = new ServerlessSDK({
     context: {
       orgName: instanceYaml.org,
@@ -118,12 +113,20 @@ module.exports = async (config, cli, command) => {
   });
 
   try {
+    const options = {
+      functionAlias,
+      stage: stageValue,
+      region: regionValue,
+      event: JSON.parse(dataValue || '{}'),
+      namespace,
+      qualifer,
+    };
     const res = await sdk.invoke(
       instanceYaml.org,
       instanceYaml.app,
       instanceYaml.stage,
       instanceYaml.name,
-      {},
+      options
     );
 
     if (res.retMsg) {

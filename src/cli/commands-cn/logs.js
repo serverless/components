@@ -75,8 +75,6 @@ module.exports = async (config, cli, command) => {
   await utils.checkBasicConfigValidation(instanceDir);
   await utils.login(config);
   const instanceYaml = await utils.loadInstanceConfig(instanceDir, command);
-  // const regionInYml = instanceYaml && instanceYaml.inputs && instanceYaml.inputs.region;
-  // const componentType = instanceYaml && instanceYaml.component;
 
   const orgUid = await chinaUtils.getOrgId();
   const telemtryData = await generatePayload({ command, rootConfig: instanceYaml, userId: orgUid });
@@ -110,10 +108,8 @@ module.exports = async (config, cli, command) => {
         instanceYaml.name,
         options
       );
-      console.log(logs)
       return logs;
     } catch (error) {
-      console.log(error, '$e$')
       telemtryData.outcome = 'failure';
 
       if (error.code === '1001') {
