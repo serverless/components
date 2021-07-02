@@ -41,8 +41,6 @@ module.exports = async (config, cli, command) => {
     i,
     function: originalFunctionAlias,
     f,
-    namespace,
-    qualifer,
   } = config;
   const stageValue = stage || s;
   const regionValue = region || r;
@@ -98,8 +96,6 @@ module.exports = async (config, cli, command) => {
         startTime: startTimeValue,
         stage: stageValue,
         region: regionValue,
-        namespace,
-        qualifer,
       };
       const logs = await sdk.getLogs(
         instanceYaml.org,

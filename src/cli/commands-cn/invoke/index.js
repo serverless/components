@@ -38,8 +38,6 @@ module.exports = async (config, cli, command) => {
     p,
     function: originalFunctionAlias,
     f,
-    namespace,
-    qualifer,
   } = config;
   const stageValue = stage || s;
   const regionValue = region || r;
@@ -118,8 +116,6 @@ module.exports = async (config, cli, command) => {
       stage: stageValue,
       region: regionValue,
       event: JSON.parse(dataValue || '{}'),
-      namespace,
-      qualifer,
     };
     const res = await sdk.invoke(
       instanceYaml.org,
