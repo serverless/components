@@ -202,7 +202,7 @@ module.exports = async () => {
     if (cli.isSessionActive()) {
       cli.sessionStop('error', error);
     } else if (error.isWarning) {
-      cli.logWarning(error)
+      cli.logWarning(error);
     } else {
       cli.logError(error);
       cli.log();

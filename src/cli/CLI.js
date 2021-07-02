@@ -300,9 +300,7 @@ class CLI {
   }
 
   logWarning(error = {}) {
-    console.log(
-      `Serverless: ${chalk.yellow(error.message)}`
-    );
+    console.log(`Serverless: ${chalk.yellow(error.message)}`);
     process.exit();
   }
 
