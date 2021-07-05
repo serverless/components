@@ -198,11 +198,10 @@ module.exports = async () => {
     }
   } catch (error) {
     process.exitCode = 1;
-
-    if (cli.isSessionActive()) {
-      cli.sessionStop('error', error);
-    } else if (error.isWarning) {
+    if (error.isWarning) {
       cli.logWarning(error);
+    } else if (cli.isSessionActive()) {
+      cli.sessionStop('error', error);
     } else {
       cli.logError(error);
       cli.log();
