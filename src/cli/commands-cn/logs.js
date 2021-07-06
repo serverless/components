@@ -1,6 +1,5 @@
 'use strict';
 
-// const { FaaS } = require('@tencent-sdk/faas');
 const utils = require('./utils');
 const { ServerlessSDK, utils: chinaUtils } = require('@serverless/platform-client-china');
 const chalk = require('chalk');
