@@ -32,7 +32,7 @@ const resolveEvents = (component, inputs) => {
       return null;
     }
 
-    const types = inputs.triggers.reduce((total, curr) => total.push(curr.type), []);
+    const types = inputs.triggers.reduce((total, curr) => [...total, curr.type], []);
     return [types.length, types];
   }
 
