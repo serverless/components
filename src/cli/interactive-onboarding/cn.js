@@ -8,6 +8,7 @@ const { ServerlessSDK } = require('@serverless/platform-client-china');
 const { v4: uuidv4 } = require('uuid');
 const { isProjectPath } = require('../utils');
 const { initTemplateFromCli } = require('../commands-cn/init');
+const { generatePayload, storeLocally } = require('../commands-cn/telemtry');
 
 const isValidProjectName = RegExp.prototype.test.bind(/^[a-zA-Z][a-zA-Z0-9-]{0,100}$/);
 
@@ -206,12 +207,26 @@ module.exports = async (config, cli) => {
   // Start CLI persistance status
   cli.sessionStart('Installing', { timer: false });
   // Start initialing the template on cli
-  await initTemplateFromCli(projectDir, packageName, registryPackage, cli, projectName);
+  const ymlParsed = await initTemplateFromCli(
+    projectDir,
+    packageName,
+    registryPackage,
+    cli,
+    projectName
+  );
 
   cli.log(`- 项目 "${projectName}" 已在当前目录成功创建`);
   cli.log(`- 执行 "cd ${projectName} && serverless deploy" 部署应用`);
 
   cli.sessionStop('success', '创建成功');
+
+  // save onboarding action data
+  const telemtryData = await generatePayload({
+    command: 'auto',
+    rootConfig: ymlParsed,
+    serviceDir: projectDir,
+  });
+  await storeLocally(telemtryData);
 
   if (
     // EN: Do you want to deploy your project on the cloud now?
