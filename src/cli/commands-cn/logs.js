@@ -1,14 +1,14 @@
 'use strict';
 
-const { FaaS } = require('@tencent-sdk/faas');
 const utils = require('./utils');
-const { utils: chinaUtils } = require('@serverless/platform-client-china');
+const { ServerlessSDK, utils: chinaUtils } = require('@serverless/platform-client-china');
 const chalk = require('chalk');
 const { generatePayload, storeLocally } = require('./telemtry');
 const dayjs = require('dayjs');
 const relativeTime = require('dayjs/plugin/relativeTime');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
+const { v4: uuidv4 } = require('uuid');
 
 dayjs.extend(utc);
 dayjs.extend(timezone); // dependent on utc plugin
@@ -72,8 +72,6 @@ module.exports = async (config, cli, command) => {
   await utils.checkBasicConfigValidation(instanceDir);
   await utils.login(config);
   const instanceYaml = await utils.loadInstanceConfig(instanceDir, command);
-  const regionInYml = instanceYaml && instanceYaml.inputs && instanceYaml.inputs.region;
-  const componentType = instanceYaml && instanceYaml.component;
 
   const orgUid = await chinaUtils.getOrgId();
   const telemtryData = await generatePayload({ command, rootConfig: instanceYaml, userId: orgUid });
@@ -82,37 +80,30 @@ module.exports = async (config, cli, command) => {
   cli.log(meta, 'grey');
   cli.log();
 
-  // Get function name
-  let finalFunctionName;
-  try {
-    if (componentType.startsWith('multi-scf')) {
-      finalFunctionName = utils.getFunctionNameOfMultiScf(instanceYaml, stageValue, functionAlias);
-    } else {
-      finalFunctionName = utils.getFunctionName(instanceYaml, stageValue);
-    }
-  } catch (error) {
-    cli.log(`Serverless: ${chalk.yellow(error.message)}`);
-    process.exit();
-  }
-
-  const client = new FaaS({
-    secretId: process.env.TENCENT_SECRET_ID,
-    secretKey: process.env.TENCENT_SECRET_KEY,
-    token: process.env.TENCENT_TOKEN,
-    region: regionValue || regionInYml || 'ap-guangzhou',
-    debug: false,
+  const sdk = new ServerlessSDK({
+    context: {
+      orgName: instanceYaml.org,
+      traceId: uuidv4(),
+      orgUid,
+    },
   });
 
-  async function getLogList(name, theStartTime) {
+  async function getLogList() {
     try {
-      const res =
-        (await client.getLogList({
-          name,
-          startTime: theStartTime,
-          namespace: 'default',
-          qualifier: '$LATEST',
-        })) || [];
-      return res.reverse();
+      const options = {
+        functionAlias,
+        startTime: startTimeValue,
+        stage: stageValue,
+        region: regionValue,
+      };
+      const logs = await sdk.getLogs(
+        instanceYaml.org,
+        instanceYaml.app,
+        instanceYaml.stage,
+        instanceYaml.name,
+        options
+      );
+      return logs;
     } catch (error) {
       telemtryData.outcome = 'failure';
 
@@ -139,7 +130,7 @@ module.exports = async (config, cli, command) => {
 
   if (!tail && !t) {
     cli.sessionStart('正在获取日志');
-    const res = await getLogList(finalFunctionName, startTimeValue);
+    const res = await getLogList();
     if (res.length > 0) {
       printLogMessages(res, cli);
     } else {
@@ -147,7 +138,7 @@ module.exports = async (config, cli, command) => {
     }
     cli.sessionStop('success', '获取日志成功');
   } else {
-    let lastLogList = await getLogList(finalFunctionName, startTimeValue);
+    let lastLogList = await getLogList();
 
     if (lastLogList.length > 0) {
       printLogMessages(lastLogList, cli);
@@ -155,7 +146,7 @@ module.exports = async (config, cli, command) => {
 
     cli.sessionStart('监听中');
     setInterval(async () => {
-      const newLogList = await getLogList(finalFunctionName, null);
+      const newLogList = await getLogList();
 
       if (newLogList.length > 0 && lastLogList.length <= 0) {
         printLogMessages(newLogList, cli);

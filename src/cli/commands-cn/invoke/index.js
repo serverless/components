@@ -1,14 +1,14 @@
 'use strict';
 
-const { FaaS } = require('@tencent-sdk/faas');
 const fs = require('fs');
 const utils = require('../utils');
 const { isJson } = require('../../utils');
-const { utils: chinaUtils } = require('@serverless/platform-client-china');
+const { ServerlessSDK, utils: chinaUtils } = require('@serverless/platform-client-china');
 const invokeLocal = require('./invoke-local');
 const { generatePayload, storeLocally } = require('../telemtry');
 const chalk = require('chalk');
 const { inspect } = require('util');
+const { v4: uuidv4 } = require('uuid');
 
 /**
  * --stage / -s Set stage
@@ -75,7 +75,6 @@ module.exports = async (config, cli, command) => {
   }
 
   await utils.login(config);
-  const regionInYml = instanceYaml && instanceYaml.inputs && instanceYaml.inputs.region;
   const componentType = instanceYaml && instanceYaml.component;
 
   const orgUid = await chinaUtils.getOrgId();
@@ -92,38 +91,28 @@ module.exports = async (config, cli, command) => {
     process.exit();
   }
 
-  let functionName;
-  try {
-    if (componentType.startsWith('multi-scf')) {
-      functionName = utils.getFunctionNameOfMultiScf(instanceYaml, stageValue, functionAlias);
-    } else {
-      functionName = utils.getFunctionName(instanceYaml, stageValue);
-    }
-  } catch (error) {
-    cli.log(`Serverless: ${chalk.yellow(error.message)}`);
-    await storeLocally({
-      ...telemtryData,
-      outcome: 'failure',
-      failure_reason: error.message,
-    });
-    process.exit();
-  }
-
-  const client = new FaaS({
-    secretId: process.env.TENCENT_SECRET_ID,
-    secretKey: process.env.TENCENT_SECRET_KEY,
-    token: process.env.TENCENT_TOKEN,
-    region: regionValue || regionInYml || 'ap-guangzhou',
-    debug: false,
+  const sdk = new ServerlessSDK({
+    context: {
+      orgName: instanceYaml.org,
+      traceId: uuidv4(),
+      orgUid,
+    },
   });
 
   try {
-    const res = await client.invoke({
-      name: functionName,
-      namespace: 'default',
-      qualifier: '$LATEST',
+    const options = {
+      functionAlias,
+      stage: stageValue,
+      region: regionValue,
       event: JSON.parse(dataValue || '{}'),
-    });
+    };
+    const res = await sdk.invoke(
+      instanceYaml.org,
+      instanceYaml.app,
+      instanceYaml.stage,
+      instanceYaml.name,
+      options
+    );
 
     if (res.retMsg) {
       const retMsg = res.retMsg;
@@ -136,11 +125,6 @@ module.exports = async (config, cli, command) => {
         const retJson = JSON.parse(retMsg);
         cli.log(inspect(retJson, { depth: Infinity, colors: true, compact: 0 }));
       } catch (error) {
-        await storeLocally({
-          ...telemtryData,
-          outcome: 'failure',
-          failure_reason: error.message,
-        });
         cli.log(retMsg);
       }
     } else {

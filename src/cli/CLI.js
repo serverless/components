@@ -299,6 +299,11 @@ class CLI {
     return null;
   }
 
+  logWarning(error = {}) {
+    console.log(`Serverless: ${chalk.yellow(error.message)}`);
+    process.exit();
+  }
+
   /**
    * TODO: REMOVE THIS.  SHOULD NOT BE IN HERE.  THIS IS NOT A GENERAL UTILS LIBRARY
    * Watch
