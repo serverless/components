@@ -34,7 +34,7 @@
   ],
   "dependencies": {
     "@serverless/platform-client": "^4.2.2",
-    "@serverless/platform-client-china": "^2.1.9",
+    "@serverless/platform-client-china": "^2.2.0",
     "@serverless/utils": "^4.0.0",
     "@tencent-sdk/faas": "^0.1.4",
     "adm-zip": "^0.5.4",
