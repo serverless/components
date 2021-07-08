@@ -78,7 +78,8 @@ ${description(`    {template}               [必填] 模板名称
 `)}`,
     'deploy': `
 ${command2('deploy')}                    部署应用到云端
-${description(`    --target                 指定要部署的组件实例路径
+${description(`    --stage / -s             指定环境名称，默认使用配置环境
+    --target                 指定要部署的组件实例路径
     --inputs                 覆写 inputs 配置
     --profile                使用指定身份的全局授权信息
     --login                  使用临时授权
@@ -86,24 +87,27 @@ ${description(`    --target                 指定要部署的组件实例路径
 `)}`,
     'info': `
 ${command2('info')}                      获取应用详情
-${description(`    --profile                指定身份的全局授权信息
+${description(`    --stage / -s             指定环境名称，默认使用配置环境
+    --profile                指定身份的全局授权信息
 `)}`,
     'dev': `
 ${command2('dev')}                       启动调试模式
-${description(`    --profile                使用指定身份的全局授权信息
+${description(`    --stage / -s             指定环境名称，默认使用配置环境
+    --profile                使用指定身份的全局授权信息
 `)}`,
     'logs': `
 ${command2('logs')}                      查看应用日志
 ${description(`    --function / -f          查看多函数组件的指定函数日志(单函数组件无需指定)
+    --stage / -s             指定环境名称，默认使用配置环境
     --startTime              指定开始时间，如：3h, 20130208T080910，默认10m
     --tail / -t              启动监听模式
     --intervial / -i         监听模式的刷新时间 默认：2000ms
-    --stage / -s             指定环境名称，默认使用配置环境
     --region / -r            指定地区名称，默认使用配置地区
 `)}`,
     'remove': `
 ${command2('remove')}                    移除应用
-${description(`    --target                 指定要移除的组件实例路径
+${description(`    --stage / -s             指定环境名称，默认使用配置环境
+    --target                 指定要移除的组件实例路径
     --profile                使用指定身份的全局授权信息
     --debug                  显示 debug 信息
 `)}`,
