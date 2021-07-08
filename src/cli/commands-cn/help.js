@@ -18,7 +18,7 @@ async function generateMainHelp(cli) {
   async function isInSCFComponentFolder() {
     try {
       const instanceYaml = await utils.loadInstanceConfig(process.cwd());
-      if (instanceYaml && instanceYaml.component === 'scf') {
+      if (instanceYaml && instanceYaml.component.includes('scf')) {
         return true;
       }
     } catch (error) {
