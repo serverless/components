@@ -101,8 +101,8 @@ ${description(`    --function / -f          查看多函数组件的指定函数
     --stage / -s             指定环境名称，默认使用配置环境
     --startTime              指定开始时间，如：3h, 20130208T080910，默认10m
     --tail / -t              启动监听模式
-    --region / -r            指定地区名称，默认使用配置地区
     --intervial / -i         监听模式的刷新时间 默认：2000ms
+    --region / -r            指定地区名称，默认使用配置地区
     --namespace / -n         指定 namaspace，默认使用配置环境
     --qualifier / -q          指定 qualifier，默认使用配置环境
 `)}`,
