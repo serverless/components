@@ -25,8 +25,8 @@ function printLogMessages(logList, cli) {
  * --tail / -t Stream new logs
  * --interval / -i poll interval
  * --function / -f function alias
- * --namespace
- * --qualifier
+ * --namespace / -n SCF namespace
+ * --qualifier / -q SCF qualifier
  */
 module.exports = async (config, cli, command) => {
   // Parse commands

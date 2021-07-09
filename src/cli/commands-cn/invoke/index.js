@@ -16,8 +16,8 @@ const { v4: uuidv4 } = require('uuid');
  * --data / -d Data sent to SCF
  * --path / -p Data path sent to SCF
  * --function / -f function alias
- * --namespace
- * --qualifier
+ * --namespace / -n SCF namespace
+ * --qualifier / -q SCF qualifier
  */
 module.exports = async (config, cli, command) => {
   const instanceDir = process.cwd();
