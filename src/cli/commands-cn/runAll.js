@@ -26,8 +26,17 @@ const { v4: uuidv4 } = require('uuid');
 const requestNotification = require('../notifications/request');
 const printNotification = require('../notifications/print-notification');
 
+function translateCommand(command) {
+  if (command === 'deploy') {
+    return '部署';
+  } else if (command === 'remove') {
+    return '移除';
+  }
+  return '执行';
+}
+
 module.exports = async (config, cli, command) => {
-  cli.sessionStart('Initializing', { timer: true });
+  cli.sessionStart('正在初始化', { timer: true });
 
   await login(config);
 
@@ -46,7 +55,7 @@ module.exports = async (config, cli, command) => {
   // Load Instance Credentials
   const credentials = await loadInstanceCredentials(templateYaml.stage);
 
-  cli.sessionStatus('Initializing', templateYaml.name);
+  cli.sessionStatus('正在初始化', templateYaml.name);
 
   // initialize SDK
   const orgUid = await tencentUtils.getOrgId();
@@ -93,9 +102,9 @@ module.exports = async (config, cli, command) => {
       : null;
 
   if (command === 'remove') {
-    cli.sessionStatus('Removing', null, 'white');
+    cli.sessionStatus('正在删除', null, 'white');
   } else {
-    cli.sessionStatus('Deploying', null, 'white');
+    cli.sessionStatus('正在部署', null, 'white');
   }
 
   const allComponents = await getAllComponents(templateYaml);
@@ -144,7 +153,7 @@ module.exports = async (config, cli, command) => {
   if (failed.length) {
     cli.sessionStop(
       'error',
-      `Errors: "${command}" ran for ${succeeded.length} apps successfully. ${failed.length} failed.`
+      `已成功 ${translateCommand(command)}组件${succeeded.length}个，失败${failed.length}个`
     );
     telemtryData.outcome = 'failure';
     telemtryData.failure_reason = failed.map((f) => f.error.message).join(',');
@@ -168,7 +177,7 @@ module.exports = async (config, cli, command) => {
     }
   }
 
-  cli.sessionStop('success', `"${command}" ran for ${succeeded.length} apps successfully.`);
+  cli.sessionStop('success', `已成功${translateCommand(command)}组件${succeeded.length}个`);
 
   if (deferredNotificationsData) printNotification(cli, await deferredNotificationsData);
   await storeLocally(telemtryData);
