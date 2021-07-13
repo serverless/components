@@ -27,7 +27,7 @@ const requestNotification = require('../notifications/request');
 const printNotification = require('../notifications/print-notification');
 
 module.exports = async (config, cli, command) => {
-  cli.sessionStart('Initializing', { timer: true });
+  cli.sessionStart('正在初始化', { timer: true });
 
   await login(config);
 
@@ -46,7 +46,7 @@ module.exports = async (config, cli, command) => {
   // Load Instance Credentials
   const credentials = await loadInstanceCredentials(templateYaml.stage);
 
-  cli.sessionStatus('Initializing', templateYaml.name);
+  cli.sessionStatus('正在初始化', templateYaml.name);
 
   // initialize SDK
   const orgUid = await tencentUtils.getOrgId();
