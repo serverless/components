@@ -687,6 +687,13 @@ const executeGraph = async (allComponents, command, graph, cli, sdk, options) =>
   }
 
   const promises = [];
+  const componentCount = Object.keys(allComponents).length;
+  const successCount = options.successCount || 0;
+  if (command === 'remove') {
+    cli.sessionStatus(`[${successCount + 1}/${componentCount}] 正在删除 ${leaves.join(', ')}`);
+  } else {
+    cli.sessionStatus(`[${successCount + 1}/${componentCount}] 正在部署 ${leaves.join(', ')}`);
+  }
 
   for (const instanceName of leaves) {
     const fn = async () => {
@@ -754,7 +761,9 @@ const executeGraph = async (allComponents, command, graph, cli, sdk, options) =>
 
         if (!options.debug) {
           cli.log();
-          cli.logOutputs(outputs);
+          cli.log(chalk.bold(`${instanceName} 部署成功:`));
+          cli.log('---------------------------------------------');
+          cli.logOutputs(instance.outputs);
         }
 
         allComponents[instanceName].outputs = instance.outputs || {};
@@ -770,6 +779,8 @@ const executeGraph = async (allComponents, command, graph, cli, sdk, options) =>
   for (const instanceName of leaves) {
     graph.removeNode(instanceName);
   }
+
+  options.successCount = successCount + leaves.length;
 
   return executeGraph(allComponents, command, graph, cli, sdk, options);
 };
