@@ -103,6 +103,8 @@ ${description(`    --function / -f          查看多函数组件的指定函数
     --tail / -t              启动监听模式
     --intervial / -i         监听模式的刷新时间 默认：2000ms
     --region / -r            指定地区名称，默认使用配置地区
+    --namespace / -n         指定命名空间，默认使用配置命名空间
+    --qualifier / -q         指定函数版本，默认使用配置版本
 `)}`,
     'remove': `
 ${command2('remove')}                    移除应用
@@ -139,6 +141,8 @@ ${description(`    --function / -f          调用的多函数组件的函数名
     --region / -r            指定地区名称，默认使用配置地区
     --data / -d              指定传入函数的事件(event)参数数据，需要使用序列化的 JSON 格式
     --path / -p              指定传入还输的事件(event)参数的 JSON 文件路径
+    --namespace / -n         指定命名空间，默认使用配置命名空间
+    --qualifier / -q         指定函数版本，默认使用配置版本
 `)}`,
     'invoke local': `
 ${command2('invoke local')}              本地调用函数

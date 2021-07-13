@@ -16,6 +16,8 @@ const { v4: uuidv4 } = require('uuid');
  * --data / -d Data sent to SCF
  * --path / -p Data path sent to SCF
  * --function / -f function alias
+ * --namespace / -n SCF namespace
+ * --qualifier / -q SCF qualifier
  */
 module.exports = async (config, cli, command) => {
   const instanceDir = process.cwd();
@@ -27,12 +29,29 @@ module.exports = async (config, cli, command) => {
     return invokeLocal(config, cli, command);
   }
 
-  const { stage, s, region, r, data, d, path, p, function: originalFunctionAlias, f } = config;
+  const {
+    stage,
+    s,
+    region,
+    r,
+    data,
+    d,
+    path,
+    p,
+    function: originalFunctionAlias,
+    f,
+    namespace,
+    n,
+    qualifier,
+    q,
+  } = config;
   const stageValue = stage || s;
   const regionValue = region || r;
   let dataValue = data || d;
   const pathValue = path || p;
   const functionAlias = originalFunctionAlias || f;
+  const namespaceValue = namespace || n;
+  const qualifierValue = qualifier || q;
 
   const instanceYaml = await utils.loadInstanceConfig(instanceDir, command);
   const telemtryData = await generatePayload({ command, rootConfig: instanceYaml });
@@ -105,6 +124,8 @@ module.exports = async (config, cli, command) => {
       stage: stageValue,
       region: regionValue,
       event: JSON.parse(dataValue || '{}'),
+      namespace: namespaceValue,
+      qualifier: qualifierValue,
     };
     const res = await sdk.invoke(
       instanceYaml.org,

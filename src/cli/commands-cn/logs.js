@@ -25,6 +25,8 @@ function printLogMessages(logList, cli) {
  * --tail / -t Stream new logs
  * --interval / -i poll interval
  * --function / -f function alias
+ * --namespace / -n SCF namespace
+ * --qualifier / -q SCF qualifier
  */
 module.exports = async (config, cli, command) => {
   // Parse commands
@@ -40,11 +42,17 @@ module.exports = async (config, cli, command) => {
     i,
     function: originalFunctionAlias,
     f,
+    namespace,
+    n,
+    qualifier,
+    q,
   } = config;
   const stageValue = stage || s;
   const regionValue = region || r;
   const intervalValue = interval || i;
   const functionAlias = originalFunctionAlias || f;
+  const namespaceValue = namespace || n;
+  const qualifierValue = qualifier || q;
   let startTimeValue;
 
   if (startTime) {
@@ -95,6 +103,8 @@ module.exports = async (config, cli, command) => {
         startTime: startTimeValue,
         stage: stageValue,
         region: regionValue,
+        namespace: namespaceValue,
+        qualifier: qualifierValue,
       };
       const logs = await sdk.getLogs(
         instanceYaml.org,
