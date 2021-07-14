@@ -157,16 +157,8 @@ module.exports = async (config, cli, command) => {
       outcome: 'failure',
       failure_reason: error.message,
     });
-    if (error.code === '1001') {
-      cli.log(
-        `Serverless: ${chalk.yellow(
-          '无法找到指定 SCF 实例，请检查 SCF 实例名称和 Stage / Region 信息或重新部署后调用'
-        )}`
-      );
-      process.exit();
-    } else {
-      throw error;
-    }
+
+    throw error;
   }
 
   await storeLocally({
