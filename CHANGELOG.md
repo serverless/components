@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.13.4](https://github.com/serverless/components/compare/v3.13.3....v3.13.4) (2021-07-13)
+
+- Namespace and qualifrer support for sls invoke and logs
+- Update help info
+
 ## [3.13.3](https://github.com/serverless/components/compare/v3.13.2....v3.13.3) (2021-07-07)
 
 - Refactoring sls logs & invoke
