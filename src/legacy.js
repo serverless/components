@@ -17,18 +17,22 @@ const {
 // These keywords are intercepted by the Serverless Components CLI
 const componentKeywords = new Set(['registry', 'init', 'publish']);
 // These keywords are allowed for nested templates
-const nestedTemplateKeywords = new Set(['deploy', 'remove', 'info', 'help', '--help']);
+const nestedTemplateKeywords = new Set([
+  'deploy',
+  'remove',
+  'info',
+  'help',
+  '--help',
+  'dev',
+  'logs',
+  'invoke',
+]);
 
 const runningComponents = () => {
   const args = minimist(process.argv.slice(2));
 
   let componentConfig;
   let instanceConfig;
-
-  // For Chinese users, if they are run a command inside component or template project, just use components to execute it
-  if (isChinaUser() && (hasServerlessConfigFile(process.cwd()) || runningTemplate(process.cwd()))) {
-    return true;
-  }
 
   // load components if user runs a keyword command, or "sls --all" or "sls --target" (that last one for china)
   if (
