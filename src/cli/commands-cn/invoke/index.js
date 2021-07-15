@@ -31,6 +31,7 @@ module.exports = async (config, cli, command) => {
     cli.log(
       `Serverless: ${chalk.yellow('该命令暂不支持对多组件进行调用，请使用 --target 指定组件实例')}`
     );
+    process.exit();
   }
 
   await utils.checkBasicConfigValidation(instanceDir);
