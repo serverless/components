@@ -25,6 +25,11 @@ const runningComponents = () => {
   let componentConfig;
   let instanceConfig;
 
+  // For Chinese users, if they are run a command inside component or template project, just use components to execute it
+  if (isChinaUser() && (hasServerlessConfigFile(process.cwd()) || runningTemplate(process.cwd()))) {
+    return true;
+  }
+
   // load components if user runs a keyword command, or "sls --all" or "sls --target" (that last one for china)
   if (
     componentKeywords.has(process.argv[2]) ||

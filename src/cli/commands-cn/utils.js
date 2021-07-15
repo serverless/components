@@ -59,6 +59,10 @@ const getDefaultOrgName = async () => {
 const checkBasicConfigValidation = async (dicPath) => {
   const instanceFile = loadInstanceConfig(dicPath);
 
+  if (!fse.existsSync(dicPath)) {
+    throw new Error(`指定的路径 ${dicPath} 不存在，请检查后重试`);
+  }
+
   if (!instanceFile) {
     throw new Error('没有找到serverless配置文件，请检查。');
   }

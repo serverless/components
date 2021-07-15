@@ -12,6 +12,8 @@ const { ServerlessSDK, utils: chinaUtils } = require('@serverless/platform-clien
 const { generatePayload, storeLocally } = require('./telemtry');
 const { v4: uuidv4 } = require('uuid');
 const utils = require('./utils');
+const chalk = require('chalk');
+const { runningTemplate } = require('../utils');
 
 class LogForwardingOutput extends Writable {
   _write(chunk, encoding, callback) {
@@ -138,6 +140,12 @@ module.exports = async (config, cli, command) => {
   let instanceDir = process.cwd();
   if (config.target) {
     instanceDir = path.join(instanceDir, config.target);
+  }
+  if (runningTemplate(instanceDir)) {
+    cli.log(
+      `Serverless: ${chalk.yellow('该命令暂不支持对多组件进行调用, 使用 --target 指定执行目录')}`
+    );
+    process.exit();
   }
 
   const projectFile = await utils.checkBasicConfigValidation(instanceDir);
