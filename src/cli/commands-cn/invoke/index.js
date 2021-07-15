@@ -1,6 +1,7 @@
 'use strict';
 
 const fs = require('fs');
+const nodePath = require('path');
 const utils = require('../utils');
 const { isJson } = require('../../utils');
 const { ServerlessSDK, utils: chinaUtils } = require('@serverless/platform-client-china');
@@ -9,6 +10,7 @@ const { generatePayload, storeLocally } = require('../telemtry');
 const chalk = require('chalk');
 const { inspect } = require('util');
 const { v4: uuidv4 } = require('uuid');
+const { runningTemplate, checkTemplateAppAndStage } = require('../../utils');
 
 /**
  * --stage / -s Set stage
@@ -20,7 +22,17 @@ const { v4: uuidv4 } = require('uuid');
  * --qualifier / -q SCF qualifier
  */
 module.exports = async (config, cli, command) => {
-  const instanceDir = process.cwd();
+  let instanceDir = process.cwd();
+  if (config.target) {
+    instanceDir = nodePath.join(instanceDir, config.target);
+  }
+
+  if (runningTemplate(instanceDir) && checkTemplateAppAndStage(instanceDir)) {
+    cli.log(
+      `Serverless: ${chalk.yellow('该命令暂不支持对多组件进行调用，请使用 --target 指定组件实例')}`
+    );
+  }
+
   await utils.checkBasicConfigValidation(instanceDir);
 
   const subCommand = config.params[0];
