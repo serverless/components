@@ -1,7 +1,7 @@
 'use strict';
 
 const path = require('path');
-const { runningTemplate, checkTemplateAppAndStage } = require('../../../utils');
+const { runningTemplate } = require('../../../utils');
 const utils = require('../../utils');
 const { readAndParseSync, fileExistsSync } = require('../../../utils');
 const { colorLog, printOutput, summaryOptions, checkRuntime } = require('./utils');
@@ -15,7 +15,7 @@ module.exports = async (config, cli, command) => {
   if (config.target) {
     instanceDir = path.join(instanceDir, config.target);
   }
-  if (runningTemplate(instanceDir) && checkTemplateAppAndStage(instanceDir)) {
+  if (runningTemplate(instanceDir)) {
     cli.log(
       `Serverless: ${chalk.yellow('该命令暂不支持对多组件进行调用，请使用 --target 指定组件实例')}`
     );

@@ -10,7 +10,7 @@ const { generatePayload, storeLocally } = require('../telemtry');
 const chalk = require('chalk');
 const { inspect } = require('util');
 const { v4: uuidv4 } = require('uuid');
-const { runningTemplate, checkTemplateAppAndStage } = require('../../utils');
+const { runningTemplate } = require('../../utils');
 
 /**
  * --stage / -s Set stage
@@ -27,7 +27,7 @@ module.exports = async (config, cli, command) => {
     instanceDir = nodePath.join(instanceDir, config.target);
   }
 
-  if (runningTemplate(instanceDir) && checkTemplateAppAndStage(instanceDir)) {
+  if (runningTemplate(instanceDir)) {
     cli.log(
       `Serverless: ${chalk.yellow('该命令暂不支持对多组件进行调用，请使用 --target 指定组件实例')}`
     );

@@ -10,7 +10,7 @@ const relativeTime = require('dayjs/plugin/relativeTime');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 const { v4: uuidv4 } = require('uuid');
-const { runningTemplate, checkTemplateAppAndStage } = require('../utils');
+const { runningTemplate } = require('../utils');
 
 dayjs.extend(utc);
 dayjs.extend(timezone); // dependent on utc plugin
@@ -83,7 +83,7 @@ module.exports = async (config, cli, command) => {
   if (config.target) {
     instanceDir = path.join(instanceDir, config.target);
   }
-  if (runningTemplate(instanceDir) && checkTemplateAppAndStage(instanceDir)) {
+  if (runningTemplate(instanceDir)) {
     cli.log(
       `Serverless: ${chalk.yellow('该命令暂不支持对多组件进行调用，请使用 --target 指定组件实例')}`
     );
