@@ -1,22 +1,33 @@
 'use strict';
 
 const path = require('path');
-
+const { runningTemplate } = require('../../../utils');
 const utils = require('../../utils');
 const { readAndParseSync, fileExistsSync } = require('../../../utils');
 const { colorLog, printOutput, summaryOptions, checkRuntime } = require('./utils');
 const runPython = require('./runPython');
 const { generatePayload, storeLocally } = require('../../telemtry');
+const chalk = require('chalk');
 
 module.exports = async (config, cli, command) => {
   const { config: ymlFilePath, c } = config;
-  let instanceYml = await utils.loadInstanceConfig(process.cwd(), command);
+  let instanceDir = process.cwd();
+  if (config.target) {
+    instanceDir = path.join(instanceDir, config.target);
+  }
+  if (runningTemplate(instanceDir)) {
+    cli.log(
+      `Serverless: ${chalk.yellow('该命令暂不支持对多组件进行调用，请使用 --target 指定组件实例')}`
+    );
+    process.exit();
+  }
+  let instanceYml = await utils.loadInstanceConfig(instanceDir, command);
   const telemtryData = await generatePayload({ command: 'invoke_local', rootConfig: instanceYml });
 
   if (ymlFilePath || c) {
     const customizedConfigFile = ymlFilePath || c;
 
-    if (!fileExistsSync(path.join(process.cwd(), customizedConfigFile))) {
+    if (!fileExistsSync(path.join(instanceDir, customizedConfigFile))) {
       await storeLocally({
         ...telemtryData,
         outcome: 'failure',
@@ -50,7 +61,7 @@ module.exports = async (config, cli, command) => {
     checkRuntime(runtime, cli);
 
     if (runtime.includes('Nodejs')) {
-      const invokeFromFile = path.join(process.cwd(), handlerFile);
+      const invokeFromFile = path.join(instanceDir, handlerFile);
       const exportedVars = require(invokeFromFile);
       const finalInvokedFunc = exportedVars[handlerFunc];
       if (!finalInvokedFunc) {
