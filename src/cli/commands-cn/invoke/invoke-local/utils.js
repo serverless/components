@@ -51,6 +51,14 @@ const checkRuntime = (requiredRuntime, cli) => {
           .replace('\n', '')}, 项目指定的版本为 ${requiredRuntime}, 建议使用相同版本进行测试。\n`
       );
     }
+  } else if (requiredRuntime.includes('Php')) {
+    let phpInfo;
+    try {
+      phpInfo = execSync('php -v').toString();
+      console.log('phpinfo', phpInfo);
+    } catch (e) {
+      throw new Error(`检查当前环境的Php 运行时出错，错误信息: ${e.message}`);
+    }
   } else {
     colorLog('当前命令只支持 Node.js 和 Python 运行时，其他运行时暂不支持。', 'yellow', cli);
   }
