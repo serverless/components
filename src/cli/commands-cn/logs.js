@@ -128,26 +128,10 @@ module.exports = async (config, cli, command) => {
       return logs;
     } catch (error) {
       telemtryData.outcome = 'failure';
-
-      if (error.code === '1001') {
-        telemtryData.failure_reason =
-          '无法找到指定 SCF 实例，请检查 SCF 实例名称和 Stage / Region 信息或重新部署后调用';
-
-        cli.log(
-          `Serverless: ${chalk.yellow(
-            '无法找到指定 SCF 实例，请检查 SCF 实例名称和 Stage / Region 信息或重新部署后调用'
-          )}`
-        );
-        await storeLocally(telemtryData);
-        process.exit();
-      } else {
-        telemtryData.failure_reason = error.message;
-        await storeLocally(telemtryData);
-        throw error;
-      }
+      telemtryData.failure_reason = error.message;
+      await storeLocally(telemtryData);
+      throw error;
     }
-
-    return 0;
   }
 
   if (!tail && !t) {
@@ -168,7 +152,13 @@ module.exports = async (config, cli, command) => {
 
     cli.sessionStart('监听中');
     setInterval(async () => {
-      const newLogList = await getLogList();
+      let newLogList;
+      // ignore timeout issue when polling new logs
+      try {
+        newLogList = await getLogList();
+      } catch (error) {
+        return 0;
+      }
 
       if (newLogList.length > 0 && lastLogList.length <= 0) {
         printLogMessages(newLogList, cli);
@@ -197,6 +187,7 @@ module.exports = async (config, cli, command) => {
           lastLogList = newLogList;
         }
       }
+      return 0;
     }, Number(intervalValue) || 2000);
   }
 };
