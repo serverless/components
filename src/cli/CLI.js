@@ -42,7 +42,7 @@ class CLI {
     this._.lastStatus = null;
     this._.debug = config.debug || false;
     this._.timer = config.timer || false;
-    this._.ci = config.ci || false;
+    this._.isNotTTY = config.isNotTTY || false;
     this._.timerStarted = Date.now();
     this._.timerSeconds = 0;
     this._.loadingDots = '';
@@ -508,19 +508,19 @@ class CLI {
     }
 
     /**
-     * CI Mode
+     * Terminal is not TTY
      */
-    if (this._.ci) {
+    if (this._.isNotTTY) {
       if (this._.status === 'Initializing' && this._.status !== this._.lastStatus) {
-        this.log('enable CI Mode');
+        this.log('this terminal isn\'t TTY terminal. disable progress')
         this._.lastStatus = `${this._.status}`;
       }
     }
 
     /**
-     * Non-Debug and Non CI Mode
+     * Non-Debug and TTY Terminal
      */
-    if (!this._.debug && !this._.ci) {
+    if (!this._.debug && !this._.isNotTTY) {
       // Update active dots
       if (this._.loadingDotCount === 0) {
         this._.loadingDots = '.';
