@@ -17,7 +17,16 @@ const {
 // These keywords are intercepted by the Serverless Components CLI
 const componentKeywords = new Set(['registry', 'init', 'publish']);
 // These keywords are allowed for nested templates
-const nestedTemplateKeywords = new Set(['deploy', 'remove', 'info', 'help', '--help']);
+const nestedTemplateKeywords = new Set([
+  'deploy',
+  'remove',
+  'info',
+  'help',
+  '--help',
+  'dev',
+  'logs',
+  'invoke',
+]);
 
 const runningComponents = () => {
   const args = minimist(process.argv.slice(2));

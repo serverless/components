@@ -94,6 +94,7 @@ ${description(`    --stage / -s             指定环境名称，默认使用配
 ${command2('dev')}                       启动调试模式
 ${description(`    --stage / -s             指定环境名称，默认使用配置环境
     --profile                使用指定身份的全局授权信息
+    --target                 指定执行命令的组件实例路径
 `)}`,
     'logs': `
 ${command2('logs')}                      查看应用日志
