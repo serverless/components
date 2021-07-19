@@ -54,8 +54,16 @@ const checkRuntime = (requiredRuntime, cli) => {
   } else if (requiredRuntime.includes('Php')) {
     let phpInfo;
     try {
-      phpInfo = execSync('php -v').toString();
-      console.log('phpinfo', phpInfo);
+      phpInfo = execSync(
+        `${process.env.INVOKE_LOCAL_PHP || 'php'} -r "echo phpversion();"`
+      ).toString();
+      const currentMajorVer = phpInfo.split('.')[0];
+      const requiredMajorVer = requiredRuntime.split('Php')[1].split('.')[0];
+      if (currentMajorVer !== requiredMajorVer) {
+        cli.log(
+          `当前系统Php 版本为 ${phpInfo}, 项目指定版本为 ${requiredRuntime}, 建议使用相同版本`
+        );
+      }
     } catch (e) {
       throw new Error(`检查当前环境的Php 运行时出错，错误信息: ${e.message}`);
     }
@@ -76,6 +84,7 @@ const summaryOptions = (config, instanceYml, cli) => {
     contextPath,
     x,
     py,
+    php,
   } = config;
   const { inputs = {}, component } = instanceYml;
 
@@ -141,6 +150,10 @@ const summaryOptions = (config, instanceYml, cli) => {
     process.env.INVOKE_LOCAL_PYTHON = py;
   }
 
+  // For php runtime, users can set php execution by --php: sls invoke local --php php7
+  if (php) {
+    process.env.INVOKE_LOCAL_PHP = php;
+  }
   // Deal with scf component(single instance situation)
   if (component.startsWith('scf')) {
     const inputsHandler = inputs.handler || '';
