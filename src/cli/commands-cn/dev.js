@@ -92,7 +92,7 @@ async function updateDeploymentStatus(cli, instanceInfo, startDebug) {
   switch (instanceStatus) {
     case 'active': {
       const {
-        state: { lambdaArn, region },
+        state: { lambdaArn, region, function: stateFunction },
         outputs: { scf, runtime, namespace },
       } = instanceInfo;
       regionStore = region;
@@ -102,9 +102,18 @@ async function updateDeploymentStatus(cli, instanceInfo, startDebug) {
       if (!runtimeInfo && scf) {
         runtimeInfo = scf.runtime;
       }
+
+      if (!runtimeInfo && stateFunction && stateFunction.Runtime) {
+        runtimeInfo = stateFunction.Runtime;
+      }
       if (!namespaceInfo && scf) {
         namespaceInfo = scf.namespace;
       }
+
+      if (!namespaceInfo && stateFunction && stateFunction.Namespace) {
+        namespaceInfo = stateFunction.Namespace;
+      }
+
       if (lambdaArn && runtimeInfo && region) {
         const functionInfo = {
           functionName: lambdaArn,
@@ -250,7 +259,7 @@ module.exports = async (config, cli, command) => {
     const instanceInfo = await getInstanceInfo(sdk, instanceYaml);
     if (instanceInfo && instanceInfo.instanceStatus && instanceInfo.instanceStatus !== 'inactive') {
       const {
-        state: { lambdaArn, region },
+        state: { lambdaArn, region, function: stateFunction },
         outputs: { scf, runtime, namespace },
       } = instanceInfo;
       regionStore = region;
@@ -260,9 +269,16 @@ module.exports = async (config, cli, command) => {
       if (!runtimeInfo && scf) {
         runtimeInfo = scf.runtime;
       }
+      if (!runtimeInfo && stateFunction && stateFunction.Runtime) {
+        runtimeInfo = stateFunction.Runtime;
+      }
       if (!namespaceInfo && scf) {
         namespaceInfo = scf.namespace;
       }
+      if (!namespaceInfo && stateFunction && stateFunction.Namespace) {
+        namespaceInfo = stateFunction.Namespace;
+      }
+
       if (lambdaArn && runtimeInfo && region && chinaUtils.doesRuntimeSupportDebug(runtimeInfo)) {
         functionInfoStore = {
           functionName: lambdaArn,
@@ -277,6 +293,7 @@ module.exports = async (config, cli, command) => {
         );
       }
     }
+
     const deployedInstance = await deploy(sdk, instanceYaml, instanceCredentials);
     await updateDeploymentStatus(cli, deployedInstance, true);
     if (deployedInstance.instanceStatus === 'error') {
