@@ -7,6 +7,7 @@
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
+const chalk = require('chalk');
 const { v1: uuidv1 } = require('uuid');
 const args = require('minimist')(process.argv.slice(2));
 const { utils: platformUtils } = require('@serverless/platform-client-china');
@@ -60,7 +61,8 @@ const checkBasicConfigValidation = async (dicPath) => {
   const instanceFile = loadInstanceConfig(dicPath);
 
   if (!fse.existsSync(dicPath)) {
-    throw new Error(`指定的路径 ${dicPath} 不存在，请检查后重试`);
+    console.log(`Serverless:${chalk.yellow(`指定的路径 ${dicPath} 不存在，请检查后重试`)}`);
+    process.exit(1);
   }
 
   if (!instanceFile) {
