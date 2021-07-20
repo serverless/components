@@ -42,7 +42,7 @@ class CLI {
     this._.lastStatus = null;
     this._.debug = config.debug || false;
     this._.timer = config.timer || false;
-    this._.isNotTTY = config.isNotTTY || false;
+    this._.isTTY = config.isTTY || true;
     this._.timerStarted = Date.now();
     this._.timerSeconds = 0;
     this._.loadingDots = '';
@@ -508,11 +508,11 @@ class CLI {
     }
 
     /**
-     * Terminal is not TTY
+     * Non-Debug and Non TTY Terminal
      */
-    if (this._.isNotTTY) {
+    if (!this._.isTTY) {
       if (this._.status === 'Initializing' && this._.status !== this._.lastStatus) {
-        this.log('this terminal isn\'t TTY terminal. disable progress')
+        this.log('this terminal isn\'t TTY terminal. disable progress');
         this._.lastStatus = `${this._.status}`;
       }
     }
@@ -520,7 +520,7 @@ class CLI {
     /**
      * Non-Debug and TTY Terminal
      */
-    if (!this._.debug && !this._.isNotTTY) {
+    if (!this._.debug && this._.isTTY) {
       // Update active dots
       if (this._.loadingDotCount === 0) {
         this._.loadingDots = '.';
