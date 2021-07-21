@@ -208,6 +208,66 @@ const loadInstanceCredentials = () => {
   return credentials;
 };
 
+const getDirForInvokeCommand = async (root, functionAlias) => {
+  let instanceDir = root;
+  const instances = [];
+
+  const directories = fs
+    .readdirSync(root)
+    .filter((f) => fs.statSync(path.join(root, f)).isDirectory());
+
+  for (const directory of directories) {
+    const directoryPath = path.join(root, directory);
+
+    const instanceYml = loadInstanceConfig(directoryPath);
+
+    if (instanceYml) {
+      const instanceYaml = await loadTencentInstanceConfig(directoryPath);
+      const instanceInfo = {
+        component: instanceYaml.component,
+        directoryPath,
+        functions: [],
+      };
+      if (
+        instanceYaml.component === 'multi-scf' &&
+        instanceYaml.inputs &&
+        instanceYaml.inputs.functions &&
+        typeof instanceYaml.inputs.functions === 'object'
+      ) {
+        instanceInfo.functions = Object.keys(instanceYaml.inputs.functions);
+      }
+      instances.push(instanceInfo);
+    }
+  }
+
+  const multiScfInstances = instances.filter((instance) => instance.component === 'multi-scf');
+  const scfInstances = instances.filter((instance) => instance.component === 'scf');
+  if (scfInstances.length + multiScfInstances.length === 0) {
+    throw new Error('没有找到可执行的函数目录，请使用 --target 指定或检查后再试');
+  } else if (scfInstances.length === 1 && multiScfInstances.length === 0) {
+    instanceDir = scfInstances[0].directoryPath;
+  } else if (scfInstances.length === 0 && multiScfInstances.length === 1) {
+    instanceDir = multiScfInstances[0].directoryPath;
+  } else if (scfInstances.length === 0 && multiScfInstances.length > 1) {
+    if (!functionAlias) {
+      throw new Error('请使用 --function / -f 指定要调用的函数');
+    }
+    const instanceDirs = multiScfInstances.filter((instance) =>
+      instance.functions.includes(functionAlias)
+    );
+    if (instanceDirs.length === 1) {
+      instanceDir = instanceDirs[0].directoryPath;
+    } else if (instanceDirs.length === 0) {
+      throw new Error('未找到指定函数，请检查后重试');
+    } else {
+      throw new Error('发现同名函数，请通过 --target 指定要调用函数的目录');
+    }
+  } else {
+    throw new Error('目录中存在多个 SCF 组件，请使用 --target 指定目录或检查后再试');
+  }
+  return instanceDir;
+};
+
 const getTemplate = async (root) => {
   const directories = fs
     .readdirSync(root)
@@ -496,6 +556,7 @@ module.exports = {
   loadInstanceCredentials,
   login,
   getDefaultOrgName,
+  getDirForInvokeCommand,
   getTemplate,
   getInstanceDashboardUrl,
   getTemplateDashboardUrl,
