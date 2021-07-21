@@ -46,6 +46,8 @@ module.exports = async (config, cli, command) => {
   const namespaceValue = namespace || n;
   const qualifierValue = qualifier || q;
 
+  await utils.login(config);
+
   let instanceDir = process.cwd();
   if (config.target) {
     instanceDir = nodePath.join(instanceDir, config.target);
@@ -108,7 +110,6 @@ module.exports = async (config, cli, command) => {
     process.exit();
   }
 
-  await utils.login(config);
   const componentType = instanceYaml && instanceYaml.component;
 
   const orgUid = await chinaUtils.getOrgId();
