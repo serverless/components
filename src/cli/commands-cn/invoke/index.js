@@ -22,26 +22,6 @@ const { runningTemplate } = require('../../utils');
  * --qualifier / -q SCF qualifier
  */
 module.exports = async (config, cli, command) => {
-  let instanceDir = process.cwd();
-  if (config.target) {
-    instanceDir = nodePath.join(instanceDir, config.target);
-  }
-
-  if (runningTemplate(instanceDir)) {
-    cli.log(
-      `Serverless: ${chalk.yellow('该命令暂不支持对多组件进行调用，请使用 --target 指定组件实例')}`
-    );
-    process.exit();
-  }
-
-  await utils.checkBasicConfigValidation(instanceDir);
-
-  const subCommand = config.params[0];
-
-  if (subCommand === 'local') {
-    return invokeLocal(config, cli, command);
-  }
-
   const {
     stage,
     s,
@@ -67,6 +47,29 @@ module.exports = async (config, cli, command) => {
   const qualifierValue = qualifier || q;
 
   await utils.login(config);
+
+  let instanceDir = process.cwd();
+  if (config.target) {
+    instanceDir = nodePath.join(instanceDir, config.target);
+  }
+
+  if (runningTemplate(instanceDir)) {
+    try {
+      instanceDir = await utils.getDirForInvokeCommand(instanceDir, functionAlias);
+    } catch (e) {
+      cli.log(`Serverless: ${chalk.yellow(e.message)}`);
+      process.exit();
+    }
+  }
+
+  await utils.checkBasicConfigValidation(instanceDir);
+
+  const subCommand = config.params[0];
+
+  if (subCommand === 'local') {
+    return invokeLocal(config, cli, command, instanceDir);
+  }
+
   const instanceYaml = await utils.loadInstanceConfig(instanceDir, command);
   const telemtryData = await generatePayload({ command, rootConfig: instanceYaml });
 
