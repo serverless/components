@@ -2,8 +2,6 @@
 
 'use strict';
 
-const path = require('path');
-const os = require('os');
 const { ServerlessSDK, utils: tencentUtils } = require('@serverless/platform-client-china');
 const {
   getOutputs,
@@ -19,6 +17,7 @@ const {
   loadInstanceCredentials,
   getTemplate,
   handleDebugLogMessage,
+  clientUidDefaultPath,
 } = require('./utils');
 const { generatePayload, storeLocally, send: sendTelemtry } = require('./telemtry');
 const generateNotificationsPayload = require('../notifications/generate-payload');
@@ -27,10 +26,9 @@ const requestNotification = require('../notifications/request');
 const printNotification = require('../notifications/print-notification');
 
 function translateCommand(command) {
-  if (command === 'deploy') {
-    return '部署';
-  } else if (command === 'remove') {
-    return '移除';
+  const translateCommandMap = new Map(['deploy', '部署'], ['remove', '移除']);
+  if (translateCommandMap.has(command)) {
+    return translateCommandMap.get(command);
   }
   return '执行';
 }
@@ -146,7 +144,7 @@ module.exports = async (config, cli, command) => {
 
   // Insert appId into client_uid-credentials to avoid repeatly searching database, no matter the status of instance is succ or fail
   if (!cliendUidResult[orgUid] && command === 'deploy') {
-    writeJsonToCredentials(path.join(os.homedir(), '.serverless/tencent/client_uid-credentials'), {
+    writeJsonToCredentials(clientUidDefaultPath, {
       client_uid: { ...cliendUidResult, [orgUid]: true },
     });
   }

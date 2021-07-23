@@ -6,7 +6,6 @@
 
 const path = require('path');
 const fs = require('fs');
-const os = require('os');
 const {
   runningTemplate,
   loadInstanceConfig,
@@ -151,12 +150,9 @@ module.exports = async (config, cli, command) => {
 
     // Insert appId into client_uid-credentials to avoid repeatly searching database, no matter the status of instance is succ or fail
     if (!cliendUidResult[orgUid]) {
-      writeJsonToCredentials(
-        path.join(os.homedir(), '.serverless/tencent/client_uid-credentials'),
-        {
-          client_uid: { ...cliendUidResult, [orgUid]: true },
-        }
-      );
+      writeJsonToCredentials(utils.clientUidDefaultPath, {
+        client_uid: { ...cliendUidResult, [orgUid]: true },
+      });
     }
     if (instance.instanceStatus === 'error') {
       telemtryData.outcome = 'failure';
