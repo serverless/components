@@ -28,6 +28,10 @@ const { getServerlessFilePath } = require('../serverlessFile');
 
 module.exports = async (config, cli, command) => {
   let instanceDir = process.cwd();
+  if (config.target) {
+    instanceDir = path.join(instanceDir, config.target);
+  }
+
   if (!config.target && runningTemplate(instanceDir) && checkTemplateAppAndStage(instanceDir)) {
     return runAll(config, cli, command);
   }
@@ -48,10 +52,6 @@ module.exports = async (config, cli, command) => {
 
   // Start CLI persistance status
   cli.sessionStart('正在初始化', { timer: true });
-
-  if (config.target) {
-    instanceDir = path.join(instanceDir, config.target);
-  }
 
   await utils.checkBasicConfigValidation(instanceDir);
 
@@ -91,6 +91,12 @@ module.exports = async (config, cli, command) => {
   });
 
   const telemtryData = await generatePayload({ command, rootConfig: instanceYaml, userId: orgUid });
+
+  // if the command is not deploy and remove, it's a custom command, we should change the event to components.custom.xxx
+  if (command !== 'deploy' && command !== 'remove') {
+    telemtryData.event = `components.custom.${command}`;
+  }
+
   // Prepare Options
   const options = {};
   options.debug = config.debug;
