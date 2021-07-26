@@ -91,8 +91,11 @@ const getTemplatesFromRegistry = async (sdk) => {
 
   // Not displaying the scf related templates in the first step
   const templatesChoices = templates
-    .filter((item) => !item.name.startsWith('scf-') || item.name === 'scf-starter')
-    .filter((item) => !item.name.startsWith('multi-scf-') || item.name === 'multi-scf-starter')
+    .filter(
+      (item) =>
+        (!item.name.startsWith('scf-') || item.name === 'scf-starter') &&
+        (!item.name.startsWith('multi-scf-') || item.name === 'multi-scf-starter')
+    )
     .map((item) => {
       let name = item.name;
 

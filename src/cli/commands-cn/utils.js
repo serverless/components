@@ -527,10 +527,9 @@ inputs:
   throw new Error('当前目录未检测到 Serverless 配置文件');
 };
 
+const clientUidDefaultPath = path.join(os.homedir(), '.serverless/tencent/client_uid-credentials');
 // If current machine does not have an uuid, create and save it, or load  and finally return the value.
-const writeClientUid = async (
-  p = path.join(os.homedir(), '.serverless/tencent/client_uid-credentials')
-) => {
+const writeClientUid = async (p = clientUidDefaultPath) => {
   let res = {};
   try {
     if (!fse.existsSync(p)) {
@@ -568,4 +567,5 @@ module.exports = {
   generateYMLForNodejsProject,
   checkBasicConfigValidation,
   writeClientUid,
+  clientUidDefaultPath,
 };
