@@ -26,7 +26,10 @@ const requestNotification = require('../notifications/request');
 const printNotification = require('../notifications/print-notification');
 
 function translateCommand(command) {
-  const translateCommandMap = new Map(['deploy', '部署'], ['remove', '移除']);
+  const translateCommandMap = new Map([
+    ['deploy', '部署'],
+    ['remove', '移除'],
+  ]);
   if (translateCommandMap.has(command)) {
     return translateCommandMap.get(command);
   }
