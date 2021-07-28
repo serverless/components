@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.14.1](https://github.com/serverless/components/compare/v3.14.0....v3.14.1) (2021-07-28)
+
+- For CN users:
+  - Detect invoking dir for templates
+  - Improve custom commands for reporting events
+
 ## [3.14.0](https://github.com/serverless/components/compare/v3.13.4....v3.14.0) (2021-07-21)
 
 - Support `--target` for `dev, logs, invoke` commands in templte for CN users
