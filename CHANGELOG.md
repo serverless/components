@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.14.2](https://github.com/serverless/components/compare/v3.14.1....v3.14.2) (2021-07-28)
+
+- Fix commands map
+
 ## [3.14.1](https://github.com/serverless/components/compare/v3.14.0....v3.14.1) (2021-07-28)
 
 - For CN users:
