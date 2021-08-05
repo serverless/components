@@ -67,5 +67,7 @@ module.exports = async (event, context, handlerFile, handlerFunc, cli) => {
     });
   } catch (e) {
     printOutput(cli, null, e);
+    fse.unlinkSync(tempPhpFile);
+    fse.unlinkSync(tempResFile);
   }
 };
