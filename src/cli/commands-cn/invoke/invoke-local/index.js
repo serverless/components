@@ -5,6 +5,7 @@ const utils = require('../../utils');
 const { readAndParseSync, fileExistsSync } = require('../../../utils');
 const { colorLog, printOutput, summaryOptions, checkRuntime } = require('./utils');
 const runPython = require('./runPython');
+const runPhp = require('./runPhp');
 const { generatePayload, storeLocally } = require('../../telemtry');
 
 module.exports = async (config, cli, command, instanceDir) => {
@@ -66,6 +67,10 @@ module.exports = async (config, cli, command, instanceDir) => {
 
     if (runtime.includes('Python')) {
       await runPython(eventData, contextData, handlerFile, handlerFunc, cli);
+    }
+
+    if (runtime.includes('Php')) {
+      await runPhp(eventData, contextData, handlerFile, handlerFunc, cli);
     }
   } catch (e) {
     await storeLocally({

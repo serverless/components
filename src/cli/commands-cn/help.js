@@ -158,6 +158,7 @@ ${description(`    --function / -f          调用的多函数组件的函数名
     --env / -e               指定环境变量信息 如: --env VAR=val
     --config / -c            指定使用的配置文件
     --py                     指定要使用的本机中的Python版本，默认使用python. 如: --py python3 (此配置只对runtime是Python的配置有效)
+    --php                    指定要使用的本机中的Php版本，默认使用php. 如: --php php7.2 (此配置只对runtime是Php的配置有效)
 `)}`,
   };
 
