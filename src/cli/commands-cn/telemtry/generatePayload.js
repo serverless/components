@@ -96,7 +96,7 @@ module.exports = async ({
       return null;
     })();
 
-    const { value: clientUid } = await writeClientUid(undefined, ciName, command); // get client uid, if it doesn't exist, create one firstly.
+    const { value: clientUid } = await writeClientUid(undefined, { ciName, command }); // get client uid, if it doesn't exist, create one firstly.
 
     let payload = {
       event: `components.command.${command}`,
