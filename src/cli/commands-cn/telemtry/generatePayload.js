@@ -74,8 +74,6 @@ module.exports = async ({
   serviceDir = process.cwd(),
 }) => {
   try {
-    const { value: clientUid } = await writeClientUid(); // get client uid, if it doesn't exist, create one firstly.
-
     if (!command) {
       throw new Error('command is required for sending metrics analytics');
     }
@@ -97,6 +95,8 @@ module.exports = async ({
       }
       return null;
     })();
+
+    const { value: clientUid } = await writeClientUid(undefined, ciName, command); // get client uid, if it doesn't exist, create one firstly.
 
     let payload = {
       event: `components.command.${command}`,

@@ -529,7 +529,7 @@ inputs:
 
 const clientUidDefaultPath = path.join(os.homedir(), '.serverless/tencent/client_uid-credentials');
 // If current machine does not have an uuid, create and save it, or load  and finally return the value.
-const writeClientUid = async (p = clientUidDefaultPath) => {
+const writeClientUid = async (p = clientUidDefaultPath, ciName, command) => {
   let res = {};
   try {
     if (!fse.existsSync(p)) {
@@ -537,6 +537,8 @@ const writeClientUid = async (p = clientUidDefaultPath) => {
       res = {
         value: uuidv1(), // the value of client_uid
         downloadAt: Date.now(), // the created time of client_uid
+        ciName,
+        command,
       };
       writeJsonToCredentials(p, {
         client_uid: res,
