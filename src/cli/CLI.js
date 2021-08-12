@@ -12,7 +12,7 @@ const figures = require('figures');
 const prettyoutput = require('prettyoutput');
 const chokidar = require('chokidar');
 const { version } = require('../../package.json');
-const { isChinaUser } = require('./utils');
+const { isChinaUser, groupByKey } = require('./utils');
 
 // CLI Colors
 const grey = chalk.dim;
@@ -301,6 +301,25 @@ class CLI {
 
   logWarning(error = {}) {
     console.log(`Serverless: ${chalk.yellow(error.message)}`);
+    process.exit();
+  }
+
+  logTypeError(typeErrors) {
+    const { component, typeVersion, messages } = typeErrors;
+    const msgsByPath = groupByKey(messages, 'path');
+    console.log();
+    console.log(`${component} 组件配置文件校验错误 : ${messages.length} （v${typeVersion}）`);
+    console.log('---------------------------------------------');
+    Object.keys(msgsByPath).forEach((key) => {
+      console.log(`  * ${key}`);
+      msgsByPath[key].forEach((msg) => {
+        let color = chalk.red;
+        if (msg.level === 'warning') {
+          color = chalk.yellow;
+        }
+        console.log(`    - ${color(msg.message)}`);
+      });
+    });
     process.exit();
   }
 

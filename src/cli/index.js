@@ -200,6 +200,8 @@ module.exports = async () => {
     process.exitCode = 1;
     if (error.isWarning) {
       cli.logWarning(error);
+    } else if (error.isTypeError) {
+      cli.logTypeError(error.typeErrors);
     } else if (cli.isSessionActive()) {
       cli.sessionStop('error', error);
     } else {
