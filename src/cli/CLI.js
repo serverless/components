@@ -306,12 +306,14 @@ class CLI {
 
   logTypeError(typeErrors) {
     const { component, typeVersion, messages } = typeErrors;
-    const errors = messages.filter(message => message.level === 'error');
-    const warnings = messages.filter(message => message.level === 'warning');
+    const errors = messages.filter((message) => message.level === 'error');
+    const warnings = messages.filter((message) => message.level === 'warning');
     const msgsByPath = groupByKey(messages, 'path');
-    process.stdout.write(ansiEscapes.eraseDown)
+    process.stdout.write(ansiEscapes.eraseDown);
     console.log();
-    console.log(`${component} 组件校验结果: 错误 ${errors.length} 警告 ${warnings.length} 规则版本 v${typeVersion}`);
+    console.log(
+      `${component} 组件校验结果: 错误 ${errors.length} 警告 ${warnings.length} 规则版本 v${typeVersion}`
+    );
     console.log('---------------------------------------------');
     if (msgsByPath.message) {
       const globalMessage = msgsByPath.message[0];
@@ -319,17 +321,19 @@ class CLI {
       if (globalMessage.level === 'error') color = chalk.red;
       console.log(`${color(globalMessage.message)}`);
     }
-    Object.keys(msgsByPath).filter(key => key!=='message').forEach((key) => {
-      console.log(grey(`  * ${key}`));
-      msgsByPath[key].forEach((msg) => {
-        let color = chalk.red;
-        if (msg.level === 'warning') {
-          color = chalk.yellow;
-        }
-        console.log(color(`    - ${msg.message}`));
+    Object.keys(msgsByPath)
+      .filter((key) => key !== 'message')
+      .forEach((key) => {
+        console.log(grey(`  * ${key}`));
+        msgsByPath[key].forEach((msg) => {
+          let color = chalk.red;
+          if (msg.level === 'warning') {
+            color = chalk.yellow;
+          }
+          console.log(color(`    - ${msg.message}`));
+        });
       });
-    });
-    if(errors.length > 0) {
+    if (errors.length > 0) {
       process.exit();
     }
   }
