@@ -311,7 +311,7 @@ class CLI {
     const msgsByPath = groupByKey(messages, 'path');
     process.stdout.write(ansiEscapes.eraseDown)
     console.log();
-    console.log(`${component} 组件校验结果: 错误 ${errors.length} 警告 ${warnings.length} 规则版本 v${typeVersion}`));
+    console.log(`${component} 组件校验结果: 错误 ${errors.length} 警告 ${warnings.length} 规则版本 v${typeVersion}`);
     console.log('---------------------------------------------');
     if (msgsByPath.message) {
       const globalMessage = msgsByPath.message[0];
