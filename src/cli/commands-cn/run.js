@@ -148,6 +148,8 @@ module.exports = async (config, cli, command) => {
     const vendorMessage = instance.outputs.vendorMessage;
     delete instance.outputs.vendorMessage;
     cli.log();
+    cli.logTypeError(instance.typeErrors);
+    cli.log();
     cli.logOutputs(instance.outputs);
     cli.log();
     cli.log(`${chalk.grey('应用控制台:')} ${utils.getInstanceDashboardUrl(instanceYaml)}`);
