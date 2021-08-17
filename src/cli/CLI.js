@@ -324,7 +324,7 @@ class CLI {
     Object.keys(msgsByPath)
       .filter((key) => key !== 'message')
       .forEach((key) => {
-        console.log(grey(`  * ${key}`));
+        console.log(`  * ${key}`);
         msgsByPath[key].forEach((msg) => {
           let color = chalk.red;
           if (msg.level === 'warning') {
