@@ -137,10 +137,10 @@ module.exports = async (config, cli, command) => {
     if (Object.prototype.hasOwnProperty.call(allComponentsWithOutputs, component)) {
       const c = allComponentsWithOutputs[component];
       if (c.error) {
-        failed.push(c.name);
+        failed.push(c);
       }
       if (c.outputs) {
-        succeeded.push(c.name);
+        succeeded.push(c);
       }
     }
   }

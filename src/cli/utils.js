@@ -753,6 +753,11 @@ const executeGraph = async (allComponents, command, graph, cli, sdk, options) =>
 
           cli.logError(error, { hideEntity: true });
           allComponents[instanceName].error = error;
+
+          // Don't try to deploy other instances if it's a permission issue
+          if (error.code === 'ResourceNotFound.Role') {
+            process.exit();
+          }
           return null;
         }
 
