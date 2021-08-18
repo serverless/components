@@ -898,8 +898,11 @@ const parseCliInputs = () => {
 
   // convert the raw inputs array to the familiar inputs object
   const cliInputs = rawInputs.reduce((accum, rawInput) => {
-    const key = rawInput.split('=')[0];
-    const value = rawInput.split('=')[1];
+    const dividedValue = rawInput.split('=');
+
+    const key = dividedValue[0];
+    // If the value contains `=` symbol, like --inputs name="value1=value2", we should join the all values together, otherwise it will be {name: value1}
+    const value = dividedValue.length > 2 ? dividedValue.slice(1).join('=') : dividedValue[1];
 
     accum[key] = setCliInputValueType(value);
 

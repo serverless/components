@@ -26,6 +26,7 @@ const nestedTemplateKeywords = new Set([
   'dev',
   'logs',
   'invoke',
+  'credentials',
 ]);
 
 const runningComponents = () => {
