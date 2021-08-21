@@ -512,7 +512,7 @@ class CLI {
      */
     if (!this._.isTTY) {
       if (this._.status === 'Initializing' && this._.status !== this._.lastStatus) {
-        this.log('this terminal isn\'t TTY terminal. disable progress');
+        this.log("this terminal isn't TTY terminal. disable progress");
         this._.lastStatus = `${this._.status}`;
       }
     }
