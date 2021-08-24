@@ -24,6 +24,7 @@ const requestNotification = require('../notifications/request');
 const printNotification = require('../notifications/print-notification');
 const { version } = require('../../../package.json');
 const { getServerlessFilePath } = require('../serverlessFile');
+const componentsVersion = require('../../../package.json').version;
 
 module.exports = async (config, cli, command) => {
   let instanceDir = process.cwd();
@@ -100,6 +101,7 @@ module.exports = async (config, cli, command) => {
   const options = {};
   options.debug = config.debug;
   options.dev = config.dev;
+  options.componentsVersion = componentsVersion;
 
   const cliendUidResult = await utils.writeClientUid();
   if (!cliendUidResult[orgUid]) {
@@ -145,6 +147,8 @@ module.exports = async (config, cli, command) => {
     const instance = await sdk.deploy(instanceYaml, instanceCredentials, options);
     const vendorMessage = instance.outputs.vendorMessage;
     delete instance.outputs.vendorMessage;
+    cli.log();
+    cli.logTypeError(instance.typeErrors);
     cli.log();
     cli.logOutputs(instance.outputs);
     cli.log();

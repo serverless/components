@@ -12,7 +12,7 @@ const figures = require('figures');
 const prettyoutput = require('prettyoutput');
 const chokidar = require('chokidar');
 const { version } = require('../../package.json');
-const { isChinaUser } = require('./utils');
+const { isChinaUser, groupByKey } = require('./utils');
 
 // CLI Colors
 const grey = chalk.dim;
@@ -302,6 +302,40 @@ class CLI {
   logWarning(error = {}) {
     console.log(`Serverless: ${chalk.yellow(error.message)}`);
     process.exit();
+  }
+
+  logTypeError(typeErrors) {
+    const { component, typeVersion, messages } = typeErrors;
+    const errors = messages.filter((message) => message.level === 'error');
+    const warnings = messages.filter((message) => message.level === 'warning');
+    const msgsByPath = groupByKey(messages, 'path');
+    process.stdout.write(ansiEscapes.eraseDown);
+    console.log();
+    console.log(
+      `${component} 组件校验结果: 错误 ${errors.length} 警告 ${warnings.length} 规则版本 v${typeVersion}`
+    );
+    console.log('---------------------------------------------');
+    if (msgsByPath.message) {
+      const globalMessage = msgsByPath.message[0];
+      let color = chalk.yellow;
+      if (globalMessage.level === 'error') color = chalk.red;
+      console.log(`${color(globalMessage.message)}`);
+    }
+    Object.keys(msgsByPath)
+      .filter((key) => key !== 'message')
+      .forEach((key) => {
+        console.log(`  * ${key}`);
+        msgsByPath[key].forEach((msg) => {
+          let color = chalk.red;
+          if (msg.level === 'warning') {
+            color = chalk.yellow;
+          }
+          console.log(color(`    - ${msg.message}`));
+        });
+      });
+    if (errors.length > 0) {
+      process.exit();
+    }
   }
 
   /**
