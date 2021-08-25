@@ -325,13 +325,18 @@ class CLI {
       .filter((key) => key !== 'message')
       .forEach((key) => {
         console.log(`  * ${key}`);
-        msgsByPath[key].forEach((msg) => {
-          let color = chalk.red;
-          if (msg.level === 'warning') {
-            color = chalk.yellow;
-          }
-          console.log(color(`    - ${msg.message}`));
-        });
+        msgsByPath[key]
+          .sort((a) => {
+            if (a.message && a.message.includes('类型错误')) return -1;
+            return 0;
+          })
+          .forEach((msg) => {
+            let color = chalk.red;
+            if (msg.level === 'warning') {
+              color = chalk.yellow;
+            }
+            console.log(color(`    - ${msg.message}`));
+          });
       });
     if (errors.length > 0) {
       process.exit();
