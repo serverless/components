@@ -83,6 +83,9 @@ ${description(`    --stage / -s             指定环境名称，默认使用配
     --inputs                 覆写 inputs 配置
     --profile                使用指定身份的全局授权信息
     --login                  使用临时授权
+    --force                  跳过缓存和 YML 验证
+    --noCache                跳过缓存
+    --noValidation           跳过 YML 验证
     --debug                  显示 debug 信息
 `)}`,
     'info': `

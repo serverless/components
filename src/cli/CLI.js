@@ -338,6 +338,8 @@ class CLI {
             console.log(color(`    - ${msg.message}`));
           });
       });
+    console.log('---------------------------------------------');
+    console.log('注: 可以使用 --noValidation 跳过 YML 验证');
     if (errors.length > 0) {
       process.exit();
     }
