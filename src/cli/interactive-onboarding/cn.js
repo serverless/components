@@ -164,11 +164,8 @@ module.exports = async (config, cli) => {
   let telemtryData = await generatePayload({ command: 'auto' });
   // Fetch latest templates from registry
   try {
-    const {
-      templatesChoices,
-      scfTemplatesChoices,
-      multiScfTemplatesChioices,
-    } = await getTemplatesFromRegistry(sdk);
+    const { templatesChoices, scfTemplatesChoices, multiScfTemplatesChioices } =
+      await getTemplatesFromRegistry(sdk);
     if (templatesChoices.length === 0) {
       // EN: Can not find any template in registry!
       cli.log(chalk.red('当前注册中心无可用模版!\n'));
