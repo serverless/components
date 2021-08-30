@@ -161,87 +161,94 @@ module.exports = async (config, cli) => {
     return null;
   }
   const sdk = new ServerlessSDK({ context: { traceId: uuidv4() } });
-
+  let telemtryData = await generatePayload({ command: 'auto' });
   // Fetch latest templates from registry
-  // prettier-ignore
-  const {
-    templatesChoices,
-    scfTemplatesChoices,
-    multiScfTemplatesChioices,
-  } = await getTemplatesFromRegistry(sdk);
-  if (templatesChoices.length === 0) {
-    // EN: Can not find any template in registry!
-    cli.log(chalk.red('当前注册中心无可用模版!\n'));
-    return null;
-  }
-  // console.log(templatesChoices)
-  const projectType = await projectTypeChoice(templatesChoices);
-  const workingDir = process.cwd();
-  let { name, id: packageName } = projectType;
-
-  // Choice runtime for scf examples
-  if (name === 'scf-starter') {
+  try {
     const {
-      scfRuntimeType: { id, name: scfName },
-    } = await getScfRuntimeTypeChoice(scfTemplatesChoices);
-    packageName = id;
-    name = scfName;
+      templatesChoices,
+      scfTemplatesChoices,
+      multiScfTemplatesChioices,
+    } = await getTemplatesFromRegistry(sdk);
+    if (templatesChoices.length === 0) {
+      // EN: Can not find any template in registry!
+      cli.log(chalk.red('当前注册中心无可用模版!\n'));
+      return null;
+    }
+    // console.log(templatesChoices)
+    const projectType = await projectTypeChoice(templatesChoices);
+    const workingDir = process.cwd();
+    let { name, id: packageName } = projectType;
+
+    // Choice runtime for scf examples
+    if (name === 'scf-starter') {
+      const {
+        scfRuntimeType: { id, name: scfName },
+      } = await getScfRuntimeTypeChoice(scfTemplatesChoices);
+      packageName = id;
+      name = scfName;
+    }
+
+    if (name === 'multi-scf-starter') {
+      const {
+        multiScfRuntimeType: { id, name: multiScfName },
+      } = await getMultiScfRuntimeTypeChoice(multiScfTemplatesChioices);
+      packageName = id;
+      name = multiScfName;
+    }
+
+    const projectName = await projectNameInput(workingDir);
+    const projectDir = path.join(workingDir, projectName);
+
+    cli.log(
+      // EN: Downloading ${projectType.name} app...
+      `Serverless: ${chalk.yellow(`正在安装 ${name} 应用...`)}\n`
+    );
+
+    // Get detailed information about the selected template
+    const registryPackage = await sdk.getPackage(packageName);
+
+    // Start CLI persistance status
+    cli.sessionStart('Installing', { timer: false });
+    // Start initialing the template on cli
+    const ymlParsed = await initTemplateFromCli(
+      projectDir,
+      packageName,
+      registryPackage,
+      cli,
+      projectName
+    );
+
+    cli.log(`- 项目 "${projectName}" 已在当前目录成功创建`);
+    cli.log(`- 执行 "cd ${projectName} && serverless deploy" 部署应用`);
+
+    cli.sessionStop('success', '创建成功');
+
+    // save onboarding action data
+    telemtryData = await generatePayload({
+      command: 'auto',
+      rootConfig: ymlParsed,
+      serviceDir: projectDir,
+    });
+    await storeLocally(telemtryData);
+
+    if (
+      // EN: Do you want to deploy your project on the cloud now?
+      !(await confirm('是否希望立即将该项目部署到云端？', {
+        name: 'shouldDeployNewProject',
+      }))
+    ) {
+      return null;
+    }
+    process.chdir(projectDir);
+
+    // Proceed with a deployment
+    process.argv.push('deploy');
+    return require('..')();
+  } catch (err) {
+    telemtryData.outcome = 'failure';
+    telemtryData.failure_reason = err.message;
+    await storeLocally(telemtryData);
+
+    throw err;
   }
-
-  if (name === 'multi-scf-starter') {
-    const {
-      multiScfRuntimeType: { id, name: multiScfName },
-    } = await getMultiScfRuntimeTypeChoice(multiScfTemplatesChioices);
-    packageName = id;
-    name = multiScfName;
-  }
-
-  const projectName = await projectNameInput(workingDir);
-  const projectDir = path.join(workingDir, projectName);
-
-  cli.log(
-    // EN: Downloading ${projectType.name} app...
-    `Serverless: ${chalk.yellow(`正在安装 ${name} 应用...`)}\n`
-  );
-
-  // Get detailed information about the selected template
-  const registryPackage = await sdk.getPackage(packageName);
-
-  // Start CLI persistance status
-  cli.sessionStart('Installing', { timer: false });
-  // Start initialing the template on cli
-  const ymlParsed = await initTemplateFromCli(
-    projectDir,
-    packageName,
-    registryPackage,
-    cli,
-    projectName
-  );
-
-  cli.log(`- 项目 "${projectName}" 已在当前目录成功创建`);
-  cli.log(`- 执行 "cd ${projectName} && serverless deploy" 部署应用`);
-
-  cli.sessionStop('success', '创建成功');
-
-  // save onboarding action data
-  const telemtryData = await generatePayload({
-    command: 'auto',
-    rootConfig: ymlParsed,
-    serviceDir: projectDir,
-  });
-  await storeLocally(telemtryData);
-
-  if (
-    // EN: Do you want to deploy your project on the cloud now?
-    !(await confirm('是否希望立即将该项目部署到云端？', {
-      name: 'shouldDeployNewProject',
-    }))
-  ) {
-    return null;
-  }
-  process.chdir(projectDir);
-
-  // Proceed with a deployment
-  process.argv.push('deploy');
-  return require('..')();
 };

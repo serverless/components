@@ -228,112 +228,124 @@ module.exports = async (config, cli, command) => {
   const telemtryData = await generatePayload({ command, rootConfig: instanceYaml, userId: orgUid });
   cli.sessionStatus('Initializing', instanceYaml.name);
 
-  // Filter configuration
-  const filter = {
-    stageName: instanceYaml.stage,
-    appName: instanceYaml.app,
-    instanceName: instanceYaml.name,
-    events: [],
-  };
+  try {
+    // Filter configuration
+    const filter = {
+      stageName: instanceYaml.stage,
+      appName: instanceYaml.app,
+      instanceName: instanceYaml.name,
+      events: [],
+    };
 
-  // User wants to receive all messages at the app level
-  if (config.filter && config.filter === 'app' && filter.instanceName) {
-    delete filter.instanceName;
-    cli.log('Enabling filtering at the activity at the application level', 'grey');
-    cli.log();
-  }
-
-  /**
-   * Watch logic
-   */
-
-  let isProcessing = false; // whether there's already a deployment in progress
-  let queuedOperation = false; // whether there's another deployment queued
-
-  // Set watcher
-  watcher = chokidar.watch(process.cwd(), { ignored: /\.serverless/ });
-
-  watcher.on('ready', async () => {
-    cli.sessionStatus('dev 模式开启中', null, 'green');
-    // Try to stop debug mode before first time deploy
-    const instanceInfo = await getInstanceInfo(sdk, instanceYaml);
-    if (instanceInfo && instanceInfo.instanceStatus && instanceInfo.instanceStatus !== 'inactive') {
-      const {
-        state: { lambdaArn, region, function: stateFunction },
-        outputs: { scf, runtime, namespace },
-      } = instanceInfo;
-      regionStore = region;
-
-      let runtimeInfo = runtime;
-      let namespaceInfo = namespace;
-      if (!runtimeInfo && scf) {
-        runtimeInfo = scf.runtime;
-      }
-      if (!runtimeInfo && stateFunction && stateFunction.Runtime) {
-        runtimeInfo = stateFunction.Runtime;
-      }
-      if (!namespaceInfo && scf) {
-        namespaceInfo = scf.namespace;
-      }
-      if (!namespaceInfo && stateFunction && stateFunction.Namespace) {
-        namespaceInfo = stateFunction.Namespace;
-      }
-
-      if (lambdaArn && runtimeInfo && region && chinaUtils.doesRuntimeSupportDebug(runtimeInfo)) {
-        functionInfoStore = {
-          functionName: lambdaArn,
-          namespace: namespaceInfo,
-          runtime: runtimeInfo,
-        };
-        // FIXME: we need to call start debug method here, due to we bind stopAll function in the startTencentRemoteLogAndDebug method and the stopAll is used in stopDebug method, if we want to stop debug mode that we must has stopAll firstly
-        await chinaUtils.startTencentRemoteLogAndDebug(
-          functionInfoStore,
-          regionStore,
-          cliEventCallback
-        );
-      }
+    // User wants to receive all messages at the app level
+    if (config.filter && config.filter === 'app' && filter.instanceName) {
+      delete filter.instanceName;
+      cli.log('Enabling filtering at the activity at the application level', 'grey');
+      cli.log();
     }
 
-    const deployedInstance = await deploy(sdk, instanceYaml, instanceCredentials);
-    await updateDeploymentStatus(cli, deployedInstance, true);
-    if (deployedInstance.instanceStatus === 'error') {
-      telemtryData.outcome = 'failure';
-      telemtryData.failure_reason = deployedInstance.deploymentError;
-    }
-    await storeLocally(telemtryData);
-  });
+    /**
+     * Watch logic
+     */
 
-  // "raw" makes sure to catch all FS events, not just file changes
-  watcher.on('raw', async () => {
-    // Skip if processing already and there is a queued operation
-    if (isProcessing && queuedOperation) {
-      return;
-    }
+    let isProcessing = false; // whether there's already a deployment in progress
+    let queuedOperation = false; // whether there's another deployment queued
 
-    // If already deploying and user made more changes, queue another deploy operation to be run after the first one
-    if (isProcessing && !queuedOperation) {
-      queuedOperation = true;
-      return;
-    }
+    // Set watcher
+    watcher = chokidar.watch(process.cwd(), { ignored: /\.serverless/ });
 
-    // If it's not processin and there is no queued operation
-    if (!isProcessing) {
-      let deployedInstance;
-      isProcessing = true;
-      cli.sessionStatus('Deploying', null, 'green');
-      // reload serverless component instance
-      instanceYaml = await utils.loadInstanceConfig(instanceDir, command);
-      deployedInstance = await deploy(sdk, instanceYaml, instanceCredentials);
-      if (queuedOperation) {
+    watcher.on('ready', async () => {
+      cli.sessionStatus('dev 模式开启中', null, 'green');
+      // Try to stop debug mode before first time deploy
+      const instanceInfo = await getInstanceInfo(sdk, instanceYaml);
+      if (
+        instanceInfo &&
+        instanceInfo.instanceStatus &&
+        instanceInfo.instanceStatus !== 'inactive'
+      ) {
+        const {
+          state: { lambdaArn, region, function: stateFunction },
+          outputs: { scf, runtime, namespace },
+        } = instanceInfo;
+        regionStore = region;
+
+        let runtimeInfo = runtime;
+        let namespaceInfo = namespace;
+        if (!runtimeInfo && scf) {
+          runtimeInfo = scf.runtime;
+        }
+        if (!runtimeInfo && stateFunction && stateFunction.Runtime) {
+          runtimeInfo = stateFunction.Runtime;
+        }
+        if (!namespaceInfo && scf) {
+          namespaceInfo = scf.namespace;
+        }
+        if (!namespaceInfo && stateFunction && stateFunction.Namespace) {
+          namespaceInfo = stateFunction.Namespace;
+        }
+
+        if (lambdaArn && runtimeInfo && region && chinaUtils.doesRuntimeSupportDebug(runtimeInfo)) {
+          functionInfoStore = {
+            functionName: lambdaArn,
+            namespace: namespaceInfo,
+            runtime: runtimeInfo,
+          };
+          // FIXME: we need to call start debug method here, due to we bind stopAll function in the startTencentRemoteLogAndDebug method and the stopAll is used in stopDebug method, if we want to stop debug mode that we must has stopAll firstly
+          await chinaUtils.startTencentRemoteLogAndDebug(
+            functionInfoStore,
+            regionStore,
+            cliEventCallback
+          );
+        }
+      }
+
+      const deployedInstance = await deploy(sdk, instanceYaml, instanceCredentials);
+      await updateDeploymentStatus(cli, deployedInstance, true);
+      if (deployedInstance.instanceStatus === 'error') {
+        telemtryData.outcome = 'failure';
+        telemtryData.failure_reason = deployedInstance.deploymentError;
+      }
+      await storeLocally(telemtryData);
+    });
+
+    // "raw" makes sure to catch all FS events, not just file changes
+    watcher.on('raw', async () => {
+      // Skip if processing already and there is a queued operation
+      if (isProcessing && queuedOperation) {
+        return;
+      }
+
+      // If already deploying and user made more changes, queue another deploy operation to be run after the first one
+      if (isProcessing && !queuedOperation) {
+        queuedOperation = true;
+        return;
+      }
+
+      // If it's not processin and there is no queued operation
+      if (!isProcessing) {
+        let deployedInstance;
+        isProcessing = true;
         cli.sessionStatus('Deploying', null, 'green');
         // reload serverless component instance
         instanceYaml = await utils.loadInstanceConfig(instanceDir, command);
         deployedInstance = await deploy(sdk, instanceYaml, instanceCredentials);
-      }
+        if (queuedOperation) {
+          cli.sessionStatus('Deploying', null, 'green');
+          // reload serverless component instance
+          instanceYaml = await utils.loadInstanceConfig(instanceDir, command);
+          deployedInstance = await deploy(sdk, instanceYaml, instanceCredentials);
+        }
 
-      await updateDeploymentStatus(cli, deployedInstance, true);
-      isProcessing = false;
-      queuedOperation = false;
-    }
-  });
+        await updateDeploymentStatus(cli, deployedInstance, true);
+        isProcessing = false;
+        queuedOperation = false;
+      }
+    });
+  } catch (e) {
+    telemtryData.outcome = 'failure';
+    telemtryData.failure_reason = e.message;
+    await storeLocally(telemtryData);
+
+    throw e;
+  }
 };

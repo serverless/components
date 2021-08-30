@@ -73,113 +73,121 @@ module.exports = async (config, cli, command) => {
   const instanceYaml = await utils.loadInstanceConfig(instanceDir, command);
   const telemtryData = await generatePayload({ command, rootConfig: instanceYaml });
 
-  if (dataValue && pathValue) {
-    cli.log(`Serverless: ${chalk.yellow('不能同时指定 data 与 path, 请检查后重试')}`);
-
-    await storeLocally({
-      ...telemtryData,
-      outcome: 'failure',
-      failure_reason: '不能同时指定 data 与 path, 请检查后重试',
-    });
-    process.exit();
-  }
-
-  if (path || p) {
-    try {
-      dataValue = fs.readFileSync(pathValue, 'utf8');
-    } catch (e) {
-      cli.log(`Serverless: ${chalk.yellow('找不到指定的路径文件, 请检查后重试')}`);
+  try {
+    if (dataValue && pathValue) {
+      cli.log(`Serverless: ${chalk.yellow('不能同时指定 data 与 path, 请检查后重试')}`);
 
       await storeLocally({
         ...telemtryData,
         outcome: 'failure',
-        failure_reason: '找不到指定的路径文件, 请检查后重试',
+        failure_reason: '不能同时指定 data 与 path, 请检查后重试',
       });
       process.exit();
     }
-  }
 
-  if (dataValue && !isJson(dataValue)) {
-    cli.log(`Serverless: ${chalk.yellow('传入的 data 不是序列化 JSON, 请检查后重试')}`);
-
-    await storeLocally({
-      ...telemtryData,
-      outcome: 'failure',
-      failure_reason: '传入的 data 不是序列化 JSON, 请检查后重试',
-    });
-    process.exit();
-  }
-
-  const componentType = instanceYaml && instanceYaml.component;
-
-  const orgUid = await chinaUtils.getOrgId();
-  telemtryData.user_uid = orgUid;
-
-  if (!componentType.startsWith('scf') && !componentType.startsWith('multi-scf')) {
-    cli.log(`Serverless: ${chalk.yellow('Inovke 命令仅能在 scf 或者 multi-scf 组件目录中调用')}`);
-
-    await storeLocally({
-      ...telemtryData,
-      outcome: 'failure',
-      failure_reason: 'Inovke 命令仅能在 scf 或者 multi-scf 组件目录中调用',
-    });
-    process.exit();
-  }
-
-  const sdk = new ServerlessSDK({
-    context: {
-      orgName: instanceYaml.org,
-      traceId: uuidv4(),
-      orgUid,
-    },
-  });
-
-  try {
-    const options = {
-      functionAlias,
-      stage: stageValue,
-      region: regionValue,
-      event: JSON.parse(dataValue || '{}'),
-      namespace: namespaceValue,
-      qualifier: qualifierValue,
-    };
-    const res = await sdk.invoke(
-      instanceYaml.org,
-      instanceYaml.app,
-      instanceYaml.stage,
-      instanceYaml.name,
-      options
-    );
-
-    if (res.retMsg) {
-      const retMsg = res.retMsg;
-      delete res.retMsg;
-      cli.logOutputs(res);
-      cli.log('---------------------------------------------');
-      cli.log(`Serverless: ${chalk.green('调用成功')}`);
-      cli.log();
+    if (path || p) {
       try {
-        const retJson = JSON.parse(retMsg);
-        cli.log(inspect(retJson, { depth: Infinity, colors: true, compact: 0 }));
-      } catch (error) {
-        cli.log(retMsg);
+        dataValue = fs.readFileSync(pathValue, 'utf8');
+      } catch (e) {
+        cli.log(`Serverless: ${chalk.yellow('找不到指定的路径文件, 请检查后重试')}`);
+
+        await storeLocally({
+          ...telemtryData,
+          outcome: 'failure',
+          failure_reason: '找不到指定的路径文件, 请检查后重试',
+        });
+        process.exit();
       }
-    } else {
-      cli.logOutputs(res);
     }
-  } catch (error) {
-    await storeLocally({
-      ...telemtryData,
-      outcome: 'failure',
-      failure_reason: error.message,
+
+    if (dataValue && !isJson(dataValue)) {
+      cli.log(`Serverless: ${chalk.yellow('传入的 data 不是序列化 JSON, 请检查后重试')}`);
+
+      await storeLocally({
+        ...telemtryData,
+        outcome: 'failure',
+        failure_reason: '传入的 data 不是序列化 JSON, 请检查后重试',
+      });
+      process.exit();
+    }
+
+    const componentType = instanceYaml && instanceYaml.component;
+
+    const orgUid = await chinaUtils.getOrgId();
+    telemtryData.user_uid = orgUid;
+
+    if (!componentType.startsWith('scf') && !componentType.startsWith('multi-scf')) {
+      cli.log(`Serverless: ${chalk.yellow('Inovke 命令仅能在 scf 或者 multi-scf 组件目录中调用')}`);
+
+      await storeLocally({
+        ...telemtryData,
+        outcome: 'failure',
+        failure_reason: 'Inovke 命令仅能在 scf 或者 multi-scf 组件目录中调用',
+      });
+      process.exit();
+    }
+
+    const sdk = new ServerlessSDK({
+      context: {
+        orgName: instanceYaml.org,
+        traceId: uuidv4(),
+        orgUid,
+      },
     });
 
-    throw error;
-  }
+    try {
+      const options = {
+        functionAlias,
+        stage: stageValue,
+        region: regionValue,
+        event: JSON.parse(dataValue || '{}'),
+        namespace: namespaceValue,
+        qualifier: qualifierValue,
+      };
+      const res = await sdk.invoke(
+        instanceYaml.org,
+        instanceYaml.app,
+        instanceYaml.stage,
+        instanceYaml.name,
+        options
+      );
 
-  await storeLocally({
-    ...telemtryData,
-    outcome: 'success',
-  });
-  return 0;
+      if (res.retMsg) {
+        const retMsg = res.retMsg;
+        delete res.retMsg;
+        cli.logOutputs(res);
+        cli.log('---------------------------------------------');
+        cli.log(`Serverless: ${chalk.green('调用成功')}`);
+        cli.log();
+        try {
+          const retJson = JSON.parse(retMsg);
+          cli.log(inspect(retJson, { depth: Infinity, colors: true, compact: 0 }));
+        } catch (error) {
+          cli.log(retMsg);
+        }
+      } else {
+        cli.logOutputs(res);
+      }
+    } catch (error) {
+      await storeLocally({
+        ...telemtryData,
+        outcome: 'failure',
+        failure_reason: error.message,
+      });
+
+      throw error;
+    }
+
+    await storeLocally({
+      ...telemtryData,
+      outcome: 'success',
+    });
+    return 0;
+  } catch (e) {
+    telemtryData.outcome = 'failure';
+    telemtryData.failure_reason = e.message;
+    await storeLocally(telemtryData);
+
+    throw e;
+  }
 };

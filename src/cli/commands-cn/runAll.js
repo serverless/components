@@ -117,75 +117,86 @@ module.exports = async (config, cli, command) => {
     configs: Object.values(allComponents),
   });
 
-  const allComponentsWithDependencies = setDependencies(allComponents);
-  const graph = createGraph(allComponentsWithDependencies, command);
+  try {
+    const allComponentsWithDependencies = setDependencies(allComponents);
+    const graph = createGraph(allComponentsWithDependencies, command);
 
-  const allComponentsWithOutputs = await executeGraph(
-    allComponentsWithDependencies,
-    command,
-    graph,
-    cli,
-    sdk,
-    credentials,
-    options
-  );
+    const allComponentsWithOutputs = await executeGraph(
+      allComponentsWithDependencies,
+      command,
+      graph,
+      cli,
+      sdk,
+      credentials,
+      options
+    );
 
-  // Check for errors
-  const succeeded = [];
-  const failed = [];
-  for (const component in allComponentsWithOutputs) {
-    if (Object.prototype.hasOwnProperty.call(allComponentsWithOutputs, component)) {
-      const c = allComponentsWithOutputs[component];
-      if (c.error) {
-        failed.push(c);
-      }
-      if (c.outputs) {
-        succeeded.push(c);
+    // Check for errors
+    const succeeded = [];
+    const failed = [];
+    for (const component in allComponentsWithOutputs) {
+      if (Object.prototype.hasOwnProperty.call(allComponentsWithOutputs, component)) {
+        const c = allComponentsWithOutputs[component];
+        if (c.error) {
+          failed.push(c);
+        }
+        if (c.outputs) {
+          succeeded.push(c);
+        }
       }
     }
-  }
 
-  // Insert appId into client_uid-credentials to avoid repeatly searching database, no matter the status of instance is succ or fail
-  if (!cliendUidResult[orgUid] && command === 'deploy') {
-    writeJsonToCredentials(clientUidDefaultPath, {
-      client_uid: { ...cliendUidResult, [orgUid]: true },
-    });
-  }
-  if (failed.length) {
-    cli.sessionStop(
-      'error',
-      `已成功 ${translateCommand(command)}组件${succeeded.length}个，失败${failed.length}个`
-    );
-    telemtryData.outcome = 'failure';
-    telemtryData.failure_reason = failed.map((f) => f.error.message).join(',');
+    // Insert appId into client_uid-credentials to avoid repeatly searching database, no matter the status of instance is succ or fail
+    if (!cliendUidResult[orgUid] && command === 'deploy') {
+      writeJsonToCredentials(clientUidDefaultPath, {
+        client_uid: { ...cliendUidResult, [orgUid]: true },
+      });
+    }
+    if (failed.length) {
+      cli.sessionStop(
+        'error',
+        `已成功 ${translateCommand(command)}组件${succeeded.length}个，失败${failed.length}个`
+      );
+      telemtryData.outcome = 'failure';
+      telemtryData.failure_reason = failed.map((f) => f.error.message).join(',');
+      await storeLocally(telemtryData);
+      if (command === 'deploy') {
+        sendTelemtry();
+      }
+      return null;
+    }
+
+    // don't show outputs if removing
+    if (command !== 'remove') {
+      const outputs = getOutputs(allComponentsWithOutputs);
+
+      // log all outputs at once at the end only on debug mode
+      // when not in debug, the graph handles logging outputs
+      // of each deployed instance in realtime
+      if (options.debug) {
+        cli.log();
+        cli.logOutputs(outputs);
+      }
+    }
+
+    cli.sessionStop('success', `已成功${translateCommand(command)}组件${succeeded.length}个`);
+
+    if (deferredNotificationsData) printNotification(cli, await deferredNotificationsData);
     await storeLocally(telemtryData);
+
     if (command === 'deploy') {
       sendTelemtry();
     }
+    sdk.disconnect();
     return null;
-  }
+  } catch (e) {
+    telemtryData.outcome = 'failure';
+    telemtryData.failure_reason = e.message;
+    await storeLocally(telemtryData);
 
-  // don't show outputs if removing
-  if (command !== 'remove') {
-    const outputs = getOutputs(allComponentsWithOutputs);
-
-    // log all outputs at once at the end only on debug mode
-    // when not in debug, the graph handles logging outputs
-    // of each deployed instance in realtime
-    if (options.debug) {
-      cli.log();
-      cli.logOutputs(outputs);
+    if (command === 'deploy') {
+      sendTelemtry();
     }
+    throw e;
   }
-
-  cli.sessionStop('success', `已成功${translateCommand(command)}组件${succeeded.length}个`);
-
-  if (deferredNotificationsData) printNotification(cli, await deferredNotificationsData);
-  await storeLocally(telemtryData);
-
-  if (command === 'deploy') {
-    sendTelemtry();
-  }
-  sdk.disconnect();
-  return null;
 };

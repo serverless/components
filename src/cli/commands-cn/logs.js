@@ -125,6 +125,7 @@ module.exports = async (config, cli, command) => {
         instanceYaml.name,
         options
       );
+      await storeLocally(telemtryData);
       return logs;
     } catch (error) {
       telemtryData.outcome = 'failure';
@@ -134,60 +135,67 @@ module.exports = async (config, cli, command) => {
     }
   }
 
-  if (!tail && !t) {
-    cli.sessionStart('正在获取日志');
-    const res = await getLogList();
-    if (res.length > 0) {
-      printLogMessages(res, cli);
+  try {
+    if (!tail && !t) {
+      cli.sessionStart('正在获取日志');
+      const res = await getLogList();
+      if (res.length > 0) {
+        printLogMessages(res, cli);
+      } else {
+        cli.log(chalk.gray('当前时间范围内没有可用的日志信息'));
+      }
+      cli.sessionStop('success', '获取日志成功');
     } else {
-      cli.log(chalk.gray('当前时间范围内没有可用的日志信息'));
-    }
-    cli.sessionStop('success', '获取日志成功');
-  } else {
-    let lastLogList = await getLogList();
+      let lastLogList = await getLogList();
 
-    if (lastLogList.length > 0) {
-      printLogMessages(lastLogList, cli);
-    }
-
-    cli.sessionStart('监听中');
-    setInterval(async () => {
-      let newLogList;
-      // ignore timeout issue when polling new logs
-      try {
-        newLogList = await getLogList();
-      } catch (error) {
-        return 0;
+      if (lastLogList.length > 0) {
+        printLogMessages(lastLogList, cli);
       }
 
-      if (newLogList.length > 0 && lastLogList.length <= 0) {
-        printLogMessages(newLogList, cli);
-        lastLogList = newLogList;
-      }
+      cli.sessionStart('监听中');
+      setInterval(async () => {
+        let newLogList;
+        // ignore timeout issue when polling new logs
+        try {
+          newLogList = await getLogList();
+        } catch (error) {
+          return 0;
+        }
 
-      if (newLogList.length > 0 && lastLogList.length > 0) {
-        const lastLogReqId = lastLogList[lastLogList.length - 1].requestId;
-        const newLogReqId = newLogList[newLogList.length - 1].requestId;
-
-        const newestLogIndexInOldLogs = lastLogList.findIndex(
-          (item) => item.requestId === newLogReqId
-        );
-        const lastLogIndexInNewLogs = newLogList.findIndex(
-          (item) => item.requestId === lastLogReqId
-        );
-
-        // When newestLogIndexInOldLogs !== -1, it means newest log already exists in the old log list
-        // Note: tencent log API has a cache mechanism, sometimes newly fetched log may not conataining newst log
-        if (newestLogIndexInOldLogs === -1) {
-          if (lastLogIndexInNewLogs === -1) {
-            printLogMessages(newLogList, cli);
-          } else if (lastLogIndexInNewLogs < newLogList.length - 1) {
-            printLogMessages(newLogList.slice(lastLogIndexInNewLogs + 1), cli);
-          }
+        if (newLogList.length > 0 && lastLogList.length <= 0) {
+          printLogMessages(newLogList, cli);
           lastLogList = newLogList;
         }
-      }
-      return 0;
-    }, Number(intervalValue) || 2000);
+
+        if (newLogList.length > 0 && lastLogList.length > 0) {
+          const lastLogReqId = lastLogList[lastLogList.length - 1].requestId;
+          const newLogReqId = newLogList[newLogList.length - 1].requestId;
+
+          const newestLogIndexInOldLogs = lastLogList.findIndex(
+            (item) => item.requestId === newLogReqId
+          );
+          const lastLogIndexInNewLogs = newLogList.findIndex(
+            (item) => item.requestId === lastLogReqId
+          );
+
+          // When newestLogIndexInOldLogs !== -1, it means newest log already exists in the old log list
+          // Note: tencent log API has a cache mechanism, sometimes newly fetched log may not conataining newst log
+          if (newestLogIndexInOldLogs === -1) {
+            if (lastLogIndexInNewLogs === -1) {
+              printLogMessages(newLogList, cli);
+            } else if (lastLogIndexInNewLogs < newLogList.length - 1) {
+              printLogMessages(newLogList.slice(lastLogIndexInNewLogs + 1), cli);
+            }
+            lastLogList = newLogList;
+          }
+        }
+        return 0;
+      }, Number(intervalValue) || 2000);
+    }
+  } catch (e) {
+    telemtryData.outcome = 'failure';
+    telemtryData.failure_reason = e.message;
+    await storeLocally(telemtryData);
+    throw e;
   }
 };

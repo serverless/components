@@ -103,67 +103,74 @@ const init = async (config, cli) => {
   cli.log();
 
   let packageName = config.t || config.template;
-  if (!packageName) {
-    if (config.params && config.params.length > 0) {
-      packageName = config.params[0];
-    } else {
-      throw new Error('请指定 component 或 template 名称，如: "serverless init scf-starter"');
-    }
-  }
-
   let telemtryData = await generatePayload({ command: 'init' });
 
-  const sdk = new ServerlessSDK({ context: { traceId: uuidv4() } });
-  const registryPackage = await sdk.getPackage(packageName);
-  if (!registryPackage) {
+  try {
+    if (!packageName) {
+      if (config.params && config.params.length > 0) {
+        packageName = config.params[0];
+      } else {
+        throw new Error('请指定 component 或 template 名称，如: "serverless init scf-starter"');
+      }
+    }
+
+    const sdk = new ServerlessSDK({ context: { traceId: uuidv4() } });
+    const registryPackage = await sdk.getPackage(packageName);
+    if (!registryPackage) {
+      telemtryData.outcome = 'failure';
+      telemtryData.failure_reason = `查询的包 "${packageName}" 不存在.`;
+      await storeLocally(telemtryData);
+
+      throw new Error(`查询的包 "${packageName}" 不存在.`);
+    }
+
+    // registryPackage.component will be null if component is not found
+    // this is the design for platform API backward compatibility
+    delete registryPackage.component;
+    if (Object.keys(registryPackage).length === 0) {
+      telemtryData.outcome = 'failure';
+      telemtryData.failure_reason = `查询的包 "${packageName}" 不存在.`;
+      await storeLocally(telemtryData);
+
+      throw new Error(`查询的包 "${packageName}" 不存在.`);
+    }
+
+    const targetName = config.name || packageName;
+    const targetPath = path.resolve(targetName);
+
+    if (registryPackage.type !== 'template') {
+      await fse.mkdir(targetPath);
+      const envDestination = path.resolve(targetPath, 'serverless.yml');
+      const envConfig = `component: ${packageName}\nname: ${targetName}\napp: ${targetName}-${
+        uuidv4().split('-')[0]
+      }\ninputs:\n`;
+      await fse.writeFile(envDestination, envConfig);
+
+      telemtryData.components.push(packageName);
+    } else {
+      const ymlParsed = await initTemplateFromCli(
+        targetPath,
+        packageName,
+        registryPackage,
+        cli,
+        targetName
+      );
+      telemtryData = await generatePayload({ command: 'init', rootConfig: ymlParsed });
+    }
+
+    cli.log(`- 项目 "${packageName}" 已在当前目录成功创建`);
+    cli.log(`- 执行 "cd ${targetName} && serverless deploy" 部署应用`);
+
+    await storeLocally(telemtryData);
+    cli.sessionStop('success', '创建成功');
+    return null;
+  } catch (err) {
     telemtryData.outcome = 'failure';
-    telemtryData.failure_reason = `查询的包 "${packageName}" 不存在.`;
+    telemtryData.failure_reason = err.message;
     await storeLocally(telemtryData);
 
-    throw new Error(`查询的包 "${packageName}" 不存在.`);
+    throw err;
   }
-
-  // registryPackage.component will be null if component is not found
-  // this is the design for platform API backward compatibility
-  delete registryPackage.component;
-  if (Object.keys(registryPackage).length === 0) {
-    telemtryData.outcome = 'failure';
-    telemtryData.failure_reason = `查询的包 "${packageName}" 不存在.`;
-    await storeLocally(telemtryData);
-
-    throw new Error(`查询的包 "${packageName}" 不存在.`);
-  }
-
-  const targetName = config.name || packageName;
-  const targetPath = path.resolve(targetName);
-
-  if (registryPackage.type !== 'template') {
-    await fse.mkdir(targetPath);
-    const envDestination = path.resolve(targetPath, 'serverless.yml');
-    const envConfig = `component: ${packageName}\nname: ${targetName}\napp: ${targetName}-${
-      uuidv4().split('-')[0]
-    }\ninputs:\n`;
-    await fse.writeFile(envDestination, envConfig);
-
-    telemtryData.components.push(packageName);
-  } else {
-    const ymlParsed = await initTemplateFromCli(
-      targetPath,
-      packageName,
-      registryPackage,
-      cli,
-      targetName
-    );
-    telemtryData = await generatePayload({ command: 'init', rootConfig: ymlParsed });
-  }
-
-  cli.log(`- 项目 "${packageName}" 已在当前目录成功创建`);
-  cli.log(`- 执行 "cd ${targetName} && serverless deploy" 部署应用`);
-
-  await storeLocally(telemtryData);
-  cli.sessionStop('success', '创建成功');
-
-  return null;
 };
 
 module.exports = {
