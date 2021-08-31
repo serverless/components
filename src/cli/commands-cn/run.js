@@ -103,6 +103,9 @@ module.exports = async (config, cli, command) => {
     const options = {};
     options.debug = config.debug;
     options.dev = config.dev;
+    options.force = config.force;
+    options.noValidation = config.noValidation;
+    options.noCache = config.noCache;
     options.componentsVersion = componentsVersion;
 
     const cliendUidResult = await utils.writeClientUid();
