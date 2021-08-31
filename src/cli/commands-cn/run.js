@@ -205,7 +205,7 @@ module.exports = async (config, cli, command) => {
     if (deferredNotificationsData) printNotification(cli, await deferredNotificationsData);
     // we will send all telemtry data into metrics server while deploying
     if (command === 'deploy') {
-      sendTelemtry();
+      await sendTelemtry();
     }
 
     sdk.disconnect();
@@ -216,7 +216,7 @@ module.exports = async (config, cli, command) => {
     await storeLocally(telemtryData);
 
     if (command === 'deploy') {
-      sendTelemtry();
+      await sendTelemtry();
     }
     throw e;
   }
