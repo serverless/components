@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.17.0](https://github.com/serverless/components/compare/v3.16.0....v3.17.0) (2021-09-01)
+
+- Record external error events
+- Add --noValidation and --noCache support for deploy command
+
 ## [3.16.0](https://github.com/serverless/components/compare/v3.15.1....v3.16.0) (2021-08-25)
 
 - Validation feature for CN users
