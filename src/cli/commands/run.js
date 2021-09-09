@@ -66,6 +66,7 @@ module.exports = async (config, cli, command) => {
     const options = {};
     options.debug = config.debug;
     options.dev = config.dev;
+    options.timeout = config.timeout;
 
     // Connect to Serverless Platform Events, if in debug mode
     if (options.debug) {
