@@ -290,12 +290,6 @@ module.exports = async (config, cli, command) => {
             namespace: namespaceInfo,
             runtime: runtimeInfo,
           };
-          // FIXME: we need to call start debug method here, due to we bind stopAll function in the startTencentRemoteLogAndDebug method and the stopAll is used in stopDebug method, if we want to stop debug mode that we must has stopAll firstly
-          await chinaUtils.startTencentRemoteLogAndDebug(
-            functionInfoStore,
-            regionStore,
-            cliEventCallback
-          );
         }
       }
 
