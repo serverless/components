@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.17.2](https://github.com/serverless/components/compare/v3.17.1....v3.17.2) (2021-11-03)
+
+- Fix wrong metrics URL for Chinese users
+
 ## [3.17.1](https://github.com/serverless/components/compare/v3.17.0....v3.17.1) (2021-09-22)
 
 - Improve `sls dev`

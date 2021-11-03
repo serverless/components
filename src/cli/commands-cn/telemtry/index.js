@@ -3,7 +3,6 @@
 const { v1: uuid } = require('uuid');
 const { join } = require('path');
 const fse = require('fs-extra');
-const metricsUrl = require('@serverless/utils/analytics-and-notfications-url');
 const isTelemetryDisabled = require('./areDisabled');
 const cacheDirPath = require('./cache-path');
 const got = require('got');
@@ -16,7 +15,10 @@ const isUuid = RegExp.prototype.test.bind(
 );
 
 const sendToMetrics = async (payload, { ids }, options = {}) => {
-  if (!metricsUrl) return null;
+  const metricsUrl =
+    process.env.SERVERLESS_PLATFORM_STAGE === 'dev'
+      ? 'https://service-pwww3r9f-1300963013.sh.apigw.tencentcs.com/release/'
+      : 'https://service-9p6tdp4y-1300963013.gz.apigw.tencentcs.com/release/';
 
   try {
     await got.post(metricsUrl, {
