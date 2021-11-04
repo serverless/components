@@ -60,7 +60,18 @@ async function deploy(sdk, instance, credentials) {
     cliEventCallback &&
     chinaUtils.doesRuntimeSupportDebug(functionInfoStore.runtime)
   ) {
-    await chinaUtils.stopTencentRemoteLogAndDebug(functionInfoStore, regionStore, cliEventCallback);
+    try {
+      await chinaUtils.stopTencentRemoteLogAndDebug(
+        functionInfoStore,
+        regionStore,
+        cliEventCallback
+      );
+    } catch (e) {
+      e.extraErrorInfo = {
+        source: 'Tencent',
+      };
+      throw e;
+    }
   }
   let instanceInfo = {};
 
@@ -77,6 +88,7 @@ async function deploy(sdk, instance, credentials) {
   } catch (e) {
     instanceInfo.instanceStatus = 'error';
     instanceInfo.deploymentError = e;
+    instanceInfo.extraErrorInfo = e.extraErrorInfo;
   }
 
   return instanceInfo;
@@ -121,9 +133,16 @@ async function updateDeploymentStatus(cli, instanceInfo, startDebug) {
           runtime: runtimeInfo,
         };
         functionInfoStore = functionInfo;
-        await chinaUtils.stopTencentRemoteLogAndDebug(functionInfo, region, cliEventCallback);
-        if (startDebug) {
-          await chinaUtils.startTencentRemoteLogAndDebug(functionInfo, region, cliEventCallback);
+        try {
+          await chinaUtils.stopTencentRemoteLogAndDebug(functionInfo, region, cliEventCallback);
+          if (startDebug) {
+            await chinaUtils.startTencentRemoteLogAndDebug(functionInfo, region, cliEventCallback);
+          }
+        } catch (e) {
+          e.extraErrorInfo = {
+            source: 'Tencent',
+          };
+          throw e;
         }
       }
       cli.log(header, 'grey');
@@ -336,9 +355,16 @@ module.exports = async (config, cli, command) => {
       }
     });
   } catch (e) {
+    if (e.extraErrorInfo) {
+      e.extraErrorInfo.step = '启动远程开发';
+    } else {
+      e.extraErrorInfo = {
+        step: '启动远程开发',
+      };
+    }
     telemtryData.outcome = 'failure';
     telemtryData.failure_reason = e.message;
-    await storeLocally(telemtryData);
+    await storeLocally(telemtryData, e);
 
     throw e;
   }

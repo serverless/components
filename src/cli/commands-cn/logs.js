@@ -128,9 +128,13 @@ module.exports = async (config, cli, command) => {
       await storeLocally(telemtryData);
       return logs;
     } catch (error) {
-      telemtryData.outcome = 'failure';
-      telemtryData.failure_reason = error.message;
-      await storeLocally(telemtryData);
+      if (!error.extraErrorInfo) {
+        error.extraErrorInfo = {
+          step: '日志获取',
+        };
+      } else {
+        error.extraErrorInfo.step = '日志获取';
+      }
       throw error;
     }
   }
@@ -195,7 +199,7 @@ module.exports = async (config, cli, command) => {
   } catch (e) {
     telemtryData.outcome = 'failure';
     telemtryData.failure_reason = e.message;
-    await storeLocally(telemtryData);
+    await storeLocally(telemtryData, e);
     throw e;
   }
 };

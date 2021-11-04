@@ -15,20 +15,22 @@ const { generatePayload, storeLocally } = require('./telemtry');
 const got = require('got');
 const { ServerlessSDK } = require('@serverless/platform-client-china');
 const spawn = require('child-process-ext/spawn');
-const { parseYaml, saveYaml } = require('./utils');
+const { parseYaml, saveYaml, ServerlessCLIError } = require('./utils');
 
 const pipeline = promisify(stream.pipeline);
 
 async function unpack(cli, dir) {
   if (await fse.exists(path.resolve(dir, 'package.json'))) {
-    cli.sessionStatus(`Installing node_modules via npm in ${dir}`);
+    cli.sessionStatus(`通过 npm install 在 ${dir} 文件夹中安装依赖`);
     try {
       await spawn('npm', ['install'], { cwd: dir });
     } catch (error) {
-      cli.logError(
-        'Failed install dependencies, make sure install dependencies manually before deploy.'
-      );
-      return null;
+      error.message = '自动安装依赖失败，请手动执行安装';
+      error.extraErrorInfo = {
+        step: '依赖安装',
+        source: 'Serverless::CLI',
+      };
+      throw error;
     }
   }
 
@@ -49,13 +51,19 @@ async function unpack(cli, dir) {
 
 const initTemplateFromCli = async (targetPath, packageName, registryPackage, cli, appName) => {
   cli.sessionStatus('Fetching template from registry', packageName);
-  const tmpFilename = path.resolve(path.basename(registryPackage.downloadKey));
-  await pipeline(got.stream(registryPackage.downloadUrl), fs.createWriteStream(tmpFilename));
 
-  cli.sessionStatus('Unpacking your new app', packageName);
-  const zip = new AdmZip(tmpFilename);
-  zip.extractAllTo(targetPath);
-  await fs.promises.unlink(tmpFilename);
+  try {
+    const tmpFilename = path.resolve(path.basename(registryPackage.downloadKey));
+    await pipeline(got.stream(registryPackage.downloadUrl), fs.createWriteStream(tmpFilename));
+
+    cli.sessionStatus('Unpacking your new app', packageName);
+    const zip = new AdmZip(tmpFilename);
+    zip.extractAllTo(targetPath);
+    await fs.promises.unlink(tmpFilename);
+  } catch (e) {
+    e.extraErrorInfo = { step: '模版下载', source: 'Serverless::CLI' };
+    throw e;
+  }
 
   cli.sessionStatus('app.YAML processd');
   let serverlessFilePath = path.resolve(targetPath, 'serverless.yaml');
@@ -115,7 +123,20 @@ const init = async (config, cli) => {
     }
 
     const sdk = new ServerlessSDK({ context: { traceId: uuidv4() } });
-    const registryPackage = await sdk.getPackage(packageName);
+    let registryPackage;
+    try {
+      registryPackage = await sdk.getPackage(packageName);
+    } catch (e) {
+      if (!e.extraErrorInfo) {
+        e.extraErrorInfo = {
+          step: '组件信息获取',
+        };
+      } else {
+        e.extraErrorInfo.step = '组件信息获取';
+      }
+
+      throw e;
+    }
     if (!registryPackage) {
       telemtryData.outcome = 'failure';
       telemtryData.failure_reason = `查询的包 "${packageName}" 不存在.`;
@@ -144,7 +165,11 @@ const init = async (config, cli) => {
       const envConfig = `component: ${packageName}\nname: ${targetName}\napp: ${targetName}-${
         uuidv4().split('-')[0]
       }\ninputs:\n`;
-      await fse.writeFile(envDestination, envConfig);
+      try {
+        await fse.writeFile(envDestination, envConfig);
+      } catch (e) {
+        throw new ServerlessCLIError(e.message);
+      }
 
       telemtryData.components.push(packageName);
     } else {
@@ -167,7 +192,7 @@ const init = async (config, cli) => {
   } catch (err) {
     telemtryData.outcome = 'failure';
     telemtryData.failure_reason = err.message;
-    await storeLocally(telemtryData);
+    await storeLocally(telemtryData, err);
 
     throw err;
   }

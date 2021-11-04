@@ -58,25 +58,33 @@ const getDefaultOrgName = async () => {
  */
 
 const checkBasicConfigValidation = async (dicPath) => {
-  const instanceFile = loadInstanceConfig(dicPath);
+  try {
+    const instanceFile = loadInstanceConfig(dicPath);
 
-  if (!fse.existsSync(dicPath)) {
-    console.log(`Serverless:${chalk.yellow(`指定的路径 ${dicPath} 不存在，请检查后重试`)}`);
-    process.exit(1);
-  }
+    if (!fse.existsSync(dicPath)) {
+      console.log(`Serverless:${chalk.yellow(`指定的路径 ${dicPath} 不存在，请检查后重试`)}`);
+      process.exit(1);
+    }
 
-  if (!instanceFile) {
-    throw new Error('没有找到serverless配置文件，请检查。');
-  }
+    if (!instanceFile) {
+      throw new Error('没有找到serverless配置文件，请检查。');
+    }
 
-  if (!instanceFile.name) {
-    throw new Error('在serverless配置文件中没有发现实例名称("name"字段)，请检查。');
-  }
+    if (!instanceFile.name) {
+      throw new Error('在serverless配置文件中没有发现实例名称("name"字段)，请检查。');
+    }
 
-  if (!instanceFile.component) {
-    throw new Error('在serverless配置文件中没有发现组件类型("component"字段)，请检查。');
+    if (!instanceFile.component) {
+      throw new Error('在serverless配置文件中没有发现组件类型("component"字段)，请检查。');
+    }
+    return instanceFile;
+  } catch (e) {
+    e.extraErrorInfo = {
+      step: '无效的Serverless应用',
+      source: 'Serverless::CLI',
+    };
+    throw e;
   }
-  return instanceFile;
 };
 
 /**
@@ -159,15 +167,23 @@ const login = async (config = {}) => {
     );
   }
 
-  const [reLoggedIn, credentials] = await platformUtils.loginWithTencent(config);
-  if (reLoggedIn) {
-    const { secret_id: secretId, secret_key: secretKey, appid, token } = credentials;
-    updateEnvFile({
-      TENCENT_APP_ID: appid,
-      TENCENT_SECRET_ID: secretId,
-      TENCENT_SECRET_KEY: secretKey,
-      TENCENT_TOKEN: token,
-    });
+  try {
+    const [reLoggedIn, credentials] = await platformUtils.loginWithTencent(config);
+    if (reLoggedIn) {
+      const { secret_id: secretId, secret_key: secretKey, appid, token } = credentials;
+      updateEnvFile({
+        TENCENT_APP_ID: appid,
+        TENCENT_SECRET_ID: secretId,
+        TENCENT_SECRET_KEY: secretKey,
+        TENCENT_TOKEN: token,
+      });
+    }
+  } catch (e) {
+    e.extraErrorInfo = {
+      source: 'Tencent::Auth',
+      step: '授权登陆',
+    };
+    throw e;
   }
 };
 
@@ -553,6 +569,14 @@ const writeClientUid = async (p = clientUidDefaultPath, options = {}) => {
   return res;
 };
 
+class ServerlessCLIError extends Error {
+  constructor(message, extraErrorInfo = {}) {
+    super(message);
+    this.message = message;
+    this.extraErrorInfo = { source: 'Serverless::CLI', ...extraErrorInfo };
+  }
+}
+
 module.exports = {
   loadInstanceConfig: loadTencentInstanceConfig,
   loadInstanceCredentials,
@@ -569,4 +593,5 @@ module.exports = {
   checkBasicConfigValidation,
   writeClientUid,
   clientUidDefaultPath,
+  ServerlessCLIError,
 };

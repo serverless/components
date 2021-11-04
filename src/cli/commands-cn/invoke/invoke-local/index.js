@@ -41,16 +41,16 @@ module.exports = async (config, cli, command, instanceDir) => {
       colorLog('当前命令只支持 SCF 组件，请在 SCF 组件目录内使用', 'yellow', cli);
     }
 
+    const [eventData, contextData, handlerFile, handlerFunc] = summaryOptions(
+      config,
+      instanceYml,
+      cli
+    );
+
+    const runtime = inputs.runtime;
+    checkRuntime(runtime, cli);
+
     try {
-      const [eventData, contextData, handlerFile, handlerFunc] = summaryOptions(
-        config,
-        instanceYml,
-        cli
-      );
-
-      const runtime = inputs.runtime;
-      checkRuntime(runtime, cli);
-
       if (runtime.includes('Nodejs')) {
         const invokeFromFile = path.join(instanceDir, handlerFile);
         const exportedVars = require(invokeFromFile);
@@ -74,17 +74,16 @@ module.exports = async (config, cli, command, instanceDir) => {
         await runPhp(eventData, contextData, handlerFile, handlerFunc, cli);
       }
     } catch (e) {
-      await storeLocally({
-        ...telemtryData,
-        outcome: 'failure',
-        failure_reason: e.message,
-      });
+      e.extraErrorInfo = {
+        step: '函数本地调用',
+        source: 'Serverless::Cli',
+      };
       throw e;
     }
 
     await storeLocally({ ...telemtryData, outcome: 'success' });
   } catch (e) {
-    await storeLocally({ ...telemtryData, outcome: 'failure', failure_reason: e.message });
+    await storeLocally({ ...telemtryData, outcome: 'failure', failure_reason: e.message }, e);
     throw e;
   }
 };
