@@ -135,47 +135,50 @@ module.exports = async (config, cli, command) => {
       },
     });
 
+    const options = {
+      functionAlias,
+      stage: stageValue,
+      region: regionValue,
+      event: JSON.parse(dataValue || '{}'),
+      namespace: namespaceValue,
+      qualifier: qualifierValue,
+    };
+    let res;
     try {
-      const options = {
-        functionAlias,
-        stage: stageValue,
-        region: regionValue,
-        event: JSON.parse(dataValue || '{}'),
-        namespace: namespaceValue,
-        qualifier: qualifierValue,
-      };
-      const res = await sdk.invoke(
+      res = await sdk.invoke(
         instanceYaml.org,
         instanceYaml.app,
         instanceYaml.stage,
         instanceYaml.name,
         options
       );
-
-      if (res.retMsg) {
-        const retMsg = res.retMsg;
-        delete res.retMsg;
-        cli.logOutputs(res);
-        cli.log('---------------------------------------------');
-        cli.log(`Serverless: ${chalk.green('调用成功')}`);
-        cli.log();
-        try {
-          const retJson = JSON.parse(retMsg);
-          cli.log(inspect(retJson, { depth: Infinity, colors: true, compact: 0 }));
-        } catch (error) {
-          cli.log(retMsg);
-        }
+    } catch (e) {
+      if (!e.extraErrorInfo) {
+        e.extraErrorInfo = {
+          step: '函数远程调用',
+        };
       } else {
-        cli.logOutputs(res);
+        e.extraErrorInfo.step = '函数远程调用';
       }
-    } catch (error) {
-      await storeLocally({
-        ...telemtryData,
-        outcome: 'failure',
-        failure_reason: error.message,
-      });
 
-      throw error;
+      throw e;
+    }
+
+    if (res.retMsg) {
+      const retMsg = res.retMsg;
+      delete res.retMsg;
+      cli.logOutputs(res);
+      cli.log('---------------------------------------------');
+      cli.log(`Serverless: ${chalk.green('调用成功')}`);
+      cli.log();
+      try {
+        const retJson = JSON.parse(retMsg);
+        cli.log(inspect(retJson, { depth: Infinity, colors: true, compact: 0 }));
+      } catch (error) {
+        cli.log(retMsg);
+      }
+    } else {
+      cli.logOutputs(res);
     }
 
     await storeLocally({
@@ -186,7 +189,7 @@ module.exports = async (config, cli, command) => {
   } catch (e) {
     telemtryData.outcome = 'failure';
     telemtryData.failure_reason = e.message;
-    await storeLocally(telemtryData);
+    await storeLocally(telemtryData, e);
 
     throw e;
   }

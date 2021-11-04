@@ -93,7 +93,7 @@ module.exports = async ({
         }
         return 'unknown';
       }
-      return null;
+      return 'untracked';
     })();
 
     const { value: clientUid } = await writeClientUid(undefined, { ciName, command }); // get client uid, if it doesn't exist, create one firstly.

@@ -87,66 +87,77 @@ const projectNameInput = async (workingDir) =>
   ).projectName.trim();
 
 const getTemplatesFromRegistry = async (sdk) => {
-  const { templates = [] } = await sdk.listPackages(null, { isFeatured: true });
+  try {
+    const { templates = [] } = await sdk.listPackages(null, { isFeatured: true });
 
-  // Not displaying the scf related templates in the first step
-  const templatesChoices = templates
-    .filter(
-      (item) =>
-        (!item.name.startsWith('scf-') || item.name === 'scf-starter') &&
-        (!item.name.startsWith('multi-scf-') || item.name === 'multi-scf-starter')
-    )
-    .map((item) => {
-      let name = item.name;
+    // Not displaying the scf related templates in the first step
+    const templatesChoices = templates
+      .filter(
+        (item) =>
+          (!item.name.startsWith('scf-') || item.name === 'scf-starter') &&
+          (!item.name.startsWith('multi-scf-') || item.name === 'multi-scf-starter')
+      )
+      .map((item) => {
+        let name = item.name;
 
-      if (item['description-i18n'] && item['description-i18n']['zh-cn']) {
-        name = `${name} - ${item['description-i18n']['zh-cn']}`;
-      } else if (item.description) {
-        name = `${name} - ${item.description}`;
-      }
+        if (item['description-i18n'] && item['description-i18n']['zh-cn']) {
+          name = `${name} - ${item['description-i18n']['zh-cn']}`;
+        } else if (item.description) {
+          name = `${name} - ${item.description}`;
+        }
 
-      return {
-        name,
-        keywords: item.keywords || '',
-        value: { id: item.componentName, name: item.name },
+        return {
+          name,
+          keywords: item.keywords || '',
+          value: { id: item.componentName, name: item.name },
+        };
+      });
+
+    const scfTemplatesChoices = templates
+      .filter((item) => item.name.startsWith('scf-') && item.name !== 'scf-starter')
+      .map((item) => {
+        let name = item.name;
+
+        if (item['description-i18n'] && item['description-i18n']['zh-cn']) {
+          name = `${name} - ${item['description-i18n']['zh-cn']}`;
+        } else if (item.description) {
+          name = `${name} - ${item.description}`;
+        }
+
+        return {
+          name,
+          value: { id: item.componentName, name: item.name },
+        };
+      });
+
+    const multiScfTemplatesChioices = templates
+      .filter((item) => item.name.startsWith('multi-scf-') && item.name !== 'multi-scf-starter')
+      .map((item) => {
+        let name = item.name;
+
+        if (item['description-i18n'] && item['description-i18n']['zh-cn']) {
+          name = `${name} - ${item['description-i18n']['zh-cn']}`;
+        } else if (item.description) {
+          name = `${name} - ${item.description}`;
+        }
+
+        return {
+          name,
+          value: { id: item.componentName, name: item.name },
+        };
+      });
+
+    return { templatesChoices, scfTemplatesChoices, multiScfTemplatesChioices };
+  } catch (e) {
+    if (!e.extraErrorInfo) {
+      e.extraErrorInfo = {
+        step: '模版信息获取',
       };
-    });
-
-  const scfTemplatesChoices = templates
-    .filter((item) => item.name.startsWith('scf-') && item.name !== 'scf-starter')
-    .map((item) => {
-      let name = item.name;
-
-      if (item['description-i18n'] && item['description-i18n']['zh-cn']) {
-        name = `${name} - ${item['description-i18n']['zh-cn']}`;
-      } else if (item.description) {
-        name = `${name} - ${item.description}`;
-      }
-
-      return {
-        name,
-        value: { id: item.componentName, name: item.name },
-      };
-    });
-
-  const multiScfTemplatesChioices = templates
-    .filter((item) => item.name.startsWith('multi-scf-') && item.name !== 'multi-scf-starter')
-    .map((item) => {
-      let name = item.name;
-
-      if (item['description-i18n'] && item['description-i18n']['zh-cn']) {
-        name = `${name} - ${item['description-i18n']['zh-cn']}`;
-      } else if (item.description) {
-        name = `${name} - ${item.description}`;
-      }
-
-      return {
-        name,
-        value: { id: item.componentName, name: item.name },
-      };
-    });
-
-  return { templatesChoices, scfTemplatesChoices, multiScfTemplatesChioices };
+    } else {
+      e.extraErrorInfo.step = '模版信息获取';
+    }
+    throw e;
+  }
 };
 
 module.exports = async (config, cli) => {
@@ -244,7 +255,7 @@ module.exports = async (config, cli) => {
   } catch (err) {
     telemtryData.outcome = 'failure';
     telemtryData.failure_reason = err.message;
-    await storeLocally(telemtryData);
+    await storeLocally(telemtryData, err);
 
     throw err;
   }
