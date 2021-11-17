@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.18.1](https://github.com/serverless/components/compare/v3.18.0....v3.18.1) (2021-11-17)
+
+- Improvement for YML genertation on Node proejct with HTTP component
+
 ## [3.18.0](https://github.com/serverless/components/compare/v3.17.2....v3.18.0) (2021-11-09)
 
 - Add more error details for mixpanel report
