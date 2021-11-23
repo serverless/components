@@ -29,6 +29,9 @@ const nestedTemplateKeywords = new Set([
   'credentials',
 ]);
 
+// WARNING: Starting with serverless v2.65.0 release, below logic is ineffective
+//          as it was integrated into serverless respository at:
+//          https://github.com/serverless/serverless/blob/master/lib/cli/triage.js
 const runningComponents = () => {
   const args = minimist(process.argv.slice(2));
 
