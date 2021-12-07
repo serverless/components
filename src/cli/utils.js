@@ -357,6 +357,9 @@ const loadInstanceConfigUncached = (directoryPath) => {
     instanceFile.app = instanceFile.name;
   }
 
+  instanceFile.app = instanceFile.app.trim();
+  instanceFile.name = instanceFile.name.trim();
+
   return instanceFile;
 };
 
