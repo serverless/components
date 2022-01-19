@@ -151,7 +151,7 @@ module.exports = async (config, cli, command) => {
       cli.sessionStop('success', '获取日志成功');
     } else {
       cli.sessionStart('监听中');
-      
+
       await new Promise((resolve, reject) => {
         // Stop polling when two errors happen in a row
         let lastLogList = [];
