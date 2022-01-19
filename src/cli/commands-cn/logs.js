@@ -150,51 +150,60 @@ module.exports = async (config, cli, command) => {
       }
       cli.sessionStop('success', '获取日志成功');
     } else {
-      let lastLogList = await getLogList();
+      let lastLogList = [];
 
       if (lastLogList.length > 0) {
         printLogMessages(lastLogList, cli);
       }
 
       cli.sessionStart('监听中');
-      setInterval(async () => {
-        let newLogList;
-        // ignore timeout issue when polling new logs
-        try {
-          newLogList = await getLogList();
-        } catch (error) {
-          return 0;
-        }
 
-        if (newLogList.length > 0 && lastLogList.length <= 0) {
-          printLogMessages(newLogList, cli);
-          lastLogList = newLogList;
-        }
-
-        if (newLogList.length > 0 && lastLogList.length > 0) {
-          const lastLogReqId = lastLogList[lastLogList.length - 1].requestId;
-          const newLogReqId = newLogList[newLogList.length - 1].requestId;
-
-          const newestLogIndexInOldLogs = lastLogList.findIndex(
-            (item) => item.requestId === newLogReqId
-          );
-          const lastLogIndexInNewLogs = newLogList.findIndex(
-            (item) => item.requestId === lastLogReqId
-          );
-
-          // When newestLogIndexInOldLogs !== -1, it means newest log already exists in the old log list
-          // Note: tencent log API has a cache mechanism, sometimes newly fetched log may not conataining newst log
-          if (newestLogIndexInOldLogs === -1) {
-            if (lastLogIndexInNewLogs === -1) {
-              printLogMessages(newLogList, cli);
-            } else if (lastLogIndexInNewLogs < newLogList.length - 1) {
-              printLogMessages(newLogList.slice(lastLogIndexInNewLogs + 1), cli);
+      await new Promise((resolve, reject) => {
+        // Stop polling when two errors happen in a row
+        let errorCount = 0;
+        const logInterval = setInterval(async () => {
+          let newLogList = [];
+          try {
+            newLogList = await getLogList() || [];
+            errorCount = 0;
+          } catch (error) {
+            errorCount += 1;
+            if (errorCount >= 2) {
+              clearInterval(logInterval);
+              reject(error);
             }
+          }
+
+          if (newLogList.length > 0 && lastLogList.length <= 0) {
+            printLogMessages(newLogList, cli);
             lastLogList = newLogList;
           }
-        }
-        return 0;
-      }, Number(intervalValue) || 2000);
+
+          if (newLogList.length > 0 && lastLogList.length > 0) {
+            const lastLogReqId = lastLogList[lastLogList.length - 1].requestId;
+            const newLogReqId = newLogList[newLogList.length - 1].requestId;
+
+            const newestLogIndexInOldLogs = lastLogList.findIndex(
+              (item) => item.requestId === newLogReqId
+            );
+            const lastLogIndexInNewLogs = newLogList.findIndex(
+              (item) => item.requestId === lastLogReqId
+            );
+
+            // When newestLogIndexInOldLogs !== -1, it means newest log already exists in the old log list
+            // Note: tencent log API has a cache mechanism, sometimes newly fetched log may not conataining newst log
+            if (newestLogIndexInOldLogs === -1) {
+              if (lastLogIndexInNewLogs === -1) {
+                printLogMessages(newLogList, cli);
+              } else if (lastLogIndexInNewLogs < newLogList.length - 1) {
+                printLogMessages(newLogList.slice(lastLogIndexInNewLogs + 1), cli);
+              }
+              lastLogList = newLogList;
+            }
+          }
+          return 0;
+        }, Number(intervalValue) || 2000);
+      });
     }
   } catch (e) {
     telemtryData.outcome = 'failure';
