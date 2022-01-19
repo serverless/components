@@ -164,7 +164,7 @@ module.exports = async (config, cli, command) => {
         const logInterval = setInterval(async () => {
           let newLogList = [];
           try {
-            newLogList = await getLogList() || [];
+            newLogList = (await getLogList()) || [];
             errorCount = 0;
           } catch (error) {
             errorCount += 1;
