@@ -6,6 +6,14 @@ All notable changes to this project will be documented in this file. See [standa
 
 - Stop polling logs when two errors happens in a row
 
+## [3.18.1](https://github.com/serverless/components/compare/v3.18.0....v3.18.1) (2021-11-17)
+
+- Improvement for YML genertation on Node proejct with HTTP component
+
+## [3.18.0](https://github.com/serverless/components/compare/v3.17.2....v3.18.0) (2021-11-09)
+
+- Add more error details for mixpanel report
+
 ## [3.17.2](https://github.com/serverless/components/compare/v3.17.1....v3.17.2) (2021-11-03)
 
 - Fix wrong metrics URL for Chinese users
