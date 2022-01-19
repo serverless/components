@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.18.2](https://github.com/serverless/components/compare/v3.18.1....v3.18.2) (2022-01-19)
+
+- Stop polling logs when two errors happens in a row
+
 ## [3.18.1](https://github.com/serverless/components/compare/v3.18.0....v3.18.1) (2021-11-17)
 
 - Improvement for YML genertation on Node proejct with HTTP component
