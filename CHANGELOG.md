@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.17.3](https://github.com/serverless/components/compare/v3.17.2....v3.17.3) (2022-01-13)
+
+- Stop polling logs when two errors happens in a row
+
 ## [3.17.2](https://github.com/serverless/components/compare/v3.17.1....v3.17.2) (2021-11-03)
 
 - Fix wrong metrics URL for Chinese users
