@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [3.17.3](https://github.com/serverless/components/compare/v3.17.2....v3.17.3) (2022-01-13)
+## [3.18.2](https://github.com/serverless/components/compare/v3.18.1....v3.18.2) (2022-01-19)
 
 - Stop polling logs when two errors happens in a row
 

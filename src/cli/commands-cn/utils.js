@@ -387,84 +387,106 @@ const saveYaml = async (yamlPath, yamlObj) => {
 };
 
 const generateYMLForNodejsProject = async (cli) => {
-  const getExpressYML = (entryFile) => `component: express
-name: expressDemo
-app: appDemo
+  const getExpressYML = () => `
+component: http
+name: http-express
+app: my-express-app-${uuidv1().split('-')[0]}
 
-inputs:${entryFile ? `\n  entryFile: ${entryFile}` : ''}
-  src: ./
-  region: ap-guangzhou
-  runtime: Nodejs10.15
-  apigatewayConf:
+inputs:
+  src:
+    src: ./
+    exclude:
+      - .env
+  faas:
+    runtme: Nodejs12.16
+    name: $\{name}
+    framework: express
+  apigw:
     protocols:
       - http
       - https
-    environment: release
 `;
 
-  const getKoaYML = (entryFile) => `component: koa
-name: koaDemo
-app: appDemo
+  const getKoaYML = () => `
+component: http
+name: http-koa
+app: my-koa-app-${uuidv1().split('-')[0]}
 
-inputs:${entryFile ? `\n  entryFile: ${entryFile}` : ''}
-  src: ./
-  region: ap-guangzhou
-  runtime: Nodejs10.15
-  apigatewayConf:
+inputs:
+  src:
+    src: ./
+    exclude:
+      - .env
+  faas:
+    runtme: Nodejs12.16
+    name: $\{name}
+    framework: koa
+  apigw:
+    ignoreUpdate: true
     protocols:
       - http
-      - https
-    environment: release
-`;
+      - https`;
 
-  const getNextYML = () => `component: nextjs
-name: nextjsDemo
-app: appDemo
+  const getNextYML = () => `
+component: http
+name: http-nextjs
+app: my-nextjs-app-${uuidv1().split('-')[0]}
 
 inputs:
   src:
     dist: ./
     hook: npm run build
-  region: ap-guangzhou
-  runtime: Nodejs10.15
-  apigatewayConf:
+    exclude:
+      - .env
+  faas:
+    runtime: Nodejs12.16
+    framework: nextjs
+    name: $\{name}
+  apigw:
     protocols:
       - http
       - https
-    environment: release
 `;
 
-  const getNuxtYML = () => `component: nuxtjs
-name: nuxtjsDemo
-app: appDemo
+  const getNuxtYML = () => `
+component: http
+name: http-nuxtjs
+app: my-nuxtjs-app-${uuidv1().split('-')[0]}
+
 
 inputs:
   src:
-    hook: npm run build
     dist: ./
-  region: ap-guangzhou
-  runtime: Nodejs10.15
-  apigatewayConf:
+    hook: npm run build
+    exclude:
+      - .env
+  faas:
+    runtime: Nodejs12.16
+    framework: nuxtjs
+    name: $\{name}
+  apigw:
     protocols:
       - http
-      - https
-    environment: release
-`;
+      - https`;
 
-  const getEggYML = () => `component: egg
-name: eggjsDemo
-app: appDemo
+  const getEggYML = () => `
+component: http
+name: http-eggjs
+app: my-eggjs-app-${uuidv1().split('-')[0]}
 
 inputs:
-  src: ./
-  region: ap-guangzhou
-  runtime: Nodejs10.15
-  apigatewayConf:
+  src:
+    dist: ./
+    exclude:
+      - .env
+  faas:
+    runtime: Nodejs12.16
+    framework: egg
+    name: $\{name}
+  apigw:
     protocols:
       - http
-      - https
-    environment: release
-`;
+      - https`;
 
   const supportedComponents = ['express', 'koa', 'next', 'nuxt', 'egg'];
   const packageJsonFile = await fs.promises.readFile(
@@ -499,11 +521,11 @@ inputs:
   }
 
   if (ymlType === 'express' || ymlType === 'koa') {
-    let entryFilePath = path.join(process.cwd(), 'sls.js');
+    let entryFilePath = path.join(process.cwd(), 'app.js');
     const hasSlsJs = await fileExists(entryFilePath);
     if (!hasSlsJs) {
       const res = await inquirer.prompt({
-        message: '未发现 sls.js，请输入入口文件名称',
+        message: '未发现 app.js，请输入入口文件名称',
         type: 'input',
         name: 'entryFile',
       });
@@ -518,11 +540,6 @@ inputs:
 
     const entryFileRelativePath = path.relative(process.cwd(), entryFilePath);
     cli.log('');
-    cli.log(
-      `提示: 为保证应用可以成功部署，需要您在入口文件中使用 module.exports 导出 ${ymlType} app，示例: module.exports = app;`,
-      'green'
-    );
-    cli.log('');
 
     if (ymlType === 'express') return getExpressYML(entryFileRelativePath);
     return getKoaYML(entryFileRelativePath);
@@ -536,11 +553,8 @@ inputs:
     return getNuxtYML();
   }
 
-  if (ymlType === 'egg') {
-    return getEggYML();
-  }
-
-  throw new Error('当前目录未检测到 Serverless 配置文件');
+  // finally return egg's yml
+  return getEggYML();
 };
 
 const clientUidDefaultPath = path.join(os.homedir(), '.serverless/tencent/client_uid-credentials');
