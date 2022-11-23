@@ -1,3 +1,7 @@
+_**Deprecation notice:** This project in given form is no longer evaluated. Please check [Serverless Framework](https://github.com/serverless/serverless/) instead_
+
+--- 
+
 [![Serverless Components](https://s3.amazonaws.com/public.assets.serverless.com/images/readme_serverless_components.gif)](http://serverless.com)
 
 <br/>
