@@ -1,4 +1,4 @@
-_**Deprecation notice:** This project in the given form is no longer evaluated. The underlying infrastructure will be kept intact as long as it doesn't require any extra maintenance, which is no longer provided. Please check [Serverless Framework](https://github.com/serverless/serverless/) instead_
+_**Deprecation notice:** This project in the given form is no longer maintained. The underlying infrastructure will be kept intact as long as it doesn't require any extra maintenance, which is no longer provided. Please check [Serverless Framework](https://github.com/serverless/serverless/) instead_
 
 --- 
 
